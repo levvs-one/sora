@@ -908,36 +908,7 @@ class SBe extends S {
   String get extInstallOne => '1 усталяванне';
 
   @override
-  String get extBadgeVerified => 'Праверана';
-
-  @override
-  String get extBadgeTop => 'Самы папулярны на гэтым тыдні';
-
-  @override
-  String get extBadgeNew => 'Новы';
-
-  @override
-  String get extBadgeStaff => 'Каманда Sora';
-
-  @override
-  String get extSideloadShort => 'Не з каталога';
-
-  @override
-  String get extSideloadWarning =>
-      'Гэта пашырэнне не з каталога каманды. Толькі аўтар ручаўся за свой ключ: усталёўвайце яго толькі ў тым выпадку, калі давяраеце аўтару.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Усталяваць «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Абнавіць «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Гэта пашырэнне зможа:';
+  String get extSideloadWarning => 'Усталёўвайце, толькі калі давяраеце самападпісанаму ключу аўтара.';
 
   @override
   String get extPermissionsWidened => 'Абнаўленне запытвае новыя дазволы:';
@@ -1063,9 +1034,6 @@ class SBe extends S {
       'Гэта абнаўленне падпісана іншым ключом аўтара, чым усталяваная версія, таму яно было заблакіравана. Калі вы давяраеце новаму ключу, выдаліце ​​пашырэнне і ўсталюйце яго зноў відавочна.';
 
   @override
-  String get extUpdateAvailable => 'Абнаўленне даступна';
-
-  @override
   String get extDisabled => 'Выключана';
 
   @override
@@ -1108,10 +1076,6 @@ class SBe extends S {
   String get extConflictsTitle => 'Канфлікты пашырэнняў';
 
   @override
-  String get extConflictsIntro =>
-      'Гэтыя пашырэнні прэтэндуюць на адно і тое ж. Выберыце, якое будзе працаваць, другое застанецца ўсталяваным.';
-
-  @override
   String get extConflictTheme => 'Тэма прыкладання';
 
   @override
@@ -1131,28 +1095,9 @@ class SBe extends S {
   String get extConflictsResolve => 'Вырашаць канфлікты';
 
   @override
-  String get extConflictNote =>
-      'Выбар захоўваецца на гэтай прыладзе. Тэма пераключаецца адразу, сеткавыя хукі ў гэтай версіі не запускаюцца.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Версія $version';
   }
-
-  @override
-  String get extAuthor => 'Аўтар';
-
-  @override
-  String get extRating => 'Рэйтынг';
-
-  @override
-  String get extInstalls => 'Усталяванні';
-
-  @override
-  String get extVersion => 'Версія';
-
-  @override
-  String get extAbout => 'Аб гэтым пашырэнні';
 
   @override
   String get extPermissionsTitle => 'Дазволы';
@@ -1165,9 +1110,6 @@ class SBe extends S {
 
   @override
   String get extSaveSettings => 'Захаваць налады';
-
-  @override
-  String get extSaving => 'Захаванне…';
 
   @override
   String extUpdateTo(String version) {
@@ -1196,7 +1138,7 @@ class SBe extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Панэль недаступная. Магчыма, пашырэнне было адключана або выдалена.';
+  String get extPanelUnavailable => 'Панэль пашырэння недаступная.';
 
   @override
   String get extPermConnectionsRead => 'Бачыць спіс актыўных злучэнняў';
@@ -1235,10 +1177,6 @@ class SBe extends S {
   String get extPermBackground => 'Запуск фонавых задач';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Запускае запланаваныя задачы, нават калі панэль закрыта. Вы можаце прыпыніць яго або змяніць частату яго запуску ў наладах пашырэння.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1271,21 +1209,13 @@ class SBe extends S {
   String get extImageFailed => 'Не ўдалося загрузіць выяву';
 
   @override
-  String get extRatingHow => 'Як працуюць рэйтынгі';
-
-  @override
-  String get extRatingHowBody =>
-      'У ацэнках выкарыстоўваецца байесаўскае сярэдняе: пашырэнне з невялікай колькасцю ацэнак застаецца каля сярэдзіны, пакуль не прагаласуе больш людзей, таму адна 5-зоркавая рэцэнзія не можа падштурхнуць новае пашырэнне да вяршыні. Нядаўнія рэйтынгі важаць больш, чым старыя, і лічыцца толькі адзін рэйтынг на ўліковы запіс.';
-
-  @override
   String get extScreenshots => 'Скрыншоты';
 
   @override
   String get extSortRelevance => 'Актуальнасць';
 
   @override
-  String get extPermNetworkDetail =>
-      'Загружае даныя з інтэрнэту праз VPN. Дазволены толькі хасты са спіса ніжэй, астатнія заблакаваны.';
+  String get extPermNetworkDetail => 'Запыты праз VPN дазволены толькі да гэтых хостаў.';
 
   @override
   String get extBgTitle => 'Фонавая задача';
@@ -1321,10 +1251,6 @@ class SBe extends S {
     );
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Задача запускаецца па раскладзе, пакуль Sora адкрыта, у тым ліку згорнутай у трэй. Мінімальны інтэрвал 15 хвілін.';
 
   @override
   String get extBgDisabledNote => 'Уключыце пашырэнне для кіравання фонавымі задачамі.';
@@ -2034,8 +1960,7 @@ class SBe extends S {
   String get extErrRevoked => 'Каманда Sora адклікала гэтую версію пашырэння: яна небяспечная або зламаная.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Не ўдалося абнавіць спіс адкліканых пашырэнняў. Усталёўка недаступная, пакуль ён не абновіцца: праверце сетку і паспрабуйце зноў.';
+  String get extErrRevocationsExpired => 'Усталяванне заблакавана да абнаўлення спіса адкліканых пашырэнняў.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2081,4 +2006,15 @@ class SBe extends S {
 
   @override
   String get extAssetRejected => 'Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы.';
+
+  @override
+  String get extVerifiedSora => 'Праверана Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count Б';
+  }
+
+  @override
+  String get extOpen => 'Адкрыць';
 }

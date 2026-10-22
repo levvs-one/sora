@@ -907,36 +907,7 @@ class SHi extends S {
   String get extInstallOne => '1 इंस्टॉल';
 
   @override
-  String get extBadgeVerified => 'सत्यापित';
-
-  @override
-  String get extBadgeTop => 'इस सप्ताह सबसे लोकप्रिय';
-
-  @override
-  String get extBadgeNew => 'नया';
-
-  @override
-  String get extBadgeStaff => 'Sora टीम';
-
-  @override
-  String get extSideloadShort => 'कैटलॉग से नहीं';
-
-  @override
-  String get extSideloadWarning =>
-      'यह एक्सटेंशन टीम कैटलॉग से नहीं है। केवल लेखक ने ही उनकी कुंजी की गारंटी दी है: इसे केवल तभी स्थापित करें जब आपको लेखक पर भरोसा हो।';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» इंस्टॉल करें';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» अपडेट करें';
-  }
-
-  @override
-  String get extPermissionsIntro => 'यह एक्सटेंशन निम्न में सक्षम होगा:';
+  String get extSideloadWarning => 'लेखक की स्वहस्ताक्षरित कुंजी पर भरोसा हो तभी इंस्टॉल करें।';
 
   @override
   String get extPermissionsWidened => 'अपडेट नई अनुमतियां मांगता है:';
@@ -1064,9 +1035,6 @@ class SHi extends S {
       'यह अद्यतन स्थापित संस्करण की तुलना में एक अलग लेखक कुंजी के साथ हस्ताक्षरित है, इसलिए इसे अवरुद्ध कर दिया गया था। यदि आप नई कुंजी पर भरोसा करते हैं, तो एक्सटेंशन को अनइंस्टॉल करें और इसे स्पष्ट रूप से फिर से इंस्टॉल करें।';
 
   @override
-  String get extUpdateAvailable => 'अपडेट उपलब्ध है';
-
-  @override
   String get extDisabled => 'बंद';
 
   @override
@@ -1109,9 +1077,6 @@ class SHi extends S {
   String get extConflictsTitle => 'विस्तार संघर्ष';
 
   @override
-  String get extConflictsIntro => 'ये एक्सटेंशन एक ही चीज़ चाहते हैं। चुनें कि कौन-सा चलेगा, दूसरा इंस्टॉल रहेगा।';
-
-  @override
   String get extConflictTheme => 'ऐप थीम';
 
   @override
@@ -1131,28 +1096,9 @@ class SHi extends S {
   String get extConflictsResolve => 'विवादों का समाधान करें';
 
   @override
-  String get extConflictNote =>
-      'आपका चुनाव इस डिवाइस पर सहेजा जाता है। थीम तुरंत बदलती है, नेटवर्क हुक इस संस्करण में नहीं चलते।';
-
-  @override
   String extVersionLabel(String version) {
     return 'संस्करण $version';
   }
-
-  @override
-  String get extAuthor => 'लेखक';
-
-  @override
-  String get extRating => 'रेटिंग';
-
-  @override
-  String get extInstalls => 'इंस्टॉल संख्या';
-
-  @override
-  String get extVersion => 'संस्करण';
-
-  @override
-  String get extAbout => 'इस एक्सटेंशन के बारे में';
 
   @override
   String get extPermissionsTitle => 'अनुमतियाँ';
@@ -1165,9 +1111,6 @@ class SHi extends S {
 
   @override
   String get extSaveSettings => 'सेटिंग्स सहेजें';
-
-  @override
-  String get extSaving => 'सहेजा जा रहा है...';
 
   @override
   String extUpdateTo(String version) {
@@ -1196,8 +1139,7 @@ class SHi extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'पैनल अनुपलब्ध है। हो सकता है कि एक्सटेंशन अक्षम कर दिया गया हो या हटा दिया गया हो.';
+  String get extPanelUnavailable => 'एक्सटेंशन पैनल उपलब्ध नहीं है।';
 
   @override
   String get extPermConnectionsRead => 'सक्रिय कनेक्शनों की सूची देखें';
@@ -1236,10 +1178,6 @@ class SHi extends S {
   String get extPermBackground => 'पृष्ठभूमि कार्य चलाएँ';
 
   @override
-  String get extPermBackgroundDetail =>
-      'पैनल बंद होने पर भी निर्धारित कार्य चलाता है। आप इसे रोक सकते हैं या एक्सटेंशन सेटिंग में यह बदल सकते हैं कि यह कितनी बार चलता है।';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SHi extends S {
   String get extImageFailed => 'छवि लोड नहीं हो सकी';
 
   @override
-  String get extRatingHow => 'रेटिंग्स कैसे काम करती हैं';
-
-  @override
-  String get extRatingHowBody =>
-      'रेटिंग बायेसियन औसत का उपयोग करती है: कुछ रेटिंग वाला एक्सटेंशन तब तक मध्य के पास रहता है जब तक कि अधिक लोग वोट नहीं करते हैं, इसलिए एक 5-सितारा समीक्षा एक नए एक्सटेंशन को शीर्ष पर नहीं धकेल सकती है। हाल की रेटिंग का महत्व पुरानी रेटिंग से अधिक है और प्रति खाता केवल एक रेटिंग ही मायने रखती है।';
-
-  @override
   String get extScreenshots => 'स्क्रीनशॉट';
 
   @override
   String get extSortRelevance => 'प्रासंगिकता';
 
   @override
-  String get extPermNetworkDetail =>
-      'VPN के ज़रिए इंटरनेट से डेटा लाता है। केवल नीचे दिए होस्ट की अनुमति है, बाकी सब ब्लॉक है।';
+  String get extPermNetworkDetail => 'VPN अनुरोध केवल नीचे दिए गए होस्ट तक पहुँच सकते हैं।';
 
   @override
   String get extBgTitle => 'पृष्ठभूमि कार्य';
@@ -1308,10 +1238,6 @@ class SHi extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# घंटे', one: '# घंटा');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Sora खुला रहने तक, ट्रे में होने पर भी, कार्य शेड्यूल के अनुसार चलता है। सबसे छोटा अंतराल 15 मिनट है।';
 
   @override
   String get extBgDisabledNote => 'इसके पृष्ठभूमि कार्य को प्रबंधित करने के लिए एक्सटेंशन को सक्षम करें।';
@@ -2008,8 +1934,7 @@ class SHi extends S {
   String get extErrRevoked => 'Sora टीम ने इस एक्सटेंशन संस्करण को वापस ले लिया है, क्योंकि यह असुरक्षित या खराब है।';
 
   @override
-  String get extErrRevocationsExpired =>
-      'वापस लिए गए एक्सटेंशन की सूची नवीनीकृत नहीं हो सकी। नवीनीकरण तक इंस्टॉल बंद है: नेटवर्क जांचें और फिर कोशिश करें।';
+  String get extErrRevocationsExpired => 'निरस्त एक्सटेंशन की सूची अपडेट होने तक इंस्टॉलेशन बंद है।';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2055,4 +1980,15 @@ class SHi extends S {
 
   @override
   String get extAssetRejected => 'एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।';
+
+  @override
+  String get extVerifiedSora => 'Sora द्वारा सत्यापित';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count बाइट';
+  }
+
+  @override
+  String get extOpen => 'खोलें';
 }

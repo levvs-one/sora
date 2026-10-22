@@ -909,36 +909,7 @@ class SAz extends S {
   String get extInstallOne => '1 quraşdırma';
 
   @override
-  String get extBadgeVerified => 'Doğrulanmış';
-
-  @override
-  String get extBadgeTop => 'Bu həftə ən populyar';
-
-  @override
-  String get extBadgeNew => 'Yeni';
-
-  @override
-  String get extBadgeStaff => 'Sora komandası';
-
-  @override
-  String get extSideloadShort => 'Kataloqdan deyil';
-
-  @override
-  String get extSideloadWarning =>
-      'Bu genişləndirici komanda kataloqundan deyil. Onların açarına yalnız müəllif zəmanət verib: onu yalnız müəllifə güvəndiyiniz halda quraşdırın.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» quraşdır';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» yenilə';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Bu genişləndirici aşağıdakıları edə biləcək:';
+  String get extSideloadWarning => 'Yalnız müəllifin özünün imzaladığı açara etibar edirsinizsə quraşdırın.';
 
   @override
   String get extPermissionsWidened => 'Yeniləmə yeni icazələr tələb edir:';
@@ -1064,9 +1035,6 @@ class SAz extends S {
       'Bu yeniləmə quraşdırılmış versiyadan fərqli müəllif açarı ilə imzalanıb, ona görə də bloklanıb. Yeni açara güvənirsinizsə, genişləndiricini silin və açıq şəkildə yenidən quraşdırın.';
 
   @override
-  String get extUpdateAvailable => 'Yeniləmə mövcuddur';
-
-  @override
   String get extDisabled => 'Söndürülüb';
 
   @override
@@ -1109,10 +1077,6 @@ class SAz extends S {
   String get extConflictsTitle => 'Genişləndirici münaqişələri';
 
   @override
-  String get extConflictsIntro =>
-      'Bu genişləndirmələr eyni şeyi istəyir. Hansının işləyəcəyini seçin, digəri quraşdırılmış qalacaq.';
-
-  @override
   String get extConflictTheme => 'Tətbiq mövzusu';
 
   @override
@@ -1132,28 +1096,9 @@ class SAz extends S {
   String get extConflictsResolve => 'Münaqişələri həll edin';
 
   @override
-  String get extConflictNote =>
-      'Seçiminiz bu cihazda saxlanılır. Mövzu dərhal dəyişir, şəbəkə hook-ları isə bu versiyada işləmir.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versiya $version';
   }
-
-  @override
-  String get extAuthor => 'Müəllif';
-
-  @override
-  String get extRating => 'Qiymətləndirmə';
-
-  @override
-  String get extInstalls => 'Quraşdırmalar';
-
-  @override
-  String get extVersion => 'Versiya';
-
-  @override
-  String get extAbout => 'Bu genişləndirici haqqında';
 
   @override
   String get extPermissionsTitle => 'İcazələr';
@@ -1166,9 +1111,6 @@ class SAz extends S {
 
   @override
   String get extSaveSettings => 'Parametrləri yadda saxlayın';
-
-  @override
-  String get extSaving => 'Saxlanır...';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class SAz extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel əlçatan deyil. Genişləndirici söndürülmüş və ya silinmiş ola bilər.';
+  String get extPanelUnavailable => 'Genişlənmə paneli əlçatan deyil.';
 
   @override
   String get extPermConnectionsRead => 'Aktiv qoşulmaların siyahısına baxın';
@@ -1236,10 +1178,6 @@ class SAz extends S {
   String get extPermBackground => 'Fon tapşırıqlarını yerinə yetirin';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Panel bağlı olsa belə, planlaşdırılmış tapşırıqları icra edir. Siz onu dayandıra və ya genişləndirici parametrlərində nə qədər işlədiyini dəyişə bilərsiniz.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SAz extends S {
   String get extImageFailed => 'Şəkli yükləmək mümkün olmadı';
 
   @override
-  String get extRatingHow => 'Reytinqlər necə işləyir';
-
-  @override
-  String get extRatingHowBody =>
-      'Reytinqlər Bayes ortalamasından istifadə edir: bir neçə reytinqə malik genişləndirici daha çox insan səs verənə qədər ortada qalır, beləliklə, tək 5 ulduzlu baxış yeni genişləndiricini zirvəyə qaldıra bilməz. Son reytinqlər köhnələrdən daha ağırdır və hər hesab üçün yalnız bir reytinq sayılır.';
-
-  @override
   String get extScreenshots => 'Ekran görüntüləri';
 
   @override
   String get extSortRelevance => 'Uyğunluq';
 
   @override
-  String get extPermNetworkDetail =>
-      'İnternetdən VPN vasitəsilə məlumat yükləyir. Yalnız aşağıdakı siyahıdakı hostlara icazə var, qalanları bloklanır.';
+  String get extPermNetworkDetail => 'VPN sorğularına yalnız aşağıdakı hostlar üçün icazə verilir.';
 
   @override
   String get extBgTitle => 'Fon tapşırığı';
@@ -1308,10 +1238,6 @@ class SAz extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Tapşırıq Sora açıq olduqca, o cümlədən tray-də olanda cədvəl üzrə işləyir. Ən qısa interval 15 dəqiqədir.';
 
   @override
   String get extBgDisabledNote => 'Fon tapşırığını idarə etmək üçün genişləndiricini aktivləşdirin.';
@@ -2009,8 +1935,7 @@ class SAz extends S {
       'Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.';
+  String get extErrRevocationsExpired => 'Ləğv edilmiş genişlənmələr siyahısı yenilənənədək quraşdırma bloklanıb.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2056,4 +1981,15 @@ class SAz extends S {
 
   @override
   String get extAssetRejected => 'Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.';
+
+  @override
+  String get extVerifiedSora => 'Sora tərəfindən təsdiqlənib';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Aç';
 }

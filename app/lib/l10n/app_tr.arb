@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 yükleme",
-  "extBadgeVerified": "Doğrulandı",
-  "extBadgeTop": "Bu haftanın en popüleri",
-  "extBadgeNew": "Yeni",
-  "extBadgeStaff": "Sora ekibi",
-  "extSideloadShort": "Katalogdan değil",
-  "extSideloadWarning": "Bu uzantı takım kataloğundan değil. Yalnızca yazar kendi anahtarına kefil olmuştur: yalnızca yazara güveniyorsanız yükleyin.",
-  "extInstallTitle": "“{name}” uzantısını yükle",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "“{name}” uzantısını güncelle",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Bu uzantı şunları yapabilecektir:",
+  "extSideloadWarning": "Yalnızca yazarın kendisinin imzaladığı anahtara güveniyorsanız yükleyin.",
   "extPermissionsWidened": "Güncelleme yeni izinler istiyor:",
   "extDangerousAck": "Bu izinlerin ciddi olduğunu anlıyorum",
   "extInstall": "Yükle",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Yalnızca https:// bağlantılarına izin verilir",
   "extErrGeneric": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
   "extErrAuthorKeyChanged": "Bu güncelleme, yüklü sürümden farklı bir yazar anahtarıyla imzalandığından engellendi. Yeni anahtara güveniyorsanız uzantıyı kaldırın ve açıkça yeniden yükleyin.",
-  "extUpdateAvailable": "Güncelleme mevcut",
   "extDisabled": "Devre dışı",
   "extToggleEnabled": "Etkinleştir {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Artık talep edilmiyor:",
   "extUpdateFailedKept": "Önceki sürüm hâlâ yüklü.",
   "extConflictsTitle": "Uzantı çakışmaları",
-  "extConflictsIntro": "Bu uzantılar aynı şeyi istiyor. Hangisinin çalışacağını seçin; diğeri kurulu kalır.",
   "extConflictTheme": "Uygulama teması",
   "extConflictNetHooks": "Ağ kancaları",
   "extConflictWinner": "{name} kazanır",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Çakışmaları çözme",
-  "extConflictNote": "Seçiminiz bu cihazda kaydedilir. Tema hemen değişir; ağ kancaları bu sürümde çalışmaz.",
   "extVersionLabel": "Sürüm {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Yazar",
-  "extRating": "Değerlendirme",
-  "extInstalls": "Kurulumlar",
-  "extVersion": "Sürüm",
-  "extAbout": "Bu uzantı hakkında",
   "extPermissionsTitle": "İzinler",
   "extNoPermissions": "Özel izin yok.",
   "extSettings": "Ayarlar",
   "extSaveSettings": "Ayarları kaydet",
-  "extSaving": "Kaydediliyor…",
   "extUpdateTo": "{version}'ye yükseltme",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Panel kullanılamıyor. Uzantı devre dışı bırakılmış veya kaldırılmış olabilir.",
+  "extPanelUnavailable": "Eklenti paneli kullanılamıyor.",
   "extPermConnectionsRead": "Etkin bağlantıların listesine bakın",
   "extPermServersRead": "Sunucularınızın listesini görün",
   "extPermSettingsRead": "Uygulama ayarlarını oku",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Ağ yoluna entegre edin (DPI bypass modülleri)",
   "extPermNetFetch": "İzin verilenler listesinden URL isteğinde bulunun",
   "extPermBackground": "Arka plan görevlerini çalıştır",
-  "extPermBackgroundDetail": "Panel kapalıyken bile zamanlanmış görevleri çalıştırır. Uzantı ayarlarından duraklatabilir veya çalışma sıklığını değiştirebilirsiniz.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Arka planda çalışır",
   "extCapNetHook": "Engel aşma ve ağ kancaları",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Değişiklik Günlüğü",
   "extImageFailed": "Resim yüklenemedi",
-  "extRatingHow": "Derecelendirmelerin işleyiş şekli",
-  "extRatingHowBody": "Derecelendirmeler Bayes ortalamasını kullanır: Az sayıda derecelendirmeye sahip bir uzantı, daha fazla kişi oy verene kadar ortalara yakın bir yerde kalır; dolayısıyla tek bir 5 yıldızlı inceleme, yeni bir uzantıyı en üst sıraya çıkaramaz. Son derecelendirmeler eski derecelendirmelerden daha ağırdır ve hesap başına yalnızca bir derecelendirme sayılır.",
   "extScreenshots": "Ekran Görüntüleri",
   "extSortRelevance": "Alaka düzeyi",
-  "extPermNetworkDetail": "İnternetten VPN üzerinden veri alır. Yalnızca aşağıdaki sunuculara izin verilir, diğer her şey engellenir.",
+  "extPermNetworkDetail": "VPN istekleri yalnızca aşağıdaki sunuculara erişebilir.",
   "extBgTitle": "Arka plan görevi",
   "extBgEnabled": "Arka planda çalıştır",
   "extBgInterval": "Çalıştırma aralığı",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Görev, Sora açık olduğu sürece, tepside dahil, zamanlamaya göre çalışır. En kısa aralık 15 dakikadır.",
   "extBgDisabledNote": "Uzantının arka plan görevini yönetmesini etkinleştirin.",
   "extCapNetwork": "Ağ erişimi",
   "extCapNetworkHosts": "Ağ: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Paket yakalama, etkin bir Sora TUN bağlantısına ihtiyaç duyar.",
   "diagnosticUnavailable": "Bu teşhis bu platformda kullanılamıyor.",
   "extErrRevoked": "Sora ekibi bu uzantı sürümünü güvensiz ya da bozuk olduğu için geri çekti.",
-  "extErrRevocationsExpired": "Geri çekilen uzantılar listesi yenilenemedi. Yenilenene kadar kurulum engellendi: ağı kontrol edip yeniden deneyin.",
+  "extErrRevocationsExpired": "İptal listesi yenilenene kadar yükleme engellendi.",
   "extRevokedDisabled": "Geri çekilen uzantılar kapatıldı: {names}",
   "customServerWgPrivateKey": "Özel anahtar",
   "customServerWgAddresses": "Arayüz adresleri",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Katı ağ kilidi",
   "strictKillSwitchWarning": "Bağlandıktan sonra çökme, yeniden başlatma veya uygulamadan çıkma durumunda bile VPN dışındaki trafiği engeller. Erişim yalnızca bağlantıyı kesince veya bu seçeneği kapatınca geri gelir. Cihaz yeniden başlatıldığında engelleme yalnızca başlangıçta bağlanma etkinse devam eder.",
   "extWorkerFailed": "Uzantının arka plan görevi başarısız oldu. Uzantı günlüğünü kontrol edin.",
-  "extAssetRejected": "Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar."
+  "extAssetRejected": "Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar.",
+  "extVerifiedSora": "Sora tarafından doğrulandı",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Aç"
 }

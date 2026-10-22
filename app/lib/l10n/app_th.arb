@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 ติดตั้ง",
-  "extBadgeVerified": "ตรวจสอบแล้ว",
-  "extBadgeTop": "ฮิตที่สุดในสัปดาห์นี้",
-  "extBadgeNew": "ใหม่",
-  "extBadgeStaff": "ทีมงาน Sora",
-  "extSideloadShort": "ไม่ใช่จากแค็ตตาล็อก",
-  "extSideloadWarning": "ส่วนขยายนี้ไม่ได้มาจากแค็ตตาล็อกของทีม มีเพียงผู้เขียนเท่านั้นที่รับรองรหัสของตน: ติดตั้งเฉพาะเมื่อคุณเชื่อถือผู้เขียนเท่านั้น",
-  "extInstallTitle": "ติดตั้ง “{name}”",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "อัปเดต “{name}”",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "ส่วนขยายนี้จะสามารถ:",
+  "extSideloadWarning": "ติดตั้งเฉพาะเมื่อคุณเชื่อถือคีย์ที่ผู้สร้างลงนามเองเท่านั้น",
   "extPermissionsWidened": "การอัปเดตจะขอสิทธิ์ใหม่:",
   "extDangerousAck": "ฉันเข้าใจว่าการอนุญาตเหล่านี้เป็นเรื่องร้ายแรง",
   "extInstall": "ติดตั้ง",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "อนุญาตเฉพาะลิงก์ https:// เท่านั้น",
   "extErrGeneric": "มีบางอย่างผิดพลาด โปรดลองอีกครั้ง",
   "extErrAuthorKeyChanged": "การอัปเดตนี้ลงนามด้วยรหัสผู้สร้างที่แตกต่างจากเวอร์ชันที่ติดตั้ง ดังนั้นจึงถูกบล็อก หากคุณเชื่อถือคีย์ใหม่ ให้ถอนการติดตั้งส่วนขยายและติดตั้งอีกครั้งอย่างชัดเจน",
-  "extUpdateAvailable": "มีการอัปเดตแล้ว",
   "extDisabled": "ปิดใช้งาน",
   "extToggleEnabled": "เปิดใช้งาน {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "ไม่มีการร้องขออีกต่อไป:",
   "extUpdateFailedKept": "เวอร์ชันก่อนหน้านี้ยังคงติดตั้งอยู่",
   "extConflictsTitle": "ข้อขัดแย้งของส่วนขยาย",
-  "extConflictsIntro": "ส่วนขยายเหล่านี้ต้องการสิ่งเดียวกัน เลือกว่าจะให้ตัวไหนทำงาน อีกตัวจะยังติดตั้งอยู่",
   "extConflictTheme": "ธีมแอป",
   "extConflictNetHooks": "ตะขอเครือข่าย",
   "extConflictWinner": "{name} ชนะ",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "แก้ไขข้อขัดแย้ง",
-  "extConflictNote": "ระบบจะบันทึกตัวเลือกของคุณไว้ในอุปกรณ์นี้ ธีมจะเปลี่ยนทันที ส่วนฮุกเครือข่ายจะไม่ทำงานในเวอร์ชันนี้",
   "extVersionLabel": "เวอร์ชัน {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "ผู้เขียน",
-  "extRating": "เรตติ้ง",
-  "extInstalls": "การติดตั้ง",
-  "extVersion": "เวอร์ชัน",
-  "extAbout": "เกี่ยวกับส่วนขยายนี้",
   "extPermissionsTitle": "สิทธิ์",
   "extNoPermissions": "ไม่มีการอนุญาตพิเศษ",
   "extSettings": "การตั้งค่า",
   "extSaveSettings": "บันทึกการตั้งค่า",
-  "extSaving": "กำลังบันทึก...",
   "extUpdateTo": "อัปเกรดเป็น {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "แผงควบคุมไม่พร้อมใช้งาน ส่วนขยายอาจถูกปิดใช้งานหรือลบออก",
+  "extPanelUnavailable": "แผงส่วนขยายไม่พร้อมใช้งาน",
   "extPermConnectionsRead": "ดูรายการการเชื่อมต่อที่ใช้งานอยู่",
   "extPermServersRead": "ดูรายการเซิร์ฟเวอร์ของคุณ",
   "extPermSettingsRead": "อ่านการตั้งค่าแอป",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "รวมเข้ากับเส้นทางเครือข่าย (DPI โมดูลบายพาส)",
   "extPermNetFetch": "ขอ URL จากรายการที่อนุญาต",
   "extPermBackground": "เรียกใช้งานพื้นหลัง",
-  "extPermBackgroundDetail": "รันงานที่กำหนดเวลาไว้แม้ในขณะที่แผงปิดอยู่ คุณสามารถหยุดชั่วคราวหรือเปลี่ยนความถี่ในการทำงานได้ในการตั้งค่าส่วนขยาย",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "ทำงานอยู่เบื้องหลัง",
   "extCapNetHook": "การหลบเลี่ยงและฮุกเครือข่าย",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "บันทึกการเปลี่ยนแปลง",
   "extImageFailed": "ไม่สามารถโหลดภาพได้",
-  "extRatingHow": "การให้คะแนนทำงานอย่างไร",
-  "extRatingHowBody": "การให้คะแนนใช้ค่าเฉลี่ยแบบเบย์: ส่วนขยายที่มีการให้คะแนนน้อยจะยังคงอยู่ใกล้ตรงกลางจนกว่าผู้คนจะโหวตมากขึ้น ดังนั้นบทวิจารณ์ระดับ 5 ดาวรายการเดียวจึงไม่สามารถผลักดันส่วนขยายใหม่ขึ้นไปด้านบนได้ การให้คะแนนล่าสุดมีน้ำหนักมากกว่าการให้คะแนนแบบเก่า และมีเพียงการให้คะแนนเดียวต่อบัญชีเท่านั้น",
   "extScreenshots": "ภาพหน้าจอ",
   "extSortRelevance": "ความเกี่ยวข้อง",
-  "extPermNetworkDetail": "ดึงข้อมูลจากอินเทอร์เน็ตผ่าน VPN อนุญาตเฉพาะโฮสต์ในรายการด้านล่าง ที่เหลือถูกบล็อก",
+  "extPermNetworkDetail": "คำขอผ่าน VPN เข้าถึงได้เฉพาะโฮสต์ด้านล่างเท่านั้น",
   "extBgTitle": "งานเบื้องหลัง",
   "extBgEnabled": "ทำงานในพื้นหลัง",
   "extBgInterval": "เรียกใช้ทุก",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "งานจะทำงานตามกำหนดเวลาขณะที่ Sora เปิดอยู่ รวมถึงตอนอยู่ในถาดระบบ ช่วงเวลาสั้นที่สุดคือ 15 นาที",
   "extBgDisabledNote": "เปิดใช้งานส่วนขยายเพื่อจัดการงานพื้นหลัง",
   "extCapNetwork": "การเข้าถึงเครือข่าย",
   "extCapNetworkHosts": "เครือข่าย: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "การจับแพ็คเก็ตจำเป็นต้องมีการเชื่อมต่อ Sora TUN ที่ใช้งานอยู่",
   "diagnosticUnavailable": "การวินิจฉัยนี้ไม่พร้อมใช้งานบนแพลตฟอร์มนี้",
   "extErrRevoked": "ทีม Sora ได้เพิกถอนส่วนขยายเวอร์ชันนี้ เพราะไม่ปลอดภัยหรือใช้งานไม่ได้",
-  "extErrRevocationsExpired": "ต่ออายุรายการส่วนขยายที่ถูกเพิกถอนไม่สำเร็จ การติดตั้งถูกบล็อกจนกว่าจะต่ออายุได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง",
+  "extErrRevocationsExpired": "การติดตั้งถูกระงับจนกว่าจะอัปเดตรายการส่วนขยายที่ถูกเพิกถอน",
   "extRevokedDisabled": "ปิดส่วนขยายที่ถูกเพิกถอนแล้ว: {names}",
   "customServerWgPrivateKey": "คีย์ส่วนตัว",
   "customServerWgAddresses": "ที่อยู่ของอินเทอร์เฟซ",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "การตัดเครือข่ายแบบเข้มงวด",
   "strictKillSwitchWarning": "หลังเชื่อมต่อ จะบล็อกการรับส่งข้อมูลนอก VPN แม้เกิดข้อขัดข้อง เริ่มใหม่ หรือออกจากแอป การเข้าถึงจะกลับมาเมื่อยกเลิกการเชื่อมต่อหรือปิดตัวเลือกนี้เท่านั้น หลังรีบูตอุปกรณ์ จะบล็อกต่อเฉพาะเมื่อเปิดการเชื่อมต่อเมื่อเริ่มต้นไว้",
   "extWorkerFailed": "งานเบื้องหลังของส่วนขยายล้มเหลว ตรวจสอบบันทึกของส่วนขยาย",
-  "extAssetRejected": "ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง"
+  "extAssetRejected": "ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง",
+  "extVerifiedSora": "ตรวจสอบโดย Sora",
+  "extReceivedBytes": "{count} ไบต์",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "เปิด"
 }

@@ -909,36 +909,7 @@ class SHy extends S {
   String get extInstallOne => '1 տեղադրում';
 
   @override
-  String get extBadgeVerified => 'Ստուգված';
-
-  @override
-  String get extBadgeTop => 'Ամենատարածվածն այս շաբաթ';
-
-  @override
-  String get extBadgeNew => 'Նոր';
-
-  @override
-  String get extBadgeStaff => 'Sora թիմ';
-
-  @override
-  String get extSideloadShort => 'Ոչ կատալոգից';
-
-  @override
-  String get extSideloadWarning =>
-      'Այս ընդլայնումը թիմի կատալոգից չէ: Միայն հեղինակն է երաշխավորել իր բանալին. տեղադրել այն միայն եթե վստահում եք հեղինակին:';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Տեղադրել «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Թարմացնել «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Այս ընդլայնումը կկարողանա՝';
+  String get extSideloadWarning => 'Տեղադրեք միայն, եթե վստահում եք հեղինակի ինքնաստորագրված բանալուն։';
 
   @override
   String get extPermissionsWidened => 'Թարմացումը պահանջում է նոր թույլտվություններ.';
@@ -1064,9 +1035,6 @@ class SHy extends S {
       'Այս թարմացումը ստորագրված է այլ հեղինակային բանալիով, քան տեղադրված տարբերակը, ուստի այն արգելափակված է: Եթե ​​վստահում եք նոր բանալին, ապատեղադրեք ընդլայնումը և նորից տեղադրեք այն հստակորեն:';
 
   @override
-  String get extUpdateAvailable => 'Թարմացումը հասանելի է';
-
-  @override
   String get extDisabled => 'Անջատված է';
 
   @override
@@ -1109,10 +1077,6 @@ class SHy extends S {
   String get extConflictsTitle => 'Ընդլայնման կոնֆլիկտներ';
 
   @override
-  String get extConflictsIntro =>
-      'Այս ընդլայնումները նույն բանն են ուզում։ Ընտրեք, թե որը կաշխատի, մյուսը կմնա տեղադրված։';
-
-  @override
   String get extConflictTheme => 'Հավելվածի թեմա';
 
   @override
@@ -1132,28 +1096,9 @@ class SHy extends S {
   String get extConflictsResolve => 'Լուծել հակամարտությունները';
 
   @override
-  String get extConflictNote =>
-      'Ձեր ընտրությունը պահվում է այս սարքում։ Թեման փոխվում է անմիջապես, իսկ ցանցային hook-երը այս տարբերակում չեն աշխատում։';
-
-  @override
   String extVersionLabel(String version) {
     return 'Տարբերակ $version';
   }
-
-  @override
-  String get extAuthor => 'Հեղինակ';
-
-  @override
-  String get extRating => 'Վարկանիշ';
-
-  @override
-  String get extInstalls => 'Տեղադրումներ';
-
-  @override
-  String get extVersion => 'Տարբերակ';
-
-  @override
-  String get extAbout => 'Այս ընդլայնման մասին';
 
   @override
   String get extPermissionsTitle => 'Թույլտվություններ';
@@ -1166,9 +1111,6 @@ class SHy extends S {
 
   @override
   String get extSaveSettings => 'Պահպանել կարգավորումները';
-
-  @override
-  String get extSaving => 'Պահվում է…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class SHy extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Վահանակն անհասանելի է։ Ընդլայնումը կարող է անջատված լինել կամ հեռացվել:';
+  String get extPanelUnavailable => 'Ընդլայնման վահանակն անհասանելի է։';
 
   @override
   String get extPermConnectionsRead => 'Տես ակտիվ կապերի ցանկը';
@@ -1236,10 +1178,6 @@ class SHy extends S {
   String get extPermBackground => 'Գործարկել ֆոնային առաջադրանքները';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Աշխատում է պլանավորված առաջադրանքները նույնիսկ երբ վահանակը փակ է: Դուք կարող եք դադարեցնել այն կամ փոխել, թե որքան հաճախ է այն աշխատում ընդլայնման կարգավորումներում:';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SHy extends S {
   String get extImageFailed => 'Չհաջողվեց բեռնել պատկերը';
 
   @override
-  String get extRatingHow => 'Ինչպես են աշխատում վարկանիշները';
-
-  @override
-  String get extRatingHowBody =>
-      'Վարկանիշներն օգտագործում են Բայեսյան միջինը. քիչ վարկանիշ ունեցող ընդլայնումը մնում է միջինին մոտ, մինչև ավելի շատ մարդիկ քվեարկեն, ուստի 5 աստղանի մեկ վերանայումը չի կարող նոր ընդլայնում առաջ մղել վերև: Վերջին գնահատականներն ավելի շատ են, քան հինները, և յուրաքանչյուր հաշվի համար միայն մեկ վարկանիշ է հաշվում:';
-
-  @override
   String get extScreenshots => 'Սքրինշոթներ';
 
   @override
   String get extSortRelevance => 'Համապատասխանություն';
 
   @override
-  String get extPermNetworkDetail =>
-      'Բեռնում է տվյալներ ինտերնետից VPN-ի միջոցով։ Թույլատրված են միայն ստորև նշված հոսթերը, մնացածն արգելափակված է։';
+  String get extPermNetworkDetail => 'VPN հարցումները թույլատրված են միայն ստորև նշված հոսթերին։';
 
   @override
   String get extBgTitle => 'Ֆոնային առաջադրանք';
@@ -1308,10 +1238,6 @@ class SHy extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ժամ', one: '# ժամ');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Առաջադրանքը գործարկվում է ժամանակացույցով, քանի դեռ Sora-ն բաց է, այդ թվում՝ սկուտեղում։ Նվազագույն միջակայքը 15 րոպե է։';
 
   @override
   String get extBgDisabledNote => 'Միացրեք ընդլայնումը իր ֆոնային առաջադրանքը կառավարելու համար:';
@@ -2012,8 +1938,7 @@ class SHy extends S {
   String get extErrRevoked => 'Sora թիմը հետ է կանչել ընդլայնման այս տարբերակը, քանի որ այն անվտանգ չէ կամ անսարք է։';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Հետ կանչված ընդլայնումների ցանկը չհաջողվեց թարմացնել։ Մինչ թարմացումը տեղադրումն արգելափակված է. ստուգեք ցանցը և կրկին փորձեք։';
+  String get extErrRevocationsExpired => 'Տեղադրումն արգելափակված է մինչև չեղարկված ընդլայնումների ցանկի թարմացումը։';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2059,4 +1984,15 @@ class SHy extends S {
 
   @override
   String get extAssetRejected => 'Ընդլայնման ֆայլը մերժվել է․ անընթեռնելի գույներ կամ անվավեր կանոններ։';
+
+  @override
+  String get extVerifiedSora => 'Ստուգված է Sora-ի կողմից';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count Բ';
+  }
+
+  @override
+  String get extOpen => 'Բացել';
 }

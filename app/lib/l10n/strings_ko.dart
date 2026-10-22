@@ -893,35 +893,7 @@ class SKo extends S {
   String get extInstallOne => '설치 1회';
 
   @override
-  String get extBadgeVerified => '확인됨';
-
-  @override
-  String get extBadgeTop => '이번 주 가장 인기 있는 항목';
-
-  @override
-  String get extBadgeNew => '신규';
-
-  @override
-  String get extBadgeStaff => 'Sora 팀';
-
-  @override
-  String get extSideloadShort => '카탈로그에 없음';
-
-  @override
-  String get extSideloadWarning => '이 확장은 팀 카탈로그에 없습니다. 작성자만이 키를 보증했습니다. 작성자를 신뢰하는 경우에만 키를 설치하세요.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '“$name” 설치';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '“$name” 업데이트';
-  }
-
-  @override
-  String get extPermissionsIntro => '이 확장 프로그램은 다음을 수행할 수 있습니다.';
+  String get extSideloadWarning => '작성자의 자체 서명 키를 신뢰하는 경우에만 설치하세요.';
 
   @override
   String get extPermissionsWidened => '업데이트에서 새 권한을 요청합니다.';
@@ -1047,9 +1019,6 @@ class SKo extends S {
       '이 업데이트는 설치된 버전과 다른 작성자 키로 서명되었으므로 차단되었습니다. 새 키를 신뢰하는 경우 확장 프로그램을 제거하고 명시적으로 다시 설치하세요.';
 
   @override
-  String get extUpdateAvailable => '업데이트 가능';
-
-  @override
   String get extDisabled => '비활성화됨';
 
   @override
@@ -1092,9 +1061,6 @@ class SKo extends S {
   String get extConflictsTitle => '확장 프로그램 충돌';
 
   @override
-  String get extConflictsIntro => '이 확장 프로그램들은 같은 것을 원합니다. 실행할 것을 고르세요. 다른 하나는 설치된 채로 남습니다.';
-
-  @override
   String get extConflictTheme => '앱 테마';
 
   @override
@@ -1114,27 +1080,9 @@ class SKo extends S {
   String get extConflictsResolve => '충돌 해결';
 
   @override
-  String get extConflictNote => '선택 사항은 이 기기에 저장됩니다. 테마는 바로 바뀌며, 네트워크 훅은 이 버전에서 실행되지 않습니다.';
-
-  @override
   String extVersionLabel(String version) {
     return '버전 $version';
   }
-
-  @override
-  String get extAuthor => '작성자';
-
-  @override
-  String get extRating => '평가';
-
-  @override
-  String get extInstalls => '설치 수';
-
-  @override
-  String get extVersion => '버전';
-
-  @override
-  String get extAbout => '이 확장 프로그램 정보';
 
   @override
   String get extPermissionsTitle => '권한';
@@ -1147,9 +1095,6 @@ class SKo extends S {
 
   @override
   String get extSaveSettings => '설정 저장';
-
-  @override
-  String get extSaving => '저장 중…';
 
   @override
   String extUpdateTo(String version) {
@@ -1178,7 +1123,7 @@ class SKo extends S {
   }
 
   @override
-  String get extPanelUnavailable => '패널을 사용할 수 없습니다. 확장 프로그램이 비활성화되었거나 제거되었을 수 있습니다.';
+  String get extPanelUnavailable => '확장 기능 패널을 사용할 수 없습니다.';
 
   @override
   String get extPermConnectionsRead => '활성 연결 목록 보기';
@@ -1217,9 +1162,6 @@ class SKo extends S {
   String get extPermBackground => '백그라운드 작업 실행';
 
   @override
-  String get extPermBackgroundDetail => '패널이 닫혀 있어도 예약된 작업을 실행합니다. 확장 프로그램 설정에서 일시 중지하거나 실행 빈도를 변경할 수 있습니다.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1252,20 +1194,13 @@ class SKo extends S {
   String get extImageFailed => '이미지를 로드할 수 없습니다.';
 
   @override
-  String get extRatingHow => '평가 작동 방식';
-
-  @override
-  String get extRatingHowBody =>
-      '평점은 베이지안 평균을 사용합니다. 평점이 거의 없는 확장 프로그램은 더 많은 사람들이 투표할 때까지 중간 근처에 유지되므로 별 5개짜리 단일 리뷰로는 새 확장 프로그램을 맨 위로 올릴 수 없습니다. 최근 평가는 이전 평가보다 중요하며 계정당 하나의 평가만 계산됩니다.';
-
-  @override
   String get extScreenshots => '스크린샷';
 
   @override
   String get extSortRelevance => '관련성';
 
   @override
-  String get extPermNetworkDetail => 'VPN을 통해 인터넷에서 데이터를 가져옵니다. 아래 호스트만 허용되며 나머지는 모두 차단됩니다.';
+  String get extPermNetworkDetail => 'VPN 요청은 아래 호스트에만 접근할 수 있습니다.';
 
   @override
   String get extBgTitle => '백그라운드 작업';
@@ -1287,9 +1222,6 @@ class SKo extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#시간');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => 'Sora가 열려 있는 동안 트레이에 있을 때도 일정에 따라 작업이 실행됩니다. 최소 간격은 15분입니다.';
 
   @override
   String get extBgDisabledNote => '백그라운드 작업을 관리하려면 확장 프로그램을 활성화하세요.';
@@ -1977,7 +1909,7 @@ class SKo extends S {
   String get extErrRevoked => 'Sora 팀이 안전하지 않거나 손상된 이 확장 프로그램 버전을 철회했습니다.';
 
   @override
-  String get extErrRevocationsExpired => '철회된 확장 프로그램 목록을 갱신하지 못했습니다. 갱신될 때까지 설치할 수 없습니다. 네트워크를 확인하고 다시 시도하세요.';
+  String get extErrRevocationsExpired => '취소 목록이 갱신될 때까지 설치가 차단됩니다.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2023,4 +1955,15 @@ class SKo extends S {
 
   @override
   String get extAssetRejected => '확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.';
+
+  @override
+  String get extVerifiedSora => 'Sora 인증됨';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 바이트';
+  }
+
+  @override
+  String get extOpen => '열기';
 }

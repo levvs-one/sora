@@ -910,36 +910,7 @@ class SUz extends S {
   String get extInstallOne => '1 ta oʻrnatish';
 
   @override
-  String get extBadgeVerified => 'Tasdiqlangan';
-
-  @override
-  String get extBadgeTop => 'Bu hafta eng mashhurlari';
-
-  @override
-  String get extBadgeNew => 'Yangi';
-
-  @override
-  String get extBadgeStaff => 'Sora jamoasi';
-
-  @override
-  String get extSideloadShort => 'Katalogdan emas';
-
-  @override
-  String get extSideloadWarning =>
-      'Bu kengaytma jamoa katalogidan emas. Ularning kalitiga faqat muallif kafolat bergan: agar siz muallifga ishonsangiz, uni o\'rnating.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name»ni oʻrnatish';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name»ni yangilash';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Ushbu kengaytma quyidagilarga qodir:';
+  String get extSideloadWarning => 'Faqat muallif o‘zi imzolagan kalitga ishonsangiz o‘rnating.';
 
   @override
   String get extPermissionsWidened => 'Yangilanish yangi ruxsatlarni talab qiladi:';
@@ -1066,9 +1037,6 @@ class SUz extends S {
       'Ushbu yangilanish o\'rnatilgan versiyadan boshqa muallif kaliti bilan imzolangan, shuning uchun u bloklangan. Agar siz yangi kalitga ishonsangiz, kengaytmani o\'chirib tashlang va uni qayta o\'rnating.';
 
   @override
-  String get extUpdateAvailable => 'Yangilanish mavjud';
-
-  @override
   String get extDisabled => 'Oʻchirilgan';
 
   @override
@@ -1111,10 +1079,6 @@ class SUz extends S {
   String get extConflictsTitle => 'Kengaytma ziddiyati';
 
   @override
-  String get extConflictsIntro =>
-      'Bu kengaytmalar bir xil narsani xohlaydi. Qaysi biri ishlashini tanlang, ikkinchisi o‘rnatilgan holda qoladi.';
-
-  @override
   String get extConflictTheme => 'Ilova mavzusi';
 
   @override
@@ -1134,28 +1098,9 @@ class SUz extends S {
   String get extConflictsResolve => 'Mojarolarni hal qilish';
 
   @override
-  String get extConflictNote =>
-      'Tanlovingiz shu qurilmada saqlanadi. Mavzu darhol almashadi, tarmoq hook’lari bu versiyada ishlamaydi.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versiya $version';
   }
-
-  @override
-  String get extAuthor => 'Muallif';
-
-  @override
-  String get extRating => 'Reyting';
-
-  @override
-  String get extInstalls => 'O\'rnatish';
-
-  @override
-  String get extVersion => 'Versiyasi';
-
-  @override
-  String get extAbout => 'Ushbu kengaytma haqida';
 
   @override
   String get extPermissionsTitle => 'Ruxsatlar';
@@ -1168,9 +1113,6 @@ class SUz extends S {
 
   @override
   String get extSaveSettings => 'Sozlamalarni saqlang';
-
-  @override
-  String get extSaving => 'Saqlanmoqda…';
 
   @override
   String extUpdateTo(String version) {
@@ -1199,7 +1141,7 @@ class SUz extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel mavjud emas. Kengaytma oʻchirilgan yoki olib tashlangan boʻlishi mumkin.';
+  String get extPanelUnavailable => 'Kengaytma paneli mavjud emas.';
 
   @override
   String get extPermConnectionsRead => 'Faol ulanishlar roʻyxatiga qarang';
@@ -1239,10 +1181,6 @@ class SUz extends S {
   String get extPermBackground => 'Fon vazifalarini bajaring';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Panel yopilganda ham rejalashtirilgan vazifalarni bajaradi. Siz uni to\'xtatib turishingiz yoki kengaytma sozlamalarida qanchalik tez-tez ishlashini o\'zgartirishingiz mumkin.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1275,21 +1213,13 @@ class SUz extends S {
   String get extImageFailed => 'Tasvirni yuklab bo‘lmadi';
 
   @override
-  String get extRatingHow => 'Baholar qanday ishlaydi';
-
-  @override
-  String get extRatingHowBody =>
-      'Reytinglar oʻrtacha Bayes koʻrsatkichidan foydalanadi: bir necha reytingga ega kengaytma koʻproq odamlar ovoz bermaguncha oʻrtaga yaqin qoladi, shuning uchun bitta 5 yulduzli sharh yangi kengaytmani yuqoriga koʻtara olmaydi. Oxirgi reytinglar eskilariga qaraganda og\'irroq va har bir hisob uchun faqat bitta reyting hisobga olinadi.';
-
-  @override
   String get extScreenshots => 'Skrinshotlar';
 
   @override
   String get extSortRelevance => 'Tegishlilik';
 
   @override
-  String get extPermNetworkDetail =>
-      'Internetdan VPN orqali ma’lumot oladi. Faqat quyidagi ro‘yxatdagi xostlarga ruxsat bor, qolgani bloklangan.';
+  String get extPermNetworkDetail => 'VPN so‘rovlariga faqat quyidagi xostlarga ruxsat beriladi.';
 
   @override
   String get extBgTitle => 'Fon vazifasi';
@@ -1311,10 +1241,6 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# soat', one: '# soat');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Vazifa Sora ochiq turganda, shu jumladan trayda bo‘lganda ham, jadval bo‘yicha ishlaydi. Eng qisqa oraliq 15 daqiqa.';
 
   @override
   String get extBgDisabledNote => 'Fon vazifasini boshqarish uchun kengaytmani yoqing.';
@@ -2019,8 +1945,7 @@ class SUz extends S {
   String get extErrRevoked => 'Sora jamoasi bu kengaytma versiyasini xavfli yoki buzuq bo‘lgani uchun qaytarib oldi.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Qaytarib olingan kengaytmalar ro‘yxatini yangilab bo‘lmadi. Yangilanmaguncha o‘rnatish bloklangan: tarmoqni tekshirib, qayta urining.';
+  String get extErrRevocationsExpired => 'Bekor qilingan kengaytmalar ro‘yxati yangilanguncha o‘rnatish bloklangan.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2066,4 +1991,15 @@ class SUz extends S {
 
   @override
   String get extAssetRejected => 'Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar.';
+
+  @override
+  String get extVerifiedSora => 'Sora tomonidan tasdiqlangan';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Ochish';
 }

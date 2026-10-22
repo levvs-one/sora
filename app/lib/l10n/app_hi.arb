@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 इंस्टॉल",
-  "extBadgeVerified": "सत्यापित",
-  "extBadgeTop": "इस सप्ताह सबसे लोकप्रिय",
-  "extBadgeNew": "नया",
-  "extBadgeStaff": "Sora टीम",
-  "extSideloadShort": "कैटलॉग से नहीं",
-  "extSideloadWarning": "यह एक्सटेंशन टीम कैटलॉग से नहीं है। केवल लेखक ने ही उनकी कुंजी की गारंटी दी है: इसे केवल तभी स्थापित करें जब आपको लेखक पर भरोसा हो।",
-  "extInstallTitle": "«{name}» इंस्टॉल करें",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "«{name}» अपडेट करें",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "यह एक्सटेंशन निम्न में सक्षम होगा:",
+  "extSideloadWarning": "लेखक की स्वहस्ताक्षरित कुंजी पर भरोसा हो तभी इंस्टॉल करें।",
   "extPermissionsWidened": "अपडेट नई अनुमतियां मांगता है:",
   "extDangerousAck": "मैं समझता हूं कि ये अनुमतियां गंभीर हैं",
   "extInstall": "इंस्टॉल करें",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "केवल https:// लिंक की अनुमति है",
   "extErrGeneric": "कुछ गलत हो गया। कृपया पुन: प्रयास करें।",
   "extErrAuthorKeyChanged": "यह अद्यतन स्थापित संस्करण की तुलना में एक अलग लेखक कुंजी के साथ हस्ताक्षरित है, इसलिए इसे अवरुद्ध कर दिया गया था। यदि आप नई कुंजी पर भरोसा करते हैं, तो एक्सटेंशन को अनइंस्टॉल करें और इसे स्पष्ट रूप से फिर से इंस्टॉल करें।",
-  "extUpdateAvailable": "अपडेट उपलब्ध है",
   "extDisabled": "बंद",
   "extToggleEnabled": "{name} सक्षम करें",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "अब नहीं माँगी जातीं:",
   "extUpdateFailedKept": "पिछला संस्करण अभी भी स्थापित है।",
   "extConflictsTitle": "विस्तार संघर्ष",
-  "extConflictsIntro": "ये एक्सटेंशन एक ही चीज़ चाहते हैं। चुनें कि कौन-सा चलेगा, दूसरा इंस्टॉल रहेगा।",
   "extConflictTheme": "ऐप थीम",
   "extConflictNetHooks": "नेटवर्क हुक",
   "extConflictWinner": "प्राथमिकता: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "विवादों का समाधान करें",
-  "extConflictNote": "आपका चुनाव इस डिवाइस पर सहेजा जाता है। थीम तुरंत बदलती है, नेटवर्क हुक इस संस्करण में नहीं चलते।",
   "extVersionLabel": "संस्करण {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "लेखक",
-  "extRating": "रेटिंग",
-  "extInstalls": "इंस्टॉल संख्या",
-  "extVersion": "संस्करण",
-  "extAbout": "इस एक्सटेंशन के बारे में",
   "extPermissionsTitle": "अनुमतियाँ",
   "extNoPermissions": "कोई विशेष अनुमति नहीं।",
   "extSettings": "सेटिंग्स",
   "extSaveSettings": "सेटिंग्स सहेजें",
-  "extSaving": "सहेजा जा रहा है...",
   "extUpdateTo": "{version} में अपग्रेड करें",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "पैनल अनुपलब्ध है। हो सकता है कि एक्सटेंशन अक्षम कर दिया गया हो या हटा दिया गया हो.",
+  "extPanelUnavailable": "एक्सटेंशन पैनल उपलब्ध नहीं है।",
   "extPermConnectionsRead": "सक्रिय कनेक्शनों की सूची देखें",
   "extPermServersRead": "अपने सर्वर की सूची देखें",
   "extPermSettingsRead": "ऐप सेटिंग पढ़ें",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "नेटवर्क पथ में एकीकृत करें (DPI बायपास मॉड्यूल)",
   "extPermNetFetch": "अनुमत सूची से URL का अनुरोध करें",
   "extPermBackground": "पृष्ठभूमि कार्य चलाएँ",
-  "extPermBackgroundDetail": "पैनल बंद होने पर भी निर्धारित कार्य चलाता है। आप इसे रोक सकते हैं या एक्सटेंशन सेटिंग में यह बदल सकते हैं कि यह कितनी बार चलता है।",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "पृष्ठभूमि में चलता है",
   "extCapNetHook": "ब्लॉक से बचाव और नेटवर्क हुक",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "चेंजलॉग",
   "extImageFailed": "छवि लोड नहीं हो सकी",
-  "extRatingHow": "रेटिंग्स कैसे काम करती हैं",
-  "extRatingHowBody": "रेटिंग बायेसियन औसत का उपयोग करती है: कुछ रेटिंग वाला एक्सटेंशन तब तक मध्य के पास रहता है जब तक कि अधिक लोग वोट नहीं करते हैं, इसलिए एक 5-सितारा समीक्षा एक नए एक्सटेंशन को शीर्ष पर नहीं धकेल सकती है। हाल की रेटिंग का महत्व पुरानी रेटिंग से अधिक है और प्रति खाता केवल एक रेटिंग ही मायने रखती है।",
   "extScreenshots": "स्क्रीनशॉट",
   "extSortRelevance": "प्रासंगिकता",
-  "extPermNetworkDetail": "VPN के ज़रिए इंटरनेट से डेटा लाता है। केवल नीचे दिए होस्ट की अनुमति है, बाकी सब ब्लॉक है।",
+  "extPermNetworkDetail": "VPN अनुरोध केवल नीचे दिए गए होस्ट तक पहुँच सकते हैं।",
   "extBgTitle": "पृष्ठभूमि कार्य",
   "extBgEnabled": "पृष्ठभूमि में चलाएँ",
   "extBgInterval": "चलाने का अंतराल",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Sora खुला रहने तक, ट्रे में होने पर भी, कार्य शेड्यूल के अनुसार चलता है। सबसे छोटा अंतराल 15 मिनट है।",
   "extBgDisabledNote": "इसके पृष्ठभूमि कार्य को प्रबंधित करने के लिए एक्सटेंशन को सक्षम करें।",
   "extCapNetwork": "नेटवर्क पहुंच",
   "extCapNetworkHosts": "नेटवर्क: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "पैकेट कैप्चर के लिए एक सक्रिय सोरा ट्यून कनेक्शन की आवश्यकता होती है।",
   "diagnosticUnavailable": "यह निदान इस प्लेटफ़ॉर्म पर उपलब्ध नहीं है.",
   "extErrRevoked": "Sora टीम ने इस एक्सटेंशन संस्करण को वापस ले लिया है, क्योंकि यह असुरक्षित या खराब है।",
-  "extErrRevocationsExpired": "वापस लिए गए एक्सटेंशन की सूची नवीनीकृत नहीं हो सकी। नवीनीकरण तक इंस्टॉल बंद है: नेटवर्क जांचें और फिर कोशिश करें।",
+  "extErrRevocationsExpired": "निरस्त एक्सटेंशन की सूची अपडेट होने तक इंस्टॉलेशन बंद है।",
   "extRevokedDisabled": "वापस लिए गए एक्सटेंशन बंद किए गए: {names}",
   "customServerWgPrivateKey": "प्राइवेट की",
   "customServerWgAddresses": "इंटरफ़ेस पते",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "सख्त नेटवर्क अवरोध",
   "strictKillSwitchWarning": "कनेक्ट होने के बाद, क्रैश, पुनः आरंभ या ऐप बंद होने पर भी VPN के बाहर का ट्रैफ़िक रोकता है। केवल डिस्कनेक्ट करने या यह विकल्प बंद करने से पहुँच लौटती है। डिवाइस पुनः आरंभ होने पर अवरोध तभी फिर लागू होगा जब शुरू होते समय कनेक्ट करने का विकल्प चालू हो।",
   "extWorkerFailed": "एक्सटेंशन का बैकग्राउंड कार्य विफल हुआ। एक्सटेंशन का लॉग देखें।",
-  "extAssetRejected": "एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।"
+  "extAssetRejected": "एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।",
+  "extVerifiedSora": "Sora द्वारा सत्यापित",
+  "extReceivedBytes": "{count} बाइट",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "खोलें"
 }

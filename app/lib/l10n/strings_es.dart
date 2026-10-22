@@ -912,36 +912,7 @@ class SEs extends S {
   String get extInstallOne => '1 instalación';
 
   @override
-  String get extBadgeVerified => 'Verificado';
-
-  @override
-  String get extBadgeTop => 'Más popular esta semana';
-
-  @override
-  String get extBadgeNew => 'Nuevo';
-
-  @override
-  String get extBadgeStaff => 'El equipo Sora';
-
-  @override
-  String get extSideloadShort => 'No del catálogo';
-
-  @override
-  String get extSideloadWarning =>
-      'Esta extensión no es del catálogo del equipo. Sólo el autor ha respondido por su clave: instálela sólo si confía en el autor.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Instalar «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Actualizar «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Esta extensión podrá:';
+  String get extSideloadWarning => 'Instala solo si confías en la clave autofirmada del autor.';
 
   @override
   String get extPermissionsWidened => 'La actualización solicita nuevos permisos:';
@@ -1068,9 +1039,6 @@ class SEs extends S {
       'Esta actualización está firmada con una clave de autor diferente a la versión instalada, por lo que fue bloqueada. Si confía en la nueva clave, desinstale la extensión y vuelva a instalarla explícitamente.';
 
   @override
-  String get extUpdateAvailable => 'Actualización disponible';
-
-  @override
   String get extDisabled => 'Desactivado';
 
   @override
@@ -1113,10 +1081,6 @@ class SEs extends S {
   String get extConflictsTitle => 'Conflictos de extensión';
 
   @override
-  String get extConflictsIntro =>
-      'Estas extensiones quieren lo mismo. Elige cuál se ejecuta; la otra seguirá instalada.';
-
-  @override
   String get extConflictTheme => 'Tema de la aplicación';
 
   @override
@@ -1136,28 +1100,9 @@ class SEs extends S {
   String get extConflictsResolve => 'Resolver conflictos';
 
   @override
-  String get extConflictNote =>
-      'Tu elección se guarda en este dispositivo. El tema cambia al instante; los hooks de red no se ejecutan en esta versión.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versión $version';
   }
-
-  @override
-  String get extAuthor => 'Autor';
-
-  @override
-  String get extRating => 'Clasificación';
-
-  @override
-  String get extInstalls => 'Instalaciones';
-
-  @override
-  String get extVersion => 'Versión';
-
-  @override
-  String get extAbout => 'Acerca de esta extensión';
 
   @override
   String get extPermissionsTitle => 'Permisos';
@@ -1170,9 +1115,6 @@ class SEs extends S {
 
   @override
   String get extSaveSettings => 'Guardar ajustes';
-
-  @override
-  String get extSaving => 'Guardando…';
 
   @override
   String extUpdateTo(String version) {
@@ -1201,8 +1143,7 @@ class SEs extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'El panel no está disponible. Es posible que la extensión se haya desactivado o eliminado.';
+  String get extPanelUnavailable => 'El panel de la extensión no está disponible.';
 
   @override
   String get extPermConnectionsRead => 'Ver lista de conexiones activas';
@@ -1241,10 +1182,6 @@ class SEs extends S {
   String get extPermBackground => 'Ejecutar tareas en segundo plano';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Ejecuta tareas programadas incluso cuando el panel está cerrado. Puede pausarlo o cambiar la frecuencia con la que se ejecuta en la configuración de la extensión.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1277,21 +1214,13 @@ class SEs extends S {
   String get extImageFailed => 'No se pudo cargar la imagen';
 
   @override
-  String get extRatingHow => 'Cómo funcionan las calificaciones';
-
-  @override
-  String get extRatingHowBody =>
-      'Las calificaciones utilizan un promedio bayesiano: una extensión con pocas calificaciones permanece cerca del medio hasta que más personas votan, por lo que una sola reseña de 5 estrellas no puede llevar una nueva extensión a la cima. Las calificaciones recientes pesan más que las antiguas y solo cuenta una calificación por cuenta.';
-
-  @override
   String get extScreenshots => 'Capturas de pantalla';
 
   @override
   String get extSortRelevance => 'Relevancia';
 
   @override
-  String get extPermNetworkDetail =>
-      'Descarga datos de internet a través de la VPN. Solo se permiten los hosts de abajo; todo lo demás está bloqueado.';
+  String get extPermNetworkDetail => 'Las solicitudes por VPN solo pueden acceder a los hosts siguientes.';
 
   @override
   String get extBgTitle => 'Tarea en segundo plano';
@@ -1313,10 +1242,6 @@ class SEs extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# horas', one: '# hora');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'La tarea se ejecuta según el horario mientras Sora está abierto, también en la bandeja. El intervalo mínimo es de 15 minutos.';
 
   @override
   String get extBgDisabledNote => 'Habilite la extensión para administrar su tarea en segundo plano.';
@@ -2022,8 +1947,7 @@ class SEs extends S {
   String get extErrRevoked => 'El equipo de Sora retiró esta versión de la extensión porque es insegura o no funciona.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'No se pudo renovar la lista de extensiones retiradas. La instalación está bloqueada hasta que se renueve: revisa la red e inténtalo de nuevo.';
+  String get extErrRevocationsExpired => 'La instalación está bloqueada hasta actualizar la lista de revocaciones.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2069,4 +1993,15 @@ class SEs extends S {
 
   @override
   String get extAssetRejected => 'Archivo de extensión rechazado: colores ilegibles o reglas no válidas.';
+
+  @override
+  String get extVerifiedSora => 'Verificado por Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Abrir';
 }

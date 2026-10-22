@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 quraşdırma",
-  "extBadgeVerified": "Doğrulanmış",
-  "extBadgeTop": "Bu həftə ən populyar",
-  "extBadgeNew": "Yeni",
-  "extBadgeStaff": "Sora komandası",
-  "extSideloadShort": "Kataloqdan deyil",
-  "extSideloadWarning": "Bu genişləndirici komanda kataloqundan deyil. Onların açarına yalnız müəllif zəmanət verib: onu yalnız müəllifə güvəndiyiniz halda quraşdırın.",
-  "extInstallTitle": "«{name}» quraşdır",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "«{name}» yenilə",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Bu genişləndirici aşağıdakıları edə biləcək:",
+  "extSideloadWarning": "Yalnız müəllifin özünün imzaladığı açara etibar edirsinizsə quraşdırın.",
   "extPermissionsWidened": "Yeniləmə yeni icazələr tələb edir:",
   "extDangerousAck": "Mən başa düşürəm ki, bu icazələr ciddidir",
   "extInstall": "Quraşdırın",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Yalnız https:// keçidlərə icazə verilir",
   "extErrGeneric": "Nəsə xəta baş verdi. Yenidən cəhd edin.",
   "extErrAuthorKeyChanged": "Bu yeniləmə quraşdırılmış versiyadan fərqli müəllif açarı ilə imzalanıb, ona görə də bloklanıb. Yeni açara güvənirsinizsə, genişləndiricini silin və açıq şəkildə yenidən quraşdırın.",
-  "extUpdateAvailable": "Yeniləmə mövcuddur",
   "extDisabled": "Söndürülüb",
   "extToggleEnabled": "{name} aktivləşdirin",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Artıq tələb olunmur:",
   "extUpdateFailedKept": "Əvvəlki versiya hələ də quraşdırılıb.",
   "extConflictsTitle": "Genişləndirici münaqişələri",
-  "extConflictsIntro": "Bu genişləndirmələr eyni şeyi istəyir. Hansının işləyəcəyini seçin, digəri quraşdırılmış qalacaq.",
   "extConflictTheme": "Tətbiq mövzusu",
   "extConflictNetHooks": "Şəbəkə qarmaqları",
   "extConflictWinner": "Üstünlük: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Münaqişələri həll edin",
-  "extConflictNote": "Seçiminiz bu cihazda saxlanılır. Mövzu dərhal dəyişir, şəbəkə hook-ları isə bu versiyada işləmir.",
   "extVersionLabel": "Versiya {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Müəllif",
-  "extRating": "Qiymətləndirmə",
-  "extInstalls": "Quraşdırmalar",
-  "extVersion": "Versiya",
-  "extAbout": "Bu genişləndirici haqqında",
   "extPermissionsTitle": "İcazələr",
   "extNoPermissions": "Xüsusi icazələr yoxdur.",
   "extSettings": "Parametrlər",
   "extSaveSettings": "Parametrləri yadda saxlayın",
-  "extSaving": "Saxlanır...",
   "extUpdateTo": "{version} versiyasına yenilə",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Panel əlçatan deyil. Genişləndirici söndürülmüş və ya silinmiş ola bilər.",
+  "extPanelUnavailable": "Genişlənmə paneli əlçatan deyil.",
   "extPermConnectionsRead": "Aktiv qoşulmaların siyahısına baxın",
   "extPermServersRead": "Serverlərinizin siyahısına baxın",
   "extPermSettingsRead": "Proqram parametrlərini oxuyun",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Şəbəkə yoluna inteqrasiya edin (DPI bypass modulları)",
   "extPermNetFetch": "İcazə verilən siyahıdan URL tələb edin",
   "extPermBackground": "Fon tapşırıqlarını yerinə yetirin",
-  "extPermBackgroundDetail": "Panel bağlı olsa belə, planlaşdırılmış tapşırıqları icra edir. Siz onu dayandıra və ya genişləndirici parametrlərində nə qədər işlədiyini dəyişə bilərsiniz.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Arxa fonda çalışır",
   "extCapNetHook": "Bloklamadan yan keçid və şəbəkə müdaxilələri",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Dəyişikliklər jurnalı",
   "extImageFailed": "Şəkli yükləmək mümkün olmadı",
-  "extRatingHow": "Reytinqlər necə işləyir",
-  "extRatingHowBody": "Reytinqlər Bayes ortalamasından istifadə edir: bir neçə reytinqə malik genişləndirici daha çox insan səs verənə qədər ortada qalır, beləliklə, tək 5 ulduzlu baxış yeni genişləndiricini zirvəyə qaldıra bilməz. Son reytinqlər köhnələrdən daha ağırdır və hər hesab üçün yalnız bir reytinq sayılır.",
   "extScreenshots": "Ekran görüntüləri",
   "extSortRelevance": "Uyğunluq",
-  "extPermNetworkDetail": "İnternetdən VPN vasitəsilə məlumat yükləyir. Yalnız aşağıdakı siyahıdakı hostlara icazə var, qalanları bloklanır.",
+  "extPermNetworkDetail": "VPN sorğularına yalnız aşağıdakı hostlar üçün icazə verilir.",
   "extBgTitle": "Fon tapşırığı",
   "extBgEnabled": "Arxa fonda işləyin",
   "extBgInterval": "İcra intervalı",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Tapşırıq Sora açıq olduqca, o cümlədən tray-də olanda cədvəl üzrə işləyir. Ən qısa interval 15 dəqiqədir.",
   "extBgDisabledNote": "Fon tapşırığını idarə etmək üçün genişləndiricini aktivləşdirin.",
   "extCapNetwork": "Şəbəkəyə giriş",
   "extCapNetworkHosts": "Şəbəkə: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Paket ələ keçirmək üçün aktiv Sora TUN bağlantısı lazımdır.",
   "diagnosticUnavailable": "Bu diaqnostika bu platformada əlçatan deyil.",
   "extErrRevoked": "Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.",
-  "extErrRevocationsExpired": "Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.",
+  "extErrRevocationsExpired": "Ləğv edilmiş genişlənmələr siyahısı yenilənənədək quraşdırma bloklanıb.",
   "extRevokedDisabled": "Geri çağırılmış genişləndirmələr söndürüldü: {names}",
   "customServerWgPrivateKey": "Gizli açar",
   "customServerWgAddresses": "İnterfeys ünvanları",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Sərt şəbəkə kilidi",
   "strictKillSwitchWarning": "Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.",
   "extWorkerFailed": "Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.",
-  "extAssetRejected": "Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar."
+  "extAssetRejected": "Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.",
+  "extVerifiedSora": "Sora tərəfindən təsdiqlənib",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Aç"
 }

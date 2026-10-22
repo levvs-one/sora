@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 встановлення",
-  "extBadgeVerified": "Перевірено",
-  "extBadgeTop": "Найпопулярніший цього тижня",
-  "extBadgeNew": "Нове",
-  "extBadgeStaff": "Команда Sora",
-  "extSideloadShort": "Не з каталогу",
-  "extSideloadWarning": "Це розширення не з каталогу команди. За свій ключ поручився лише автор: встановлюйте його, лише якщо довіряєте автору.",
-  "extInstallTitle": "Установити «{name}»",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Оновити «{name}»",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Це розширення зможе:",
+  "extSideloadWarning": "Установлюйте, лише якщо довіряєте самопідписаному ключу автора.",
   "extPermissionsWidened": "Оновлення запитує нові дозволи:",
   "extDangerousAck": "Я розумію, що ці дозволи серйозні",
   "extInstall": "Встановити",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Дозволено лише посилання https://",
   "extErrGeneric": "Щось пішло не так. Спробуйте ще раз.",
   "extErrAuthorKeyChanged": "Це оновлення підписано іншим ключем автора, ніж встановлена ​​версія, тому його було заблоковано. Якщо ви довіряєте новому ключу, видаліть розширення та встановіть його знову явно.",
-  "extUpdateAvailable": "Доступне оновлення",
   "extDisabled": "Вимкнено",
   "extToggleEnabled": "Увімкнути {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Більше не вимагається:",
   "extUpdateFailedKept": "Попередня версія все ще встановлена.",
   "extConflictsTitle": "Конфлікти розширень",
-  "extConflictsIntro": "Ці розширення претендують на одне й те саме. Виберіть, яке працюватиме, друге залишиться встановленим.",
   "extConflictTheme": "Тема програми",
   "extConflictNetHooks": "Мережеві перехоплення",
   "extConflictWinner": "Перевага: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Вирішення конфліктів",
-  "extConflictNote": "Вибір зберігається на цьому пристрої. Тема перемикається одразу, мережеві хуки в цій версії не запускаються.",
   "extVersionLabel": "Версія {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Автор",
-  "extRating": "Рейтинг",
-  "extInstalls": "Встановлення",
-  "extVersion": "Версія",
-  "extAbout": "Про це розширення",
   "extPermissionsTitle": "Дозволи",
   "extNoPermissions": "Немає спеціальних дозволів.",
   "extSettings": "Налаштування",
   "extSaveSettings": "Зберегти налаштування",
-  "extSaving": "Збереження…",
   "extUpdateTo": "Оновити до {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Панель недоступна. Можливо, розширення було вимкнено або видалено.",
+  "extPanelUnavailable": "Панель розширення недоступна.",
   "extPermConnectionsRead": "Перегляд активних з'єднань",
   "extPermServersRead": "Бачити список серверів",
   "extPermSettingsRead": "Прочитайте налаштування програми",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Інтеграція в мережевий шлях (модулі обходу DPI)",
   "extPermNetFetch": "Запитувати URL із дозволеного списку",
   "extPermBackground": "Запуск фонових завдань",
-  "extPermBackgroundDetail": "Виконує заплановані завдання, навіть якщо панель закрита. Ви можете призупинити його або змінити частоту його запуску в налаштуваннях розширення.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Працює у фоновому режимі",
   "extCapNetHook": "Обходи блокувань і мережеві хуки",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Журнал змін",
   "extImageFailed": "Не вдалося завантажити зображення",
-  "extRatingHow": "Як працюють рейтинги",
-  "extRatingHowBody": "Для оцінок використовується середнє байєсівське значення: розширення з невеликою кількістю оцінок залишається біля середини, доки не проголосує більше людей, тому один відгук із 5 зірками не може підняти нове розширення наверх. Останні рейтинги важливіші за старі, і враховується лише один рейтинг на обліковий запис.",
   "extScreenshots": "Скріншоти",
   "extSortRelevance": "Релевантність",
-  "extPermNetworkDetail": "Завантажує дані з інтернету через VPN. Дозволені лише хости зі списку нижче, решту заблоковано.",
+  "extPermNetworkDetail": "Запити через VPN дозволені лише до цих хостів.",
   "extBgTitle": "Фонове завдання",
   "extBgEnabled": "Виконувати у фоні",
   "extBgInterval": "Запускати кожні",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Завдання запускається за розкладом, поки Sora відкрита, зокрема згорнута в трей. Мінімальний інтервал 15 хвилин.",
   "extBgDisabledNote": "Увімкніть розширення для керування його фоновим завданням.",
   "extCapNetwork": "Доступ до мережі",
   "extCapNetworkHosts": "Мережа: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Для захоплення пакетів потрібне активне з’єднання Sora TUN.",
   "diagnosticUnavailable": "Ця діагностика недоступна на цій платформі.",
   "extErrRevoked": "Команда Sora відкликала цю версію розширення: вона небезпечна або зламана.",
-  "extErrRevocationsExpired": "Не вдалося оновити список відкликаних розширень. Встановлення недоступне, доки він не оновиться: перевірте мережу й спробуйте знову.",
+  "extErrRevocationsExpired": "Установлення заблоковано до оновлення списку відкликаних розширень.",
   "extRevokedDisabled": "Вимкнено відкликані розширення: {names}",
   "customServerWgPrivateKey": "Приватний ключ",
   "customServerWgAddresses": "Адреси інтерфейсу",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Суворий kill switch",
   "strictKillSwitchWarning": "Після підключення блокує трафік поза VPN навіть після збою, перезапуску чи виходу з програми. Доступ відновиться лише після відключення VPN або цієї опції. Після перезавантаження блокування відновлюється лише з увімкненим підключенням під час запуску.",
   "extWorkerFailed": "Фонове завдання розширення завершилося з помилкою. Перевірте журнал розширення.",
-  "extAssetRejected": "Файл розширення відхилено: нечитабельні кольори або неправильні правила."
+  "extAssetRejected": "Файл розширення відхилено: нечитабельні кольори або неправильні правила.",
+  "extVerifiedSora": "Перевірено Sora",
+  "extReceivedBytes": "{count} Б",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Відкрити"
 }

@@ -908,36 +908,7 @@ class SBn extends S {
   String get extInstallOne => '1 ইনস্টল করুন';
 
   @override
-  String get extBadgeVerified => 'যাচাই করা হয়েছে';
-
-  @override
-  String get extBadgeTop => 'এই সপ্তাহে সবচেয়ে জনপ্রিয়';
-
-  @override
-  String get extBadgeNew => 'নতুন';
-
-  @override
-  String get extBadgeStaff => 'Sora দল';
-
-  @override
-  String get extSideloadShort => 'ক্যাটালগ থেকে না';
-
-  @override
-  String get extSideloadWarning =>
-      'এই এক্সটেনশন টিম ক্যাটালগ থেকে নয়। শুধুমাত্র লেখক তাদের কীটির জন্য প্রমাণ দিয়েছেন: আপনি যদি লেখককে বিশ্বাস করেন তবেই এটি ইনস্টল করুন।';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» ইনস্টল করুন';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» আপডেট করুন';
-  }
-
-  @override
-  String get extPermissionsIntro => 'এই এক্সটেনশনটি সক্ষম হবে:';
+  String get extSideloadWarning => 'লেখকের স্বস্বাক্ষরিত কী বিশ্বাস করলেই ইনস্টল করুন।';
 
   @override
   String get extPermissionsWidened => 'আপডেটটি নতুন অনুমতির জন্য জিজ্ঞাসা করে:';
@@ -1064,9 +1035,6 @@ class SBn extends S {
       'এই আপডেটটি ইনস্টল করা সংস্করণের চেয়ে একটি ভিন্ন লেখক কী দিয়ে স্বাক্ষরিত, তাই এটি ব্লক করা হয়েছে। আপনি যদি নতুন কী বিশ্বাস করেন তবে এক্সটেনশনটি আনইনস্টল করুন এবং স্পষ্টভাবে আবার ইনস্টল করুন।';
 
   @override
-  String get extUpdateAvailable => 'আপডেট উপলব্ধ';
-
-  @override
   String get extDisabled => 'বন্ধ';
 
   @override
@@ -1109,9 +1077,6 @@ class SBn extends S {
   String get extConflictsTitle => 'এক্সটেনশন দ্বন্দ্ব';
 
   @override
-  String get extConflictsIntro => 'এই এক্সটেনশনগুলো একই জিনিস চায়। কোনটি চলবে বেছে নিন, অন্যটি ইনস্টল থাকবে।';
-
-  @override
   String get extConflictTheme => 'অ্যাপ থিম';
 
   @override
@@ -1131,28 +1096,9 @@ class SBn extends S {
   String get extConflictsResolve => 'দ্বন্দ্ব সমাধান';
 
   @override
-  String get extConflictNote =>
-      'আপনার পছন্দ এই ডিভাইসে সংরক্ষিত হয়। থিম সঙ্গে সঙ্গে বদলায়, নেটওয়ার্ক হুক এই সংস্করণে চলে না।';
-
-  @override
   String extVersionLabel(String version) {
     return 'সংস্করণ $version';
   }
-
-  @override
-  String get extAuthor => 'লেখক';
-
-  @override
-  String get extRating => 'রেটিং';
-
-  @override
-  String get extInstalls => 'ইনস্টল সংখ্যা';
-
-  @override
-  String get extVersion => 'সংস্করণ';
-
-  @override
-  String get extAbout => 'এই এক্সটেনশন সম্পর্কে';
 
   @override
   String get extPermissionsTitle => 'অনুমতি';
@@ -1165,9 +1111,6 @@ class SBn extends S {
 
   @override
   String get extSaveSettings => 'সেটিংস সংরক্ষণ করুন';
-
-  @override
-  String get extSaving => 'সংরক্ষণ করা হচ্ছে...';
 
   @override
   String extUpdateTo(String version) {
@@ -1196,7 +1139,7 @@ class SBn extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'প্যানেল অনুপলব্ধ. এক্সটেনশনটি নিষ্ক্রিয় বা সরানো হতে পারে৷';
+  String get extPanelUnavailable => 'এক্সটেনশনের প্যানেল উপলব্ধ নেই।';
 
   @override
   String get extPermConnectionsRead => 'সক্রিয় সংযোগের তালিকা দেখুন';
@@ -1235,10 +1178,6 @@ class SBn extends S {
   String get extPermBackground => 'ব্যাকগ্রাউন্ড কাজ চালান';
 
   @override
-  String get extPermBackgroundDetail =>
-      'প্যানেল বন্ধ থাকা অবস্থায়ও নির্ধারিত কাজ চালায়। আপনি এটিকে বিরতি দিতে পারেন বা এক্সটেনশন সেটিংসে এটি কতবার চলে তা পরিবর্তন করতে পারেন৷';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1271,21 +1210,13 @@ class SBn extends S {
   String get extImageFailed => 'ইমেজ লোড করা যায়নি';
 
   @override
-  String get extRatingHow => 'রেটিং কীভাবে গণনা করা হয়';
-
-  @override
-  String get extRatingHowBody =>
-      'রেটিং একটি Bayesian গড় ব্যবহার করে: কিছু রেটিং সহ একটি এক্সটেনশন মাঝামাঝি কাছাকাছি থাকে যতক্ষণ না আরও বেশি লোক ভোট দেয়, তাই একটি একক 5-স্টার পর্যালোচনা শীর্ষে একটি নতুন এক্সটেনশনকে ঠেলে দিতে পারে না। সাম্প্রতিক রেটিংগুলি পুরানোগুলির থেকে বেশি ওজন করে এবং প্রতি অ্যাকাউন্টে শুধুমাত্র একটি রেটিং গণনা করা হয়৷';
-
-  @override
   String get extScreenshots => 'স্ক্রিনশট';
 
   @override
   String get extSortRelevance => 'প্রাসঙ্গিকতা';
 
   @override
-  String get extPermNetworkDetail =>
-      'VPN-এর মাধ্যমে ইন্টারনেট থেকে ডেটা আনে। শুধু নিচের তালিকার হোস্ট অনুমোদিত, বাকি সব বন্ধ।';
+  String get extPermNetworkDetail => 'VPN অনুরোধ শুধু নিচের হোস্টগুলিতে অনুমোদিত।';
 
   @override
   String get extBgTitle => 'পটভূমির কাজ';
@@ -1307,9 +1238,6 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ঘণ্টা', one: '# ঘণ্টা');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => 'Sora খোলা থাকলে, ট্রেতে থাকলেও, কাজটি সময়সূচি অনুযায়ী চলে। সবচেয়ে কম ব্যবধান ১৫ মিনিট।';
 
   @override
   String get extBgDisabledNote => 'এর ব্যাকগ্রাউন্ড টাস্ক পরিচালনা করতে এক্সটেনশন সক্রিয় করুন।';
@@ -2012,8 +1940,7 @@ class SBn extends S {
   String get extErrRevoked => 'Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।';
 
   @override
-  String get extErrRevocationsExpired =>
-      'প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।';
+  String get extErrRevocationsExpired => 'বাতিল করা এক্সটেনশনের তালিকা হালনাগাদ না হওয়া পর্যন্ত ইনস্টল বন্ধ আছে।';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2059,4 +1986,15 @@ class SBn extends S {
 
   @override
   String get extAssetRejected => 'এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।';
+
+  @override
+  String get extVerifiedSora => 'Sora দ্বারা যাচাইকৃত';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count বাইট';
+  }
+
+  @override
+  String get extOpen => 'খুলুন';
 }

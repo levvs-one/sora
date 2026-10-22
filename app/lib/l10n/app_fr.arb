@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 installation",
-  "extBadgeVerified": "Vérifié",
-  "extBadgeTop": "Les plus populaires cette semaine",
-  "extBadgeNew": "Nouveau",
-  "extBadgeStaff": "L'équipe Sora",
-  "extSideloadShort": "Pas du catalogue",
-  "extSideloadWarning": "Cette extension ne provient pas du catalogue de l'équipe. Seul l'auteur s'est porté garant de sa clé : installez-la uniquement si vous faites confiance à l'auteur.",
-  "extInstallTitle": "Installer « {name} »",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Mettre à jour « {name} »",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Cette extension pourra :",
+  "extSideloadWarning": "Installez uniquement si vous faites confiance à la clé autosignée de l’auteur.",
   "extPermissionsWidened": "La mise à jour demande de nouvelles autorisations :",
   "extDangerousAck": "Je comprends que ces autorisations sont sérieuses",
   "extInstall": "Installer",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Seuls les liens https:// sont autorisés",
   "extErrGeneric": "Quelque chose s'est mal passé. Veuillez réessayer.",
   "extErrAuthorKeyChanged": "Cette mise à jour est signée avec une clé d'auteur différente de celle de la version installée, elle a donc été bloquée. Si vous faites confiance à la nouvelle clé, désinstallez l'extension et réinstallez-la explicitement.",
-  "extUpdateAvailable": "Mise à jour disponible",
   "extDisabled": "Désactivé",
   "extToggleEnabled": "Activer {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Plus demandé :",
   "extUpdateFailedKept": "La version précédente est toujours installée.",
   "extConflictsTitle": "Conflits d'extensions",
-  "extConflictsIntro": "Ces extensions veulent la même chose. Choisissez celle qui fonctionne ; l’autre reste installée.",
   "extConflictTheme": "Thème de l'application",
   "extConflictNetHooks": "Crochets réseau",
   "extConflictWinner": "{name} gagne",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Résoudre les conflits",
-  "extConflictNote": "Votre choix est enregistré sur cet appareil. Un thème change immédiatement ; les hooks réseau ne s'exécutent pas dans cette version.",
   "extVersionLabel": "Version {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Auteur",
-  "extRating": "Note",
-  "extInstalls": "Installations",
-  "extVersion": "Version",
-  "extAbout": "À propos de cette extension",
   "extPermissionsTitle": "Autorisations",
   "extNoPermissions": "Aucune autorisation spéciale.",
   "extSettings": "Paramètres",
   "extSaveSettings": "Enregistrer les paramètres",
-  "extSaving": "Sauvegarde…",
   "extUpdateTo": "Mettre à jour vers {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Le panneau n'est pas disponible. L'extension a peut-être été désactivée ou supprimée.",
+  "extPanelUnavailable": "Le panneau de l’extension est indisponible.",
   "extPermConnectionsRead": "Voir la liste des connexions actives",
   "extPermServersRead": "Voir une liste de vos serveurs",
   "extPermSettingsRead": "Lire les paramètres de l'application",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Intégrer dans le chemin réseau (modules de contournement DPI)",
   "extPermNetFetch": "Demander URL à partir de la liste autorisée",
   "extPermBackground": "Exécuter des tâches en arrière-plan",
-  "extPermBackgroundDetail": "Exécute les tâches planifiées même lorsque le panneau est fermé. Vous pouvez le suspendre ou modifier la fréquence d'exécution dans les paramètres de l'extension.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Fonctionne en arrière-plan",
   "extCapNetHook": "Contournements et hooks réseau",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Journal des modifications",
   "extImageFailed": "Impossible de charger l'image",
-  "extRatingHow": "Comment fonctionnent les notations",
-  "extRatingHowBody": "Les notes utilisent une moyenne bayésienne : une extension avec peu de notes reste proche du milieu jusqu'à ce que davantage de personnes votent, de sorte qu'un seul avis 5 étoiles ne peut pas pousser une nouvelle extension vers le haut. Les notes récentes pèsent plus que les anciennes, et une seule note par compte compte.",
   "extScreenshots": "Captures d'écran",
   "extSortRelevance": "Pertinence",
-  "extPermNetworkDetail": "Récupère des données sur Internet via le VPN. Seuls les hôtes ci-dessous sont autorisés, tout le reste est bloqué.",
+  "extPermNetworkDetail": "Les requêtes VPN sont limitées aux hôtes ci-dessous.",
   "extBgTitle": "Tâche en arrière-plan",
   "extBgEnabled": "Exécuter en arrière-plan",
   "extBgInterval": "Exécuter toutes les",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "La tâche s’exécute selon le calendrier tant que Sora est ouvert, y compris dans la zone de notification. L’intervalle minimal est de 15 minutes.",
   "extBgDisabledNote": "Autoriser l'extension à gérer sa tâche en arrière-plan.",
   "extCapNetwork": "Accès au réseau",
   "extCapNetworkHosts": "Réseau : {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "La capture de paquets nécessite une connexion Sora TUN active.",
   "diagnosticUnavailable": "Ce diagnostic n'est pas disponible sur cette plateforme.",
   "extErrRevoked": "L’équipe Sora a retiré cette version de l’extension, car elle est dangereuse ou défectueuse.",
-  "extErrRevocationsExpired": "La liste des extensions retirées n’a pas pu être renouvelée. L’installation est bloquée jusqu’à son renouvellement : vérifiez le réseau et réessayez.",
+  "extErrRevocationsExpired": "L’installation est bloquée jusqu’à la mise à jour de la liste de révocation.",
   "extRevokedDisabled": "Des extensions retirées ont été désactivées : {names}",
   "customServerWgPrivateKey": "Clé privée",
   "customServerWgAddresses": "Adresses de l’interface",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Coupe-circuit strict",
   "strictKillSwitchWarning": "Après la connexion, bloque le trafic hors VPN même après un plantage, un redémarrage ou la fermeture de l’application. Seule la déconnexion ou la désactivation de cette option rétablit l’accès. Après un redémarrage du système, le blocage reprend uniquement si la connexion au démarrage est activée.",
   "extWorkerFailed": "La tâche en arrière-plan de l’extension a échoué. Consultez son journal.",
-  "extAssetRejected": "Fichier d’extension refusé : couleurs illisibles ou règles invalides."
+  "extAssetRejected": "Fichier d’extension refusé : couleurs illisibles ou règles invalides.",
+  "extVerifiedSora": "Vérifié par Sora",
+  "extReceivedBytes": "{count} o",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Ouvrir"
 }

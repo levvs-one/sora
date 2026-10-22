@@ -909,36 +909,8 @@ class SId extends S {
   String get extInstallOne => '1 pemasangan';
 
   @override
-  String get extBadgeVerified => 'Terverifikasi';
-
-  @override
-  String get extBadgeTop => 'Paling populer minggu ini';
-
-  @override
-  String get extBadgeNew => 'Baru';
-
-  @override
-  String get extBadgeStaff => 'Tim Sora';
-
-  @override
-  String get extSideloadShort => 'Bukan dari katalog';
-
-  @override
   String get extSideloadWarning =>
-      'Ekstensi ini bukan dari katalog tim. Hanya penulis yang menjamin kuncinya: instal hanya jika Anda memercayai penulisnya.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Pasang “$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Perbarui “$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Ekstensi ini akan dapat:';
+      'Instal hanya jika Anda memercayai kunci yang ditandatangani sendiri oleh pembuatnya.';
 
   @override
   String get extPermissionsWidened => 'Pembaruan meminta izin baru:';
@@ -1064,9 +1036,6 @@ class SId extends S {
       'Pembaruan ini ditandatangani dengan kunci penulis yang berbeda dari versi yang diinstal, sehingga diblokir. Jika Anda memercayai kunci baru, copot pemasangan ekstensi dan pasang kembali secara eksplisit.';
 
   @override
-  String get extUpdateAvailable => 'Pembaruan tersedia';
-
-  @override
   String get extDisabled => 'Dinonaktifkan';
 
   @override
@@ -1109,10 +1078,6 @@ class SId extends S {
   String get extConflictsTitle => 'Konflik perluasan';
 
   @override
-  String get extConflictsIntro =>
-      'Ekstensi ini menginginkan hal yang sama. Pilih mana yang berjalan; yang lain tetap terpasang.';
-
-  @override
   String get extConflictTheme => 'Tema aplikasi';
 
   @override
@@ -1132,28 +1097,9 @@ class SId extends S {
   String get extConflictsResolve => 'Selesaikan konflik';
 
   @override
-  String get extConflictNote =>
-      'Pilihan Anda disimpan di perangkat ini. Tema langsung berganti; hook jaringan tidak dijalankan di versi ini.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versi $version';
   }
-
-  @override
-  String get extAuthor => 'Penulis';
-
-  @override
-  String get extRating => 'Peringkat';
-
-  @override
-  String get extInstalls => 'Instalasi';
-
-  @override
-  String get extVersion => 'Versi';
-
-  @override
-  String get extAbout => 'Tentang ekstensi ini';
 
   @override
   String get extPermissionsTitle => 'Izin';
@@ -1166,9 +1112,6 @@ class SId extends S {
 
   @override
   String get extSaveSettings => 'Simpan pengaturan';
-
-  @override
-  String get extSaving => 'Menyimpan…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1140,7 @@ class SId extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel tidak tersedia. Ekstensi mungkin telah dinonaktifkan atau dihapus.';
+  String get extPanelUnavailable => 'Panel ekstensi tidak tersedia.';
 
   @override
   String get extPermConnectionsRead => 'Lihat daftar koneksi aktif';
@@ -1236,10 +1179,6 @@ class SId extends S {
   String get extPermBackground => 'Jalankan tugas latar belakang';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Menjalankan tugas terjadwal bahkan ketika panel ditutup. Anda dapat menjeda atau mengubah frekuensi dijalankannya di pengaturan ekstensi.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1211,13 @@ class SId extends S {
   String get extImageFailed => 'Tidak dapat memuat gambar';
 
   @override
-  String get extRatingHow => 'Cara kerja pemeringkatan';
-
-  @override
-  String get extRatingHowBody =>
-      'Peringkat menggunakan rata-rata Bayesian: ekstensi dengan sedikit peringkat tetap berada di tengah hingga lebih banyak orang memilih, sehingga satu ulasan bintang 5 tidak dapat mendorong ekstensi baru ke atas. Peringkat terbaru lebih berbobot dibandingkan peringkat lama, dan hanya satu peringkat per akun yang dihitung.';
-
-  @override
   String get extScreenshots => 'Tangkapan Layar';
 
   @override
   String get extSortRelevance => 'Relevansi';
 
   @override
-  String get extPermNetworkDetail =>
-      'Mengambil data dari internet melalui VPN. Hanya host di bawah yang diizinkan, sisanya diblokir.';
+  String get extPermNetworkDetail => 'Permintaan VPN hanya diizinkan ke host di bawah ini.';
 
   @override
   String get extBgTitle => 'Tugas latar belakang';
@@ -1308,10 +1239,6 @@ class SId extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# jam');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Tugas berjalan sesuai jadwal selama Sora terbuka, termasuk saat di baki. Interval terpendek 15 menit.';
 
   @override
   String get extBgDisabledNote => 'Aktifkan ekstensi untuk mengelola tugas latar belakangnya.';
@@ -2009,8 +1936,7 @@ class SId extends S {
   String get extErrRevoked => 'Tim Sora menarik versi ekstensi ini karena tidak aman atau rusak.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Daftar ekstensi yang ditarik tidak dapat diperbarui. Pemasangan diblokir sampai diperbarui: periksa jaringan lalu coba lagi.';
+  String get extErrRevocationsExpired => 'Instalasi diblokir hingga daftar pencabutan diperbarui.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2056,4 +1982,15 @@ class SId extends S {
 
   @override
   String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
+
+  @override
+  String get extVerifiedSora => 'Diverifikasi oleh Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Buka';
 }

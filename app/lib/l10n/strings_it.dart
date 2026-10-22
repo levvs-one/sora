@@ -914,36 +914,7 @@ class SIt extends S {
   String get extInstallOne => '1 installazione';
 
   @override
-  String get extBadgeVerified => 'Verificato';
-
-  @override
-  String get extBadgeTop => 'Most popular this week';
-
-  @override
-  String get extBadgeNew => 'Nuovo';
-
-  @override
-  String get extBadgeStaff => 'La squadra Sora';
-
-  @override
-  String get extSideloadShort => 'Non dal catalogo';
-
-  @override
-  String get extSideloadWarning =>
-      'Questa estensione non è presente nel catalogo del team. Solo l\'autore ha garantito per la propria chiave: installala solo se ti fidi dell\'autore.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Installa «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Aggiorna «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Questa estensione sarà in grado di:';
+  String get extSideloadWarning => 'Installa solo se ti fidi della chiave autofirmata dell’autore.';
 
   @override
   String get extPermissionsWidened => 'L\'aggiornamento richiede nuove autorizzazioni:';
@@ -1071,9 +1042,6 @@ class SIt extends S {
       'Questo aggiornamento è firmato con una chiave autore diversa rispetto alla versione installata, quindi è stato bloccato. Se ti fidi della nuova chiave, disinstalla l\'estensione e installala di nuovo esplicitamente.';
 
   @override
-  String get extUpdateAvailable => 'Aggiornamento disponibile';
-
-  @override
   String get extDisabled => 'Disattivato';
 
   @override
@@ -1116,10 +1084,6 @@ class SIt extends S {
   String get extConflictsTitle => 'Conflitti di estensione';
 
   @override
-  String get extConflictsIntro =>
-      'Queste estensioni vogliono la stessa cosa. Scegli quale funziona; l’altra resta installata.';
-
-  @override
   String get extConflictTheme => 'Tema dell\'app';
 
   @override
@@ -1139,28 +1103,9 @@ class SIt extends S {
   String get extConflictsResolve => 'Risolvere i conflitti';
 
   @override
-  String get extConflictNote =>
-      'La tua scelta viene salvata su questo dispositivo. Un tema cambia subito; gli hook di rete non vengono eseguiti in questa versione.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versione $version';
   }
-
-  @override
-  String get extAuthor => 'Autore';
-
-  @override
-  String get extRating => 'Valutazione';
-
-  @override
-  String get extInstalls => 'Installazioni';
-
-  @override
-  String get extVersion => 'Versione';
-
-  @override
-  String get extAbout => 'Informazioni su questa estensione';
 
   @override
   String get extPermissionsTitle => 'Autorizzazioni';
@@ -1173,9 +1118,6 @@ class SIt extends S {
 
   @override
   String get extSaveSettings => 'Salva le impostazioni';
-
-  @override
-  String get extSaving => 'Salvataggio…';
 
   @override
   String extUpdateTo(String version) {
@@ -1204,8 +1146,7 @@ class SIt extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'Il pannello non è disponibile. L\'estensione potrebbe essere stata disabilitata o rimossa.';
+  String get extPanelUnavailable => 'Il pannello dell’estensione non è disponibile.';
 
   @override
   String get extPermConnectionsRead => 'Visualizza l\'elenco delle connessioni attive';
@@ -1244,10 +1185,6 @@ class SIt extends S {
   String get extPermBackground => 'Esegui attività in background';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Esegue le attività pianificate anche quando il pannello è chiuso. Puoi metterlo in pausa o modificare la frequenza con cui viene eseguito nelle impostazioni dell\'estensione.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1280,21 +1217,13 @@ class SIt extends S {
   String get extImageFailed => 'Impossibile caricare l\'immagine';
 
   @override
-  String get extRatingHow => 'Come funzionano le valutazioni';
-
-  @override
-  String get extRatingHowBody =>
-      'Le valutazioni utilizzano una media bayesiana: un\'estensione con poche valutazioni rimane quasi al centro finché non votano più persone, quindi una singola recensione a 5 stelle non può spingere una nuova estensione in cima. Le valutazioni recenti pesano più di quelle vecchie e conta solo una valutazione per account.';
-
-  @override
   String get extScreenshots => 'Schermate';
 
   @override
   String get extSortRelevance => 'Rilevanza';
 
   @override
-  String get extPermNetworkDetail =>
-      'Scarica dati da Internet tramite la VPN. Sono consentiti solo gli host qui sotto, tutto il resto è bloccato.';
+  String get extPermNetworkDetail => 'Le richieste VPN sono limitate agli host elencati sotto.';
 
   @override
   String get extBgTitle => 'Attività in background';
@@ -1316,10 +1245,6 @@ class SIt extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ore', one: '# ora');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'L’attività viene eseguita secondo la pianificazione finché Sora è aperto, anche nell’area di notifica. L’intervallo minimo è di 15 minuti.';
 
   @override
   String get extBgDisabledNote => 'Abilita l\'estensione a gestire la sua attività in background.';
@@ -2025,8 +1950,7 @@ class SIt extends S {
       'Il team di Sora ha ritirato questa versione dell’estensione perché non è sicura o non funziona.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Non è stato possibile rinnovare l’elenco delle estensioni ritirate. L’installazione è bloccata finché non viene rinnovato: controlla la rete e riprova.';
+  String get extErrRevocationsExpired => 'L’installazione è bloccata fino all’aggiornamento dell’elenco delle revoche.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2073,4 +1997,15 @@ class SIt extends S {
 
   @override
   String get extAssetRejected => 'File dell’estensione rifiutato: colori illeggibili o regole non valide.';
+
+  @override
+  String get extVerifiedSora => 'Verificato da Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Apri';
 }

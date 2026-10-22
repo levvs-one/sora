@@ -911,36 +911,7 @@ class SPt extends S {
   String get extInstallOne => '1 instalação';
 
   @override
-  String get extBadgeVerified => 'Verificado';
-
-  @override
-  String get extBadgeTop => 'Mais popular esta semana';
-
-  @override
-  String get extBadgeNew => 'Novo';
-
-  @override
-  String get extBadgeStaff => 'A equipe Sora';
-
-  @override
-  String get extSideloadShort => 'Não é do catálogo';
-
-  @override
-  String get extSideloadWarning =>
-      'Esta extensão não faz parte do catálogo da equipe. Somente o autor garantiu sua chave: instale-a somente se você confiar no autor.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Instalar «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Atualizar «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Esta extensão será capaz de:';
+  String get extSideloadWarning => 'Instale apenas se confiar na chave autoassinada do autor.';
 
   @override
   String get extPermissionsWidened => 'A atualização pede novas permissões:';
@@ -1067,9 +1038,6 @@ class SPt extends S {
       'Esta atualização está assinada com uma chave de autor diferente da versão instalada, por isso foi bloqueada. Se você confia na nova chave, desinstale a extensão e instale-a novamente explicitamente.';
 
   @override
-  String get extUpdateAvailable => 'Atualização disponível';
-
-  @override
   String get extDisabled => 'Desativado';
 
   @override
@@ -1112,10 +1080,6 @@ class SPt extends S {
   String get extConflictsTitle => 'Conflitos de extensão';
 
   @override
-  String get extConflictsIntro =>
-      'Estas extensões querem a mesma coisa. Escolha qual funciona; a outra continua instalada.';
-
-  @override
   String get extConflictTheme => 'Tema do aplicativo';
 
   @override
@@ -1135,28 +1099,9 @@ class SPt extends S {
   String get extConflictsResolve => 'Resolver conflitos';
 
   @override
-  String get extConflictNote =>
-      'Sua escolha fica salva neste dispositivo. O tema muda na hora; os hooks de rede não são executados nesta versão.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versão $version';
   }
-
-  @override
-  String get extAuthor => 'Autor';
-
-  @override
-  String get extRating => 'Avaliação';
-
-  @override
-  String get extInstalls => 'Instalações';
-
-  @override
-  String get extVersion => 'Versão';
-
-  @override
-  String get extAbout => 'Sobre esta extensão';
 
   @override
   String get extPermissionsTitle => 'Permissões';
@@ -1169,9 +1114,6 @@ class SPt extends S {
 
   @override
   String get extSaveSettings => 'Salvar configurações';
-
-  @override
-  String get extSaving => 'Salvando…';
 
   @override
   String extUpdateTo(String version) {
@@ -1200,7 +1142,7 @@ class SPt extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'O painel não está disponível. A extensão pode ter sido desativada ou removida.';
+  String get extPanelUnavailable => 'O painel da extensão está indisponível.';
 
   @override
   String get extPermConnectionsRead => 'Veja lista de conexões ativas';
@@ -1239,10 +1181,6 @@ class SPt extends S {
   String get extPermBackground => 'Executar tarefas em segundo plano';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Executa tarefas agendadas mesmo quando o painel está fechado. Você pode pausá-lo ou alterar a frequência de execução nas configurações da extensão.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1275,21 +1213,13 @@ class SPt extends S {
   String get extImageFailed => 'Não foi possível carregar a imagem';
 
   @override
-  String get extRatingHow => 'Como funcionam as classificações';
-
-  @override
-  String get extRatingHowBody =>
-      'As classificações usam uma média bayesiana: uma extensão com poucas avaliações permanece próxima do meio até que mais pessoas votem, portanto, uma única avaliação de 5 estrelas não pode levar uma nova extensão ao topo. As classificações recentes pesam mais do que as antigas e apenas uma classificação por conta conta.';
-
-  @override
   String get extScreenshots => 'Capturas de tela';
 
   @override
   String get extSortRelevance => 'Relevância';
 
   @override
-  String get extPermNetworkDetail =>
-      'Busca dados da internet pela VPN. Só os hosts abaixo são permitidos; todo o resto é bloqueado.';
+  String get extPermNetworkDetail => 'As solicitações por VPN só podem acessar os hosts abaixo.';
 
   @override
   String get extBgTitle => 'Tarefa em segundo plano';
@@ -1311,10 +1241,6 @@ class SPt extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# horas', one: '# hora');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'A tarefa roda conforme o agendamento enquanto o Sora está aberto, inclusive na bandeja. O intervalo mínimo é de 15 minutos.';
 
   @override
   String get extBgDisabledNote => 'Habilite a extensão para gerenciar sua tarefa em segundo plano.';
@@ -2018,8 +1944,7 @@ class SPt extends S {
   String get extErrRevoked => 'A equipe do Sora retirou esta versão da extensão porque é insegura ou está quebrada.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Não foi possível renovar a lista de extensões retiradas. A instalação fica bloqueada até que seja renovada: verifique a rede e tente novamente.';
+  String get extErrRevocationsExpired => 'A instalação está bloqueada até a atualização da lista de revogações.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2065,4 +1990,15 @@ class SPt extends S {
 
   @override
   String get extAssetRejected => 'Ficheiro da extensão rejeitado: cores ilegíveis ou regras inválidas.';
+
+  @override
+  String get extVerifiedSora => 'Verificado pela Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Abrir';
 }

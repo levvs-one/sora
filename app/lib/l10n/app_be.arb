@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 усталяванне",
-  "extBadgeVerified": "Праверана",
-  "extBadgeTop": "Самы папулярны на гэтым тыдні",
-  "extBadgeNew": "Новы",
-  "extBadgeStaff": "Каманда Sora",
-  "extSideloadShort": "Не з каталога",
-  "extSideloadWarning": "Гэта пашырэнне не з каталога каманды. Толькі аўтар ручаўся за свой ключ: усталёўвайце яго толькі ў тым выпадку, калі давяраеце аўтару.",
-  "extInstallTitle": "Усталяваць «{name}»",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Абнавіць «{name}»",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Гэта пашырэнне зможа:",
+  "extSideloadWarning": "Усталёўвайце, толькі калі давяраеце самападпісанаму ключу аўтара.",
   "extPermissionsWidened": "Абнаўленне запытвае новыя дазволы:",
   "extDangerousAck": "Я разумею, што гэтыя дазволы сур'ёзныя",
   "extInstall": "Усталяваць",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Дазваляюцца толькі спасылкі https://",
   "extErrGeneric": "Нешта пайшло не так. Калі ласка, паспрабуйце яшчэ раз.",
   "extErrAuthorKeyChanged": "Гэта абнаўленне падпісана іншым ключом аўтара, чым усталяваная версія, таму яно было заблакіравана. Калі вы давяраеце новаму ключу, выдаліце ​​пашырэнне і ўсталюйце яго зноў відавочна.",
-  "extUpdateAvailable": "Абнаўленне даступна",
   "extDisabled": "Выключана",
   "extToggleEnabled": "Уключыць {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Больш не патрабуецца:",
   "extUpdateFailedKept": "Папярэдняя версія ўсё яшчэ ўсталявана.",
   "extConflictsTitle": "Канфлікты пашырэнняў",
-  "extConflictsIntro": "Гэтыя пашырэнні прэтэндуюць на адно і тое ж. Выберыце, якое будзе працаваць, другое застанецца ўсталяваным.",
   "extConflictTheme": "Тэма прыкладання",
   "extConflictNetHooks": "Сеткавыя хукі",
   "extConflictWinner": "Перавага: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Вырашаць канфлікты",
-  "extConflictNote": "Выбар захоўваецца на гэтай прыладзе. Тэма пераключаецца адразу, сеткавыя хукі ў гэтай версіі не запускаюцца.",
   "extVersionLabel": "Версія {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Аўтар",
-  "extRating": "Рэйтынг",
-  "extInstalls": "Усталяванні",
-  "extVersion": "Версія",
-  "extAbout": "Аб гэтым пашырэнні",
   "extPermissionsTitle": "Дазволы",
   "extNoPermissions": "Няма спецыяльных дазволаў.",
   "extSettings": "Налады",
   "extSaveSettings": "Захаваць налады",
-  "extSaving": "Захаванне…",
   "extUpdateTo": "Абнавіць да {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Панэль недаступная. Магчыма, пашырэнне было адключана або выдалена.",
+  "extPanelUnavailable": "Панэль пашырэння недаступная.",
   "extPermConnectionsRead": "Бачыць спіс актыўных злучэнняў",
   "extPermServersRead": "Бачыць спіс вашых сервераў",
   "extPermSettingsRead": "Чытанне налад праграмы",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Інтэграцыя ў сеткавы шлях (модулі абыходу DPI)",
   "extPermNetFetch": "Запытваць URL з дазволенага спісу",
   "extPermBackground": "Запуск фонавых задач",
-  "extPermBackgroundDetail": "Запускае запланаваныя задачы, нават калі панэль закрыта. Вы можаце прыпыніць яго або змяніць частату яго запуску ў наладах пашырэння.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Працуе ў фонавым рэжыме",
   "extCapNetHook": "Абыходы блакаванняў і сеткавыя хукі",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Журнал змяненняў",
   "extImageFailed": "Не ўдалося загрузіць выяву",
-  "extRatingHow": "Як працуюць рэйтынгі",
-  "extRatingHowBody": "У ацэнках выкарыстоўваецца байесаўскае сярэдняе: пашырэнне з невялікай колькасцю ацэнак застаецца каля сярэдзіны, пакуль не прагаласуе больш людзей, таму адна 5-зоркавая рэцэнзія не можа падштурхнуць новае пашырэнне да вяршыні. Нядаўнія рэйтынгі важаць больш, чым старыя, і лічыцца толькі адзін рэйтынг на ўліковы запіс.",
   "extScreenshots": "Скрыншоты",
   "extSortRelevance": "Актуальнасць",
-  "extPermNetworkDetail": "Загружае даныя з інтэрнэту праз VPN. Дазволены толькі хасты са спіса ніжэй, астатнія заблакаваны.",
+  "extPermNetworkDetail": "Запыты праз VPN дазволены толькі да гэтых хостаў.",
   "extBgTitle": "Фонавая задача",
   "extBgEnabled": "Выконваць у фоне",
   "extBgInterval": "Запускаць кожныя",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Задача запускаецца па раскладзе, пакуль Sora адкрыта, у тым ліку згорнутай у трэй. Мінімальны інтэрвал 15 хвілін.",
   "extBgDisabledNote": "Уключыце пашырэнне для кіравання фонавымі задачамі.",
   "extCapNetwork": "Доступ да сеткі",
   "extCapNetworkHosts": "Сетка: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Для захопу пакетаў патрабуецца актыўнае злучэнне Sora TUN.",
   "diagnosticUnavailable": "Гэтая дыягностыка недаступная на гэтай платформе.",
   "extErrRevoked": "Каманда Sora адклікала гэтую версію пашырэння: яна небяспечная або зламаная.",
-  "extErrRevocationsExpired": "Не ўдалося абнавіць спіс адкліканых пашырэнняў. Усталёўка недаступная, пакуль ён не абновіцца: праверце сетку і паспрабуйце зноў.",
+  "extErrRevocationsExpired": "Усталяванне заблакавана да абнаўлення спіса адкліканых пашырэнняў.",
   "extRevokedDisabled": "Адкліканыя пашырэнні выключаны: {names}",
   "customServerWgPrivateKey": "Прыватны ключ",
   "customServerWgAddresses": "Адрасы інтэрфейсу",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Строгі kill switch",
   "strictKillSwitchWarning": "Пасля падключэння блакуе трафік па-за VPN нават пасля збою, перазапуску ці выхаду з праграмы. Доступ вернецца толькі пасля адключэння VPN або гэтай налады. Пасля перазагрузкі блакаванне аднаўляецца толькі пры ўключаным падключэнні пры запуску.",
   "extWorkerFailed": "Фонавае заданне пашырэння не выканана. Праверце журнал пашырэння.",
-  "extAssetRejected": "Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы."
+  "extAssetRejected": "Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы.",
+  "extVerifiedSora": "Праверана Sora",
+  "extReceivedBytes": "{count} Б",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Адкрыць"
 }

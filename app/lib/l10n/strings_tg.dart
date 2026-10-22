@@ -910,36 +910,7 @@ class STg extends S {
   String get extInstallOne => '1 насб';
 
   @override
-  String get extBadgeVerified => 'Тасдиқ карда шудааст';
-
-  @override
-  String get extBadgeTop => 'Маъмултарин дар ин ҳафта';
-
-  @override
-  String get extBadgeNew => 'Нав';
-
-  @override
-  String get extBadgeStaff => 'Дастаи Sora';
-
-  @override
-  String get extSideloadShort => 'Аз каталог нест';
-
-  @override
-  String get extSideloadWarning =>
-      'Ин васеъшавӣ аз каталоги даста нест. Калиди онҳоро танҳо муаллиф кафолат додааст: онро танҳо агар шумо ба муаллиф бовар кунед, насб кунед.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Насб кардани «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Навсозии «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Ин васеъшавӣ қодир аст:';
+  String get extSideloadWarning => 'Танҳо агар ба калиди худимзошудаи муаллиф бовар кунед, насб намоед.';
 
   @override
   String get extPermissionsWidened => 'Навсозӣ иҷозатҳои навро талаб мекунад:';
@@ -1066,9 +1037,6 @@ class STg extends S {
       'Ин навсозӣ бо калиди дигари муаллиф аз версияи насбшуда имзо шудааст, бинобар ин он баста шуд. Агар шумо ба калиди нав бовар кунед, васеъкуниро нест кунед ва онро дубора насб кунед.';
 
   @override
-  String get extUpdateAvailable => 'Навсозии дастрас';
-
-  @override
   String get extDisabled => 'Хомӯш';
 
   @override
@@ -1111,10 +1079,6 @@ class STg extends S {
   String get extConflictsTitle => 'Ихтилофоти васеъшавӣ';
 
   @override
-  String get extConflictsIntro =>
-      'Ин васеъкуниҳо як чизро мехоҳанд. Интихоб кунед, ки кадомаш кор кунад, дигаре насбшуда мемонад.';
-
-  @override
   String get extConflictTheme => 'Мавзӯи барнома';
 
   @override
@@ -1134,28 +1098,9 @@ class STg extends S {
   String get extConflictsResolve => 'ихтилофотро ҳал кунед';
 
   @override
-  String get extConflictNote =>
-      'Интихоби шумо дар ҳамин дастгоҳ нигоҳ дошта мешавад. Мавзӯъ фавран иваз мешавад, хукҳои шабака дар ин версия кор намекунанд.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Версияи $version';
   }
-
-  @override
-  String get extAuthor => 'Муаллиф';
-
-  @override
-  String get extRating => 'Рейтинг';
-
-  @override
-  String get extInstalls => 'Насбкунӣ';
-
-  @override
-  String get extVersion => 'Версия';
-
-  @override
-  String get extAbout => 'Дар бораи ин тамдид';
 
   @override
   String get extPermissionsTitle => 'Иҷозатҳо';
@@ -1168,9 +1113,6 @@ class STg extends S {
 
   @override
   String get extSaveSettings => 'Танзимотро захира кунед';
-
-  @override
-  String get extSaving => 'Захира…';
 
   @override
   String extUpdateTo(String version) {
@@ -1199,7 +1141,7 @@ class STg extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Панел дастнорас аст. Мумкин аст васеъшавӣ ғайрифаъол ё хориҷ карда шуда бошад.';
+  String get extPanelUnavailable => 'Панели васеъшавӣ дастнорас аст.';
 
   @override
   String get extPermConnectionsRead => 'Ба рӯйхати пайвастҳои фаъол нигаред';
@@ -1238,10 +1180,6 @@ class STg extends S {
   String get extPermBackground => 'Вазифаҳои заминаро иҷро кунед';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Вазифаҳои ба нақша гирифташударо ҳатто ҳангоми пӯшида будани панел иҷро мекунад. Шумо метавонед онро таваққуф кунед ё дар танзимоти васеъшавӣ чанд маротиба кор кардани онро тағир диҳед.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1274,21 +1212,13 @@ class STg extends S {
   String get extImageFailed => 'Тасвирро бор карда натавонист';
 
   @override
-  String get extRatingHow => 'Рейтингҳо чӣ гуна кор мекунанд';
-
-  @override
-  String get extRatingHowBody =>
-      'Рейтингҳо ҳисоби миёнаи Байесиро истифода мебаранд: тамдиди дорои чанд рейтинг то он даме, ки шумораи бештари одамон овоз медиҳанд, дар наздикии мобайн боқӣ мемонад, аз ин рӯ як баррасии 5-ситорадор наметавонад тамдиди навро ба боло тела диҳад. Рейтингҳои охирин нисбат ба рейтингҳои кӯҳна зиёдтаранд ва танҳо як рейтинг барои як ҳисоб ҳисоб карда мешавад.';
-
-  @override
   String get extScreenshots => 'Скриншотҳо';
 
   @override
   String get extSortRelevance => 'Муносибат';
 
   @override
-  String get extPermNetworkDetail =>
-      'Маълумотро аз интернет тавассути VPN мегирад. Танҳо хостҳои рӯйхати зерин иҷозат доранд, боқимонда баста аст.';
+  String get extPermNetworkDetail => 'Дархостҳои VPN танҳо ба мизбонҳои зерин иҷозат дода мешаванд.';
 
   @override
   String get extBgTitle => 'Вазифаи пасзамина';
@@ -1310,10 +1240,6 @@ class STg extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# соат');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Вазифа то он даме ки Sora кушода аст, аз ҷумла дар трей, мувофиқи ҷадвал иҷро мешавад. Кӯтоҳтарин фосила 15 дақиқа аст.';
 
   @override
   String get extBgDisabledNote => 'Барои идоракунии вазифаи пасзамина васеъшавиро фаъол кунед.';
@@ -2012,8 +1938,7 @@ class STg extends S {
   String get extErrRevoked => 'Дастаи Sora ин версияи васеъкуниро бозхонд, зеро он хатарнок ё вайрон аст.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Рӯйхати васеъкуниҳои бозхондашуда нав нашуд. То навшавӣ насб баста аст: шабакаро санҷед ва боз кӯшиш кунед.';
+  String get extErrRevocationsExpired => 'Насб то навсозии рӯйхати васеъшавиҳои бозхондшуда баста аст.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2059,4 +1984,15 @@ class STg extends S {
 
   @override
   String get extAssetRejected => 'Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст.';
+
+  @override
+  String get extVerifiedSora => 'Аз ҷониби Sora санҷида шудааст';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count Б';
+  }
+
+  @override
+  String get extOpen => 'Кушодан';
 }

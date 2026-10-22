@@ -909,36 +909,7 @@ class SVi extends S {
   String get extInstallOne => '1 lượt cài đặt';
 
   @override
-  String get extBadgeVerified => 'Đã xác minh';
-
-  @override
-  String get extBadgeTop => 'Phổ biến nhất tuần này';
-
-  @override
-  String get extBadgeNew => 'Mới';
-
-  @override
-  String get extBadgeStaff => 'Đội Sora';
-
-  @override
-  String get extSideloadShort => 'Không có trong danh mục';
-
-  @override
-  String get extSideloadWarning =>
-      'Tiện ích mở rộng này không có trong danh mục của nhóm. Chỉ tác giả mới xác nhận khóa của họ: chỉ cài đặt nó nếu bạn tin tưởng tác giả.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Cài đặt “$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Cập nhật “$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Tiện ích mở rộng này sẽ có thể:';
+  String get extSideloadWarning => 'Chỉ cài đặt nếu bạn tin tưởng khóa tự ký của tác giả.';
 
   @override
   String get extPermissionsWidened => 'Bản cập nhật yêu cầu quyền mới:';
@@ -1065,9 +1036,6 @@ class SVi extends S {
       'Bản cập nhật này được ký bằng khóa tác giả khác với phiên bản đã cài đặt nên đã bị chặn. Nếu bạn tin cậy khóa mới, hãy gỡ cài đặt tiện ích mở rộng và cài đặt lại một cách rõ ràng.';
 
   @override
-  String get extUpdateAvailable => 'Đã có bản cập nhật';
-
-  @override
   String get extDisabled => 'Đã tắt';
 
   @override
@@ -1110,10 +1078,6 @@ class SVi extends S {
   String get extConflictsTitle => 'Xung đột tiện ích mở rộng';
 
   @override
-  String get extConflictsIntro =>
-      'Các tiện ích này muốn cùng một thứ. Chọn tiện ích sẽ chạy; tiện ích còn lại vẫn được cài đặt.';
-
-  @override
   String get extConflictTheme => 'Chủ đề ứng dụng';
 
   @override
@@ -1133,28 +1097,9 @@ class SVi extends S {
   String get extConflictsResolve => 'Giải quyết xung đột';
 
   @override
-  String get extConflictNote =>
-      'Lựa chọn của bạn được lưu trên thiết bị này. Giao diện đổi ngay, còn hook mạng không chạy trong phiên bản này.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Phiên bản $version';
   }
-
-  @override
-  String get extAuthor => 'Tác giả';
-
-  @override
-  String get extRating => 'Đánh giá';
-
-  @override
-  String get extInstalls => 'Lượt cài đặt';
-
-  @override
-  String get extVersion => 'Phiên bản';
-
-  @override
-  String get extAbout => 'Giới thiệu về tiện ích mở rộng này';
 
   @override
   String get extPermissionsTitle => 'Quyền';
@@ -1167,9 +1112,6 @@ class SVi extends S {
 
   @override
   String get extSaveSettings => 'Lưu cài đặt';
-
-  @override
-  String get extSaving => 'Đang lưu…';
 
   @override
   String extUpdateTo(String version) {
@@ -1198,8 +1140,7 @@ class SVi extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'Bảng điều khiển không có sẵn. Tiện ích mở rộng có thể đã bị vô hiệu hóa hoặc bị xóa.';
+  String get extPanelUnavailable => 'Bảng tiện ích không khả dụng.';
 
   @override
   String get extPermConnectionsRead => 'Xem danh sách các kết nối đang hoạt động';
@@ -1238,10 +1179,6 @@ class SVi extends S {
   String get extPermBackground => 'Chạy các tác vụ nền';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Chạy các tác vụ đã lên lịch ngay cả khi đóng bảng điều khiển. Bạn có thể tạm dừng hoặc thay đổi tần suất chạy trong cài đặt tiện ích mở rộng.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1274,21 +1211,13 @@ class SVi extends S {
   String get extImageFailed => 'Không thể tải hình ảnh';
 
   @override
-  String get extRatingHow => 'Cách xếp hạng hoạt động';
-
-  @override
-  String get extRatingHowBody =>
-      'Xếp hạng sử dụng mức trung bình Bayes: tiện ích mở rộng có ít xếp hạng sẽ ở gần giữa cho đến khi có nhiều người bỏ phiếu hơn, do đó, một đánh giá 5 sao không thể đẩy tiện ích mở rộng mới lên đầu. Xếp hạng gần đây nặng hơn xếp hạng cũ và chỉ tính một xếp hạng cho mỗi tài khoản.';
-
-  @override
   String get extScreenshots => 'Ảnh chụp màn hình';
 
   @override
   String get extSortRelevance => 'Mức độ liên quan';
 
   @override
-  String get extPermNetworkDetail =>
-      'Tải dữ liệu từ internet qua VPN. Chỉ các máy chủ bên dưới được phép, còn lại đều bị chặn.';
+  String get extPermNetworkDetail => 'Yêu cầu qua VPN chỉ được phép đến các máy chủ bên dưới.';
 
   @override
   String get extBgTitle => 'Tác vụ nền';
@@ -1310,10 +1239,6 @@ class SVi extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# giờ');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Tác vụ chạy theo lịch khi Sora đang mở, kể cả khi ở khay hệ thống. Khoảng cách ngắn nhất là 15 phút.';
 
   @override
   String get extBgDisabledNote => 'Kích hoạt tiện ích mở rộng để quản lý tác vụ nền của nó.';
@@ -2010,8 +1935,7 @@ class SVi extends S {
   String get extErrRevoked => 'Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.';
+  String get extErrRevocationsExpired => 'Việc cài đặt bị chặn cho đến khi danh sách thu hồi được cập nhật.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2057,4 +1981,15 @@ class SVi extends S {
 
   @override
   String get extAssetRejected => 'Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ.';
+
+  @override
+  String get extVerifiedSora => 'Được Sora xác minh';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Mở';
 }

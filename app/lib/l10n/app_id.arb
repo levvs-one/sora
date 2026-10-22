@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 pemasangan",
-  "extBadgeVerified": "Terverifikasi",
-  "extBadgeTop": "Paling populer minggu ini",
-  "extBadgeNew": "Baru",
-  "extBadgeStaff": "Tim Sora",
-  "extSideloadShort": "Bukan dari katalog",
-  "extSideloadWarning": "Ekstensi ini bukan dari katalog tim. Hanya penulis yang menjamin kuncinya: instal hanya jika Anda memercayai penulisnya.",
-  "extInstallTitle": "Pasang “{name}”",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Perbarui “{name}”",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Ekstensi ini akan dapat:",
+  "extSideloadWarning": "Instal hanya jika Anda memercayai kunci yang ditandatangani sendiri oleh pembuatnya.",
   "extPermissionsWidened": "Pembaruan meminta izin baru:",
   "extDangerousAck": "Saya memahami bahwa izin ini serius",
   "extInstall": "Pasang",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Hanya tautan https:// yang diperbolehkan",
   "extErrGeneric": "Ada yang tidak beres. Silakan coba lagi.",
   "extErrAuthorKeyChanged": "Pembaruan ini ditandatangani dengan kunci penulis yang berbeda dari versi yang diinstal, sehingga diblokir. Jika Anda memercayai kunci baru, copot pemasangan ekstensi dan pasang kembali secara eksplisit.",
-  "extUpdateAvailable": "Pembaruan tersedia",
   "extDisabled": "Dinonaktifkan",
   "extToggleEnabled": "Aktifkan {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Tidak lagi diminta:",
   "extUpdateFailedKept": "Versi sebelumnya masih terinstal.",
   "extConflictsTitle": "Konflik perluasan",
-  "extConflictsIntro": "Ekstensi ini menginginkan hal yang sama. Pilih mana yang berjalan; yang lain tetap terpasang.",
   "extConflictTheme": "Tema aplikasi",
   "extConflictNetHooks": "Kait jaringan",
   "extConflictWinner": "{name} menang",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Selesaikan konflik",
-  "extConflictNote": "Pilihan Anda disimpan di perangkat ini. Tema langsung berganti; hook jaringan tidak dijalankan di versi ini.",
   "extVersionLabel": "Versi {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Penulis",
-  "extRating": "Peringkat",
-  "extInstalls": "Instalasi",
-  "extVersion": "Versi",
-  "extAbout": "Tentang ekstensi ini",
   "extPermissionsTitle": "Izin",
   "extNoPermissions": "Tidak ada izin khusus.",
   "extSettings": "Pengaturan",
   "extSaveSettings": "Simpan pengaturan",
-  "extSaving": "Menyimpan…",
   "extUpdateTo": "Perbarui ke {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Panel tidak tersedia. Ekstensi mungkin telah dinonaktifkan atau dihapus.",
+  "extPanelUnavailable": "Panel ekstensi tidak tersedia.",
   "extPermConnectionsRead": "Lihat daftar koneksi aktif",
   "extPermServersRead": "Lihat daftar server Anda",
   "extPermSettingsRead": "Baca pengaturan aplikasi",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Integrasikan ke jalur jaringan (DPI modul bypass)",
   "extPermNetFetch": "Minta URL dari daftar yang diizinkan",
   "extPermBackground": "Jalankan tugas latar belakang",
-  "extPermBackgroundDetail": "Menjalankan tugas terjadwal bahkan ketika panel ditutup. Anda dapat menjeda atau mengubah frekuensi dijalankannya di pengaturan ekstensi.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Berjalan di latar belakang",
   "extCapNetHook": "Pengelakan dan kait jaringan",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Catatan Perubahan",
   "extImageFailed": "Tidak dapat memuat gambar",
-  "extRatingHow": "Cara kerja pemeringkatan",
-  "extRatingHowBody": "Peringkat menggunakan rata-rata Bayesian: ekstensi dengan sedikit peringkat tetap berada di tengah hingga lebih banyak orang memilih, sehingga satu ulasan bintang 5 tidak dapat mendorong ekstensi baru ke atas. Peringkat terbaru lebih berbobot dibandingkan peringkat lama, dan hanya satu peringkat per akun yang dihitung.",
   "extScreenshots": "Tangkapan Layar",
   "extSortRelevance": "Relevansi",
-  "extPermNetworkDetail": "Mengambil data dari internet melalui VPN. Hanya host di bawah yang diizinkan, sisanya diblokir.",
+  "extPermNetworkDetail": "Permintaan VPN hanya diizinkan ke host di bawah ini.",
   "extBgTitle": "Tugas latar belakang",
   "extBgEnabled": "Jalankan di latar belakang",
   "extBgInterval": "Jalankan setiap",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Tugas berjalan sesuai jadwal selama Sora terbuka, termasuk saat di baki. Interval terpendek 15 menit.",
   "extBgDisabledNote": "Aktifkan ekstensi untuk mengelola tugas latar belakangnya.",
   "extCapNetwork": "Akses jaringan",
   "extCapNetworkHosts": "Jaringan: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Pengambilan paket memerlukan koneksi Sora TUN yang aktif.",
   "diagnosticUnavailable": "Diagnostik ini tidak tersedia pada platform ini.",
   "extErrRevoked": "Tim Sora menarik versi ekstensi ini karena tidak aman atau rusak.",
-  "extErrRevocationsExpired": "Daftar ekstensi yang ditarik tidak dapat diperbarui. Pemasangan diblokir sampai diperbarui: periksa jaringan lalu coba lagi.",
+  "extErrRevocationsExpired": "Instalasi diblokir hingga daftar pencabutan diperbarui.",
   "extRevokedDisabled": "Ekstensi yang ditarik dimatikan: {names}",
   "customServerWgPrivateKey": "Kunci privat",
   "customServerWgAddresses": "Alamat antarmuka",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Pemutus jaringan ketat",
   "strictKillSwitchWarning": "Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan.",
   "extWorkerFailed": "Tugas latar belakang ekstensi gagal. Periksa log ekstensi.",
-  "extAssetRejected": "Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid."
+  "extAssetRejected": "Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.",
+  "extVerifiedSora": "Diverifikasi oleh Sora",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Buka"
 }

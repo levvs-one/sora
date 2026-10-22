@@ -893,35 +893,7 @@ class SZh extends S {
   String get extInstallOne => '1 次安装';
 
   @override
-  String get extBadgeVerified => '已验证';
-
-  @override
-  String get extBadgeTop => '本周热门';
-
-  @override
-  String get extBadgeNew => '新';
-
-  @override
-  String get extBadgeStaff => 'Sora 团队';
-
-  @override
-  String get extSideloadShort => '非目录来源';
-
-  @override
-  String get extSideloadWarning => '非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '安装「$name」';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '更新「$name」';
-  }
-
-  @override
-  String get extPermissionsIntro => '此扩展将能够：';
+  String get extSideloadWarning => '仅在信任作者的自签名密钥时安装。';
 
   @override
   String get extPermissionsWidened => '此更新要求新的权限：';
@@ -1046,9 +1018,6 @@ class SZh extends S {
   String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
 
   @override
-  String get extUpdateAvailable => '有可用更新';
-
-  @override
   String get extDisabled => '已停用';
 
   @override
@@ -1091,9 +1060,6 @@ class SZh extends S {
   String get extConflictsTitle => '扩展冲突';
 
   @override
-  String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
-
-  @override
   String get extConflictTheme => '应用主题';
 
   @override
@@ -1113,27 +1079,9 @@ class SZh extends S {
   String get extConflictsResolve => '解决冲突';
 
   @override
-  String get extConflictNote => '你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。';
-
-  @override
   String extVersionLabel(String version) {
     return '版本 $version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '评分';
-
-  @override
-  String get extInstalls => '安装次数';
-
-  @override
-  String get extVersion => '版本';
-
-  @override
-  String get extAbout => '关于';
 
   @override
   String get extPermissionsTitle => '权限';
@@ -1146,9 +1094,6 @@ class SZh extends S {
 
   @override
   String get extSaveSettings => '保存设置';
-
-  @override
-  String get extSaving => '正在保存…';
 
   @override
   String extUpdateTo(String version) {
@@ -1177,7 +1122,7 @@ class SZh extends S {
   }
 
   @override
-  String get extPanelUnavailable => '面板无法使用，扩展可能已停用或移除。';
+  String get extPanelUnavailable => '扩展面板不可用。';
 
   @override
   String get extPermConnectionsRead => '查看目前的连接清单';
@@ -1216,9 +1161,6 @@ class SZh extends S {
   String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermBackgroundDetail => '即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1251,19 +1193,13 @@ class SZh extends S {
   String get extImageFailed => '无法加载图片';
 
   @override
-  String get extRatingHow => '评分计算方式';
-
-  @override
-  String get extRatingHowBody => '评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。';
-
-  @override
   String get extScreenshots => '截图';
 
   @override
   String get extSortRelevance => '相关性';
 
   @override
-  String get extPermNetworkDetail => '通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。';
+  String get extPermNetworkDetail => 'VPN 请求仅限访问以下主机。';
 
   @override
   String get extBgTitle => '后台任务';
@@ -1285,9 +1221,6 @@ class SZh extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => '只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。';
 
   @override
   String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
@@ -1973,7 +1906,7 @@ class SZh extends S {
   String get extErrRevoked => 'Sora 团队已撤回此扩展版本，因为它不安全或已损坏。';
 
   @override
-  String get extErrRevocationsExpired => '无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。';
+  String get extErrRevocationsExpired => '撤销列表更新前无法安装扩展。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2018,6 +1951,17 @@ class SZh extends S {
 
   @override
   String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+
+  @override
+  String get extVerifiedSora => '经 Sora 验证';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 字节';
+  }
+
+  @override
+  String get extOpen => '打开';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2908,35 +2852,7 @@ class SZhHans extends SZh {
   String get extInstallOne => '1 次安装';
 
   @override
-  String get extBadgeVerified => '已验证';
-
-  @override
-  String get extBadgeTop => '本周热门';
-
-  @override
-  String get extBadgeNew => '新';
-
-  @override
-  String get extBadgeStaff => 'Sora 团队';
-
-  @override
-  String get extSideloadShort => '非目录来源';
-
-  @override
-  String get extSideloadWarning => '非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '安装「$name」';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '更新「$name」';
-  }
-
-  @override
-  String get extPermissionsIntro => '此扩展将能够：';
+  String get extSideloadWarning => '仅在信任作者的自签名密钥时安装。';
 
   @override
   String get extPermissionsWidened => '此更新要求新的权限：';
@@ -3061,9 +2977,6 @@ class SZhHans extends SZh {
   String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
 
   @override
-  String get extUpdateAvailable => '有可用更新';
-
-  @override
   String get extDisabled => '已停用';
 
   @override
@@ -3106,9 +3019,6 @@ class SZhHans extends SZh {
   String get extConflictsTitle => '扩展冲突';
 
   @override
-  String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
-
-  @override
   String get extConflictTheme => '应用主题';
 
   @override
@@ -3128,27 +3038,9 @@ class SZhHans extends SZh {
   String get extConflictsResolve => '解决冲突';
 
   @override
-  String get extConflictNote => '你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。';
-
-  @override
   String extVersionLabel(String version) {
     return '版本 $version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '评分';
-
-  @override
-  String get extInstalls => '安装次数';
-
-  @override
-  String get extVersion => '版本';
-
-  @override
-  String get extAbout => '关于';
 
   @override
   String get extPermissionsTitle => '权限';
@@ -3161,9 +3053,6 @@ class SZhHans extends SZh {
 
   @override
   String get extSaveSettings => '保存设置';
-
-  @override
-  String get extSaving => '正在保存…';
 
   @override
   String extUpdateTo(String version) {
@@ -3192,7 +3081,7 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get extPanelUnavailable => '面板无法使用，扩展可能已停用或移除。';
+  String get extPanelUnavailable => '扩展面板不可用。';
 
   @override
   String get extPermConnectionsRead => '查看目前的连接清单';
@@ -3231,9 +3120,6 @@ class SZhHans extends SZh {
   String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermBackgroundDetail => '即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -3266,19 +3152,13 @@ class SZhHans extends SZh {
   String get extImageFailed => '无法加载图片';
 
   @override
-  String get extRatingHow => '评分计算方式';
-
-  @override
-  String get extRatingHowBody => '评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。';
-
-  @override
   String get extScreenshots => '截图';
 
   @override
   String get extSortRelevance => '相关性';
 
   @override
-  String get extPermNetworkDetail => '通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。';
+  String get extPermNetworkDetail => 'VPN 请求仅限访问以下主机。';
 
   @override
   String get extBgTitle => '后台任务';
@@ -3300,9 +3180,6 @@ class SZhHans extends SZh {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => '只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。';
 
   @override
   String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
@@ -3988,7 +3865,7 @@ class SZhHans extends SZh {
   String get extErrRevoked => 'Sora 团队已撤回此扩展版本，因为它不安全或已损坏。';
 
   @override
-  String get extErrRevocationsExpired => '无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。';
+  String get extErrRevocationsExpired => '撤销列表更新前无法安装扩展。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -4033,6 +3910,17 @@ class SZhHans extends SZh {
 
   @override
   String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+
+  @override
+  String get extVerifiedSora => '经 Sora 验证';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 字节';
+  }
+
+  @override
+  String get extOpen => '打开';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4923,35 +4811,7 @@ class SZhHant extends SZh {
   String get extInstallOne => '1 次安裝';
 
   @override
-  String get extBadgeVerified => '已驗證';
-
-  @override
-  String get extBadgeTop => '本週熱門';
-
-  @override
-  String get extBadgeNew => '最新';
-
-  @override
-  String get extBadgeStaff => 'Sora 團隊';
-
-  @override
-  String get extSideloadShort => '非來自目錄';
-
-  @override
-  String get extSideloadWarning => '非來自團隊目錄。作者金鑰僅由作者自行聲明，請只在信任作者時安裝。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '安裝「$name」';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '更新「$name」';
-  }
-
-  @override
-  String get extPermissionsIntro => '此擴充功能將能夠：';
+  String get extSideloadWarning => '僅在信任作者的自簽章金鑰時安裝。';
 
   @override
   String get extPermissionsWidened => '此更新要求新的權限：';
@@ -5076,9 +4936,6 @@ class SZhHant extends SZh {
   String get extErrAuthorKeyChanged => '此更新的作者簽署金鑰與已安裝版本不同，因此已遭封鎖。若您信任新金鑰，請先解除安裝擴充功能，再自行重新安裝。';
 
   @override
-  String get extUpdateAvailable => '有可用更新';
-
-  @override
   String get extDisabled => '已停用';
 
   @override
@@ -5121,9 +4978,6 @@ class SZhHant extends SZh {
   String get extConflictsTitle => '擴充功能衝突';
 
   @override
-  String get extConflictsIntro => '這些擴充功能想要同一樣東西。選擇要讓哪個執行，另一個仍保持安裝。';
-
-  @override
   String get extConflictTheme => '應用程式佈景主題';
 
   @override
@@ -5143,27 +4997,9 @@ class SZhHant extends SZh {
   String get extConflictsResolve => '解決衝突';
 
   @override
-  String get extConflictNote => '你的選擇會儲存在此裝置上。主題會立即切換，網路掛鉤在此版本中不會執行。';
-
-  @override
   String extVersionLabel(String version) {
     return '版本 $version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '評分';
-
-  @override
-  String get extInstalls => '安裝次數';
-
-  @override
-  String get extVersion => '版本';
-
-  @override
-  String get extAbout => '關於';
 
   @override
   String get extPermissionsTitle => '權限';
@@ -5176,9 +5012,6 @@ class SZhHant extends SZh {
 
   @override
   String get extSaveSettings => '儲存設定';
-
-  @override
-  String get extSaving => '正在儲存…';
 
   @override
   String extUpdateTo(String version) {
@@ -5207,7 +5040,7 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get extPanelUnavailable => '面板無法使用，擴充功能可能已停用或移除。';
+  String get extPanelUnavailable => '擴充功能面板無法使用。';
 
   @override
   String get extPermConnectionsRead => '查看目前的連接清單';
@@ -5246,9 +5079,6 @@ class SZhHant extends SZh {
   String get extPermBackground => '執行背景工作';
 
   @override
-  String get extPermBackgroundDetail => '即使關閉面板，仍會執行排程工作。您可以在擴充功能設定中暫停工作或調整執行頻率。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -5281,20 +5111,13 @@ class SZhHant extends SZh {
   String get extImageFailed => '無法載入圖片';
 
   @override
-  String get extRatingHow => '評分計算方式';
-
-  @override
-  String get extRatingHowBody =>
-      '評分採用貝氏平均：評分數量較少的擴充功能會維持在中間值附近，直到有更多人評分，因此單一五星評價無法讓新擴充功能登上榜首。近期評分的權重高於較早的評分，每個帳號只計入一筆評分。';
-
-  @override
   String get extScreenshots => '螢幕擷取畫面';
 
   @override
   String get extSortRelevance => '相關程度';
 
   @override
-  String get extPermNetworkDetail => '透過 VPN 從網際網路取得資料。只允許下方列出的主機，其餘全部封鎖。';
+  String get extPermNetworkDetail => 'VPN 請求僅限存取以下主機。';
 
   @override
   String get extBgTitle => '背景工作';
@@ -5316,9 +5139,6 @@ class SZhHant extends SZh {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小時');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => '只要 Sora 處於開啟狀態（包括在系統匣中），工作就會依排程執行。最短間隔為 15 分鐘。';
 
   @override
   String get extBgDisabledNote => '請先啟用擴充功能，才能管理背景工作。';
@@ -6004,7 +5824,7 @@ class SZhHant extends SZh {
   String get extErrRevoked => 'Sora 團隊已撤回此擴充功能版本，因為它不安全或已損壞。';
 
   @override
-  String get extErrRevocationsExpired => '無法更新已撤回擴充功能的清單。在更新之前無法安裝：請檢查網路後重試。';
+  String get extErrRevocationsExpired => '撤銷清單更新前無法安裝擴充功能。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -6050,4 +5870,15 @@ class SZhHant extends SZh {
 
   @override
   String get extAssetRejected => '擴充功能檔案遭拒：顏色難以辨認或規則無效。';
+
+  @override
+  String get extVerifiedSora => '經 Sora 驗證';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 位元組';
+  }
+
+  @override
+  String get extOpen => '開啟';
 }

@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 次安装",
-  "extBadgeVerified": "已验证",
-  "extBadgeTop": "本周热门",
-  "extBadgeNew": "新",
-  "extBadgeStaff": "Sora 团队",
-  "extSideloadShort": "非目录来源",
-  "extSideloadWarning": "非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。",
-  "extInstallTitle": "安装「{name}」",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "更新「{name}」",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "此扩展将能够：",
+  "extSideloadWarning": "仅在信任作者的自签名密钥时安装。",
   "extPermissionsWidened": "此更新要求新的权限：",
   "extDangerousAck": "我了解这些权限的影响范围很大",
   "extInstall": "安装",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "仅允许 https:// 链接",
   "extErrGeneric": "发生错误，请再试一次。",
   "extErrAuthorKeyChanged": "此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。",
-  "extUpdateAvailable": "有可用更新",
   "extDisabled": "已停用",
   "extToggleEnabled": "启用 {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "不再要求：",
   "extUpdateFailedKept": "已保留先前安装的版本。",
   "extConflictsTitle": "扩展冲突",
-  "extConflictsIntro": "这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。",
   "extConflictTheme": "应用主题",
   "extConflictNetHooks": "网络拦截挂钩",
   "extConflictWinner": "优先使用 {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "解决冲突",
-  "extConflictNote": "你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。",
   "extVersionLabel": "版本 {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "作者",
-  "extRating": "评分",
-  "extInstalls": "安装次数",
-  "extVersion": "版本",
-  "extAbout": "关于",
   "extPermissionsTitle": "权限",
   "extNoPermissions": "不需要特殊权限。",
   "extSettings": "设置",
   "extSaveSettings": "保存设置",
-  "extSaving": "正在保存…",
   "extUpdateTo": "更新至 {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "面板无法使用，扩展可能已停用或移除。",
+  "extPanelUnavailable": "扩展面板不可用。",
   "extPermConnectionsRead": "查看目前的连接清单",
   "extPermServersRead": "查看您的服务器清单",
   "extPermSettingsRead": "读取应用程序设置",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "介入网络传输路径（DPI 绕过模块）",
   "extPermNetFetch": "访问允许清单中的 URL",
   "extPermBackground": "执行后台任务",
-  "extPermBackgroundDetail": "即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "在后台执行",
   "extCapNetHook": "绕过机制与网络挂钩",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "版本记录",
   "extImageFailed": "无法加载图片",
-  "extRatingHow": "评分计算方式",
-  "extRatingHowBody": "评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。",
   "extScreenshots": "截图",
   "extSortRelevance": "相关性",
-  "extPermNetworkDetail": "通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。",
+  "extPermNetworkDetail": "VPN 请求仅限访问以下主机。",
   "extBgTitle": "后台任务",
   "extBgEnabled": "在后台执行",
   "extBgInterval": "执行间隔",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。",
   "extBgDisabledNote": "请先启用扩展，才能管理后台任务。",
   "extCapNetwork": "网络访问",
   "extCapNetworkHosts": "网络：{hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "数据包捕获需要活动的 Sora TUN 连接。",
   "diagnosticUnavailable": "此诊断在此平台上不可用。",
   "extErrRevoked": "Sora 团队已撤回此扩展版本，因为它不安全或已损坏。",
-  "extErrRevocationsExpired": "无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。",
+  "extErrRevocationsExpired": "撤销列表更新前无法安装扩展。",
   "extRevokedDisabled": "已关闭被撤回的扩展：{names}",
   "customServerWgPrivateKey": "私钥",
   "customServerWgAddresses": "接口地址",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "严格网络锁定",
   "strictKillSwitchWarning": "连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。",
   "extWorkerFailed": "扩展的后台任务失败。请查看扩展日志。",
-  "extAssetRejected": "扩展文件被拒绝：颜色难以辨认或规则无效。"
+  "extAssetRejected": "扩展文件被拒绝：颜色难以辨认或规则无效。",
+  "extVerifiedSora": "经 Sora 验证",
+  "extReceivedBytes": "{count} 字节",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "打开"
 }

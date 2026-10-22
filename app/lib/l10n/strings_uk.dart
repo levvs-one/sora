@@ -908,36 +908,7 @@ class SUk extends S {
   String get extInstallOne => '1 встановлення';
 
   @override
-  String get extBadgeVerified => 'Перевірено';
-
-  @override
-  String get extBadgeTop => 'Найпопулярніший цього тижня';
-
-  @override
-  String get extBadgeNew => 'Нове';
-
-  @override
-  String get extBadgeStaff => 'Команда Sora';
-
-  @override
-  String get extSideloadShort => 'Не з каталогу';
-
-  @override
-  String get extSideloadWarning =>
-      'Це розширення не з каталогу команди. За свій ключ поручився лише автор: встановлюйте його, лише якщо довіряєте автору.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Установити «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Оновити «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Це розширення зможе:';
+  String get extSideloadWarning => 'Установлюйте, лише якщо довіряєте самопідписаному ключу автора.';
 
   @override
   String get extPermissionsWidened => 'Оновлення запитує нові дозволи:';
@@ -1063,9 +1034,6 @@ class SUk extends S {
       'Це оновлення підписано іншим ключем автора, ніж встановлена ​​версія, тому його було заблоковано. Якщо ви довіряєте новому ключу, видаліть розширення та встановіть його знову явно.';
 
   @override
-  String get extUpdateAvailable => 'Доступне оновлення';
-
-  @override
   String get extDisabled => 'Вимкнено';
 
   @override
@@ -1108,10 +1076,6 @@ class SUk extends S {
   String get extConflictsTitle => 'Конфлікти розширень';
 
   @override
-  String get extConflictsIntro =>
-      'Ці розширення претендують на одне й те саме. Виберіть, яке працюватиме, друге залишиться встановленим.';
-
-  @override
   String get extConflictTheme => 'Тема програми';
 
   @override
@@ -1131,28 +1095,9 @@ class SUk extends S {
   String get extConflictsResolve => 'Вирішення конфліктів';
 
   @override
-  String get extConflictNote =>
-      'Вибір зберігається на цьому пристрої. Тема перемикається одразу, мережеві хуки в цій версії не запускаються.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Версія $version';
   }
-
-  @override
-  String get extAuthor => 'Автор';
-
-  @override
-  String get extRating => 'Рейтинг';
-
-  @override
-  String get extInstalls => 'Встановлення';
-
-  @override
-  String get extVersion => 'Версія';
-
-  @override
-  String get extAbout => 'Про це розширення';
 
   @override
   String get extPermissionsTitle => 'Дозволи';
@@ -1165,9 +1110,6 @@ class SUk extends S {
 
   @override
   String get extSaveSettings => 'Зберегти налаштування';
-
-  @override
-  String get extSaving => 'Збереження…';
 
   @override
   String extUpdateTo(String version) {
@@ -1196,7 +1138,7 @@ class SUk extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Панель недоступна. Можливо, розширення було вимкнено або видалено.';
+  String get extPanelUnavailable => 'Панель розширення недоступна.';
 
   @override
   String get extPermConnectionsRead => 'Перегляд активних з\'єднань';
@@ -1235,10 +1177,6 @@ class SUk extends S {
   String get extPermBackground => 'Запуск фонових завдань';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Виконує заплановані завдання, навіть якщо панель закрита. Ви можете призупинити його або змінити частоту його запуску в налаштуваннях розширення.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1271,21 +1209,13 @@ class SUk extends S {
   String get extImageFailed => 'Не вдалося завантажити зображення';
 
   @override
-  String get extRatingHow => 'Як працюють рейтинги';
-
-  @override
-  String get extRatingHowBody =>
-      'Для оцінок використовується середнє байєсівське значення: розширення з невеликою кількістю оцінок залишається біля середини, доки не проголосує більше людей, тому один відгук із 5 зірками не може підняти нове розширення наверх. Останні рейтинги важливіші за старі, і враховується лише один рейтинг на обліковий запис.';
-
-  @override
   String get extScreenshots => 'Скріншоти';
 
   @override
   String get extSortRelevance => 'Релевантність';
 
   @override
-  String get extPermNetworkDetail =>
-      'Завантажує дані з інтернету через VPN. Дозволені лише хости зі списку нижче, решту заблоковано.';
+  String get extPermNetworkDetail => 'Запити через VPN дозволені лише до цих хостів.';
 
   @override
   String get extBgTitle => 'Фонове завдання';
@@ -1321,10 +1251,6 @@ class SUk extends S {
     );
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Завдання запускається за розкладом, поки Sora відкрита, зокрема згорнута в трей. Мінімальний інтервал 15 хвилин.';
 
   @override
   String get extBgDisabledNote => 'Увімкніть розширення для керування його фоновим завданням.';
@@ -2036,8 +1962,7 @@ class SUk extends S {
   String get extErrRevoked => 'Команда Sora відкликала цю версію розширення: вона небезпечна або зламана.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Не вдалося оновити список відкликаних розширень. Встановлення недоступне, доки він не оновиться: перевірте мережу й спробуйте знову.';
+  String get extErrRevocationsExpired => 'Установлення заблоковано до оновлення списку відкликаних розширень.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2083,4 +2008,15 @@ class SUk extends S {
 
   @override
   String get extAssetRejected => 'Файл розширення відхилено: нечитабельні кольори або неправильні правила.';
+
+  @override
+  String get extVerifiedSora => 'Перевірено Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count Б';
+  }
+
+  @override
+  String get extOpen => 'Відкрити';
 }

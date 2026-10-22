@@ -909,36 +909,7 @@ class SKa extends S {
   String get extInstallOne => '1 ინსტალაცია';
 
   @override
-  String get extBadgeVerified => 'დამოწმებულია';
-
-  @override
-  String get extBadgeTop => 'ყველაზე პოპულარული ამ კვირაში';
-
-  @override
-  String get extBadgeNew => 'ახალი';
-
-  @override
-  String get extBadgeStaff => 'Sora გუნდი';
-
-  @override
-  String get extSideloadShort => 'არა კატალოგიდან';
-
-  @override
-  String get extSideloadWarning =>
-      'ეს გაფართოება არ არის გუნდის კატალოგიდან. მხოლოდ ავტორმა დადო გარანტია მათი გასაღებისთვის: დააინსტალირეთ მხოლოდ იმ შემთხვევაში, თუ ენდობით ავტორს.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '„$name“-ის დაყენება';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '„$name“-ის განახლება';
-  }
-
-  @override
-  String get extPermissionsIntro => 'ამ გაფართოებას შეეძლება:';
+  String get extSideloadWarning => 'დააყენეთ მხოლოდ მაშინ, თუ ენდობით ავტორის თვითხელმოწერილ გასაღებს.';
 
   @override
   String get extPermissionsWidened => 'განახლება ითხოვს ახალ ნებართვებს:';
@@ -1065,9 +1036,6 @@ class SKa extends S {
       'ეს განახლება ხელმოწერილია სხვა ავტორის გასაღებით, ვიდრე დაინსტალირებული ვერსია, ამიტომ დაბლოკილია. თუ ენდობით ახალ გასაღებს, წაშალეთ გაფართოება და ხელახლა დააინსტალირეთ იგი აშკარად.';
 
   @override
-  String get extUpdateAvailable => 'განახლება ხელმისაწვდომია';
-
-  @override
   String get extDisabled => 'გამორთულია';
 
   @override
@@ -1110,10 +1078,6 @@ class SKa extends S {
   String get extConflictsTitle => 'გაფართოების კონფლიქტები';
 
   @override
-  String get extConflictsIntro =>
-      'ეს გაფართოებები ერთსა და იმავეს ითხოვს. აირჩიეთ, რომელი იმუშავებს, მეორე დაინსტალირებული დარჩება.';
-
-  @override
   String get extConflictTheme => 'აპლიკაციის თემა';
 
   @override
@@ -1133,28 +1097,9 @@ class SKa extends S {
   String get extConflictsResolve => 'კონფლიქტების მოგვარება';
 
   @override
-  String get extConflictNote =>
-      'თქვენი არჩევანი ინახება ამ მოწყობილობაზე. თემა მაშინვე იცვლება, ქსელური ჰუკები კი ამ ვერსიაში არ ეშვება.';
-
-  @override
   String extVersionLabel(String version) {
     return 'ვერსია $version';
   }
-
-  @override
-  String get extAuthor => 'ავტორი';
-
-  @override
-  String get extRating => 'რეიტინგი';
-
-  @override
-  String get extInstalls => 'ინსტალაციები';
-
-  @override
-  String get extVersion => 'ვერსია';
-
-  @override
-  String get extAbout => 'ამ გაფართოების შესახებ';
 
   @override
   String get extPermissionsTitle => 'ნებართვები';
@@ -1167,9 +1112,6 @@ class SKa extends S {
 
   @override
   String get extSaveSettings => 'პარამეტრების შენახვა';
-
-  @override
-  String get extSaving => 'ინახება…';
 
   @override
   String extUpdateTo(String version) {
@@ -1198,7 +1140,7 @@ class SKa extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'პანელი მიუწვდომელია. გაფართოება შესაძლოა გათიშული ან წაშლილი იყოს.';
+  String get extPanelUnavailable => 'გაფართოების პანელი მიუწვდომელია.';
 
   @override
   String get extPermConnectionsRead => 'იხილეთ აქტიური კავშირების სია';
@@ -1237,10 +1179,6 @@ class SKa extends S {
   String get extPermBackground => 'გაუშვით ფონური ამოცანები';
 
   @override
-  String get extPermBackgroundDetail =>
-      'ასრულებს დაგეგმილ ამოცანებს მაშინაც კი, როდესაც პანელი დახურულია. შეგიძლიათ დააპაუზოთ ან შეცვალოთ მისი გაშვების სიხშირე გაფართოების პარამეტრებში.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1273,21 +1211,13 @@ class SKa extends S {
   String get extImageFailed => 'სურათის ჩატვირთვა ვერ მოხერხდა';
 
   @override
-  String get extRatingHow => 'როგორ მუშაობს რეიტინგები';
-
-  @override
-  String get extRatingHowBody =>
-      'რეიტინგები იყენებს ბაიესის საშუალოს: გაფართოება მცირე რეიტინგით რჩება შუათან ახლოს, სანამ მეტი ადამიანი არ მისცემს ხმას, ასე რომ, ერთი 5 ვარსკვლავიანი მიმოხილვა ვერ აიყვანს ახალ გაფართოებას ზევით. ბოლო რეიტინგები უფრო მეტს იწონის, ვიდრე ძველები და ანგარიშზე მხოლოდ ერთი რეიტინგი ითვლება.';
-
-  @override
   String get extScreenshots => 'ეკრანის ანაბეჭდები';
 
   @override
   String get extSortRelevance => 'აქტუალობა';
 
   @override
-  String get extPermNetworkDetail =>
-      'ტვირთავს მონაცემებს ინტერნეტიდან VPN-ის გავლით. დაშვებულია მხოლოდ ქვემოთ მოცემული ჰოსტები, დანარჩენი დაბლოკილია.';
+  String get extPermNetworkDetail => 'VPN მოთხოვნები მხოლოდ ქვემოთ ჩამოთვლილ ჰოსტებზეა დაშვებული.';
 
   @override
   String get extBgTitle => 'ფონური ამოცანა';
@@ -1309,9 +1239,6 @@ class SKa extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# საათი', one: '# საათი');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => 'დავალება გრაფიკით ეშვება, სანამ Sora ღიაა, მათ შორის უჯრაში. მინიმალური ინტერვალი 15 წუთია.';
 
   @override
   String get extBgDisabledNote => 'ჩართეთ გაფართოება მისი ფონის ამოცანის მართვისთვის.';
@@ -2013,8 +1940,7 @@ class SKa extends S {
   String get extErrRevoked => 'Sora-ს გუნდმა გაფართოების ეს ვერსია გააუქმა, რადგან ის სახიფათო ან გაუმართავია.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'გაუქმებული გაფართოებების სია ვერ განახლდა. განახლებამდე ინსტალაცია დაბლოკილია: შეამოწმეთ ქსელი და სცადეთ თავიდან.';
+  String get extErrRevocationsExpired => 'დაყენება დაბლოკილია გაუქმებული გაფართოებების სიის განახლებამდე.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2060,4 +1986,15 @@ class SKa extends S {
 
   @override
   String get extAssetRejected => 'გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები.';
+
+  @override
+  String get extVerifiedSora => 'დამოწმებულია Sora-ს მიერ';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count ბაიტი';
+  }
+
+  @override
+  String get extOpen => 'გახსნა';
 }

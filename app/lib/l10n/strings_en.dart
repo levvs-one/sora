@@ -897,36 +897,7 @@ class SEn extends S {
   String get extInstallOne => '1 install';
 
   @override
-  String get extBadgeVerified => 'Verified';
-
-  @override
-  String get extBadgeTop => 'Top this week';
-
-  @override
-  String get extBadgeNew => 'New';
-
-  @override
-  String get extBadgeStaff => 'Sora team';
-
-  @override
-  String get extSideloadShort => 'Not from catalog';
-
-  @override
-  String get extSideloadWarning =>
-      'Not from the team catalog. The author\'s key is self-attested: install only if you trust the author.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Install $name';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Update $name';
-  }
-
-  @override
-  String get extPermissionsIntro => 'This extension will be able to:';
+  String get extSideloadWarning => 'Install only if you trust the author’s self-signed key.';
 
   @override
   String get extPermissionsWidened => 'The update asks for new permissions:';
@@ -1052,9 +1023,6 @@ class SEn extends S {
       'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
 
   @override
-  String get extUpdateAvailable => 'Update available';
-
-  @override
   String get extDisabled => 'Disabled';
 
   @override
@@ -1097,10 +1065,6 @@ class SEn extends S {
   String get extConflictsTitle => 'Extension conflicts';
 
   @override
-  String get extConflictsIntro =>
-      'These extensions want the same thing. Choose which one runs; the other stays installed.';
-
-  @override
   String get extConflictTheme => 'App theme';
 
   @override
@@ -1120,28 +1084,9 @@ class SEn extends S {
   String get extConflictsResolve => 'Resolve';
 
   @override
-  String get extConflictNote =>
-      'Your choice is saved on this device. A theme switches right away; network hooks are not run in this version.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get extAuthor => 'Author';
-
-  @override
-  String get extRating => 'Rating';
-
-  @override
-  String get extInstalls => 'Installs';
-
-  @override
-  String get extVersion => 'Version';
-
-  @override
-  String get extAbout => 'About';
 
   @override
   String get extPermissionsTitle => 'Permissions';
@@ -1154,9 +1099,6 @@ class SEn extends S {
 
   @override
   String get extSaveSettings => 'Save settings';
-
-  @override
-  String get extSaving => 'Saving…';
 
   @override
   String extUpdateTo(String version) {
@@ -1185,7 +1127,7 @@ class SEn extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'The panel is unavailable. The extension may have been disabled or removed.';
+  String get extPanelUnavailable => 'The extension panel is unavailable.';
 
   @override
   String get extPermConnectionsRead => 'See the list of active connections';
@@ -1224,10 +1166,6 @@ class SEn extends S {
   String get extPermBackground => 'Run background tasks';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.';
-
-  @override
   String get extPermNotYetActive => 'This permission does nothing in this version of Sora yet.';
 
   @override
@@ -1260,21 +1198,13 @@ class SEn extends S {
   String get extImageFailed => 'Couldn\'t load the image';
 
   @override
-  String get extRatingHow => 'How ratings work';
-
-  @override
-  String get extRatingHowBody =>
-      'Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.';
-
-  @override
   String get extScreenshots => 'Screenshots';
 
   @override
   String get extSortRelevance => 'Relevance';
 
   @override
-  String get extPermNetworkDetail =>
-      'Fetches data from the internet through the VPN. Only the hosts below are allowed; everything else is blocked.';
+  String get extPermNetworkDetail => 'VPN requests can reach only the hosts below.';
 
   @override
   String get extBgTitle => 'Background task';
@@ -1296,10 +1226,6 @@ class SEn extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# hours', one: '# hour');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'The task runs on schedule while Sora is open, including when it sits in the tray. The shortest interval is 15 minutes.';
 
   @override
   String get extBgDisabledNote => 'Enable the extension to manage its background task.';
@@ -1992,8 +1918,7 @@ class SEn extends S {
   String get extErrRevoked => 'The Sora team revoked this extension version because it is unsafe or broken.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'The list of revoked extensions could not be renewed. Installing is blocked until it is: check the network and try again.';
+  String get extErrRevocationsExpired => 'Installation is blocked until the revocation list is refreshed.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2039,4 +1964,15 @@ class SEn extends S {
 
   @override
   String get extAssetRejected => 'Extension asset rejected: unreadable colors or invalid rules.';
+
+  @override
+  String get extVerifiedSora => 'Verified by Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Open';
 }

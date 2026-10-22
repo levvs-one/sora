@@ -913,36 +913,7 @@ class SFr extends S {
   String get extInstallOne => '1 installation';
 
   @override
-  String get extBadgeVerified => 'Vérifié';
-
-  @override
-  String get extBadgeTop => 'Les plus populaires cette semaine';
-
-  @override
-  String get extBadgeNew => 'Nouveau';
-
-  @override
-  String get extBadgeStaff => 'L\'équipe Sora';
-
-  @override
-  String get extSideloadShort => 'Pas du catalogue';
-
-  @override
-  String get extSideloadWarning =>
-      'Cette extension ne provient pas du catalogue de l\'équipe. Seul l\'auteur s\'est porté garant de sa clé : installez-la uniquement si vous faites confiance à l\'auteur.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Installer « $name »';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Mettre à jour « $name »';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Cette extension pourra :';
+  String get extSideloadWarning => 'Installez uniquement si vous faites confiance à la clé autosignée de l’auteur.';
 
   @override
   String get extPermissionsWidened => 'La mise à jour demande de nouvelles autorisations :';
@@ -1069,9 +1040,6 @@ class SFr extends S {
       'Cette mise à jour est signée avec une clé d\'auteur différente de celle de la version installée, elle a donc été bloquée. Si vous faites confiance à la nouvelle clé, désinstallez l\'extension et réinstallez-la explicitement.';
 
   @override
-  String get extUpdateAvailable => 'Mise à jour disponible';
-
-  @override
   String get extDisabled => 'Désactivé';
 
   @override
@@ -1114,10 +1082,6 @@ class SFr extends S {
   String get extConflictsTitle => 'Conflits d\'extensions';
 
   @override
-  String get extConflictsIntro =>
-      'Ces extensions veulent la même chose. Choisissez celle qui fonctionne ; l’autre reste installée.';
-
-  @override
   String get extConflictTheme => 'Thème de l\'application';
 
   @override
@@ -1137,28 +1101,9 @@ class SFr extends S {
   String get extConflictsResolve => 'Résoudre les conflits';
 
   @override
-  String get extConflictNote =>
-      'Votre choix est enregistré sur cet appareil. Un thème change immédiatement ; les hooks réseau ne s\'exécutent pas dans cette version.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get extAuthor => 'Auteur';
-
-  @override
-  String get extRating => 'Note';
-
-  @override
-  String get extInstalls => 'Installations';
-
-  @override
-  String get extVersion => 'Version';
-
-  @override
-  String get extAbout => 'À propos de cette extension';
 
   @override
   String get extPermissionsTitle => 'Autorisations';
@@ -1171,9 +1116,6 @@ class SFr extends S {
 
   @override
   String get extSaveSettings => 'Enregistrer les paramètres';
-
-  @override
-  String get extSaving => 'Sauvegarde…';
 
   @override
   String extUpdateTo(String version) {
@@ -1202,8 +1144,7 @@ class SFr extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'Le panneau n\'est pas disponible. L\'extension a peut-être été désactivée ou supprimée.';
+  String get extPanelUnavailable => 'Le panneau de l’extension est indisponible.';
 
   @override
   String get extPermConnectionsRead => 'Voir la liste des connexions actives';
@@ -1242,10 +1183,6 @@ class SFr extends S {
   String get extPermBackground => 'Exécuter des tâches en arrière-plan';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Exécute les tâches planifiées même lorsque le panneau est fermé. Vous pouvez le suspendre ou modifier la fréquence d\'exécution dans les paramètres de l\'extension.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1278,21 +1215,13 @@ class SFr extends S {
   String get extImageFailed => 'Impossible de charger l\'image';
 
   @override
-  String get extRatingHow => 'Comment fonctionnent les notations';
-
-  @override
-  String get extRatingHowBody =>
-      'Les notes utilisent une moyenne bayésienne : une extension avec peu de notes reste proche du milieu jusqu\'à ce que davantage de personnes votent, de sorte qu\'un seul avis 5 étoiles ne peut pas pousser une nouvelle extension vers le haut. Les notes récentes pèsent plus que les anciennes, et une seule note par compte compte.';
-
-  @override
   String get extScreenshots => 'Captures d\'écran';
 
   @override
   String get extSortRelevance => 'Pertinence';
 
   @override
-  String get extPermNetworkDetail =>
-      'Récupère des données sur Internet via le VPN. Seuls les hôtes ci-dessous sont autorisés, tout le reste est bloqué.';
+  String get extPermNetworkDetail => 'Les requêtes VPN sont limitées aux hôtes ci-dessous.';
 
   @override
   String get extBgTitle => 'Tâche en arrière-plan';
@@ -1314,10 +1243,6 @@ class SFr extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# heures', one: '# heure');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'La tâche s’exécute selon le calendrier tant que Sora est ouvert, y compris dans la zone de notification. L’intervalle minimal est de 15 minutes.';
 
   @override
   String get extBgDisabledNote => 'Autoriser l\'extension à gérer sa tâche en arrière-plan.';
@@ -2024,8 +1949,7 @@ class SFr extends S {
       'L’équipe Sora a retiré cette version de l’extension, car elle est dangereuse ou défectueuse.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'La liste des extensions retirées n’a pas pu être renouvelée. L’installation est bloquée jusqu’à son renouvellement : vérifiez le réseau et réessayez.';
+  String get extErrRevocationsExpired => 'L’installation est bloquée jusqu’à la mise à jour de la liste de révocation.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2071,4 +1995,15 @@ class SFr extends S {
 
   @override
   String get extAssetRejected => 'Fichier d’extension refusé : couleurs illisibles ou règles invalides.';
+
+  @override
+  String get extVerifiedSora => 'Vérifié par Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count o';
+  }
+
+  @override
+  String get extOpen => 'Ouvrir';
 }

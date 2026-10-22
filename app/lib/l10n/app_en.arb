@@ -345,29 +345,7 @@
       }
     }
   },
-  "extBadgeVerified": "Verified",
-  "extBadgeTop": "Top this week",
-  "extBadgeNew": "New",
-  "extBadgeStaff": "Sora team",
-  "extSideloadShort": "Not from catalog",
-  "extSideloadWarning": "Not from the team catalog. The author's key is self-attested: install only if you trust the author.",
-  "extInstallTitle": "Install {name}",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Update {name}",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "This extension will be able to:",
+  "extSideloadWarning": "Install only if you trust the author’s self-signed key.",
   "extPermissionsWidened": "The update asks for new permissions:",
   "extDangerousAck": "I understand these permissions are powerful",
   "extInstall": "Install",
@@ -415,7 +393,6 @@
   "extErrHttpsOnly": "Only https:// links are allowed",
   "extErrGeneric": "Something went wrong. Please try again.",
   "extErrAuthorKeyChanged": "This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.",
-  "extUpdateAvailable": "Update available",
   "extDisabled": "Disabled",
   "extToggleEnabled": "Enable {name}",
   "@extToggleEnabled": {
@@ -449,7 +426,6 @@
   "extPermissionsRemoved": "No longer requested:",
   "extUpdateFailedKept": "The previous version is still installed.",
   "extConflictsTitle": "Extension conflicts",
-  "extConflictsIntro": "These extensions want the same thing. Choose which one runs; the other stays installed.",
   "extConflictTheme": "App theme",
   "extConflictNetHooks": "Network hooks",
   "extConflictWinner": "{name} wins",
@@ -469,7 +445,6 @@
     }
   },
   "extConflictsResolve": "Resolve",
-  "extConflictNote": "Your choice is saved on this device. A theme switches right away; network hooks are not run in this version.",
   "extVersionLabel": "Version {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -478,16 +453,10 @@
       }
     }
   },
-  "extAuthor": "Author",
-  "extRating": "Rating",
-  "extInstalls": "Installs",
-  "extVersion": "Version",
-  "extAbout": "About",
   "extPermissionsTitle": "Permissions",
   "extNoPermissions": "No special permissions.",
   "extSettings": "Settings",
   "extSaveSettings": "Save settings",
-  "extSaving": "Saving…",
   "extUpdateTo": "Update to {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -522,7 +491,7 @@
       }
     }
   },
-  "extPanelUnavailable": "The panel is unavailable. The extension may have been disabled or removed.",
+  "extPanelUnavailable": "The extension panel is unavailable.",
   "extPermConnectionsRead": "See the list of active connections",
   "extPermServersRead": "See your server list",
   "extPermSettingsRead": "Read app settings",
@@ -535,7 +504,6 @@
   "extPermNetHooks": "Hook into the network path (DPI bypass modules)",
   "extPermNetFetch": "Fetch URLs from an allowlist",
   "extPermBackground": "Run background tasks",
-  "extPermBackgroundDetail": "Runs scheduled tasks even when the panel is closed. You can pause it or change how often it runs in the extension settings.",
   "extPermNotYetActive": "This permission does nothing in this version of Sora yet.",
   "extCapBackground": "Runs in the background",
   "extCapNetHook": "Bypasses & network hooks",
@@ -553,11 +521,9 @@
   },
   "extChangelog": "Changelog",
   "extImageFailed": "Couldn't load the image",
-  "extRatingHow": "How ratings work",
-  "extRatingHowBody": "Ratings use a Bayesian average: an extension with few ratings stays near the middle until more people vote, so a single 5-star review cannot push a new extension to the top. Recent ratings weigh more than old ones, and only one rating per account counts.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevance",
-  "extPermNetworkDetail": "Fetches data from the internet through the VPN. Only the hosts below are allowed; everything else is blocked.",
+  "extPermNetworkDetail": "VPN requests can reach only the hosts below.",
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
@@ -577,7 +543,6 @@
       }
     }
   },
-  "extBgNote": "The task runs on schedule while Sora is open, including when it sits in the tray. The shortest interval is 15 minutes.",
   "extBgDisabledNote": "Enable the extension to manage its background task.",
   "extCapNetwork": "Network access",
   "extCapNetworkHosts": "Network: {hosts}",
@@ -858,7 +823,7 @@
   "diagnosticRequiresTun": "Packet capture needs an active Sora TUN connection.",
   "diagnosticUnavailable": "This diagnostic is unavailable on this platform.",
   "extErrRevoked": "The Sora team revoked this extension version because it is unsafe or broken.",
-  "extErrRevocationsExpired": "The list of revoked extensions could not be renewed. Installing is blocked until it is: check the network and try again.",
+  "extErrRevocationsExpired": "Installation is blocked until the revocation list is refreshed.",
   "extRevokedDisabled": "Revoked extensions were turned off: {names}",
   "customServerWgPrivateKey": "Private key",
   "customServerWgAddresses": "Interface addresses",
@@ -872,5 +837,15 @@
   "strictKillSwitch": "Strict kill switch",
   "strictKillSwitchWarning": "After connecting, blocks traffic outside the VPN even after a crash, restart or app exit. Only Disconnect or turning this off restores access. After reboot, blocking resumes only when Connect on start is enabled.",
   "extWorkerFailed": "The extension background task failed. Check the extension log.",
-  "extAssetRejected": "Extension asset rejected: unreadable colors or invalid rules."
+  "extAssetRejected": "Extension asset rejected: unreadable colors or invalid rules.",
+  "extVerifiedSora": "Verified by Sora",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Open"
 }

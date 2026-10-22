@@ -911,36 +911,7 @@ class SPl extends S {
   String get extInstallOne => '1 instalacja';
 
   @override
-  String get extBadgeVerified => 'Zweryfikowano';
-
-  @override
-  String get extBadgeTop => 'Najpopularniejsze w tym tygodniu';
-
-  @override
-  String get extBadgeNew => 'Nowość';
-
-  @override
-  String get extBadgeStaff => 'Zespół Sora';
-
-  @override
-  String get extSideloadShort => 'Nie z katalogu';
-
-  @override
-  String get extSideloadWarning =>
-      'To rozszerzenie nie pochodzi z katalogu zespołu. Tylko autor poręczył za swój klucz: zainstaluj go tylko wtedy, gdy ufasz autorowi.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Zainstaluj „$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Aktualizuj „$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'To rozszerzenie będzie mogło:';
+  String get extSideloadWarning => 'Instaluj tylko, jeśli ufasz kluczowi podpisanemu przez samego autora.';
 
   @override
   String get extPermissionsWidened => 'Aktualizacja prosi o nowe uprawnienia:';
@@ -1067,9 +1038,6 @@ class SPl extends S {
       'Ta aktualizacja jest podpisana innym kluczem autora niż wersja zainstalowana, więc została zablokowana. Jeśli ufasz nowemu kluczowi, odinstaluj rozszerzenie i zainstaluj je ponownie.';
 
   @override
-  String get extUpdateAvailable => 'Dostępna aktualizacja';
-
-  @override
   String get extDisabled => 'Wyłączone';
 
   @override
@@ -1112,10 +1080,6 @@ class SPl extends S {
   String get extConflictsTitle => 'Konflikty rozszerzeń';
 
   @override
-  String get extConflictsIntro =>
-      'Te rozszerzenia chcą tego samego. Wybierz, które ma działać; drugie zostanie zainstalowane.';
-
-  @override
   String get extConflictTheme => 'Motyw aplikacji';
 
   @override
@@ -1135,28 +1099,9 @@ class SPl extends S {
   String get extConflictsResolve => 'Rozwiązuj konflikty';
 
   @override
-  String get extConflictNote =>
-      'Twój wybór jest zapisywany na tym urządzeniu. Motyw zmienia się od razu, a hooki sieciowe nie są uruchamiane w tej wersji.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Wersja $version';
   }
-
-  @override
-  String get extAuthor => 'Autor';
-
-  @override
-  String get extRating => 'Ocena';
-
-  @override
-  String get extInstalls => 'Instalacje';
-
-  @override
-  String get extVersion => 'Wersja';
-
-  @override
-  String get extAbout => 'Informacje o tym rozszerzeniu';
 
   @override
   String get extPermissionsTitle => 'Uprawnienia';
@@ -1169,9 +1114,6 @@ class SPl extends S {
 
   @override
   String get extSaveSettings => 'Zapisz ustawienia';
-
-  @override
-  String get extSaving => 'Zapisywanie…';
 
   @override
   String extUpdateTo(String version) {
@@ -1200,7 +1142,7 @@ class SPl extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel jest niedostępny. Rozszerzenie mogło zostać wyłączone lub usunięte.';
+  String get extPanelUnavailable => 'Panel rozszerzenia jest niedostępny.';
 
   @override
   String get extPermConnectionsRead => 'Zobacz listę aktywnych połączeń';
@@ -1239,10 +1181,6 @@ class SPl extends S {
   String get extPermBackground => 'Uruchom zadania w tle';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Uruchamia zaplanowane zadania nawet wtedy, gdy panel jest zamknięty. Możesz je wstrzymać lub zmienić częstotliwość jego uruchamiania w ustawieniach rozszerzenia.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1275,21 +1213,13 @@ class SPl extends S {
   String get extImageFailed => 'Nie można załadować obrazu';
 
   @override
-  String get extRatingHow => 'Jak działają oceny';
-
-  @override
-  String get extRatingHowBody =>
-      'Oceny opierają się na średniej Bayesa: rozszerzenie z kilkoma ocenami pozostaje w pobliżu środka, dopóki więcej osób nie zagłosuje, więc pojedyncza 5-gwiazdkowa recenzja nie może wysunąć nowego rozszerzenia na sam szczyt. Najnowsze oceny mają większą wagę niż stare i liczy się tylko jedna ocena na konto.';
-
-  @override
   String get extScreenshots => 'Zrzuty ekranu';
 
   @override
   String get extSortRelevance => 'Trafność';
 
   @override
-  String get extPermNetworkDetail =>
-      'Pobiera dane z internetu przez VPN. Dozwolone są tylko hosty z listy poniżej, wszystko inne jest blokowane.';
+  String get extPermNetworkDetail => 'Żądania VPN mogą docierać tylko do hostów poniżej.';
 
   @override
   String get extBgTitle => 'Zadanie w tle';
@@ -1325,10 +1255,6 @@ class SPl extends S {
     );
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Zadanie działa według harmonogramu, dopóki Sora jest otwarta, także w zasobniku. Najkrótszy odstęp to 15 minut.';
 
   @override
   String get extBgDisabledNote => 'Włącz rozszerzenie, aby zarządzać zadaniami w tle.';
@@ -2041,8 +1967,7 @@ class SPl extends S {
   String get extErrRevoked => 'Zespół Sora wycofał tę wersję rozszerzenia, ponieważ jest niebezpieczna lub uszkodzona.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Nie udało się odnowić listy wycofanych rozszerzeń. Instalacja jest zablokowana do czasu odnowienia: sprawdź sieć i spróbuj ponownie.';
+  String get extErrRevocationsExpired => 'Instalacja jest zablokowana do czasu odświeżenia listy unieważnień.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2088,4 +2013,15 @@ class SPl extends S {
 
   @override
   String get extAssetRejected => 'Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły.';
+
+  @override
+  String get extVerifiedSora => 'Zweryfikowano przez Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Otwórz';
 }

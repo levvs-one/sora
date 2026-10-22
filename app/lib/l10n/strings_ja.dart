@@ -894,35 +894,7 @@ class SJa extends S {
   String get extInstallOne => 'インストール数: 1';
 
   @override
-  String get extBadgeVerified => '確認済み';
-
-  @override
-  String get extBadgeTop => '今週の一番人気';
-
-  @override
-  String get extBadgeNew => '新しい';
-
-  @override
-  String get extBadgeStaff => 'Soraチーム';
-
-  @override
-  String get extSideloadShort => 'カタログ外';
-
-  @override
-  String get extSideloadWarning => 'この拡張子はチームカタログからのものではありません。作成者だけがキーを保証しています。作成者を信頼できる場合にのみインストールしてください。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '「$name」をインストール';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '「$name」を更新';
-  }
-
-  @override
-  String get extPermissionsIntro => 'この拡張機能では次のことが可能になります。';
+  String get extSideloadWarning => '作者の自己署名鍵を信頼できる場合のみインストールしてください。';
 
   @override
   String get extPermissionsWidened => 'アップデートでは新しい権限が求められます。';
@@ -1048,9 +1020,6 @@ class SJa extends S {
       'このアップデートは、インストールされているバージョンとは異なる作成者キーで署名されているため、ブロックされました。新しいキーを信頼する場合は、拡張機能をアンインストールし、明示的に再度インストールしてください。';
 
   @override
-  String get extUpdateAvailable => 'アップデートあり';
-
-  @override
   String get extDisabled => '無効';
 
   @override
@@ -1093,9 +1062,6 @@ class SJa extends S {
   String get extConflictsTitle => '拡張子の競合';
 
   @override
-  String get extConflictsIntro => 'これらの拡張機能は同じものを使おうとしています。動かす方を選んでください。もう一方はインストールされたままです。';
-
-  @override
   String get extConflictTheme => 'アプリテーマ';
 
   @override
@@ -1115,27 +1081,9 @@ class SJa extends S {
   String get extConflictsResolve => '競合を解決する';
 
   @override
-  String get extConflictNote => '選択はこのデバイスに保存されます。テーマはすぐに切り替わります。ネットワークフックはこのバージョンでは実行されません。';
-
-  @override
   String extVersionLabel(String version) {
     return 'バージョン$version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '評価';
-
-  @override
-  String get extInstalls => 'インストール数';
-
-  @override
-  String get extVersion => 'バージョン';
-
-  @override
-  String get extAbout => 'この拡張機能について';
 
   @override
   String get extPermissionsTitle => '権限';
@@ -1148,9 +1096,6 @@ class SJa extends S {
 
   @override
   String get extSaveSettings => '設定の保存';
-
-  @override
-  String get extSaving => '保存中…';
 
   @override
   String extUpdateTo(String version) {
@@ -1179,7 +1124,7 @@ class SJa extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'パネルが使用できません。拡張機能が無効になっているか、削除されている可能性があります。';
+  String get extPanelUnavailable => '拡張機能のパネルを利用できません。';
 
   @override
   String get extPermConnectionsRead => 'アクティブな接続のリストを参照';
@@ -1218,9 +1163,6 @@ class SJa extends S {
   String get extPermBackground => 'バックグラウンドタスクを実行する';
 
   @override
-  String get extPermBackgroundDetail => 'パネルが閉じている場合でも、スケジュールされたタスクを実行します。拡張機能の設定で一時停止したり、実行頻度を変更したりできます。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1253,20 +1195,13 @@ class SJa extends S {
   String get extImageFailed => '画像を読み込めませんでした';
 
   @override
-  String get extRatingHow => '評価の仕組み';
-
-  @override
-  String get extRatingHowBody =>
-      '評価にはベイズ平均が使用されます。評価の少ない拡張機能は、より多くの人が投票するまで中央付近に留まるため、1 つの 5 つ星のレビューによって新しい拡張機能を上位に押し上げることはできません。最近の評価は古い評価よりも重みがあり、アカウントごとに 1 つの評価のみがカウントされます。';
-
-  @override
   String get extScreenshots => 'スクリーンショット';
 
   @override
   String get extSortRelevance => '関連性';
 
   @override
-  String get extPermNetworkDetail => 'VPN 経由でインターネットからデータを取得します。許可されるのは下のホストだけで、それ以外はブロックされます。';
+  String get extPermNetworkDetail => 'VPN 経由のリクエストは以下のホストにのみ許可されます。';
 
   @override
   String get extBgTitle => 'バックグラウンドタスク';
@@ -1288,9 +1223,6 @@ class SJa extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 時間');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => 'Sora を開いている間はトレイにある場合も含め、タスクがスケジュールどおり実行されます。最短間隔は 15 分です。';
 
   @override
   String get extBgDisabledNote => '拡張機能がバックグラウンド タスクを管理できるようにします。';
@@ -1977,7 +1909,7 @@ class SJa extends S {
   String get extErrRevoked => 'この拡張機能のバージョンは安全でないか壊れているため、Sora チームが取り消しました。';
 
   @override
-  String get extErrRevocationsExpired => '取り消された拡張機能のリストを更新できませんでした。更新されるまでインストールできません。ネットワークを確認して再試行してください。';
+  String get extErrRevocationsExpired => '失効リストが更新されるまでインストールはブロックされます。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2023,4 +1955,15 @@ class SJa extends S {
 
   @override
   String get extAssetRejected => '拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。';
+
+  @override
+  String get extVerifiedSora => 'Sora 認証済み';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count バイト';
+  }
+
+  @override
+  String get extOpen => '開く';
 }

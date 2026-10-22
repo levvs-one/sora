@@ -909,36 +909,7 @@ class SKy extends S {
   String get extInstallOne => '1 орнотуу';
 
   @override
-  String get extBadgeVerified => 'Текшерилди';
-
-  @override
-  String get extBadgeTop => 'Бул аптада эң популярдуу';
-
-  @override
-  String get extBadgeNew => 'Жаңы';
-
-  @override
-  String get extBadgeStaff => 'Sora командасы';
-
-  @override
-  String get extSideloadShort => 'Каталогдон эмес';
-
-  @override
-  String get extSideloadWarning =>
-      'Бул кеңейтүү команда каталогунан эмес. Алардын ачкычына автор гана кепилдик берди: аны авторго ишенсеңиз гана орнотуңуз.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» орнотуу';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» жаңыртуу';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Бул кеңейтүү төмөнкүлөрдү жасай алат:';
+  String get extSideloadWarning => 'Автор өзү кол койгон ачкычка ишенсеңиз гана орнотуңуз.';
 
   @override
   String get extPermissionsWidened => 'Жаңыртуу жаңы уруксаттарды сурайт:';
@@ -1065,9 +1036,6 @@ class SKy extends S {
       'Бул жаңыртууга орнотулган версияга караганда башка автор ачкычы менен кол коюлган, андыктан ал бөгөттөлгөн. Эгер жаңы ачкычка ишенсеңиз, кеңейтүүнү чыгарып салып, аны кайра орнотуңуз.';
 
   @override
-  String get extUpdateAvailable => 'Жаңыртуу жеткиликтүү';
-
-  @override
   String get extDisabled => 'Өчүк';
 
   @override
@@ -1110,10 +1078,6 @@ class SKy extends S {
   String get extConflictsTitle => 'Кеңейтүү боюнча карама-каршылыктар';
 
   @override
-  String get extConflictsIntro =>
-      'Бул кеңейтүүлөр бир эле нерсени каалайт. Кайсынысы иштей турганын тандаңыз, экинчиси орнотулган бойдон калат.';
-
-  @override
   String get extConflictTheme => 'Колдонмо темасы';
 
   @override
@@ -1133,28 +1097,9 @@ class SKy extends S {
   String get extConflictsResolve => 'Конфликттерди чечүү';
 
   @override
-  String get extConflictNote =>
-      'Тандооңуз ушул түзмөктө сакталат. Тема дароо которулат, тармактык хуктар бул версияда иштебейт.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Версия $version';
   }
-
-  @override
-  String get extAuthor => 'Автор';
-
-  @override
-  String get extRating => 'Рейтинг';
-
-  @override
-  String get extInstalls => 'Орнотуулар';
-
-  @override
-  String get extVersion => 'Версия';
-
-  @override
-  String get extAbout => 'Бул кеңейтүү жөнүндө';
 
   @override
   String get extPermissionsTitle => 'Уруксаттар';
@@ -1167,9 +1112,6 @@ class SKy extends S {
 
   @override
   String get extSaveSettings => 'Орнотууларды сактоо';
-
-  @override
-  String get extSaving => 'Сактоо…';
 
   @override
   String extUpdateTo(String version) {
@@ -1198,7 +1140,7 @@ class SKy extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Панел жеткиликсиз. Кеңейтүү өчүрүлгөн же өчүрүлгөн болушу мүмкүн.';
+  String get extPanelUnavailable => 'Кеңейтүүнүн панели жеткиликсиз.';
 
   @override
   String get extPermConnectionsRead => 'Жигердүү байланыштардын тизмесин караңыз';
@@ -1237,10 +1179,6 @@ class SKy extends S {
   String get extPermBackground => 'Фондук тапшырмаларды иштетүү';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Панел жабык болгондо да пландаштырылган тапшырмаларды аткарат. Сиз аны тындыра аласыз же кеңейтүү жөндөөлөрүнөн анын канчалык көп иштешин өзгөртө аласыз.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1273,21 +1211,13 @@ class SKy extends S {
   String get extImageFailed => 'Сүрөт жүктөлгөн жок';
 
   @override
-  String get extRatingHow => 'Рейтингдер кантип иштейт';
-
-  @override
-  String get extRatingHowBody =>
-      'Рейтингдер Байесиялык орточо көрсөткүчтү колдонушат: бир нече рейтинги бар кеңейтүү көбүрөөк адам добуш бергенге чейин ортого жакын калат, андыктан бир 5 жылдыздуу карап чыгуу жаңы кеңейтүүнү эң жогору көтөрө албайт. Акыркы рейтингдер эскилерге караганда көбүрөөк жана ар бир эсепке бир гана рейтинг эсептелет.';
-
-  @override
   String get extScreenshots => 'Скриншоттор';
 
   @override
   String get extSortRelevance => 'актуалдуулугу';
 
   @override
-  String get extPermNetworkDetail =>
-      'Интернеттен маалыматты VPN аркылуу жүктөйт. Төмөнкү тизмедеги хосттор гана уруксат, калганы бөгөттөлгөн.';
+  String get extPermNetworkDetail => 'VPN сурамдарына төмөнкү хостторго гана уруксат берилет.';
 
   @override
   String get extBgTitle => 'Фондук тапшырма';
@@ -1309,10 +1239,6 @@ class SKy extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# саат', one: '# саат');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Тапшырма Sora ачык турганда, анын ичинде трейде турганда да, график боюнча иштейт. Эң кыска аралык 15 мүнөт.';
 
   @override
   String get extBgDisabledNote => 'Фондук тапшырманы башкаруу үчүн кеңейтүүнү иштетиңиз.';
@@ -2016,8 +1942,7 @@ class SKy extends S {
   String get extErrRevoked => 'Sora командасы кеңейтүүнүн бул версиясын коопсуз эмес же бузук деп кайтарып алды.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Кайтарылган кеңейтүүлөрдүн тизмесин жаңыртуу мүмкүн болгон жок. Жаңыртылганча орнотуу бөгөттөлгөн: тармакты текшерип, кайра аракет кылыңыз.';
+  String get extErrRevocationsExpired => 'Жокко чыгарылган кеңейтүүлөрдүн тизмеси жаңырмайынча орнотуу бөгөттөлгөн.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2063,4 +1988,15 @@ class SKy extends S {
 
   @override
   String get extAssetRejected => 'Кеңейтменин файлы четке кагылды: окулбаган түстөр же жараксыз эрежелер.';
+
+  @override
+  String get extVerifiedSora => 'Sora тарабынан текшерилген';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count Б';
+  }
+
+  @override
+  String get extOpen => 'Ачуу';
 }

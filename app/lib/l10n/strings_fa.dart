@@ -908,36 +908,7 @@ class SFa extends S {
   String get extInstallOne => '1 نصب';
 
   @override
-  String get extBadgeVerified => 'تأیید شد';
-
-  @override
-  String get extBadgeTop => 'محبوب ترین این هفته';
-
-  @override
-  String get extBadgeNew => 'جدید';
-
-  @override
-  String get extBadgeStaff => 'تیم Sora';
-
-  @override
-  String get extSideloadShort => 'نه از کاتالوگ';
-
-  @override
-  String get extSideloadWarning =>
-      'این برنامه افزودنی از کاتالوگ تیم نیست. فقط نویسنده کلید خود را تضمین کرده است: فقط در صورتی آن را نصب کنید که به نویسنده اعتماد دارید.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'نصب «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'به‌روزرسانی «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'این برنامه افزودنی قادر خواهد بود:';
+  String get extSideloadWarning => 'فقط اگر به کلید خودامضای نویسنده اعتماد دارید نصب کنید.';
 
   @override
   String get extPermissionsWidened => 'به روز رسانی مجوزهای جدید را می خواهد:';
@@ -1064,9 +1035,6 @@ class SFa extends S {
       'این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد. اگر به کلید جدید اعتماد دارید، برنامه افزودنی را حذف نصب کنید و دوباره آن را به صراحت نصب کنید.';
 
   @override
-  String get extUpdateAvailable => 'به‌روزرسانی موجود است';
-
-  @override
   String get extDisabled => 'غیرفعال';
 
   @override
@@ -1109,10 +1077,6 @@ class SFa extends S {
   String get extConflictsTitle => 'تعارضات پسوند';
 
   @override
-  String get extConflictsIntro =>
-      'این افزونه‌ها یک چیز را می‌خواهند. انتخاب کنید کدام اجرا شود؛ دیگری نصب‌شده می‌ماند.';
-
-  @override
   String get extConflictTheme => 'تم برنامه';
 
   @override
@@ -1132,28 +1096,9 @@ class SFa extends S {
   String get extConflictsResolve => 'تعارضات را حل کنید';
 
   @override
-  String get extConflictNote =>
-      'انتخاب شما روی این دستگاه ذخیره می‌شود. پوسته فوراً عوض می‌شود، اما هوک‌های شبکه در این نسخه اجرا نمی‌شوند.';
-
-  @override
   String extVersionLabel(String version) {
     return 'نسخه $version';
   }
-
-  @override
-  String get extAuthor => 'نویسنده';
-
-  @override
-  String get extRating => 'رتبه بندی';
-
-  @override
-  String get extInstalls => 'دفعات نصب';
-
-  @override
-  String get extVersion => 'نسخه';
-
-  @override
-  String get extAbout => 'درباره این پسوند';
 
   @override
   String get extPermissionsTitle => 'مجوزها';
@@ -1166,9 +1111,6 @@ class SFa extends S {
 
   @override
   String get extSaveSettings => 'ذخیرهٔ تنظیمات';
-
-  @override
-  String get extSaving => 'در حال ذخیره…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class SFa extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'پانل در دسترس نیست. پسوند ممکن است غیرفعال یا حذف شده باشد.';
+  String get extPanelUnavailable => 'پنل افزونه در دسترس نیست.';
 
   @override
   String get extPermConnectionsRead => 'لیست اتصالات فعال را ببینید';
@@ -1236,10 +1178,6 @@ class SFa extends S {
   String get extPermBackground => 'وظایف پس زمینه را اجرا کنید';
 
   @override
-  String get extPermBackgroundDetail =>
-      'کارهای برنامه ریزی شده را حتی زمانی که پانل بسته است اجرا می کند. می‌توانید آن را موقتاً متوقف کنید یا تعداد دفعات اجرای آن را در تنظیمات برنامه افزودنی تغییر دهید.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SFa extends S {
   String get extImageFailed => 'تصویر بارگیری نشد';
 
   @override
-  String get extRatingHow => 'رتبه بندی چگونه کار می کند';
-
-  @override
-  String get extRatingHowBody =>
-      'رتبه‌بندی‌ها از میانگین بیزی استفاده می‌کنند: برنامه‌های افزودنی با رتبه‌بندی‌های کم تا زمانی که افراد بیشتری رای دهند، نزدیک به وسط می‌ماند، بنابراین یک بررسی 5 ستاره نمی‌تواند یک برنامه افزودنی جدید را به بالاترین سطح برساند. رتبه‌بندی‌های اخیر بیشتر از رتبه‌بندی‌های قدیمی هستند و تنها یک رتبه برای هر حساب حساب می‌شود.';
-
-  @override
   String get extScreenshots => 'تصاویر';
 
   @override
   String get extSortRelevance => 'ربط';
 
   @override
-  String get extPermNetworkDetail =>
-      'داده‌ها را از طریق VPN از اینترنت دریافت می‌کند. فقط میزبان‌های فهرست زیر مجازند و بقیه مسدودند.';
+  String get extPermNetworkDetail => 'درخواست‌های VPN فقط به میزبان‌های زیر مجازند.';
 
   @override
   String get extBgTitle => 'کار پس‌زمینه';
@@ -1308,10 +1238,6 @@ class SFa extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ساعت', one: '# ساعت');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'وظیفه تا وقتی Sora باز است، حتی در سینی سیستم، طبق زمان‌بندی اجرا می‌شود. کوتاه‌ترین فاصله ۱۵ دقیقه است.';
 
   @override
   String get extBgDisabledNote => 'برنامه افزودنی را برای مدیریت وظیفه پس‌زمینه خود فعال کنید.';
@@ -2009,8 +1935,7 @@ class SFa extends S {
   String get extErrRevoked => 'تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.';
+  String get extErrRevocationsExpired => 'نصب تا به‌روزرسانی فهرست افزونه‌های لغوشده مسدود است.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2056,4 +1981,15 @@ class SFa extends S {
 
   @override
   String get extAssetRejected => 'فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.';
+
+  @override
+  String get extVerifiedSora => 'تأییدشده توسط Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count بایت';
+  }
+
+  @override
+  String get extOpen => 'باز کردن';
 }

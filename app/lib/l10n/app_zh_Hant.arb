@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 次安裝",
-  "extBadgeVerified": "已驗證",
-  "extBadgeTop": "本週熱門",
-  "extBadgeNew": "最新",
-  "extBadgeStaff": "Sora 團隊",
-  "extSideloadShort": "非來自目錄",
-  "extSideloadWarning": "非來自團隊目錄。作者金鑰僅由作者自行聲明，請只在信任作者時安裝。",
-  "extInstallTitle": "安裝「{name}」",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "更新「{name}」",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "此擴充功能將能夠：",
+  "extSideloadWarning": "僅在信任作者的自簽章金鑰時安裝。",
   "extPermissionsWidened": "此更新要求新的權限：",
   "extDangerousAck": "我瞭解這些權限的影響範圍很大",
   "extInstall": "安裝",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "僅允許 https:// 連結",
   "extErrGeneric": "發生錯誤，請再試一次。",
   "extErrAuthorKeyChanged": "此更新的作者簽署金鑰與已安裝版本不同，因此已遭封鎖。若您信任新金鑰，請先解除安裝擴充功能，再自行重新安裝。",
-  "extUpdateAvailable": "有可用更新",
   "extDisabled": "已停用",
   "extToggleEnabled": "啟用 {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "不再要求：",
   "extUpdateFailedKept": "已保留先前安裝的版本。",
   "extConflictsTitle": "擴充功能衝突",
-  "extConflictsIntro": "這些擴充功能想要同一樣東西。選擇要讓哪個執行，另一個仍保持安裝。",
   "extConflictTheme": "應用程式佈景主題",
   "extConflictNetHooks": "網路攔截掛鉤",
   "extConflictWinner": "優先使用 {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "解決衝突",
-  "extConflictNote": "你的選擇會儲存在此裝置上。主題會立即切換，網路掛鉤在此版本中不會執行。",
   "extVersionLabel": "版本 {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "作者",
-  "extRating": "評分",
-  "extInstalls": "安裝次數",
-  "extVersion": "版本",
-  "extAbout": "關於",
   "extPermissionsTitle": "權限",
   "extNoPermissions": "不需要特殊權限。",
   "extSettings": "設定",
   "extSaveSettings": "儲存設定",
-  "extSaving": "正在儲存…",
   "extUpdateTo": "更新至 {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "面板無法使用，擴充功能可能已停用或移除。",
+  "extPanelUnavailable": "擴充功能面板無法使用。",
   "extPermConnectionsRead": "查看目前的連接清單",
   "extPermServersRead": "查看您的伺服器清單",
   "extPermSettingsRead": "讀取應用程式設定",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "介入網路傳輸路徑（DPI 繞過模組）",
   "extPermNetFetch": "存取允許清單中的 URL",
   "extPermBackground": "執行背景工作",
-  "extPermBackgroundDetail": "即使關閉面板，仍會執行排程工作。您可以在擴充功能設定中暫停工作或調整執行頻率。",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "在背景執行",
   "extCapNetHook": "繞過機制與網路掛鉤",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "版本記錄",
   "extImageFailed": "無法載入圖片",
-  "extRatingHow": "評分計算方式",
-  "extRatingHowBody": "評分採用貝氏平均：評分數量較少的擴充功能會維持在中間值附近，直到有更多人評分，因此單一五星評價無法讓新擴充功能登上榜首。近期評分的權重高於較早的評分，每個帳號只計入一筆評分。",
   "extScreenshots": "螢幕擷取畫面",
   "extSortRelevance": "相關程度",
-  "extPermNetworkDetail": "透過 VPN 從網際網路取得資料。只允許下方列出的主機，其餘全部封鎖。",
+  "extPermNetworkDetail": "VPN 請求僅限存取以下主機。",
   "extBgTitle": "背景工作",
   "extBgEnabled": "在背景執行",
   "extBgInterval": "執行間隔",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "只要 Sora 處於開啟狀態（包括在系統匣中），工作就會依排程執行。最短間隔為 15 分鐘。",
   "extBgDisabledNote": "請先啟用擴充功能，才能管理背景工作。",
   "extCapNetwork": "網路存取",
   "extCapNetworkHosts": "網路：{hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "封包擷取需要活動的 Sora TUN 連線。",
   "diagnosticUnavailable": "此診斷在此平台上不可用。",
   "extErrRevoked": "Sora 團隊已撤回此擴充功能版本，因為它不安全或已損壞。",
-  "extErrRevocationsExpired": "無法更新已撤回擴充功能的清單。在更新之前無法安裝：請檢查網路後重試。",
+  "extErrRevocationsExpired": "撤銷清單更新前無法安裝擴充功能。",
   "extRevokedDisabled": "已關閉被撤回的擴充功能：{names}",
   "customServerWgPrivateKey": "私密金鑰",
   "customServerWgAddresses": "介面位址",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "嚴格網路鎖定",
   "strictKillSwitchWarning": "連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。",
   "extWorkerFailed": "擴充功能的背景工作失敗。請查看擴充功能記錄。",
-  "extAssetRejected": "擴充功能檔案遭拒：顏色難以辨認或規則無效。"
+  "extAssetRejected": "擴充功能檔案遭拒：顏色難以辨認或規則無效。",
+  "extVerifiedSora": "經 Sora 驗證",
+  "extReceivedBytes": "{count} 位元組",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "開啟"
 }

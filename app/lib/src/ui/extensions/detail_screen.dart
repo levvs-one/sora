@@ -93,245 +93,210 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       animation: Listenable.merge([store, store.logChanges]),
       builder: (context, _) {
         final live = store.get(m.id) ?? installed;
-        return Screen(
-          title: m.name,
-          children: [
-            _header(context, m, entry),
-            const SizedBox(height: 16),
-            Group(
+        return Scaffold(
+          body: SafeArea(
+            child: Column(
               children: [
-                Tile(
-                  title: s.extAuthor,
-                  trailing: Text(m.author.name, style: Styles.body.copyWith(color: palette.ink2)),
-                ),
-                if (entry != null) ...[
-                  // Like the cards: missing data is no row, never a fake
-                  // 0.0 rating or a "0 installs" line.
-                  if (entry.rating > 0)
-                    Tile(
-                      title: s.extRating,
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          StarRating(rating: entry.rating),
-                          const SizedBox(width: 6),
-                          Icon(Symbols.info_rounded, size: 16, color: palette.ink3),
-                        ],
-                      ),
-                      // The published rating methodology, in plain language.
-                      onTap: () => showRatingHowDialog(context),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                    child: RoundButton(
+                      icon: Symbols.chevron_left_rounded,
+                      label: MaterialLocalizations.of(context).backButtonTooltip,
+                      onTap: () => Navigator.of(context).maybePop(),
                     ),
-                  if (entry.installs > 0)
-                    Tile(
-                      title: s.extInstalls,
-                      trailing: Text('${entry.installs}', style: Styles.body.copyWith(color: palette.ink2)),
-                    ),
-                ],
-                Tile(
-                  title: s.extVersion,
-                  trailing: Text(m.version, style: Styles.body.copyWith(color: palette.ink2)),
+                  ),
                 ),
-              ],
-            ),
-            if (entry != null && entry.screenshotUrls.isNotEmpty) ...[
-              Heading(s.extScreenshots),
-              _ScreenshotsCarousel(urls: entry.screenshotUrls),
-              const SizedBox(height: 16),
-            ],
-            if (entry != null && entry.changelog.isNotEmpty) ...[
-              Heading(s.extChangelog),
-              Group(
-                children: [
-                  for (final c in entry.changelog)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 640),
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
                         children: [
-                          Row(
+                          _header(context, m, entry),
+                          const SizedBox(height: 24),
+                          _actions(context, store, m, live, entry),
+                          if (m.description.isNotEmpty) ...[
+                            const SizedBox(height: 24),
+                            Text(m.description, style: Styles.body.copyWith(fontSize: 14, color: palette.ink)),
+                          ],
+                          _SectionHeading(s.extPermissionsTitle),
+                          Group(
                             children: [
-                              Text(c.version, style: Styles.bodyStrong.copyWith(color: palette.ink)),
-                              const SizedBox(width: 8),
-                              Text(
-                                DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag())
-                                    .format(c.date.toLocal()),
-                                style: Styles.caption.copyWith(color: palette.ink3),
+                              Padding(
+                                padding: const EdgeInsets.all(14),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (m.permissions.isEmpty)
+                                      Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink2))
+                                    else
+                                      for (final p in m.permissions) ...[
+                                        PermissionRow(
+                                          blurb: permissionBlurb(context, p),
+                                          risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
+                                        ),
+                                        // Same marker as the install prompt: a
+                                        // permission whose runtime is not built must say
+                                        // so here too, not only before the grant.
+                                        if (isNotYetActive(p))
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 28, bottom: 4),
+                                            child: Text(
+                                              s.extPermNotYetActive,
+                                              style: Styles.caption.copyWith(color: palette.ink2),
+                                            ),
+                                          ),
+                                        if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 28, bottom: 4),
+                                            child: NetworkHostsList(hosts: m.networkHosts),
+                                          ),
+                                      ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(c.notes, style: Styles.body.copyWith(color: palette.ink2)),
+                          if (entry != null && entry.changelog.length > 1) ...[
+                            _SectionHeading(s.extChangelog),
+                            for (final c in entry.changelog)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          c.version,
+                                          style: Styles.bodyStrong.copyWith(fontSize: 14, color: palette.ink),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag())
+                                              .format(c.date.toLocal()),
+                                          style: Styles.secondary.copyWith(color: palette.ink2),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(c.notes, style: Styles.body.copyWith(fontSize: 14, color: palette.ink)),
+                                  ],
+                                ),
+                              ),
+                          ],
+                          if (entry != null && entry.screenshotUrls.isNotEmpty) ...[
+                            _SectionHeading(s.extScreenshots),
+                            _ScreenshotsCarousel(urls: entry.screenshotUrls),
+                          ],
+                          if (live != null && _hasBackgroundTask(live)) ...[
+                            _SectionHeading(s.extBgTitle),
+                            _BackgroundTaskSection(extensionId: live.id, interactive: live.enabled),
+                          ],
+                          if (live != null && m.routingEntry != null) ...[
+                            _SectionHeading(s.extCapRouting),
+                            Column(
+                              children: [
+                                for (final r in store.routingRules.where((r) => r.extensionId == live.id))
+                                  Tile(
+                                    title: r.rule.shown,
+                                    detail: r.comment.isEmpty ? null : r.comment,
+                                    trailing: Text(switch (r.rule.target) {
+                                      RuleTarget.direct => s.ruleDirect,
+                                      RuleTarget.proxy => s.ruleProxy,
+                                      RuleTarget.block => s.ruleBlock,
+                                    }, style: Styles.secondary.copyWith(color: palette.ink)),
+                                  ),
+                                Tile(
+                                  title:
+                                      live.enabled &&
+                                          live.granted.contains('routing.rules') &&
+                                          !store.runtimeErrors.containsKey(live.id)
+                                      ? s.extEnabled
+                                      : s.extDisabled,
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (live != null && store.runtimeLog(live.id).isNotEmpty) ...[
+                            _SectionHeading(s.logs),
+                            Column(
+                              children: [
+                                for (final line in store.runtimeLog(live.id))
+                                  Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Text(line, style: Styles.caption.copyWith(color: palette.ink)),
+                                  ),
+                              ],
+                            ),
+                          ],
+                          // Every declared panel gets its own row: with several panels a
+                          // single "open" button would silently pick the first one.
+                          if (live != null && live.enabled && m.panels.length > 1) ...[
+                            _SectionHeading(s.extCapPanel),
+                            Column(
+                              children: [
+                                for (final p in m.panels)
+                                  LinkTile(
+                                    title: p.title,
+                                    onTap: () =>
+                                        push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: p.id)),
+                                  ),
+                              ],
+                            ),
+                          ],
+                          if (live != null && _settings != null && m.settingsSchema != null) ...[
+                            _SectionHeading(s.extSettings),
+                            _SettingsForm(
+                              manifest: m,
+                              values: _settings!,
+                              saving: _saving,
+                              onChanged: (k, v) => setState(() => _settings![k] = v),
+                              onSave: () => _saveSettings(m.id),
+                            ),
+                          ],
                         ],
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-            if (m.description.isNotEmpty) ...[
-              Heading(s.extAbout),
-              Group(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Text(m.description, style: Styles.body.copyWith(color: palette.ink)),
-                  ),
-                ],
-              ),
-            ],
-            Heading(s.extPermissionsTitle),
-            Group(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (m.permissions.isEmpty)
-                        Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink2))
-                      else
-                        for (final p in m.permissions) ...[
-                          PermissionRow(
-                            blurb: permissionBlurb(context, p),
-                            risk: lookupPermission(p)?.risk ?? ExtRisk.normal,
-                          ),
-                          // Same marker as the install prompt: a
-                          // permission whose runtime is not built must say
-                          // so here too, not only before the grant.
-                          if (isNotYetActive(p))
-                            Padding(
-                              padding: const EdgeInsets.only(left: 28, bottom: 4),
-                              child: Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink2)),
-                            ),
-                          if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 28, bottom: 4),
-                              child: NetworkHostsList(hosts: m.networkHosts),
-                            ),
-                        ],
-                    ],
                   ),
                 ),
               ],
             ),
-            if (live != null && _hasBackgroundTask(live)) ...[
-              Heading(s.extBgTitle),
-              _BackgroundTaskSection(extensionId: live.id, interactive: live.enabled),
-            ],
-            if (live != null && m.routingEntry != null) ...[
-              Heading(s.extCapRouting),
-              Group(
-                children: [
-                  for (final r in store.routingRules.where((r) => r.extensionId == live.id))
-                    Tile(
-                      title: r.rule.shown,
-                      detail: r.comment.isEmpty ? null : r.comment,
-                      trailing: Text(switch (r.rule.target) {
-                        RuleTarget.direct => s.ruleDirect,
-                        RuleTarget.proxy => s.ruleProxy,
-                        RuleTarget.block => s.ruleBlock,
-                      }, style: Styles.secondary.copyWith(color: palette.ink)),
-                    ),
-                  Tile(
-                    title:
-                        live.enabled &&
-                            live.granted.contains('routing.rules') &&
-                            !store.runtimeErrors.containsKey(live.id)
-                        ? s.extEnabled
-                        : s.extDisabled,
-                  ),
-                ],
-              ),
-            ],
-            if (live != null && store.runtimeLog(live.id).isNotEmpty) ...[
-              Heading(s.logs),
-              Group(
-                children: [
-                  for (final line in store.runtimeLog(live.id))
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(line, style: Styles.caption.copyWith(color: palette.ink)),
-                    ),
-                ],
-              ),
-            ],
-            // Every declared panel gets its own row: with several panels a
-            // single "open" button would silently pick the first one.
-            if (live != null && live.enabled && m.panels.isNotEmpty) ...[
-              Heading(s.extCapPanel),
-              Group(
-                children: [
-                  for (final p in m.panels)
-                    LinkTile(
-                      title: p.title,
-                      onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: p.id)),
-                    ),
-                ],
-              ),
-            ],
-            if (live != null && _settings != null && m.settingsSchema != null) ...[
-              Heading(s.extSettings),
-              _SettingsForm(
-                manifest: m,
-                values: _settings!,
-                saving: _saving,
-                onChanged: (k, v) => setState(() => _settings![k] = v),
-                onSave: () => _saveSettings(m.id),
-              ),
-            ],
-            const SizedBox(height: 8),
-            _actions(context, store, m, live, entry),
-          ],
+          ),
         );
       },
     );
   }
 
   Widget _header(BuildContext context, ExtManifest m, CatalogEntry? entry) {
-    final s = S.of(context), palette = Palette.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: palette.field),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: palette.field.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(Symbols.extension_rounded, color: palette.ink2, size: 28),
+    final palette = Palette.of(context);
+    final live = ExtScope.of(context).get(m.id) ?? widget.installed;
+    return Row(
+      children: [
+        Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(14)),
+          child: Icon(Symbols.extension_rounded, color: palette.ink2, size: 28),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExtensionName(
+                name: m.name,
+                verified: live == null ? (entry?.badges.contains('staff') ?? false) : isTeamExtension(live),
+              ),
+              const SizedBox(height: 4),
+              Text('${m.author.name}, ${m.version}', style: Styles.secondary.copyWith(color: palette.ink2)),
+            ],
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(m.name, style: Styles.heading.copyWith(color: palette.ink)),
-                const SizedBox(height: 2),
-                Text(s.extByAuthor(m.author.name), style: Styles.caption.copyWith(color: palette.ink2)),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    if (entry != null) ...[
-                      if (entry.rating > 0) StarRating(rating: entry.rating),
-                      ...catalogBadges(context, entry),
-                    ] else if (widget.installed?.source != 'catalog')
-                      ExtBadge(label: s.extSideloadShort, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -356,7 +321,20 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
           const SizedBox(height: 8),
           PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
-        const SizedBox(height: 8),
+        if (live.enabled && m.panels.length == 1) ...[
+          if (needsUpdate)
+            _QuietButton(
+              label: s.extOpen,
+              icon: Symbols.open_in_new_rounded,
+              onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: m.panels.single.id)),
+            )
+          else
+            PrimaryButton(
+              label: s.extOpen,
+              onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: m.panels.single.id)),
+            ),
+          const SizedBox(height: 12),
+        ],
         SwitchTile(
           title: s.extEnabled,
           value: live.enabled,
@@ -450,6 +428,17 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
   }
 }
 
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 24, bottom: 8),
+    child: Text(text, style: Styles.bodyStrong.copyWith(fontSize: 14, color: Palette.of(context).ink)),
+  );
+}
+
 class _QuietButton extends StatelessWidget {
   const _QuietButton({required this.label, required this.icon, required this.onTap, this.danger = false});
   final String label;
@@ -460,30 +449,16 @@ class _QuietButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    // Button role for screen readers; the visible text is the label.
-    return Semantics(
-      button: true,
-      child: Pressable(
-        onTap: onTap,
-        child: Container(
-          // minHeight keeps large text scales from clipping the label.
-          constraints: const BoxConstraints(minHeight: 52),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: palette.surface,
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: palette.field),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 18, color: danger ? palette.danger : palette.ink2),
-              const SizedBox(width: 8),
-              Flexible(child: Text(label, style: danger ? Styles.dangerStrong(context) : Styles.bodyStrong)),
-            ],
-          ),
-        ),
+    return TextButton.icon(
+      style: TextButton.styleFrom(
+        foregroundColor: danger ? palette.danger : palette.ink2,
+        minimumSize: const Size(44, 44),
+        textStyle: Styles.secondary.copyWith(fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+      onPressed: onTap,
+      icon: Icon(icon, size: 18),
+      label: Text(label),
     );
   }
 }
@@ -505,22 +480,15 @@ class _SettingsForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context), palette = Palette.of(context);
+    final s = S.of(context);
     final props = (manifest.settingsSchema?['properties'] as Map<String, dynamic>?) ?? {};
-    return Group(
+    return Column(
       children: [
         for (final e in props.entries) _field(context, e.key, e.value as Map<String, dynamic>),
         Padding(
           padding: const EdgeInsets.all(12),
-          child: PrimaryButton(label: s.extSaveSettings, onTap: saving ? null : () => onSave()),
+          child: PrimaryButton(label: s.extSaveSettings, busy: saving, onTap: saving ? null : () => onSave()),
         ),
-        if (saving)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Center(
-              child: Text(s.extSaving, style: Styles.caption.copyWith(color: palette.ink2)),
-            ),
-          ),
       ],
     );
   }
@@ -661,7 +629,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
     final s = S.of(context), palette = Palette.of(context);
     final config = _config;
     final editable = widget.interactive && !_busy;
-    return Group(
+    return Column(
       children: [
         if (config == null)
           const Padding(
@@ -677,13 +645,11 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
                 : null,
           ),
           _intervalTile(config, editable),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-            child: Text(
-              widget.interactive ? s.extBgNote : s.extBgDisabledNote,
-              style: Styles.caption.copyWith(color: palette.ink2),
+          if (!widget.interactive)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
+              child: Text(s.extBgDisabledNote, style: Styles.caption.copyWith(color: palette.ink2)),
             ),
-          ),
         ],
       ],
     );

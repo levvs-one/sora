@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 انسٹال کریں۔",
-  "extBadgeVerified": "تصدیق شدہ",
-  "extBadgeTop": "اس ہفتے سب سے زیادہ مقبول",
-  "extBadgeNew": "نیا",
-  "extBadgeStaff": "Sora ٹیم",
-  "extSideloadShort": "کیٹلاگ سے نہیں۔",
-  "extSideloadWarning": "یہ توسیع ٹیم کیٹلاگ سے نہیں ہے۔ صرف مصنف نے اپنی کلید کی تصدیق کی ہے: اسے صرف اس صورت میں انسٹال کریں جب آپ مصنف پر بھروسہ کریں۔",
-  "extInstallTitle": "«{name}» نصب کریں",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "«{name}» اپ ڈیٹ کریں",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "یہ ایکسٹینشن اس قابل ہو گی:",
+  "extSideloadWarning": "صرف تب انسٹال کریں جب آپ مصنف کی خود دستخط کردہ کلید پر بھروسہ کرتے ہوں۔",
   "extPermissionsWidened": "اپ ڈیٹ نئی اجازتیں مانگتا ہے:",
   "extDangerousAck": "میں سمجھتا ہوں کہ یہ اجازتیں سنجیدہ ہیں۔",
   "extInstall": "انسٹال کریں۔",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "صرف https:// لنکس کی اجازت ہے۔",
   "extErrGeneric": "کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔",
   "extErrAuthorKeyChanged": "اس اپ ڈیٹ پر انسٹال شدہ ورژن سے مختلف مصنف کی کلید کے ساتھ دستخط کیے گئے ہیں، اس لیے اسے بلاک کر دیا گیا تھا۔ اگر آپ کو نئی کلید پر بھروسہ ہے، تو ایکسٹینشن اَن انسٹال کریں اور اسے دوبارہ واضح طور پر انسٹال کریں۔",
-  "extUpdateAvailable": "اپ ڈیٹ دستیاب ہے۔",
   "extDisabled": "غیر فعال",
   "extToggleEnabled": "فعال کریں {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "مزید درخواست نہیں کی گئی:",
   "extUpdateFailedKept": "پچھلا ورژن اب بھی انسٹال ہے۔",
   "extConflictsTitle": "توسیع کے تنازعات",
-  "extConflictsIntro": "یہ ایکسٹینشنز ایک ہی چیز چاہتی ہیں۔ چنیں کہ کون سی چلے گی، دوسری انسٹال رہے گی۔",
   "extConflictTheme": "ایپ تھیم",
   "extConflictNetHooks": "نیٹ ورک ہکس",
   "extConflictWinner": "ترجیح: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "تنازعات کو حل کریں۔",
-  "extConflictNote": "آپ کا انتخاب اس آلے پر محفوظ ہوتا ہے۔ تھیم فوراً بدل جاتی ہے، نیٹ ورک ہُکس اس ورژن میں نہیں چلتے۔",
   "extVersionLabel": "ورژن {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "مصنف",
-  "extRating": "درجہ بندی",
-  "extInstalls": "تنصیبات",
-  "extVersion": "ورژن",
-  "extAbout": "اس توسیع کے بارے میں",
   "extPermissionsTitle": "اجازتیں۔",
   "extNoPermissions": "کوئی خاص اجازت نہیں ہے۔",
   "extSettings": "ترتیبات",
   "extSaveSettings": "ترتیبات کو محفوظ کریں۔",
-  "extSaving": "محفوظ ہو رہا ہے…",
   "extUpdateTo": "{version} میں اپ گریڈ کریں",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "پینل دستیاب نہیں ہے۔ ہو سکتا ہے کہ توسیع کو غیر فعال یا ہٹا دیا گیا ہو۔",
+  "extPanelUnavailable": "ایکسٹینشن پینل دستیاب نہیں ہے۔",
   "extPermConnectionsRead": "فعال رابطوں کی فہرست دیکھیں",
   "extPermServersRead": "اپنے سرورز کی فہرست دیکھیں",
   "extPermSettingsRead": "ایپ کی ترتیبات پڑھیں",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "نیٹ ورک پاتھ میں ضم کریں (DPI بائی پاس ماڈیولز)",
   "extPermNetFetch": "URL کی اجازت دی گئی فہرست سے درخواست کریں۔",
   "extPermBackground": "پس منظر کے کام چلائیں۔",
-  "extPermBackgroundDetail": "پینل بند ہونے پر بھی طے شدہ کام چلاتا ہے۔ آپ ایکسٹینشن کی ترتیبات میں اسے روک سکتے ہیں یا اسے تبدیل کر سکتے ہیں کہ یہ کتنی بار چلتا ہے۔",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "پس منظر میں چلتا ہے۔",
   "extCapNetHook": "پابندی سے بچاؤ اور نیٹ ورک ہکس",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "چینج لاگ",
   "extImageFailed": "تصویر کو لوڈ نہیں کیا جا سکا",
-  "extRatingHow": "درجہ بندی کیسے کام کرتی ہے۔",
-  "extRatingHowBody": "ریٹنگز ایک Bayesian اوسط کا استعمال کرتی ہیں: چند ریٹنگز کے ساتھ ایک توسیع اس وقت تک وسط کے قریب رہتی ہے جب تک کہ زیادہ لوگ ووٹ نہ دیں، اس لیے ایک 5-اسٹار جائزہ کسی نئی توسیع کو اوپر نہیں لے جا سکتا۔ حالیہ درجہ بندیوں کا وزن پرانے سے زیادہ ہے، اور فی اکاؤنٹ صرف ایک درجہ بندی شمار ہوتی ہے۔",
   "extScreenshots": "اسکرین شاٹس",
   "extSortRelevance": "مطابقت",
-  "extPermNetworkDetail": "VPN کے ذریعے انٹرنیٹ سے ڈیٹا لاتی ہے۔ صرف نیچے دیے گئے ہوسٹ کی اجازت ہے، باقی سب بلاک ہے۔",
+  "extPermNetworkDetail": "VPN درخواستیں صرف نیچے دیے گئے ہوسٹس تک پہنچ سکتی ہیں۔",
   "extBgTitle": "پس منظر کا کام",
   "extBgEnabled": "پس منظر میں چلائیں۔",
   "extBgInterval": "چلانے کا وقفہ",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "جب تک Sora کھلا ہے، ٹرے میں ہونے پر بھی، کام شیڈول کے مطابق چلتا ہے۔ کم سے کم وقفہ 15 منٹ ہے۔",
   "extBgDisabledNote": "اس کے پس منظر کے کام کو منظم کرنے کے لیے ایکسٹینشن کو فعال کریں۔",
   "extCapNetwork": "نیٹ ورک تک رسائی",
   "extCapNetworkHosts": "نیٹ ورک: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "پیکٹ کیپچر کو ایک فعال Sora TUN کنکشن کی ضرورت ہے۔",
   "diagnosticUnavailable": "یہ تشخیص اس پلیٹ فارم پر دستیاب نہیں ہے۔",
   "extErrRevoked": "Sora ٹیم نے یہ ایکسٹینشن ورژن واپس لے لیا ہے کیونکہ یہ غیر محفوظ یا خراب ہے۔",
-  "extErrRevocationsExpired": "واپس لیے گئے ایکسٹینشنز کی فہرست تازہ نہیں ہو سکی۔ تازہ ہونے تک انسٹال بند ہے: نیٹ ورک چیک کر کے دوبارہ کوشش کریں۔",
+  "extErrRevocationsExpired": "منسوخ ایکسٹینشنز کی فہرست اپ ڈیٹ ہونے تک انسٹالیشن مسدود ہے۔",
   "extRevokedDisabled": "واپس لیے گئے ایکسٹینشنز بند کر دیے گئے: {names}",
   "customServerWgPrivateKey": "نجی کلید",
   "customServerWgAddresses": "انٹرفیس پتے",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "سخت نیٹ ورک بندش",
   "strictKillSwitchWarning": "اتصال کے بعد، خرابی، دوبارہ آغاز یا ایپ بند ہونے پر بھی VPN سے باہر کی ٹریفک روکتا ہے۔ رسائی صرف اتصال منقطع کرنے یا اس اختیار کو بند کرنے سے بحال ہوتی ہے۔ آلہ دوبارہ شروع ہونے پر بندش صرف اسی وقت بحال ہوتی ہے جب آغاز پر اتصال فعال ہو۔",
   "extWorkerFailed": "ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔",
-  "extAssetRejected": "ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔"
+  "extAssetRejected": "ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔",
+  "extVerifiedSora": "Sora سے تصدیق شدہ",
+  "extReceivedBytes": "{count} بائٹس",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "کھولیں"
 }

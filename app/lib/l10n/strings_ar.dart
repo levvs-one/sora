@@ -899,36 +899,7 @@ class SAr extends S {
   String get extInstallOne => 'تثبيت واحد';
 
   @override
-  String get extBadgeVerified => 'تم التحقق منه';
-
-  @override
-  String get extBadgeTop => 'الأكثر شعبية هذا الأسبوع';
-
-  @override
-  String get extBadgeNew => 'جديد';
-
-  @override
-  String get extBadgeStaff => 'فريق Sora';
-
-  @override
-  String get extSideloadShort => 'ليس من الكتالوج';
-
-  @override
-  String get extSideloadWarning =>
-      'هذا الملحق ليس من كتالوج الفريق. لقد كفل المؤلف فقط مفتاحه: قم بتثبيته فقط إذا كنت تثق في المؤلف.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'تثبيت «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'تحديث «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'سيتمكن هذا الملحق من:';
+  String get extSideloadWarning => 'ثبّت فقط إذا كنت تثق بمفتاح المؤلف الموقّع ذاتيًا.';
 
   @override
   String get extPermissionsWidened => 'التحديث يطلب أذونات جديدة:';
@@ -1054,9 +1025,6 @@ class SAr extends S {
       'تم توقيع هذا التحديث باستخدام مفتاح مؤلف مختلف عن الإصدار المثبت، لذلك تم حظره. إذا كنت تثق في المفتاح الجديد، فقم بإلغاء تثبيت الملحق وتثبيته مرة أخرى بشكل صريح.';
 
   @override
-  String get extUpdateAvailable => 'التحديث متاح';
-
-  @override
   String get extDisabled => 'معطل';
 
   @override
@@ -1099,9 +1067,6 @@ class SAr extends S {
   String get extConflictsTitle => 'تعارضات الملحق';
 
   @override
-  String get extConflictsIntro => 'تريد هذه الإضافات الشيء نفسه. اختر أيّها يعمل، وستبقى الأخرى مثبّتة.';
-
-  @override
   String get extConflictTheme => 'سمة التطبيق';
 
   @override
@@ -1121,28 +1086,9 @@ class SAr extends S {
   String get extConflictsResolve => 'حل النزاعات';
 
   @override
-  String get extConflictNote =>
-      'يُحفظ اختيارك على هذا الجهاز. يتغيّر المظهر فورًا، أما خطافات الشبكة فلا تعمل في هذا الإصدار.';
-
-  @override
   String extVersionLabel(String version) {
     return 'النسخة $version';
   }
-
-  @override
-  String get extAuthor => 'المؤلف';
-
-  @override
-  String get extRating => 'التقييم';
-
-  @override
-  String get extInstalls => 'عمليات التثبيت';
-
-  @override
-  String get extVersion => 'النسخة';
-
-  @override
-  String get extAbout => 'حول هذا الملحق';
 
   @override
   String get extPermissionsTitle => 'الأذونات';
@@ -1155,9 +1101,6 @@ class SAr extends S {
 
   @override
   String get extSaveSettings => 'حفظ الإعدادات';
-
-  @override
-  String get extSaving => 'الحفظ...';
 
   @override
   String extUpdateTo(String version) {
@@ -1186,7 +1129,7 @@ class SAr extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'اللوحة غير متوفرة. ربما تم تعطيل الملحق أو إزالته.';
+  String get extPanelUnavailable => 'لوحة الإضافة غير متاحة.';
 
   @override
   String get extPermConnectionsRead => 'راجع قائمة الاتصالات النشطة';
@@ -1225,10 +1168,6 @@ class SAr extends S {
   String get extPermBackground => 'تشغيل المهام الخلفية';
 
   @override
-  String get extPermBackgroundDetail =>
-      'يقوم بتشغيل المهام المجدولة حتى عندما تكون اللوحة مغلقة. يمكنك إيقافه مؤقتًا أو تغيير عدد مرات تشغيله في إعدادات الملحق.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1261,21 +1200,13 @@ class SAr extends S {
   String get extImageFailed => 'تعذر تحميل الصورة';
 
   @override
-  String get extRatingHow => 'كيفية عمل التقييمات';
-
-  @override
-  String get extRatingHowBody =>
-      'تستخدم التقييمات متوسط بايزي: يظل الملحق الذي يحتوي على عدد قليل من التقييمات بالقرب من المنتصف حتى يصوت المزيد من الأشخاص، لذلك لا يمكن لمراجعة واحدة من فئة 5 نجوم دفع الملحق الجديد إلى الأعلى. التقييمات الحديثة لها وزن أكبر من التقييمات القديمة، ويتم احتساب تقييم واحد فقط لكل حساب.';
-
-  @override
   String get extScreenshots => 'لقطات الشاشة';
 
   @override
   String get extSortRelevance => 'الصلة';
 
   @override
-  String get extPermNetworkDetail =>
-      'تجلب بيانات من الإنترنت عبر VPN. يُسمح فقط بالمضيفين في القائمة أدناه، وكل ما عداهم محظور.';
+  String get extPermNetworkDetail => 'تُسمح طلبات VPN إلى المضيفين أدناه فقط.';
 
   @override
   String get extBgTitle => 'مهمة في الخلفية';
@@ -1315,10 +1246,6 @@ class SAr extends S {
     );
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'تعمل المهمة وفق الجدول ما دام Sora مفتوحًا، بما في ذلك عند وجوده في علبة النظام. أقصر فاصل 15 دقيقة.';
 
   @override
   String get extBgDisabledNote => 'قم بتمكين الملحق لإدارة مهمة الخلفية الخاصة به.';
@@ -2029,8 +1956,7 @@ class SAr extends S {
   String get extErrRevoked => 'سحب فريق Sora هذا الإصدار من الإضافة لأنه غير آمن أو معطّل.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'تعذّر تحديث قائمة الإضافات المسحوبة. التثبيت متوقف حتى تُحدَّث: تحقّق من الشبكة وحاول مجددًا.';
+  String get extErrRevocationsExpired => 'التثبيت محظور حتى يتم تحديث قائمة الإضافات الملغاة.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2076,4 +2002,15 @@ class SAr extends S {
 
   @override
   String get extAssetRejected => 'تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة.';
+
+  @override
+  String get extVerifiedSora => 'تم التحقق بواسطة Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count بايت';
+  }
+
+  @override
+  String get extOpen => 'فتح';
 }

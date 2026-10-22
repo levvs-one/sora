@@ -906,36 +906,7 @@ class STh extends S {
   String get extInstallOne => '1 ติดตั้ง';
 
   @override
-  String get extBadgeVerified => 'ตรวจสอบแล้ว';
-
-  @override
-  String get extBadgeTop => 'ฮิตที่สุดในสัปดาห์นี้';
-
-  @override
-  String get extBadgeNew => 'ใหม่';
-
-  @override
-  String get extBadgeStaff => 'ทีมงาน Sora';
-
-  @override
-  String get extSideloadShort => 'ไม่ใช่จากแค็ตตาล็อก';
-
-  @override
-  String get extSideloadWarning =>
-      'ส่วนขยายนี้ไม่ได้มาจากแค็ตตาล็อกของทีม มีเพียงผู้เขียนเท่านั้นที่รับรองรหัสของตน: ติดตั้งเฉพาะเมื่อคุณเชื่อถือผู้เขียนเท่านั้น';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'ติดตั้ง “$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'อัปเดต “$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'ส่วนขยายนี้จะสามารถ:';
+  String get extSideloadWarning => 'ติดตั้งเฉพาะเมื่อคุณเชื่อถือคีย์ที่ผู้สร้างลงนามเองเท่านั้น';
 
   @override
   String get extPermissionsWidened => 'การอัปเดตจะขอสิทธิ์ใหม่:';
@@ -1061,9 +1032,6 @@ class STh extends S {
       'การอัปเดตนี้ลงนามด้วยรหัสผู้สร้างที่แตกต่างจากเวอร์ชันที่ติดตั้ง ดังนั้นจึงถูกบล็อก หากคุณเชื่อถือคีย์ใหม่ ให้ถอนการติดตั้งส่วนขยายและติดตั้งอีกครั้งอย่างชัดเจน';
 
   @override
-  String get extUpdateAvailable => 'มีการอัปเดตแล้ว';
-
-  @override
   String get extDisabled => 'ปิดใช้งาน';
 
   @override
@@ -1106,9 +1074,6 @@ class STh extends S {
   String get extConflictsTitle => 'ข้อขัดแย้งของส่วนขยาย';
 
   @override
-  String get extConflictsIntro => 'ส่วนขยายเหล่านี้ต้องการสิ่งเดียวกัน เลือกว่าจะให้ตัวไหนทำงาน อีกตัวจะยังติดตั้งอยู่';
-
-  @override
   String get extConflictTheme => 'ธีมแอป';
 
   @override
@@ -1128,28 +1093,9 @@ class STh extends S {
   String get extConflictsResolve => 'แก้ไขข้อขัดแย้ง';
 
   @override
-  String get extConflictNote =>
-      'ระบบจะบันทึกตัวเลือกของคุณไว้ในอุปกรณ์นี้ ธีมจะเปลี่ยนทันที ส่วนฮุกเครือข่ายจะไม่ทำงานในเวอร์ชันนี้';
-
-  @override
   String extVersionLabel(String version) {
     return 'เวอร์ชัน $version';
   }
-
-  @override
-  String get extAuthor => 'ผู้เขียน';
-
-  @override
-  String get extRating => 'เรตติ้ง';
-
-  @override
-  String get extInstalls => 'การติดตั้ง';
-
-  @override
-  String get extVersion => 'เวอร์ชัน';
-
-  @override
-  String get extAbout => 'เกี่ยวกับส่วนขยายนี้';
 
   @override
   String get extPermissionsTitle => 'สิทธิ์';
@@ -1162,9 +1108,6 @@ class STh extends S {
 
   @override
   String get extSaveSettings => 'บันทึกการตั้งค่า';
-
-  @override
-  String get extSaving => 'กำลังบันทึก...';
 
   @override
   String extUpdateTo(String version) {
@@ -1193,7 +1136,7 @@ class STh extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'แผงควบคุมไม่พร้อมใช้งาน ส่วนขยายอาจถูกปิดใช้งานหรือลบออก';
+  String get extPanelUnavailable => 'แผงส่วนขยายไม่พร้อมใช้งาน';
 
   @override
   String get extPermConnectionsRead => 'ดูรายการการเชื่อมต่อที่ใช้งานอยู่';
@@ -1232,10 +1175,6 @@ class STh extends S {
   String get extPermBackground => 'เรียกใช้งานพื้นหลัง';
 
   @override
-  String get extPermBackgroundDetail =>
-      'รันงานที่กำหนดเวลาไว้แม้ในขณะที่แผงปิดอยู่ คุณสามารถหยุดชั่วคราวหรือเปลี่ยนความถี่ในการทำงานได้ในการตั้งค่าส่วนขยาย';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1268,21 +1207,13 @@ class STh extends S {
   String get extImageFailed => 'ไม่สามารถโหลดภาพได้';
 
   @override
-  String get extRatingHow => 'การให้คะแนนทำงานอย่างไร';
-
-  @override
-  String get extRatingHowBody =>
-      'การให้คะแนนใช้ค่าเฉลี่ยแบบเบย์: ส่วนขยายที่มีการให้คะแนนน้อยจะยังคงอยู่ใกล้ตรงกลางจนกว่าผู้คนจะโหวตมากขึ้น ดังนั้นบทวิจารณ์ระดับ 5 ดาวรายการเดียวจึงไม่สามารถผลักดันส่วนขยายใหม่ขึ้นไปด้านบนได้ การให้คะแนนล่าสุดมีน้ำหนักมากกว่าการให้คะแนนแบบเก่า และมีเพียงการให้คะแนนเดียวต่อบัญชีเท่านั้น';
-
-  @override
   String get extScreenshots => 'ภาพหน้าจอ';
 
   @override
   String get extSortRelevance => 'ความเกี่ยวข้อง';
 
   @override
-  String get extPermNetworkDetail =>
-      'ดึงข้อมูลจากอินเทอร์เน็ตผ่าน VPN อนุญาตเฉพาะโฮสต์ในรายการด้านล่าง ที่เหลือถูกบล็อก';
+  String get extPermNetworkDetail => 'คำขอผ่าน VPN เข้าถึงได้เฉพาะโฮสต์ด้านล่างเท่านั้น';
 
   @override
   String get extBgTitle => 'งานเบื้องหลัง';
@@ -1304,10 +1235,6 @@ class STh extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ชั่วโมง');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'งานจะทำงานตามกำหนดเวลาขณะที่ Sora เปิดอยู่ รวมถึงตอนอยู่ในถาดระบบ ช่วงเวลาสั้นที่สุดคือ 15 นาที';
 
   @override
   String get extBgDisabledNote => 'เปิดใช้งานส่วนขยายเพื่อจัดการงานพื้นหลัง';
@@ -1999,8 +1926,7 @@ class STh extends S {
   String get extErrRevoked => 'ทีม Sora ได้เพิกถอนส่วนขยายเวอร์ชันนี้ เพราะไม่ปลอดภัยหรือใช้งานไม่ได้';
 
   @override
-  String get extErrRevocationsExpired =>
-      'ต่ออายุรายการส่วนขยายที่ถูกเพิกถอนไม่สำเร็จ การติดตั้งถูกบล็อกจนกว่าจะต่ออายุได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง';
+  String get extErrRevocationsExpired => 'การติดตั้งถูกระงับจนกว่าจะอัปเดตรายการส่วนขยายที่ถูกเพิกถอน';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2046,4 +1972,15 @@ class STh extends S {
 
   @override
   String get extAssetRejected => 'ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง';
+
+  @override
+  String get extVerifiedSora => 'ตรวจสอบโดย Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count ไบต์';
+  }
+
+  @override
+  String get extOpen => 'เปิด';
 }

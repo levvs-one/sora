@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "설치 1회",
-  "extBadgeVerified": "확인됨",
-  "extBadgeTop": "이번 주 가장 인기 있는 항목",
-  "extBadgeNew": "신규",
-  "extBadgeStaff": "Sora 팀",
-  "extSideloadShort": "카탈로그에 없음",
-  "extSideloadWarning": "이 확장은 팀 카탈로그에 없습니다. 작성자만이 키를 보증했습니다. 작성자를 신뢰하는 경우에만 키를 설치하세요.",
-  "extInstallTitle": "“{name}” 설치",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "“{name}” 업데이트",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "이 확장 프로그램은 다음을 수행할 수 있습니다.",
+  "extSideloadWarning": "작성자의 자체 서명 키를 신뢰하는 경우에만 설치하세요.",
   "extPermissionsWidened": "업데이트에서 새 권한을 요청합니다.",
   "extDangerousAck": "나는 이러한 권한이 심각한 것임을 이해합니다",
   "extInstall": "설치",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "https:// 링크만 허용됩니다.",
   "extErrGeneric": "문제가 발생했습니다. 다시 시도해 주세요.",
   "extErrAuthorKeyChanged": "이 업데이트는 설치된 버전과 다른 작성자 키로 서명되었으므로 차단되었습니다. 새 키를 신뢰하는 경우 확장 프로그램을 제거하고 명시적으로 다시 설치하세요.",
-  "extUpdateAvailable": "업데이트 가능",
   "extDisabled": "비활성화됨",
   "extToggleEnabled": "{name} 활성화",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "더 이상 요청되지 않음:",
   "extUpdateFailedKept": "이전 버전이 아직 설치되어 있습니다.",
   "extConflictsTitle": "확장 프로그램 충돌",
-  "extConflictsIntro": "이 확장 프로그램들은 같은 것을 원합니다. 실행할 것을 고르세요. 다른 하나는 설치된 채로 남습니다.",
   "extConflictTheme": "앱 테마",
   "extConflictNetHooks": "네트워크 후크",
   "extConflictWinner": "{name} 승리",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "충돌 해결",
-  "extConflictNote": "선택 사항은 이 기기에 저장됩니다. 테마는 바로 바뀌며, 네트워크 훅은 이 버전에서 실행되지 않습니다.",
   "extVersionLabel": "버전 {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "작성자",
-  "extRating": "평가",
-  "extInstalls": "설치 수",
-  "extVersion": "버전",
-  "extAbout": "이 확장 프로그램 정보",
   "extPermissionsTitle": "권한",
   "extNoPermissions": "특별한 권한이 없습니다.",
   "extSettings": "설정",
   "extSaveSettings": "설정 저장",
-  "extSaving": "저장 중…",
   "extUpdateTo": "{version}(으)로 업그레이드",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "패널을 사용할 수 없습니다. 확장 프로그램이 비활성화되었거나 제거되었을 수 있습니다.",
+  "extPanelUnavailable": "확장 기능 패널을 사용할 수 없습니다.",
   "extPermConnectionsRead": "활성 연결 목록 보기",
   "extPermServersRead": "서버 목록 보기",
   "extPermSettingsRead": "앱 설정 읽기",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "네트워크 경로에 통합(DPI 우회 모듈)",
   "extPermNetFetch": "허용 목록에서 URL 요청",
   "extPermBackground": "백그라운드 작업 실행",
-  "extPermBackgroundDetail": "패널이 닫혀 있어도 예약된 작업을 실행합니다. 확장 프로그램 설정에서 일시 중지하거나 실행 빈도를 변경할 수 있습니다.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "백그라운드에서 실행됩니다.",
   "extCapNetHook": "우회 기능 및 네트워크 후크",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "변경 로그",
   "extImageFailed": "이미지를 로드할 수 없습니다.",
-  "extRatingHow": "평가 작동 방식",
-  "extRatingHowBody": "평점은 베이지안 평균을 사용합니다. 평점이 거의 없는 확장 프로그램은 더 많은 사람들이 투표할 때까지 중간 근처에 유지되므로 별 5개짜리 단일 리뷰로는 새 확장 프로그램을 맨 위로 올릴 수 없습니다. 최근 평가는 이전 평가보다 중요하며 계정당 하나의 평가만 계산됩니다.",
   "extScreenshots": "스크린샷",
   "extSortRelevance": "관련성",
-  "extPermNetworkDetail": "VPN을 통해 인터넷에서 데이터를 가져옵니다. 아래 호스트만 허용되며 나머지는 모두 차단됩니다.",
+  "extPermNetworkDetail": "VPN 요청은 아래 호스트에만 접근할 수 있습니다.",
   "extBgTitle": "백그라운드 작업",
   "extBgEnabled": "백그라운드에서 실행",
   "extBgInterval": "실행 간격",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Sora가 열려 있는 동안 트레이에 있을 때도 일정에 따라 작업이 실행됩니다. 최소 간격은 15분입니다.",
   "extBgDisabledNote": "백그라운드 작업을 관리하려면 확장 프로그램을 활성화하세요.",
   "extCapNetwork": "네트워크 액세스",
   "extCapNetworkHosts": "네트워크: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "패킷 캡처에는 활성 Sora TUN 연결이 필요합니다.",
   "diagnosticUnavailable": "이 플랫폼에서는 이 진단을 사용할 수 없습니다.",
   "extErrRevoked": "Sora 팀이 안전하지 않거나 손상된 이 확장 프로그램 버전을 철회했습니다.",
-  "extErrRevocationsExpired": "철회된 확장 프로그램 목록을 갱신하지 못했습니다. 갱신될 때까지 설치할 수 없습니다. 네트워크를 확인하고 다시 시도하세요.",
+  "extErrRevocationsExpired": "취소 목록이 갱신될 때까지 설치가 차단됩니다.",
   "extRevokedDisabled": "철회된 확장 프로그램을 껐습니다: {names}",
   "customServerWgPrivateKey": "개인 키",
   "customServerWgAddresses": "인터페이스 주소",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "엄격한 네트워크 차단",
   "strictKillSwitchWarning": "연결 후에는 충돌, 재시작 또는 앱 종료 후에도 VPN 외부 트래픽을 차단합니다. 연결을 끊거나 이 옵션을 꺼야 접근이 복원됩니다. 기기를 재부팅한 뒤에는 시작 시 연결이 활성화된 경우에만 차단을 재개합니다.",
   "extWorkerFailed": "확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.",
-  "extAssetRejected": "확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다."
+  "extAssetRejected": "확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.",
+  "extVerifiedSora": "Sora 인증됨",
+  "extReceivedBytes": "{count} 바이트",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "열기"
 }

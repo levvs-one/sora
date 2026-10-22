@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 instalación",
-  "extBadgeVerified": "Verificado",
-  "extBadgeTop": "Más popular esta semana",
-  "extBadgeNew": "Nuevo",
-  "extBadgeStaff": "El equipo Sora",
-  "extSideloadShort": "No del catálogo",
-  "extSideloadWarning": "Esta extensión no es del catálogo del equipo. Sólo el autor ha respondido por su clave: instálela sólo si confía en el autor.",
-  "extInstallTitle": "Instalar «{name}»",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Actualizar «{name}»",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Esta extensión podrá:",
+  "extSideloadWarning": "Instala solo si confías en la clave autofirmada del autor.",
   "extPermissionsWidened": "La actualización solicita nuevos permisos:",
   "extDangerousAck": "Entiendo que estos permisos son serios",
   "extInstall": "Instalar",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Sólo se permiten enlaces https://",
   "extErrGeneric": "Algo salió mal. Por favor inténtalo de nuevo.",
   "extErrAuthorKeyChanged": "Esta actualización está firmada con una clave de autor diferente a la versión instalada, por lo que fue bloqueada. Si confía en la nueva clave, desinstale la extensión y vuelva a instalarla explícitamente.",
-  "extUpdateAvailable": "Actualización disponible",
   "extDisabled": "Desactivado",
   "extToggleEnabled": "Habilitar {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Ya no se solicita:",
   "extUpdateFailedKept": "La versión anterior aún está instalada.",
   "extConflictsTitle": "Conflictos de extensión",
-  "extConflictsIntro": "Estas extensiones quieren lo mismo. Elige cuál se ejecuta; la otra seguirá instalada.",
   "extConflictTheme": "Tema de la aplicación",
   "extConflictNetHooks": "Ganchos de red",
   "extConflictWinner": "{name} gana",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Resolver conflictos",
-  "extConflictNote": "Tu elección se guarda en este dispositivo. El tema cambia al instante; los hooks de red no se ejecutan en esta versión.",
   "extVersionLabel": "Versión {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Autor",
-  "extRating": "Clasificación",
-  "extInstalls": "Instalaciones",
-  "extVersion": "Versión",
-  "extAbout": "Acerca de esta extensión",
   "extPermissionsTitle": "Permisos",
   "extNoPermissions": "Sin permisos especiales.",
   "extSettings": "Ajustes",
   "extSaveSettings": "Guardar ajustes",
-  "extSaving": "Guardando…",
   "extUpdateTo": "Actualizar a {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "El panel no está disponible. Es posible que la extensión se haya desactivado o eliminado.",
+  "extPanelUnavailable": "El panel de la extensión no está disponible.",
   "extPermConnectionsRead": "Ver lista de conexiones activas",
   "extPermServersRead": "Ver una lista de sus servidores",
   "extPermSettingsRead": "Leer la configuración de la aplicación",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Integrar en la ruta de red (módulos de derivación DPI)",
   "extPermNetFetch": "Solicitar URL de la lista permitida",
   "extPermBackground": "Ejecutar tareas en segundo plano",
-  "extPermBackgroundDetail": "Ejecuta tareas programadas incluso cuando el panel está cerrado. Puede pausarlo o cambiar la frecuencia con la que se ejecuta en la configuración de la extensión.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Se ejecuta en segundo plano",
   "extCapNetHook": "Evasión de bloqueos y enganches de red",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Registro de cambios",
   "extImageFailed": "No se pudo cargar la imagen",
-  "extRatingHow": "Cómo funcionan las calificaciones",
-  "extRatingHowBody": "Las calificaciones utilizan un promedio bayesiano: una extensión con pocas calificaciones permanece cerca del medio hasta que más personas votan, por lo que una sola reseña de 5 estrellas no puede llevar una nueva extensión a la cima. Las calificaciones recientes pesan más que las antiguas y solo cuenta una calificación por cuenta.",
   "extScreenshots": "Capturas de pantalla",
   "extSortRelevance": "Relevancia",
-  "extPermNetworkDetail": "Descarga datos de internet a través de la VPN. Solo se permiten los hosts de abajo; todo lo demás está bloqueado.",
+  "extPermNetworkDetail": "Las solicitudes por VPN solo pueden acceder a los hosts siguientes.",
   "extBgTitle": "Tarea en segundo plano",
   "extBgEnabled": "Ejecutar en segundo plano",
   "extBgInterval": "Ejecutar cada",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "La tarea se ejecuta según el horario mientras Sora está abierto, también en la bandeja. El intervalo mínimo es de 15 minutos.",
   "extBgDisabledNote": "Habilite la extensión para administrar su tarea en segundo plano.",
   "extCapNetwork": "Acceso a la red",
   "extCapNetworkHosts": "Red: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "La captura de paquetes necesita una conexión Sora TUN activa.",
   "diagnosticUnavailable": "Este diagnóstico no está disponible en esta plataforma.",
   "extErrRevoked": "El equipo de Sora retiró esta versión de la extensión porque es insegura o no funciona.",
-  "extErrRevocationsExpired": "No se pudo renovar la lista de extensiones retiradas. La instalación está bloqueada hasta que se renueve: revisa la red e inténtalo de nuevo.",
+  "extErrRevocationsExpired": "La instalación está bloqueada hasta actualizar la lista de revocaciones.",
   "extRevokedDisabled": "Se desactivaron extensiones retiradas: {names}",
   "customServerWgPrivateKey": "Clave privada",
   "customServerWgAddresses": "Direcciones de la interfaz",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Bloqueo de red estricto",
   "strictKillSwitchWarning": "Tras conectar, bloquea el tráfico fuera de la VPN incluso después de un fallo, reinicio o cierre de la aplicación. Solo desconectar o desactivar esta opción restablece el acceso. Tras reiniciar el equipo, el bloqueo se reanuda solo si está activada la conexión al inicio.",
   "extWorkerFailed": "Falló la tarea en segundo plano de la extensión. Revisa su registro.",
-  "extAssetRejected": "Archivo de extensión rechazado: colores ilegibles o reglas no válidas."
+  "extAssetRejected": "Archivo de extensión rechazado: colores ilegibles o reglas no válidas.",
+  "extVerifiedSora": "Verificado por Sora",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Abrir"
 }

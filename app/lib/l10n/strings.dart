@@ -1785,59 +1785,11 @@ abstract class S {
   /// **'1 установка'**
   String get extInstallOne;
 
-  /// No description provided for @extBadgeVerified.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверено'**
-  String get extBadgeVerified;
-
-  /// No description provided for @extBadgeTop.
-  ///
-  /// In ru, this message translates to:
-  /// **'Топ недели'**
-  String get extBadgeTop;
-
-  /// No description provided for @extBadgeNew.
-  ///
-  /// In ru, this message translates to:
-  /// **'Новое'**
-  String get extBadgeNew;
-
-  /// No description provided for @extBadgeStaff.
-  ///
-  /// In ru, this message translates to:
-  /// **'Команда Sora'**
-  String get extBadgeStaff;
-
-  /// No description provided for @extSideloadShort.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не из каталога'**
-  String get extSideloadShort;
-
   /// No description provided for @extSideloadWarning.
   ///
   /// In ru, this message translates to:
-  /// **'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.'**
+  /// **'Устанавливайте, только если доверяете самоподписанному ключу автора.'**
   String get extSideloadWarning;
-
-  /// No description provided for @extInstallTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Установить «{name}»'**
-  String extInstallTitle(String name);
-
-  /// No description provided for @extUpdateTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Обновить «{name}»'**
-  String extUpdateTitle(String name);
-
-  /// No description provided for @extPermissionsIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Расширение сможет:'**
-  String get extPermissionsIntro;
 
   /// No description provided for @extPermissionsWidened.
   ///
@@ -2079,12 +2031,6 @@ abstract class S {
   /// **'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.'**
   String get extErrAuthorKeyChanged;
 
-  /// No description provided for @extUpdateAvailable.
-  ///
-  /// In ru, this message translates to:
-  /// **'Доступно обновление'**
-  String get extUpdateAvailable;
-
   /// No description provided for @extDisabled.
   ///
   /// In ru, this message translates to:
@@ -2157,12 +2103,6 @@ abstract class S {
   /// **'Конфликты расширений'**
   String get extConflictsTitle;
 
-  /// No description provided for @extConflictsIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.'**
-  String get extConflictsIntro;
-
   /// No description provided for @extConflictTheme.
   ///
   /// In ru, this message translates to:
@@ -2193,47 +2133,11 @@ abstract class S {
   /// **'Решить'**
   String get extConflictsResolve;
 
-  /// No description provided for @extConflictNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выбор сохраняется на этом устройстве. Тема переключается сразу, сетевые хуки в этой версии не запускаются.'**
-  String get extConflictNote;
-
   /// No description provided for @extVersionLabel.
   ///
   /// In ru, this message translates to:
   /// **'Версия {version}'**
   String extVersionLabel(String version);
-
-  /// No description provided for @extAuthor.
-  ///
-  /// In ru, this message translates to:
-  /// **'Автор'**
-  String get extAuthor;
-
-  /// No description provided for @extRating.
-  ///
-  /// In ru, this message translates to:
-  /// **'Оценка'**
-  String get extRating;
-
-  /// No description provided for @extInstalls.
-  ///
-  /// In ru, this message translates to:
-  /// **'Установки'**
-  String get extInstalls;
-
-  /// No description provided for @extVersion.
-  ///
-  /// In ru, this message translates to:
-  /// **'Версия'**
-  String get extVersion;
-
-  /// No description provided for @extAbout.
-  ///
-  /// In ru, this message translates to:
-  /// **'Описание'**
-  String get extAbout;
 
   /// No description provided for @extPermissionsTitle.
   ///
@@ -2258,12 +2162,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Сохранить настройки'**
   String get extSaveSettings;
-
-  /// No description provided for @extSaving.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сохранение…'**
-  String get extSaving;
 
   /// No description provided for @extUpdateTo.
   ///
@@ -2304,7 +2202,7 @@ abstract class S {
   /// No description provided for @extPanelUnavailable.
   ///
   /// In ru, this message translates to:
-  /// **'Панель недоступна. Возможно, расширение отключено или удалено.'**
+  /// **'Панель расширения недоступна.'**
   String get extPanelUnavailable;
 
   /// No description provided for @extPermConnectionsRead.
@@ -2379,12 +2277,6 @@ abstract class S {
   /// **'Выполнять фоновые задачи'**
   String get extPermBackground;
 
-  /// No description provided for @extPermBackgroundDetail.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения.'**
-  String get extPermBackgroundDetail;
-
   /// No description provided for @extPermNotYetActive.
   ///
   /// In ru, this message translates to:
@@ -2445,18 +2337,6 @@ abstract class S {
   /// **'Не удалось загрузить изображение'**
   String get extImageFailed;
 
-  /// No description provided for @extRatingHow.
-  ///
-  /// In ru, this message translates to:
-  /// **'Как считаются оценки'**
-  String get extRatingHow;
-
-  /// No description provided for @extRatingHowBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, поэтому один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.'**
-  String get extRatingHowBody;
-
   /// No description provided for @extScreenshots.
   ///
   /// In ru, this message translates to:
@@ -2472,7 +2352,7 @@ abstract class S {
   /// No description provided for @extPermNetworkDetail.
   ///
   /// In ru, this message translates to:
-  /// **'Загружает данные из интернета через VPN. Разрешены только хосты из списка ниже, остальные заблокированы.'**
+  /// **'Запросы через VPN разрешены только к этим хостам.'**
   String get extPermNetworkDetail;
 
   /// No description provided for @extBgTitle.
@@ -2504,12 +2384,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'{count, plural, one{# час} few{# часа} other{# часов}}'**
   String extBgHours(int count);
-
-  /// No description provided for @extBgNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Задача запускается по расписанию, пока Sora открыта, в том числе свёрнутой в трей. Минимальный интервал 15 минут.'**
-  String get extBgNote;
 
   /// No description provided for @extBgDisabledNote.
   ///
@@ -3798,7 +3672,7 @@ abstract class S {
   /// No description provided for @extErrRevocationsExpired.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось обновить список отозванных расширений. Установка недоступна, пока он не обновится: проверьте сеть и попробуйте снова.'**
+  /// **'Установка заблокирована до обновления списка отозванных расширений.'**
   String get extErrRevocationsExpired;
 
   /// No description provided for @extRevokedDisabled.
@@ -3884,6 +3758,24 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
   String get extAssetRejected;
+
+  /// No description provided for @extVerifiedSora.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверено Sora'**
+  String get extVerifiedSora;
+
+  /// No description provided for @extReceivedBytes.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} Б'**
+  String extReceivedBytes(String count);
+
+  /// No description provided for @extOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть'**
+  String get extOpen;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

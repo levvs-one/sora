@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 instalacja",
-  "extBadgeVerified": "Zweryfikowano",
-  "extBadgeTop": "Najpopularniejsze w tym tygodniu",
-  "extBadgeNew": "Nowość",
-  "extBadgeStaff": "Zespół Sora",
-  "extSideloadShort": "Nie z katalogu",
-  "extSideloadWarning": "To rozszerzenie nie pochodzi z katalogu zespołu. Tylko autor poręczył za swój klucz: zainstaluj go tylko wtedy, gdy ufasz autorowi.",
-  "extInstallTitle": "Zainstaluj „{name}”",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Aktualizuj „{name}”",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "To rozszerzenie będzie mogło:",
+  "extSideloadWarning": "Instaluj tylko, jeśli ufasz kluczowi podpisanemu przez samego autora.",
   "extPermissionsWidened": "Aktualizacja prosi o nowe uprawnienia:",
   "extDangerousAck": "Rozumiem, że te uprawnienia są poważne",
   "extInstall": "Zainstaluj",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Dozwolone są tylko linki https://",
   "extErrGeneric": "Coś poszło nie tak. Spróbuj ponownie.",
   "extErrAuthorKeyChanged": "Ta aktualizacja jest podpisana innym kluczem autora niż wersja zainstalowana, więc została zablokowana. Jeśli ufasz nowemu kluczowi, odinstaluj rozszerzenie i zainstaluj je ponownie.",
-  "extUpdateAvailable": "Dostępna aktualizacja",
   "extDisabled": "Wyłączone",
   "extToggleEnabled": "Włącz {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Nie jest już wymagane:",
   "extUpdateFailedKept": "Poprzednia wersja jest nadal zainstalowana.",
   "extConflictsTitle": "Konflikty rozszerzeń",
-  "extConflictsIntro": "Te rozszerzenia chcą tego samego. Wybierz, które ma działać; drugie zostanie zainstalowane.",
   "extConflictTheme": "Motyw aplikacji",
   "extConflictNetHooks": "Haki sieciowe",
   "extConflictWinner": "{name} wygrywa",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Rozwiązuj konflikty",
-  "extConflictNote": "Twój wybór jest zapisywany na tym urządzeniu. Motyw zmienia się od razu, a hooki sieciowe nie są uruchamiane w tej wersji.",
   "extVersionLabel": "Wersja {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Autor",
-  "extRating": "Ocena",
-  "extInstalls": "Instalacje",
-  "extVersion": "Wersja",
-  "extAbout": "Informacje o tym rozszerzeniu",
   "extPermissionsTitle": "Uprawnienia",
   "extNoPermissions": "Brak specjalnych uprawnień.",
   "extSettings": "Ustawienia",
   "extSaveSettings": "Zapisz ustawienia",
-  "extSaving": "Zapisywanie…",
   "extUpdateTo": "Aktualizacja do {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Panel jest niedostępny. Rozszerzenie mogło zostać wyłączone lub usunięte.",
+  "extPanelUnavailable": "Panel rozszerzenia jest niedostępny.",
   "extPermConnectionsRead": "Zobacz listę aktywnych połączeń",
   "extPermServersRead": "Zobacz listę swoich serwerów",
   "extPermSettingsRead": "Przeczytaj ustawienia aplikacji",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Integracja ze ścieżką sieciową (DPI moduły obejściowe)",
   "extPermNetFetch": "Żądanie URL z listy dozwolonych",
   "extPermBackground": "Uruchom zadania w tle",
-  "extPermBackgroundDetail": "Uruchamia zaplanowane zadania nawet wtedy, gdy panel jest zamknięty. Możesz je wstrzymać lub zmienić częstotliwość jego uruchamiania w ustawieniach rozszerzenia.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Działa w tle",
   "extCapNetHook": "Obchodzenie blokad i haki sieciowe",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Dziennik zmian",
   "extImageFailed": "Nie można załadować obrazu",
-  "extRatingHow": "Jak działają oceny",
-  "extRatingHowBody": "Oceny opierają się na średniej Bayesa: rozszerzenie z kilkoma ocenami pozostaje w pobliżu środka, dopóki więcej osób nie zagłosuje, więc pojedyncza 5-gwiazdkowa recenzja nie może wysunąć nowego rozszerzenia na sam szczyt. Najnowsze oceny mają większą wagę niż stare i liczy się tylko jedna ocena na konto.",
   "extScreenshots": "Zrzuty ekranu",
   "extSortRelevance": "Trafność",
-  "extPermNetworkDetail": "Pobiera dane z internetu przez VPN. Dozwolone są tylko hosty z listy poniżej, wszystko inne jest blokowane.",
+  "extPermNetworkDetail": "Żądania VPN mogą docierać tylko do hostów poniżej.",
   "extBgTitle": "Zadanie w tle",
   "extBgEnabled": "Uruchom w tle",
   "extBgInterval": "Uruchamiaj co",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Zadanie działa według harmonogramu, dopóki Sora jest otwarta, także w zasobniku. Najkrótszy odstęp to 15 minut.",
   "extBgDisabledNote": "Włącz rozszerzenie, aby zarządzać zadaniami w tle.",
   "extCapNetwork": "Dostęp do sieci",
   "extCapNetworkHosts": "Sieć: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Przechwytywanie pakietów wymaga aktywnego połączenia Sora TUN.",
   "diagnosticUnavailable": "Ta diagnostyka jest niedostępna na tej platformie.",
   "extErrRevoked": "Zespół Sora wycofał tę wersję rozszerzenia, ponieważ jest niebezpieczna lub uszkodzona.",
-  "extErrRevocationsExpired": "Nie udało się odnowić listy wycofanych rozszerzeń. Instalacja jest zablokowana do czasu odnowienia: sprawdź sieć i spróbuj ponownie.",
+  "extErrRevocationsExpired": "Instalacja jest zablokowana do czasu odświeżenia listy unieważnień.",
   "extRevokedDisabled": "Wyłączono wycofane rozszerzenia: {names}",
   "customServerWgPrivateKey": "Klucz prywatny",
   "customServerWgAddresses": "Adresy interfejsu",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Ścisła blokada sieci",
   "strictKillSwitchWarning": "Po połączeniu blokuje ruch poza VPN także po awarii, ponownym uruchomieniu lub zamknięciu aplikacji. Dostęp przywraca tylko rozłączenie lub wyłączenie tej opcji. Po restarcie systemu blokada wraca tylko przy włączonym łączeniu podczas uruchamiania.",
   "extWorkerFailed": "Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.",
-  "extAssetRejected": "Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły."
+  "extAssetRejected": "Odrzucono plik rozszerzenia: nieczytelne kolory lub nieprawidłowe reguły.",
+  "extVerifiedSora": "Zweryfikowano przez Sora",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Otwórz"
 }

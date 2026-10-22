@@ -909,36 +909,7 @@ class STk extends S {
   String get extInstallOne => '1 gurmak';
 
   @override
-  String get extBadgeVerified => 'Barlandy';
-
-  @override
-  String get extBadgeTop => 'Şu hepde iň meşhur';
-
-  @override
-  String get extBadgeNew => 'Täze';
-
-  @override
-  String get extBadgeStaff => 'Sora topary';
-
-  @override
-  String get extSideloadShort => 'Katalogdan däl';
-
-  @override
-  String get extSideloadWarning =>
-      'Bu giňeldiş toparyň katalogyndan däl. Awtor öz açaryny diňe özi tassyklaýar: diňe awtora ynanýan bolsaňyz gurnaň.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» gurna';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» täzele';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Bu giňeldiş aşakdakylary edip biler:';
+  String get extSideloadWarning => 'Diňe awtoryň öz gol çeken açaryna ynanýan bolsaňyz guruň.';
 
   @override
   String get extPermissionsWidened => 'Täzelenme täze rugsatlar soraýar:';
@@ -1064,9 +1035,6 @@ class STk extends S {
       'Bu täzelenme, gurnalan wersiýadan başga awtor açary bilen gol çekildi, şonuň üçin ol petiklendi. Täze açara ynanýan bolsaňyz, giňeltmäni aýyryň we aç-açan guruň.';
 
   @override
-  String get extUpdateAvailable => 'Täzelenme elýeterli';
-
-  @override
   String get extDisabled => 'Öçürilen';
 
   @override
@@ -1109,10 +1077,6 @@ class STk extends S {
   String get extConflictsTitle => 'Giňeldiş gapma-garşylyklary';
 
   @override
-  String get extConflictsIntro =>
-      'Bu giňeltmeler şol bir zady isleýär. Haýsysynyň işlejegini saýlaň, beýlekisi gurnalgy galar.';
-
-  @override
   String get extConflictTheme => 'Programma mowzugy';
 
   @override
@@ -1132,28 +1096,9 @@ class STk extends S {
   String get extConflictsResolve => 'Dawa-jenjelleri çözüň';
 
   @override
-  String get extConflictNote =>
-      'Saýlawyňyz şu enjamda saklanýar. Tema derrew çalşýar, tor hook-lary bu wersiýada işlemeýär.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Wersiýa $version';
   }
-
-  @override
-  String get extAuthor => 'Awtory';
-
-  @override
-  String get extRating => 'Reýting';
-
-  @override
-  String get extInstalls => 'Gurnamalar';
-
-  @override
-  String get extVersion => 'Wersiýa';
-
-  @override
-  String get extAbout => 'Bu giňeltme hakda';
 
   @override
   String get extPermissionsTitle => 'Rugsatlar';
@@ -1166,9 +1111,6 @@ class STk extends S {
 
   @override
   String get extSaveSettings => 'Sazlamalary ýazdyryň';
-
-  @override
-  String get extSaving => 'Saklanylýar…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class STk extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel elýeterli däl. Giňeldiş öçürilen ýa-da aýrylan bolmagy mümkin.';
+  String get extPanelUnavailable => 'Giňeltmäniň paneli elýeterli däl.';
 
   @override
   String get extPermConnectionsRead => 'Işjeň birikmeleriň sanawyna serediň';
@@ -1236,10 +1178,6 @@ class STk extends S {
   String get extPermBackground => 'Fon meselelerini işlediň';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Panel ýapylanda-da meýilleşdirilen işleri ýerine ýetirýär. Ony duruzyp ýa-da giňeltme sazlamalarynda näçe gezek işleýändigini üýtgedip bilersiňiz.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class STk extends S {
   String get extImageFailed => 'Suraty ýükläp bolmady';
 
   @override
-  String get extRatingHow => 'Reýtingleriň nähili işleýändigi';
-
-  @override
-  String get extRatingHowBody =>
-      'Reýtingler Baýziýanyň ortaça derejesini ulanýar: az bahaly giňeltme, köp adam ses berýänçä ortada galar, şonuň üçin 5 ýyldyzly ýekeje syn täze uzaldyşy ýokarsyna çykaryp bilmez. Soňky reýtingleriň agramy köne bahalardan has köp we hasap üçin diňe bir reýting hasaplanýar.';
-
-  @override
   String get extScreenshots => 'Ekran suratlary';
 
   @override
   String get extSortRelevance => 'Degişlilik';
 
   @override
-  String get extPermNetworkDetail =>
-      'Internetden VPN arkaly maglumat alýar. Diňe aşakdaky sanawdaky hostlara rugsat berilýär, galanlary bloklanýar.';
+  String get extPermNetworkDetail => 'VPN haýyşlaryna diňe aşakdaky hostlara rugsat berilýär.';
 
   @override
   String get extBgTitle => 'Fon işi';
@@ -1308,10 +1238,6 @@ class STk extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# sagat', one: '# sagat');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Sora açyk wagty, şol sanda traýda wagty hem, tabşyryk meýilnama boýunça işleýär. Iň gysga aralyk 15 minut.';
 
   @override
   String get extBgDisabledNote => 'Fon işini dolandyrmak üçin giňeldişi işjeňleşdiriň.';
@@ -2004,8 +1930,7 @@ class STk extends S {
   String get extErrRevoked => 'Sora topary bu giňeltmäniň wersiýasyny howply ýa-da bozuk bolany üçin yzyna aldy.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Yzyna alnan giňeltmeleriň sanawyny täzeläp bolmady. Täzelenýänçä gurnamak ýapyk: tory barlaň we täzeden synanyşyň.';
+  String get extErrRevocationsExpired => 'Ýatyrylan giňeltmeleriň sanawy täzelenýänçä gurnama petiklenen.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2051,4 +1976,15 @@ class STk extends S {
 
   @override
   String get extAssetRejected => 'Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.';
+
+  @override
+  String get extVerifiedSora => 'Sora tarapyndan barlanan';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Aç';
 }

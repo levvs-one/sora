@@ -909,36 +909,7 @@ class STr extends S {
   String get extInstallOne => '1 yükleme';
 
   @override
-  String get extBadgeVerified => 'Doğrulandı';
-
-  @override
-  String get extBadgeTop => 'Bu haftanın en popüleri';
-
-  @override
-  String get extBadgeNew => 'Yeni';
-
-  @override
-  String get extBadgeStaff => 'Sora ekibi';
-
-  @override
-  String get extSideloadShort => 'Katalogdan değil';
-
-  @override
-  String get extSideloadWarning =>
-      'Bu uzantı takım kataloğundan değil. Yalnızca yazar kendi anahtarına kefil olmuştur: yalnızca yazara güveniyorsanız yükleyin.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '“$name” uzantısını yükle';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '“$name” uzantısını güncelle';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Bu uzantı şunları yapabilecektir:';
+  String get extSideloadWarning => 'Yalnızca yazarın kendisinin imzaladığı anahtara güveniyorsanız yükleyin.';
 
   @override
   String get extPermissionsWidened => 'Güncelleme yeni izinler istiyor:';
@@ -1064,9 +1035,6 @@ class STr extends S {
       'Bu güncelleme, yüklü sürümden farklı bir yazar anahtarıyla imzalandığından engellendi. Yeni anahtara güveniyorsanız uzantıyı kaldırın ve açıkça yeniden yükleyin.';
 
   @override
-  String get extUpdateAvailable => 'Güncelleme mevcut';
-
-  @override
   String get extDisabled => 'Devre dışı';
 
   @override
@@ -1109,9 +1077,6 @@ class STr extends S {
   String get extConflictsTitle => 'Uzantı çakışmaları';
 
   @override
-  String get extConflictsIntro => 'Bu uzantılar aynı şeyi istiyor. Hangisinin çalışacağını seçin; diğeri kurulu kalır.';
-
-  @override
   String get extConflictTheme => 'Uygulama teması';
 
   @override
@@ -1131,28 +1096,9 @@ class STr extends S {
   String get extConflictsResolve => 'Çakışmaları çözme';
 
   @override
-  String get extConflictNote =>
-      'Seçiminiz bu cihazda kaydedilir. Tema hemen değişir; ağ kancaları bu sürümde çalışmaz.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Sürüm $version';
   }
-
-  @override
-  String get extAuthor => 'Yazar';
-
-  @override
-  String get extRating => 'Değerlendirme';
-
-  @override
-  String get extInstalls => 'Kurulumlar';
-
-  @override
-  String get extVersion => 'Sürüm';
-
-  @override
-  String get extAbout => 'Bu uzantı hakkında';
 
   @override
   String get extPermissionsTitle => 'İzinler';
@@ -1165,9 +1111,6 @@ class STr extends S {
 
   @override
   String get extSaveSettings => 'Ayarları kaydet';
-
-  @override
-  String get extSaving => 'Kaydediliyor…';
 
   @override
   String extUpdateTo(String version) {
@@ -1196,7 +1139,7 @@ class STr extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel kullanılamıyor. Uzantı devre dışı bırakılmış veya kaldırılmış olabilir.';
+  String get extPanelUnavailable => 'Eklenti paneli kullanılamıyor.';
 
   @override
   String get extPermConnectionsRead => 'Etkin bağlantıların listesine bakın';
@@ -1235,10 +1178,6 @@ class STr extends S {
   String get extPermBackground => 'Arka plan görevlerini çalıştır';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Panel kapalıyken bile zamanlanmış görevleri çalıştırır. Uzantı ayarlarından duraklatabilir veya çalışma sıklığını değiştirebilirsiniz.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1271,21 +1210,13 @@ class STr extends S {
   String get extImageFailed => 'Resim yüklenemedi';
 
   @override
-  String get extRatingHow => 'Derecelendirmelerin işleyiş şekli';
-
-  @override
-  String get extRatingHowBody =>
-      'Derecelendirmeler Bayes ortalamasını kullanır: Az sayıda derecelendirmeye sahip bir uzantı, daha fazla kişi oy verene kadar ortalara yakın bir yerde kalır; dolayısıyla tek bir 5 yıldızlı inceleme, yeni bir uzantıyı en üst sıraya çıkaramaz. Son derecelendirmeler eski derecelendirmelerden daha ağırdır ve hesap başına yalnızca bir derecelendirme sayılır.';
-
-  @override
   String get extScreenshots => 'Ekran Görüntüleri';
 
   @override
   String get extSortRelevance => 'Alaka düzeyi';
 
   @override
-  String get extPermNetworkDetail =>
-      'İnternetten VPN üzerinden veri alır. Yalnızca aşağıdaki sunuculara izin verilir, diğer her şey engellenir.';
+  String get extPermNetworkDetail => 'VPN istekleri yalnızca aşağıdaki sunuculara erişebilir.';
 
   @override
   String get extBgTitle => 'Arka plan görevi';
@@ -1307,10 +1238,6 @@ class STr extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Görev, Sora açık olduğu sürece, tepside dahil, zamanlamaya göre çalışır. En kısa aralık 15 dakikadır.';
 
   @override
   String get extBgDisabledNote => 'Uzantının arka plan görevini yönetmesini etkinleştirin.';
@@ -2013,8 +1940,7 @@ class STr extends S {
   String get extErrRevoked => 'Sora ekibi bu uzantı sürümünü güvensiz ya da bozuk olduğu için geri çekti.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Geri çekilen uzantılar listesi yenilenemedi. Yenilenene kadar kurulum engellendi: ağı kontrol edip yeniden deneyin.';
+  String get extErrRevocationsExpired => 'İptal listesi yenilenene kadar yükleme engellendi.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2060,4 +1986,15 @@ class STr extends S {
 
   @override
   String get extAssetRejected => 'Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar.';
+
+  @override
+  String get extVerifiedSora => 'Sora tarafından doğrulandı';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Aç';
 }

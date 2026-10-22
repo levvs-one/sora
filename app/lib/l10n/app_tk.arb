@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 gurmak",
-  "extBadgeVerified": "Barlandy",
-  "extBadgeTop": "Şu hepde iň meşhur",
-  "extBadgeNew": "Täze",
-  "extBadgeStaff": "Sora topary",
-  "extSideloadShort": "Katalogdan däl",
-  "extSideloadWarning": "Bu giňeldiş toparyň katalogyndan däl. Awtor öz açaryny diňe özi tassyklaýar: diňe awtora ynanýan bolsaňyz gurnaň.",
-  "extInstallTitle": "«{name}» gurna",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "«{name}» täzele",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Bu giňeldiş aşakdakylary edip biler:",
+  "extSideloadWarning": "Diňe awtoryň öz gol çeken açaryna ynanýan bolsaňyz guruň.",
   "extPermissionsWidened": "Täzelenme täze rugsatlar soraýar:",
   "extDangerousAck": "Bu rugsatlaryň çynlakaýdygyna düşünýärin",
   "extInstall": "Gurna",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Diňe https:// baglanyşyklara rugsat berilýär",
   "extErrGeneric": "Bir zat nädogry boldy. Gaýtadan synanyşmagyňyzy haýyş edýäris.",
   "extErrAuthorKeyChanged": "Bu täzelenme, gurnalan wersiýadan başga awtor açary bilen gol çekildi, şonuň üçin ol petiklendi. Täze açara ynanýan bolsaňyz, giňeltmäni aýyryň we aç-açan guruň.",
-  "extUpdateAvailable": "Täzelenme elýeterli",
   "extDisabled": "Öçürilen",
   "extToggleEnabled": "{name} işlediň",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Indi soralmaýar:",
   "extUpdateFailedKept": "Öňki wersiýasy henizem gurnalan.",
   "extConflictsTitle": "Giňeldiş gapma-garşylyklary",
-  "extConflictsIntro": "Bu giňeltmeler şol bir zady isleýär. Haýsysynyň işlejegini saýlaň, beýlekisi gurnalgy galar.",
   "extConflictTheme": "Programma mowzugy",
   "extConflictNetHooks": "Tor çeňňekleri",
   "extConflictWinner": "Ileri tutulýar: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Dawa-jenjelleri çözüň",
-  "extConflictNote": "Saýlawyňyz şu enjamda saklanýar. Tema derrew çalşýar, tor hook-lary bu wersiýada işlemeýär.",
   "extVersionLabel": "Wersiýa {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Awtory",
-  "extRating": "Reýting",
-  "extInstalls": "Gurnamalar",
-  "extVersion": "Wersiýa",
-  "extAbout": "Bu giňeltme hakda",
   "extPermissionsTitle": "Rugsatlar",
   "extNoPermissions": "Ýörite rugsatlar gerek däl.",
   "extSettings": "Sazlamalar",
   "extSaveSettings": "Sazlamalary ýazdyryň",
-  "extSaving": "Saklanylýar…",
   "extUpdateTo": "{version} wersiýasyna täzele",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Panel elýeterli däl. Giňeldiş öçürilen ýa-da aýrylan bolmagy mümkin.",
+  "extPanelUnavailable": "Giňeltmäniň paneli elýeterli däl.",
   "extPermConnectionsRead": "Işjeň birikmeleriň sanawyna serediň",
   "extPermServersRead": "Serwerleriňiziň sanawyna serediň",
   "extPermSettingsRead": "Programma sazlamalaryny okaň",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Tor ýoluna goşulyň (DPI aýlaw modullary)",
   "extPermNetFetch": "Rugsat berlen sanawdan URL haýyş",
   "extPermBackground": "Fon meselelerini işlediň",
-  "extPermBackgroundDetail": "Panel ýapylanda-da meýilleşdirilen işleri ýerine ýetirýär. Ony duruzyp ýa-da giňeltme sazlamalarynda näçe gezek işleýändigini üýtgedip bilersiňiz.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Fonda işleýär",
   "extCapNetHook": "Böwetden aýlanyp geçiş we tor hook-lary",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Üýtgeşmeleriň taryhy",
   "extImageFailed": "Suraty ýükläp bolmady",
-  "extRatingHow": "Reýtingleriň nähili işleýändigi",
-  "extRatingHowBody": "Reýtingler Baýziýanyň ortaça derejesini ulanýar: az bahaly giňeltme, köp adam ses berýänçä ortada galar, şonuň üçin 5 ýyldyzly ýekeje syn täze uzaldyşy ýokarsyna çykaryp bilmez. Soňky reýtingleriň agramy köne bahalardan has köp we hasap üçin diňe bir reýting hasaplanýar.",
   "extScreenshots": "Ekran suratlary",
   "extSortRelevance": "Degişlilik",
-  "extPermNetworkDetail": "Internetden VPN arkaly maglumat alýar. Diňe aşakdaky sanawdaky hostlara rugsat berilýär, galanlary bloklanýar.",
+  "extPermNetworkDetail": "VPN haýyşlaryna diňe aşakdaky hostlara rugsat berilýär.",
   "extBgTitle": "Fon işi",
   "extBgEnabled": "Fonda işletmek",
   "extBgInterval": "Işletmek aralygy",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Sora açyk wagty, şol sanda traýda wagty hem, tabşyryk meýilnama boýunça işleýär. Iň gysga aralyk 15 minut.",
   "extBgDisabledNote": "Fon işini dolandyrmak üçin giňeldişi işjeňleşdiriň.",
   "extCapNetwork": "Tora giriş",
   "extCapNetworkHosts": "Tor: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Paket almak üçin işjeň Sora TUN birikmesi gerek.",
   "diagnosticUnavailable": "Bu anyklaýyş bu platformada elýeterli däl.",
   "extErrRevoked": "Sora topary bu giňeltmäniň wersiýasyny howply ýa-da bozuk bolany üçin yzyna aldy.",
-  "extErrRevocationsExpired": "Yzyna alnan giňeltmeleriň sanawyny täzeläp bolmady. Täzelenýänçä gurnamak ýapyk: tory barlaň we täzeden synanyşyň.",
+  "extErrRevocationsExpired": "Ýatyrylan giňeltmeleriň sanawy täzelenýänçä gurnama petiklenen.",
   "extRevokedDisabled": "Yzyna alnan giňeltmeler öçürildi: {names}",
   "customServerWgPrivateKey": "Gizlin açar",
   "customServerWgAddresses": "Interfeýs salgylary",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Berk tor gulpy",
   "strictKillSwitchWarning": "Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär.",
   "extWorkerFailed": "Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.",
-  "extAssetRejected": "Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler."
+  "extAssetRejected": "Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.",
+  "extVerifiedSora": "Sora tarapyndan barlanan",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Aç"
 }

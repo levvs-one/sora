@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 ইনস্টল করুন",
-  "extBadgeVerified": "যাচাই করা হয়েছে",
-  "extBadgeTop": "এই সপ্তাহে সবচেয়ে জনপ্রিয়",
-  "extBadgeNew": "নতুন",
-  "extBadgeStaff": "Sora দল",
-  "extSideloadShort": "ক্যাটালগ থেকে না",
-  "extSideloadWarning": "এই এক্সটেনশন টিম ক্যাটালগ থেকে নয়। শুধুমাত্র লেখক তাদের কীটির জন্য প্রমাণ দিয়েছেন: আপনি যদি লেখককে বিশ্বাস করেন তবেই এটি ইনস্টল করুন।",
-  "extInstallTitle": "«{name}» ইনস্টল করুন",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "«{name}» আপডেট করুন",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "এই এক্সটেনশনটি সক্ষম হবে:",
+  "extSideloadWarning": "লেখকের স্বস্বাক্ষরিত কী বিশ্বাস করলেই ইনস্টল করুন।",
   "extPermissionsWidened": "আপডেটটি নতুন অনুমতির জন্য জিজ্ঞাসা করে:",
   "extDangerousAck": "আমি বুঝি যে এই অনুমতিগুলি গুরুতর৷",
   "extInstall": "ইনস্টল করুন",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "শুধুমাত্র https:// লিঙ্ক অনুমোদিত",
   "extErrGeneric": "কিছু ভুল হয়েছে. আবার চেষ্টা করুন.",
   "extErrAuthorKeyChanged": "এই আপডেটটি ইনস্টল করা সংস্করণের চেয়ে একটি ভিন্ন লেখক কী দিয়ে স্বাক্ষরিত, তাই এটি ব্লক করা হয়েছে। আপনি যদি নতুন কী বিশ্বাস করেন তবে এক্সটেনশনটি আনইনস্টল করুন এবং স্পষ্টভাবে আবার ইনস্টল করুন।",
-  "extUpdateAvailable": "আপডেট উপলব্ধ",
   "extDisabled": "বন্ধ",
   "extToggleEnabled": "সক্ষম করুন {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "আর চাওয়া হচ্ছে না:",
   "extUpdateFailedKept": "পূর্ববর্তী সংস্করণ এখনও ইনস্টল করা আছে.",
   "extConflictsTitle": "এক্সটেনশন দ্বন্দ্ব",
-  "extConflictsIntro": "এই এক্সটেনশনগুলো একই জিনিস চায়। কোনটি চলবে বেছে নিন, অন্যটি ইনস্টল থাকবে।",
   "extConflictTheme": "অ্যাপ থিম",
   "extConflictNetHooks": "নেটওয়ার্ক হুক",
   "extConflictWinner": "অগ্রাধিকার: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "দ্বন্দ্ব সমাধান",
-  "extConflictNote": "আপনার পছন্দ এই ডিভাইসে সংরক্ষিত হয়। থিম সঙ্গে সঙ্গে বদলায়, নেটওয়ার্ক হুক এই সংস্করণে চলে না।",
   "extVersionLabel": "সংস্করণ {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "লেখক",
-  "extRating": "রেটিং",
-  "extInstalls": "ইনস্টল সংখ্যা",
-  "extVersion": "সংস্করণ",
-  "extAbout": "এই এক্সটেনশন সম্পর্কে",
   "extPermissionsTitle": "অনুমতি",
   "extNoPermissions": "কোন বিশেষ অনুমতি নেই.",
   "extSettings": "সেটিংস",
   "extSaveSettings": "সেটিংস সংরক্ষণ করুন",
-  "extSaving": "সংরক্ষণ করা হচ্ছে...",
   "extUpdateTo": "{version} এ আপগ্রেড করুন",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "প্যানেল অনুপলব্ধ. এক্সটেনশনটি নিষ্ক্রিয় বা সরানো হতে পারে৷",
+  "extPanelUnavailable": "এক্সটেনশনের প্যানেল উপলব্ধ নেই।",
   "extPermConnectionsRead": "সক্রিয় সংযোগের তালিকা দেখুন",
   "extPermServersRead": "আপনার সার্ভারের একটি তালিকা দেখুন",
   "extPermSettingsRead": "অ্যাপ সেটিংস পড়ুন",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "নেটওয়ার্ক পাথে একীভূত করুন (DPI বাইপাস মডিউল)",
   "extPermNetFetch": "অনুরোধ URL",
   "extPermBackground": "ব্যাকগ্রাউন্ড কাজ চালান",
-  "extPermBackgroundDetail": "প্যানেল বন্ধ থাকা অবস্থায়ও নির্ধারিত কাজ চালায়। আপনি এটিকে বিরতি দিতে পারেন বা এক্সটেনশন সেটিংসে এটি কতবার চলে তা পরিবর্তন করতে পারেন৷",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "ব্যাকগ্রাউন্ডে রান",
   "extCapNetHook": "ব্লক এড়ানো ও নেটওয়ার্ক হুক",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "চেঞ্জলগ",
   "extImageFailed": "ইমেজ লোড করা যায়নি",
-  "extRatingHow": "রেটিং কীভাবে গণনা করা হয়",
-  "extRatingHowBody": "রেটিং একটি Bayesian গড় ব্যবহার করে: কিছু রেটিং সহ একটি এক্সটেনশন মাঝামাঝি কাছাকাছি থাকে যতক্ষণ না আরও বেশি লোক ভোট দেয়, তাই একটি একক 5-স্টার পর্যালোচনা শীর্ষে একটি নতুন এক্সটেনশনকে ঠেলে দিতে পারে না। সাম্প্রতিক রেটিংগুলি পুরানোগুলির থেকে বেশি ওজন করে এবং প্রতি অ্যাকাউন্টে শুধুমাত্র একটি রেটিং গণনা করা হয়৷",
   "extScreenshots": "স্ক্রিনশট",
   "extSortRelevance": "প্রাসঙ্গিকতা",
-  "extPermNetworkDetail": "VPN-এর মাধ্যমে ইন্টারনেট থেকে ডেটা আনে। শুধু নিচের তালিকার হোস্ট অনুমোদিত, বাকি সব বন্ধ।",
+  "extPermNetworkDetail": "VPN অনুরোধ শুধু নিচের হোস্টগুলিতে অনুমোদিত।",
   "extBgTitle": "পটভূমির কাজ",
   "extBgEnabled": "ব্যাকগ্রাউন্ডে চালান",
   "extBgInterval": "চালানোর ব্যবধান",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Sora খোলা থাকলে, ট্রেতে থাকলেও, কাজটি সময়সূচি অনুযায়ী চলে। সবচেয়ে কম ব্যবধান ১৫ মিনিট।",
   "extBgDisabledNote": "এর ব্যাকগ্রাউন্ড টাস্ক পরিচালনা করতে এক্সটেনশন সক্রিয় করুন।",
   "extCapNetwork": "নেটওয়ার্ক অ্যাক্সেস",
   "extCapNetworkHosts": "নেটওয়ার্ক: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "প্যাকেট ক্যাপচার একটি সক্রিয় Sora TUN সংযোগ প্রয়োজন।",
   "diagnosticUnavailable": "এই ডায়াগনস্টিক এই প্ল্যাটফর্মে অনুপলব্ধ.",
   "extErrRevoked": "Sora দল এই এক্সটেনশন সংস্করণটি প্রত্যাহার করেছে, কারণ এটি অনিরাপদ বা ভাঙা।",
-  "extErrRevocationsExpired": "প্রত্যাহার করা এক্সটেনশনের তালিকা নবায়ন করা যায়নি। নবায়ন না হওয়া পর্যন্ত ইনস্টল বন্ধ: নেটওয়ার্ক দেখে আবার চেষ্টা করুন।",
+  "extErrRevocationsExpired": "বাতিল করা এক্সটেনশনের তালিকা হালনাগাদ না হওয়া পর্যন্ত ইনস্টল বন্ধ আছে।",
   "extRevokedDisabled": "প্রত্যাহার করা এক্সটেনশন বন্ধ করা হয়েছে: {names}",
   "customServerWgPrivateKey": "প্রাইভেট কী",
   "customServerWgAddresses": "ইন্টারফেস ঠিকানা",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "কঠোর নেটওয়ার্ক অবরোধ",
   "strictKillSwitchWarning": "সংযোগের পর, ক্র্যাশ, পুনরায় চালু বা অ্যাপ বন্ধ হলেও VPN-এর বাইরের ট্র্যাফিক আটকায়। শুধু সংযোগ বিচ্ছিন্ন করলে বা এই বিকল্প বন্ধ করলে প্রবেশাধিকার ফিরে আসে। ডিভাইস পুনরায় চালু হলে শুরুতে সংযোগের বিকল্প চালু থাকলেই অবরোধ আবার কার্যকর হয়।",
   "extWorkerFailed": "এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।",
-  "extAssetRejected": "এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।"
+  "extAssetRejected": "এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।",
+  "extVerifiedSora": "Sora দ্বারা যাচাইকৃত",
+  "extReceivedBytes": "{count} বাইট",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "খুলুন"
 }

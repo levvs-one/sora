@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "インストール数: 1",
-  "extBadgeVerified": "確認済み",
-  "extBadgeTop": "今週の一番人気",
-  "extBadgeNew": "新しい",
-  "extBadgeStaff": "Soraチーム",
-  "extSideloadShort": "カタログ外",
-  "extSideloadWarning": "この拡張子はチームカタログからのものではありません。作成者だけがキーを保証しています。作成者を信頼できる場合にのみインストールしてください。",
-  "extInstallTitle": "「{name}」をインストール",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "「{name}」を更新",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "この拡張機能では次のことが可能になります。",
+  "extSideloadWarning": "作者の自己署名鍵を信頼できる場合のみインストールしてください。",
   "extPermissionsWidened": "アップデートでは新しい権限が求められます。",
   "extDangerousAck": "これらの権限が重要であることを理解しています",
   "extInstall": "インストール",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "https:// リンクのみが許可されます",
   "extErrGeneric": "何か問題が発生しました。もう一度試してください。",
   "extErrAuthorKeyChanged": "このアップデートは、インストールされているバージョンとは異なる作成者キーで署名されているため、ブロックされました。新しいキーを信頼する場合は、拡張機能をアンインストールし、明示的に再度インストールしてください。",
-  "extUpdateAvailable": "アップデートあり",
   "extDisabled": "無効",
   "extToggleEnabled": "{name}を有効にする",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "要求されなくなりました:",
   "extUpdateFailedKept": "以前のバージョンがまだインストールされています。",
   "extConflictsTitle": "拡張子の競合",
-  "extConflictsIntro": "これらの拡張機能は同じものを使おうとしています。動かす方を選んでください。もう一方はインストールされたままです。",
   "extConflictTheme": "アプリテーマ",
   "extConflictNetHooks": "ネットワークフック",
   "extConflictWinner": "{name}が勝利",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "競合を解決する",
-  "extConflictNote": "選択はこのデバイスに保存されます。テーマはすぐに切り替わります。ネットワークフックはこのバージョンでは実行されません。",
   "extVersionLabel": "バージョン{version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "作者",
-  "extRating": "評価",
-  "extInstalls": "インストール数",
-  "extVersion": "バージョン",
-  "extAbout": "この拡張機能について",
   "extPermissionsTitle": "権限",
   "extNoPermissions": "特別な権限はありません。",
   "extSettings": "設定",
   "extSaveSettings": "設定の保存",
-  "extSaving": "保存中…",
   "extUpdateTo": "{version} に更新",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "パネルが使用できません。拡張機能が無効になっているか、削除されている可能性があります。",
+  "extPanelUnavailable": "拡張機能のパネルを利用できません。",
   "extPermConnectionsRead": "アクティブな接続のリストを参照",
   "extPermServersRead": "サーバーのリストを参照してください",
   "extPermSettingsRead": "アプリ設定の読み取り",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "ネットワーク パスへの統合 (DPI バイパス モジュール)",
   "extPermNetFetch": "許可リストから URL をリクエストします",
   "extPermBackground": "バックグラウンドタスクを実行する",
-  "extPermBackgroundDetail": "パネルが閉じている場合でも、スケジュールされたタスクを実行します。拡張機能の設定で一時停止したり、実行頻度を変更したりできます。",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "バックグラウンドで実行",
   "extCapNetHook": "回避機能とネットワークフック",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "変更履歴",
   "extImageFailed": "画像を読み込めませんでした",
-  "extRatingHow": "評価の仕組み",
-  "extRatingHowBody": "評価にはベイズ平均が使用されます。評価の少ない拡張機能は、より多くの人が投票するまで中央付近に留まるため、1 つの 5 つ星のレビューによって新しい拡張機能を上位に押し上げることはできません。最近の評価は古い評価よりも重みがあり、アカウントごとに 1 つの評価のみがカウントされます。",
   "extScreenshots": "スクリーンショット",
   "extSortRelevance": "関連性",
-  "extPermNetworkDetail": "VPN 経由でインターネットからデータを取得します。許可されるのは下のホストだけで、それ以外はブロックされます。",
+  "extPermNetworkDetail": "VPN 経由のリクエストは以下のホストにのみ許可されます。",
   "extBgTitle": "バックグラウンドタスク",
   "extBgEnabled": "バックグラウンドで実行",
   "extBgInterval": "実行間隔",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Sora を開いている間はトレイにある場合も含め、タスクがスケジュールどおり実行されます。最短間隔は 15 分です。",
   "extBgDisabledNote": "拡張機能がバックグラウンド タスクを管理できるようにします。",
   "extCapNetwork": "ネットワークアクセス",
   "extCapNetworkHosts": "ネットワーク: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "パケット キャプチャには、アクティブな Sora TUN 接続が必要です。",
   "diagnosticUnavailable": "この診断は、このプラットフォームでは使用できません。",
   "extErrRevoked": "この拡張機能のバージョンは安全でないか壊れているため、Sora チームが取り消しました。",
-  "extErrRevocationsExpired": "取り消された拡張機能のリストを更新できませんでした。更新されるまでインストールできません。ネットワークを確認して再試行してください。",
+  "extErrRevocationsExpired": "失効リストが更新されるまでインストールはブロックされます。",
   "extRevokedDisabled": "取り消された拡張機能をオフにしました: {names}",
   "customServerWgPrivateKey": "秘密鍵",
   "customServerWgAddresses": "インターフェイスのアドレス",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "厳格なネットワーク遮断",
   "strictKillSwitchWarning": "接続後は、クラッシュ、再起動、アプリ終了後も VPN 外の通信を遮断します。接続を切るか、この設定をオフにした場合のみアクセスが戻ります。端末の再起動後は、起動時の接続が有効な場合のみ遮断を再開します。",
   "extWorkerFailed": "拡張機能のバックグラウンドタスクに失敗しました。拡張機能のログを確認してください。",
-  "extAssetRejected": "拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。"
+  "extAssetRejected": "拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。",
+  "extVerifiedSora": "Sora 認証済み",
+  "extReceivedBytes": "{count} バイト",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "開く"
 }

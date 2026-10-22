@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 ta oʻrnatish",
-  "extBadgeVerified": "Tasdiqlangan",
-  "extBadgeTop": "Bu hafta eng mashhurlari",
-  "extBadgeNew": "Yangi",
-  "extBadgeStaff": "Sora jamoasi",
-  "extSideloadShort": "Katalogdan emas",
-  "extSideloadWarning": "Bu kengaytma jamoa katalogidan emas. Ularning kalitiga faqat muallif kafolat bergan: agar siz muallifga ishonsangiz, uni o'rnating.",
-  "extInstallTitle": "«{name}»ni oʻrnatish",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "«{name}»ni yangilash",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Ushbu kengaytma quyidagilarga qodir:",
+  "extSideloadWarning": "Faqat muallif o‘zi imzolagan kalitga ishonsangiz o‘rnating.",
   "extPermissionsWidened": "Yangilanish yangi ruxsatlarni talab qiladi:",
   "extDangerousAck": "Men bu ruxsatlar jiddiy ekanligini tushunaman",
   "extInstall": "O'rnatish",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Faqat https:// havolalarga ruxsat berilgan",
   "extErrGeneric": "Nimadir xato ketdi. Iltimos, qayta urinib koʻring.",
   "extErrAuthorKeyChanged": "Ushbu yangilanish o'rnatilgan versiyadan boshqa muallif kaliti bilan imzolangan, shuning uchun u bloklangan. Agar siz yangi kalitga ishonsangiz, kengaytmani o'chirib tashlang va uni qayta o'rnating.",
-  "extUpdateAvailable": "Yangilanish mavjud",
   "extDisabled": "Oʻchirilgan",
   "extToggleEnabled": "Yoqish {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Endi talab qilinmaydi:",
   "extUpdateFailedKept": "Oldingi versiya hali ham o'rnatilgan.",
   "extConflictsTitle": "Kengaytma ziddiyati",
-  "extConflictsIntro": "Bu kengaytmalar bir xil narsani xohlaydi. Qaysi biri ishlashini tanlang, ikkinchisi o‘rnatilgan holda qoladi.",
   "extConflictTheme": "Ilova mavzusi",
   "extConflictNetHooks": "Tarmoq ilgaklari",
   "extConflictWinner": "Ustuvorlik: {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Mojarolarni hal qilish",
-  "extConflictNote": "Tanlovingiz shu qurilmada saqlanadi. Mavzu darhol almashadi, tarmoq hook’lari bu versiyada ishlamaydi.",
   "extVersionLabel": "Versiya {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Muallif",
-  "extRating": "Reyting",
-  "extInstalls": "O'rnatish",
-  "extVersion": "Versiyasi",
-  "extAbout": "Ushbu kengaytma haqida",
   "extPermissionsTitle": "Ruxsatlar",
   "extNoPermissions": "Maxsus ruxsatlar yo'q.",
   "extSettings": "Sozlamalar",
   "extSaveSettings": "Sozlamalarni saqlang",
-  "extSaving": "Saqlanmoqda…",
   "extUpdateTo": "{version} ga yangilang",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Panel mavjud emas. Kengaytma oʻchirilgan yoki olib tashlangan boʻlishi mumkin.",
+  "extPanelUnavailable": "Kengaytma paneli mavjud emas.",
   "extPermConnectionsRead": "Faol ulanishlar roʻyxatiga qarang",
   "extPermServersRead": "Serverlaringiz roʻyxatini koʻring",
   "extPermSettingsRead": "Ilova sozlamalarini o‘qing",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Tarmoq yoʻliga integratsiyalash (DPI chetlab oʻtish modullari)",
   "extPermNetFetch": "Ruxsat berilgan roʻyxatdan URL soʻrovi",
   "extPermBackground": "Fon vazifalarini bajaring",
-  "extPermBackgroundDetail": "Panel yopilganda ham rejalashtirilgan vazifalarni bajaradi. Siz uni to'xtatib turishingiz yoki kengaytma sozlamalarida qanchalik tez-tez ishlashini o'zgartirishingiz mumkin.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Orqa fonda ishlaydi",
   "extCapNetHook": "Cheklovni chetlab oʻtish va tarmoq ilgaklari",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "O'zgarishlar jurnali",
   "extImageFailed": "Tasvirni yuklab bo‘lmadi",
-  "extRatingHow": "Baholar qanday ishlaydi",
-  "extRatingHowBody": "Reytinglar oʻrtacha Bayes koʻrsatkichidan foydalanadi: bir necha reytingga ega kengaytma koʻproq odamlar ovoz bermaguncha oʻrtaga yaqin qoladi, shuning uchun bitta 5 yulduzli sharh yangi kengaytmani yuqoriga koʻtara olmaydi. Oxirgi reytinglar eskilariga qaraganda og'irroq va har bir hisob uchun faqat bitta reyting hisobga olinadi.",
   "extScreenshots": "Skrinshotlar",
   "extSortRelevance": "Tegishlilik",
-  "extPermNetworkDetail": "Internetdan VPN orqali ma’lumot oladi. Faqat quyidagi ro‘yxatdagi xostlarga ruxsat bor, qolgani bloklangan.",
+  "extPermNetworkDetail": "VPN so‘rovlariga faqat quyidagi xostlarga ruxsat beriladi.",
   "extBgTitle": "Fon vazifasi",
   "extBgEnabled": "Orqa fonda ishga tushirish",
   "extBgInterval": "Ishga tushirish oraligʻi",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Vazifa Sora ochiq turganda, shu jumladan trayda bo‘lganda ham, jadval bo‘yicha ishlaydi. Eng qisqa oraliq 15 daqiqa.",
   "extBgDisabledNote": "Fon vazifasini boshqarish uchun kengaytmani yoqing.",
   "extCapNetwork": "Tarmoqqa kirish",
   "extCapNetworkHosts": "Tarmoq: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Paketlarni yozib olish uchun faol Sora TUN ulanishi kerak.",
   "diagnosticUnavailable": "Ushbu diagnostika ushbu platformada mavjud emas.",
   "extErrRevoked": "Sora jamoasi bu kengaytma versiyasini xavfli yoki buzuq bo‘lgani uchun qaytarib oldi.",
-  "extErrRevocationsExpired": "Qaytarib olingan kengaytmalar ro‘yxatini yangilab bo‘lmadi. Yangilanmaguncha o‘rnatish bloklangan: tarmoqni tekshirib, qayta urining.",
+  "extErrRevocationsExpired": "Bekor qilingan kengaytmalar ro‘yxati yangilanguncha o‘rnatish bloklangan.",
   "extRevokedDisabled": "Qaytarib olingan kengaytmalar o‘chirildi: {names}",
   "customServerWgPrivateKey": "Maxfiy kalit",
   "customServerWgAddresses": "Interfeys manzillari",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Qatʼiy tarmoq qulfi",
   "strictKillSwitchWarning": "Ulangandan keyin nosozlik, qayta ishga tushirish yoki ilovadan chiqishda ham VPN tashqarisidagi trafikni bloklaydi. Kirish faqat ulanish uzilganda yoki bu sozlama oʻchirilganda tiklanadi. Qurilma qayta yoqilganda bloklash faqat ishga tushishda ulanish yoqilgan boʻlsa davom etadi.",
   "extWorkerFailed": "Kengaytmaning fon vazifasi bajarilmadi. Kengaytma jurnalini tekshiring.",
-  "extAssetRejected": "Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar."
+  "extAssetRejected": "Kengaytma fayli rad etildi: o‘qib bo‘lmaydigan ranglar yoki noto‘g‘ri qoidalar.",
+  "extVerifiedSora": "Sora tomonidan tasdiqlangan",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Ochish"
 }

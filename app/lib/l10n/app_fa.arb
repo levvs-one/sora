@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 نصب",
-  "extBadgeVerified": "تأیید شد",
-  "extBadgeTop": "محبوب ترین این هفته",
-  "extBadgeNew": "جدید",
-  "extBadgeStaff": "تیم Sora",
-  "extSideloadShort": "نه از کاتالوگ",
-  "extSideloadWarning": "این برنامه افزودنی از کاتالوگ تیم نیست. فقط نویسنده کلید خود را تضمین کرده است: فقط در صورتی آن را نصب کنید که به نویسنده اعتماد دارید.",
-  "extInstallTitle": "نصب «{name}»",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "به‌روزرسانی «{name}»",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "این برنامه افزودنی قادر خواهد بود:",
+  "extSideloadWarning": "فقط اگر به کلید خودامضای نویسنده اعتماد دارید نصب کنید.",
   "extPermissionsWidened": "به روز رسانی مجوزهای جدید را می خواهد:",
   "extDangerousAck": "می‌دانم که این مجوزها جدی هستند",
   "extInstall": "نصب",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "فقط پیوندهای https:// مجاز هستند",
   "extErrGeneric": "مشکلی پیش آمد. لطفا دوباره امتحان کنید.",
   "extErrAuthorKeyChanged": "این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد. اگر به کلید جدید اعتماد دارید، برنامه افزودنی را حذف نصب کنید و دوباره آن را به صراحت نصب کنید.",
-  "extUpdateAvailable": "به‌روزرسانی موجود است",
   "extDisabled": "غیرفعال",
   "extToggleEnabled": "{name} را فعال کنید",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "دیگر درخواست نمی‌شود:",
   "extUpdateFailedKept": "نسخه قبلی هنوز نصب است.",
   "extConflictsTitle": "تعارضات پسوند",
-  "extConflictsIntro": "این افزونه‌ها یک چیز را می‌خواهند. انتخاب کنید کدام اجرا شود؛ دیگری نصب‌شده می‌ماند.",
   "extConflictTheme": "تم برنامه",
   "extConflictNetHooks": "قلاب های شبکه",
   "extConflictWinner": "اولویت با {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "تعارضات را حل کنید",
-  "extConflictNote": "انتخاب شما روی این دستگاه ذخیره می‌شود. پوسته فوراً عوض می‌شود، اما هوک‌های شبکه در این نسخه اجرا نمی‌شوند.",
   "extVersionLabel": "نسخه {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "نویسنده",
-  "extRating": "رتبه بندی",
-  "extInstalls": "دفعات نصب",
-  "extVersion": "نسخه",
-  "extAbout": "درباره این پسوند",
   "extPermissionsTitle": "مجوزها",
   "extNoPermissions": "بدون مجوزهای خاص.",
   "extSettings": "تنظیمات",
   "extSaveSettings": "ذخیرهٔ تنظیمات",
-  "extSaving": "در حال ذخیره…",
   "extUpdateTo": "ارتقا به {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "پانل در دسترس نیست. پسوند ممکن است غیرفعال یا حذف شده باشد.",
+  "extPanelUnavailable": "پنل افزونه در دسترس نیست.",
   "extPermConnectionsRead": "لیست اتصالات فعال را ببینید",
   "extPermServersRead": "فهرستی از سرورهای خود را ببینید",
   "extPermSettingsRead": "تنظیمات برنامه را بخوانید",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "ادغام در مسیر شبکه (DPI ماژول های دور زدن)",
   "extPermNetFetch": "URL را از لیست مجاز درخواست کنید",
   "extPermBackground": "وظایف پس زمینه را اجرا کنید",
-  "extPermBackgroundDetail": "کارهای برنامه ریزی شده را حتی زمانی که پانل بسته است اجرا می کند. می‌توانید آن را موقتاً متوقف کنید یا تعداد دفعات اجرای آن را در تنظیمات برنامه افزودنی تغییر دهید.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "در پس‌زمینه اجرا می‌شود",
   "extCapNetHook": "دور زدن محدودیت‌ها و قلاب‌های شبکه",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "تغییرات",
   "extImageFailed": "تصویر بارگیری نشد",
-  "extRatingHow": "رتبه بندی چگونه کار می کند",
-  "extRatingHowBody": "رتبه‌بندی‌ها از میانگین بیزی استفاده می‌کنند: برنامه‌های افزودنی با رتبه‌بندی‌های کم تا زمانی که افراد بیشتری رای دهند، نزدیک به وسط می‌ماند، بنابراین یک بررسی 5 ستاره نمی‌تواند یک برنامه افزودنی جدید را به بالاترین سطح برساند. رتبه‌بندی‌های اخیر بیشتر از رتبه‌بندی‌های قدیمی هستند و تنها یک رتبه برای هر حساب حساب می‌شود.",
   "extScreenshots": "تصاویر",
   "extSortRelevance": "ربط",
-  "extPermNetworkDetail": "داده‌ها را از طریق VPN از اینترنت دریافت می‌کند. فقط میزبان‌های فهرست زیر مجازند و بقیه مسدودند.",
+  "extPermNetworkDetail": "درخواست‌های VPN فقط به میزبان‌های زیر مجازند.",
   "extBgTitle": "کار پس‌زمینه",
   "extBgEnabled": "در پس‌زمینه اجرا شود",
   "extBgInterval": "فاصلهٔ اجرا",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "وظیفه تا وقتی Sora باز است، حتی در سینی سیستم، طبق زمان‌بندی اجرا می‌شود. کوتاه‌ترین فاصله ۱۵ دقیقه است.",
   "extBgDisabledNote": "برنامه افزودنی را برای مدیریت وظیفه پس‌زمینه خود فعال کنید.",
   "extCapNetwork": "دسترسی به شبکه",
   "extCapNetworkHosts": "شبکه: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "ضبط بسته به یک اتصال فعال Sora TUN نیاز دارد.",
   "diagnosticUnavailable": "این تشخیص در این پلتفرم در دسترس نیست.",
   "extErrRevoked": "تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.",
-  "extErrRevocationsExpired": "فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.",
+  "extErrRevocationsExpired": "نصب تا به‌روزرسانی فهرست افزونه‌های لغوشده مسدود است.",
   "extRevokedDisabled": "افزونه‌های لغوشده خاموش شدند: {names}",
   "customServerWgPrivateKey": "کلید خصوصی",
   "customServerWgAddresses": "نشانی‌های رابط",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "قطع اضطراری سخت‌گیرانه",
   "strictKillSwitchWarning": "پس از اتصال، ترافیک خارج از VPN را حتی پس از خرابی، راه‌اندازی مجدد یا خروج از برنامه مسدود می‌کند. دسترسی فقط با قطع اتصال یا خاموش کردن این گزینه برمی‌گردد. پس از راه‌اندازی مجدد دستگاه، مسدودسازی فقط در صورت فعال بودن اتصال هنگام شروع از سر گرفته می‌شود.",
   "extWorkerFailed": "وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.",
-  "extAssetRejected": "فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر."
+  "extAssetRejected": "فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.",
+  "extVerifiedSora": "تأییدشده توسط Sora",
+  "extReceivedBytes": "{count} بایت",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "باز کردن"
 }

@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 Installation",
-  "extBadgeVerified": "Verifiziert",
-  "extBadgeTop": "Diese Woche am beliebtesten",
-  "extBadgeNew": "Neu",
-  "extBadgeStaff": "Das Sora-Team",
-  "extSideloadShort": "Nicht aus dem Katalog",
-  "extSideloadWarning": "Diese Erweiterung stammt nicht aus dem Teamkatalog. Nur der Autor hat für seinen Schlüssel bürgt: Installieren Sie ihn nur, wenn Sie dem Autor vertrauen.",
-  "extInstallTitle": "„{name}“ installieren",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "„{name}“ aktualisieren",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Diese Erweiterung kann:",
+  "extSideloadWarning": "Nur installieren, wenn Sie dem selbst signierten Schlüssel des Autors vertrauen.",
   "extPermissionsWidened": "Das Update fordert neue Berechtigungen:",
   "extDangerousAck": "Ich verstehe, dass diese Berechtigungen ernst sind",
   "extInstall": "Installieren",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Es sind nur https://-Links zulässig",
   "extErrGeneric": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
   "extErrAuthorKeyChanged": "Dieses Update ist mit einem anderen Autorenschlüssel als die installierte Version signiert und wurde daher blockiert. Wenn Sie dem neuen Schlüssel vertrauen, deinstallieren Sie die Erweiterung und installieren Sie sie explizit erneut.",
-  "extUpdateAvailable": "Update verfügbar",
   "extDisabled": "Deaktiviert",
   "extToggleEnabled": "{name} aktivieren",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Nicht mehr angefordert:",
   "extUpdateFailedKept": "Die Vorgängerversion ist noch installiert.",
   "extConflictsTitle": "Erweiterungskonflikte",
-  "extConflictsIntro": "Diese Erweiterungen wollen dasselbe. Wähle, welche läuft; die andere bleibt installiert.",
   "extConflictTheme": "App-Theme",
   "extConflictNetHooks": "Netzwerk-Hooks",
   "extConflictWinner": "{name} gewinnt",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Konflikte lösen",
-  "extConflictNote": "Ihre Auswahl wird auf diesem Gerät gespeichert. Ein Design wechselt sofort, Netzwerk-Hooks laufen in dieser Version nicht.",
   "extVersionLabel": "Version {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Autor",
-  "extRating": "Bewertung",
-  "extInstalls": "Installationen",
-  "extVersion": "Version",
-  "extAbout": "Über diese Erweiterung",
   "extPermissionsTitle": "Berechtigungen",
   "extNoPermissions": "Keine besonderen Berechtigungen.",
   "extSettings": "Einstellungen",
   "extSaveSettings": "Einstellungen speichern",
-  "extSaving": "Speichern…",
   "extUpdateTo": "Upgrade auf {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Das Panel ist nicht verfügbar. Die Erweiterung wurde möglicherweise deaktiviert oder entfernt.",
+  "extPanelUnavailable": "Das Erweiterungspanel ist nicht verfügbar.",
   "extPermConnectionsRead": "Liste aktiver Verbindungen einsehen",
   "extPermServersRead": "Ihre Serverliste einsehen",
   "extPermSettingsRead": "App-Einstellungen lesen",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "In den Netzwerkpfad integrieren (DPI Bypass-Module)",
   "extPermNetFetch": "Fordern Sie URL aus der Zulassungsliste an",
   "extPermBackground": "Hintergrundaufgaben ausführen",
-  "extPermBackgroundDetail": "Führt geplante Aufgaben aus, auch wenn das Panel geschlossen ist. Sie können es anhalten oder ändern, wie oft es in den Erweiterungseinstellungen ausgeführt wird.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Läuft im Hintergrund",
   "extCapNetHook": "Umgehungen und Netzwerk-Hooks",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Änderungsprotokoll",
   "extImageFailed": "Das Bild konnte nicht geladen werden",
-  "extRatingHow": "Wie Bewertungen funktionieren",
-  "extRatingHowBody": "Die Bewertungen basieren auf einem Bayes'schen Durchschnitt: Eine Erweiterung mit wenigen Bewertungen bleibt in der Nähe der Mitte, bis mehr Leute abstimmen, sodass eine einzelne 5-Sterne-Bewertung eine neue Erweiterung nicht an die Spitze bringen kann. Aktuelle Bewertungen wiegen mehr als alte und es zählt nur eine Bewertung pro Konto.",
   "extScreenshots": "Screenshots",
   "extSortRelevance": "Relevanz",
-  "extPermNetworkDetail": "Lädt Daten über das VPN aus dem Internet. Nur die Hosts unten sind erlaubt, alles andere ist gesperrt.",
+  "extPermNetworkDetail": "VPN-Anfragen sind nur an die folgenden Hosts erlaubt.",
   "extBgTitle": "Hintergrundaufgabe",
   "extBgEnabled": "Im Hintergrund ausführen",
   "extBgInterval": "Ausführen alle",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Die Aufgabe läuft nach Zeitplan, solange Sora geöffnet ist, auch im Tray. Das kürzeste Intervall sind 15 Minuten.",
   "extBgDisabledNote": "Aktivieren Sie die Erweiterung, um ihre Hintergrundaufgabe zu verwalten.",
   "extCapNetwork": "Netzwerkzugriff",
   "extCapNetworkHosts": "Netzwerk: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Für die Paketerfassung ist eine aktive Sora TUN-Verbindung erforderlich.",
   "diagnosticUnavailable": "Diese Diagnose ist auf dieser Plattform nicht verfügbar.",
   "extErrRevoked": "Das Sora-Team hat diese Version der Erweiterung zurückgezogen, weil sie unsicher oder defekt ist.",
-  "extErrRevocationsExpired": "Die Liste zurückgezogener Erweiterungen konnte nicht erneuert werden. Installationen sind gesperrt, bis das gelingt: Netzwerk prüfen und erneut versuchen.",
+  "extErrRevocationsExpired": "Die Installation ist bis zur Aktualisierung der Sperrliste blockiert.",
   "extRevokedDisabled": "Zurückgezogene Erweiterungen wurden ausgeschaltet: {names}",
   "customServerWgPrivateKey": "Privater Schlüssel",
   "customServerWgAddresses": "Schnittstellenadressen",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Strikte Netzwerksperre",
   "strictKillSwitchWarning": "Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start.",
   "extWorkerFailed": "Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen. Prüfe das Erweiterungsprotokoll.",
-  "extAssetRejected": "Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln."
+  "extAssetRejected": "Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln.",
+  "extVerifiedSora": "Von Sora verifiziert",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Öffnen"
 }

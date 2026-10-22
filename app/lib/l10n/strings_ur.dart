@@ -906,36 +906,7 @@ class SUr extends S {
   String get extInstallOne => '1 انسٹال کریں۔';
 
   @override
-  String get extBadgeVerified => 'تصدیق شدہ';
-
-  @override
-  String get extBadgeTop => 'اس ہفتے سب سے زیادہ مقبول';
-
-  @override
-  String get extBadgeNew => 'نیا';
-
-  @override
-  String get extBadgeStaff => 'Sora ٹیم';
-
-  @override
-  String get extSideloadShort => 'کیٹلاگ سے نہیں۔';
-
-  @override
-  String get extSideloadWarning =>
-      'یہ توسیع ٹیم کیٹلاگ سے نہیں ہے۔ صرف مصنف نے اپنی کلید کی تصدیق کی ہے: اسے صرف اس صورت میں انسٹال کریں جب آپ مصنف پر بھروسہ کریں۔';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» نصب کریں';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» اپ ڈیٹ کریں';
-  }
-
-  @override
-  String get extPermissionsIntro => 'یہ ایکسٹینشن اس قابل ہو گی:';
+  String get extSideloadWarning => 'صرف تب انسٹال کریں جب آپ مصنف کی خود دستخط کردہ کلید پر بھروسہ کرتے ہوں۔';
 
   @override
   String get extPermissionsWidened => 'اپ ڈیٹ نئی اجازتیں مانگتا ہے:';
@@ -1062,9 +1033,6 @@ class SUr extends S {
       'اس اپ ڈیٹ پر انسٹال شدہ ورژن سے مختلف مصنف کی کلید کے ساتھ دستخط کیے گئے ہیں، اس لیے اسے بلاک کر دیا گیا تھا۔ اگر آپ کو نئی کلید پر بھروسہ ہے، تو ایکسٹینشن اَن انسٹال کریں اور اسے دوبارہ واضح طور پر انسٹال کریں۔';
 
   @override
-  String get extUpdateAvailable => 'اپ ڈیٹ دستیاب ہے۔';
-
-  @override
   String get extDisabled => 'غیر فعال';
 
   @override
@@ -1107,9 +1075,6 @@ class SUr extends S {
   String get extConflictsTitle => 'توسیع کے تنازعات';
 
   @override
-  String get extConflictsIntro => 'یہ ایکسٹینشنز ایک ہی چیز چاہتی ہیں۔ چنیں کہ کون سی چلے گی، دوسری انسٹال رہے گی۔';
-
-  @override
   String get extConflictTheme => 'ایپ تھیم';
 
   @override
@@ -1129,28 +1094,9 @@ class SUr extends S {
   String get extConflictsResolve => 'تنازعات کو حل کریں۔';
 
   @override
-  String get extConflictNote =>
-      'آپ کا انتخاب اس آلے پر محفوظ ہوتا ہے۔ تھیم فوراً بدل جاتی ہے، نیٹ ورک ہُکس اس ورژن میں نہیں چلتے۔';
-
-  @override
   String extVersionLabel(String version) {
     return 'ورژن $version';
   }
-
-  @override
-  String get extAuthor => 'مصنف';
-
-  @override
-  String get extRating => 'درجہ بندی';
-
-  @override
-  String get extInstalls => 'تنصیبات';
-
-  @override
-  String get extVersion => 'ورژن';
-
-  @override
-  String get extAbout => 'اس توسیع کے بارے میں';
 
   @override
   String get extPermissionsTitle => 'اجازتیں۔';
@@ -1163,9 +1109,6 @@ class SUr extends S {
 
   @override
   String get extSaveSettings => 'ترتیبات کو محفوظ کریں۔';
-
-  @override
-  String get extSaving => 'محفوظ ہو رہا ہے…';
 
   @override
   String extUpdateTo(String version) {
@@ -1194,7 +1137,7 @@ class SUr extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'پینل دستیاب نہیں ہے۔ ہو سکتا ہے کہ توسیع کو غیر فعال یا ہٹا دیا گیا ہو۔';
+  String get extPanelUnavailable => 'ایکسٹینشن پینل دستیاب نہیں ہے۔';
 
   @override
   String get extPermConnectionsRead => 'فعال رابطوں کی فہرست دیکھیں';
@@ -1233,10 +1176,6 @@ class SUr extends S {
   String get extPermBackground => 'پس منظر کے کام چلائیں۔';
 
   @override
-  String get extPermBackgroundDetail =>
-      'پینل بند ہونے پر بھی طے شدہ کام چلاتا ہے۔ آپ ایکسٹینشن کی ترتیبات میں اسے روک سکتے ہیں یا اسے تبدیل کر سکتے ہیں کہ یہ کتنی بار چلتا ہے۔';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1269,21 +1208,13 @@ class SUr extends S {
   String get extImageFailed => 'تصویر کو لوڈ نہیں کیا جا سکا';
 
   @override
-  String get extRatingHow => 'درجہ بندی کیسے کام کرتی ہے۔';
-
-  @override
-  String get extRatingHowBody =>
-      'ریٹنگز ایک Bayesian اوسط کا استعمال کرتی ہیں: چند ریٹنگز کے ساتھ ایک توسیع اس وقت تک وسط کے قریب رہتی ہے جب تک کہ زیادہ لوگ ووٹ نہ دیں، اس لیے ایک 5-اسٹار جائزہ کسی نئی توسیع کو اوپر نہیں لے جا سکتا۔ حالیہ درجہ بندیوں کا وزن پرانے سے زیادہ ہے، اور فی اکاؤنٹ صرف ایک درجہ بندی شمار ہوتی ہے۔';
-
-  @override
   String get extScreenshots => 'اسکرین شاٹس';
 
   @override
   String get extSortRelevance => 'مطابقت';
 
   @override
-  String get extPermNetworkDetail =>
-      'VPN کے ذریعے انٹرنیٹ سے ڈیٹا لاتی ہے۔ صرف نیچے دیے گئے ہوسٹ کی اجازت ہے، باقی سب بلاک ہے۔';
+  String get extPermNetworkDetail => 'VPN درخواستیں صرف نیچے دیے گئے ہوسٹس تک پہنچ سکتی ہیں۔';
 
   @override
   String get extBgTitle => 'پس منظر کا کام';
@@ -1305,10 +1236,6 @@ class SUr extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# گھنٹے', one: '# گھنٹہ');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'جب تک Sora کھلا ہے، ٹرے میں ہونے پر بھی، کام شیڈول کے مطابق چلتا ہے۔ کم سے کم وقفہ 15 منٹ ہے۔';
 
   @override
   String get extBgDisabledNote => 'اس کے پس منظر کے کام کو منظم کرنے کے لیے ایکسٹینشن کو فعال کریں۔';
@@ -2008,8 +1935,7 @@ class SUr extends S {
   String get extErrRevoked => 'Sora ٹیم نے یہ ایکسٹینشن ورژن واپس لے لیا ہے کیونکہ یہ غیر محفوظ یا خراب ہے۔';
 
   @override
-  String get extErrRevocationsExpired =>
-      'واپس لیے گئے ایکسٹینشنز کی فہرست تازہ نہیں ہو سکی۔ تازہ ہونے تک انسٹال بند ہے: نیٹ ورک چیک کر کے دوبارہ کوشش کریں۔';
+  String get extErrRevocationsExpired => 'منسوخ ایکسٹینشنز کی فہرست اپ ڈیٹ ہونے تک انسٹالیشن مسدود ہے۔';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2055,4 +1981,15 @@ class SUr extends S {
 
   @override
   String get extAssetRejected => 'ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔';
+
+  @override
+  String get extVerifiedSora => 'Sora سے تصدیق شدہ';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count بائٹس';
+  }
+
+  @override
+  String get extOpen => 'کھولیں';
 }

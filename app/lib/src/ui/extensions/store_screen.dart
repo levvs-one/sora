@@ -30,6 +30,7 @@ import '../../sora.dart';
 import 'conflicts_sheet.dart';
 import 'detail_screen.dart';
 import 'permissions_sheet.dart';
+import 'progress_window.dart';
 import 'widgets.dart';
 
 class ExtensionsScreen extends StatefulWidget {
@@ -75,37 +76,60 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final s = S.of(context);
     return ExtScope(
       store: _store,
-      child: Screen(
-        title: s.extensions,
-        actions: [
-          RoundButton(
-            icon: Symbols.install_desktop_rounded,
-            label: s.extInstallFromFile,
-            onTap: _ready ? () => _installFromFile(context) : null,
+      child: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 640),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            s.extensions,
+                            style: Styles.heading.copyWith(fontSize: 22, color: Palette.of(context).ink),
+                          ),
+                        ),
+                        RoundButton(
+                          icon: Symbols.install_desktop_rounded,
+                          label: s.extInstallFromFile,
+                          onTap: _ready ? () => _installFromFile(context) : null,
+                        ),
+                        const SizedBox(width: 8),
+                        RoundButton(
+                          icon: Symbols.link_rounded,
+                          label: s.extInstallFromUrl,
+                          onTap: _ready ? () => _installFromUrl(context) : null,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Expanded(
+                      child: _ready
+                          ? const _ExtensionsBody()
+                          : _failed
+                          ? Center(
+                              child: Text(
+                                s.extErrGeneric,
+                                style: Styles.body.copyWith(color: Palette.of(context).ink2),
+                              ),
+                            )
+                          : const Center(child: CircularProgressIndicator()),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          RoundButton(
-            icon: Symbols.link_rounded,
-            label: s.extInstallFromUrl,
-            onTap: _ready ? () => _installFromUrl(context) : null,
-          ),
-        ],
-        fill: _ready
-            ? const _ExtensionsBody()
-            : _failed
-            ? Center(
-                child: Text(s.extErrGeneric, style: Styles.body.copyWith(color: Palette.of(context).ink2)),
-              )
-            : const Center(child: CircularProgressIndicator()),
-        children: const [],
+        ),
       ),
     );
   }
@@ -122,7 +146,8 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   Future<void> _installFromUrl(BuildContext context) async {
     final s = S.of(context);
     final controller = TextEditingController();
-    final url = await showDialog<String>(
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final route = DialogRoute<String>(
       context: context,
       builder: (context) {
         final palette = Palette.of(context);
@@ -138,7 +163,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(s.extInstallFromUrl, style: Styles.title.copyWith(color: palette.ink)),
+                  Text(s.extInstallFromUrl, style: Styles.heading.copyWith(fontSize: 22, color: palette.ink)),
                   const SizedBox(height: 12),
                   TextField(
                     controller: controller,
@@ -155,43 +180,96 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         );
       },
     );
+    final url = await navigator.push(route);
+    await route.completed;
+    controller.dispose();
     if (url == null || url.isEmpty || !context.mounted) return;
     if (!url.startsWith('https://')) {
       _showError(context, s.extErrHttpsOnly);
       return;
     }
+    final uri = Uri.tryParse(url);
+    if (uri == null || uri.host.isEmpty) {
+      _showError(context, s.extErrNetwork);
+      return;
+    }
+    await _downloadAndInstall(context, uri, source: 'url');
+  }
+
+  Future<bool> _downloadAndInstall(BuildContext context, Uri url, {required String source, CatalogEntry? entry}) async {
+    final s = S.of(context);
+    final client = http.Client();
+    var cancelled = false;
+    late final ExtensionInstallDialog window;
+    void progress(int received, int? total) {
+      window.show(
+        InstallProgressWindow(
+          stage: InstallStage.download,
+          received: received,
+          total: total,
+          onCancel: () {
+            cancelled = true;
+            client.close();
+            unawaited(window.close());
+          },
+        ),
+      );
+    }
+
+    window = ExtensionInstallDialog(context, const InstallProgressWindow(stage: InstallStage.download));
+    progress(0, entry?.size);
     try {
-      final client = http.Client();
-      try {
-        final data = await _downloadCapped(
-          client,
-          Uri.parse(url),
-          limit: maxPackageBytes,
-        ).timeout(const Duration(seconds: 60));
-        if (!context.mounted) return;
-        await _installBytes(context, data, source: 'url', expectedSha256: null);
-      } finally {
-        client.close();
-      }
+      final data = await _downloadCapped(
+        client,
+        url,
+        limit: entry == null ? maxPackageBytes : math.min(entry.size, maxPackageBytes),
+        expectedSize: entry?.size,
+        onProgress: progress,
+      ).timeout(Duration(seconds: entry == null ? 60 : 120));
+      if (cancelled || !context.mounted) return false;
+      final installedVersion = entry == null ? null : _store.get(entry.id)?.version;
+      final changelog = entry?.changelog
+          .where((c) => installedVersion == null || compareVersions(c.version, installedVersion) > 0)
+          .toList();
+      return await _installBytes(
+        context,
+        data,
+        source: source,
+        expectedSha256: entry?.sha256,
+        authorKeyPin: entry?.authorKey,
+        changelog: changelog,
+        window: window,
+        verified: entry?.badges.contains('staff') ?? false,
+      );
     } catch (_) {
-      if (context.mounted) _showError(context, s.extErrNetwork);
+      await window.close();
+      if (!cancelled && context.mounted) _showError(context, s.extErrNetwork);
+      return false;
+    } finally {
+      client.close();
+      await window.close();
     }
   }
 
-  /// Downloads a .soraext with a hard byte cap enforced while streaming, so
-  /// a rogue URL cannot exhaust memory before [ExtPackage.open] runs its own
-  /// structural checks. Throws on HTTP errors, timeouts and over-limit
-  /// bodies; callers map every failure to a network error. Closing [client]
-  /// aborts the download (used by the cancel button).
-  static Future<Uint8List> _downloadCapped(http.Client client, Uri url, {required int limit}) async {
+  static Future<Uint8List> _downloadCapped(
+    http.Client client,
+    Uri url, {
+    required int limit,
+    int? expectedSize,
+    required void Function(int received, int? total) onProgress,
+  }) async {
     final response = await client.send(http.Request('GET', url));
     if (response.statusCode != 200) throw Exception('http ${response.statusCode}');
-    final body = <int>[];
+    final total = expectedSize ?? response.contentLength;
+    if (total != null && total > limit) throw Exception('download exceeds $limit bytes');
+    final body = BytesBuilder(copy: false);
+    onProgress(0, total);
     await for (final chunk in response.stream) {
-      body.addAll(chunk);
-      if (body.length > limit) throw Exception('download exceeds $limit bytes');
+      if (body.length + chunk.length > limit) throw Exception('download exceeds $limit bytes');
+      body.add(chunk);
+      onProgress(body.length, total);
     }
-    return Uint8List.fromList(body);
+    return body.takeBytes();
   }
 
   /// Verifies and installs raw .soraext bytes with the permission prompt.
@@ -207,35 +285,21 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     required String? expectedSha256,
     List<CatalogChangelogEntry>? changelog,
     String? authorKeyPin,
+    ExtensionInstallDialog? window,
+    bool verified = false,
   }) async {
     final s = S.of(context);
     if (!context.mounted) return false;
-    var progressOpen = false;
-    void showProgress(String label) {
-      progressOpen = true;
-      _showProgress(context, label);
-    }
-
-    void hideProgress() {
-      if (progressOpen) {
-        progressOpen = false;
-        if (context.mounted) Navigator.of(context).pop();
-      }
-    }
-
-    // Whether the previous version stays in place if this fails. True for
-    // every failure path below: the registry is only rewritten after the
-    // new content is fully extracted, so a failed update never leaves the
-    // user without the working version.
+    final progress = window ?? ExtensionInstallDialog(context, const InstallProgressWindow(stage: InstallStage.verify));
     var isUpdate = false;
-    void showFailure(BuildContext context, String message) {
-      hideProgress();
+    Future<void> showFailure(String message) async {
+      await progress.close();
       if (context.mounted) {
         _showError(context, isUpdate ? '$message\n\n${s.extUpdateFailedKept}' : message);
       }
     }
 
-    showProgress(s.extVerifying);
+    progress.show(const InstallProgressWindow(stage: InstallStage.verify));
     try {
       if (expectedSha256 != null) {
         final ok = _sha256Hex(data) == expectedSha256.toLowerCase();
@@ -250,7 +314,6 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         throw PackageError('needs app ${pkg.manifest.minAppVersion}');
       }
       isUpdate = _store.get(pkg.manifest.id) != null;
-      hideProgress();
       if (!context.mounted) return false;
       // A widening update shows exactly what is new, under the "Update"
       // title, instead of the full list under "Install". Dropped
@@ -261,35 +324,40 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       // additions (the prompt still titles itself "Update").
       final added = diff?.added;
       final removed = diff == null || diff.removed.isEmpty ? null : diff.removed;
-      final granted = await showInstallPrompt(
-        context,
-        manifest: pkg.manifest,
-        sideload: source != 'catalog',
-        addedPermissions: added,
-        removedPermissions: removed,
-        changelog: changelog,
+      final decision = Completer<List<String>?>();
+      progress.show(
+        InstallPermissionPrompt(
+          manifest: pkg.manifest,
+          sideload: source != 'catalog',
+          addedPermissions: added,
+          removedPermissions: removed,
+          changelog: changelog,
+          verified: verified || pkg.manifest.author.publicKey.trim() == teamPublicKey,
+          onDecision: (granted) {
+            if (!decision.isCompleted) decision.complete(granted);
+          },
+        ),
       );
+      final granted = await decision.future;
       if (granted == null || !context.mounted) return false;
-      showProgress(s.extInstalling);
-      try {
-        await _store.install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
-      } finally {
-        hideProgress();
-      }
+      progress.show(const InstallProgressWindow(stage: InstallStage.install));
+      await _store.install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
       return true;
     } on ExtAssetError {
-      hideProgress();
+      await progress.close();
       if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s.extAssetRejected)));
     } on PackageError catch (e) {
-      if (context.mounted) showFailure(context, _mapInstallError(context, e.message));
+      if (context.mounted) await showFailure(_mapInstallError(context, e.message));
     } on SignatureError {
-      if (context.mounted) showFailure(context, s.extErrSignature);
+      if (context.mounted) await showFailure(s.extErrSignature);
     } on ManifestError {
-      if (context.mounted) showFailure(context, s.extErrManifest);
+      if (context.mounted) await showFailure(s.extErrManifest);
     } on ExtStoreError catch (e) {
-      if (context.mounted) showFailure(context, extStoreErrorText(s, e));
+      if (context.mounted) await showFailure(extStoreErrorText(s, e));
     } catch (_) {
-      if (context.mounted) showFailure(context, s.extErrGeneric);
+      if (context.mounted) await showFailure(s.extErrGeneric);
+    } finally {
+      await progress.close();
     }
     return false;
   }
@@ -305,66 +373,6 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       return s.extErrMinApp(version);
     }
     return s.extErrGeneric;
-  }
-
-  void _showProgress(BuildContext context, String label) {
-    final palette = Palette.of(context);
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        backgroundColor: palette.raised,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(width: 16),
-              Text(label, style: Styles.body.copyWith(color: palette.ink)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Like [_showProgress] but with a Cancel button. Tapping it pops the
-  /// dialog and runs [onCancel] (the caller aborts the work, e.g. closes
-  /// the download client). A cancelled operation is not an error: the
-  /// caller must stay silent instead of showing a failure dialog.
-  void _showProgressWithCancel(BuildContext context, String label, VoidCallback onCancel) {
-    final palette = Palette.of(context);
-    final s = S.of(context);
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => Dialog(
-        backgroundColor: palette.raised,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(label, style: Styles.body.copyWith(color: palette.ink)),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(dialogContext).pop();
-                  onCancel();
-                },
-                child: Text(s.extCancel, style: TextStyle(color: palette.ink2)),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   void _showError(BuildContext context, String message) {
@@ -389,7 +397,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                     Icon(Symbols.error_rounded, color: palette.danger),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(s.extInstallFailed, style: Styles.title.copyWith(color: palette.ink)),
+                      child: Text(s.extInstallFailed, style: Styles.heading.copyWith(fontSize: 22, color: palette.ink)),
                     ),
                   ],
                 ),
@@ -816,7 +824,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       author: e.author,
       rating: e.rating,
       installs: e.installs,
-      badges: catalogBadges(context, e),
+      verified: e.badges.contains('staff'),
       subtitle: e.description,
       permissions: e.permissions,
       onTap: () => push<void>(
@@ -835,61 +843,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
   /// installed; false on cancel or failure (the failure dialog is shown
   /// by [_installBytes], so callers must not add their own noise).
   Future<bool> _installFromCatalog(BuildContext context, CatalogEntry e) async {
-    final s = S.of(context);
     final state = context.findAncestorStateOfType<_ExtensionsScreenState>();
     if (state == null || !context.mounted) return false;
-    // The download is cancellable: closing the client aborts the stream.
-    // A user-cancelled download is not an error: stay silent.
-    final client = http.Client();
-    var cancelled = false;
-    var dialogOpen = false;
-    void closeDialog() {
-      if (dialogOpen && context.mounted) {
-        dialogOpen = false;
-        Navigator.of(context).pop();
-      }
-    }
-
-    dialogOpen = true;
-    state._showProgressWithCancel(context, s.extDownloading, () {
-      cancelled = true;
-      closeDialog();
-      client.close();
-    });
-    try {
-      // The catalog entry carries the expected size; anything beyond it is
-      // not the advertised package.
-      final data = await _ExtensionsScreenState._downloadCapped(
-        client,
-        Uri.parse(e.downloadUrl),
-        limit: e.size,
-      ).timeout(const Duration(seconds: 120));
-      closeDialog();
-      if (!context.mounted) return false;
-      // Changelog rows newer than the installed version, newest first.
-      // A fresh install sees the whole history.
-      final installedVersion = state._store.get(e.id)?.version;
-      final changelog = [
-        for (final c in e.changelog)
-          if (installedVersion == null || compareVersions(c.version, installedVersion) > 0) c,
-      ];
-      return await state._installBytes(
-        context,
-        data,
-        source: 'catalog',
-        expectedSha256: e.sha256,
-        authorKeyPin: e.authorKey,
-        changelog: changelog.isEmpty ? null : changelog,
-      );
-    } catch (_) {
-      closeDialog();
-      if (!cancelled && context.mounted) {
-        state._showError(context, s.extErrNetwork);
-      }
-      return false;
-    } finally {
-      client.close();
-    }
+    return state._downloadAndInstall(context, Uri.parse(e.downloadUrl), source: 'catalog', entry: e);
   }
 
   Widget _buildInstalled(BuildContext context) {
@@ -995,16 +951,8 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 key: ValueKey(inst.id),
                 title: inst.manifest.name,
                 author: inst.manifest.author.name,
-                badges: [
-                  if (inst.source != 'catalog')
-                    ExtBadge(label: s.extSideloadShort, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
-                  if (needsUpdate) ExtBadge(label: s.extUpdateAvailable),
-                  if (!inst.enabled) ExtBadge(label: s.extDisabled),
-                  // A signal, not the form itself: the full
-                  // settings form lives on the detail screen, one tap away.
-                  if (inst.manifest.settingsSchema != null)
-                    ExtBadge(label: s.extSettings, icon: Symbols.settings_rounded),
-                ],
+                verified: isTeamExtension(inst),
+                sideload: inst.source != 'catalog',
                 subtitle: s.extVersionLabel(inst.version),
                 enabled: inst.enabled,
                 capabilities: inst.manifest.capabilities,
@@ -1013,15 +961,27 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 onTap: () => push<void>(context, ExtensionDetailScreen(installed: inst)),
                 // The switch alone announces only on/off; the label names
                 // the extension it toggles.
-                trailing: Semantics(
-                  label: s.extToggleEnabled(inst.manifest.name),
-                  child: CupertinoSwitch(
-                    value: inst.enabled,
-                    onChanged: (v) => toggleExtension(context, store, inst.id, v),
-                    activeTrackColor: palette.ink,
-                    inactiveTrackColor: palette.field,
-                    thumbColor: palette.surface,
-                  ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (needsUpdate) ...[
+                      PillButton(
+                        label: s.extUpdate,
+                        onTap: () => _installFromCatalog(context, _catalog!.find(inst.id)!),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    Semantics(
+                      label: s.extToggleEnabled(inst.manifest.name),
+                      child: CupertinoSwitch(
+                        value: inst.enabled,
+                        onChanged: (v) => toggleExtension(context, store, inst.id, v),
+                        activeTrackColor: palette.ink,
+                        inactiveTrackColor: palette.field,
+                        thumbColor: palette.surface,
+                      ),
+                    ),
+                  ],
                 ),
               );
             },

@@ -913,36 +913,7 @@ class SDe extends S {
   String get extInstallOne => '1 Installation';
 
   @override
-  String get extBadgeVerified => 'Verifiziert';
-
-  @override
-  String get extBadgeTop => 'Diese Woche am beliebtesten';
-
-  @override
-  String get extBadgeNew => 'Neu';
-
-  @override
-  String get extBadgeStaff => 'Das Sora-Team';
-
-  @override
-  String get extSideloadShort => 'Nicht aus dem Katalog';
-
-  @override
-  String get extSideloadWarning =>
-      'Diese Erweiterung stammt nicht aus dem Teamkatalog. Nur der Autor hat für seinen Schlüssel bürgt: Installieren Sie ihn nur, wenn Sie dem Autor vertrauen.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '„$name“ installieren';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '„$name“ aktualisieren';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Diese Erweiterung kann:';
+  String get extSideloadWarning => 'Nur installieren, wenn Sie dem selbst signierten Schlüssel des Autors vertrauen.';
 
   @override
   String get extPermissionsWidened => 'Das Update fordert neue Berechtigungen:';
@@ -1071,9 +1042,6 @@ class SDe extends S {
       'Dieses Update ist mit einem anderen Autorenschlüssel als die installierte Version signiert und wurde daher blockiert. Wenn Sie dem neuen Schlüssel vertrauen, deinstallieren Sie die Erweiterung und installieren Sie sie explizit erneut.';
 
   @override
-  String get extUpdateAvailable => 'Update verfügbar';
-
-  @override
   String get extDisabled => 'Deaktiviert';
 
   @override
@@ -1116,10 +1084,6 @@ class SDe extends S {
   String get extConflictsTitle => 'Erweiterungskonflikte';
 
   @override
-  String get extConflictsIntro =>
-      'Diese Erweiterungen wollen dasselbe. Wähle, welche läuft; die andere bleibt installiert.';
-
-  @override
   String get extConflictTheme => 'App-Theme';
 
   @override
@@ -1139,28 +1103,9 @@ class SDe extends S {
   String get extConflictsResolve => 'Konflikte lösen';
 
   @override
-  String get extConflictNote =>
-      'Ihre Auswahl wird auf diesem Gerät gespeichert. Ein Design wechselt sofort, Netzwerk-Hooks laufen in dieser Version nicht.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Version $version';
   }
-
-  @override
-  String get extAuthor => 'Autor';
-
-  @override
-  String get extRating => 'Bewertung';
-
-  @override
-  String get extInstalls => 'Installationen';
-
-  @override
-  String get extVersion => 'Version';
-
-  @override
-  String get extAbout => 'Über diese Erweiterung';
 
   @override
   String get extPermissionsTitle => 'Berechtigungen';
@@ -1173,9 +1118,6 @@ class SDe extends S {
 
   @override
   String get extSaveSettings => 'Einstellungen speichern';
-
-  @override
-  String get extSaving => 'Speichern…';
 
   @override
   String extUpdateTo(String version) {
@@ -1204,8 +1146,7 @@ class SDe extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'Das Panel ist nicht verfügbar. Die Erweiterung wurde möglicherweise deaktiviert oder entfernt.';
+  String get extPanelUnavailable => 'Das Erweiterungspanel ist nicht verfügbar.';
 
   @override
   String get extPermConnectionsRead => 'Liste aktiver Verbindungen einsehen';
@@ -1244,10 +1185,6 @@ class SDe extends S {
   String get extPermBackground => 'Hintergrundaufgaben ausführen';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Führt geplante Aufgaben aus, auch wenn das Panel geschlossen ist. Sie können es anhalten oder ändern, wie oft es in den Erweiterungseinstellungen ausgeführt wird.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1280,21 +1217,13 @@ class SDe extends S {
   String get extImageFailed => 'Das Bild konnte nicht geladen werden';
 
   @override
-  String get extRatingHow => 'Wie Bewertungen funktionieren';
-
-  @override
-  String get extRatingHowBody =>
-      'Die Bewertungen basieren auf einem Bayes\'schen Durchschnitt: Eine Erweiterung mit wenigen Bewertungen bleibt in der Nähe der Mitte, bis mehr Leute abstimmen, sodass eine einzelne 5-Sterne-Bewertung eine neue Erweiterung nicht an die Spitze bringen kann. Aktuelle Bewertungen wiegen mehr als alte und es zählt nur eine Bewertung pro Konto.';
-
-  @override
   String get extScreenshots => 'Screenshots';
 
   @override
   String get extSortRelevance => 'Relevanz';
 
   @override
-  String get extPermNetworkDetail =>
-      'Lädt Daten über das VPN aus dem Internet. Nur die Hosts unten sind erlaubt, alles andere ist gesperrt.';
+  String get extPermNetworkDetail => 'VPN-Anfragen sind nur an die folgenden Hosts erlaubt.';
 
   @override
   String get extBgTitle => 'Hintergrundaufgabe';
@@ -1316,10 +1245,6 @@ class SDe extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# Stunden', one: '# Stunde');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Die Aufgabe läuft nach Zeitplan, solange Sora geöffnet ist, auch im Tray. Das kürzeste Intervall sind 15 Minuten.';
 
   @override
   String get extBgDisabledNote => 'Aktivieren Sie die Erweiterung, um ihre Hintergrundaufgabe zu verwalten.';
@@ -2020,8 +1945,7 @@ class SDe extends S {
       'Das Sora-Team hat diese Version der Erweiterung zurückgezogen, weil sie unsicher oder defekt ist.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Die Liste zurückgezogener Erweiterungen konnte nicht erneuert werden. Installationen sind gesperrt, bis das gelingt: Netzwerk prüfen und erneut versuchen.';
+  String get extErrRevocationsExpired => 'Die Installation ist bis zur Aktualisierung der Sperrliste blockiert.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2068,4 +1992,15 @@ class SDe extends S {
 
   @override
   String get extAssetRejected => 'Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln.';
+
+  @override
+  String get extVerifiedSora => 'Von Sora verifiziert';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Öffnen';
 }

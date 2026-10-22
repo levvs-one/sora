@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "تثبيت واحد",
-  "extBadgeVerified": "تم التحقق منه",
-  "extBadgeTop": "الأكثر شعبية هذا الأسبوع",
-  "extBadgeNew": "جديد",
-  "extBadgeStaff": "فريق Sora",
-  "extSideloadShort": "ليس من الكتالوج",
-  "extSideloadWarning": "هذا الملحق ليس من كتالوج الفريق. لقد كفل المؤلف فقط مفتاحه: قم بتثبيته فقط إذا كنت تثق في المؤلف.",
-  "extInstallTitle": "تثبيت «{name}»",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "تحديث «{name}»",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "سيتمكن هذا الملحق من:",
+  "extSideloadWarning": "ثبّت فقط إذا كنت تثق بمفتاح المؤلف الموقّع ذاتيًا.",
   "extPermissionsWidened": "التحديث يطلب أذونات جديدة:",
   "extDangerousAck": "أدرك أن هذه الأذونات خطيرة",
   "extInstall": "تثبيت",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "يُسمح فقط بروابط https://",
   "extErrGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
   "extErrAuthorKeyChanged": "تم توقيع هذا التحديث باستخدام مفتاح مؤلف مختلف عن الإصدار المثبت، لذلك تم حظره. إذا كنت تثق في المفتاح الجديد، فقم بإلغاء تثبيت الملحق وتثبيته مرة أخرى بشكل صريح.",
-  "extUpdateAvailable": "التحديث متاح",
   "extDisabled": "معطل",
   "extToggleEnabled": "تمكين {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "لم يعد مطلوبًا:",
   "extUpdateFailedKept": "لا يزال الإصدار السابق مثبتًا.",
   "extConflictsTitle": "تعارضات الملحق",
-  "extConflictsIntro": "تريد هذه الإضافات الشيء نفسه. اختر أيّها يعمل، وستبقى الأخرى مثبّتة.",
   "extConflictTheme": "سمة التطبيق",
   "extConflictNetHooks": "خطافات الشبكة",
   "extConflictWinner": "الأولوية لـ {name}",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "حل النزاعات",
-  "extConflictNote": "يُحفظ اختيارك على هذا الجهاز. يتغيّر المظهر فورًا، أما خطافات الشبكة فلا تعمل في هذا الإصدار.",
   "extVersionLabel": "النسخة {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "المؤلف",
-  "extRating": "التقييم",
-  "extInstalls": "عمليات التثبيت",
-  "extVersion": "النسخة",
-  "extAbout": "حول هذا الملحق",
   "extPermissionsTitle": "الأذونات",
   "extNoPermissions": "لا توجد أذونات خاصة.",
   "extSettings": "الإعدادات",
   "extSaveSettings": "حفظ الإعدادات",
-  "extSaving": "الحفظ...",
   "extUpdateTo": "الترقية إلى {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "اللوحة غير متوفرة. ربما تم تعطيل الملحق أو إزالته.",
+  "extPanelUnavailable": "لوحة الإضافة غير متاحة.",
   "extPermConnectionsRead": "راجع قائمة الاتصالات النشطة",
   "extPermServersRead": "عرض قائمة خوادمك",
   "extPermSettingsRead": "قراءة إعدادات التطبيق",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "التدخل في مسار الشبكة (وحدات تجاوز DPI)",
   "extPermNetFetch": "اطلب URL من القائمة المسموح بها",
   "extPermBackground": "تشغيل المهام الخلفية",
-  "extPermBackgroundDetail": "يقوم بتشغيل المهام المجدولة حتى عندما تكون اللوحة مغلقة. يمكنك إيقافه مؤقتًا أو تغيير عدد مرات تشغيله في إعدادات الملحق.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "يعمل في الخلفية",
   "extCapNetHook": "تجاوز الحجب واعتراضات الشبكة",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "سجل التغيير",
   "extImageFailed": "تعذر تحميل الصورة",
-  "extRatingHow": "كيفية عمل التقييمات",
-  "extRatingHowBody": "تستخدم التقييمات متوسط بايزي: يظل الملحق الذي يحتوي على عدد قليل من التقييمات بالقرب من المنتصف حتى يصوت المزيد من الأشخاص، لذلك لا يمكن لمراجعة واحدة من فئة 5 نجوم دفع الملحق الجديد إلى الأعلى. التقييمات الحديثة لها وزن أكبر من التقييمات القديمة، ويتم احتساب تقييم واحد فقط لكل حساب.",
   "extScreenshots": "لقطات الشاشة",
   "extSortRelevance": "الصلة",
-  "extPermNetworkDetail": "تجلب بيانات من الإنترنت عبر VPN. يُسمح فقط بالمضيفين في القائمة أدناه، وكل ما عداهم محظور.",
+  "extPermNetworkDetail": "تُسمح طلبات VPN إلى المضيفين أدناه فقط.",
   "extBgTitle": "مهمة في الخلفية",
   "extBgEnabled": "تشغيل في الخلفية",
   "extBgInterval": "التشغيل كل",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "تعمل المهمة وفق الجدول ما دام Sora مفتوحًا، بما في ذلك عند وجوده في علبة النظام. أقصر فاصل 15 دقيقة.",
   "extBgDisabledNote": "قم بتمكين الملحق لإدارة مهمة الخلفية الخاصة به.",
   "extCapNetwork": "الوصول إلى الشبكة",
   "extCapNetworkHosts": "الشبكة: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "يحتاج التقاط الحزم إلى اتصال Sora TUN نشط.",
   "diagnosticUnavailable": "هذا التشخيص غير متوفر على هذا النظام الأساسي.",
   "extErrRevoked": "سحب فريق Sora هذا الإصدار من الإضافة لأنه غير آمن أو معطّل.",
-  "extErrRevocationsExpired": "تعذّر تحديث قائمة الإضافات المسحوبة. التثبيت متوقف حتى تُحدَّث: تحقّق من الشبكة وحاول مجددًا.",
+  "extErrRevocationsExpired": "التثبيت محظور حتى يتم تحديث قائمة الإضافات الملغاة.",
   "extRevokedDisabled": "تم إيقاف الإضافات المسحوبة: {names}",
   "customServerWgPrivateKey": "المفتاح الخاص",
   "customServerWgAddresses": "عناوين الواجهة",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "مفتاح إيقاف صارم",
   "strictKillSwitchWarning": "بعد الاتصال، يحظر حركة البيانات خارج VPN حتى بعد التعطل أو إعادة التشغيل أو إغلاق التطبيق. لا تعود إمكانية الوصول إلا بقطع الاتصال أو تعطيل هذا الخيار. بعد إعادة تشغيل الجهاز، يُستأنف الحظر فقط إذا كان الاتصال عند بدء التشغيل مفعّلاً.",
   "extWorkerFailed": "فشلت المهمة الخلفية للإضافة. راجع سجل الإضافة.",
-  "extAssetRejected": "تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة."
+  "extAssetRejected": "تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة.",
+  "extVerifiedSora": "تم التحقق بواسطة Sora",
+  "extReceivedBytes": "{count} بايت",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "فتح"
 }

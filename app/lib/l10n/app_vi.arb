@@ -561,29 +561,7 @@
     }
   },
   "extInstallOne": "1 lượt cài đặt",
-  "extBadgeVerified": "Đã xác minh",
-  "extBadgeTop": "Phổ biến nhất tuần này",
-  "extBadgeNew": "Mới",
-  "extBadgeStaff": "Đội Sora",
-  "extSideloadShort": "Không có trong danh mục",
-  "extSideloadWarning": "Tiện ích mở rộng này không có trong danh mục của nhóm. Chỉ tác giả mới xác nhận khóa của họ: chỉ cài đặt nó nếu bạn tin tưởng tác giả.",
-  "extInstallTitle": "Cài đặt “{name}”",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Cập nhật “{name}”",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Tiện ích mở rộng này sẽ có thể:",
+  "extSideloadWarning": "Chỉ cài đặt nếu bạn tin tưởng khóa tự ký của tác giả.",
   "extPermissionsWidened": "Bản cập nhật yêu cầu quyền mới:",
   "extDangerousAck": "Tôi hiểu rằng những quyền này là nghiêm trọng",
   "extInstall": "Cài đặt",
@@ -631,7 +609,6 @@
   "extErrHttpsOnly": "Chỉ cho phép liên kết https://",
   "extErrGeneric": "Đã xảy ra lỗi. Vui lòng thử lại.",
   "extErrAuthorKeyChanged": "Bản cập nhật này được ký bằng khóa tác giả khác với phiên bản đã cài đặt nên đã bị chặn. Nếu bạn tin cậy khóa mới, hãy gỡ cài đặt tiện ích mở rộng và cài đặt lại một cách rõ ràng.",
-  "extUpdateAvailable": "Đã có bản cập nhật",
   "extDisabled": "Đã tắt",
   "extToggleEnabled": "Kích hoạt {name}",
   "@extToggleEnabled": {
@@ -665,7 +642,6 @@
   "extPermissionsRemoved": "Không còn được yêu cầu:",
   "extUpdateFailedKept": "Phiên bản trước đó vẫn được cài đặt.",
   "extConflictsTitle": "Xung đột tiện ích mở rộng",
-  "extConflictsIntro": "Các tiện ích này muốn cùng một thứ. Chọn tiện ích sẽ chạy; tiện ích còn lại vẫn được cài đặt.",
   "extConflictTheme": "Chủ đề ứng dụng",
   "extConflictNetHooks": "Móc mạng",
   "extConflictWinner": "{name} thắng",
@@ -685,7 +661,6 @@
     }
   },
   "extConflictsResolve": "Giải quyết xung đột",
-  "extConflictNote": "Lựa chọn của bạn được lưu trên thiết bị này. Giao diện đổi ngay, còn hook mạng không chạy trong phiên bản này.",
   "extVersionLabel": "Phiên bản {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +669,10 @@
       }
     }
   },
-  "extAuthor": "Tác giả",
-  "extRating": "Đánh giá",
-  "extInstalls": "Lượt cài đặt",
-  "extVersion": "Phiên bản",
-  "extAbout": "Giới thiệu về tiện ích mở rộng này",
   "extPermissionsTitle": "Quyền",
   "extNoPermissions": "Không có quyền đặc biệt.",
   "extSettings": "Cài đặt",
   "extSaveSettings": "Lưu cài đặt",
-  "extSaving": "Đang lưu…",
   "extUpdateTo": "Nâng cấp lên {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +707,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Bảng điều khiển không có sẵn. Tiện ích mở rộng có thể đã bị vô hiệu hóa hoặc bị xóa.",
+  "extPanelUnavailable": "Bảng tiện ích không khả dụng.",
   "extPermConnectionsRead": "Xem danh sách các kết nối đang hoạt động",
   "extPermServersRead": "Xem danh sách máy chủ của bạn",
   "extPermSettingsRead": "Đọc cài đặt ứng dụng",
@@ -751,7 +720,6 @@
   "extPermNetHooks": "Tích hợp vào đường dẫn mạng (DPI mô-đun bỏ qua)",
   "extPermNetFetch": "Yêu cầu URL từ danh sách được phép",
   "extPermBackground": "Chạy các tác vụ nền",
-  "extPermBackgroundDetail": "Chạy các tác vụ đã lên lịch ngay cả khi đóng bảng điều khiển. Bạn có thể tạm dừng hoặc thay đổi tần suất chạy trong cài đặt tiện ích mở rộng.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Chạy ở chế độ nền",
   "extCapNetHook": "Vượt chặn và hook mạng",
@@ -769,11 +737,9 @@
   },
   "extChangelog": "Nhật ký thay đổi",
   "extImageFailed": "Không thể tải hình ảnh",
-  "extRatingHow": "Cách xếp hạng hoạt động",
-  "extRatingHowBody": "Xếp hạng sử dụng mức trung bình Bayes: tiện ích mở rộng có ít xếp hạng sẽ ở gần giữa cho đến khi có nhiều người bỏ phiếu hơn, do đó, một đánh giá 5 sao không thể đẩy tiện ích mở rộng mới lên đầu. Xếp hạng gần đây nặng hơn xếp hạng cũ và chỉ tính một xếp hạng cho mỗi tài khoản.",
   "extScreenshots": "Ảnh chụp màn hình",
   "extSortRelevance": "Mức độ liên quan",
-  "extPermNetworkDetail": "Tải dữ liệu từ internet qua VPN. Chỉ các máy chủ bên dưới được phép, còn lại đều bị chặn.",
+  "extPermNetworkDetail": "Yêu cầu qua VPN chỉ được phép đến các máy chủ bên dưới.",
   "extBgTitle": "Tác vụ nền",
   "extBgEnabled": "Chạy ở chế độ nền",
   "extBgInterval": "Chạy mỗi",
@@ -793,7 +759,6 @@
       }
     }
   },
-  "extBgNote": "Tác vụ chạy theo lịch khi Sora đang mở, kể cả khi ở khay hệ thống. Khoảng cách ngắn nhất là 15 phút.",
   "extBgDisabledNote": "Kích hoạt tiện ích mở rộng để quản lý tác vụ nền của nó.",
   "extCapNetwork": "Truy cập mạng",
   "extCapNetworkHosts": "Mạng: {hosts}",
@@ -1003,7 +968,7 @@
   "diagnosticRequiresTun": "Việc chụp gói cần có kết nối Sora TUN đang hoạt động.",
   "diagnosticUnavailable": "Chẩn đoán này không có sẵn trên nền tảng này.",
   "extErrRevoked": "Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.",
-  "extErrRevocationsExpired": "Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.",
+  "extErrRevocationsExpired": "Việc cài đặt bị chặn cho đến khi danh sách thu hồi được cập nhật.",
   "extRevokedDisabled": "Đã tắt các tiện ích bị thu hồi: {names}",
   "customServerWgPrivateKey": "Khóa riêng",
   "customServerWgAddresses": "Địa chỉ giao diện",
@@ -1017,5 +982,15 @@
   "strictKillSwitch": "Chặn mạng nghiêm ngặt",
   "strictKillSwitchWarning": "Sau khi kết nối, chặn lưu lượng ngoài VPN kể cả khi gặp sự cố, khởi động lại hoặc thoát ứng dụng. Chỉ ngắt kết nối hoặc tắt tùy chọn này mới khôi phục truy cập. Sau khi khởi động lại thiết bị, chỉ tiếp tục chặn nếu đã bật kết nối khi khởi động.",
   "extWorkerFailed": "Tác vụ nền của tiện ích mở rộng thất bại. Kiểm tra nhật ký tiện ích.",
-  "extAssetRejected": "Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ."
+  "extAssetRejected": "Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ.",
+  "extVerifiedSora": "Được Sora xác minh",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Mở"
 }
