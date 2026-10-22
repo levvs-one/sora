@@ -22,6 +22,8 @@ type Settings struct {
 	Reconnect        bool
 	Endpoints        []Endpoint
 	AllowLAN         bool
+	// OLCRTC permits provider-selected SFU/ICE destinations for the carrier.
+	OLCRTC bool
 	// Bypass lists destinations that must skip the tunnel.
 	Bypass []string
 	// TunnelMode is the tunnel the plan asked for: system, application or

@@ -882,7 +882,7 @@ class STk extends S {
 
   @override
   String get modesGuide =>
-      'Serweriňiziň haýsy motora mätäçdigini bilmeýän bolsaňyz, Awto saýlaň. Sora birikmezden ozal profil we sazlamalary barlaýar. Dwigatel meýilnamaňyzyň geçiriş giňligini artdyryp bilmez: öndürijilik serwere, ugra, protokola we tora baglydyr.\n\n## Reesimler\n\n### traffichli traffik (TUN)\n\nSora wirtual tor interfeýsini döredýär we TCP we UDP ýaly programma trafigini ugrukdyrýar. Bu re modeimi Telegram, oýunlar we Discord sesi üçin ulanyň. Düzgünler belli bir saýtlary ýa-da programmalary gönüden-göni iberip ýa-da blokirläp biler. Tor hyzmaty, zerur protokoly goldaýan serwere we serwere mätäç.\n\n### System proksi\n\nSora ýerli HTTP / SOCKS proksi düzýär. Ulgam proksi sazlamalaryna hormat goýýan programmalar ony ulanýarlar. Öz torlary bilen goýmalar gönüden-göni birigip biler; UDP we sesli jaňlar adatça TUN gerek. Bu re modeim proksi goldawy bilen brauzerlere we programmalara laýyk gelýär.\n\n### Serwer ýok\n\nLinux-de, Sora HTTP / TLS haýyşlaryny bölmek we üýtgetmek we käbir DPI barlaglaryndan aýlanyp geçmek üçin [zapret] (https://github.com/bol-van/zapret) ulanýar. IP-iňiz şol bir ýagdaýda galýar we birikmeler göni web sahypasyna gidýär. Netijeler üpjün edijiňize we blokirleme usulyna baglydyr.\n\nHäzirki integrasiýa, TCP-den HTTP we TLS üçin tpws ulanýar. IP blokirlemesinden ýa-da UDP-den geçmeýär we Telegram-iň MTProto birikmelerini kepillendirip bilmeýär. Discord sesi, Telegram jaňlary we bu hili çäklendirmeler üçin TUN bilen VPN serwerini ulanyň.\n\n## Dwigateller\n\n### Awto\n\nSora ähli birikme meýilnamasyny goldaýan gurnalan hereketlendirijini saýlaýar: serwer protokollary, transportlar, toparlar, böleklere bölüniş we re modeim. Gabat gelmeýän el bilen saýlamak, häzirki baglanyşygy togtatmazdan ozal ret edilýär. Awto ýa-da başga dwigateli saýlaň we sazlamalary täzeden ulanyň.\n\n### sing-box\n\nTäze Sora paketleri [sing-box-lx] (https://github.com/Leadaxe/sing-box-lx), [sing-box] (https://github.com/SagerNet/sing-box), müşderi tarapyna XHTTP we VLESS Encryption goşýar. Sora gurluşy we mümkinçiliklerini ykrar edýär. XHTTP bolmazdan ýokary akym gurmak, diňe öz adyndan bu mümkinçiligi gazanyp bilmez.\n\nGoldaw berlen protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard we WireGuard we AmneziaWG AmneziaWG Doly Xray JSON profilleri Xray talap edýär. Täze AWG 3.x meýdanlaryny entek import edip bolmaýar. sing-box kompýuterdäki beýleki programmalaryň tapyp bilýän parol bilen goralýan ýerli dolandyryş portuny ulanýar.\n\n### Xray\n\n[Xray-core] (https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption we TLS böleklerini goldaýar. Şeýle hem, marşrutlaryny we toparlaryny gorap saklamak bilen doly üpjün ediji Xray profilini işleýär. Şeýle profilleri özlerini alyp barşyny üýtgetmän awtomatiki usulda başga motora öwrüp bolmaz.\n\nBaglanan Xray TLS şahadatnamasyny tassyklamagy (\"allowInsecure\") ýapýan sazlamany aýyrdy. Awto bu sazlamany talap edýän adaty serwerler üçin sing-box ýa-da mihomo saýlaýar. Xray saýlamak, häzirki birikmäni togtatmazdan ozal gabat gelmeýändigini habar berýär. Has köne JSON profillerinde barlanylýan şahadatnama ýa-da şahadatnama pin bilen täzelenen üpjün ediji profiline mätäç.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ätiýaçlyk serwere yzygiderli geçiş toparlaryny, ýük paýlaşmagy, XHTTP we AmneziaWG goldaýar. Ätiýaçlyk serwere awtomatik geçmek möhüm bolsa, ony saýlaň. Sora-nyň TLS bölekleme sazlamasy bu ýadro bilen elýeterli däl.\n\n## Sora-de laýyklyk\n\n| Aýratynlyk | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN we TCP / UDP | Hawa | Hawa | Hawa |\n| XHTTP | Hawa | Hawa | Hawa |\n| VLESS Encryption | Hawa | Hawa | Hawa |\n| Doly Xray tertibi | | Ok | Hawa | | Ok |\n| TUIC / AnyTLS | Ikisi | | Ok | TUIC |\n| TLS bölekleri | Hawa | Hawa | | Ok |\n| AmneziaWG 1.x / 2.x | Hawa | | Ok | Hawa |\n| Yza gaýdyp gelen topar | | Ok | ²ok | Hawa |\n\nZ J1/J2/J3/Itime bolan profiller mihomo ulanýar; bu meýdanlar hiç haçan sessiz-üýnsüz taşlanmaly däldir. Complete Doly Xray profilleriniň topary üçin programma ätiýaçlyk profilini saýlaýar. Goldaw gurlan gurna baglydyr; hakda wersiýasyny barlaň.\n\n## TUN ýygyndysy\n\nStack wirtual interfeýsiň içinde TCP we UDP işleýär. Reesimler panelinde Xray we mihomo gVisor, System, Mixed we MIPS hödürleýär. Her hereketlendiriji öz islegini tygşytlaýar. System proksi we Serwersiz reesimler bu ileri tutmany ulanmaýarlar.\n\n- ** Mixed ** - TCP ulgam stakasyny ulanýar, gVisor bolsa UDP işleýär. Bu Linux-da mihomo üçin başlangyç görnüşdir. Windows-da Xray we mihomo başlangyç görnüş hökmünde MIPS ulanýar.\n- ** System ** - ulgam toplumyny ulanýar. Tor programmalarynda kynçylyklar ýüze çyksa, başga bir warianty synap görüň.\n- ** gVisor ** - ulanyjy giňişliginde traffigi dolandyrýar.\n- ** MIPS ** - mihomo-iň öz IP ýygyndysy, birleşdirilen 1.19.32 wersiýasynda bar.\n\nLinux-de, Xray gurnalan gVisor deslapky görnüşde ulanýar. Linux-de System, Mixed we MIPS mihomo-ni TUN hereketlendirijisi hökmünde ulanyp, TCP we UDP-ni tassyklanan ýerli SOCKS baglanyşygy arkaly Xray-e ugradýar. Xray protokoly, üpjün edijiniň profilini we marşrutyny saklaýar. Bu üç wariant gurnalan mihomo talap edýär. Windows-de Xray dört TUN stekiniň hemmesi üçin mihomo 1.19.32 ýa-da has täze wersiýany ulanýar. Protokollar we ugur kesgitlemek Xray-da galýar. Bu birleşmede programma düzgünleri diňe göni birikmäni we bloklamagy goldaýar; Linux-de bu düzgünler Xray-yň içindäki gVisor stekini talap edýär.\n\nKöprü ikinji gezek işleýär. Linux-de üç sany boş ölçegde, ýerli Xray TUN-dan has takmynan 32–36 MiB fiziki ýat ulanyldy. Bu göçürip almak ýüküni ölçemeýär: CPU we ýat çykdajylary birikmelere baglydyr. sing-box-de hiç hili saýlaýjy ýok. Hiç bir stak her ulgamda has gowy işlemegi kepillendirmeýär. Ackygyndy saýlaň we toruňyzda synap görmek üçin “Apply” -y täzeden birikdiriň.\n\n## Sazlamalary ulanmak\n\nSerwer saýlamak awtomatiki birikdirilýär. Reodeim, hereketlendiriji, DNS we düzgün sazlamalary derrew saklanýar; işjeň birikme wagtynda, \"Goý\" düwmesine basyň we olary ulanmak üçin gaýtadan birikdiriň. Dwigateli täzeden açmak ýüklemeleri we jaňlary kesip biler. Gaýtalanyp basmak parallel baglanyşyklara başlamaz; aýyrmak birikmäni tamamlaýar we baglanyşygy boşadýar.\n\nInternet diňe VPN arkaly tunel gaçanda göni traffigi bloklaýar. Tutuş maşyna täsir edýär. Açyk aýyrmak Sora düzgünlerini aýyrýar. Arassalamak gutarmasa, birikmäni täzeden synap görüň we gündeligi açyň.\n\n## Taslama resminamalary\n\n- [sing-box-lx: konfigurasiýa we goldaw] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box resminamalary] (https://sing-box.sagernet.org/)\n- [Xray resminamalary] (https://xtls.github.io/)\n- [mihomo resminamalary] (https://wiki.metacubex.one/)\n- [zapret: iş we çäklendirmeler] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Serweriňiziň haýsy motora mätäçdigini bilmeýän bolsaňyz, Awto saýlaň. Sora birikmezden ozal profil we sazlamalary barlaýar. Dwigatel meýilnamaňyzyň geçiriş giňligini artdyryp bilmez: öndürijilik serwere, ugra, protokola we tora baglydyr.\n\n## Reesimler\n\n### traffichli traffik (TUN)\n\nSora wirtual tor interfeýsini döredýär we TCP we UDP ýaly programma trafigini ugrukdyrýar. Bu re modeimi Telegram, oýunlar we Discord sesi üçin ulanyň. Düzgünler belli bir saýtlary ýa-da programmalary gönüden-göni iberip ýa-da blokirläp biler. Tor hyzmaty, zerur protokoly goldaýan serwere we serwere mätäç.\n\n### System proksi\n\nSora ýerli HTTP / SOCKS proksi düzýär. Ulgam proksi sazlamalaryna hormat goýýan programmalar ony ulanýarlar. Öz torlary bilen goýmalar gönüden-göni birigip biler; UDP we sesli jaňlar adatça TUN gerek. Bu re modeim proksi goldawy bilen brauzerlere we programmalara laýyk gelýär.\n\n### Serwer ýok\n\nLinux-de, Sora HTTP / TLS haýyşlaryny bölmek we üýtgetmek we käbir DPI barlaglaryndan aýlanyp geçmek üçin [zapret] (https://github.com/bol-van/zapret) ulanýar. IP-iňiz şol bir ýagdaýda galýar we birikmeler göni web sahypasyna gidýär. Netijeler üpjün edijiňize we blokirleme usulyna baglydyr.\n\nHäzirki integrasiýa, TCP-den HTTP we TLS üçin tpws ulanýar. IP blokirlemesinden ýa-da UDP-den geçmeýär we Telegram-iň MTProto birikmelerini kepillendirip bilmeýär. Discord sesi, Telegram jaňlary we bu hili çäklendirmeler üçin TUN bilen VPN serwerini ulanyň.\n\n## Dwigateller\n\n### Awto\n\nSora ähli birikme meýilnamasyny goldaýan gurnalan hereketlendirijini saýlaýar: serwer protokollary, transportlar, toparlar, böleklere bölüniş we re modeim. Gabat gelmeýän el bilen saýlamak, häzirki baglanyşygy togtatmazdan ozal ret edilýär. Awto ýa-da başga dwigateli saýlaň we sazlamalary täzeden ulanyň.\n\n### sing-box\n\nTäze Sora paketleri [sing-box-lx] (https://github.com/Leadaxe/sing-box-lx), [sing-box] (https://github.com/SagerNet/sing-box), müşderi tarapyna XHTTP we VLESS Encryption goşýar. Sora gurluşy we mümkinçiliklerini ykrar edýär. XHTTP bolmazdan ýokary akym gurmak, diňe öz adyndan bu mümkinçiligi gazanyp bilmez.\n\nGoldaw berlen protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard we WireGuard we AmneziaWG AmneziaWG Doly Xray JSON profilleri Xray talap edýär. Täze AWG 3.x meýdanlaryny entek import edip bolmaýar. sing-box kompýuterdäki beýleki programmalaryň tapyp bilýän parol bilen goralýan ýerli dolandyryş portuny ulanýar.\n\n### Xray\n\n[Xray-core] (https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption we TLS böleklerini goldaýar. Şeýle hem, marşrutlaryny we toparlaryny gorap saklamak bilen doly üpjün ediji Xray profilini işleýär. Şeýle profilleri özlerini alyp barşyny üýtgetmän awtomatiki usulda başga motora öwrüp bolmaz.\n\nBaglanan Xray TLS şahadatnamasyny tassyklamagy (\"allowInsecure\") ýapýan sazlamany aýyrdy. Awto bu sazlamany talap edýän adaty serwerler üçin sing-box ýa-da mihomo saýlaýar. Xray saýlamak, häzirki birikmäni togtatmazdan ozal gabat gelmeýändigini habar berýär. Has köne JSON profillerinde barlanylýan şahadatnama ýa-da şahadatnama pin bilen täzelenen üpjün ediji profiline mätäç.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ätiýaçlyk serwere yzygiderli geçiş toparlaryny, ýük paýlaşmagy, XHTTP we AmneziaWG goldaýar. Ätiýaçlyk serwere awtomatik geçmek möhüm bolsa, ony saýlaň. Sora-nyň TLS bölekleme sazlamasy bu ýadro bilen elýeterli däl.\n\n## Sora-de laýyklyk\n\n| Aýratynlyk | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN we TCP / UDP | Hawa | Hawa | Hawa |\n| XHTTP | Hawa | Hawa | Hawa |\n| VLESS Encryption | Hawa | Hawa | Hawa |\n| Doly Xray tertibi | | Ok | Hawa | | Ok |\n| TUIC / AnyTLS | Ikisi | | Ok | TUIC |\n| mieru | Ýok | Ýok | Hawa |\n| NaiveProxy | Hawa | Ýok | Ýok |\n| TLS bölekleri | Hawa | Hawa | | Ok |\n| AmneziaWG 1.x / 2.x | Hawa | | Ok | Hawa |\n| Yza gaýdyp gelen topar | | Ok | ²ok | Hawa |\n\nZ J1/J2/J3/Itime bolan profiller mihomo ulanýar; bu meýdanlar hiç haçan sessiz-üýnsüz taşlanmaly däldir. Complete Doly Xray profilleriniň topary üçin programma ätiýaçlyk profilini saýlaýar. Goldaw gurlan gurna baglydyr; hakda wersiýasyny barlaň.\n\n## TUN ýygyndysy\n\nStack wirtual interfeýsiň içinde TCP we UDP işleýär. Reesimler panelinde Xray we mihomo gVisor, System, Mixed we MIPS hödürleýär. Her hereketlendiriji öz islegini tygşytlaýar. System proksi we Serwersiz reesimler bu ileri tutmany ulanmaýarlar.\n\n- ** Mixed ** - TCP ulgam stakasyny ulanýar, gVisor bolsa UDP işleýär. Bu Linux-da mihomo üçin başlangyç görnüşdir. Windows-da Xray we mihomo başlangyç görnüş hökmünde MIPS ulanýar.\n- ** System ** - ulgam toplumyny ulanýar. Tor programmalarynda kynçylyklar ýüze çyksa, başga bir warianty synap görüň.\n- ** gVisor ** - ulanyjy giňişliginde traffigi dolandyrýar.\n- ** MIPS ** - mihomo-iň öz IP ýygyndysy, birleşdirilen 1.19.32 wersiýasynda bar.\n\nLinux-de, Xray gurnalan gVisor deslapky görnüşde ulanýar. Linux-de System, Mixed we MIPS mihomo-ni TUN hereketlendirijisi hökmünde ulanyp, TCP we UDP-ni tassyklanan ýerli SOCKS baglanyşygy arkaly Xray-e ugradýar. Xray protokoly, üpjün edijiniň profilini we marşrutyny saklaýar. Bu üç wariant gurnalan mihomo talap edýär. Windows-de Xray dört TUN stekiniň hemmesi üçin mihomo 1.19.32 ýa-da has täze wersiýany ulanýar. Protokollar we ugur kesgitlemek Xray-da galýar. Bu birleşmede programma düzgünleri diňe göni birikmäni we bloklamagy goldaýar; Linux-de bu düzgünler Xray-yň içindäki gVisor stekini talap edýär.\n\nKöprü ikinji gezek işleýär. Linux-de üç sany boş ölçegde, ýerli Xray TUN-dan has takmynan 32–36 MiB fiziki ýat ulanyldy. Bu göçürip almak ýüküni ölçemeýär: CPU we ýat çykdajylary birikmelere baglydyr. sing-box-de hiç hili saýlaýjy ýok. Hiç bir stak her ulgamda has gowy işlemegi kepillendirmeýär. Ackygyndy saýlaň we toruňyzda synap görmek üçin “Apply” -y täzeden birikdiriň.\n\n## Sazlamalary ulanmak\n\nSerwer saýlamak awtomatiki birikdirilýär. Reodeim, hereketlendiriji, DNS we düzgün sazlamalary derrew saklanýar; işjeň birikme wagtynda, \"Goý\" düwmesine basyň we olary ulanmak üçin gaýtadan birikdiriň. Dwigateli täzeden açmak ýüklemeleri we jaňlary kesip biler. Gaýtalanyp basmak parallel baglanyşyklara başlamaz; aýyrmak birikmäni tamamlaýar we baglanyşygy boşadýar.\n\nInternet diňe VPN arkaly tunel gaçanda göni traffigi bloklaýar. Tutuş maşyna täsir edýär. Açyk aýyrmak Sora düzgünlerini aýyrýar. Arassalamak gutarmasa, birikmäni täzeden synap görüň we gündeligi açyň.\n\n## Taslama resminamalary\n\n- [sing-box-lx: konfigurasiýa we goldaw] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box resminamalary] (https://sing-box.sagernet.org/)\n- [Xray resminamalary] (https://xtls.github.io/)\n- [mihomo resminamalary] (https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: iş we çäklendirmeler] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP trafikini Jitsi, Yandex Telemost ýa-da WB Stream wideo jaňynyň üsti bilen geçirýär. olcrtc:// baglanyşygyny ýa-da QR koduny import ediň. Proksi we TUN režimlerinde sing-box, Xray we mihomo bilen işleýär; UDP goldanylmaýar. Iki tarapa-da gabat gelýän OLC2 ýygyndylary gerek. Başlangyç taslama arhiwlenen.\n';
 
   @override
   String get probeServers => 'Serwerleri barlaň';
@@ -909,36 +909,7 @@ class STk extends S {
   String get extInstallOne => '1 gurmak';
 
   @override
-  String get extBadgeVerified => 'Barlandy';
-
-  @override
-  String get extBadgeTop => 'Şu hepde iň meşhur';
-
-  @override
-  String get extBadgeNew => 'Täze';
-
-  @override
-  String get extBadgeStaff => 'Sora topary';
-
-  @override
-  String get extSideloadShort => 'Katalogdan däl';
-
-  @override
-  String get extSideloadWarning =>
-      'Bu giňeldiş toparyň katalogyndan däl. Awtor öz açaryny diňe özi tassyklaýar: diňe awtora ynanýan bolsaňyz gurnaň.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» gurna';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» täzele';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Bu giňeldiş aşakdakylary edip biler:';
+  String get extSideloadWarning => 'Diňe awtoryň öz gol çeken açaryna ynanýan bolsaňyz guruň.';
 
   @override
   String get extPermissionsWidened => 'Täzelenme täze rugsatlar soraýar:';
@@ -1064,9 +1035,6 @@ class STk extends S {
       'Bu täzelenme, gurnalan wersiýadan başga awtor açary bilen gol çekildi, şonuň üçin ol petiklendi. Täze açara ynanýan bolsaňyz, giňeltmäni aýyryň we aç-açan guruň.';
 
   @override
-  String get extUpdateAvailable => 'Täzelenme elýeterli';
-
-  @override
   String get extDisabled => 'Öçürilen';
 
   @override
@@ -1109,10 +1077,6 @@ class STk extends S {
   String get extConflictsTitle => 'Giňeldiş gapma-garşylyklary';
 
   @override
-  String get extConflictsIntro =>
-      'Bu giňeltmeler şol bir zady isleýär. Haýsysynyň işlejegini saýlaň, beýlekisi gurnalgy galar.';
-
-  @override
   String get extConflictTheme => 'Programma mowzugy';
 
   @override
@@ -1132,28 +1096,9 @@ class STk extends S {
   String get extConflictsResolve => 'Dawa-jenjelleri çözüň';
 
   @override
-  String get extConflictNote =>
-      'Saýlawyňyz şu enjamda saklanýar. Tema derrew çalşýar, tor hook-lary bu wersiýada işlemeýär.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Wersiýa $version';
   }
-
-  @override
-  String get extAuthor => 'Awtory';
-
-  @override
-  String get extRating => 'Reýting';
-
-  @override
-  String get extInstalls => 'Gurnamalar';
-
-  @override
-  String get extVersion => 'Wersiýa';
-
-  @override
-  String get extAbout => 'Bu giňeltme hakda';
 
   @override
   String get extPermissionsTitle => 'Rugsatlar';
@@ -1166,9 +1111,6 @@ class STk extends S {
 
   @override
   String get extSaveSettings => 'Sazlamalary ýazdyryň';
-
-  @override
-  String get extSaving => 'Saklanylýar…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class STk extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel elýeterli däl. Giňeldiş öçürilen ýa-da aýrylan bolmagy mümkin.';
+  String get extPanelUnavailable => 'Giňeltmäniň paneli elýeterli däl.';
 
   @override
   String get extPermConnectionsRead => 'Işjeň birikmeleriň sanawyna serediň';
@@ -1236,10 +1178,6 @@ class STk extends S {
   String get extPermBackground => 'Fon meselelerini işlediň';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Panel ýapylanda-da meýilleşdirilen işleri ýerine ýetirýär. Ony duruzyp ýa-da giňeltme sazlamalarynda näçe gezek işleýändigini üýtgedip bilersiňiz.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class STk extends S {
   String get extImageFailed => 'Suraty ýükläp bolmady';
 
   @override
-  String get extRatingHow => 'Reýtingleriň nähili işleýändigi';
-
-  @override
-  String get extRatingHowBody =>
-      'Reýtingler Baýziýanyň ortaça derejesini ulanýar: az bahaly giňeltme, köp adam ses berýänçä ortada galar, şonuň üçin 5 ýyldyzly ýekeje syn täze uzaldyşy ýokarsyna çykaryp bilmez. Soňky reýtingleriň agramy köne bahalardan has köp we hasap üçin diňe bir reýting hasaplanýar.';
-
-  @override
   String get extScreenshots => 'Ekran suratlary';
 
   @override
   String get extSortRelevance => 'Degişlilik';
 
   @override
-  String get extPermNetworkDetail =>
-      'Internetden VPN arkaly maglumat alýar. Diňe aşakdaky sanawdaky hostlara rugsat berilýär, galanlary bloklanýar.';
+  String get extPermNetworkDetail => 'VPN haýyşlaryna diňe aşakdaky hostlara rugsat berilýär.';
 
   @override
   String get extBgTitle => 'Fon işi';
@@ -1308,10 +1238,6 @@ class STk extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# sagat', one: '# sagat');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Sora açyk wagty, şol sanda traýda wagty hem, tabşyryk meýilnama boýunça işleýär. Iň gysga aralyk 15 minut.';
 
   @override
   String get extBgDisabledNote => 'Fon işini dolandyrmak üçin giňeldişi işjeňleşdiriň.';
@@ -1345,13 +1271,7 @@ class STk extends S {
   String get qrCopyLink => 'Baglanyşygy göçüriň';
 
   @override
-  String get qrShowLink => 'Baglanyşyk görkeziň';
-
-  @override
-  String get qrHideLink => 'Baglanyşygy gizläň';
-
-  @override
-  String get qrWarning => 'Bu QR kody birikme maglumatlaryny öz içine alýar. Nätanyş adamlara görkezmäň.';
+  String get qrWarning => 'Kody diňe ynanýan adamlaryňyz bilen paýlaşyň.';
 
   @override
   String get qrScanHint => 'QR kodly ekran suratyny ýa-da suraty saýlaň, ýa-da salgyny goýuň';
@@ -1467,6 +1387,9 @@ class STk extends S {
 
   @override
   String get sortBy => 'tertipläň';
+
+  @override
+  String get sortSubscription => 'Abunadaky tertipde';
 
   @override
   String get sortPing => 'Ping';
@@ -1804,15 +1727,9 @@ class STk extends S {
   String get customServerHideSecret => 'Gizlin maglumaty gizle';
 
   @override
-  String get customServerBadge => 'şahsy';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” serwerini pozuň?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Serweri el bilen goşuň: salgy, port we protokol';
 
   @override
   String get customServerTest => 'Synag';
@@ -1982,10 +1899,6 @@ class STk extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks üçin: usul:açar sözi, mysal üçin chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Paket almak';
 
   @override
@@ -2004,8 +1917,7 @@ class STk extends S {
   String get extErrRevoked => 'Sora topary bu giňeltmäniň wersiýasyny howply ýa-da bozuk bolany üçin yzyna aldy.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Yzyna alnan giňeltmeleriň sanawyny täzeläp bolmady. Täzelenýänçä gurnamak ýapyk: tory barlaň we täzeden synanyşyň.';
+  String get extErrRevocationsExpired => 'Ýatyrylan giňeltmeleriň sanawy täzelenýänçä gurnama petiklenen.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2051,4 +1963,39 @@ class STk extends S {
 
   @override
   String get extAssetRejected => 'Giňeltmäniň faýly ret edildi: okalmaýan reňkler ýa-da nädogry düzgünler.';
+
+  @override
+  String get extVerifiedSora => 'Sora tarapyndan barlanan';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Aç';
+
+  @override
+  String get customServerOwn => 'Şahsy serwer';
+
+  @override
+  String get customServerPaste => 'Salgyny goý';
+
+  @override
+  String get customServerUser => 'Ulanyjy ady';
+
+  @override
+  String get customServerPassword => 'Açar sözi';
+
+  @override
+  String get customServerSecretRequired => 'Baha giriziň';
+
+  @override
+  String get customServerLinkInvalid => 'Serwer salgysy nädogry';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

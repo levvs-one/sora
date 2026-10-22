@@ -124,14 +124,14 @@ func validateServer(what, server string, required bool) error {
 		}
 		return nil
 	}
-	if strings.ContainsAny(server, "/@:? ") {
-		return fmt.Errorf("%s: server %q must be a bare host or address", what, server)
-	}
 	if strings.HasPrefix(server, "[") && strings.HasSuffix(server, "]") {
 		server = server[1 : len(server)-1]
 	}
 	if net.ParseIP(server) != nil {
 		return nil
+	}
+	if strings.ContainsAny(server, "/@:? ") {
+		return fmt.Errorf("%s: server %q must be a bare host or address", what, server)
 	}
 	if !isDomain(server) {
 		return fmt.Errorf("%s: server %q is not a valid hostname", what, server)

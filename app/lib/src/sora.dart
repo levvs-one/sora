@@ -476,6 +476,8 @@ class Sora extends ChangeNotifier {
       for (final s in _subscriptions.values)
         for (final o in s.outbounds)
           if (seen.add(o.id) && !hidden.contains(o.id)) o,
+      for (final server in customServers)
+        if (server.hasOutbound() && seen.add(server.outbound.id)) server.outbound,
     ];
   }
 
@@ -1622,8 +1624,8 @@ class Sora extends ChangeNotifier {
         ),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
-      _subscriptions[answer.state.settings.id] = answer.state;
-      notifyListeners();
+      // The watch owns insertion order, including when a save response
+      // races the initial snapshot. Inserting here could overtake it.
       _noteSyncChanged();
       return null;
     } catch (error) {
@@ -1709,6 +1711,27 @@ class Sora extends ChangeNotifier {
   /// User-added servers, stored by the core outside subscriptions.
   final List<CustomServer> _customServers = [];
   List<CustomServer> get customServers => List.unmodifiable(_customServers);
+  List<String> customProtocols = [
+    for (final p in CustomProtocol.values)
+      if (p != CustomProtocol.CUSTOM_PROTOCOL_UNSPECIFIED) p.name.replaceFirst('CUSTOM_PROTOCOL_', '').toLowerCase(),
+  ];
+
+  /// Uses the same parser as subscriptions, without persisting the draft.
+  Future<PreviewCustomServerResponse> previewCustomServer(String text) async {
+    final link = _link;
+    if (link == null) throw CoreFailure.unavailable;
+    try {
+      final answer = await link.custom.previewCustomServer(
+        PreviewCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, link: text),
+        options: CallOptions(timeout: const Duration(seconds: 10)),
+      );
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      return answer;
+    } on GrpcError catch (error) {
+      if (error.code == StatusCode.unimplemented) throw const CoreFailure('core.api.version_mismatch');
+      rethrow;
+    }
+  }
 
   /// Loads custom servers after the core link opens. The service lands with
   /// the core update; until then the section simply stays empty.
@@ -1724,6 +1747,7 @@ class Sora extends ChangeNotifier {
       _customServers
         ..clear()
         ..addAll(answer.servers);
+      if (answer.protocols.isNotEmpty) customProtocols = answer.protocols.toList();
       recovered('custom-servers');
       notifyListeners();
     } catch (error) {
@@ -1735,16 +1759,25 @@ class Sora extends ChangeNotifier {
   /// Saves a new custom server; the core assigns its id (an empty id creates,
   /// a set id updates). Returns null on success; failures are reported
   /// through the notification stream.
-  Future<CoreFailure?> addCustomServer(CustomServer server) => _call(() async {
+  Future<CoreFailure?> addCustomServer(CustomServer server, {bool replaceCredentials = false}) => _call(() async {
     final link = _link!;
     final answer = await link.custom.saveCustomServer(
-      SaveCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
+      SaveCustomServerRequest(
+        apiVersion: apiVersion,
+        controlAuthenticator: link.token,
+        server: server,
+        replaceCredentials: replaceCredentials,
+      ),
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
     // Upsert, not append: the sync bridge re-saves known ids (update path),
     // and appending would duplicate the entry in the list.
-    _customServers.removeWhere((s) => s.id == answer.server.id);
-    _customServers.add(answer.server);
+    final index = _customServers.indexWhere((s) => s.id == answer.server.id);
+    if (index < 0) {
+      _customServers.add(answer.server);
+    } else {
+      _customServers[index] = answer.server;
+    }
     notifyListeners();
     _noteSyncChanged();
   });
@@ -2349,7 +2382,9 @@ SessionPlan buildPlan({
     final others = [
       for (final o in ordinary)
         if (o.id != choice) o,
-    ]..sort((a, b) => (latency[a.id] ?? 1 << 30).compareTo(latency[b.id] ?? 1 << 30));
+    ];
+    final order = {for (var i = 0; i < ordinary.length; i++) ordinary[i].id: i};
+    others.sort((a, b) => compareAutoSelect(a.id, b.id, 'ping', latency, bandwidth, providerOrder: order));
     plan.groups.add(
       GroupSpec(
         name: Sora.failoverGroup,
@@ -2448,7 +2483,8 @@ double smartScoreOf(
 }
 
 /// Compares two servers for auto-selection. [mode] is ping, speed or smart;
-/// unknown modes fall back to ping. Ties break by ping.
+/// unknown modes and missing speed measurements fall back to ping.
+/// Equal ranking keys retain the provider order.
 int compareAutoSelect(
   String a,
   String b,
@@ -2456,8 +2492,14 @@ int compareAutoSelect(
   Map<String, int?> latency,
   Map<String, ({int bps, DateTime at})> bandwidth, {
   double? Function(String id)? reliabilityOf,
+  Map<String, int> providerOrder = const {},
 }) {
-  int byPing() => (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
+  int byProvider() => (providerOrder[a] ?? 1 << 30).compareTo(providerOrder[b] ?? 1 << 30);
+  int byPing() {
+    final compared = (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
+    return compared != 0 ? compared : byProvider();
+  }
+
   switch (mode) {
     case 'speed':
       final x = freshBandwidthOf(bandwidth, a), y = freshBandwidthOf(bandwidth, b);
@@ -2465,7 +2507,7 @@ int compareAutoSelect(
         if (x == null) return 1;
         if (y == null) return -1;
         final bySpeed = y.compareTo(x);
-        if (bySpeed != 0) return bySpeed;
+        return bySpeed != 0 ? bySpeed : byProvider();
       }
       return byPing();
     case 'smart':
@@ -2475,7 +2517,7 @@ int compareAutoSelect(
         bandwidth,
         reliability: reliabilityOf?.call(b),
       ).compareTo(smartScoreOf(a, latency, bandwidth, reliability: reliabilityOf?.call(a)));
-      return bySmart != 0 ? bySmart : byPing();
+      return bySmart != 0 ? bySmart : byProvider();
     default:
       return byPing();
   }
@@ -2490,9 +2532,19 @@ OutboundSpec _fastest(
   String autoSelect = 'ping',
   double? Function(String id)? reliabilityOf,
 }) {
+  final order = {for (var i = 0; i < profiles.length; i++) profiles[i].id: i};
   var best = profiles.first;
   for (final o in profiles) {
-    if (compareAutoSelect(o.id, best.id, autoSelect, latency, bandwidth, reliabilityOf: reliabilityOf) < 0) {
+    if (compareAutoSelect(
+          o.id,
+          best.id,
+          autoSelect,
+          latency,
+          bandwidth,
+          reliabilityOf: reliabilityOf,
+          providerOrder: order,
+        ) <
+        0) {
       best = o;
     }
   }

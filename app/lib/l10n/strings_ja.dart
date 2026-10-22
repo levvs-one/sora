@@ -867,7 +867,7 @@ class SJa extends S {
 
   @override
   String get modesGuide =>
-      'サーバーにどのエンジンが必要かわからない場合は、「自動」を選択してください。 Sora は接続前にプロファイルと設定を確認します。 エンジンはプランの帯域幅を増やすことはできません。パフォーマンスはサーバー、ルート、プロトコル、ネットワークに依存します。\n\n## モード\n\n### すべてのトラフィック (TUN)\n\nSora は、仮想ネットワーク インターフェイスを作成し、TCP や UDP などのアプリケーション トラフィックをそのインターフェイス経由でルーティングします。 このモードは、Telegram、ゲーム、および Discord 音声に使用します。 ルールでは、特定のサイトやプログラムを直接送信したり、ブロックしたりできます。 ネットワーク サービスには、許可と、必要なプロトコルをサポートするサーバーが必要です。\n\n### System プロキシ\n\nSora は、ローカル HTTP/SOCKS プロキシを構成します。 システムのプロキシ設定を尊重するアプリケーションはこれを使用します。 独自のネットワーク スタックを持つアプリケーションは直接接続できます。 UDP および音声通話には通常、TUN が必要です。 このモードは、プロキシをサポートするブラウザとアプリケーションに適しています。\n\n### サーバーがありません\n\nLinux では、Sora は [zapret](https://github.com/bol-van/zapret) を使用して HTTP/TLS リクエストを分割および再形成し、一部の DPI チェックをバイパスします。 IP は変更されず、接続は Web サイトに直接接続されます。 結果はプロバイダーとブロック方法によって異なります。\n\n現在の統合では、HTTP および TLS over TCP に tpws を使用します。 IP ブロッキングや UDP の中継はバイパスせず、Telegram の MTProto 接続を保証することはできません。 Discord 音声、Telegram 通話、およびこれらの種類の制限には、TUN を備えた VPN サーバーを使用します。\n\n## エンジン\n\n### 自動\n\nSora は、接続プラン全体 (サーバー プロトコル、トランスポート、グループ、フラグメンテーション、モード) をサポートする、インストールされているエンジンを選択します。 互換性のない手動選択は、現在の接続を停止する前に拒否されます。 [自動] または別のエンジンを選択し、設定を再度適用します。\n\n### sing-box\n\n新しい Sora パッケージには、[sing-box](https://github.com/SagerNet/sing-box) のフォークである [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) が含まれており、クライアント側 XHTTP および VLESS Encryption が追加されています。 Sora は、ビルドとその機能を認識します。 XHTTP のないアップストリーム ビルドでは、名前だけではこの機能が得られません。\n\n対応するプロトコルは VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard、および Sora が読み込める AmneziaWG 1.x/2.x のパラメーターです。完全な Xray JSON プロファイルには Xray が必要です。新しい AWG 3.x のフィールドはまだ読み込めません。sing-box はパスワードで保護されたローカル制御ポートを使用し、このポートは同じコンピューターの他のアプリから検出できます。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) は、VLESS、REALITY、XHTTP、VLESS Encryption、および TLS フラグメンテーションをサポートします。 また、ルーティングとグループを維持しながら、完全なプロバイダー Xray プロファイルを実行します。 このようなプロファイルは、動作を変更せずに別のエンジンに自動的に変換できません。\n\nバンドルされている Xray では、TLS 証明書の検証を無効にする設定 (`allowInsecure`) が削除されました。 この設定が必要な通常のサーバーでは、sing-box または mihomo が自動的に選択されます。 Xray を選択すると、現在の接続を停止する前に非互換性が手動で報告されます。 古い完全な JSON プロファイルには、検証可能な証明書または証明書 PIN を含む更新されたプロバイダー プロファイルが必要です。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) は、順序付けされたフォールバックおよび負荷分散グループ、XHTTP および AmneziaWG をサポートします。 バックアップ サーバーへの自動フェイルオーバーが重要な場合に選択してください。 Sora の TLS フラグメンテーション設定は、このエンジンでは使用できません。\n\n## Sora の互換性\n\n| 特集 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN と TCP/UDP | はい | はい | はい |\n| XHTTP | はい | はい | はい |\n| VLESS Encryption | はい | はい | はい |\n| Xray の全プロフィール | いいえ | はい | いいえ |\n| TUIC / AnyTLS | 両方 | いいえ | TUIC |\n| TLS フラグメンテーション | はい | はい | いいえ |\n| AmneziaWG 1.x/2.x | はい¹ | いいえ | はい |\n| 順序付けされたフォールバック グループ | いいえ | いいえ² | はい |\n\n¹ J1/J2/J3/Itime のプロファイルは mihomo を使用します。 これらのフィールドは決して黙って破棄してはなりません。 ² 完全な Xray プロファイルのグループの場合、アプリはバックアップ プロファイルを選択します。 サポートはインストールされているビルドによって異なります。 「バージョン情報」でバージョンを確認してください。\n\n## TUN スタック\n\nスタックは仮想インターフェイス内で TCP と UDP を処理します。 モード パネルでは、Xray および mihomo は、gVisor、System、Mixed、および MIPS を提供します。 各エンジンは独自の設定を保存します。 System プロキシ モードとサーバーレス モードでは、この設定は使用されません。\n\n- **Mixed** - TCP はシステム スタックを使用し、gVisor は UDP を処理します。 Linux では mihomo のデフォルトです。Windows では Xray と mihomo のデフォルトは MIPS です。\n- **System**: システム スタックを使用します。 ネットワーク アプリケーションに問題が発生した場合は、別のオプションを試してください。\n- **gVisor**: ユーザー空間のトラフィックを処理します。\n- **MIPS**: mihomo 独自の IP スタック。バンドルされたバージョン 1.19.32 で利用可能。\n\nLinux では、Xray はデフォルトで組み込みの gVisor を使用します。 Linux の System、Mixed、および MIPS は、TUN エンジンとして mihomo を使用し、認証されたローカル SOCKS リンク経由で TCP と UDP を Xray に転送します。 Xray は、プロトコル、プロバイダー プロファイル、およびルーティングを保持します。 これら 3 つのオプションには、mihomo がインストールされている必要があります。 Windows では、Xray は4種類すべてのTUNスタックに mihomo 1.19.32 以降を使用します。プロトコルとルーティングは Xray が処理します。この構成のアプリケーションルールは直接接続とブロックのみ対応します。Linux では、これらのルールには Xray 内蔵の gVisor が必要です。\n\nブリッジは 2 番目のプロセスを実行します。 Linux での 3 つのアイドル状態の測定では、ネイティブ Xray TUN よりも約 32 ～ 36 MiB 多くの物理メモリを使用しました。 これはダウンロードの負荷を測定するものではありません。CPU とメモリのコストは接続によって異なります。 sing-box にはスタック セレクターがありません。 すべてのネットワークでより優れたパフォーマンスを保証するスタックはありません。 スタックを選択し、[適用して再接続] を選択して、ネットワーク内で試してください。\n\n## 設定を適用する\n\nサーバーを選択すると、自動的に再接続されます。 モード、エンジン、DNS、ルールの設定はすぐに保存されます。 アクティブな接続中に、[適用] をクリックして再接続し、それらを使用します。 エンジンを再起動すると、ダウンロードと通話が中断される場合があります。 クリックを繰り返しても並列接続は開始されません。 切断すると遷移が終了し、接続が解放されます。\n\nVPN 経由のみのインターネットは、トンネルが切断されたときに直接トラフィックをブロックします。 マシン全体に影響します。 明示的に切断すると、Sora のルールが削除されます。 クリーンアップが完了しない場合は、切断を再試行してログを開きます。\n\n## プロジェクトのドキュメント\n\n- [sing-box-lx: 構成とサポート](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ドキュメント](https://sing-box.sagernet.org/)\n- [Xray ドキュメント](https://xtls.github.io/)\n- [mihomo ドキュメント](https://wiki.metacubex.one/)\n- [zapret: 操作と制限事項](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'サーバーにどのエンジンが必要かわからない場合は、「自動」を選択してください。 Sora は接続前にプロファイルと設定を確認します。 エンジンはプランの帯域幅を増やすことはできません。パフォーマンスはサーバー、ルート、プロトコル、ネットワークに依存します。\n\n## モード\n\n### すべてのトラフィック (TUN)\n\nSora は、仮想ネットワーク インターフェイスを作成し、TCP や UDP などのアプリケーション トラフィックをそのインターフェイス経由でルーティングします。 このモードは、Telegram、ゲーム、および Discord 音声に使用します。 ルールでは、特定のサイトやプログラムを直接送信したり、ブロックしたりできます。 ネットワーク サービスには、許可と、必要なプロトコルをサポートするサーバーが必要です。\n\n### System プロキシ\n\nSora は、ローカル HTTP/SOCKS プロキシを構成します。 システムのプロキシ設定を尊重するアプリケーションはこれを使用します。 独自のネットワーク スタックを持つアプリケーションは直接接続できます。 UDP および音声通話には通常、TUN が必要です。 このモードは、プロキシをサポートするブラウザとアプリケーションに適しています。\n\n### サーバーがありません\n\nLinux では、Sora は [zapret](https://github.com/bol-van/zapret) を使用して HTTP/TLS リクエストを分割および再形成し、一部の DPI チェックをバイパスします。 IP は変更されず、接続は Web サイトに直接接続されます。 結果はプロバイダーとブロック方法によって異なります。\n\n現在の統合では、HTTP および TLS over TCP に tpws を使用します。 IP ブロッキングや UDP の中継はバイパスせず、Telegram の MTProto 接続を保証することはできません。 Discord 音声、Telegram 通話、およびこれらの種類の制限には、TUN を備えた VPN サーバーを使用します。\n\n## エンジン\n\n### 自動\n\nSora は、接続プラン全体 (サーバー プロトコル、トランスポート、グループ、フラグメンテーション、モード) をサポートする、インストールされているエンジンを選択します。 互換性のない手動選択は、現在の接続を停止する前に拒否されます。 [自動] または別のエンジンを選択し、設定を再度適用します。\n\n### sing-box\n\n新しい Sora パッケージには、[sing-box](https://github.com/SagerNet/sing-box) のフォークである [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) が含まれており、クライアント側 XHTTP および VLESS Encryption が追加されています。 Sora は、ビルドとその機能を認識します。 XHTTP のないアップストリーム ビルドでは、名前だけではこの機能が得られません。\n\n対応するプロトコルは VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard、および Sora が読み込める AmneziaWG 1.x/2.x のパラメーターです。完全な Xray JSON プロファイルには Xray が必要です。新しい AWG 3.x のフィールドはまだ読み込めません。sing-box はパスワードで保護されたローカル制御ポートを使用し、このポートは同じコンピューターの他のアプリから検出できます。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) は、VLESS、REALITY、XHTTP、VLESS Encryption、および TLS フラグメンテーションをサポートします。 また、ルーティングとグループを維持しながら、完全なプロバイダー Xray プロファイルを実行します。 このようなプロファイルは、動作を変更せずに別のエンジンに自動的に変換できません。\n\nバンドルされている Xray では、TLS 証明書の検証を無効にする設定 (`allowInsecure`) が削除されました。 この設定が必要な通常のサーバーでは、sing-box または mihomo が自動的に選択されます。 Xray を選択すると、現在の接続を停止する前に非互換性が手動で報告されます。 古い完全な JSON プロファイルには、検証可能な証明書または証明書 PIN を含む更新されたプロバイダー プロファイルが必要です。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) は、順序付けされたフォールバックおよび負荷分散グループ、XHTTP および AmneziaWG をサポートします。 バックアップ サーバーへの自動フェイルオーバーが重要な場合に選択してください。 Sora の TLS フラグメンテーション設定は、このエンジンでは使用できません。\n\n## Sora の互換性\n\n| 特集 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN と TCP/UDP | はい | はい | はい |\n| XHTTP | はい | はい | はい |\n| VLESS Encryption | はい | はい | はい |\n| Xray の全プロフィール | いいえ | はい | いいえ |\n| TUIC / AnyTLS | 両方 | いいえ | TUIC |\n| mieru | いいえ | いいえ | はい |\n| NaiveProxy | はい | いいえ | いいえ |\n| TLS フラグメンテーション | はい | はい | いいえ |\n| AmneziaWG 1.x/2.x | はい¹ | いいえ | はい |\n| 順序付けされたフォールバック グループ | いいえ | いいえ² | はい |\n\n¹ J1/J2/J3/Itime のプロファイルは mihomo を使用します。 これらのフィールドは決して黙って破棄してはなりません。 ² 完全な Xray プロファイルのグループの場合、アプリはバックアップ プロファイルを選択します。 サポートはインストールされているビルドによって異なります。 「バージョン情報」でバージョンを確認してください。\n\n## TUN スタック\n\nスタックは仮想インターフェイス内で TCP と UDP を処理します。 モード パネルでは、Xray および mihomo は、gVisor、System、Mixed、および MIPS を提供します。 各エンジンは独自の設定を保存します。 System プロキシ モードとサーバーレス モードでは、この設定は使用されません。\n\n- **Mixed** - TCP はシステム スタックを使用し、gVisor は UDP を処理します。 Linux では mihomo のデフォルトです。Windows では Xray と mihomo のデフォルトは MIPS です。\n- **System**: システム スタックを使用します。 ネットワーク アプリケーションに問題が発生した場合は、別のオプションを試してください。\n- **gVisor**: ユーザー空間のトラフィックを処理します。\n- **MIPS**: mihomo 独自の IP スタック。バンドルされたバージョン 1.19.32 で利用可能。\n\nLinux では、Xray はデフォルトで組み込みの gVisor を使用します。 Linux の System、Mixed、および MIPS は、TUN エンジンとして mihomo を使用し、認証されたローカル SOCKS リンク経由で TCP と UDP を Xray に転送します。 Xray は、プロトコル、プロバイダー プロファイル、およびルーティングを保持します。 これら 3 つのオプションには、mihomo がインストールされている必要があります。 Windows では、Xray は4種類すべてのTUNスタックに mihomo 1.19.32 以降を使用します。プロトコルとルーティングは Xray が処理します。この構成のアプリケーションルールは直接接続とブロックのみ対応します。Linux では、これらのルールには Xray 内蔵の gVisor が必要です。\n\nブリッジは 2 番目のプロセスを実行します。 Linux での 3 つのアイドル状態の測定では、ネイティブ Xray TUN よりも約 32 ～ 36 MiB 多くの物理メモリを使用しました。 これはダウンロードの負荷を測定するものではありません。CPU とメモリのコストは接続によって異なります。 sing-box にはスタック セレクターがありません。 すべてのネットワークでより優れたパフォーマンスを保証するスタックはありません。 スタックを選択し、[適用して再接続] を選択して、ネットワーク内で試してください。\n\n## 設定を適用する\n\nサーバーを選択すると、自動的に再接続されます。 モード、エンジン、DNS、ルールの設定はすぐに保存されます。 アクティブな接続中に、[適用] をクリックして再接続し、それらを使用します。 エンジンを再起動すると、ダウンロードと通話が中断される場合があります。 クリックを繰り返しても並列接続は開始されません。 切断すると遷移が終了し、接続が解放されます。\n\nVPN 経由のみのインターネットは、トンネルが切断されたときに直接トラフィックをブロックします。 マシン全体に影響します。 明示的に切断すると、Sora のルールが削除されます。 クリーンアップが完了しない場合は、切断を再試行してログを開きます。\n\n## プロジェクトのドキュメント\n\n- [sing-box-lx: 構成とサポート](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box ドキュメント](https://sing-box.sagernet.org/)\n- [Xray ドキュメント](https://xtls.github.io/)\n- [mihomo ドキュメント](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: 操作と制限事項](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC は Jitsi、Yandex Telemost、WB Stream のビデオ通話を通じて TCP を転送します。olcrtc:// リンクまたは QR コードをインポートしてください。プロキシと TUN モードで sing-box、Xray、mihomo に対応します。UDP には対応していません。両端で互換性のある OLC2 ビルドが必要です。元のプロジェクトはアーカイブされています。\n';
 
   @override
   String get probeServers => 'サーバーを確認する';
@@ -894,35 +894,7 @@ class SJa extends S {
   String get extInstallOne => 'インストール数: 1';
 
   @override
-  String get extBadgeVerified => '確認済み';
-
-  @override
-  String get extBadgeTop => '今週の一番人気';
-
-  @override
-  String get extBadgeNew => '新しい';
-
-  @override
-  String get extBadgeStaff => 'Soraチーム';
-
-  @override
-  String get extSideloadShort => 'カタログ外';
-
-  @override
-  String get extSideloadWarning => 'この拡張子はチームカタログからのものではありません。作成者だけがキーを保証しています。作成者を信頼できる場合にのみインストールしてください。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '「$name」をインストール';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '「$name」を更新';
-  }
-
-  @override
-  String get extPermissionsIntro => 'この拡張機能では次のことが可能になります。';
+  String get extSideloadWarning => '作者の自己署名鍵を信頼できる場合のみインストールしてください。';
 
   @override
   String get extPermissionsWidened => 'アップデートでは新しい権限が求められます。';
@@ -1048,9 +1020,6 @@ class SJa extends S {
       'このアップデートは、インストールされているバージョンとは異なる作成者キーで署名されているため、ブロックされました。新しいキーを信頼する場合は、拡張機能をアンインストールし、明示的に再度インストールしてください。';
 
   @override
-  String get extUpdateAvailable => 'アップデートあり';
-
-  @override
   String get extDisabled => '無効';
 
   @override
@@ -1093,9 +1062,6 @@ class SJa extends S {
   String get extConflictsTitle => '拡張子の競合';
 
   @override
-  String get extConflictsIntro => 'これらの拡張機能は同じものを使おうとしています。動かす方を選んでください。もう一方はインストールされたままです。';
-
-  @override
   String get extConflictTheme => 'アプリテーマ';
 
   @override
@@ -1115,27 +1081,9 @@ class SJa extends S {
   String get extConflictsResolve => '競合を解決する';
 
   @override
-  String get extConflictNote => '選択はこのデバイスに保存されます。テーマはすぐに切り替わります。ネットワークフックはこのバージョンでは実行されません。';
-
-  @override
   String extVersionLabel(String version) {
     return 'バージョン$version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '評価';
-
-  @override
-  String get extInstalls => 'インストール数';
-
-  @override
-  String get extVersion => 'バージョン';
-
-  @override
-  String get extAbout => 'この拡張機能について';
 
   @override
   String get extPermissionsTitle => '権限';
@@ -1148,9 +1096,6 @@ class SJa extends S {
 
   @override
   String get extSaveSettings => '設定の保存';
-
-  @override
-  String get extSaving => '保存中…';
 
   @override
   String extUpdateTo(String version) {
@@ -1179,7 +1124,7 @@ class SJa extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'パネルが使用できません。拡張機能が無効になっているか、削除されている可能性があります。';
+  String get extPanelUnavailable => '拡張機能のパネルを利用できません。';
 
   @override
   String get extPermConnectionsRead => 'アクティブな接続のリストを参照';
@@ -1218,9 +1163,6 @@ class SJa extends S {
   String get extPermBackground => 'バックグラウンドタスクを実行する';
 
   @override
-  String get extPermBackgroundDetail => 'パネルが閉じている場合でも、スケジュールされたタスクを実行します。拡張機能の設定で一時停止したり、実行頻度を変更したりできます。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1253,20 +1195,13 @@ class SJa extends S {
   String get extImageFailed => '画像を読み込めませんでした';
 
   @override
-  String get extRatingHow => '評価の仕組み';
-
-  @override
-  String get extRatingHowBody =>
-      '評価にはベイズ平均が使用されます。評価の少ない拡張機能は、より多くの人が投票するまで中央付近に留まるため、1 つの 5 つ星のレビューによって新しい拡張機能を上位に押し上げることはできません。最近の評価は古い評価よりも重みがあり、アカウントごとに 1 つの評価のみがカウントされます。';
-
-  @override
   String get extScreenshots => 'スクリーンショット';
 
   @override
   String get extSortRelevance => '関連性';
 
   @override
-  String get extPermNetworkDetail => 'VPN 経由でインターネットからデータを取得します。許可されるのは下のホストだけで、それ以外はブロックされます。';
+  String get extPermNetworkDetail => 'VPN 経由のリクエストは以下のホストにのみ許可されます。';
 
   @override
   String get extBgTitle => 'バックグラウンドタスク';
@@ -1288,9 +1223,6 @@ class SJa extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 時間');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => 'Sora を開いている間はトレイにある場合も含め、タスクがスケジュールどおり実行されます。最短間隔は 15 分です。';
 
   @override
   String get extBgDisabledNote => '拡張機能がバックグラウンド タスクを管理できるようにします。';
@@ -1324,13 +1256,7 @@ class SJa extends S {
   String get qrCopyLink => 'リンクをコピー';
 
   @override
-  String get qrShowLink => 'リンクを表示';
-
-  @override
-  String get qrHideLink => 'リンクを隠す';
-
-  @override
-  String get qrWarning => 'この QR コードには接続の詳細が含まれています。見知らぬ人に見せないでください。';
+  String get qrWarning => '信頼できる人にだけコードを共有してください。';
 
   @override
   String get qrScanHint => 'QR コードを含むスクリーンショットや写真を選ぶか、リンクを貼り付けてください';
@@ -1445,6 +1371,9 @@ class SJa extends S {
 
   @override
   String get sortBy => '並べ替え順';
+
+  @override
+  String get sortSubscription => 'サブスクリプションの順序';
 
   @override
   String get sortPing => 'ピン';
@@ -1781,15 +1710,9 @@ class SJa extends S {
   String get customServerHideSecret => '秘密を隠す';
 
   @override
-  String get customServerBadge => 'カスタム';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'サーバー「$name」を削除しますか?';
   }
-
-  @override
-  String get customServerEmptyHint => 'サーバーを手動で追加します: アドレス、ポート、プロトコル';
 
   @override
   String get customServerTest => 'テスト';
@@ -1956,9 +1879,6 @@ class SJa extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)';
-
-  @override
   String get diagnosticPackets => 'パケットキャプチャ';
 
   @override
@@ -1977,7 +1897,7 @@ class SJa extends S {
   String get extErrRevoked => 'この拡張機能のバージョンは安全でないか壊れているため、Sora チームが取り消しました。';
 
   @override
-  String get extErrRevocationsExpired => '取り消された拡張機能のリストを更新できませんでした。更新されるまでインストールできません。ネットワークを確認して再試行してください。';
+  String get extErrRevocationsExpired => '失効リストが更新されるまでインストールはブロックされます。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2023,4 +1943,39 @@ class SJa extends S {
 
   @override
   String get extAssetRejected => '拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。';
+
+  @override
+  String get extVerifiedSora => 'Sora 認証済み';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count バイト';
+  }
+
+  @override
+  String get extOpen => '開く';
+
+  @override
+  String get customServerOwn => '自分のサーバー';
+
+  @override
+  String get customServerPaste => 'リンクを貼り付け';
+
+  @override
+  String get customServerUser => 'ユーザー名';
+
+  @override
+  String get customServerPassword => 'パスワード';
+
+  @override
+  String get customServerSecretRequired => '値を入力してください';
+
+  @override
+  String get customServerLinkInvalid => 'サーバーリンクが無効です';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

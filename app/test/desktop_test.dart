@@ -15,21 +15,32 @@ void main() {
         add('sora://add/https://sub.example.com/s/abc?flag=1').url.toString(),
         'https://sub.example.com/s/abc?flag=1',
       );
-      expect(add('happ://add/https://sub.example.com/s/abc').url.host, 'sub.example.com');
-      expect(add('happ://add/https%3A%2F%2Fsub.example.com%2Fs%2Fabc').url.path, '/s/abc');
-      expect(add('HAPP://ADD/https://sub.example.com/x').url.path, '/x');
+      expect(Uri.parse(add('happ://add/https://sub.example.com/s/abc').url).host, 'sub.example.com');
+      expect(Uri.parse(add('happ://add/https%3A%2F%2Fsub.example.com%2Fs%2Fabc').url).path, '/s/abc');
+      expect(Uri.parse(add('HAPP://ADD/https://sub.example.com/x').url).path, '/x');
     });
 
     test('the links of other clients are read too, with their names', () {
       final v2 = add('v2rayn://install-config?url=https%3A%2F%2Fsub.example.com%2Fa');
       expect(v2.url.toString(), 'https://sub.example.com/a');
       final clash = add('clash://install-config?url=https%3A%2F%2Fsub.example.com%2Fb&name=Work');
-      expect((clash.url.path, clash.name), ('/b', 'Work'));
+      expect((Uri.parse(clash.url).path, clash.name), ('/b', 'Work'));
       final hiddify = add('hiddify://import/https://sub.example.com/c#My%20VPN');
-      expect((hiddify.url.path, hiddify.name), ('/c', 'My VPN'));
+      expect((Uri.parse(hiddify.url).path, hiddify.name), ('/c', 'My VPN'));
       final singbox = add('sing-box://import-remote-profile?url=https%3A%2F%2Fsub.example.com%2Fd#Home');
-      expect((singbox.url.path, singbox.name), ('/d', 'Home'));
+      expect((Uri.parse(singbox.url).path, singbox.name), ('/d', 'Home'));
       expect(add('sora://add?url=https%3A%2F%2Fsub.example.com%2Fe&name=NL').name, 'NL');
+    });
+
+    test('community links keep credentials, transport and repeated port pairs for QR imports', () {
+      for (final text in [
+        'mieru://CjoKCUNvbW11bml0eRIZCgVhbGljZRIQcHJpdmF0ZS1wYXNzd29yZBoSCgkxMjcuMC4wLjEaBQi7AxAC',
+        'mierus://alice:p%40ss%2Bword@example.com?profile=Community&port=443&protocol=TCP&port=4400-4402&protocol=UDP',
+        'naive+https://alice:p%40ss%2Bword@example.com:443/?extra-headers=X-Test%3A%20secret#Community',
+        'naive+quic://alice:password@[2001:db8::1]:443/#Community',
+      ]) {
+        expect(add(text).url.toString(), text);
+      }
     });
 
     test('a link Happ encrypted is recognised, not mistaken for a subscription', () {

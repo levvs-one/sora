@@ -866,7 +866,7 @@ class SZh extends S {
 
   @override
   String get modesGuide =>
-      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。 选择一个堆栈并选择“应用并重新连接”以在您的网络中进行尝试。\n\n## 应用设置\n\n选择服务器会自动重新连接。 模式、引擎、DNS和规则设置立即保存； 在活动连接期间，单击应用并重新连接即可使用它们。 重新启动引擎可能会中断下载和调用。 重复点击不会启动并行连接； 断开连接结束转换并释放连接。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。 选择一个堆栈并选择“应用并重新连接”以在您的网络中进行尝试。\n\n## 应用设置\n\n选择服务器会自动重新连接。 模式、引擎、DNS和规则设置立即保存； 在活动连接期间，单击应用并重新连接即可使用它们。 重新启动引擎可能会中断下载和调用。 重复点击不会启动并行连接； 断开连接结束转换并释放连接。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
 
   @override
   String get probeServers => '检查服务器';
@@ -893,35 +893,7 @@ class SZh extends S {
   String get extInstallOne => '1 次安装';
 
   @override
-  String get extBadgeVerified => '已验证';
-
-  @override
-  String get extBadgeTop => '本周热门';
-
-  @override
-  String get extBadgeNew => '新';
-
-  @override
-  String get extBadgeStaff => 'Sora 团队';
-
-  @override
-  String get extSideloadShort => '非目录来源';
-
-  @override
-  String get extSideloadWarning => '非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '安装「$name」';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '更新「$name」';
-  }
-
-  @override
-  String get extPermissionsIntro => '此扩展将能够：';
+  String get extSideloadWarning => '仅在信任作者的自签名密钥时安装。';
 
   @override
   String get extPermissionsWidened => '此更新要求新的权限：';
@@ -1046,9 +1018,6 @@ class SZh extends S {
   String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
 
   @override
-  String get extUpdateAvailable => '有可用更新';
-
-  @override
   String get extDisabled => '已停用';
 
   @override
@@ -1091,9 +1060,6 @@ class SZh extends S {
   String get extConflictsTitle => '扩展冲突';
 
   @override
-  String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
-
-  @override
   String get extConflictTheme => '应用主题';
 
   @override
@@ -1113,27 +1079,9 @@ class SZh extends S {
   String get extConflictsResolve => '解决冲突';
 
   @override
-  String get extConflictNote => '你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。';
-
-  @override
   String extVersionLabel(String version) {
     return '版本 $version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '评分';
-
-  @override
-  String get extInstalls => '安装次数';
-
-  @override
-  String get extVersion => '版本';
-
-  @override
-  String get extAbout => '关于';
 
   @override
   String get extPermissionsTitle => '权限';
@@ -1146,9 +1094,6 @@ class SZh extends S {
 
   @override
   String get extSaveSettings => '保存设置';
-
-  @override
-  String get extSaving => '正在保存…';
 
   @override
   String extUpdateTo(String version) {
@@ -1177,7 +1122,7 @@ class SZh extends S {
   }
 
   @override
-  String get extPanelUnavailable => '面板无法使用，扩展可能已停用或移除。';
+  String get extPanelUnavailable => '扩展面板不可用。';
 
   @override
   String get extPermConnectionsRead => '查看目前的连接清单';
@@ -1216,9 +1161,6 @@ class SZh extends S {
   String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermBackgroundDetail => '即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1251,19 +1193,13 @@ class SZh extends S {
   String get extImageFailed => '无法加载图片';
 
   @override
-  String get extRatingHow => '评分计算方式';
-
-  @override
-  String get extRatingHowBody => '评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。';
-
-  @override
   String get extScreenshots => '截图';
 
   @override
   String get extSortRelevance => '相关性';
 
   @override
-  String get extPermNetworkDetail => '通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。';
+  String get extPermNetworkDetail => 'VPN 请求仅限访问以下主机。';
 
   @override
   String get extBgTitle => '后台任务';
@@ -1285,9 +1221,6 @@ class SZh extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => '只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。';
 
   @override
   String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
@@ -1321,13 +1254,7 @@ class SZh extends S {
   String get qrCopyLink => '复制链接';
 
   @override
-  String get qrShowLink => '显示链接';
-
-  @override
-  String get qrHideLink => '隐藏链接';
-
-  @override
-  String get qrWarning => '此 QR 码含有连接信息，请勿向陌生人展示。';
+  String get qrWarning => '仅与信任的人分享此二维码。';
 
   @override
   String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
@@ -1442,6 +1369,9 @@ class SZh extends S {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '按订阅顺序';
 
   @override
   String get sortPing => '延迟';
@@ -1777,15 +1707,9 @@ class SZh extends S {
   String get customServerHideSecret => '隐藏密钥';
 
   @override
-  String get customServerBadge => '自订';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '要删除服务器「$name」吗？';
   }
-
-  @override
-  String get customServerEmptyHint => '手动添加服务器：地址、端口和协议';
 
   @override
   String get customServerTest => '测试';
@@ -1952,9 +1876,6 @@ class SZh extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => '抓包';
 
   @override
@@ -1973,7 +1894,7 @@ class SZh extends S {
   String get extErrRevoked => 'Sora 团队已撤回此扩展版本，因为它不安全或已损坏。';
 
   @override
-  String get extErrRevocationsExpired => '无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。';
+  String get extErrRevocationsExpired => '撤销列表更新前无法安装扩展。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2018,6 +1939,41 @@ class SZh extends S {
 
   @override
   String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+
+  @override
+  String get extVerifiedSora => '经 Sora 验证';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 字节';
+  }
+
+  @override
+  String get extOpen => '打开';
+
+  @override
+  String get customServerOwn => '自有服务器';
+
+  @override
+  String get customServerPaste => '粘贴链接';
+
+  @override
+  String get customServerUser => '用户名';
+
+  @override
+  String get customServerPassword => '密码';
+
+  @override
+  String get customServerSecretRequired => '请输入一个值';
+
+  @override
+  String get customServerLinkInvalid => '服务器链接无效';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2881,7 +2837,7 @@ class SZhHans extends SZh {
 
   @override
   String get modesGuide =>
-      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。 选择一个堆栈并选择“应用并重新连接”以在您的网络中进行尝试。\n\n## 应用设置\n\n选择服务器会自动重新连接。 模式、引擎、DNS和规则设置立即保存； 在活动连接期间，单击应用并重新连接即可使用它们。 重新启动引擎可能会中断下载和调用。 重复点击不会启动并行连接； 断开连接结束转换并释放连接。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。 选择一个堆栈并选择“应用并重新连接”以在您的网络中进行尝试。\n\n## 应用设置\n\n选择服务器会自动重新连接。 模式、引擎、DNS和规则设置立即保存； 在活动连接期间，单击应用并重新连接即可使用它们。 重新启动引擎可能会中断下载和调用。 重复点击不会启动并行连接； 断开连接结束转换并释放连接。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
 
   @override
   String get probeServers => '检查服务器';
@@ -2908,35 +2864,7 @@ class SZhHans extends SZh {
   String get extInstallOne => '1 次安装';
 
   @override
-  String get extBadgeVerified => '已验证';
-
-  @override
-  String get extBadgeTop => '本周热门';
-
-  @override
-  String get extBadgeNew => '新';
-
-  @override
-  String get extBadgeStaff => 'Sora 团队';
-
-  @override
-  String get extSideloadShort => '非目录来源';
-
-  @override
-  String get extSideloadWarning => '非来自团队目录。作者密钥仅由作者自行声明，请只在信任作者时安装。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '安装「$name」';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '更新「$name」';
-  }
-
-  @override
-  String get extPermissionsIntro => '此扩展将能够：';
+  String get extSideloadWarning => '仅在信任作者的自签名密钥时安装。';
 
   @override
   String get extPermissionsWidened => '此更新要求新的权限：';
@@ -3061,9 +2989,6 @@ class SZhHans extends SZh {
   String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
 
   @override
-  String get extUpdateAvailable => '有可用更新';
-
-  @override
   String get extDisabled => '已停用';
 
   @override
@@ -3106,9 +3031,6 @@ class SZhHans extends SZh {
   String get extConflictsTitle => '扩展冲突';
 
   @override
-  String get extConflictsIntro => '这些扩展想要同一样东西。选择让哪个运行，另一个仍保持安装。';
-
-  @override
   String get extConflictTheme => '应用主题';
 
   @override
@@ -3128,27 +3050,9 @@ class SZhHans extends SZh {
   String get extConflictsResolve => '解决冲突';
 
   @override
-  String get extConflictNote => '你的选择会保存在此设备上。主题会立即切换，网络钩子在此版本中不运行。';
-
-  @override
   String extVersionLabel(String version) {
     return '版本 $version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '评分';
-
-  @override
-  String get extInstalls => '安装次数';
-
-  @override
-  String get extVersion => '版本';
-
-  @override
-  String get extAbout => '关于';
 
   @override
   String get extPermissionsTitle => '权限';
@@ -3161,9 +3065,6 @@ class SZhHans extends SZh {
 
   @override
   String get extSaveSettings => '保存设置';
-
-  @override
-  String get extSaving => '正在保存…';
 
   @override
   String extUpdateTo(String version) {
@@ -3192,7 +3093,7 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get extPanelUnavailable => '面板无法使用，扩展可能已停用或移除。';
+  String get extPanelUnavailable => '扩展面板不可用。';
 
   @override
   String get extPermConnectionsRead => '查看目前的连接清单';
@@ -3231,9 +3132,6 @@ class SZhHans extends SZh {
   String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermBackgroundDetail => '即使关闭面板，仍会执行计划工作。您可以在扩展设置中暂停工作或调整执行频率。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -3266,19 +3164,13 @@ class SZhHans extends SZh {
   String get extImageFailed => '无法加载图片';
 
   @override
-  String get extRatingHow => '评分计算方式';
-
-  @override
-  String get extRatingHowBody => '评分采用贝叶斯平均：评分数量较少的扩展会维持在中间值附近，直到有更多人评分，因此单一五星评价无法让新扩展登上榜首。近期评分的权重高于较早的评分，每个账号只计入一笔评分。';
-
-  @override
   String get extScreenshots => '截图';
 
   @override
   String get extSortRelevance => '相关性';
 
   @override
-  String get extPermNetworkDetail => '通过 VPN 从互联网获取数据。只允许下方列出的主机，其余全部阻止。';
+  String get extPermNetworkDetail => 'VPN 请求仅限访问以下主机。';
 
   @override
   String get extBgTitle => '后台任务';
@@ -3300,9 +3192,6 @@ class SZhHans extends SZh {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => '只要 Sora 处于打开状态（包括在托盘中），任务就会按计划运行。最短间隔为 15 分钟。';
 
   @override
   String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
@@ -3336,13 +3225,7 @@ class SZhHans extends SZh {
   String get qrCopyLink => '复制链接';
 
   @override
-  String get qrShowLink => '显示链接';
-
-  @override
-  String get qrHideLink => '隐藏链接';
-
-  @override
-  String get qrWarning => '此 QR 码含有连接信息，请勿向陌生人展示。';
+  String get qrWarning => '仅与信任的人分享此二维码。';
 
   @override
   String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
@@ -3457,6 +3340,9 @@ class SZhHans extends SZh {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '按订阅顺序';
 
   @override
   String get sortPing => '延迟';
@@ -3792,15 +3678,9 @@ class SZhHans extends SZh {
   String get customServerHideSecret => '隐藏密钥';
 
   @override
-  String get customServerBadge => '自订';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '要删除服务器「$name」吗？';
   }
-
-  @override
-  String get customServerEmptyHint => '手动添加服务器：地址、端口和协议';
 
   @override
   String get customServerTest => '测试';
@@ -3967,9 +3847,6 @@ class SZhHans extends SZh {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => '抓包';
 
   @override
@@ -3988,7 +3865,7 @@ class SZhHans extends SZh {
   String get extErrRevoked => 'Sora 团队已撤回此扩展版本，因为它不安全或已损坏。';
 
   @override
-  String get extErrRevocationsExpired => '无法更新已撤回扩展的列表。在更新之前无法安装：请检查网络后重试。';
+  String get extErrRevocationsExpired => '撤销列表更新前无法安装扩展。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -4033,6 +3910,41 @@ class SZhHans extends SZh {
 
   @override
   String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+
+  @override
+  String get extVerifiedSora => '经 Sora 验证';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 字节';
+  }
+
+  @override
+  String get extOpen => '打开';
+
+  @override
+  String get customServerOwn => '自有服务器';
+
+  @override
+  String get customServerPaste => '粘贴链接';
+
+  @override
+  String get customServerUser => '用户名';
+
+  @override
+  String get customServerPassword => '密码';
+
+  @override
+  String get customServerSecretRequired => '请输入一个值';
+
+  @override
+  String get customServerLinkInvalid => '服务器链接无效';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4896,7 +4808,7 @@ class SZhHant extends SZh {
 
   @override
   String get modesGuide =>
-      '如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed**: TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 Linux 上 mihomo 的預設值。在 Windows 上，Xray 和 mihomo 預設使用 MIPS。\n- **System**: 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor**: 處理用戶空間中的流量。\n- **MIPS**: mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows 上，Xray 的四種 TUN 協定堆疊均使用 mihomo 1.19.32 或更新版本。協定與路由仍由 Xray 處理。此組合中的應用程式規則僅支援直連與封鎖；在 Linux 上，這些規則需要 Xray 內建的 gVisor。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。 選擇一個堆疊並選擇“應用並重新連接”以在您的網路中進行嘗試。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。 模式、引擎、DNS和規則設定立即儲存；在活動連線期間，按一下應用並重新連線即可使用它們。 重新啟動引擎可能會中斷下載和呼叫。 重複點擊不會啟動並行連接；斷開連接結束轉換並釋放連接。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      '如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| mieru | 沒有 | 沒有 | 是的 |\n| NaiveProxy | 是的 | 沒有 | 沒有 |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed**: TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 Linux 上 mihomo 的預設值。在 Windows 上，Xray 和 mihomo 預設使用 MIPS。\n- **System**: 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor**: 處理用戶空間中的流量。\n- **MIPS**: mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows 上，Xray 的四種 TUN 協定堆疊均使用 mihomo 1.19.32 或更新版本。協定與路由仍由 Xray 處理。此組合中的應用程式規則僅支援直連與封鎖；在 Linux 上，這些規則需要 Xray 內建的 gVisor。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。 選擇一個堆疊並選擇“應用並重新連接”以在您的網路中進行嘗試。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。 模式、引擎、DNS和規則設定立即儲存；在活動連線期間，按一下應用並重新連線即可使用它們。 重新啟動引擎可能會中斷下載和呼叫。 重複點擊不會啟動並行連接；斷開連接結束轉換並釋放連接。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 透過 Jitsi、Yandex Telemost 或 WB Stream 的視訊通話傳輸 TCP。請匯入 olcrtc:// 連結或 QR 碼。它支援 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支援 UDP。兩端需要相容的 OLC2 建置版本。上游專案已封存。\n';
 
   @override
   String get probeServers => '檢查伺服器';
@@ -4923,35 +4835,7 @@ class SZhHant extends SZh {
   String get extInstallOne => '1 次安裝';
 
   @override
-  String get extBadgeVerified => '已驗證';
-
-  @override
-  String get extBadgeTop => '本週熱門';
-
-  @override
-  String get extBadgeNew => '最新';
-
-  @override
-  String get extBadgeStaff => 'Sora 團隊';
-
-  @override
-  String get extSideloadShort => '非來自目錄';
-
-  @override
-  String get extSideloadWarning => '非來自團隊目錄。作者金鑰僅由作者自行聲明，請只在信任作者時安裝。';
-
-  @override
-  String extInstallTitle(String name) {
-    return '安裝「$name」';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '更新「$name」';
-  }
-
-  @override
-  String get extPermissionsIntro => '此擴充功能將能夠：';
+  String get extSideloadWarning => '僅在信任作者的自簽章金鑰時安裝。';
 
   @override
   String get extPermissionsWidened => '此更新要求新的權限：';
@@ -5076,9 +4960,6 @@ class SZhHant extends SZh {
   String get extErrAuthorKeyChanged => '此更新的作者簽署金鑰與已安裝版本不同，因此已遭封鎖。若您信任新金鑰，請先解除安裝擴充功能，再自行重新安裝。';
 
   @override
-  String get extUpdateAvailable => '有可用更新';
-
-  @override
   String get extDisabled => '已停用';
 
   @override
@@ -5121,9 +5002,6 @@ class SZhHant extends SZh {
   String get extConflictsTitle => '擴充功能衝突';
 
   @override
-  String get extConflictsIntro => '這些擴充功能想要同一樣東西。選擇要讓哪個執行，另一個仍保持安裝。';
-
-  @override
   String get extConflictTheme => '應用程式佈景主題';
 
   @override
@@ -5143,27 +5021,9 @@ class SZhHant extends SZh {
   String get extConflictsResolve => '解決衝突';
 
   @override
-  String get extConflictNote => '你的選擇會儲存在此裝置上。主題會立即切換，網路掛鉤在此版本中不會執行。';
-
-  @override
   String extVersionLabel(String version) {
     return '版本 $version';
   }
-
-  @override
-  String get extAuthor => '作者';
-
-  @override
-  String get extRating => '評分';
-
-  @override
-  String get extInstalls => '安裝次數';
-
-  @override
-  String get extVersion => '版本';
-
-  @override
-  String get extAbout => '關於';
 
   @override
   String get extPermissionsTitle => '權限';
@@ -5176,9 +5036,6 @@ class SZhHant extends SZh {
 
   @override
   String get extSaveSettings => '儲存設定';
-
-  @override
-  String get extSaving => '正在儲存…';
 
   @override
   String extUpdateTo(String version) {
@@ -5207,7 +5064,7 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get extPanelUnavailable => '面板無法使用，擴充功能可能已停用或移除。';
+  String get extPanelUnavailable => '擴充功能面板無法使用。';
 
   @override
   String get extPermConnectionsRead => '查看目前的連接清單';
@@ -5246,9 +5103,6 @@ class SZhHant extends SZh {
   String get extPermBackground => '執行背景工作';
 
   @override
-  String get extPermBackgroundDetail => '即使關閉面板，仍會執行排程工作。您可以在擴充功能設定中暫停工作或調整執行頻率。';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -5281,20 +5135,13 @@ class SZhHant extends SZh {
   String get extImageFailed => '無法載入圖片';
 
   @override
-  String get extRatingHow => '評分計算方式';
-
-  @override
-  String get extRatingHowBody =>
-      '評分採用貝氏平均：評分數量較少的擴充功能會維持在中間值附近，直到有更多人評分，因此單一五星評價無法讓新擴充功能登上榜首。近期評分的權重高於較早的評分，每個帳號只計入一筆評分。';
-
-  @override
   String get extScreenshots => '螢幕擷取畫面';
 
   @override
   String get extSortRelevance => '相關程度';
 
   @override
-  String get extPermNetworkDetail => '透過 VPN 從網際網路取得資料。只允許下方列出的主機，其餘全部封鎖。';
+  String get extPermNetworkDetail => 'VPN 請求僅限存取以下主機。';
 
   @override
   String get extBgTitle => '背景工作';
@@ -5316,9 +5163,6 @@ class SZhHant extends SZh {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小時');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote => '只要 Sora 處於開啟狀態（包括在系統匣中），工作就會依排程執行。最短間隔為 15 分鐘。';
 
   @override
   String get extBgDisabledNote => '請先啟用擴充功能，才能管理背景工作。';
@@ -5352,13 +5196,7 @@ class SZhHant extends SZh {
   String get qrCopyLink => '複製連結';
 
   @override
-  String get qrShowLink => '顯示連結';
-
-  @override
-  String get qrHideLink => '隱藏連結';
-
-  @override
-  String get qrWarning => '此 QR 碼含有連接資訊，請勿向陌生人展示。';
+  String get qrWarning => '僅與信任的人分享此 QR 碼。';
 
   @override
   String get qrScanHint => '選擇包含 QR 碼的截圖或相片，或貼上連結';
@@ -5473,6 +5311,9 @@ class SZhHant extends SZh {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '依訂閱順序';
 
   @override
   String get sortPing => '延遲';
@@ -5808,15 +5649,9 @@ class SZhHant extends SZh {
   String get customServerHideSecret => '隱藏機密資訊';
 
   @override
-  String get customServerBadge => '自訂';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '要刪除伺服器「$name」嗎？';
   }
-
-  @override
-  String get customServerEmptyHint => '手動新增伺服器：位址、連接埠和協定';
 
   @override
   String get customServerTest => '測試';
@@ -5983,9 +5818,6 @@ class SZhHant extends SZh {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密碼，例如 chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => '抓包';
 
   @override
@@ -6004,7 +5836,7 @@ class SZhHant extends SZh {
   String get extErrRevoked => 'Sora 團隊已撤回此擴充功能版本，因為它不安全或已損壞。';
 
   @override
-  String get extErrRevocationsExpired => '無法更新已撤回擴充功能的清單。在更新之前無法安裝：請檢查網路後重試。';
+  String get extErrRevocationsExpired => '撤銷清單更新前無法安裝擴充功能。';
 
   @override
   String extRevokedDisabled(String names) {
@@ -6050,4 +5882,39 @@ class SZhHant extends SZh {
 
   @override
   String get extAssetRejected => '擴充功能檔案遭拒：顏色難以辨認或規則無效。';
+
+  @override
+  String get extVerifiedSora => '經 Sora 驗證';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count 位元組';
+  }
+
+  @override
+  String get extOpen => '開啟';
+
+  @override
+  String get customServerOwn => '自有伺服器';
+
+  @override
+  String get customServerPaste => '貼上連結';
+
+  @override
+  String get customServerUser => '使用者名稱';
+
+  @override
+  String get customServerPassword => '密碼';
+
+  @override
+  String get customServerSecretRequired => '請輸入一個值';
+
+  @override
+  String get customServerLinkInvalid => '伺服器連結無效';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

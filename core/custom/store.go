@@ -46,6 +46,8 @@ type Server struct {
 	ID        string
 	Name      string
 	Protocol  Protocol
+	Transport string
+	Security  string
 	Address   string
 	Port      uint16
 	SecretRef string
@@ -58,6 +60,8 @@ type record struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
 	Protocol  Protocol  `json:"protocol"`
+	Transport string    `json:"transport,omitempty"`
+	Security  string    `json:"security,omitempty"`
 	Address   string    `json:"address"`
 	Port      uint16    `json:"port"`
 	SecretRef string    `json:"secret_ref"`
@@ -279,6 +283,8 @@ func (s *Store) Save(in Server, credentials []byte) (Server, error) {
 	current.ID = in.ID
 	current.Name = strings.TrimSpace(in.Name)
 	current.Protocol = in.Protocol
+	current.Transport = in.Transport
+	current.Security = in.Security
 	current.Address = strings.TrimSpace(in.Address)
 	current.Port = in.Port
 	current.Updated = time.Now().UTC()

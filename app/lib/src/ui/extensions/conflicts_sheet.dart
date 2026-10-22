@@ -16,6 +16,7 @@ import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/conflicts.dart';
 import '../../ext/store.dart';
+import 'widgets.dart';
 
 /// Shows the resolution sheet. Returns true when the user saved decisions.
 Future<bool> showConflictsSheet(
@@ -50,7 +51,6 @@ class _ConflictsSheet extends StatefulWidget {
 class _ConflictsSheetState extends State<_ConflictsSheet> {
   final _winners = <String, String>{};
   bool _saving = false;
-  String? _error;
 
   @override
   void initState() {
@@ -68,7 +68,6 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
   Future<void> _save() async {
     setState(() {
       _saving = true;
-      _error = null;
     });
     try {
       for (final c in widget.conflicts) {
@@ -80,8 +79,8 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
       if (mounted) {
         setState(() {
           _saving = false;
-          _error = S.of(context).extErrGeneric;
         });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).extErrGeneric)));
       }
       return;
     }
@@ -108,12 +107,10 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
                   Icon(Symbols.warning_rounded, color: palette.danger),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(s.extConflictsTitle, style: Styles.title.copyWith(color: palette.ink)),
+                    child: Text(s.extConflictsTitle, style: Styles.heading.copyWith(fontSize: 22, color: palette.ink)),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(s.extConflictsIntro, style: Styles.body.copyWith(color: palette.ink2)),
               const SizedBox(height: 16),
               for (final c in widget.conflicts) ...[
                 _ConflictBlock(
@@ -123,11 +120,6 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
                   onPick: (id) => setState(() => _winners[c.key] = id),
                 ),
                 const SizedBox(height: 12),
-              ],
-              Text(s.extConflictNote, style: Styles.caption.copyWith(color: palette.ink3)),
-              if (_error != null) ...[
-                const SizedBox(height: 8),
-                Text(_error!, style: Styles.body.copyWith(color: palette.danger)),
               ],
               const SizedBox(height: 16),
               PrimaryButton(label: s.extConfirm, busy: _saving, onTap: _complete && !_saving ? _save : null),
@@ -154,40 +146,42 @@ class _ConflictBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: palette.field),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(_kindLabel(context, conflict.kind), style: Styles.bodyStrong.copyWith(color: palette.ink)),
-          const SizedBox(height: 8),
-          for (final id in conflict.extensionIds)
-            _ContenderRow(
-              name: store.get(id)?.manifest.name ?? id,
-              detail: _detail(context, id),
-              selected: winner == id,
-              onTap: () => onPick(id),
-            ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(_kindLabel(context, conflict.kind), style: Styles.bodyStrong.copyWith(color: palette.ink)),
+        if (conflict.kind == ExtConflictKind.netHooks)
+          Text(S.of(context).extPermNotYetActive, style: Styles.secondary.copyWith(color: palette.ink2)),
+        const SizedBox(height: 8),
+        for (final id in conflict.extensionIds)
+          _ContenderRow(
+            name: store.get(id)?.manifest.name ?? id,
+            detail: _detail(context, id),
+            verified: store.get(id) != null && isTeamExtension(store.get(id)!),
+            selected: winner == id,
+            onTap: () => onPick(id),
+          ),
+      ],
     );
   }
 
   String _detail(BuildContext context, String id) {
     final inst = store.get(id);
     if (inst == null) return id;
-    return '${S.of(context).extVersionLabel(inst.version)} · ${inst.manifest.author.name}';
+    return '${S.of(context).extVersionLabel(inst.version)}, ${inst.manifest.author.name}';
   }
 }
 
 class _ContenderRow extends StatelessWidget {
-  const _ContenderRow({required this.name, required this.detail, required this.selected, required this.onTap});
+  const _ContenderRow({
+    required this.name,
+    required this.verified,
+    required this.detail,
+    required this.selected,
+    required this.onTap,
+  });
   final String name;
+  final bool verified;
   final String detail;
   final bool selected;
   final VoidCallback onTap;
@@ -217,12 +211,7 @@ class _ContenderRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: Styles.body.copyWith(color: palette.ink),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ExtensionName(name: name, verified: verified, list: true),
                     Text(
                       detail,
                       style: Styles.caption.copyWith(color: palette.ink2),

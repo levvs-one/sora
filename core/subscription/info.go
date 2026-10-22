@@ -3,6 +3,7 @@ package subscription
 import (
 	"bytes"
 	"encoding/base64"
+	"math"
 	"mime"
 	"net/http"
 	"net/url"
@@ -79,6 +80,33 @@ func parseInfo(header http.Header, body []byte) Info {
 	info.WebPageURL = cleanURL(values["profile-web-page-url"])
 	info.SupportURL = cleanURL(values["support-url"])
 	info.Announce = cleanText(decodeMarked(values["announce"]), maxAnnounceRunes, true)
+	if info.Title == "" {
+		info.Title = cleanText(values["name"], maxTitleRunes, false)
+	}
+	if info.UpdateInterval == 0 {
+		refresh := values["refresh"]
+		if strings.HasSuffix(refresh, "d") {
+			if n, err := strconv.Atoi(strings.TrimSuffix(refresh, "d")); err == nil && n > 0 && n <= 365 {
+				refresh = strconv.Itoa(n*24) + "h"
+			}
+		}
+		if d, err := time.ParseDuration(refresh); err == nil && d >= 5*time.Second && d <= 365*24*time.Hour {
+			info.UpdateInterval = d
+		}
+	}
+	if !info.HasUsage {
+		used, total, _ := strings.Cut(values["used"], "/")
+		n, ok := volume(used)
+		if ok {
+			info.HasUsage = true
+			info.Download = n
+		}
+		if v, ok := volume(total); ok {
+			info.Total = v
+		} else if v, ok := volume(values["available"]); ok {
+			info.Total = v
+		}
+	}
 	return info
 }
 
@@ -227,4 +255,26 @@ func cleanURL(v string) string {
 		return ""
 	}
 	return u.String()
+}
+
+// volume reads the decimal units used by olcrtc subscription v1 metadata.
+func volume(raw string) (uint64, bool) {
+	raw = strings.ToLower(strings.TrimSpace(raw))
+	factor := float64(1)
+	for _, unit := range []struct {
+		name   string
+		factor float64
+	}{{"tb", 1e12}, {"gb", 1e9}, {"mb", 1e6}, {"kb", 1e3}, {"b", 1}} {
+		if strings.HasSuffix(raw, unit.name) {
+			raw = strings.TrimSpace(strings.TrimSuffix(raw, unit.name))
+			factor = unit.factor
+			break
+		}
+	}
+	n, err := strconv.ParseFloat(raw, 64)
+	value := n * factor
+	if err != nil || value < 0 || value >= float64(^uint64(0)) || math.IsNaN(value) {
+		return 0, false
+	}
+	return uint64(value), true
 }

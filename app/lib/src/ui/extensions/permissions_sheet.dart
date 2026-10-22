@@ -20,32 +20,6 @@ import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import 'widgets.dart';
 
-/// Shows the install prompt. Returns the granted permission ids, or null
-/// when the user cancelled.
-///
-/// [addedPermissions] / [removedPermissions] describe a widening update:
-/// only the delta is shown, with the "Update" title. [changelog]
-/// lists the new versions' notes newest-first; null when unknown (sideload).
-Future<List<String>?> showInstallPrompt(
-  BuildContext context, {
-  required ExtManifest manifest,
-  required bool sideload,
-  List<String>? addedPermissions,
-  List<String>? removedPermissions,
-  List<CatalogChangelogEntry>? changelog,
-}) {
-  return showDialog<List<String>>(
-    context: context,
-    builder: (_) => _InstallPrompt(
-      manifest: manifest,
-      sideload: sideload,
-      addedPermissions: addedPermissions,
-      removedPermissions: removedPermissions,
-      changelog: changelog,
-    ),
-  );
-}
-
 String permissionBlurb(BuildContext context, String id) {
   final s = S.of(context);
   switch (id) {
@@ -84,8 +58,6 @@ String permissionBlurb(BuildContext context, String id) {
 String? permissionDetail(BuildContext context, String id) {
   final s = S.of(context);
   switch (id) {
-    case 'background':
-      return s.extPermBackgroundDetail;
     case 'net.fetch':
       return s.extPermNetworkDetail;
     default:
@@ -93,25 +65,30 @@ String? permissionDetail(BuildContext context, String id) {
   }
 }
 
-class _InstallPrompt extends StatefulWidget {
-  const _InstallPrompt({
+class InstallPermissionPrompt extends StatefulWidget {
+  const InstallPermissionPrompt({
+    super.key,
     required this.manifest,
     required this.sideload,
     this.addedPermissions,
     this.removedPermissions,
     this.changelog,
+    this.onDecision,
+    this.verified = false,
   });
   final ExtManifest manifest;
   final bool sideload;
   final List<String>? addedPermissions;
   final List<String>? removedPermissions;
   final List<CatalogChangelogEntry>? changelog;
+  final ValueChanged<List<String>?>? onDecision;
+  final bool verified;
 
   @override
-  State<_InstallPrompt> createState() => _InstallPromptState();
+  State<InstallPermissionPrompt> createState() => _InstallPromptState();
 }
 
-class _InstallPromptState extends State<_InstallPrompt> {
+class _InstallPromptState extends State<InstallPermissionPrompt> {
   bool _dangerousAck = false;
 
   @override
@@ -154,10 +131,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          isUpdate ? s.extUpdateTitle(m.name) : s.extInstallTitle(m.name),
-                          style: Styles.title.copyWith(color: palette.ink),
-                        ),
+                        ExtensionName(name: m.name, verified: widget.verified),
                         const SizedBox(height: 2),
                         Text(s.extByAuthor(m.author.name), style: Styles.caption.copyWith(color: palette.ink2)),
                       ],
@@ -167,7 +141,16 @@ class _InstallPromptState extends State<_InstallPrompt> {
               ),
               if (widget.sideload) ...[
                 const SizedBox(height: 12),
-                ExtBadge(label: s.extSideloadWarning, tone: ExtBadgeTone.warn, icon: Symbols.warning_rounded),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Symbols.warning_rounded, size: 18, color: palette.danger),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(s.extSideloadWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
+                    ),
+                  ],
+                ),
               ],
               const SizedBox(height: 12),
               if (widget.changelog != null && widget.changelog!.isNotEmpty) ...[
@@ -184,7 +167,7 @@ class _InstallPromptState extends State<_InstallPrompt> {
                 const SizedBox(height: 4),
               ],
               Text(
-                showDelta ? s.extPermissionsWidened : s.extPermissionsIntro,
+                showDelta ? s.extPermissionsWidened : s.extPermissionsTitle,
                 style: Styles.body.copyWith(color: palette.ink),
               ),
               const SizedBox(height: 4),
@@ -230,11 +213,11 @@ class _InstallPromptState extends State<_InstallPrompt> {
               const SizedBox(height: 16),
               PrimaryButton(
                 label: isUpdate ? s.extUpdate : s.extInstall,
-                onTap: canInstall ? () => Navigator.pop(context, List.of(m.permissions)) : null,
+                onTap: canInstall ? () => _decide(List.of(m.permissions)) : null,
               ),
               const SizedBox(height: 8),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => _decide(null),
                 child: Text(s.extCancel, style: TextStyle(color: palette.ink2)),
               ),
             ],
@@ -242,6 +225,14 @@ class _InstallPromptState extends State<_InstallPrompt> {
         ),
       ),
     );
+  }
+
+  void _decide(List<String>? granted) {
+    if (widget.onDecision != null) {
+      widget.onDecision!(granted);
+    } else {
+      Navigator.pop(context, granted);
+    }
   }
 
   /// The plain-language explanation (and, for network access, the exact

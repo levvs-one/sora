@@ -1746,7 +1746,7 @@ abstract class S {
   /// No description provided for @modesGuide.
   ///
   /// In ru, this message translates to:
-  /// **'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed**: TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System**: использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor**: обрабатывает трафик в пользовательском пространстве.\n- **MIPS**: собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n'**
+  /// **'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| mieru | Нет | Нет | Да |\n| NaiveProxy | Да | Нет | Нет |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed**: TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System**: использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor**: обрабатывает трафик в пользовательском пространстве.\n- **MIPS**: собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC передаёт TCP через видеозвонок в Jitsi, Яндекс Телемосте или WB Stream. Импортируйте ссылку olcrtc:// или QR-код. Протокол работает с sing-box, Xray и mihomo в режимах прокси и TUN; UDP не поддерживается. Обоим концам нужны совместимые сборки OLC2. Исходный проект архивирован.\n'**
   String get modesGuide;
 
   /// No description provided for @probeServers.
@@ -1785,59 +1785,11 @@ abstract class S {
   /// **'1 установка'**
   String get extInstallOne;
 
-  /// No description provided for @extBadgeVerified.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверено'**
-  String get extBadgeVerified;
-
-  /// No description provided for @extBadgeTop.
-  ///
-  /// In ru, this message translates to:
-  /// **'Топ недели'**
-  String get extBadgeTop;
-
-  /// No description provided for @extBadgeNew.
-  ///
-  /// In ru, this message translates to:
-  /// **'Новое'**
-  String get extBadgeNew;
-
-  /// No description provided for @extBadgeStaff.
-  ///
-  /// In ru, this message translates to:
-  /// **'Команда Sora'**
-  String get extBadgeStaff;
-
-  /// No description provided for @extSideloadShort.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не из каталога'**
-  String get extSideloadShort;
-
   /// No description provided for @extSideloadWarning.
   ///
   /// In ru, this message translates to:
-  /// **'Не из каталога команды. Ключ автора не проверен: устанавливайте, только если доверяете автору.'**
+  /// **'Устанавливайте, только если доверяете самоподписанному ключу автора.'**
   String get extSideloadWarning;
-
-  /// No description provided for @extInstallTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Установить «{name}»'**
-  String extInstallTitle(String name);
-
-  /// No description provided for @extUpdateTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Обновить «{name}»'**
-  String extUpdateTitle(String name);
-
-  /// No description provided for @extPermissionsIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Расширение сможет:'**
-  String get extPermissionsIntro;
 
   /// No description provided for @extPermissionsWidened.
   ///
@@ -2079,12 +2031,6 @@ abstract class S {
   /// **'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.'**
   String get extErrAuthorKeyChanged;
 
-  /// No description provided for @extUpdateAvailable.
-  ///
-  /// In ru, this message translates to:
-  /// **'Доступно обновление'**
-  String get extUpdateAvailable;
-
   /// No description provided for @extDisabled.
   ///
   /// In ru, this message translates to:
@@ -2157,12 +2103,6 @@ abstract class S {
   /// **'Конфликты расширений'**
   String get extConflictsTitle;
 
-  /// No description provided for @extConflictsIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Эти расширения претендуют на одно и то же. Выберите, какое будет работать, второе останется установленным.'**
-  String get extConflictsIntro;
-
   /// No description provided for @extConflictTheme.
   ///
   /// In ru, this message translates to:
@@ -2193,47 +2133,11 @@ abstract class S {
   /// **'Решить'**
   String get extConflictsResolve;
 
-  /// No description provided for @extConflictNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выбор сохраняется на этом устройстве. Тема переключается сразу, сетевые хуки в этой версии не запускаются.'**
-  String get extConflictNote;
-
   /// No description provided for @extVersionLabel.
   ///
   /// In ru, this message translates to:
   /// **'Версия {version}'**
   String extVersionLabel(String version);
-
-  /// No description provided for @extAuthor.
-  ///
-  /// In ru, this message translates to:
-  /// **'Автор'**
-  String get extAuthor;
-
-  /// No description provided for @extRating.
-  ///
-  /// In ru, this message translates to:
-  /// **'Оценка'**
-  String get extRating;
-
-  /// No description provided for @extInstalls.
-  ///
-  /// In ru, this message translates to:
-  /// **'Установки'**
-  String get extInstalls;
-
-  /// No description provided for @extVersion.
-  ///
-  /// In ru, this message translates to:
-  /// **'Версия'**
-  String get extVersion;
-
-  /// No description provided for @extAbout.
-  ///
-  /// In ru, this message translates to:
-  /// **'Описание'**
-  String get extAbout;
 
   /// No description provided for @extPermissionsTitle.
   ///
@@ -2258,12 +2162,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Сохранить настройки'**
   String get extSaveSettings;
-
-  /// No description provided for @extSaving.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сохранение…'**
-  String get extSaving;
 
   /// No description provided for @extUpdateTo.
   ///
@@ -2304,7 +2202,7 @@ abstract class S {
   /// No description provided for @extPanelUnavailable.
   ///
   /// In ru, this message translates to:
-  /// **'Панель недоступна. Возможно, расширение отключено или удалено.'**
+  /// **'Панель расширения недоступна.'**
   String get extPanelUnavailable;
 
   /// No description provided for @extPermConnectionsRead.
@@ -2379,12 +2277,6 @@ abstract class S {
   /// **'Выполнять фоновые задачи'**
   String get extPermBackground;
 
-  /// No description provided for @extPermBackgroundDetail.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выполняет задачи по расписанию, даже когда панель расширения закрыта. Приостановить или изменить интервал можно в настройках расширения.'**
-  String get extPermBackgroundDetail;
-
   /// No description provided for @extPermNotYetActive.
   ///
   /// In ru, this message translates to:
@@ -2445,18 +2337,6 @@ abstract class S {
   /// **'Не удалось загрузить изображение'**
   String get extImageFailed;
 
-  /// No description provided for @extRatingHow.
-  ///
-  /// In ru, this message translates to:
-  /// **'Как считаются оценки'**
-  String get extRatingHow;
-
-  /// No description provided for @extRatingHowBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Оценки считаются по байесовскому среднему: расширение с малым числом оценок остаётся около середины, пока не проголосует больше людей, поэтому один отзыв «5 звёзд» не выведет новое расширение в топ. Свежие оценки весят больше старых, с одного аккаунта засчитывается только одна оценка.'**
-  String get extRatingHowBody;
-
   /// No description provided for @extScreenshots.
   ///
   /// In ru, this message translates to:
@@ -2472,7 +2352,7 @@ abstract class S {
   /// No description provided for @extPermNetworkDetail.
   ///
   /// In ru, this message translates to:
-  /// **'Загружает данные из интернета через VPN. Разрешены только хосты из списка ниже, остальные заблокированы.'**
+  /// **'Запросы через VPN разрешены только к этим хостам.'**
   String get extPermNetworkDetail;
 
   /// No description provided for @extBgTitle.
@@ -2504,12 +2384,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'{count, plural, one{# час} few{# часа} other{# часов}}'**
   String extBgHours(int count);
-
-  /// No description provided for @extBgNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Задача запускается по расписанию, пока Sora открыта, в том числе свёрнутой в трей. Минимальный интервал 15 минут.'**
-  String get extBgNote;
 
   /// No description provided for @extBgDisabledNote.
   ///
@@ -2565,22 +2439,10 @@ abstract class S {
   /// **'Скопировать ссылку'**
   String get qrCopyLink;
 
-  /// No description provided for @qrShowLink.
-  ///
-  /// In ru, this message translates to:
-  /// **'Показать ссылку'**
-  String get qrShowLink;
-
-  /// No description provided for @qrHideLink.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скрыть ссылку'**
-  String get qrHideLink;
-
   /// No description provided for @qrWarning.
   ///
   /// In ru, this message translates to:
-  /// **'QR-код содержит данные для подключения. Не показывайте его посторонним.'**
+  /// **'Показывайте код только тем, кому доверяете.'**
   String get qrWarning;
 
   /// No description provided for @qrScanHint.
@@ -2804,6 +2666,12 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Сортировать'**
   String get sortBy;
+
+  /// No description provided for @sortSubscription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как в подписке'**
+  String get sortSubscription;
 
   /// No description provided for @sortPing.
   ///
@@ -3435,23 +3303,11 @@ abstract class S {
   /// **'Скрыть секрет'**
   String get customServerHideSecret;
 
-  /// No description provided for @customServerBadge.
-  ///
-  /// In ru, this message translates to:
-  /// **'свой'**
-  String get customServerBadge;
-
   /// No description provided for @customServerDeleteConfirm.
   ///
   /// In ru, this message translates to:
   /// **'Удалить сервер «{name}»?'**
   String customServerDeleteConfirm(String name);
-
-  /// No description provided for @customServerEmptyHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Добавьте сервер вручную: адрес, порт и протокол'**
-  String get customServerEmptyHint;
 
   /// No description provided for @customServerTest.
   ///
@@ -3753,12 +3609,6 @@ abstract class S {
   /// **'Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.'**
   String get syncUnavailableAndroid;
 
-  /// No description provided for @customServerShadowsocksCredentials.
-  ///
-  /// In ru, this message translates to:
-  /// **'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль'**
-  String get customServerShadowsocksCredentials;
-
   /// No description provided for @diagnosticPackets.
   ///
   /// In ru, this message translates to:
@@ -3798,7 +3648,7 @@ abstract class S {
   /// No description provided for @extErrRevocationsExpired.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось обновить список отозванных расширений. Установка недоступна, пока он не обновится: проверьте сеть и попробуйте снова.'**
+  /// **'Установка заблокирована до обновления списка отозванных расширений.'**
   String get extErrRevocationsExpired;
 
   /// No description provided for @extRevokedDisabled.
@@ -3884,6 +3734,72 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
   String get extAssetRejected;
+
+  /// No description provided for @extVerifiedSora.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверено Sora'**
+  String get extVerifiedSora;
+
+  /// No description provided for @extReceivedBytes.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} Б'**
+  String extReceivedBytes(String count);
+
+  /// No description provided for @extOpen.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть'**
+  String get extOpen;
+
+  /// No description provided for @customServerOwn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свой сервер'**
+  String get customServerOwn;
+
+  /// No description provided for @customServerPaste.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вставить ссылку'**
+  String get customServerPaste;
+
+  /// No description provided for @customServerUser.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пользователь'**
+  String get customServerUser;
+
+  /// No description provided for @customServerPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль'**
+  String get customServerPassword;
+
+  /// No description provided for @customServerSecretRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите значение'**
+  String get customServerSecretRequired;
+
+  /// No description provided for @customServerLinkInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверная ссылка на сервер'**
+  String get customServerLinkInvalid;
+
+  /// No description provided for @customServerMethodHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'chacha20-ietf-poly1305'**
+  String get customServerMethodHint;
+
+  /// No description provided for @customServerWgAddressesHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'10.0.0.2/32'**
+  String get customServerWgAddressesHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

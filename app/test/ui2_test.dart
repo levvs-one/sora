@@ -497,10 +497,14 @@ void main() {
     await tester.tap(toggle);
     await tester.pumpAndSettle();
     expect(find.byType(Announcement), findsOneWidget);
+    await tester.ensureVisible(servers);
+    await tester.pumpAndSettle();
     await tester.tap(servers);
     await tester.pumpAndSettle();
     expect(find.byType(Announcement), findsOneWidget);
     expect(find.text('￼Нидерланды, Амстердам'), findsOneWidget);
+    await tester.ensureVisible(servers);
+    await tester.pumpAndSettle();
     await tester.tap(servers);
     await tester.pumpAndSettle();
     expect(find.text('￼Нидерланды, Амстердам'), findsNWidgets(2));

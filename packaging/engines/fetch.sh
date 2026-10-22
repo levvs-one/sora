@@ -13,6 +13,7 @@ lock="$(dirname "$0")/engines.lock"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$dest"
+dest=$(cd "$dest" && pwd)
 
 found=0
 while read -r engine line_arch digest url; do
@@ -28,6 +29,12 @@ while read -r engine line_arch digest url; do
 		exe=$(find "$work/$engine" -iname "${engine}*.exe" ! -iname 'wxray.exe' | head -1)
 		[[ -n "$exe" ]] || { echo "engines.lock: no executable in $(basename "$url")" >&2; exit 1; }
 		install -m 0755 "$exe" "$dest/$engine.exe"
+		if [[ "$engine" == sing-box && "$arch" == windows-amd64 ]]; then
+			# The DLL is version-coupled to the engine and covered by the archive checksum.
+			cronet=$(find "$work/$engine" -name libcronet.dll -type f)
+			[[ -n "$cronet" ]] || { echo "sing-box archive has no libcronet.dll" >&2; exit 1; }
+			install -m 0644 "$cronet" "$dest/libcronet.dll"
+		fi
 		if [[ "$engine" == xray ]]; then
 			install -m 0644 "$work/xray/geoip.dat" "$work/xray/geosite.dat" "$dest/"
 		fi
@@ -59,4 +66,30 @@ done <"$lock"
 if [[ "$found" -ne 3 ]]; then
 	echo "engines.lock has $found engines for $arch, expected 3" >&2
 	exit 1
+fi
+
+# The archived upstream has no binary releases. Keep its wire implementation
+# unchanged and verify the complete source archive before invoking the Go build.
+if [[ "$arch" != win7-* ]]; then
+ olcrtc_revision=f3ad8fb7c0d0fa981423f83269526fa94077c23d
+ olcrtc_digest=3a9d5af88f5d74daefab96e8d642409946be79fc89f35587c1b74722ca2c3a4f
+ source_file="$work/olcrtc.tar.gz"
+ curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$source_file" "https://codeload.github.com/openlibrecommunity/olcrtc/tar.gz/$olcrtc_revision"
+ echo "$olcrtc_digest  $source_file" | sha256sum --check --quiet --strict
+ mkdir "$work/olcrtc-source"
+ tar --extract --gzip --file "$source_file" --directory "$work/olcrtc-source" --strip-components=1
+ target_os=linux
+ target_arch=$arch
+ target_name=olcrtc
+ if [[ "$arch" == windows-amd64 ]]; then
+  target_os=windows
+  target_arch=amd64
+  target_name=olcrtc.exe
+ fi
+ (cd "$work/olcrtc-source" && GOTOOLCHAIN=go1.27.3 CGO_ENABLED=0 GOOS=$target_os GOARCH=$target_arch go build -mod=readonly -trimpath -buildvcs=false -ldflags='-s -w -buildid=' -o "$dest/$target_name" ./cmd/olcrtc)
+ binary_digest=$(sha256sum "$dest/$target_name")
+ binary_digest=${binary_digest%% *}
+ printf '{"Revision":"%s","SHA256":"%s"}\n' "$olcrtc_revision" "$binary_digest" >"$dest/$target_name.json"
+ install -m 0644 "$work/olcrtc-source/LICENSE" "$dest/olcrtc.LICENSE"
+ echo "olcrtc $arch: source verified, built $olcrtc_revision"
 fi

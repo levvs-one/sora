@@ -880,7 +880,7 @@ class SHi extends S {
 
   @override
   String get modesGuide =>
-      'यदि आप अनिश्चित हैं कि आपके सर्वर को किस इंजन की आवश्यकता है तो ऑटो चुनें। Sora कनेक्ट करने से पहले प्रोफ़ाइल और सेटिंग्स की जाँच करता है। कोई इंजन आपके प्लान की बैंडविड्थ नहीं बढ़ा सकता: प्रदर्शन सर्वर, रूट, प्रोटोकॉल और नेटवर्क पर निर्भर करता है।\n\n## मोड\n\n### समस्त ट्रैफ़िक (TUN)\n\nSora एक वर्चुअल नेटवर्क इंटरफ़ेस बनाता है और टीसीपी और यूडीपी सहित इसके माध्यम से एप्लिकेशन ट्रैफ़िक को रूट करता है। इस मोड का उपयोग Telegram, गेम्स और Discord वॉयस के लिए करें। नियम विशिष्ट साइटों या कार्यक्रमों को सीधे भेज सकते हैं या उन्हें ब्लॉक कर सकते हैं। नेटवर्क सेवा को अनुमति और एक सर्वर की आवश्यकता होती है जो आवश्यक प्रोटोकॉल का समर्थन करता हो।\n\n### System प्रॉक्सी\n\nSora एक स्थानीय HTTP/SOCKS प्रॉक्सी को कॉन्फ़िगर करता है। सिस्टम प्रॉक्सी सेटिंग्स का सम्मान करने वाले एप्लिकेशन इसका उपयोग करते हैं। अपने स्वयं के नेटवर्क स्टैक वाले एप्लिकेशन सीधे कनेक्ट हो सकते हैं; यूडीपी और वॉयस कॉल के लिए आम तौर पर TUN की आवश्यकता होती है। यह मोड प्रॉक्सी समर्थन वाले ब्राउज़र और एप्लिकेशन के लिए उपयुक्त है।\n\n### कोई सर्वर नहीं\n\nLinux पर, Sora HTTP/TLS अनुरोधों को विभाजित और नया आकार देने और कुछ DPI जांचों को बायपास करने के लिए [zapret](https://github.com/bol-van/zapret) का उपयोग करता है। आपका आईपी वही रहता है और कनेक्शन सीधे वेबसाइट पर चले जाते हैं। परिणाम आपके प्रदाता और अवरुद्ध करने की विधि पर निर्भर करते हैं।\n\nवर्तमान एकीकरण टीसीपी पर HTTP और TLS के लिए tpws का उपयोग करता है। यह आईपी ब्लॉकिंग या रिले यूडीपी को बायपास नहीं करता है, और Telegram के MTProto कनेक्शन की गारंटी नहीं दे सकता है। Discord वॉयस, Telegram कॉल और इस प्रकार के प्रतिबंधों के लिए TUN वाले वीपीएन सर्वर का उपयोग करें।\n\n## इंजन\n\n### ऑटो\n\nSora एक स्थापित इंजन का चयन करता है जो संपूर्ण कनेक्शन योजना का समर्थन करता है: सर्वर प्रोटोकॉल, ट्रांसपोर्ट, समूह, विखंडन और मोड। वर्तमान कनेक्शन को रोकने से पहले एक असंगत मैन्युअल विकल्प को अस्वीकार कर दिया जाता है। ऑटो या अन्य इंजन चुनें और सेटिंग्स फिर से लागू करें।\n\n### sing-box\n\nनए Sora पैकेज में [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) का एक कांटा, क्लाइंट-साइड XHTTP और VLESS Encryption शामिल है। Sora निर्माण और उसकी क्षमताओं को पहचानता है। XHTTP के बिना एक अपस्ट्रीम बिल्ड केवल इसके नाम से यह क्षमता हासिल नहीं करता है।\n\nसमर्थित प्रोटोकॉल में VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard और AmneziaWG 1.x/2.x पैरामीटर शामिल हैं। Sora आयात कर सकते हैं. पूर्ण Xray JSON प्रोफाइल के लिए Xray की आवश्यकता होती है। नई AWG 3.x फ़ील्ड अभी तक आयात नहीं की जा सकतीं. sing-box एक पासवर्ड-संरक्षित स्थानीय नियंत्रण पोर्ट का उपयोग करता है, जिसे कंप्यूटर पर अन्य एप्लिकेशन पता लगा सकते हैं।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption और TLS विखंडन का समर्थन करता है। यह उनकी रूटिंग और समूहों को संरक्षित करते हुए संपूर्ण प्रदाता Xray प्रोफाइल भी चलाता है। ऐसी प्रोफ़ाइलों को उनके व्यवहार को बदले बिना स्वचालित रूप से किसी अन्य इंजन में परिवर्तित नहीं किया जा सकता है।\n\nबंडल किए गए Xray ने उस सेटिंग को हटा दिया जो TLS प्रमाणपत्र सत्यापन (`allowInsecure`) को अक्षम कर देती है। इस सेटिंग की आवश्यकता वाले सामान्य सर्वर के लिए स्वतः sing-box या mihomo का चयन करता है। Xray का चयन वर्तमान कनेक्शन को रोकने से पहले मैन्युअल रूप से असंगतता की रिपोर्ट करता है। पुराने पूर्ण JSON प्रोफाइल को सत्यापन योग्य प्रमाणपत्र या प्रमाणपत्र पिन के साथ एक अद्यतन प्रदाता प्रोफ़ाइल की आवश्यकता होती है।\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ऑर्डर किए गए फ़ॉलबैक और लोड-बैलेंसिंग समूहों, XHTTP और AmneziaWG का समर्थन करता है। जब बैकअप सर्वर पर स्वचालित विफलता मायने रखती है तो इसे चुनें। इस इंजन के साथ Sora की TLS फ़्रेग्मेंटेशन सेटिंग उपलब्ध नहीं है।\n\n## Sora में अनुकूलता\n\n| फ़ीचर | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows ट्यून और टीसीपी/यूडीपी | हाँ | हाँ | हाँ |\n| XHTTP | हाँ | हाँ | हाँ |\n| VLESS Encryption | हाँ | हाँ | हाँ |\n| पूर्ण Xray प्रोफ़ाइल | नहीं | हाँ | नहीं |\n| TUIC / AnyTLS | दोनों | नहीं | TUIC |\n| टीएलएस विखंडन | हाँ | हाँ | नहीं |\n| AmneziaWG 1.x/2.x | हाँ¹ | नहीं | हाँ |\n| आदेशित फ़ॉलबैक समूह | नहीं | नहीं² | हाँ |\n\n¹ J1/J2/J3/Itime वाली प्रोफ़ाइलें mihomo का उपयोग करती हैं; इन क्षेत्रों को कभी भी चुपचाप नहीं छोड़ा जाना चाहिए। ² संपूर्ण Xray प्रोफाइल के समूह के लिए, ऐप एक बैकअप प्रोफ़ाइल का चयन करता है। समर्थन स्थापित बिल्ड पर निर्भर करता है; अबाउट में इसका संस्करण जांचें।\n\n## ट्यून स्टैक\n\nस्टैक वर्चुअल इंटरफ़ेस के अंदर टीसीपी और यूडीपी को संभालता है। मोड पैनल में, Xray और mihomo gVisor, System, Mixed और MIPS ऑफर करते हैं। प्रत्येक इंजन अपनी प्राथमिकता बचाता है। System प्रॉक्सी और सर्वर रहित मोड इस प्राथमिकता का उपयोग नहीं करते हैं।\n\n- **Mixed** - टीसीपी सिस्टम स्टैक का उपयोग करता है, जबकि gVisor यूडीपी को संभालता है। Linux पर यह mihomo का डिफ़ॉल्ट है। Windows पर Xray और mihomo डिफ़ॉल्ट रूप से MIPS का उपयोग करते हैं।\n- **System** - सिस्टम स्टैक का उपयोग करता है। यदि नेटवर्क अनुप्रयोगों में समस्याएँ आती हैं तो दूसरा विकल्प आज़माएँ।\n- **gVisor** - यूजरस्पेस में ट्रैफिक को संभालता है।\n- **MIPS** - mihomo का अपना आईपी स्टैक, बंडल संस्करण 1.19.32 में उपलब्ध है।\n\nLinux पर, Xray डिफ़ॉल्ट रूप से अपने अंतर्निहित gVisor का उपयोग करता है। System, Mixed और Linux पर MIPS TUN इंजन के रूप में mihomo का उपयोग करते हैं, एक प्रमाणित स्थानीय SOCKS लिंक पर TCP और UDP को Xray पर अग्रेषित करते हैं। Xray प्रोटोकॉल, प्रदाता प्रोफ़ाइल और रूटिंग को बरकरार रखता है। इन तीन विकल्पों के लिए एक स्थापित mihomo की आवश्यकता होती है। Windows पर Xray चारों TUN स्टैक के लिए mihomo 1.19.32 या नया संस्करण उपयोग करता है। प्रोटोकॉल और रूटिंग Xray में रहते हैं। इस संयोजन में ऐप के नियम केवल सीधे कनेक्शन और ब्लॉक करने का समर्थन करते हैं; Linux पर इन नियमों के लिए Xray का अंतर्निहित gVisor आवश्यक है।\n\nब्रिज दूसरी प्रक्रिया चलाता है। Linux पर तीन निष्क्रिय मापों में, इसने मूल Xray TUN की तुलना में लगभग 32-36 MiB अधिक भौतिक मेमोरी का उपयोग किया। यह डाउनलोड लोड को मापता नहीं है: सीपीयू और मेमोरी की लागत कनेक्शन पर निर्भर करती है। sing-box में कोई स्टैक चयनकर्ता नहीं है। कोई भी स्टैक हर नेटवर्क में बेहतर प्रदर्शन की गारंटी नहीं देता। एक स्टैक चुनें और इसे अपने नेटवर्क में आज़माने के लिए लागू करें और पुनः कनेक्ट करें चुनें।\n\n## सेटिंग्स लागू करना\n\nसर्वर का चयन स्वचालित रूप से पुनः कनेक्ट हो जाता है। मोड, इंजन, डीएनएस और नियम सेटिंग्स तुरंत सहेजी जाती हैं; सक्रिय कनेक्शन के दौरान, लागू करें पर क्लिक करें और उनका उपयोग करने के लिए पुनः कनेक्ट करें। इंजन को पुनः आरंभ करने से डाउनलोड और कॉल बाधित हो सकते हैं। बार-बार क्लिक करने से समानांतर कनेक्शन प्रारंभ नहीं होते; डिस्कनेक्ट करने से संक्रमण समाप्त हो जाता है और कनेक्शन रिलीज़ हो जाता है।\n\nसुरंग गिरने पर केवल वीपीएन के माध्यम से इंटरनेट सीधे यातायात को अवरुद्ध करता है। इसका असर पूरी मशीन पर पड़ता है. एक स्पष्ट डिस्कनेक्ट Sora के नियमों को हटा देता है। यदि सफ़ाई समाप्त नहीं होती है, तो डिस्कनेक्ट करने का पुनः प्रयास करें और लॉग खोलें।\n\n## परियोजना दस्तावेज़ीकरण\n\n- [sing-box-lx: कॉन्फ़िगरेशन और समर्थन](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box दस्तावेज़](https://sing-box.sagernet.org/)\n- [Xray दस्तावेज़](https://xtls.github.io/)\n- [mihomo दस्तावेज़](https://wiki.metacubex.one/)\n- [zapret: संचालन और सीमाएं](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'यदि आप अनिश्चित हैं कि आपके सर्वर को किस इंजन की आवश्यकता है तो ऑटो चुनें। Sora कनेक्ट करने से पहले प्रोफ़ाइल और सेटिंग्स की जाँच करता है। कोई इंजन आपके प्लान की बैंडविड्थ नहीं बढ़ा सकता: प्रदर्शन सर्वर, रूट, प्रोटोकॉल और नेटवर्क पर निर्भर करता है।\n\n## मोड\n\n### समस्त ट्रैफ़िक (TUN)\n\nSora एक वर्चुअल नेटवर्क इंटरफ़ेस बनाता है और टीसीपी और यूडीपी सहित इसके माध्यम से एप्लिकेशन ट्रैफ़िक को रूट करता है। इस मोड का उपयोग Telegram, गेम्स और Discord वॉयस के लिए करें। नियम विशिष्ट साइटों या कार्यक्रमों को सीधे भेज सकते हैं या उन्हें ब्लॉक कर सकते हैं। नेटवर्क सेवा को अनुमति और एक सर्वर की आवश्यकता होती है जो आवश्यक प्रोटोकॉल का समर्थन करता हो।\n\n### System प्रॉक्सी\n\nSora एक स्थानीय HTTP/SOCKS प्रॉक्सी को कॉन्फ़िगर करता है। सिस्टम प्रॉक्सी सेटिंग्स का सम्मान करने वाले एप्लिकेशन इसका उपयोग करते हैं। अपने स्वयं के नेटवर्क स्टैक वाले एप्लिकेशन सीधे कनेक्ट हो सकते हैं; यूडीपी और वॉयस कॉल के लिए आम तौर पर TUN की आवश्यकता होती है। यह मोड प्रॉक्सी समर्थन वाले ब्राउज़र और एप्लिकेशन के लिए उपयुक्त है।\n\n### कोई सर्वर नहीं\n\nLinux पर, Sora HTTP/TLS अनुरोधों को विभाजित और नया आकार देने और कुछ DPI जांचों को बायपास करने के लिए [zapret](https://github.com/bol-van/zapret) का उपयोग करता है। आपका आईपी वही रहता है और कनेक्शन सीधे वेबसाइट पर चले जाते हैं। परिणाम आपके प्रदाता और अवरुद्ध करने की विधि पर निर्भर करते हैं।\n\nवर्तमान एकीकरण टीसीपी पर HTTP और TLS के लिए tpws का उपयोग करता है। यह आईपी ब्लॉकिंग या रिले यूडीपी को बायपास नहीं करता है, और Telegram के MTProto कनेक्शन की गारंटी नहीं दे सकता है। Discord वॉयस, Telegram कॉल और इस प्रकार के प्रतिबंधों के लिए TUN वाले वीपीएन सर्वर का उपयोग करें।\n\n## इंजन\n\n### ऑटो\n\nSora एक स्थापित इंजन का चयन करता है जो संपूर्ण कनेक्शन योजना का समर्थन करता है: सर्वर प्रोटोकॉल, ट्रांसपोर्ट, समूह, विखंडन और मोड। वर्तमान कनेक्शन को रोकने से पहले एक असंगत मैन्युअल विकल्प को अस्वीकार कर दिया जाता है। ऑटो या अन्य इंजन चुनें और सेटिंग्स फिर से लागू करें।\n\n### sing-box\n\nनए Sora पैकेज में [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) का एक कांटा, क्लाइंट-साइड XHTTP और VLESS Encryption शामिल है। Sora निर्माण और उसकी क्षमताओं को पहचानता है। XHTTP के बिना एक अपस्ट्रीम बिल्ड केवल इसके नाम से यह क्षमता हासिल नहीं करता है।\n\nसमर्थित प्रोटोकॉल में VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard और AmneziaWG 1.x/2.x पैरामीटर शामिल हैं। Sora आयात कर सकते हैं. पूर्ण Xray JSON प्रोफाइल के लिए Xray की आवश्यकता होती है। नई AWG 3.x फ़ील्ड अभी तक आयात नहीं की जा सकतीं. sing-box एक पासवर्ड-संरक्षित स्थानीय नियंत्रण पोर्ट का उपयोग करता है, जिसे कंप्यूटर पर अन्य एप्लिकेशन पता लगा सकते हैं।\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption और TLS विखंडन का समर्थन करता है। यह उनकी रूटिंग और समूहों को संरक्षित करते हुए संपूर्ण प्रदाता Xray प्रोफाइल भी चलाता है। ऐसी प्रोफ़ाइलों को उनके व्यवहार को बदले बिना स्वचालित रूप से किसी अन्य इंजन में परिवर्तित नहीं किया जा सकता है।\n\nबंडल किए गए Xray ने उस सेटिंग को हटा दिया जो TLS प्रमाणपत्र सत्यापन (`allowInsecure`) को अक्षम कर देती है। इस सेटिंग की आवश्यकता वाले सामान्य सर्वर के लिए स्वतः sing-box या mihomo का चयन करता है। Xray का चयन वर्तमान कनेक्शन को रोकने से पहले मैन्युअल रूप से असंगतता की रिपोर्ट करता है। पुराने पूर्ण JSON प्रोफाइल को सत्यापन योग्य प्रमाणपत्र या प्रमाणपत्र पिन के साथ एक अद्यतन प्रदाता प्रोफ़ाइल की आवश्यकता होती है।\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ऑर्डर किए गए फ़ॉलबैक और लोड-बैलेंसिंग समूहों, XHTTP और AmneziaWG का समर्थन करता है। जब बैकअप सर्वर पर स्वचालित विफलता मायने रखती है तो इसे चुनें। इस इंजन के साथ Sora की TLS फ़्रेग्मेंटेशन सेटिंग उपलब्ध नहीं है।\n\n## Sora में अनुकूलता\n\n| फ़ीचर | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows ट्यून और टीसीपी/यूडीपी | हाँ | हाँ | हाँ |\n| XHTTP | हाँ | हाँ | हाँ |\n| VLESS Encryption | हाँ | हाँ | हाँ |\n| पूर्ण Xray प्रोफ़ाइल | नहीं | हाँ | नहीं |\n| TUIC / AnyTLS | दोनों | नहीं | TUIC |\n| mieru | नहीं | नहीं | हाँ |\n| NaiveProxy | हाँ | नहीं | नहीं |\n| टीएलएस विखंडन | हाँ | हाँ | नहीं |\n| AmneziaWG 1.x/2.x | हाँ¹ | नहीं | हाँ |\n| आदेशित फ़ॉलबैक समूह | नहीं | नहीं² | हाँ |\n\n¹ J1/J2/J3/Itime वाली प्रोफ़ाइलें mihomo का उपयोग करती हैं; इन क्षेत्रों को कभी भी चुपचाप नहीं छोड़ा जाना चाहिए। ² संपूर्ण Xray प्रोफाइल के समूह के लिए, ऐप एक बैकअप प्रोफ़ाइल का चयन करता है। समर्थन स्थापित बिल्ड पर निर्भर करता है; अबाउट में इसका संस्करण जांचें।\n\n## ट्यून स्टैक\n\nस्टैक वर्चुअल इंटरफ़ेस के अंदर टीसीपी और यूडीपी को संभालता है। मोड पैनल में, Xray और mihomo gVisor, System, Mixed और MIPS ऑफर करते हैं। प्रत्येक इंजन अपनी प्राथमिकता बचाता है। System प्रॉक्सी और सर्वर रहित मोड इस प्राथमिकता का उपयोग नहीं करते हैं।\n\n- **Mixed** - टीसीपी सिस्टम स्टैक का उपयोग करता है, जबकि gVisor यूडीपी को संभालता है। Linux पर यह mihomo का डिफ़ॉल्ट है। Windows पर Xray और mihomo डिफ़ॉल्ट रूप से MIPS का उपयोग करते हैं।\n- **System** - सिस्टम स्टैक का उपयोग करता है। यदि नेटवर्क अनुप्रयोगों में समस्याएँ आती हैं तो दूसरा विकल्प आज़माएँ।\n- **gVisor** - यूजरस्पेस में ट्रैफिक को संभालता है।\n- **MIPS** - mihomo का अपना आईपी स्टैक, बंडल संस्करण 1.19.32 में उपलब्ध है।\n\nLinux पर, Xray डिफ़ॉल्ट रूप से अपने अंतर्निहित gVisor का उपयोग करता है। System, Mixed और Linux पर MIPS TUN इंजन के रूप में mihomo का उपयोग करते हैं, एक प्रमाणित स्थानीय SOCKS लिंक पर TCP और UDP को Xray पर अग्रेषित करते हैं। Xray प्रोटोकॉल, प्रदाता प्रोफ़ाइल और रूटिंग को बरकरार रखता है। इन तीन विकल्पों के लिए एक स्थापित mihomo की आवश्यकता होती है। Windows पर Xray चारों TUN स्टैक के लिए mihomo 1.19.32 या नया संस्करण उपयोग करता है। प्रोटोकॉल और रूटिंग Xray में रहते हैं। इस संयोजन में ऐप के नियम केवल सीधे कनेक्शन और ब्लॉक करने का समर्थन करते हैं; Linux पर इन नियमों के लिए Xray का अंतर्निहित gVisor आवश्यक है।\n\nब्रिज दूसरी प्रक्रिया चलाता है। Linux पर तीन निष्क्रिय मापों में, इसने मूल Xray TUN की तुलना में लगभग 32-36 MiB अधिक भौतिक मेमोरी का उपयोग किया। यह डाउनलोड लोड को मापता नहीं है: सीपीयू और मेमोरी की लागत कनेक्शन पर निर्भर करती है। sing-box में कोई स्टैक चयनकर्ता नहीं है। कोई भी स्टैक हर नेटवर्क में बेहतर प्रदर्शन की गारंटी नहीं देता। एक स्टैक चुनें और इसे अपने नेटवर्क में आज़माने के लिए लागू करें और पुनः कनेक्ट करें चुनें।\n\n## सेटिंग्स लागू करना\n\nसर्वर का चयन स्वचालित रूप से पुनः कनेक्ट हो जाता है। मोड, इंजन, डीएनएस और नियम सेटिंग्स तुरंत सहेजी जाती हैं; सक्रिय कनेक्शन के दौरान, लागू करें पर क्लिक करें और उनका उपयोग करने के लिए पुनः कनेक्ट करें। इंजन को पुनः आरंभ करने से डाउनलोड और कॉल बाधित हो सकते हैं। बार-बार क्लिक करने से समानांतर कनेक्शन प्रारंभ नहीं होते; डिस्कनेक्ट करने से संक्रमण समाप्त हो जाता है और कनेक्शन रिलीज़ हो जाता है।\n\nसुरंग गिरने पर केवल वीपीएन के माध्यम से इंटरनेट सीधे यातायात को अवरुद्ध करता है। इसका असर पूरी मशीन पर पड़ता है. एक स्पष्ट डिस्कनेक्ट Sora के नियमों को हटा देता है। यदि सफ़ाई समाप्त नहीं होती है, तो डिस्कनेक्ट करने का पुनः प्रयास करें और लॉग खोलें।\n\n## परियोजना दस्तावेज़ीकरण\n\n- [sing-box-lx: कॉन्फ़िगरेशन और समर्थन](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box दस्तावेज़](https://sing-box.sagernet.org/)\n- [Xray दस्तावेज़](https://xtls.github.io/)\n- [mihomo दस्तावेज़](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: संचालन और सीमाएं](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC, Jitsi, Yandex Telemost या WB Stream की वीडियो कॉल के ज़रिए TCP ट्रैफ़िक भेजता है। olcrtc:// लिंक या QR कोड आयात करें। यह प्रॉक्सी और TUN मोड में sing-box, Xray और mihomo के साथ काम करता है; UDP समर्थित नहीं है। दोनों सिरों पर OLC2 के संगत बिल्ड चाहिए। मूल परियोजना संग्रहित कर दी गई है।\n';
 
   @override
   String get probeServers => 'सर्वरों की जाँच करें';
@@ -907,36 +907,7 @@ class SHi extends S {
   String get extInstallOne => '1 इंस्टॉल';
 
   @override
-  String get extBadgeVerified => 'सत्यापित';
-
-  @override
-  String get extBadgeTop => 'इस सप्ताह सबसे लोकप्रिय';
-
-  @override
-  String get extBadgeNew => 'नया';
-
-  @override
-  String get extBadgeStaff => 'Sora टीम';
-
-  @override
-  String get extSideloadShort => 'कैटलॉग से नहीं';
-
-  @override
-  String get extSideloadWarning =>
-      'यह एक्सटेंशन टीम कैटलॉग से नहीं है। केवल लेखक ने ही उनकी कुंजी की गारंटी दी है: इसे केवल तभी स्थापित करें जब आपको लेखक पर भरोसा हो।';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» इंस्टॉल करें';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» अपडेट करें';
-  }
-
-  @override
-  String get extPermissionsIntro => 'यह एक्सटेंशन निम्न में सक्षम होगा:';
+  String get extSideloadWarning => 'लेखक की स्वहस्ताक्षरित कुंजी पर भरोसा हो तभी इंस्टॉल करें।';
 
   @override
   String get extPermissionsWidened => 'अपडेट नई अनुमतियां मांगता है:';
@@ -1064,9 +1035,6 @@ class SHi extends S {
       'यह अद्यतन स्थापित संस्करण की तुलना में एक अलग लेखक कुंजी के साथ हस्ताक्षरित है, इसलिए इसे अवरुद्ध कर दिया गया था। यदि आप नई कुंजी पर भरोसा करते हैं, तो एक्सटेंशन को अनइंस्टॉल करें और इसे स्पष्ट रूप से फिर से इंस्टॉल करें।';
 
   @override
-  String get extUpdateAvailable => 'अपडेट उपलब्ध है';
-
-  @override
   String get extDisabled => 'बंद';
 
   @override
@@ -1109,9 +1077,6 @@ class SHi extends S {
   String get extConflictsTitle => 'विस्तार संघर्ष';
 
   @override
-  String get extConflictsIntro => 'ये एक्सटेंशन एक ही चीज़ चाहते हैं। चुनें कि कौन-सा चलेगा, दूसरा इंस्टॉल रहेगा।';
-
-  @override
   String get extConflictTheme => 'ऐप थीम';
 
   @override
@@ -1131,28 +1096,9 @@ class SHi extends S {
   String get extConflictsResolve => 'विवादों का समाधान करें';
 
   @override
-  String get extConflictNote =>
-      'आपका चुनाव इस डिवाइस पर सहेजा जाता है। थीम तुरंत बदलती है, नेटवर्क हुक इस संस्करण में नहीं चलते।';
-
-  @override
   String extVersionLabel(String version) {
     return 'संस्करण $version';
   }
-
-  @override
-  String get extAuthor => 'लेखक';
-
-  @override
-  String get extRating => 'रेटिंग';
-
-  @override
-  String get extInstalls => 'इंस्टॉल संख्या';
-
-  @override
-  String get extVersion => 'संस्करण';
-
-  @override
-  String get extAbout => 'इस एक्सटेंशन के बारे में';
 
   @override
   String get extPermissionsTitle => 'अनुमतियाँ';
@@ -1165,9 +1111,6 @@ class SHi extends S {
 
   @override
   String get extSaveSettings => 'सेटिंग्स सहेजें';
-
-  @override
-  String get extSaving => 'सहेजा जा रहा है...';
 
   @override
   String extUpdateTo(String version) {
@@ -1196,8 +1139,7 @@ class SHi extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'पैनल अनुपलब्ध है। हो सकता है कि एक्सटेंशन अक्षम कर दिया गया हो या हटा दिया गया हो.';
+  String get extPanelUnavailable => 'एक्सटेंशन पैनल उपलब्ध नहीं है।';
 
   @override
   String get extPermConnectionsRead => 'सक्रिय कनेक्शनों की सूची देखें';
@@ -1236,10 +1178,6 @@ class SHi extends S {
   String get extPermBackground => 'पृष्ठभूमि कार्य चलाएँ';
 
   @override
-  String get extPermBackgroundDetail =>
-      'पैनल बंद होने पर भी निर्धारित कार्य चलाता है। आप इसे रोक सकते हैं या एक्सटेंशन सेटिंग में यह बदल सकते हैं कि यह कितनी बार चलता है।';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SHi extends S {
   String get extImageFailed => 'छवि लोड नहीं हो सकी';
 
   @override
-  String get extRatingHow => 'रेटिंग्स कैसे काम करती हैं';
-
-  @override
-  String get extRatingHowBody =>
-      'रेटिंग बायेसियन औसत का उपयोग करती है: कुछ रेटिंग वाला एक्सटेंशन तब तक मध्य के पास रहता है जब तक कि अधिक लोग वोट नहीं करते हैं, इसलिए एक 5-सितारा समीक्षा एक नए एक्सटेंशन को शीर्ष पर नहीं धकेल सकती है। हाल की रेटिंग का महत्व पुरानी रेटिंग से अधिक है और प्रति खाता केवल एक रेटिंग ही मायने रखती है।';
-
-  @override
   String get extScreenshots => 'स्क्रीनशॉट';
 
   @override
   String get extSortRelevance => 'प्रासंगिकता';
 
   @override
-  String get extPermNetworkDetail =>
-      'VPN के ज़रिए इंटरनेट से डेटा लाता है। केवल नीचे दिए होस्ट की अनुमति है, बाकी सब ब्लॉक है।';
+  String get extPermNetworkDetail => 'VPN अनुरोध केवल नीचे दिए गए होस्ट तक पहुँच सकते हैं।';
 
   @override
   String get extBgTitle => 'पृष्ठभूमि कार्य';
@@ -1308,10 +1238,6 @@ class SHi extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# घंटे', one: '# घंटा');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Sora खुला रहने तक, ट्रे में होने पर भी, कार्य शेड्यूल के अनुसार चलता है। सबसे छोटा अंतराल 15 मिनट है।';
 
   @override
   String get extBgDisabledNote => 'इसके पृष्ठभूमि कार्य को प्रबंधित करने के लिए एक्सटेंशन को सक्षम करें।';
@@ -1345,13 +1271,7 @@ class SHi extends S {
   String get qrCopyLink => 'लिंक कॉपी करें';
 
   @override
-  String get qrShowLink => 'लिंक दिखाएँ';
-
-  @override
-  String get qrHideLink => 'लिंक छुपाएं';
-
-  @override
-  String get qrWarning => 'इस QR कोड में कनेक्शन विवरण शामिल है। इसे अजनबियों को न दिखाएं.';
+  String get qrWarning => 'यह कोड केवल भरोसेमंद लोगों को दिखाएँ।';
 
   @override
   String get qrScanHint => 'QR कोड वाला स्क्रीनशॉट या फ़ोटो चुनें, या लिंक पेस्ट करें';
@@ -1468,6 +1388,9 @@ class SHi extends S {
 
   @override
   String get sortBy => 'क्रमबद्ध करें';
+
+  @override
+  String get sortSubscription => 'सदस्यता के क्रम में';
 
   @override
   String get sortPing => 'पिंग';
@@ -1808,15 +1731,9 @@ class SHi extends S {
   String get customServerHideSecret => 'रहस्य छुपाएं';
 
   @override
-  String get customServerBadge => 'कस्टम';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'सर्वर \"$name\" हटाएं?';
   }
-
-  @override
-  String get customServerEmptyHint => 'मैन्युअल रूप से एक सर्वर जोड़ें: पता, पोर्ट और प्रोटोकॉल';
 
   @override
   String get customServerTest => 'परीक्षण';
@@ -1986,10 +1903,6 @@ class SHi extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks के लिए: method:password, जैसे chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'पैकेट पर कब्जा';
 
   @override
@@ -2008,8 +1921,7 @@ class SHi extends S {
   String get extErrRevoked => 'Sora टीम ने इस एक्सटेंशन संस्करण को वापस ले लिया है, क्योंकि यह असुरक्षित या खराब है।';
 
   @override
-  String get extErrRevocationsExpired =>
-      'वापस लिए गए एक्सटेंशन की सूची नवीनीकृत नहीं हो सकी। नवीनीकरण तक इंस्टॉल बंद है: नेटवर्क जांचें और फिर कोशिश करें।';
+  String get extErrRevocationsExpired => 'निरस्त एक्सटेंशन की सूची अपडेट होने तक इंस्टॉलेशन बंद है।';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2055,4 +1967,39 @@ class SHi extends S {
 
   @override
   String get extAssetRejected => 'एक्सटेंशन फ़ाइल अस्वीकृत: अपठनीय रंग या अमान्य नियम।';
+
+  @override
+  String get extVerifiedSora => 'Sora द्वारा सत्यापित';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count बाइट';
+  }
+
+  @override
+  String get extOpen => 'खोलें';
+
+  @override
+  String get customServerOwn => 'अपना सर्वर';
+
+  @override
+  String get customServerPaste => 'लिंक पेस्ट करें';
+
+  @override
+  String get customServerUser => 'उपयोगकर्ता नाम';
+
+  @override
+  String get customServerPassword => 'पासवर्ड';
+
+  @override
+  String get customServerSecretRequired => 'कोई मान दर्ज करें';
+
+  @override
+  String get customServerLinkInvalid => 'सर्वर लिंक अमान्य है';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

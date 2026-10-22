@@ -48,7 +48,7 @@ class _ServersScreenState extends State<ServersScreen> {
     super.initState();
     // No setState listener on [_search]: the subscription sections below
     // listen through ValueListenableBuilder, so typing rebuilds only the
-    // list, not the toolbar, search field and custom card.
+    // list, not the toolbar, search field and custom group.
   }
 
   @override
@@ -69,11 +69,9 @@ class _ServersScreenState extends State<ServersScreen> {
     final sora = SoraScope.of(context);
     final s = S.of(context);
     final palette = Palette.of(context);
-    if (widget.embedded && sora.subscriptions.isEmpty && sora.customServers.isEmpty) {
-      return widget.scrollable ? const SizedBox.expand() : const SliverToBoxAdapter();
-    }
     final sortMode = sora.settings.serverSortMode;
     String sortLabel(String mode) => switch (mode) {
+      'subscription' => s.sortSubscription,
       'speed' => s.sortSpeed,
       'name' => s.sortName,
       _ => s.sortPing,
@@ -97,7 +95,7 @@ class _ServersScreenState extends State<ServersScreen> {
         ),
       MenuAnchor(
         menuChildren: [
-          for (final mode in ['ping', 'speed', 'name'])
+          for (final mode in ['subscription', 'ping', 'speed', 'name'])
             MenuItemButton(
               onPressed: () => unawaited(sora.change((x) => x.serverSortMode = mode, replan: false)),
               leadingIcon: sortMode == mode
@@ -116,6 +114,7 @@ class _ServersScreenState extends State<ServersScreen> {
         0,
         RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
       ),
+      if (sora.customServers.isEmpty) const _OwnServerAction(),
       RoundButton(
         icon: Symbols.qr_code_scanner_rounded,
         label: s.qrScan,
@@ -148,13 +147,7 @@ class _ServersScreenState extends State<ServersScreen> {
           decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(4),
-            child: sora.servers.isNotEmpty
-                ? _ServerRow(id: 'auto', name: s.serverAuto)
-                : Tile(
-                    title: s.addSubscription,
-                    onTap: () => showSubscriptionSheet(context),
-                    trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
-                  ),
+            child: _ServerRow(id: 'auto', name: s.serverAuto),
           ),
         ),
       ),
@@ -167,17 +160,24 @@ class _ServersScreenState extends State<ServersScreen> {
             label: MaterialLocalizations.of(context).backButtonTooltip,
             onTap: () => Navigator.of(context).maybePop(),
           ),
-        const Spacer(),
-        ...actions,
+        Expanded(
+          child: Wrap(alignment: WrapAlignment.end, crossAxisAlignment: WrapCrossAlignment.center, children: actions),
+        ),
       ],
     );
     final separator = palette.ink3.withValues(alpha: 0.28);
     final slivers = <Widget>[
-      SliverToBoxAdapter(child: Column(children: [toolbar, const SizedBox(height: 8), search])),
-      SliverToBoxAdapter(child: automatic),
-      const SliverToBoxAdapter(child: _CustomServersCard()),
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            toolbar,
+            if (sora.subscriptions.isNotEmpty) ...[const SizedBox(height: 8), search],
+          ],
+        ),
+      ),
+      if (sora.servers.isNotEmpty) SliverToBoxAdapter(child: automatic),
       // Typing filters the subscription sections only: the toolbar, search
-      // field and custom card keep their state instead of the whole screen
+      // field and custom group keep their state instead of the whole screen
       // rebuilding on every keystroke.
       ValueListenableBuilder<TextEditingValue>(
         valueListenable: _search,
@@ -185,12 +185,17 @@ class _ServersScreenState extends State<ServersScreen> {
           final query = value.text.trim().toLowerCase();
           // One shared cache per build pass: the sort step and the rows both
           // need each group entry's prospective active member (see
-          // _sortEntries), so it is computed once, not per comparison and
+          // sortServerEntries), so it is computed once, not per comparison and
           // again per row.
           final shownCache = <Entry, OutboundSpec?>{};
           final sections = <Widget>[];
           for (final subscription in sora.subscriptions) {
-            final entries = _sortEntries(_matching(_visibleEntries(subscription, sora), query), sora, shownCache);
+            final entries = sortServerEntries(
+              _matching(_visibleEntries(subscription, sora), query),
+              sora,
+              subscription.outbounds,
+              shownCache,
+            );
             if (query.isNotEmpty && entries.isEmpty) continue;
             sections.add(
               SliverPadding(
@@ -246,6 +251,7 @@ class _ServersScreenState extends State<ServersScreen> {
           return SliverMainAxisGroup(slivers: sections);
         },
       ),
+      if (sora.customServers.isNotEmpty) const SliverToBoxAdapter(child: _CustomServersGroup()),
     ];
     if (!widget.scrollable) {
       return SliverPadding(
@@ -265,8 +271,9 @@ class _ServersScreenState extends State<ServersScreen> {
     return widget.embedded ? list : Scaffold(backgroundColor: palette.background, body: list);
   }
 
-  Widget _tourTarget(int step, Widget child) =>
-      widget.embedded ? TourTarget(step: step, radius: step == 0 ? 18 : 12, child: child) : child;
+  Widget _tourTarget(int step, Widget child) => widget.embedded && SoraScope.of(context).subscriptions.isNotEmpty
+      ? TourTarget(step: step, radius: step == 0 ? 18 : 12, child: child)
+      : child;
 }
 
 List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
@@ -311,8 +318,25 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
 /// scans every member; computing it once per entry per build pass instead
 /// of once per sort comparison plus once per row removes the probe-tick
 /// hotspot (latency ticks rebuild this screen about three times a second).
-List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpec?>? shownCache]) {
+List<Entry> sortServerEntries(
+  List<Entry> entries,
+  Sora sora,
+  List<OutboundSpec> providerOrder, [
+  Map<Entry, OutboundSpec?>? shownCache,
+]) {
   final mode = sora.settings.serverSortMode;
+  // Overrides can split a group, so use the provider positions of the
+  // remaining members rather than the order in which overrides emitted rows.
+  final positions = {for (var i = 0; i < providerOrder.length; i++) providerOrder[i].id: i};
+  final order = {
+    for (final entry in entries)
+      entry: entry.members.map((member) => positions[member.id]!).reduce((a, b) => a < b ? a : b),
+  };
+  int byProvider(Entry a, Entry b) => order[a]!.compareTo(order[b]!);
+  if (mode == 'subscription') {
+    entries.sort(byProvider);
+    return entries;
+  }
   if (mode == 'name') {
     // Sort keys are computed once per pass, not per comparison (the
     // benchmark screen's pattern, same as the key map below): the
@@ -320,7 +344,10 @@ List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpe
     // on every probe-tick rebuild. The values are pure in the entry name,
     // so the order is identical.
     final nameKeys = {for (final e in entries) e: e.name.toLowerCase()};
-    entries.sort((a, b) => nameKeys[a]!.compareTo(nameKeys[b]!));
+    entries.sort((a, b) {
+      final compared = nameKeys[a]!.compareTo(nameKeys[b]!);
+      return compared != 0 ? compared : byProvider(a, b);
+    });
     return entries;
   }
   // Groups are represented by the prospective active member (the same one
@@ -335,7 +362,10 @@ List<Entry> _sortEntries(List<Entry> entries, Sora sora, [Map<Entry, OutboundSpe
   }
 
   final keys = {for (final e in entries) e: keyOf(e)};
-  entries.sort((a, b) => sora.compareServers(keys[a]!, keys[b]!, mode));
+  entries.sort((a, b) {
+    final compared = sora.compareServers(keys[a]!, keys[b]!, mode);
+    return compared != 0 ? compared : byProvider(a, b);
+  });
   return entries;
 }
 
@@ -389,7 +419,7 @@ class _ServerRow extends StatelessWidget {
     final chosen = sora.selected == id;
     // Use the prospective active member's latency for a group row. The same
     // member supplies the wire-level flow shown in the badge below. The sort
-    // step already computed it for this build pass (see _sortEntries).
+    // step already computed it for this build pass (see sortServerEntries).
     final OutboundSpec? shown = entry == null || !entry!.isGroup
         ? null
         : shownCache?[entry!] ??
@@ -604,6 +634,15 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     onTap: () => unawaited(sora.refreshSubscription(state.settings.id)),
                   ),
                 ),
+              Tooltip(
+                message: s.qrShareTitle,
+                child: RoundButton(
+                  key: ValueKey('share-subscription-${state.settings.id}'),
+                  icon: Symbols.qr_code_rounded,
+                  label: s.qrShareTitle,
+                  onTap: () => unawaited(shareSubscriptionQr(context, state)),
+                ),
+              ),
               MenuAnchor(
                 alignmentOffset: const Offset(-150, 4),
                 menuChildren: [
@@ -612,7 +651,6 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     _item(context, s.providerWebsite, () => unawaited(openLink(context, info.webPageUrl))),
                   if (info.supportUrl.isNotEmpty)
                     _item(context, s.support, () => unawaited(openLink(context, info.supportUrl))),
-                  _item(context, s.qrShareTitle, () => unawaited(_shareQr(context, state))),
                   _item(
                     context,
                     s.subscriptionSettings,
@@ -678,7 +716,7 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
 
 /// Fetches the subscription link and shows it as a QR code. Failures are
 /// reported through the standard failure pipeline; nothing raw is shown.
-Future<void> _shareQr(BuildContext context, SubscriptionState state) async {
+Future<void> shareSubscriptionQr(BuildContext context, SubscriptionState state) async {
   final sora = SoraScope.read(context);
   final url = await sora.fetchSubscriptionLink(state.settings.id);
   if (url != null && context.mounted) {
@@ -704,19 +742,40 @@ Future<void> _deleteCustomServer(BuildContext context, CustomServer server) asyn
   }
 }
 
-/// The user's own servers, stored by the core outside subscriptions. Always
-/// visible: the empty state is the discovery path to the add form.
-class _CustomServersCard extends StatelessWidget {
-  const _CustomServersCard();
+class _OwnServerAction extends StatelessWidget {
+  const _OwnServerAction();
 
   @override
   Widget build(BuildContext context) {
-    final sora = SoraScope.of(context);
     final s = S.of(context);
     final palette = Palette.of(context);
-    final servers = sora.customServers;
+    return Tooltip(
+      message: s.customServerAdd,
+      child: TextButton.icon(
+        key: const ValueKey('add-own-server'),
+        onPressed: () => unawaited(showAddServerSheet(context)),
+        icon: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
+        label: Text(s.customServerOwn, style: Styles.secondary.copyWith(color: palette.ink)),
+        style: TextButton.styleFrom(
+          minimumSize: const Size(0, 36),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomServersGroup extends StatelessWidget {
+  const _CustomServersGroup();
+
+  @override
+  Widget build(BuildContext context) {
+    final servers = SoraScope.of(context).customServers;
+    final palette = Palette.of(context);
     final separator = palette.ink3.withValues(alpha: 0.28);
     return Padding(
+      key: const ValueKey('own-servers-group'),
       padding: const EdgeInsets.only(bottom: 16),
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -724,50 +783,27 @@ class _CustomServersCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: separator),
         ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      s.customServers,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Styles.bodyStrong.copyWith(color: palette.ink),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(S.of(context).customServers, style: Styles.bodyStrong.copyWith(color: palette.ink)),
                     ),
-                  ),
-                  RoundButton(
-                    icon: Symbols.add_rounded,
-                    label: s.customServerAdd,
-                    onTap: () => unawaited(push<void>(context, const AddServerScreen())),
-                  ),
-                ],
+                    const _OwnServerAction(),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-              child: servers.isEmpty
-                  ? Tile(
-                      title: s.customServerAdd,
-                      detail: s.customServerEmptyHint,
-                      onTap: () => unawaited(push<void>(context, const AddServerScreen())),
-                      trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
-                    )
-                  : Column(
-                      children: [
-                        for (var i = 0; i < servers.length; i++) ...[
-                          if (i > 0) Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
-                          // Keyed by server id: the row is stateful (its
-                          // in-flight test spinner), so a deletion must not
-                          // shift that state onto the next server.
-                          _CustomServerRow(key: ValueKey(servers[i].id), server: servers[i]),
-                        ],
-                      ],
-                    ),
-            ),
-          ],
+              for (var i = 0; i < servers.length; i++) ...[
+                if (i > 0) Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
+                _CustomServerRow(key: ValueKey(servers[i].id), server: servers[i]),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -823,7 +859,7 @@ class _CustomServerRowState extends State<_CustomServerRow> {
           radius: 8,
           give: 1,
           child: SizedBox(
-            height: 56,
+            height: 48,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
@@ -833,24 +869,16 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                server.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Styles.row.copyWith(color: palette.ink),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            _CustomBadge(label: s.customServerBadge),
-                          ],
+                        Text(
+                          server.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Styles.row.copyWith(color: palette.ink),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 3),
                           child: Text(
-                            '${customProtocolLabel(server.protocol)} | ${server.address}:${server.port}',
+                            '${customServerProtocol(server).toUpperCase()} | ${server.address}:${server.port}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: Styles.caption.copyWith(color: palette.ink3),
@@ -861,7 +889,7 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
-                    width: 84,
+                    width: 64,
                     child: Text(
                       !measured
                           ? ''
@@ -886,6 +914,15 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                     ),
                   ),
                   Tooltip(
+                    message: s.edit,
+                    child: RoundButton(
+                      key: ValueKey('edit-own-server-${server.id}'),
+                      icon: Symbols.edit_rounded,
+                      label: s.edit,
+                      onTap: () => unawaited(showAddServerSheet(context, server: server)),
+                    ),
+                  ),
+                  Tooltip(
                     message: s.delete,
                     child: Pressable(
                       onTap: () => unawaited(_deleteCustomServer(context, server)),
@@ -901,28 +938,6 @@ class _CustomServerRowState extends State<_CustomServerRow> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// A small outlined pill marking a user-added server.
-class _CustomBadge extends StatelessWidget {
-  const _CustomBadge({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = Palette.of(context);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(color: palette.ink3.withValues(alpha: 0.6)),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: Text(label, style: Styles.caption.copyWith(color: palette.ink2)),
       ),
     );
   }

@@ -881,7 +881,7 @@ class SFa extends S {
 
   @override
   String get modesGuide =>
-      'اگر مطمئن نیستید که سرور شما به کدام موتور نیاز دارد، Auto را انتخاب کنید. Sora نمایه و تنظیمات را قبل از اتصال بررسی می کند. یک موتور نمی تواند پهنای باند طرح شما را افزایش دهد: عملکرد به سرور، مسیر، پروتکل و شبکه بستگی دارد.\n\n## حالت ها\n\n### همه ترافیک (TUN)\n\nSora یک رابط شبکه مجازی ایجاد می کند و ترافیک برنامه ها از جمله TCP و UDP را از طریق آن هدایت می کند. از این حالت برای Telegram، بازی ها و صدای Discord استفاده کنید. قوانین می توانند سایت ها یا برنامه های خاصی را مستقیما ارسال کنند یا آنها را مسدود کنند. سرویس شبکه به مجوز و سروری نیاز دارد که از پروتکل مورد نیاز پشتیبانی کند.\n\n### پروکسی System\n\nSora یک پروکسی محلی HTTP/SOCKS را پیکربندی می کند. برنامه هایی که به تنظیمات پراکسی سیستم احترام می گذارند از آن استفاده می کنند. برنامه های کاربردی با پشته شبکه خود ممکن است مستقیماً متصل شوند. UDP و تماس های صوتی به طور کلی به TUN نیاز دارند. این حالت برای مرورگرها و برنامه های دارای پشتیبانی از پروکسی مناسب است.\n\n### بدون سرور\n\nدر Linux، Sora از [zapret](https://github.com/bol-van/zapret) برای تقسیم و تغییر شکل درخواست‌های HTTP/TLS و دور زدن برخی از بررسی‌های DPI استفاده می‌کند. IP شما ثابت می ماند و اتصالات مستقیماً به وب سایت می روند. نتایج به ارائه دهنده شما و روش مسدود کردن بستگی دارد.\n\nادغام فعلی از tpws برای HTTP و TLS روی TCP استفاده می کند. از مسدود کردن IP یا رله UDP عبور نمی کند و نمی تواند اتصالات Telegram MTProto را تضمین کند. از یک سرور VPN با TUN برای صدای Discord، تماس های Telegram و این نوع محدودیت ها استفاده کنید.\n\n## موتورها\n\n### خودکار\n\nSora موتور نصب شده ای را انتخاب می کند که از کل طرح اتصال پشتیبانی می کند: پروتکل های سرور، حمل و نقل، گروه ها، تکه تکه شدن و حالت. انتخاب دستی ناسازگار قبل از توقف اتصال فعلی رد می شود. Auto یا موتور دیگری را انتخاب کنید و دوباره تنظیمات را اعمال کنید.\n\n### sing-box\n\nبسته‌های جدید Sora شامل [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، چنگال [sing-box](https://github.com/SagerNet/sing-box)، اضافه کردن XHTTP و VLESS Encryption سمت مشتری است. Sora ساخت و قابلیت های آن را تشخیص می دهد. یک ساخت بالادستی بدون XHTTP این قابلیت را به تنهایی از نام خود به دست نمی آورد.\n\nپروتکل‌های پشتیبانی‌شده شامل VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard و پارامترهای AmneziaWG 1.x/2.x هستند که Sora می‌تواند وارد کند. پروفایل کامل Xray JSON به Xray نیاز دارد. وارد کردن فیلدهای جدید AWG 3.x هنوز امکان‌پذیر نیست. sing-box از یک درگاه کنترل محلی محافظت‌شده با گذرواژه استفاده می‌کند که برنامه‌های دیگر روی رایانه می‌توانند آن را شناسایی کنند.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) از تکه تکه شدن VLESS، REALITY، XHTTP، VLESS Encryption و TLS پشتیبانی می کند. همچنین پروفیل های کامل ارائه دهنده Xray را اجرا می کند و در عین حال مسیریابی و گروه های آنها را حفظ می کند. چنین پروفایل هایی را نمی توان بدون تغییر رفتار به طور خودکار به موتور دیگری تبدیل کرد.\n\nXray همراه، تنظیمی را که تأیید گواهی TLS را غیرفعال می‌کرد («allowInsecure») حذف کرد. خودکار sing-box یا mihomo را برای سرورهای معمولی که به این تنظیم نیاز دارند انتخاب می کند. انتخاب Xray به صورت دستی ناسازگاری را قبل از توقف اتصال فعلی گزارش می کند. نمایه‌های کامل JSON قدیمی‌تر به نمایه ارائه‌دهنده به‌روزرسانی شده با گواهی یا پین گواهی قابل تأیید نیاز دارند.\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) از گروه‌های بازگشتی و متعادل‌کننده بار سفارش‌داده‌شده، XHTTP و AmneziaWG پشتیبانی می‌کند. زمانی آن را انتخاب کنید که خطای خودکار به سرور پشتیبان مهم است. تنظیم تکه تکه شدن TLS Sora با این موتور در دسترس نیست.\n\n## سازگاری در Sora\n\n| ویژگی | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN و TCP/UDP | بله | بله | بله |\n| XHTTP | بله | بله | بله |\n| VLESS Encryption | بله | بله | بله |\n| پروفایل کامل Xray | نه | بله | نه |\n| TUIC / AnyTLS | هر دو | نه | TUIC |\n| تکه تکه شدن TLS | بله | بله | نه |\n| AmneziaWG 1.x/2.x | بله¹ | نه | بله |\n| گروه بازگشتی سفارشی | نه | No² | بله |\n\n¹ نمایه‌های دارای J1/J2/J3/Itime از mihomo استفاده می‌کنند. این زمینه ها هرگز نباید بی سر و صدا کنار گذاشته شوند. ² برای گروهی از نمایه‌های کامل Xray، برنامه یک نمایه پشتیبان انتخاب می‌کند. پشتیبانی بستگی به ساخت نصب شده دارد. نسخه آن را در About چک کنید.\n\n## پشته TUN\n\nپشته TCP و UDP را در داخل رابط مجازی کنترل می کند. در پانل حالت ها، Xray و mihomo gVisor، System، Mixed و MIPS را ارائه می دهند. هر موتور اولویت خود را ذخیره می کند. پروکسی System و حالت‌های بدون سرور از این اولویت استفاده نمی‌کنند.\n\n- **Mixed** - TCP از پشته سیستم استفاده می کند، در حالی که gVisor UDP را کنترل می کند. این پیش‌فرض mihomo در Linux است. در Windows، Xray و mihomo به‌طور پیش‌فرض از MIPS استفاده می‌کنند.\n- **System** - از پشته سیستم استفاده می کند. اگر برنامه های شبکه با مشکل مواجه شدند، گزینه دیگری را امتحان کنید.\n- **gVisor** - ترافیک در فضای کاربران را کنترل می کند.\n- **MIPS**: پشته IP اختصاصی mihomo، موجود در نسخه همراه 1.19.32.\n\nدر Linux، Xray به طور پیش فرض از gVisor داخلی خود استفاده می کند. System، Mixed و MIPS در Linux از mihomo به عنوان موتور TUN استفاده می‌کنند و TCP و UDP را به Xray از طریق پیوند محلی SOCKS تأیید شده ارسال می‌کنند. Xray پروتکل، مشخصات ارائه دهنده و مسیریابی را حفظ می کند. این سه گزینه به mihomo نصب شده نیاز دارند. در Windows، Xray برای هر چهار پشته TUN از mihomo 1.19.32 یا جدیدتر استفاده می‌کند. پروتکل‌ها و مسیریابی در Xray باقی می‌مانند. قوانین برنامه‌ها در این ترکیب فقط اتصال مستقیم و مسدودسازی را پشتیبانی می‌کنند؛ در Linux این قوانین به gVisor داخلی Xray نیاز دارند.\n\nپل فرآیند دوم را اجرا می کند. در سه اندازه گیری غیرفعال در Linux، از حافظه فیزیکی 32 تا 36 مگابایت بیشتر از Xray TUN استفاده کرد. این بار دانلود را اندازه نمی‌گیرد: هزینه‌های CPU و حافظه به اتصالات بستگی دارد. sing-box انتخابگر پشته ندارد. هیچ پشته ای عملکرد بهتر را در هر شبکه ای تضمین نمی کند. یک پشته را انتخاب کنید و Apply را انتخاب کنید و دوباره متصل شوید تا آن را در شبکه خود امتحان کنید.\n\n## اعمال تنظیمات\n\nانتخاب سرور به طور خودکار دوباره متصل می شود. تنظیمات حالت، موتور، DNS و قوانین بلافاصله ذخیره می شوند. در طول یک اتصال فعال، روی Apply کلیک کنید و دوباره متصل شوید تا از آنها استفاده کنید. راه اندازی مجدد موتور ممکن است بارگیری ها و تماس ها را قطع کند. کلیک های مکرر اتصالات موازی را شروع نمی کنند. قطع کردن انتقال به پایان می رسد و اتصال آزاد می شود.\n\nاینترنت فقط از طریق VPN ترافیک مستقیم را هنگام سقوط یک تونل مسدود می کند. کل دستگاه را تحت تأثیر قرار می دهد. قطع صریح قوانین Sora را حذف می کند. اگر پاکسازی تمام نشد، دوباره سعی کنید اتصال را قطع کرده و گزارش را باز کنید.\n\n## مستندات پروژه\n\n- [sing-box-lx: پیکربندی و پشتیبانی] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [مستندات sing-box] (https://sing-box.sagernet.org/)\n- [اسناد Xray] (https://xtls.github.io/)\n- [مستندات mihomo] (https://wiki.metacubex.one/)\n- [zapret: عملیات و محدودیت ها] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'اگر مطمئن نیستید که سرور شما به کدام موتور نیاز دارد، Auto را انتخاب کنید. Sora نمایه و تنظیمات را قبل از اتصال بررسی می کند. یک موتور نمی تواند پهنای باند طرح شما را افزایش دهد: عملکرد به سرور، مسیر، پروتکل و شبکه بستگی دارد.\n\n## حالت ها\n\n### همه ترافیک (TUN)\n\nSora یک رابط شبکه مجازی ایجاد می کند و ترافیک برنامه ها از جمله TCP و UDP را از طریق آن هدایت می کند. از این حالت برای Telegram، بازی ها و صدای Discord استفاده کنید. قوانین می توانند سایت ها یا برنامه های خاصی را مستقیما ارسال کنند یا آنها را مسدود کنند. سرویس شبکه به مجوز و سروری نیاز دارد که از پروتکل مورد نیاز پشتیبانی کند.\n\n### پروکسی System\n\nSora یک پروکسی محلی HTTP/SOCKS را پیکربندی می کند. برنامه هایی که به تنظیمات پراکسی سیستم احترام می گذارند از آن استفاده می کنند. برنامه های کاربردی با پشته شبکه خود ممکن است مستقیماً متصل شوند. UDP و تماس های صوتی به طور کلی به TUN نیاز دارند. این حالت برای مرورگرها و برنامه های دارای پشتیبانی از پروکسی مناسب است.\n\n### بدون سرور\n\nدر Linux، Sora از [zapret](https://github.com/bol-van/zapret) برای تقسیم و تغییر شکل درخواست‌های HTTP/TLS و دور زدن برخی از بررسی‌های DPI استفاده می‌کند. IP شما ثابت می ماند و اتصالات مستقیماً به وب سایت می روند. نتایج به ارائه دهنده شما و روش مسدود کردن بستگی دارد.\n\nادغام فعلی از tpws برای HTTP و TLS روی TCP استفاده می کند. از مسدود کردن IP یا رله UDP عبور نمی کند و نمی تواند اتصالات Telegram MTProto را تضمین کند. از یک سرور VPN با TUN برای صدای Discord، تماس های Telegram و این نوع محدودیت ها استفاده کنید.\n\n## موتورها\n\n### خودکار\n\nSora موتور نصب شده ای را انتخاب می کند که از کل طرح اتصال پشتیبانی می کند: پروتکل های سرور، حمل و نقل، گروه ها، تکه تکه شدن و حالت. انتخاب دستی ناسازگار قبل از توقف اتصال فعلی رد می شود. Auto یا موتور دیگری را انتخاب کنید و دوباره تنظیمات را اعمال کنید.\n\n### sing-box\n\nبسته‌های جدید Sora شامل [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، چنگال [sing-box](https://github.com/SagerNet/sing-box)، اضافه کردن XHTTP و VLESS Encryption سمت مشتری است. Sora ساخت و قابلیت های آن را تشخیص می دهد. یک ساخت بالادستی بدون XHTTP این قابلیت را به تنهایی از نام خود به دست نمی آورد.\n\nپروتکل‌های پشتیبانی‌شده شامل VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard و پارامترهای AmneziaWG 1.x/2.x هستند که Sora می‌تواند وارد کند. پروفایل کامل Xray JSON به Xray نیاز دارد. وارد کردن فیلدهای جدید AWG 3.x هنوز امکان‌پذیر نیست. sing-box از یک درگاه کنترل محلی محافظت‌شده با گذرواژه استفاده می‌کند که برنامه‌های دیگر روی رایانه می‌توانند آن را شناسایی کنند.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) از تکه تکه شدن VLESS، REALITY، XHTTP، VLESS Encryption و TLS پشتیبانی می کند. همچنین پروفیل های کامل ارائه دهنده Xray را اجرا می کند و در عین حال مسیریابی و گروه های آنها را حفظ می کند. چنین پروفایل هایی را نمی توان بدون تغییر رفتار به طور خودکار به موتور دیگری تبدیل کرد.\n\nXray همراه، تنظیمی را که تأیید گواهی TLS را غیرفعال می‌کرد («allowInsecure») حذف کرد. خودکار sing-box یا mihomo را برای سرورهای معمولی که به این تنظیم نیاز دارند انتخاب می کند. انتخاب Xray به صورت دستی ناسازگاری را قبل از توقف اتصال فعلی گزارش می کند. نمایه‌های کامل JSON قدیمی‌تر به نمایه ارائه‌دهنده به‌روزرسانی شده با گواهی یا پین گواهی قابل تأیید نیاز دارند.\n\n### mihomo\n\n[mihomo] (https://github.com/MetaCubeX/mihomo) از گروه‌های بازگشتی و متعادل‌کننده بار سفارش‌داده‌شده، XHTTP و AmneziaWG پشتیبانی می‌کند. زمانی آن را انتخاب کنید که خطای خودکار به سرور پشتیبان مهم است. تنظیم تکه تکه شدن TLS Sora با این موتور در دسترس نیست.\n\n## سازگاری در Sora\n\n| ویژگی | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN و TCP/UDP | بله | بله | بله |\n| XHTTP | بله | بله | بله |\n| VLESS Encryption | بله | بله | بله |\n| پروفایل کامل Xray | نه | بله | نه |\n| TUIC / AnyTLS | هر دو | نه | TUIC |\n| mieru | نه | نه | بله |\n| NaiveProxy | بله | نه | نه |\n| تکه تکه شدن TLS | بله | بله | نه |\n| AmneziaWG 1.x/2.x | بله¹ | نه | بله |\n| گروه بازگشتی سفارشی | نه | No² | بله |\n\n¹ نمایه‌های دارای J1/J2/J3/Itime از mihomo استفاده می‌کنند. این زمینه ها هرگز نباید بی سر و صدا کنار گذاشته شوند. ² برای گروهی از نمایه‌های کامل Xray، برنامه یک نمایه پشتیبان انتخاب می‌کند. پشتیبانی بستگی به ساخت نصب شده دارد. نسخه آن را در About چک کنید.\n\n## پشته TUN\n\nپشته TCP و UDP را در داخل رابط مجازی کنترل می کند. در پانل حالت ها، Xray و mihomo gVisor، System، Mixed و MIPS را ارائه می دهند. هر موتور اولویت خود را ذخیره می کند. پروکسی System و حالت‌های بدون سرور از این اولویت استفاده نمی‌کنند.\n\n- **Mixed** - TCP از پشته سیستم استفاده می کند، در حالی که gVisor UDP را کنترل می کند. این پیش‌فرض mihomo در Linux است. در Windows، Xray و mihomo به‌طور پیش‌فرض از MIPS استفاده می‌کنند.\n- **System** - از پشته سیستم استفاده می کند. اگر برنامه های شبکه با مشکل مواجه شدند، گزینه دیگری را امتحان کنید.\n- **gVisor** - ترافیک در فضای کاربران را کنترل می کند.\n- **MIPS**: پشته IP اختصاصی mihomo، موجود در نسخه همراه 1.19.32.\n\nدر Linux، Xray به طور پیش فرض از gVisor داخلی خود استفاده می کند. System، Mixed و MIPS در Linux از mihomo به عنوان موتور TUN استفاده می‌کنند و TCP و UDP را به Xray از طریق پیوند محلی SOCKS تأیید شده ارسال می‌کنند. Xray پروتکل، مشخصات ارائه دهنده و مسیریابی را حفظ می کند. این سه گزینه به mihomo نصب شده نیاز دارند. در Windows، Xray برای هر چهار پشته TUN از mihomo 1.19.32 یا جدیدتر استفاده می‌کند. پروتکل‌ها و مسیریابی در Xray باقی می‌مانند. قوانین برنامه‌ها در این ترکیب فقط اتصال مستقیم و مسدودسازی را پشتیبانی می‌کنند؛ در Linux این قوانین به gVisor داخلی Xray نیاز دارند.\n\nپل فرآیند دوم را اجرا می کند. در سه اندازه گیری غیرفعال در Linux، از حافظه فیزیکی 32 تا 36 مگابایت بیشتر از Xray TUN استفاده کرد. این بار دانلود را اندازه نمی‌گیرد: هزینه‌های CPU و حافظه به اتصالات بستگی دارد. sing-box انتخابگر پشته ندارد. هیچ پشته ای عملکرد بهتر را در هر شبکه ای تضمین نمی کند. یک پشته را انتخاب کنید و Apply را انتخاب کنید و دوباره متصل شوید تا آن را در شبکه خود امتحان کنید.\n\n## اعمال تنظیمات\n\nانتخاب سرور به طور خودکار دوباره متصل می شود. تنظیمات حالت، موتور، DNS و قوانین بلافاصله ذخیره می شوند. در طول یک اتصال فعال، روی Apply کلیک کنید و دوباره متصل شوید تا از آنها استفاده کنید. راه اندازی مجدد موتور ممکن است بارگیری ها و تماس ها را قطع کند. کلیک های مکرر اتصالات موازی را شروع نمی کنند. قطع کردن انتقال به پایان می رسد و اتصال آزاد می شود.\n\nاینترنت فقط از طریق VPN ترافیک مستقیم را هنگام سقوط یک تونل مسدود می کند. کل دستگاه را تحت تأثیر قرار می دهد. قطع صریح قوانین Sora را حذف می کند. اگر پاکسازی تمام نشد، دوباره سعی کنید اتصال را قطع کرده و گزارش را باز کنید.\n\n## مستندات پروژه\n\n- [sing-box-lx: پیکربندی و پشتیبانی] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [مستندات sing-box] (https://sing-box.sagernet.org/)\n- [اسناد Xray] (https://xtls.github.io/)\n- [مستندات mihomo] (https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: عملیات و محدودیت ها] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC ترافیک TCP را از طریق تماس ویدیویی در Jitsi، Yandex Telemost یا WB Stream منتقل می‌کند. پیوند olcrtc:// یا کد QR را وارد کنید. با sing-box، Xray و mihomo در حالت‌های پراکسی و TUN کار می‌کند؛ UDP پشتیبانی نمی‌شود. هر دو طرف به نسخه‌های سازگار OLC2 نیاز دارند. پروژهٔ اصلی بایگانی شده است.\n';
 
   @override
   String get probeServers => 'سرورها را بررسی کنید';
@@ -908,36 +908,7 @@ class SFa extends S {
   String get extInstallOne => '1 نصب';
 
   @override
-  String get extBadgeVerified => 'تأیید شد';
-
-  @override
-  String get extBadgeTop => 'محبوب ترین این هفته';
-
-  @override
-  String get extBadgeNew => 'جدید';
-
-  @override
-  String get extBadgeStaff => 'تیم Sora';
-
-  @override
-  String get extSideloadShort => 'نه از کاتالوگ';
-
-  @override
-  String get extSideloadWarning =>
-      'این برنامه افزودنی از کاتالوگ تیم نیست. فقط نویسنده کلید خود را تضمین کرده است: فقط در صورتی آن را نصب کنید که به نویسنده اعتماد دارید.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'نصب «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'به‌روزرسانی «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'این برنامه افزودنی قادر خواهد بود:';
+  String get extSideloadWarning => 'فقط اگر به کلید خودامضای نویسنده اعتماد دارید نصب کنید.';
 
   @override
   String get extPermissionsWidened => 'به روز رسانی مجوزهای جدید را می خواهد:';
@@ -1064,9 +1035,6 @@ class SFa extends S {
       'این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد. اگر به کلید جدید اعتماد دارید، برنامه افزودنی را حذف نصب کنید و دوباره آن را به صراحت نصب کنید.';
 
   @override
-  String get extUpdateAvailable => 'به‌روزرسانی موجود است';
-
-  @override
   String get extDisabled => 'غیرفعال';
 
   @override
@@ -1109,10 +1077,6 @@ class SFa extends S {
   String get extConflictsTitle => 'تعارضات پسوند';
 
   @override
-  String get extConflictsIntro =>
-      'این افزونه‌ها یک چیز را می‌خواهند. انتخاب کنید کدام اجرا شود؛ دیگری نصب‌شده می‌ماند.';
-
-  @override
   String get extConflictTheme => 'تم برنامه';
 
   @override
@@ -1132,28 +1096,9 @@ class SFa extends S {
   String get extConflictsResolve => 'تعارضات را حل کنید';
 
   @override
-  String get extConflictNote =>
-      'انتخاب شما روی این دستگاه ذخیره می‌شود. پوسته فوراً عوض می‌شود، اما هوک‌های شبکه در این نسخه اجرا نمی‌شوند.';
-
-  @override
   String extVersionLabel(String version) {
     return 'نسخه $version';
   }
-
-  @override
-  String get extAuthor => 'نویسنده';
-
-  @override
-  String get extRating => 'رتبه بندی';
-
-  @override
-  String get extInstalls => 'دفعات نصب';
-
-  @override
-  String get extVersion => 'نسخه';
-
-  @override
-  String get extAbout => 'درباره این پسوند';
 
   @override
   String get extPermissionsTitle => 'مجوزها';
@@ -1166,9 +1111,6 @@ class SFa extends S {
 
   @override
   String get extSaveSettings => 'ذخیرهٔ تنظیمات';
-
-  @override
-  String get extSaving => 'در حال ذخیره…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class SFa extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'پانل در دسترس نیست. پسوند ممکن است غیرفعال یا حذف شده باشد.';
+  String get extPanelUnavailable => 'پنل افزونه در دسترس نیست.';
 
   @override
   String get extPermConnectionsRead => 'لیست اتصالات فعال را ببینید';
@@ -1236,10 +1178,6 @@ class SFa extends S {
   String get extPermBackground => 'وظایف پس زمینه را اجرا کنید';
 
   @override
-  String get extPermBackgroundDetail =>
-      'کارهای برنامه ریزی شده را حتی زمانی که پانل بسته است اجرا می کند. می‌توانید آن را موقتاً متوقف کنید یا تعداد دفعات اجرای آن را در تنظیمات برنامه افزودنی تغییر دهید.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SFa extends S {
   String get extImageFailed => 'تصویر بارگیری نشد';
 
   @override
-  String get extRatingHow => 'رتبه بندی چگونه کار می کند';
-
-  @override
-  String get extRatingHowBody =>
-      'رتبه‌بندی‌ها از میانگین بیزی استفاده می‌کنند: برنامه‌های افزودنی با رتبه‌بندی‌های کم تا زمانی که افراد بیشتری رای دهند، نزدیک به وسط می‌ماند، بنابراین یک بررسی 5 ستاره نمی‌تواند یک برنامه افزودنی جدید را به بالاترین سطح برساند. رتبه‌بندی‌های اخیر بیشتر از رتبه‌بندی‌های قدیمی هستند و تنها یک رتبه برای هر حساب حساب می‌شود.';
-
-  @override
   String get extScreenshots => 'تصاویر';
 
   @override
   String get extSortRelevance => 'ربط';
 
   @override
-  String get extPermNetworkDetail =>
-      'داده‌ها را از طریق VPN از اینترنت دریافت می‌کند. فقط میزبان‌های فهرست زیر مجازند و بقیه مسدودند.';
+  String get extPermNetworkDetail => 'درخواست‌های VPN فقط به میزبان‌های زیر مجازند.';
 
   @override
   String get extBgTitle => 'کار پس‌زمینه';
@@ -1308,10 +1238,6 @@ class SFa extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ساعت', one: '# ساعت');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'وظیفه تا وقتی Sora باز است، حتی در سینی سیستم، طبق زمان‌بندی اجرا می‌شود. کوتاه‌ترین فاصله ۱۵ دقیقه است.';
 
   @override
   String get extBgDisabledNote => 'برنامه افزودنی را برای مدیریت وظیفه پس‌زمینه خود فعال کنید.';
@@ -1345,13 +1271,7 @@ class SFa extends S {
   String get qrCopyLink => 'پیوند را کپی کنید';
 
   @override
-  String get qrShowLink => 'نمایش پیوند';
-
-  @override
-  String get qrHideLink => 'پنهان کردن پیوند';
-
-  @override
-  String get qrWarning => 'این کد QR حاوی جزئیات اتصال است. آن را به غریبه ها نشان ندهید.';
+  String get qrWarning => 'کد را فقط با افراد مورد اعتماد به اشتراک بگذارید.';
 
   @override
   String get qrScanHint => 'یک اسکرین‌شات یا عکس دارای کد QR انتخاب کنید یا پیوندی را جای‌گذاری کنید';
@@ -1469,6 +1389,9 @@ class SFa extends S {
 
   @override
   String get sortBy => 'مرتب سازی بر اساس';
+
+  @override
+  String get sortSubscription => 'به ترتیب اشتراک';
 
   @override
   String get sortPing => 'پینگ';
@@ -1808,15 +1731,9 @@ class SFa extends S {
   String get customServerHideSecret => 'مخفی کردن راز';
 
   @override
-  String get customServerBadge => 'سفارشی';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'سرور \"$name\" حذف شود؟';
   }
-
-  @override
-  String get customServerEmptyHint => 'سرور را به صورت دستی اضافه کنید: آدرس، پورت و پروتکل';
 
   @override
   String get customServerTest => 'آزمایش';
@@ -1987,10 +1904,6 @@ class SFa extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'ضبط بسته';
 
   @override
@@ -2009,8 +1922,7 @@ class SFa extends S {
   String get extErrRevoked => 'تیم Sora این نسخه از افزونه را لغو کرد، چون ناامن یا خراب است.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'فهرست افزونه‌های لغوشده به‌روز نشد. تا به‌روز شدن آن نصب ممکن نیست: شبکه را بررسی و دوباره تلاش کنید.';
+  String get extErrRevocationsExpired => 'نصب تا به‌روزرسانی فهرست افزونه‌های لغوشده مسدود است.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2056,4 +1968,39 @@ class SFa extends S {
 
   @override
   String get extAssetRejected => 'فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.';
+
+  @override
+  String get extVerifiedSora => 'تأییدشده توسط Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count بایت';
+  }
+
+  @override
+  String get extOpen => 'باز کردن';
+
+  @override
+  String get customServerOwn => 'سرور شخصی';
+
+  @override
+  String get customServerPaste => 'جای‌گذاری پیوند';
+
+  @override
+  String get customServerUser => 'نام کاربری';
+
+  @override
+  String get customServerPassword => 'گذرواژه';
+
+  @override
+  String get customServerSecretRequired => 'یک مقدار وارد کنید';
+
+  @override
+  String get customServerLinkInvalid => 'پیوند سرور نامعتبر است';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

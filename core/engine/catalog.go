@@ -17,6 +17,8 @@ type Availability struct {
 	Usable    bool
 	Reason    string
 	BuildTags []string
+	// NaiveReady is set only after the installed engine loads Cronet.
+	NaiveReady bool
 }
 
 // Catalog holds upstream engine capabilities, separate from installed
@@ -30,7 +32,7 @@ var Catalog = map[Kind]Capabilities{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 			ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 			ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
-			ProtocolDirect: true,
+			ProtocolDirect: true, ProtocolMieru: true,
 		},
 		Features: map[Feature]bool{
 			FeatureChains: true, FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
@@ -49,7 +51,7 @@ var Catalog = map[Kind]Capabilities{
 			ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 			ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 			ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
-			ProtocolAnyTLS: true, ProtocolDirect: true,
+			ProtocolAnyTLS: true, ProtocolDirect: true, ProtocolNaive: true,
 		},
 		Features: map[Feature]bool{
 			FeatureChains: true, FeatureTun: true, FeatureFakeIP: true, FeatureRuleSets: true,
@@ -148,6 +150,12 @@ func SelectEngine(p *Plan, available []Availability, preference []Kind) (Selecti
 			continue
 		}
 		missing := caps.Missing(p)
+		if p.Protocols()[ProtocolNaive] && kind == KindSingBox && !avail.NaiveReady {
+			missing = append(missing, "NaiveProxy runtime (Cronet)")
+		}
+		if p.Protocols()[ProtocolMieru] && kind == KindMihomo && avail.Version.Less(Version{Major: 1, Minor: 19, Patch: 32}) {
+			missing = append(missing, "mieru requires mihomo 1.19.32")
+		}
 		if len(missing) > 0 {
 			rejected = append(rejected, fmt.Sprintf("%s: cannot carry %s", kind, strings.Join(missing, ", ")))
 			continue
@@ -180,6 +188,9 @@ func (c Capabilities) Missing(p *Plan) []string {
 	}
 	if c.Kind == KindSingBox {
 		for _, o := range p.Outbounds {
+			if o.Protocol == ProtocolNaive && p.Options.Fragment.Enabled {
+				missing = append(missing, "TLS fragmentation on NaiveProxy")
+			}
 			if a := o.Amnezia; a != nil && (a.J1 != "" || a.J2 != "" || a.J3 != "" || a.Itime != 0) {
 				missing = append(missing, "AmneziaWG J1/J2/J3/Itime parameters")
 				break

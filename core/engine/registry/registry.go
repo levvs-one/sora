@@ -18,6 +18,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/bypass"
 	"github.com/levvs-one/sora-client/core/engine/mihomo"
+	"github.com/levvs-one/sora-client/core/engine/olcrtc"
 	"github.com/levvs-one/sora-client/core/engine/singbox"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
 	"github.com/levvs-one/sora-client/core/engine/xray"
@@ -57,7 +58,8 @@ type Registry struct {
 	base supervise.Config
 	// tpws is zapret's proxy for bypass outbounds; empty when not
 	// installed.
-	tpws string
+	tpws   string
+	olcrtc supervise.Binary
 
 	mu   sync.Mutex
 	last engine.Selection
@@ -74,6 +76,7 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 			r.tpws = candidate
 		}
 	}
+	r.olcrtc, _ = olcrtc.Discover(ctx, enginesDir)
 	for _, kind := range engine.DefaultPreference {
 		b, err := drivers[kind].prober.Discover(ctx, enginesDir)
 		if err != nil {
@@ -83,8 +86,17 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 			continue
 		}
 		r.binaries[kind] = b
-		r.availability = append(r.availability, engine.Availability{Kind: kind, Path: b.Path, Version: b.Version, BuildTags: b.BuildTags, Usable: true})
+		naiveReady := kind == engine.KindSingBox && singbox.NaiveReady(ctx, b)
+		r.availability = append(r.availability, engine.Availability{Kind: kind, Path: b.Path, Version: b.Version, BuildTags: b.BuildTags, Usable: true, NaiveReady: naiveReady})
 	}
+	auxiliary := engine.Availability{Kind: engine.Kind("olcrtc"), Reason: "not installed"}
+	if r.olcrtc.Path != "" {
+		auxiliary.Path = r.olcrtc.Path
+		auxiliary.Version = r.olcrtc.Version
+		auxiliary.Usable = true
+		auxiliary.Reason = ""
+	}
+	r.availability = append(r.availability, auxiliary)
 	return r
 }
 
@@ -98,6 +110,9 @@ func (r *Registry) Binaries() []supervise.Binary {
 		if b, ok := r.binaries[kind]; ok {
 			out = append(out, b)
 		}
+	}
+	if r.olcrtc.Path != "" {
+		out = append(out, r.olcrtc)
 	}
 	return out
 }
@@ -166,7 +181,10 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		}
 		// Select capabilities against the SOCKS5 plan produced by
 		// bypass rewriting.
-		selectPlan := bypass.Rewrite(p, nil)
+		if olcrtc.Has(p) && r.olcrtc.Path == "" {
+			return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing, "registry: olcrtc needs the pinned olcrtc binary and checksum manifest")
+		}
+		selectPlan := olcrtc.Rewrite(bypass.Rewrite(p, nil), nil)
 		sel, bridge, err := r.selectPlan(selectPlan, order)
 		r.mu.Lock()
 		r.last = sel
@@ -186,10 +204,16 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		} else {
 			built, err = drivers[sel.Kind].build(cfg)
 		}
-		if err != nil || !withBypass {
-			return built, err
+		if err != nil {
+			return nil, err
 		}
-		return bypass.Wrap(built, r.tpws, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs), nil
+		if olcrtc.Has(p) {
+			built = olcrtc.Wrap(built, r.olcrtc.Path, filepath.Join(r.base.HomeDir, "olcrtc"), r.base.Logs)
+		}
+		if withBypass {
+			built = bypass.Wrap(built, r.tpws, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs)
+		}
+		return built, nil
 	}
 }
 
@@ -253,7 +277,7 @@ func (r *Registry) Measure(ctx context.Context, outbounds []engine.Outbound, opt
 	var orphans []engine.Outbound
 	for _, o := range outbounds {
 		single := &engine.Plan{Outbounds: []engine.Outbound{o}}
-		sel, err := engine.SelectEngine(single, r.availability, order)
+		sel, err := engine.SelectEngine(olcrtc.Rewrite(single, nil), r.availability, order)
 		if err != nil {
 			orphans = append(orphans, o)
 			continue
@@ -274,7 +298,20 @@ func (r *Registry) Measure(ctx context.Context, outbounds []engine.Outbound, opt
 			// Suppress measurement engine logs; results already
 			// report probe outcomes.
 			cfg.Logs = nil
-			if err := drivers[kind].measure(ctx, cfg, group, opts, out); err != nil {
+			measure := drivers[kind].measure
+			if olcrtc.Has(&engine.Plan{Outbounds: group}) {
+				measure = measureThroughController(func(c supervise.Config) (engine.Engine, error) {
+					if r.olcrtc.Path == "" {
+						return nil, errs.Newf(errs.CodeNotFound, errs.KeyEngineBinaryMissing, "olcrtc: the pinned binary is not installed")
+					}
+					inner, err := drivers[kind].build(c)
+					if err != nil {
+						return nil, err
+					}
+					return olcrtc.Wrap(inner, r.olcrtc.Path, filepath.Join(c.HomeDir, "olcrtc"), nil), nil
+				})
+			}
+			if err := measure(ctx, cfg, group, opts, out); err != nil {
 				// Startup failures must produce a result for
 				// every affected server.
 				for _, o := range group {
@@ -284,7 +321,11 @@ func (r *Registry) Measure(ctx context.Context, outbounds []engine.Outbound, opt
 		}()
 	}
 	for _, o := range orphans {
-		out <- engine.Measurement{OutboundID: o.ID, Err: engine.ErrNoEngine}
+		failure := engine.ErrNoEngine
+		if o.Protocol == engine.ProtocolOLCRTC {
+			failure = errs.Newf(errs.CodeNotFound, errs.KeyEngineBinaryMissing, "olcrtc: no installed engine combination can carry this tunnel")
+		}
+		out <- engine.Measurement{OutboundID: o.ID, Err: failure}
 	}
 	go func() {
 		wg.Wait()
@@ -344,7 +385,7 @@ func measureThroughController(build func(supervise.Config) (engine.Engine, error
 // BenchmarkEngine uses isolated state and a fresh listener for one temporary
 // measurement. The caller owns home and removes it after closing the engine.
 func (r *Registry) BenchmarkEngine(ctx context.Context, plan *engine.Plan, home string) (engine.Engine, error) {
-	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, tpws: r.tpws}
+	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, tpws: r.tpws, olcrtc: r.olcrtc}
 	isolated.base.HomeDir = home
 	isolated.base.LocalPort = 0
 	return isolated.Factory()(ctx, plan)

@@ -179,3 +179,21 @@ func TestParseJSONDuplicatesByStableKey(t *testing.T) {
 		t.Fatalf("duplicate items = %#v, want one entry at index 1", r.Report.DuplicateItems)
 	}
 }
+
+func TestVMessShareJSONPreservesConnectionFields(t *testing.T) {
+	raw := `{"v":"2","ps":"Home","add":"example.com","port":"443","id":"123e4567-e89b-12d3-a456-426614174000","aid":"0","scy":"auto","net":"ws","type":"none","host":"cdn.example.com","path":"/vpn","tls":"tls","sni":"example.com","alpn":"h2,http/1.1","fp":"chrome"}`
+	result, err := (LinkParser{}).Parse([]byte("vmess://" + base64.StdEncoding.EncodeToString([]byte(raw))))
+	if err != nil || len(result.Servers) != 1 {
+		t.Fatalf("VMess share JSON: %v %+v", err, result.Report)
+	}
+	o := result.Servers[0]
+	if o.UUID != "123e4567-e89b-12d3-a456-426614174000" || o.Host != "example.com" || o.Transport != "ws" || o.Security != "tls" || o.Path != "/vpn" || o.HostHeader != "cdn.example.com" || o.ServerName != "example.com" || o.Fingerprint != "chrome" || len(o.ALPN) != 2 {
+		t.Fatalf("lost VMess fields: %+v", o)
+	}
+	for _, unsupported := range []string{strings.Replace(raw, `"aid":"0"`, `"aid":"64"`, 1), strings.Replace(raw, `"v":"2"`, `"v":"2","pcs":"pin"`, 1)} {
+		result, err := (LinkParser{}).Parse([]byte("vmess://" + base64.StdEncoding.EncodeToString([]byte(unsupported))))
+		if err != nil || len(result.Servers) != 0 || result.Report.Unsupported != 1 {
+			t.Fatal("unsupported VMess options silently lost")
+		}
+	}
+}

@@ -43,6 +43,14 @@ class CustomServersClient extends $grpc.Client {
 
   CustomServersClient(super.channel, {super.options, super.interceptors});
 
+  /// Previews only the supplied link, without reading or writing the vault.
+  $grpc.ResponseFuture<$0.PreviewCustomServerResponse> previewCustomServer(
+    $0.PreviewCustomServerRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$previewCustomServer, request, options: options);
+  }
+
   /// SaveCustomServer creates a server (empty id) or updates an existing one.
   $grpc.ResponseFuture<$0.SaveCustomServerResponse> saveCustomServer(
     $0.SaveCustomServerRequest request, {
@@ -81,6 +89,11 @@ class CustomServersClient extends $grpc.Client {
 
   // method descriptors
 
+  static final _$previewCustomServer =
+      $grpc.ClientMethod<$0.PreviewCustomServerRequest, $0.PreviewCustomServerResponse>(
+          '/sora.custom.v1.CustomServers/PreviewCustomServer',
+          ($0.PreviewCustomServerRequest value) => value.writeToBuffer(),
+          $0.PreviewCustomServerResponse.fromBuffer);
   static final _$saveCustomServer = $grpc.ClientMethod<$0.SaveCustomServerRequest, $0.SaveCustomServerResponse>(
       '/sora.custom.v1.CustomServers/SaveCustomServer',
       ($0.SaveCustomServerRequest value) => value.writeToBuffer(),
@@ -104,6 +117,13 @@ abstract class CustomServersServiceBase extends $grpc.Service {
   $core.String get $name => 'sora.custom.v1.CustomServers';
 
   CustomServersServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.PreviewCustomServerRequest, $0.PreviewCustomServerResponse>(
+        'PreviewCustomServer',
+        previewCustomServer_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.PreviewCustomServerRequest.fromBuffer(value),
+        ($0.PreviewCustomServerResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.SaveCustomServerRequest, $0.SaveCustomServerResponse>(
         'SaveCustomServer',
         saveCustomServer_Pre,
@@ -133,6 +153,14 @@ abstract class CustomServersServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) => $0.TestCustomServerRequest.fromBuffer(value),
         ($0.TestCustomServerResponse value) => value.writeToBuffer()));
   }
+
+  $async.Future<$0.PreviewCustomServerResponse> previewCustomServer_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.PreviewCustomServerRequest> $request) async {
+    return previewCustomServer($call, await $request);
+  }
+
+  $async.Future<$0.PreviewCustomServerResponse> previewCustomServer(
+      $grpc.ServiceCall call, $0.PreviewCustomServerRequest request);
 
   $async.Future<$0.SaveCustomServerResponse> saveCustomServer_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.SaveCustomServerRequest> $request) async {

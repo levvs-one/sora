@@ -26,7 +26,7 @@ func TestFactoryPicksTheEngineThatCarriesThePlan(t *testing.T) {
 		t.Skip("set SORA_ENGINES_DIR to a directory with sing-box, xray and mihomo")
 	}
 	r := Discover(context.Background(), dir, supervise.Config{HomeDir: t.TempDir()})
-	if len(r.Binaries()) != 3 {
+	if len(r.binaries) != 3 {
 		t.Fatalf("want three engines, found %v", r.Availability())
 	}
 	factory := r.Factory()

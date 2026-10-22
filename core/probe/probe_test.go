@@ -15,11 +15,29 @@ import (
 // TestTheEndpointBudgetBelongsToTheProberNotToTheRequest checks shared socket
 // limits and rejection of excess concurrent requests without queuing.
 func TestTheEndpointBudgetBelongsToTheProberNotToTheRequest(t *testing.T) {
-	prober := probe.New(probe.Config{Timeout: 50 * time.Millisecond, Concurrency: 1})
-	endpoint := []*corev1.Endpoint{{Host: "127.0.0.1", Port: 1}}
+	// A listener that accepts and never answers holds the TLS handshake open,
+	// so the first measurement keeps its socket slot and the others wait for
+	// it. A closed port refuses instantly and let the measurements finish
+	// before the fifth request on a loaded machine.
+	silent, err := (&net.ListenConfig{}).Listen(t.Context(), "tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	accepted := make(chan net.Conn, probe.MaxConcurrentRequests)
+	go func() {
+		for {
+			conn, err := silent.Accept()
+			if err != nil {
+				close(accepted)
+				return
+			}
+			accepted <- conn
+		}
+	}()
+	port := uint32(silent.Addr().(*net.TCPAddr).Port)
+	prober := probe.New(probe.Config{Timeout: 10 * time.Second, Concurrency: 1, TLS: true})
+	endpoint := []*corev1.Endpoint{{Host: "127.0.0.1", Port: port}}
 
-	// The first measurements are held open by the slow timeout on a closed
-	// port.
 	held := make([]<-chan *corev1.ProbeResult, 0, probe.MaxConcurrentRequests)
 	for range probe.MaxConcurrentRequests {
 		results, err := prober.Probe(context.Background(), endpoint, nil)
@@ -33,8 +51,15 @@ func TestTheEndpointBudgetBelongsToTheProberNotToTheRequest(t *testing.T) {
 	} else if errs.KeyOf(err) != errs.KeyProbeTooMany {
 		t.Errorf("a refused measurement answered the key %q", errs.KeyOf(err))
 	}
+	// Each held measurement connects in turn; closing its socket ends the
+	// handshake and frees the slot for the next one.
+	_ = silent.Close()
+	go func() {
+		for conn := range accepted {
+			_ = conn.Close()
+		}
+	}()
 	for _, results := range held {
-		// Drain results to release the request slot.
 		for range results {
 		}
 	}

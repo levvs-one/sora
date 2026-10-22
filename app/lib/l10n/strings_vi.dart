@@ -882,7 +882,7 @@ class SVi extends S {
 
   @override
   String get modesGuide =>
-      'Chọn Tự động nếu bạn không chắc máy chủ của mình cần công cụ nào. Sora kiểm tra cấu hình và cài đặt trước khi kết nối. Công cụ không thể tăng băng thông gói của bạn: hiệu suất phụ thuộc vào máy chủ, tuyến đường, giao thức và mạng.\n\n## Chế độ\n\n### Tất cả lưu lượng truy cập (TUN)\n\nSora tạo giao diện mạng ảo và định tuyến lưu lượng ứng dụng qua đó, bao gồm TCP và UDP. Sử dụng chế độ này cho Telegram, trò chơi và giọng nói Discord. Các quy tắc có thể gửi trực tiếp các trang web hoặc chương trình cụ thể hoặc chặn chúng. Dịch vụ mạng cần có sự cho phép và máy chủ hỗ trợ giao thức được yêu cầu.\n\n### Proxy System\n\nSora định cấu hình proxy HTTP/SOCKS cục bộ. Các ứng dụng tôn trọng cài đặt proxy hệ thống sẽ sử dụng nó. Các ứng dụng có ngăn xếp mạng riêng có thể kết nối trực tiếp; UDP và cuộc gọi thoại thường cần TUN. Chế độ này phù hợp với các trình duyệt và ứng dụng có hỗ trợ proxy.\n\n### Không có máy chủ\n\nTrên Linux, Sora sử dụng [zapret](https://github.com/bol-van/zapret) để phân tách và định hình lại các yêu cầu HTTP/TLS cũng như bỏ qua một số kiểm tra DPI. IP của bạn vẫn giữ nguyên và các kết nối sẽ truy cập trực tiếp vào trang web. Kết quả phụ thuộc vào nhà cung cấp của bạn và phương pháp chặn.\n\nTích hợp hiện tại sử dụng tpws cho HTTP và TLS qua TCP. Nó không bỏ qua việc chặn IP hoặc chuyển tiếp UDP và không thể đảm bảo các kết nối MTProto của Telegram. Sử dụng máy chủ VPN có TUN cho giọng nói Discord, cuộc gọi Telegram và các loại hạn chế này.\n\n## Động cơ\n\n### Tự động\n\nSora chọn một công cụ được cài đặt hỗ trợ toàn bộ gói kết nối: giao thức máy chủ, truyền tải, nhóm, phân mảnh và chế độ. Lựa chọn thủ công không tương thích sẽ bị từ chối trước khi dừng kết nối hiện tại. Chọn Tự động hoặc công cụ khác và áp dụng lại cài đặt.\n\n###sing-box\n\nCác gói Sora mới bao gồm [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), một nhánh của [sing-box](https://github.com/SagerNet/sing-box), thêm XHTTP và VLESS Encryption phía máy khách. Sora công nhận bản dựng và khả năng của nó. Một bản dựng ngược dòng không có XHTTP sẽ không có được khả năng này chỉ từ tên của nó.\n\nCác giao thức được hỗ trợ bao gồm VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard và các tham số AmneziaWG 1.x/2.x Sora có thể nhập. Cấu hình JSON Xray đầy đủ yêu cầu Xray. Chưa thể nhập các trường AWG 3.x mới. sing-box sử dụng cổng điều khiển cục bộ được bảo vệ bằng mật khẩu mà các ứng dụng khác trên máy tính có thể phát hiện.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) hỗ trợ phân mảnh VLESS, REALITY, XHTTP, VLESS Encryption và TLS. Nó cũng chạy các hồ sơ Xray hoàn chỉnh của nhà cung cấp trong khi vẫn bảo toàn định tuyến và nhóm của họ. Những cấu hình như vậy không thể được tự động chuyển đổi sang một công cụ khác mà không thay đổi hành vi của chúng.\n\nXray đi kèm đã xóa cài đặt tắt xác minh chứng chỉ TLS (`allowInsecure`). Tự động chọn sing-box hoặc mihomo cho các máy chủ thông thường yêu cầu cài đặt này. Việc chọn Xray sẽ báo cáo sự không tương thích theo cách thủ công trước khi dừng kết nối hiện tại. Hồ sơ JSON đầy đủ cũ hơn cần hồ sơ nhà cung cấp được cập nhật với chứng chỉ hoặc mã chứng chỉ có thể xác minh được.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) hỗ trợ các nhóm cân bằng tải và dự phòng theo thứ tự, XHTTP và AmneziaWG. Chọn nó khi việc tự động chuyển đổi dự phòng sang máy chủ dự phòng có vấn đề. Cài đặt phân mảnh TLS của Sora không khả dụng với công cụ này.\n\n## Khả năng tương thích trong Sora\n\n| Tính năng | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN và TCP/UDP | Có | Có | Có |\n| XHTTP | Có | Có | Có |\n| VLESS Encryption | Có | Có | Có |\n| Hồ sơ Xray đầy đủ | Không | Có | Không |\n| TUIC / AnyTLS | Cả hai | Không | TUIC |\n| Phân mảnh TLS | Có | Có | Không |\n| AmneziaWG 1.x/2.x | Có¹ | Không | Có |\n| Nhóm dự phòng được đặt hàng | Không | Không có | Có |\n\n¹ Cấu hình có J1/J2/J3/Itime sử dụng mihomo; những trường này không bao giờ được loại bỏ một cách âm thầm. ² Đối với một nhóm cấu hình Xray hoàn chỉnh, ứng dụng sẽ chọn một cấu hình dự phòng. Hỗ trợ tùy thuộc vào bản dựng được cài đặt; kiểm tra phiên bản của nó trong Giới thiệu.\n\n## ngăn xếp TUN\n\nNgăn xếp xử lý TCP và UDP bên trong giao diện ảo. Trong bảng chế độ, Xray và mihomo cung cấp gVisor, System, Mixed và MIPS. Mỗi động cơ lưu tùy chọn riêng của mình. Chế độ proxy và Serverless System không sử dụng tùy chọn này.\n\n- **Mixed**: TCP sử dụng ngăn xếp hệ thống, trong khi gVisor xử lý UDP. Đây là mặc định của mihomo trên Linux. Trên Windows, Xray và mihomo mặc định dùng MIPS.\n- **System**: sử dụng ngăn xếp hệ thống. Hãy thử tùy chọn khác nếu ứng dụng mạng gặp sự cố.\n- **gVisor**: xử lý lưu lượng truy cập trong không gian người dùng.\n- **MIPS**: Ngăn xếp IP riêng của mihomo, có sẵn trong phiên bản đi kèm 1.19.32.\n\nTrên Linux, Xray sử dụng gVisor tích hợp theo mặc định. System, Mixed và MIPS trên Linux sử dụng mihomo làm công cụ TUN, chuyển tiếp TCP và UDP tới Xray qua liên kết SOCKS cục bộ đã được xác thực. Xray giữ lại giao thức, hồ sơ nhà cung cấp và định tuyến. Ba tùy chọn này yêu cầu cài đặt mihomo. Trên Windows, Xray sử dụng mihomo 1.19.32 trở lên cho cả bốn ngăn xếp TUN. Giao thức và định tuyến vẫn do Xray xử lý. Quy tắc ứng dụng trong cấu hình này chỉ hỗ trợ kết nối trực tiếp và chặn; trên Linux, các quy tắc này cần gVisor tích hợp của Xray.\n\nCây cầu chạy một quá trình thứ hai. Trong ba phép đo không hoạt động trên Linux, nó sử dụng bộ nhớ vật lý nhiều hơn khoảng 32–36 MiB so với Xray TUN gốc. Điều này không đo lường tải tải xuống: chi phí CPU và bộ nhớ phụ thuộc vào kết nối. sing-box không có bộ chọn ngăn xếp. Không có ngăn xếp nào đảm bảo hiệu suất tốt hơn trong mọi mạng. Chọn một ngăn xếp rồi chọn Áp dụng và kết nối lại để thử trong mạng của bạn.\n\n## Áp dụng cài đặt\n\nViệc chọn máy chủ sẽ tự động kết nối lại. Cài đặt chế độ, công cụ, DNS và quy tắc được lưu ngay lập tức; trong khi kết nối đang hoạt động, hãy nhấp vào Áp dụng và kết nối lại để sử dụng chúng. Việc khởi động lại công cụ có thể làm gián đoạn quá trình tải xuống và cuộc gọi. Nhấp chuột lặp đi lặp lại không bắt đầu kết nối song song; ngắt kết nối kết thúc quá trình chuyển đổi và giải phóng kết nối.\n\nInternet chỉ thông qua VPN chặn lưu lượng truy cập trực tiếp khi đường hầm bị hỏng. Nó ảnh hưởng đến toàn bộ máy. Việc ngắt kết nối rõ ràng sẽ loại bỏ các quy tắc của Sora. Nếu việc dọn dẹp không hoàn tất, hãy thử ngắt kết nối lại và mở nhật ký.\n\n## Tài liệu dự án\n\n- [sing-box-lx: cấu hình và hỗ trợ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Tài liệu sing-box](https://sing-box.sagernet.org/)\n- [Tài liệu Xray](https://xtls.github.io/)\n- [Tài liệu mihomo](https://wiki.metacubex.one/)\n- [zapret: hoạt động và những hạn chế](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Chọn Tự động nếu bạn không chắc máy chủ của mình cần công cụ nào. Sora kiểm tra cấu hình và cài đặt trước khi kết nối. Công cụ không thể tăng băng thông gói của bạn: hiệu suất phụ thuộc vào máy chủ, tuyến đường, giao thức và mạng.\n\n## Chế độ\n\n### Tất cả lưu lượng truy cập (TUN)\n\nSora tạo giao diện mạng ảo và định tuyến lưu lượng ứng dụng qua đó, bao gồm TCP và UDP. Sử dụng chế độ này cho Telegram, trò chơi và giọng nói Discord. Các quy tắc có thể gửi trực tiếp các trang web hoặc chương trình cụ thể hoặc chặn chúng. Dịch vụ mạng cần có sự cho phép và máy chủ hỗ trợ giao thức được yêu cầu.\n\n### Proxy System\n\nSora định cấu hình proxy HTTP/SOCKS cục bộ. Các ứng dụng tôn trọng cài đặt proxy hệ thống sẽ sử dụng nó. Các ứng dụng có ngăn xếp mạng riêng có thể kết nối trực tiếp; UDP và cuộc gọi thoại thường cần TUN. Chế độ này phù hợp với các trình duyệt và ứng dụng có hỗ trợ proxy.\n\n### Không có máy chủ\n\nTrên Linux, Sora sử dụng [zapret](https://github.com/bol-van/zapret) để phân tách và định hình lại các yêu cầu HTTP/TLS cũng như bỏ qua một số kiểm tra DPI. IP của bạn vẫn giữ nguyên và các kết nối sẽ truy cập trực tiếp vào trang web. Kết quả phụ thuộc vào nhà cung cấp của bạn và phương pháp chặn.\n\nTích hợp hiện tại sử dụng tpws cho HTTP và TLS qua TCP. Nó không bỏ qua việc chặn IP hoặc chuyển tiếp UDP và không thể đảm bảo các kết nối MTProto của Telegram. Sử dụng máy chủ VPN có TUN cho giọng nói Discord, cuộc gọi Telegram và các loại hạn chế này.\n\n## Động cơ\n\n### Tự động\n\nSora chọn một công cụ được cài đặt hỗ trợ toàn bộ gói kết nối: giao thức máy chủ, truyền tải, nhóm, phân mảnh và chế độ. Lựa chọn thủ công không tương thích sẽ bị từ chối trước khi dừng kết nối hiện tại. Chọn Tự động hoặc công cụ khác và áp dụng lại cài đặt.\n\n###sing-box\n\nCác gói Sora mới bao gồm [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), một nhánh của [sing-box](https://github.com/SagerNet/sing-box), thêm XHTTP và VLESS Encryption phía máy khách. Sora công nhận bản dựng và khả năng của nó. Một bản dựng ngược dòng không có XHTTP sẽ không có được khả năng này chỉ từ tên của nó.\n\nCác giao thức được hỗ trợ bao gồm VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard và các tham số AmneziaWG 1.x/2.x Sora có thể nhập. Cấu hình JSON Xray đầy đủ yêu cầu Xray. Chưa thể nhập các trường AWG 3.x mới. sing-box sử dụng cổng điều khiển cục bộ được bảo vệ bằng mật khẩu mà các ứng dụng khác trên máy tính có thể phát hiện.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) hỗ trợ phân mảnh VLESS, REALITY, XHTTP, VLESS Encryption và TLS. Nó cũng chạy các hồ sơ Xray hoàn chỉnh của nhà cung cấp trong khi vẫn bảo toàn định tuyến và nhóm của họ. Những cấu hình như vậy không thể được tự động chuyển đổi sang một công cụ khác mà không thay đổi hành vi của chúng.\n\nXray đi kèm đã xóa cài đặt tắt xác minh chứng chỉ TLS (`allowInsecure`). Tự động chọn sing-box hoặc mihomo cho các máy chủ thông thường yêu cầu cài đặt này. Việc chọn Xray sẽ báo cáo sự không tương thích theo cách thủ công trước khi dừng kết nối hiện tại. Hồ sơ JSON đầy đủ cũ hơn cần hồ sơ nhà cung cấp được cập nhật với chứng chỉ hoặc mã chứng chỉ có thể xác minh được.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) hỗ trợ các nhóm cân bằng tải và dự phòng theo thứ tự, XHTTP và AmneziaWG. Chọn nó khi việc tự động chuyển đổi dự phòng sang máy chủ dự phòng có vấn đề. Cài đặt phân mảnh TLS của Sora không khả dụng với công cụ này.\n\n## Khả năng tương thích trong Sora\n\n| Tính năng | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN và TCP/UDP | Có | Có | Có |\n| XHTTP | Có | Có | Có |\n| VLESS Encryption | Có | Có | Có |\n| Hồ sơ Xray đầy đủ | Không | Có | Không |\n| TUIC / AnyTLS | Cả hai | Không | TUIC |\n| mieru | Không | Không | Có |\n| NaiveProxy | Có | Không | Không |\n| Phân mảnh TLS | Có | Có | Không |\n| AmneziaWG 1.x/2.x | Có¹ | Không | Có |\n| Nhóm dự phòng được đặt hàng | Không | Không có | Có |\n\n¹ Cấu hình có J1/J2/J3/Itime sử dụng mihomo; những trường này không bao giờ được loại bỏ một cách âm thầm. ² Đối với một nhóm cấu hình Xray hoàn chỉnh, ứng dụng sẽ chọn một cấu hình dự phòng. Hỗ trợ tùy thuộc vào bản dựng được cài đặt; kiểm tra phiên bản của nó trong Giới thiệu.\n\n## ngăn xếp TUN\n\nNgăn xếp xử lý TCP và UDP bên trong giao diện ảo. Trong bảng chế độ, Xray và mihomo cung cấp gVisor, System, Mixed và MIPS. Mỗi động cơ lưu tùy chọn riêng của mình. Chế độ proxy và Serverless System không sử dụng tùy chọn này.\n\n- **Mixed**: TCP sử dụng ngăn xếp hệ thống, trong khi gVisor xử lý UDP. Đây là mặc định của mihomo trên Linux. Trên Windows, Xray và mihomo mặc định dùng MIPS.\n- **System**: sử dụng ngăn xếp hệ thống. Hãy thử tùy chọn khác nếu ứng dụng mạng gặp sự cố.\n- **gVisor**: xử lý lưu lượng truy cập trong không gian người dùng.\n- **MIPS**: Ngăn xếp IP riêng của mihomo, có sẵn trong phiên bản đi kèm 1.19.32.\n\nTrên Linux, Xray sử dụng gVisor tích hợp theo mặc định. System, Mixed và MIPS trên Linux sử dụng mihomo làm công cụ TUN, chuyển tiếp TCP và UDP tới Xray qua liên kết SOCKS cục bộ đã được xác thực. Xray giữ lại giao thức, hồ sơ nhà cung cấp và định tuyến. Ba tùy chọn này yêu cầu cài đặt mihomo. Trên Windows, Xray sử dụng mihomo 1.19.32 trở lên cho cả bốn ngăn xếp TUN. Giao thức và định tuyến vẫn do Xray xử lý. Quy tắc ứng dụng trong cấu hình này chỉ hỗ trợ kết nối trực tiếp và chặn; trên Linux, các quy tắc này cần gVisor tích hợp của Xray.\n\nCây cầu chạy một quá trình thứ hai. Trong ba phép đo không hoạt động trên Linux, nó sử dụng bộ nhớ vật lý nhiều hơn khoảng 32–36 MiB so với Xray TUN gốc. Điều này không đo lường tải tải xuống: chi phí CPU và bộ nhớ phụ thuộc vào kết nối. sing-box không có bộ chọn ngăn xếp. Không có ngăn xếp nào đảm bảo hiệu suất tốt hơn trong mọi mạng. Chọn một ngăn xếp rồi chọn Áp dụng và kết nối lại để thử trong mạng của bạn.\n\n## Áp dụng cài đặt\n\nViệc chọn máy chủ sẽ tự động kết nối lại. Cài đặt chế độ, công cụ, DNS và quy tắc được lưu ngay lập tức; trong khi kết nối đang hoạt động, hãy nhấp vào Áp dụng và kết nối lại để sử dụng chúng. Việc khởi động lại công cụ có thể làm gián đoạn quá trình tải xuống và cuộc gọi. Nhấp chuột lặp đi lặp lại không bắt đầu kết nối song song; ngắt kết nối kết thúc quá trình chuyển đổi và giải phóng kết nối.\n\nInternet chỉ thông qua VPN chặn lưu lượng truy cập trực tiếp khi đường hầm bị hỏng. Nó ảnh hưởng đến toàn bộ máy. Việc ngắt kết nối rõ ràng sẽ loại bỏ các quy tắc của Sora. Nếu việc dọn dẹp không hoàn tất, hãy thử ngắt kết nối lại và mở nhật ký.\n\n## Tài liệu dự án\n\n- [sing-box-lx: cấu hình và hỗ trợ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Tài liệu sing-box](https://sing-box.sagernet.org/)\n- [Tài liệu Xray](https://xtls.github.io/)\n- [Tài liệu mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: hoạt động và những hạn chế](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC truyền TCP qua cuộc gọi video trên Jitsi, Yandex Telemost hoặc WB Stream. Nhập liên kết olcrtc:// hoặc mã QR. Giao thức hoạt động với sing-box, Xray và mihomo ở chế độ proxy và TUN; không hỗ trợ UDP. Cả hai đầu cần các bản dựng OLC2 tương thích. Dự án gốc đã được lưu trữ.\n';
 
   @override
   String get probeServers => 'Kiểm tra máy chủ';
@@ -909,36 +909,7 @@ class SVi extends S {
   String get extInstallOne => '1 lượt cài đặt';
 
   @override
-  String get extBadgeVerified => 'Đã xác minh';
-
-  @override
-  String get extBadgeTop => 'Phổ biến nhất tuần này';
-
-  @override
-  String get extBadgeNew => 'Mới';
-
-  @override
-  String get extBadgeStaff => 'Đội Sora';
-
-  @override
-  String get extSideloadShort => 'Không có trong danh mục';
-
-  @override
-  String get extSideloadWarning =>
-      'Tiện ích mở rộng này không có trong danh mục của nhóm. Chỉ tác giả mới xác nhận khóa của họ: chỉ cài đặt nó nếu bạn tin tưởng tác giả.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Cài đặt “$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Cập nhật “$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Tiện ích mở rộng này sẽ có thể:';
+  String get extSideloadWarning => 'Chỉ cài đặt nếu bạn tin tưởng khóa tự ký của tác giả.';
 
   @override
   String get extPermissionsWidened => 'Bản cập nhật yêu cầu quyền mới:';
@@ -1065,9 +1036,6 @@ class SVi extends S {
       'Bản cập nhật này được ký bằng khóa tác giả khác với phiên bản đã cài đặt nên đã bị chặn. Nếu bạn tin cậy khóa mới, hãy gỡ cài đặt tiện ích mở rộng và cài đặt lại một cách rõ ràng.';
 
   @override
-  String get extUpdateAvailable => 'Đã có bản cập nhật';
-
-  @override
   String get extDisabled => 'Đã tắt';
 
   @override
@@ -1110,10 +1078,6 @@ class SVi extends S {
   String get extConflictsTitle => 'Xung đột tiện ích mở rộng';
 
   @override
-  String get extConflictsIntro =>
-      'Các tiện ích này muốn cùng một thứ. Chọn tiện ích sẽ chạy; tiện ích còn lại vẫn được cài đặt.';
-
-  @override
   String get extConflictTheme => 'Chủ đề ứng dụng';
 
   @override
@@ -1133,28 +1097,9 @@ class SVi extends S {
   String get extConflictsResolve => 'Giải quyết xung đột';
 
   @override
-  String get extConflictNote =>
-      'Lựa chọn của bạn được lưu trên thiết bị này. Giao diện đổi ngay, còn hook mạng không chạy trong phiên bản này.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Phiên bản $version';
   }
-
-  @override
-  String get extAuthor => 'Tác giả';
-
-  @override
-  String get extRating => 'Đánh giá';
-
-  @override
-  String get extInstalls => 'Lượt cài đặt';
-
-  @override
-  String get extVersion => 'Phiên bản';
-
-  @override
-  String get extAbout => 'Giới thiệu về tiện ích mở rộng này';
 
   @override
   String get extPermissionsTitle => 'Quyền';
@@ -1167,9 +1112,6 @@ class SVi extends S {
 
   @override
   String get extSaveSettings => 'Lưu cài đặt';
-
-  @override
-  String get extSaving => 'Đang lưu…';
 
   @override
   String extUpdateTo(String version) {
@@ -1198,8 +1140,7 @@ class SVi extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'Bảng điều khiển không có sẵn. Tiện ích mở rộng có thể đã bị vô hiệu hóa hoặc bị xóa.';
+  String get extPanelUnavailable => 'Bảng tiện ích không khả dụng.';
 
   @override
   String get extPermConnectionsRead => 'Xem danh sách các kết nối đang hoạt động';
@@ -1238,10 +1179,6 @@ class SVi extends S {
   String get extPermBackground => 'Chạy các tác vụ nền';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Chạy các tác vụ đã lên lịch ngay cả khi đóng bảng điều khiển. Bạn có thể tạm dừng hoặc thay đổi tần suất chạy trong cài đặt tiện ích mở rộng.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1274,21 +1211,13 @@ class SVi extends S {
   String get extImageFailed => 'Không thể tải hình ảnh';
 
   @override
-  String get extRatingHow => 'Cách xếp hạng hoạt động';
-
-  @override
-  String get extRatingHowBody =>
-      'Xếp hạng sử dụng mức trung bình Bayes: tiện ích mở rộng có ít xếp hạng sẽ ở gần giữa cho đến khi có nhiều người bỏ phiếu hơn, do đó, một đánh giá 5 sao không thể đẩy tiện ích mở rộng mới lên đầu. Xếp hạng gần đây nặng hơn xếp hạng cũ và chỉ tính một xếp hạng cho mỗi tài khoản.';
-
-  @override
   String get extScreenshots => 'Ảnh chụp màn hình';
 
   @override
   String get extSortRelevance => 'Mức độ liên quan';
 
   @override
-  String get extPermNetworkDetail =>
-      'Tải dữ liệu từ internet qua VPN. Chỉ các máy chủ bên dưới được phép, còn lại đều bị chặn.';
+  String get extPermNetworkDetail => 'Yêu cầu qua VPN chỉ được phép đến các máy chủ bên dưới.';
 
   @override
   String get extBgTitle => 'Tác vụ nền';
@@ -1310,10 +1239,6 @@ class SVi extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# giờ');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Tác vụ chạy theo lịch khi Sora đang mở, kể cả khi ở khay hệ thống. Khoảng cách ngắn nhất là 15 phút.';
 
   @override
   String get extBgDisabledNote => 'Kích hoạt tiện ích mở rộng để quản lý tác vụ nền của nó.';
@@ -1347,13 +1272,7 @@ class SVi extends S {
   String get qrCopyLink => 'Sao chép liên kết';
 
   @override
-  String get qrShowLink => 'Hiển thị liên kết';
-
-  @override
-  String get qrHideLink => 'Ẩn liên kết';
-
-  @override
-  String get qrWarning => 'Mã QR này chứa chi tiết kết nối. Đừng cho người lạ xem.';
+  String get qrWarning => 'Chỉ chia sẻ mã này với người bạn tin tưởng.';
 
   @override
   String get qrScanHint => 'Chọn ảnh chụp màn hình hoặc ảnh có mã QR, hoặc dán liên kết';
@@ -1471,6 +1390,9 @@ class SVi extends S {
 
   @override
   String get sortBy => 'Sắp xếp theo';
+
+  @override
+  String get sortSubscription => 'Theo thứ tự đăng ký';
 
   @override
   String get sortPing => 'Ping';
@@ -1808,15 +1730,9 @@ class SVi extends S {
   String get customServerHideSecret => 'Ẩn bí mật';
 
   @override
-  String get customServerBadge => 'tùy chỉnh';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Xóa máy chủ “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Thêm máy chủ theo cách thủ công: địa chỉ, cổng và giao thức';
 
   @override
   String get customServerTest => 'Kiểm tra';
@@ -1988,10 +1904,6 @@ class SVi extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Với Shadowsocks: phương thức:mật khẩu, ví dụ chacha20-ietf-poly1305:matkhau';
-
-  @override
   String get diagnosticPackets => 'Chụp gói';
 
   @override
@@ -2010,8 +1922,7 @@ class SVi extends S {
   String get extErrRevoked => 'Nhóm Sora đã thu hồi phiên bản tiện ích này vì không an toàn hoặc bị lỗi.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Không thể gia hạn danh sách tiện ích bị thu hồi. Việc cài đặt bị chặn cho đến khi gia hạn được: kiểm tra mạng rồi thử lại.';
+  String get extErrRevocationsExpired => 'Việc cài đặt bị chặn cho đến khi danh sách thu hồi được cập nhật.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2057,4 +1968,39 @@ class SVi extends S {
 
   @override
   String get extAssetRejected => 'Tệp tiện ích bị từ chối: màu khó đọc hoặc quy tắc không hợp lệ.';
+
+  @override
+  String get extVerifiedSora => 'Được Sora xác minh';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Mở';
+
+  @override
+  String get customServerOwn => 'Máy chủ riêng';
+
+  @override
+  String get customServerPaste => 'Dán liên kết';
+
+  @override
+  String get customServerUser => 'Tên người dùng';
+
+  @override
+  String get customServerPassword => 'Mật khẩu';
+
+  @override
+  String get customServerSecretRequired => 'Nhập một giá trị';
+
+  @override
+  String get customServerLinkInvalid => 'Liên kết máy chủ không hợp lệ';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

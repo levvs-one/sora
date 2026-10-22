@@ -872,7 +872,7 @@ class SAr extends S {
 
   @override
   String get modesGuide =>
-      'اختر تلقائي إذا لم تكن متأكدًا من المحرك الذي يحتاجه خادمك. يقوم Sora بالتحقق من ملف التعريف والإعدادات قبل الاتصال. لا يمكن للمحرك زيادة النطاق الترددي لخطتك: يعتمد الأداء على الخادم والمسار والبروتوكول والشبكة.\n\n## وسائط\n\n### كل حركة المرور (TUN)\n\nيقوم Sora بإنشاء واجهة شبكة افتراضية وتوجيه حركة مرور التطبيقات من خلالها، بما في ذلك TCP وUDP. استخدم هذا الوضع لـ Telegram والألعاب وصوت Discord. يمكن للقواعد إرسال مواقع أو برامج محددة مباشرة أو حظرها. تحتاج خدمة الشبكة إلى إذن وخادم يدعم البروتوكول المطلوب.\n\n### وكيل System\n\nيقوم Sora بتكوين وكيل HTTP/SOCKS محلي. تستخدمه التطبيقات التي تحترم إعدادات وكيل النظام. قد تتصل التطبيقات التي تحتوي على مكدس الشبكة الخاص بها مباشرةً؛ تحتاج UDP والمكالمات الصوتية عمومًا إلى TUN. يناسب هذا الوضع المتصفحات والتطبيقات التي تدعم الوكيل.\n\n### لا يوجد خادم\n\nفي Linux، يستخدم Sora [zapret](https://github.com/bol-van/zapret) لتقسيم طلبات HTTP/TLS وإعادة تشكيلها وتجاوز بعض عمليات فحص DPI. يظل عنوان IP الخاص بك كما هو وتنتقل الاتصالات مباشرة إلى موقع الويب. تعتمد النتائج على المزود الخاص بك وطريقة الحظر.\n\nيستخدم التكامل الحالي tpws لـ HTTP وTLS عبر TCP. فهو لا يتجاوز حظر IP أو يقوم بترحيل UDP، ولا يمكنه ضمان اتصالات Telegram الخاصة بـ MTProto. استخدم خادم VPN مع TUN للصوت Discord ومكالمات Telegram وهذه الأنواع من القيود.\n\n## المحركات\n\n### آلي\n\nيختار Sora محركًا مثبتًا يدعم خطة الاتصال بأكملها: بروتوكولات الخادم ووسائل النقل والمجموعات والتجزئة والوضع. يتم رفض الاختيار اليدوي غير المتوافق قبل إيقاف الاتصال الحالي. اختر Auto أو محرك آخر وقم بتطبيق الإعدادات مرة أخرى.\n\n### sing-box\n\nتشتمل حزم Sora الجديدة على [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، وشوكة [sing-box](https://github.com/SagerNet/sing-box)، وإضافة XHTTP وVLESS Encryption من جانب العميل. يتعرف Sora على البنية وقدراتها. لا يكتسب الإصدار الأولي بدون XHTTP هذه الإمكانية من اسمه وحده.\n\nتتضمن البروتوكولات المدعومة VLESS، وVMess، وTrojan، وShadowsocks، وHysteria2، وTUIC، وAnyTLS، وWireGuard ومعلمات AmneziaWG 1.x/2.x يمكن استيراد Sora. تتطلب ملفات تعريف Xray JSON الكاملة Xray. لا يمكن استيراد حقول AWG 3.x الجديدة بعد. يستخدم sing-box منفذ تحكم محلي محمي بكلمة مرور، والذي يمكن للتطبيقات الأخرى الموجودة على الكمبيوتر اكتشافه.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) يدعم تجزئة VLESS وREALITY وXHTTP وVLESS Encryption وTLS. كما أنه يدير ملفات تعريف Xray الكاملة للموفر مع الحفاظ على التوجيه والمجموعات الخاصة بهم. لا يمكن تحويل ملفات التعريف هذه تلقائيًا إلى محرك آخر دون تغيير سلوكها.\n\nقام Xray المجمّع بإزالة الإعداد الذي يعطل التحقق من شهادة TLS (\'allowInsecure`). يقوم Auto بتحديد sing-box أو mihomo للخوادم العادية التي تتطلب هذا الإعداد. يؤدي تحديد Xray يدويًا إلى الإبلاغ عن عدم التوافق قبل إيقاف الاتصال الحالي. تحتاج ملفات تعريف JSON الكاملة الأقدم إلى ملف تعريف موفر محدث مع شهادة أو دبوس شهادة يمكن التحقق منه.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) يدعم المجموعات الاحتياطية وموازنة التحميل المرتبة، XHTTP وAmneziaWG. اختره عندما يكون تجاوز الفشل التلقائي إلى خادم النسخ الاحتياطي مهمًا. لا يتوفر إعداد تجزئة TLS الخاص بـ Sora مع هذا المحرك.\n\n## التوافق في Sora\n\n| ميزة | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN وTCP/UDP | نعم | نعم | نعم |\n| XHTTP | نعم | نعم | نعم |\n| VLESS Encryption | نعم | نعم | نعم |\n| الملف الشخصي الكامل لـ Xray | لا | نعم | لا |\n| TUIC / AnyTLS | كلاهما | لا | TUIC |\n| تجزئة TLS | نعم | نعم | لا |\n| AmneziaWG 1.x/2.x | نعم¹ | لا | نعم |\n| أمرت مجموعة احتياطية | لا | رقم² | نعم |\n\n¹ تستخدم ملفات التعريف ذات J1/J2/J3/Itime mihomo؛ لا يجب أبدًا التخلص من هذه الحقول بصمت. ² بالنسبة لمجموعة ملفات تعريف Xray الكاملة، يقوم التطبيق بتحديد ملف تعريف احتياطي. يعتمد الدعم على البنية المثبتة؛ تحقق من نسخته في حول.\n\n## مكدس TUN\n\nيتعامل المكدس مع TCP وUDP داخل الواجهة الافتراضية. في لوحة الأوضاع، تقدم Xray وmihomo gVisor، وSystem، وMixed، وMIPS. يحفظ كل محرك تفضيلاته الخاصة. لا يستخدم الوكيل System والأوضاع بدون خادم هذا التفضيل.\n\n- **Mixed**: يستخدم TCP مكدس النظام، بينما يتعامل gVisor مع UDP. هذا هو الإعداد الافتراضي لـ mihomo على Linux. في Windows، يستخدم Xray وmihomo مكدس MIPS افتراضيًا.\n- **System**: يستخدم مكدس النظام. جرب خيارًا آخر إذا واجهت تطبيقات الشبكة مشكلات.\n- **gVisor**: يتعامل مع حركة المرور في مساحة المستخدمين.\n- **MIPS**: حزمة IP الخاصة بـ mihomo، المتوفرة في الإصدار المجمع 1.19.32.\n\nفي Linux، يستخدم Xray gVisor المدمج بشكل افتراضي. تستخدم System وMixed وMIPS على Linux mihomo كمحرك TUN، حيث تقوم بإعادة توجيه TCP وUDP إلى Xray عبر رابط SOCKS محلي معتمد. يحتفظ Xray بالبروتوكول وملف تعريف الموفر والتوجيه. تتطلب هذه الخيارات الثلاثة تثبيت mihomo. في Windows، يستخدم Xray المحرك mihomo 1.19.32 أو أحدث لجميع مكدسات TUN الأربعة. تبقى البروتوكولات والتوجيه في Xray. تدعم قواعد التطبيقات في هذا الربط الاتصال المباشر والحظر فقط؛ على Linux تتطلب هذه القواعد gVisor المدمج في Xray.\n\nيدير الجسر عملية ثانية. في ثلاثة قياسات خاملة على Linux، استخدمت حوالي 32-36 ميجابايت من الذاكرة الفعلية أكثر من Xray TUN الأصلي. هذا لا يقيس حمل التنزيل: تعتمد تكاليف وحدة المعالجة المركزية والذاكرة على الاتصالات. لا يحتوي sing-box على محدد المكدس. لا يضمن عدم وجود مكدس أداءً أفضل في كل شبكة. اختر مكدسًا وحدد تطبيق وأعد الاتصال لتجربته في شبكتك.\n\n## تطبيق الإعدادات\n\nيؤدي تحديد الخادم إلى إعادة الاتصال تلقائيًا. يتم حفظ إعدادات الوضع والمحرك وDNS والقاعدة على الفور؛ أثناء الاتصال النشط، انقر فوق \"تطبيق\" ثم أعد الاتصال لاستخدامها. قد تؤدي إعادة تشغيل المحرك إلى مقاطعة التنزيلات والمكالمات. النقرات المتكررة لا تؤدي إلى بدء اتصالات متوازية؛ يؤدي قطع الاتصال إلى إنهاء عملية النقل وتحرير الاتصال.\n\nالإنترنت فقط من خلال VPN يحظر حركة المرور المباشرة عند انقطاع النفق. إنه يؤثر على الجهاز بأكمله. يؤدي قطع الاتصال الصريح إلى إزالة قواعد Sora. إذا لم تنتهي عملية التنظيف، أعد محاولة قطع الاتصال وافتح السجل.\n\n## وثائق المشروع\n\n- [sing-box-lx: التكوين والدعم](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [وثائق sing-box](https://sing-box.sagernet.org/)\n- [وثائق Xray](https://xtls.github.io/)\n- [وثائق mihomo](https://wiki.metacubex.one/)\n- [zapret: التشغيل والقيود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'اختر تلقائي إذا لم تكن متأكدًا من المحرك الذي يحتاجه خادمك. يقوم Sora بالتحقق من ملف التعريف والإعدادات قبل الاتصال. لا يمكن للمحرك زيادة النطاق الترددي لخطتك: يعتمد الأداء على الخادم والمسار والبروتوكول والشبكة.\n\n## وسائط\n\n### كل حركة المرور (TUN)\n\nيقوم Sora بإنشاء واجهة شبكة افتراضية وتوجيه حركة مرور التطبيقات من خلالها، بما في ذلك TCP وUDP. استخدم هذا الوضع لـ Telegram والألعاب وصوت Discord. يمكن للقواعد إرسال مواقع أو برامج محددة مباشرة أو حظرها. تحتاج خدمة الشبكة إلى إذن وخادم يدعم البروتوكول المطلوب.\n\n### وكيل System\n\nيقوم Sora بتكوين وكيل HTTP/SOCKS محلي. تستخدمه التطبيقات التي تحترم إعدادات وكيل النظام. قد تتصل التطبيقات التي تحتوي على مكدس الشبكة الخاص بها مباشرةً؛ تحتاج UDP والمكالمات الصوتية عمومًا إلى TUN. يناسب هذا الوضع المتصفحات والتطبيقات التي تدعم الوكيل.\n\n### لا يوجد خادم\n\nفي Linux، يستخدم Sora [zapret](https://github.com/bol-van/zapret) لتقسيم طلبات HTTP/TLS وإعادة تشكيلها وتجاوز بعض عمليات فحص DPI. يظل عنوان IP الخاص بك كما هو وتنتقل الاتصالات مباشرة إلى موقع الويب. تعتمد النتائج على المزود الخاص بك وطريقة الحظر.\n\nيستخدم التكامل الحالي tpws لـ HTTP وTLS عبر TCP. فهو لا يتجاوز حظر IP أو يقوم بترحيل UDP، ولا يمكنه ضمان اتصالات Telegram الخاصة بـ MTProto. استخدم خادم VPN مع TUN للصوت Discord ومكالمات Telegram وهذه الأنواع من القيود.\n\n## المحركات\n\n### آلي\n\nيختار Sora محركًا مثبتًا يدعم خطة الاتصال بأكملها: بروتوكولات الخادم ووسائل النقل والمجموعات والتجزئة والوضع. يتم رفض الاختيار اليدوي غير المتوافق قبل إيقاف الاتصال الحالي. اختر Auto أو محرك آخر وقم بتطبيق الإعدادات مرة أخرى.\n\n### sing-box\n\nتشتمل حزم Sora الجديدة على [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)، وشوكة [sing-box](https://github.com/SagerNet/sing-box)، وإضافة XHTTP وVLESS Encryption من جانب العميل. يتعرف Sora على البنية وقدراتها. لا يكتسب الإصدار الأولي بدون XHTTP هذه الإمكانية من اسمه وحده.\n\nتتضمن البروتوكولات المدعومة VLESS، وVMess، وTrojan، وShadowsocks، وHysteria2، وTUIC، وAnyTLS، وWireGuard ومعلمات AmneziaWG 1.x/2.x يمكن استيراد Sora. تتطلب ملفات تعريف Xray JSON الكاملة Xray. لا يمكن استيراد حقول AWG 3.x الجديدة بعد. يستخدم sing-box منفذ تحكم محلي محمي بكلمة مرور، والذي يمكن للتطبيقات الأخرى الموجودة على الكمبيوتر اكتشافه.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) يدعم تجزئة VLESS وREALITY وXHTTP وVLESS Encryption وTLS. كما أنه يدير ملفات تعريف Xray الكاملة للموفر مع الحفاظ على التوجيه والمجموعات الخاصة بهم. لا يمكن تحويل ملفات التعريف هذه تلقائيًا إلى محرك آخر دون تغيير سلوكها.\n\nقام Xray المجمّع بإزالة الإعداد الذي يعطل التحقق من شهادة TLS (\'allowInsecure`). يقوم Auto بتحديد sing-box أو mihomo للخوادم العادية التي تتطلب هذا الإعداد. يؤدي تحديد Xray يدويًا إلى الإبلاغ عن عدم التوافق قبل إيقاف الاتصال الحالي. تحتاج ملفات تعريف JSON الكاملة الأقدم إلى ملف تعريف موفر محدث مع شهادة أو دبوس شهادة يمكن التحقق منه.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) يدعم المجموعات الاحتياطية وموازنة التحميل المرتبة، XHTTP وAmneziaWG. اختره عندما يكون تجاوز الفشل التلقائي إلى خادم النسخ الاحتياطي مهمًا. لا يتوفر إعداد تجزئة TLS الخاص بـ Sora مع هذا المحرك.\n\n## التوافق في Sora\n\n| ميزة | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN وTCP/UDP | نعم | نعم | نعم |\n| XHTTP | نعم | نعم | نعم |\n| VLESS Encryption | نعم | نعم | نعم |\n| الملف الشخصي الكامل لـ Xray | لا | نعم | لا |\n| TUIC / AnyTLS | كلاهما | لا | TUIC |\n| mieru | لا | لا | نعم |\n| NaiveProxy | نعم | لا | لا |\n| تجزئة TLS | نعم | نعم | لا |\n| AmneziaWG 1.x/2.x | نعم¹ | لا | نعم |\n| أمرت مجموعة احتياطية | لا | رقم² | نعم |\n\n¹ تستخدم ملفات التعريف ذات J1/J2/J3/Itime mihomo؛ لا يجب أبدًا التخلص من هذه الحقول بصمت. ² بالنسبة لمجموعة ملفات تعريف Xray الكاملة، يقوم التطبيق بتحديد ملف تعريف احتياطي. يعتمد الدعم على البنية المثبتة؛ تحقق من نسخته في حول.\n\n## مكدس TUN\n\nيتعامل المكدس مع TCP وUDP داخل الواجهة الافتراضية. في لوحة الأوضاع، تقدم Xray وmihomo gVisor، وSystem، وMixed، وMIPS. يحفظ كل محرك تفضيلاته الخاصة. لا يستخدم الوكيل System والأوضاع بدون خادم هذا التفضيل.\n\n- **Mixed**: يستخدم TCP مكدس النظام، بينما يتعامل gVisor مع UDP. هذا هو الإعداد الافتراضي لـ mihomo على Linux. في Windows، يستخدم Xray وmihomo مكدس MIPS افتراضيًا.\n- **System**: يستخدم مكدس النظام. جرب خيارًا آخر إذا واجهت تطبيقات الشبكة مشكلات.\n- **gVisor**: يتعامل مع حركة المرور في مساحة المستخدمين.\n- **MIPS**: حزمة IP الخاصة بـ mihomo، المتوفرة في الإصدار المجمع 1.19.32.\n\nفي Linux، يستخدم Xray gVisor المدمج بشكل افتراضي. تستخدم System وMixed وMIPS على Linux mihomo كمحرك TUN، حيث تقوم بإعادة توجيه TCP وUDP إلى Xray عبر رابط SOCKS محلي معتمد. يحتفظ Xray بالبروتوكول وملف تعريف الموفر والتوجيه. تتطلب هذه الخيارات الثلاثة تثبيت mihomo. في Windows، يستخدم Xray المحرك mihomo 1.19.32 أو أحدث لجميع مكدسات TUN الأربعة. تبقى البروتوكولات والتوجيه في Xray. تدعم قواعد التطبيقات في هذا الربط الاتصال المباشر والحظر فقط؛ على Linux تتطلب هذه القواعد gVisor المدمج في Xray.\n\nيدير الجسر عملية ثانية. في ثلاثة قياسات خاملة على Linux، استخدمت حوالي 32-36 ميجابايت من الذاكرة الفعلية أكثر من Xray TUN الأصلي. هذا لا يقيس حمل التنزيل: تعتمد تكاليف وحدة المعالجة المركزية والذاكرة على الاتصالات. لا يحتوي sing-box على محدد المكدس. لا يضمن عدم وجود مكدس أداءً أفضل في كل شبكة. اختر مكدسًا وحدد تطبيق وأعد الاتصال لتجربته في شبكتك.\n\n## تطبيق الإعدادات\n\nيؤدي تحديد الخادم إلى إعادة الاتصال تلقائيًا. يتم حفظ إعدادات الوضع والمحرك وDNS والقاعدة على الفور؛ أثناء الاتصال النشط، انقر فوق \"تطبيق\" ثم أعد الاتصال لاستخدامها. قد تؤدي إعادة تشغيل المحرك إلى مقاطعة التنزيلات والمكالمات. النقرات المتكررة لا تؤدي إلى بدء اتصالات متوازية؛ يؤدي قطع الاتصال إلى إنهاء عملية النقل وتحرير الاتصال.\n\nالإنترنت فقط من خلال VPN يحظر حركة المرور المباشرة عند انقطاع النفق. إنه يؤثر على الجهاز بأكمله. يؤدي قطع الاتصال الصريح إلى إزالة قواعد Sora. إذا لم تنتهي عملية التنظيف، أعد محاولة قطع الاتصال وافتح السجل.\n\n## وثائق المشروع\n\n- [sing-box-lx: التكوين والدعم](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [وثائق sing-box](https://sing-box.sagernet.org/)\n- [وثائق Xray](https://xtls.github.io/)\n- [وثائق mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: التشغيل والقيود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nينقل OLCRTC حركة TCP عبر مكالمة فيديو في Jitsi أو Yandex Telemost أو WB Stream. استورد رابط olcrtc:// أو رمز QR. يعمل مع sing-box وXray وmihomo في وضعي الوكيل وTUN؛ لا يدعم UDP. يحتاج الطرفان إلى إصدارات OLC2 متوافقة. المشروع الأصلي مؤرشف.\n';
 
   @override
   String get probeServers => 'فحص الخوادم';
@@ -899,36 +899,7 @@ class SAr extends S {
   String get extInstallOne => 'تثبيت واحد';
 
   @override
-  String get extBadgeVerified => 'تم التحقق منه';
-
-  @override
-  String get extBadgeTop => 'الأكثر شعبية هذا الأسبوع';
-
-  @override
-  String get extBadgeNew => 'جديد';
-
-  @override
-  String get extBadgeStaff => 'فريق Sora';
-
-  @override
-  String get extSideloadShort => 'ليس من الكتالوج';
-
-  @override
-  String get extSideloadWarning =>
-      'هذا الملحق ليس من كتالوج الفريق. لقد كفل المؤلف فقط مفتاحه: قم بتثبيته فقط إذا كنت تثق في المؤلف.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'تثبيت «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'تحديث «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'سيتمكن هذا الملحق من:';
+  String get extSideloadWarning => 'ثبّت فقط إذا كنت تثق بمفتاح المؤلف الموقّع ذاتيًا.';
 
   @override
   String get extPermissionsWidened => 'التحديث يطلب أذونات جديدة:';
@@ -1054,9 +1025,6 @@ class SAr extends S {
       'تم توقيع هذا التحديث باستخدام مفتاح مؤلف مختلف عن الإصدار المثبت، لذلك تم حظره. إذا كنت تثق في المفتاح الجديد، فقم بإلغاء تثبيت الملحق وتثبيته مرة أخرى بشكل صريح.';
 
   @override
-  String get extUpdateAvailable => 'التحديث متاح';
-
-  @override
   String get extDisabled => 'معطل';
 
   @override
@@ -1099,9 +1067,6 @@ class SAr extends S {
   String get extConflictsTitle => 'تعارضات الملحق';
 
   @override
-  String get extConflictsIntro => 'تريد هذه الإضافات الشيء نفسه. اختر أيّها يعمل، وستبقى الأخرى مثبّتة.';
-
-  @override
   String get extConflictTheme => 'سمة التطبيق';
 
   @override
@@ -1121,28 +1086,9 @@ class SAr extends S {
   String get extConflictsResolve => 'حل النزاعات';
 
   @override
-  String get extConflictNote =>
-      'يُحفظ اختيارك على هذا الجهاز. يتغيّر المظهر فورًا، أما خطافات الشبكة فلا تعمل في هذا الإصدار.';
-
-  @override
   String extVersionLabel(String version) {
     return 'النسخة $version';
   }
-
-  @override
-  String get extAuthor => 'المؤلف';
-
-  @override
-  String get extRating => 'التقييم';
-
-  @override
-  String get extInstalls => 'عمليات التثبيت';
-
-  @override
-  String get extVersion => 'النسخة';
-
-  @override
-  String get extAbout => 'حول هذا الملحق';
 
   @override
   String get extPermissionsTitle => 'الأذونات';
@@ -1155,9 +1101,6 @@ class SAr extends S {
 
   @override
   String get extSaveSettings => 'حفظ الإعدادات';
-
-  @override
-  String get extSaving => 'الحفظ...';
 
   @override
   String extUpdateTo(String version) {
@@ -1186,7 +1129,7 @@ class SAr extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'اللوحة غير متوفرة. ربما تم تعطيل الملحق أو إزالته.';
+  String get extPanelUnavailable => 'لوحة الإضافة غير متاحة.';
 
   @override
   String get extPermConnectionsRead => 'راجع قائمة الاتصالات النشطة';
@@ -1225,10 +1168,6 @@ class SAr extends S {
   String get extPermBackground => 'تشغيل المهام الخلفية';
 
   @override
-  String get extPermBackgroundDetail =>
-      'يقوم بتشغيل المهام المجدولة حتى عندما تكون اللوحة مغلقة. يمكنك إيقافه مؤقتًا أو تغيير عدد مرات تشغيله في إعدادات الملحق.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1261,21 +1200,13 @@ class SAr extends S {
   String get extImageFailed => 'تعذر تحميل الصورة';
 
   @override
-  String get extRatingHow => 'كيفية عمل التقييمات';
-
-  @override
-  String get extRatingHowBody =>
-      'تستخدم التقييمات متوسط بايزي: يظل الملحق الذي يحتوي على عدد قليل من التقييمات بالقرب من المنتصف حتى يصوت المزيد من الأشخاص، لذلك لا يمكن لمراجعة واحدة من فئة 5 نجوم دفع الملحق الجديد إلى الأعلى. التقييمات الحديثة لها وزن أكبر من التقييمات القديمة، ويتم احتساب تقييم واحد فقط لكل حساب.';
-
-  @override
   String get extScreenshots => 'لقطات الشاشة';
 
   @override
   String get extSortRelevance => 'الصلة';
 
   @override
-  String get extPermNetworkDetail =>
-      'تجلب بيانات من الإنترنت عبر VPN. يُسمح فقط بالمضيفين في القائمة أدناه، وكل ما عداهم محظور.';
+  String get extPermNetworkDetail => 'تُسمح طلبات VPN إلى المضيفين أدناه فقط.';
 
   @override
   String get extBgTitle => 'مهمة في الخلفية';
@@ -1317,10 +1248,6 @@ class SAr extends S {
   }
 
   @override
-  String get extBgNote =>
-      'تعمل المهمة وفق الجدول ما دام Sora مفتوحًا، بما في ذلك عند وجوده في علبة النظام. أقصر فاصل 15 دقيقة.';
-
-  @override
   String get extBgDisabledNote => 'قم بتمكين الملحق لإدارة مهمة الخلفية الخاصة به.';
 
   @override
@@ -1352,13 +1279,7 @@ class SAr extends S {
   String get qrCopyLink => 'نسخ الرابط';
 
   @override
-  String get qrShowLink => 'إظهار الرابط';
-
-  @override
-  String get qrHideLink => 'إخفاء الرابط';
-
-  @override
-  String get qrWarning => 'يحتوي هذا الرمز QR على تفاصيل الاتصال. لا تظهر ذلك للغرباء.';
+  String get qrWarning => 'لا تشارك الرمز إلا مع من تثق بهم.';
 
   @override
   String get qrScanHint => 'اختر لقطة شاشة أو صورة تحتوي على رمز QR، أو الصق رابطًا';
@@ -1483,6 +1404,9 @@ class SAr extends S {
 
   @override
   String get sortBy => 'الترتيب حسب';
+
+  @override
+  String get sortSubscription => 'حسب ترتيب الاشتراك';
 
   @override
   String get sortPing => 'بينغ';
@@ -1821,15 +1745,9 @@ class SAr extends S {
   String get customServerHideSecret => 'إخفاء السر';
 
   @override
-  String get customServerBadge => 'مخصص';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'حذف الخادم \"$name\"؟';
   }
-
-  @override
-  String get customServerEmptyHint => 'إضافة خادم يدويًا: العنوان والمنفذ والبروتوكول';
 
   @override
   String get customServerTest => 'الاختبار';
@@ -2007,10 +1925,6 @@ class SAr extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'التقاط الحزمة';
 
   @override
@@ -2029,8 +1943,7 @@ class SAr extends S {
   String get extErrRevoked => 'سحب فريق Sora هذا الإصدار من الإضافة لأنه غير آمن أو معطّل.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'تعذّر تحديث قائمة الإضافات المسحوبة. التثبيت متوقف حتى تُحدَّث: تحقّق من الشبكة وحاول مجددًا.';
+  String get extErrRevocationsExpired => 'التثبيت محظور حتى يتم تحديث قائمة الإضافات الملغاة.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2076,4 +1989,39 @@ class SAr extends S {
 
   @override
   String get extAssetRejected => 'تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة.';
+
+  @override
+  String get extVerifiedSora => 'تم التحقق بواسطة Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count بايت';
+  }
+
+  @override
+  String get extOpen => 'فتح';
+
+  @override
+  String get customServerOwn => 'خادم خاص';
+
+  @override
+  String get customServerPaste => 'لصق رابط';
+
+  @override
+  String get customServerUser => 'اسم المستخدم';
+
+  @override
+  String get customServerPassword => 'كلمة المرور';
+
+  @override
+  String get customServerSecretRequired => 'أدخل قيمة';
+
+  @override
+  String get customServerLinkInvalid => 'رابط الخادم غير صالح';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

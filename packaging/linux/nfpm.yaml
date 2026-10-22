@@ -44,6 +44,13 @@ contents:
   - src: ./dist/engines/mihomo
     dst: /usr/lib/sora/engines/mihomo
     file_info: {mode: 0755}
+  - src: ./dist/engines/olcrtc
+    dst: /usr/lib/sora/engines/olcrtc
+    file_info: {mode: 0755}
+  - src: ./dist/engines/olcrtc.json
+    dst: /usr/lib/sora/engines/olcrtc.json
+  - src: ./dist/engines/olcrtc.LICENSE
+    dst: /usr/share/licenses/sora-core/olcrtc.LICENSE
   - src: ./dist/engines/geoip.dat
     dst: /usr/lib/sora/engines/geoip.dat
   - src: ./dist/engines/geosite.dat

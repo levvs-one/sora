@@ -882,7 +882,7 @@ class SId extends S {
 
   @override
   String get modesGuide =>
-      'Pilih Otomatis jika Anda tidak yakin mesin mana yang dibutuhkan server Anda. Sora memeriksa profil dan pengaturan sebelum menghubungkan. Mesin tidak dapat meningkatkan bandwidth paket Anda: kinerja bergantung pada server, rute, protokol, dan jaringan.\n\n## Mode\n\n### Semua lalu lintas (TUN)\n\nSora membuat antarmuka jaringan virtual dan merutekan lalu lintas aplikasi melaluinya, termasuk TCP dan UDP. Gunakan mode ini untuk Telegram, game, dan suara Discord. Aturan dapat mengirim situs atau program tertentu secara langsung atau memblokirnya. Layanan jaringan memerlukan izin dan server yang mendukung protokol yang diperlukan.\n\n### Proksi System\n\nSora mengonfigurasi proksi HTTP/SOCKS lokal. Aplikasi yang menghormati pengaturan proxy sistem menggunakannya. Aplikasi dengan tumpukan jaringannya sendiri dapat terhubung secara langsung; UDP dan panggilan suara umumnya memerlukan TUN. Mode ini cocok untuk browser dan aplikasi dengan dukungan proxy.\n\n### Tidak ada server\n\nDi Linux, Sora menggunakan [zapret](https://github.com/bol-van/zapret) untuk membagi dan membentuk ulang permintaan HTTP/TLS dan melewati beberapa pemeriksaan DPI. IP Anda tetap sama dan koneksi langsung ke situs web. Hasil bergantung pada penyedia Anda dan metode pemblokiran.\n\nIntegrasi saat ini menggunakan tpws untuk HTTP dan TLS melalui TCP. Ini tidak melewati pemblokiran IP atau menyampaikan UDP, dan tidak dapat menjamin koneksi MTProto MTProto. Gunakan server VPN dengan TUN untuk suara Discord, panggilan Telegram dan pembatasan semacam ini.\n\n## Mesin\n\n### Otomatis\n\nSora memilih mesin terinstal yang mendukung seluruh paket koneksi: protokol server, transport, grup, fragmentasi, dan mode. Pilihan manual yang tidak kompatibel ditolak sebelum menghentikan koneksi saat ini. Pilih Otomatis atau mesin lain dan terapkan kembali pengaturannya.\n\n### sing-box\n\nPaket Sora baru mencakup [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), fork dari [sing-box](https://github.com/SagerNet/sing-box), menambahkan XHTTP dan VLESS Encryption sisi klien. Sora mengenali build dan kemampuannya. Build upstream tanpa XHTTP tidak mendapatkan kemampuan ini hanya dari namanya saja.\n\nProtokol yang didukung mencakup parameter VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard dan AmneziaWG 1.x/2.x Sora dapat mengimpor. Profil JSON Xray lengkap memerlukan Xray. Bidang AWG 3.x baru belum dapat diimpor. sing-box menggunakan port kontrol lokal yang dilindungi kata sandi, yang dapat dideteksi oleh aplikasi lain di komputer.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) mendukung fragmentasi VLESS, REALITY, XHTTP, VLESS Encryption dan TLS. Ini juga menjalankan profil lengkap penyedia Xray sambil mempertahankan perutean dan grupnya. Profil tersebut tidak dapat secara otomatis dikonversi ke mesin lain tanpa mengubah perilakunya.\n\nXray yang dibundel menghapus pengaturan yang menonaktifkan verifikasi sertifikat TLS (`allowInsecure`). Otomatis memilih sing-box atau mihomo untuk server biasa yang memerlukan pengaturan ini. Memilih Xray secara manual melaporkan ketidakcocokan sebelum menghentikan koneksi saat ini. Profil JSON lengkap yang lebih lama memerlukan profil penyedia yang diperbarui dengan sertifikat atau pin sertifikat yang dapat diverifikasi.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) mendukung grup fallback dan penyeimbang beban yang dipesan, XHTTP dan AmneziaWG. Pilih ketika failover otomatis ke server cadangan penting. Pengaturan fragmentasi TLS Sora tidak tersedia dengan mesin ini.\n\n## Kompatibilitas di Sora\n\n| Fitur | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN dan TCP/UDP | Ya | Ya | Ya |\n| XHTTP | Ya | Ya | Ya |\n| VLESS Encryption | Ya | Ya | Ya |\n| Profil lengkap Xray | Tidak | Ya | Tidak |\n| TUIC / AnyTLS | Keduanya | Tidak | TUIC |\n| Fragmentasi TLS | Ya | Ya | Tidak |\n| AmneziaWG 1.x/2.x | Ya¹ | Tidak | Ya |\n| Grup cadangan yang dipesan | Tidak | Tidak² | Ya |\n\n¹ Profil dengan J1/J2/J3/Itime menggunakan mihomo; bidang-bidang ini tidak boleh dibuang secara diam-diam. ² Untuk grup profil Xray lengkap, aplikasi memilih profil cadangan. Dukungan bergantung pada build yang diinstal; periksa versinya di Tentang.\n\n## Tumpukan TUN\n\nTumpukan menangani TCP dan UDP di dalam antarmuka virtual. Di panel mode, Xray dan mihomo menawarkan gVisor, System, Mixed dan MIPS. Setiap mesin menyimpan preferensinya sendiri. Proksi System dan mode Tanpa Server tidak menggunakan preferensi ini.\n\n- **Mixed**: TCP menggunakan tumpukan sistem, sedangkan gVisor menangani UDP. Ini adalah bawaan mihomo di Linux. Di Windows, Xray dan mihomo menggunakan MIPS secara bawaan.\n- **System**: menggunakan tumpukan sistem. Coba opsi lain jika aplikasi jaringan mengalami masalah.\n- **gVisor**: menangani lalu lintas di ruang pengguna.\n- **MIPS**: tumpukan IP milik mihomo, tersedia dalam paket versi 1.19.32.\n\nPada Linux, Xray menggunakan gVisor bawaannya secara default. System, Mixed dan MIPS di Linux menggunakan mihomo sebagai mesin TUN, meneruskan TCP dan UDP ke Xray melalui tautan SOCKS lokal yang diautentikasi. Xray mempertahankan protokol, profil penyedia, dan perutean. Ketiga opsi ini memerlukan mihomo yang diinstal. Pada Windows, Xray menggunakan mihomo 1.19.32 atau lebih baru untuk keempat tumpukan TUN. Protokol dan perutean tetap di Xray. Aturan aplikasi dalam kombinasi ini hanya mendukung koneksi langsung dan pemblokiran; di Linux aturan ini memerlukan gVisor bawaan Xray.\n\nJembatan menjalankan proses kedua. Dalam tiga pengukuran idle di Linux, memori fisik menggunakan sekitar 32–36 MiB lebih banyak daripada Xray TUN asli. Ini tidak mengukur beban pengunduhan: biaya CPU dan memori bergantung pada koneksi. sing-box tidak memiliki pemilih tumpukan. Tidak ada tumpukan yang menjamin kinerja lebih baik di setiap jaringan. Pilih tumpukan dan pilih Terapkan dan sambungkan kembali untuk mencobanya di jaringan Anda.\n\n## Menerapkan pengaturan\n\nMemilih server akan terhubung kembali secara otomatis. Pengaturan mode, mesin, DNS, dan aturan segera disimpan; selama koneksi aktif, klik Terapkan dan sambungkan kembali untuk menggunakannya. Memulai ulang mesin dapat mengganggu pengunduhan dan panggilan. Klik berulang kali tidak memulai koneksi paralel; pemutusan mengakhiri transisi dan melepaskan koneksi.\n\nInternet hanya melalui VPN memblokir lalu lintas langsung ketika terowongan terputus. Ini mempengaruhi keseluruhan mesin. Pemutusan hubungan secara eksplisit menghapus aturan Sora. Jika pembersihan tidak selesai, coba lagi putuskan sambungan dan buka log.\n\n## Dokumentasi proyek\n\n- [sing-box-lx: konfigurasi dan dukungan](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [dokumentasi sing-box](https://sing-box.sagernet.org/)\n- [dokumentasi Xray](https://xtls.github.io/)\n- [dokumentasi mihomo](https://wiki.metacubex.one/)\n- [zapret: pengoperasian dan batasan](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Pilih Otomatis jika Anda tidak yakin mesin mana yang dibutuhkan server Anda. Sora memeriksa profil dan pengaturan sebelum menghubungkan. Mesin tidak dapat meningkatkan bandwidth paket Anda: kinerja bergantung pada server, rute, protokol, dan jaringan.\n\n## Mode\n\n### Semua lalu lintas (TUN)\n\nSora membuat antarmuka jaringan virtual dan merutekan lalu lintas aplikasi melaluinya, termasuk TCP dan UDP. Gunakan mode ini untuk Telegram, game, dan suara Discord. Aturan dapat mengirim situs atau program tertentu secara langsung atau memblokirnya. Layanan jaringan memerlukan izin dan server yang mendukung protokol yang diperlukan.\n\n### Proksi System\n\nSora mengonfigurasi proksi HTTP/SOCKS lokal. Aplikasi yang menghormati pengaturan proxy sistem menggunakannya. Aplikasi dengan tumpukan jaringannya sendiri dapat terhubung secara langsung; UDP dan panggilan suara umumnya memerlukan TUN. Mode ini cocok untuk browser dan aplikasi dengan dukungan proxy.\n\n### Tidak ada server\n\nDi Linux, Sora menggunakan [zapret](https://github.com/bol-van/zapret) untuk membagi dan membentuk ulang permintaan HTTP/TLS dan melewati beberapa pemeriksaan DPI. IP Anda tetap sama dan koneksi langsung ke situs web. Hasil bergantung pada penyedia Anda dan metode pemblokiran.\n\nIntegrasi saat ini menggunakan tpws untuk HTTP dan TLS melalui TCP. Ini tidak melewati pemblokiran IP atau menyampaikan UDP, dan tidak dapat menjamin koneksi MTProto MTProto. Gunakan server VPN dengan TUN untuk suara Discord, panggilan Telegram dan pembatasan semacam ini.\n\n## Mesin\n\n### Otomatis\n\nSora memilih mesin terinstal yang mendukung seluruh paket koneksi: protokol server, transport, grup, fragmentasi, dan mode. Pilihan manual yang tidak kompatibel ditolak sebelum menghentikan koneksi saat ini. Pilih Otomatis atau mesin lain dan terapkan kembali pengaturannya.\n\n### sing-box\n\nPaket Sora baru mencakup [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), fork dari [sing-box](https://github.com/SagerNet/sing-box), menambahkan XHTTP dan VLESS Encryption sisi klien. Sora mengenali build dan kemampuannya. Build upstream tanpa XHTTP tidak mendapatkan kemampuan ini hanya dari namanya saja.\n\nProtokol yang didukung mencakup parameter VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard dan AmneziaWG 1.x/2.x Sora dapat mengimpor. Profil JSON Xray lengkap memerlukan Xray. Bidang AWG 3.x baru belum dapat diimpor. sing-box menggunakan port kontrol lokal yang dilindungi kata sandi, yang dapat dideteksi oleh aplikasi lain di komputer.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) mendukung fragmentasi VLESS, REALITY, XHTTP, VLESS Encryption dan TLS. Ini juga menjalankan profil lengkap penyedia Xray sambil mempertahankan perutean dan grupnya. Profil tersebut tidak dapat secara otomatis dikonversi ke mesin lain tanpa mengubah perilakunya.\n\nXray yang dibundel menghapus pengaturan yang menonaktifkan verifikasi sertifikat TLS (`allowInsecure`). Otomatis memilih sing-box atau mihomo untuk server biasa yang memerlukan pengaturan ini. Memilih Xray secara manual melaporkan ketidakcocokan sebelum menghentikan koneksi saat ini. Profil JSON lengkap yang lebih lama memerlukan profil penyedia yang diperbarui dengan sertifikat atau pin sertifikat yang dapat diverifikasi.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) mendukung grup fallback dan penyeimbang beban yang dipesan, XHTTP dan AmneziaWG. Pilih ketika failover otomatis ke server cadangan penting. Pengaturan fragmentasi TLS Sora tidak tersedia dengan mesin ini.\n\n## Kompatibilitas di Sora\n\n| Fitur | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN dan TCP/UDP | Ya | Ya | Ya |\n| XHTTP | Ya | Ya | Ya |\n| VLESS Encryption | Ya | Ya | Ya |\n| Profil lengkap Xray | Tidak | Ya | Tidak |\n| TUIC / AnyTLS | Keduanya | Tidak | TUIC |\n| mieru | Tidak | Tidak | Ya |\n| NaiveProxy | Ya | Tidak | Tidak |\n| Fragmentasi TLS | Ya | Ya | Tidak |\n| AmneziaWG 1.x/2.x | Ya¹ | Tidak | Ya |\n| Grup cadangan yang dipesan | Tidak | Tidak² | Ya |\n\n¹ Profil dengan J1/J2/J3/Itime menggunakan mihomo; bidang-bidang ini tidak boleh dibuang secara diam-diam. ² Untuk grup profil Xray lengkap, aplikasi memilih profil cadangan. Dukungan bergantung pada build yang diinstal; periksa versinya di Tentang.\n\n## Tumpukan TUN\n\nTumpukan menangani TCP dan UDP di dalam antarmuka virtual. Di panel mode, Xray dan mihomo menawarkan gVisor, System, Mixed dan MIPS. Setiap mesin menyimpan preferensinya sendiri. Proksi System dan mode Tanpa Server tidak menggunakan preferensi ini.\n\n- **Mixed**: TCP menggunakan tumpukan sistem, sedangkan gVisor menangani UDP. Ini adalah bawaan mihomo di Linux. Di Windows, Xray dan mihomo menggunakan MIPS secara bawaan.\n- **System**: menggunakan tumpukan sistem. Coba opsi lain jika aplikasi jaringan mengalami masalah.\n- **gVisor**: menangani lalu lintas di ruang pengguna.\n- **MIPS**: tumpukan IP milik mihomo, tersedia dalam paket versi 1.19.32.\n\nPada Linux, Xray menggunakan gVisor bawaannya secara default. System, Mixed dan MIPS di Linux menggunakan mihomo sebagai mesin TUN, meneruskan TCP dan UDP ke Xray melalui tautan SOCKS lokal yang diautentikasi. Xray mempertahankan protokol, profil penyedia, dan perutean. Ketiga opsi ini memerlukan mihomo yang diinstal. Pada Windows, Xray menggunakan mihomo 1.19.32 atau lebih baru untuk keempat tumpukan TUN. Protokol dan perutean tetap di Xray. Aturan aplikasi dalam kombinasi ini hanya mendukung koneksi langsung dan pemblokiran; di Linux aturan ini memerlukan gVisor bawaan Xray.\n\nJembatan menjalankan proses kedua. Dalam tiga pengukuran idle di Linux, memori fisik menggunakan sekitar 32–36 MiB lebih banyak daripada Xray TUN asli. Ini tidak mengukur beban pengunduhan: biaya CPU dan memori bergantung pada koneksi. sing-box tidak memiliki pemilih tumpukan. Tidak ada tumpukan yang menjamin kinerja lebih baik di setiap jaringan. Pilih tumpukan dan pilih Terapkan dan sambungkan kembali untuk mencobanya di jaringan Anda.\n\n## Menerapkan pengaturan\n\nMemilih server akan terhubung kembali secara otomatis. Pengaturan mode, mesin, DNS, dan aturan segera disimpan; selama koneksi aktif, klik Terapkan dan sambungkan kembali untuk menggunakannya. Memulai ulang mesin dapat mengganggu pengunduhan dan panggilan. Klik berulang kali tidak memulai koneksi paralel; pemutusan mengakhiri transisi dan melepaskan koneksi.\n\nInternet hanya melalui VPN memblokir lalu lintas langsung ketika terowongan terputus. Ini mempengaruhi keseluruhan mesin. Pemutusan hubungan secara eksplisit menghapus aturan Sora. Jika pembersihan tidak selesai, coba lagi putuskan sambungan dan buka log.\n\n## Dokumentasi proyek\n\n- [sing-box-lx: konfigurasi dan dukungan](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [dokumentasi sing-box](https://sing-box.sagernet.org/)\n- [dokumentasi Xray](https://xtls.github.io/)\n- [dokumentasi mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: pengoperasian dan batasan](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC membawa TCP melalui panggilan video di Jitsi, Yandex Telemost, atau WB Stream. Impor tautan olcrtc:// atau kode QR. Protokol ini bekerja dengan sing-box, Xray, dan mihomo dalam mode proksi dan TUN; UDP tidak didukung. Kedua ujung memerlukan build OLC2 yang kompatibel. Proyek asal telah diarsipkan.\n';
 
   @override
   String get probeServers => 'Periksa server';
@@ -909,36 +909,8 @@ class SId extends S {
   String get extInstallOne => '1 pemasangan';
 
   @override
-  String get extBadgeVerified => 'Terverifikasi';
-
-  @override
-  String get extBadgeTop => 'Paling populer minggu ini';
-
-  @override
-  String get extBadgeNew => 'Baru';
-
-  @override
-  String get extBadgeStaff => 'Tim Sora';
-
-  @override
-  String get extSideloadShort => 'Bukan dari katalog';
-
-  @override
   String get extSideloadWarning =>
-      'Ekstensi ini bukan dari katalog tim. Hanya penulis yang menjamin kuncinya: instal hanya jika Anda memercayai penulisnya.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Pasang “$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Perbarui “$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Ekstensi ini akan dapat:';
+      'Instal hanya jika Anda memercayai kunci yang ditandatangani sendiri oleh pembuatnya.';
 
   @override
   String get extPermissionsWidened => 'Pembaruan meminta izin baru:';
@@ -1064,9 +1036,6 @@ class SId extends S {
       'Pembaruan ini ditandatangani dengan kunci penulis yang berbeda dari versi yang diinstal, sehingga diblokir. Jika Anda memercayai kunci baru, copot pemasangan ekstensi dan pasang kembali secara eksplisit.';
 
   @override
-  String get extUpdateAvailable => 'Pembaruan tersedia';
-
-  @override
   String get extDisabled => 'Dinonaktifkan';
 
   @override
@@ -1109,10 +1078,6 @@ class SId extends S {
   String get extConflictsTitle => 'Konflik perluasan';
 
   @override
-  String get extConflictsIntro =>
-      'Ekstensi ini menginginkan hal yang sama. Pilih mana yang berjalan; yang lain tetap terpasang.';
-
-  @override
   String get extConflictTheme => 'Tema aplikasi';
 
   @override
@@ -1132,28 +1097,9 @@ class SId extends S {
   String get extConflictsResolve => 'Selesaikan konflik';
 
   @override
-  String get extConflictNote =>
-      'Pilihan Anda disimpan di perangkat ini. Tema langsung berganti; hook jaringan tidak dijalankan di versi ini.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versi $version';
   }
-
-  @override
-  String get extAuthor => 'Penulis';
-
-  @override
-  String get extRating => 'Peringkat';
-
-  @override
-  String get extInstalls => 'Instalasi';
-
-  @override
-  String get extVersion => 'Versi';
-
-  @override
-  String get extAbout => 'Tentang ekstensi ini';
 
   @override
   String get extPermissionsTitle => 'Izin';
@@ -1166,9 +1112,6 @@ class SId extends S {
 
   @override
   String get extSaveSettings => 'Simpan pengaturan';
-
-  @override
-  String get extSaving => 'Menyimpan…';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1140,7 @@ class SId extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel tidak tersedia. Ekstensi mungkin telah dinonaktifkan atau dihapus.';
+  String get extPanelUnavailable => 'Panel ekstensi tidak tersedia.';
 
   @override
   String get extPermConnectionsRead => 'Lihat daftar koneksi aktif';
@@ -1236,10 +1179,6 @@ class SId extends S {
   String get extPermBackground => 'Jalankan tugas latar belakang';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Menjalankan tugas terjadwal bahkan ketika panel ditutup. Anda dapat menjeda atau mengubah frekuensi dijalankannya di pengaturan ekstensi.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1211,13 @@ class SId extends S {
   String get extImageFailed => 'Tidak dapat memuat gambar';
 
   @override
-  String get extRatingHow => 'Cara kerja pemeringkatan';
-
-  @override
-  String get extRatingHowBody =>
-      'Peringkat menggunakan rata-rata Bayesian: ekstensi dengan sedikit peringkat tetap berada di tengah hingga lebih banyak orang memilih, sehingga satu ulasan bintang 5 tidak dapat mendorong ekstensi baru ke atas. Peringkat terbaru lebih berbobot dibandingkan peringkat lama, dan hanya satu peringkat per akun yang dihitung.';
-
-  @override
   String get extScreenshots => 'Tangkapan Layar';
 
   @override
   String get extSortRelevance => 'Relevansi';
 
   @override
-  String get extPermNetworkDetail =>
-      'Mengambil data dari internet melalui VPN. Hanya host di bawah yang diizinkan, sisanya diblokir.';
+  String get extPermNetworkDetail => 'Permintaan VPN hanya diizinkan ke host di bawah ini.';
 
   @override
   String get extBgTitle => 'Tugas latar belakang';
@@ -1308,10 +1239,6 @@ class SId extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# jam');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Tugas berjalan sesuai jadwal selama Sora terbuka, termasuk saat di baki. Interval terpendek 15 menit.';
 
   @override
   String get extBgDisabledNote => 'Aktifkan ekstensi untuk mengelola tugas latar belakangnya.';
@@ -1345,13 +1272,7 @@ class SId extends S {
   String get qrCopyLink => 'Salin tautan';
 
   @override
-  String get qrShowLink => 'Tampilkan tautan';
-
-  @override
-  String get qrHideLink => 'Sembunyikan tautan';
-
-  @override
-  String get qrWarning => 'Kode QR ini berisi detail koneksi. Jangan perlihatkan kepada orang asing.';
+  String get qrWarning => 'Bagikan kode ini hanya kepada orang yang Anda percaya.';
 
   @override
   String get qrScanHint => 'Pilih tangkapan layar atau foto berisi kode QR, atau tempel tautan';
@@ -1469,6 +1390,9 @@ class SId extends S {
 
   @override
   String get sortBy => 'Urutkan berdasarkan';
+
+  @override
+  String get sortSubscription => 'Sesuai urutan langganan';
 
   @override
   String get sortPing => 'Ping';
@@ -1807,15 +1731,9 @@ class SId extends S {
   String get customServerHideSecret => 'Sembunyikan rahasia';
 
   @override
-  String get customServerBadge => 'khusus';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Hapus server “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Tambahkan server secara manual: alamat, port dan protokol';
 
   @override
   String get customServerTest => 'Tes';
@@ -1987,10 +1905,6 @@ class SId extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi';
-
-  @override
   String get diagnosticPackets => 'Penangkapan paket';
 
   @override
@@ -2009,8 +1923,7 @@ class SId extends S {
   String get extErrRevoked => 'Tim Sora menarik versi ekstensi ini karena tidak aman atau rusak.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Daftar ekstensi yang ditarik tidak dapat diperbarui. Pemasangan diblokir sampai diperbarui: periksa jaringan lalu coba lagi.';
+  String get extErrRevocationsExpired => 'Instalasi diblokir hingga daftar pencabutan diperbarui.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2056,4 +1969,39 @@ class SId extends S {
 
   @override
   String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
+
+  @override
+  String get extVerifiedSora => 'Diverifikasi oleh Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Buka';
+
+  @override
+  String get customServerOwn => 'Server sendiri';
+
+  @override
+  String get customServerPaste => 'Tempel tautan';
+
+  @override
+  String get customServerUser => 'Nama pengguna';
+
+  @override
+  String get customServerPassword => 'Kata sandi';
+
+  @override
+  String get customServerSecretRequired => 'Masukkan nilai';
+
+  @override
+  String get customServerLinkInvalid => 'Tautan server tidak valid';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

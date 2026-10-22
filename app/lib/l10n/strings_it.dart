@@ -887,7 +887,7 @@ class SIt extends S {
 
   @override
   String get modesGuide =>
-      'Scegli Auto se non sei sicuro di quale motore abbia bisogno il tuo server. Sora controlla il profilo e le impostazioni prima della connessione. Un motore non può aumentare la larghezza di banda del tuo piano: le prestazioni dipendono dal server, dal percorso, dal protocollo e dalla rete.\n\n## Modalità\n\n### Tutto il traffico (TUN)\n\nSora crea un\'interfaccia di rete virtuale e instrada il traffico delle applicazioni attraverso di essa, inclusi TCP e UDP. Utilizzare questa modalità per Telegram, giochi e voce Discord. Le regole possono inviare direttamente siti o programmi specifici o bloccarli. Il servizio di rete necessita dell\'autorizzazione e di un server che supporti il ​​protocollo richiesto.\n\n###Proxy System\n\nSora configura un proxy HTTP/SOCKS locale. Le applicazioni che rispettano le impostazioni proxy del sistema lo utilizzano. Le applicazioni con il proprio stack di rete possono connettersi direttamente; UDP e le chiamate vocali generalmente necessitano di TUN. Questa modalità è adatta ai browser e alle applicazioni con supporto proxy.\n\n### Nessun server\n\nSu Linux, Sora utilizza [zapret](https://github.com/bol-van/zapret) per dividere e rimodellare le richieste HTTP/TLS e ignorare alcuni controlli DPI. Il tuo IP rimane lo stesso e le connessioni vanno direttamente al sito web. I risultati dipendono dal tuo provider e dal metodo di blocco.\n\nL\'integrazione attuale utilizza tpws per HTTP e TLS su TCP. Non bypassa il blocco IP né inoltra UDP e non può garantire le connessioni MTProto di Telegram. Utilizza un server VPN con TUN per voce Discord, chiamate Telegram e questo tipo di restrizioni.\n\n## Motori\n\n### Automatico\n\nSora seleziona un motore installato che supporta l\'intero piano di connessione: protocolli server, trasporti, gruppi, frammentazione e modalità. Una scelta manuale incompatibile viene rifiutata prima di interrompere la connessione corrente. Scegli Auto o un altro motore e applica nuovamente le impostazioni.\n\n###sing-box\n\nI nuovi pacchetti Sora includono [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), un fork di [sing-box](https://github.com/SagerNet/sing-box), aggiungendo XHTTP e VLESS Encryption lato client. Sora riconosce la build e le sue capacità. Una build upstream senza XHTTP non ottiene questa funzionalità solo dal suo nome.\n\nI protocolli supportati includono VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard e i parametri AmneziaWG 1.x/2.x Sora può importare. I profili JSON Xray completi richiedono Xray. I nuovi campi AWG 3.x non possono ancora essere importati. sing-box utilizza una porta di controllo locale protetta da password, che può essere rilevata da altre applicazioni sul computer.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) supporta VLESS, REALITY, XHTTP, VLESS Encryption e la frammentazione TLS. Esegue inoltre i profili Xray completi del provider preservandone il routing e i gruppi. Tali profili non possono essere convertiti automaticamente in un altro motore senza modificarne il comportamento.\n\nLo Xray in bundle ha rimosso l\'impostazione che disabilita la verifica del certificato TLS (`allowInsecure`). Seleziona automaticamente sing-box o mihomo per i server ordinari che richiedono questa impostazione. La selezione di Xray segnala manualmente l\'incompatibilità prima di interrompere la connessione corrente. I profili JSON completi meno recenti necessitano di un profilo provider aggiornato con un certificato verificabile o un pin del certificato.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) supporta i gruppi di fallback e bilanciamento del carico ordinati, XHTTP e AmneziaWG. Sceglilo quando è importante il failover automatico su un server di backup. L\'impostazione di frammentazione TLS di Sora non è disponibile con questo motore.\n\n## Compatibilità con Sora\n\n| Caratteristica | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN e TCP/UDP | Sì | Sì | Sì |\n| XHTTP | Sì | Sì | Sì |\n| VLESS Encryption | Sì | Sì | Sì |\n| Profilo completo Xray | No | Sì | No |\n| TUIC / AnyTLS | Entrambi | No | TUIC |\n| Frammentazione TLS | Sì | Sì | No |\n| AmneziaWG 1.x/2.x | Sì¹ | No | Sì |\n| Gruppo di fallback ordinato | No | No² | Sì |\n\n¹ I profili con J1/J2/J3/Itime utilizzano mihomo; questi campi non devono mai essere scartati silenziosamente. ² Per un gruppo di profili Xray completi, l\'app seleziona un profilo di backup. Il supporto dipende dalla build installata; controlla la sua versione in Informazioni.\n\n## Pila TUN\n\nLo stack gestisce TCP e UDP all\'interno dell\'interfaccia virtuale. Nel pannello delle modalità, Xray e mihomo offrono gVisor, System, Mixed e MIPS. Ogni motore salva la propria preferenza. Il proxy System e le modalità Serverless non utilizzano questa preferenza.\n\n- **Mixed**: TCP utilizza lo stack di sistema, mentre gVisor gestisce UDP. Questa è l\'impostazione predefinita per mihomo su Linux. Su Windows, Xray e mihomo usano MIPS per impostazione predefinita.\n- **System**: utilizza lo stack di sistema. Prova un\'altra opzione se le applicazioni di rete riscontrano problemi.\n- **gVisor**: gestisce il traffico nello spazio utente.\n- **MIPS**: stack IP di mihomo, disponibile nella versione in bundle 1.19.32.\n\nSu Linux, Xray utilizza il gVisor integrato per impostazione predefinita. System, Mixed e MIPS su Linux utilizzano mihomo come motore TUN, inoltrando TCP e UDP a Xray su un collegamento SOCKS locale autenticato. Xray conserva il protocollo, il profilo del provider e il routing. Queste tre opzioni richiedono uno mihomo installato. Su Windows, Xray utilizza mihomo 1.19.32 o successivo per tutti e quattro gli stack TUN. Protocolli e instradamento restano in Xray. Le regole delle applicazioni in questa combinazione supportano solo connessioni dirette e blocco; su Linux richiedono il gVisor integrato di Xray.\n\nIl bridge esegue un secondo processo. In tre misurazioni inattive su Linux, ha utilizzato circa 32-36 MiB di memoria fisica in più rispetto allo Xray TUN nativo. Questo non misura il carico di download: i costi della CPU e della memoria dipendono dalle connessioni. sing-box non dispone di selettore di stack. Nessuno stack garantisce prestazioni migliori in ogni rete. Scegli uno stack e seleziona Applica e riconnetti per provarlo nella tua rete.\n\n## Applicazione delle impostazioni\n\nLa selezione di un server si riconnette automaticamente. Le impostazioni di modalità, motore, DNS e regole vengono salvate immediatamente; durante una connessione attiva, fare clic su Applica e riconnettersi per utilizzarli. Il riavvio di un motore potrebbe interrompere download e chiamate. I clic ripetuti non avviano connessioni parallele; la disconnessione termina la transizione e rilascia la connessione.\n\nInternet solo tramite VPN blocca il traffico diretto quando un tunnel si interrompe. Colpisce l\'intera macchina. Una disconnessione esplicita rimuove le regole di Sora. Se la pulizia non viene completata, riprova a disconnettersi e ad aprire il registro.\n\n## Documentazione del progetto\n\n- [sing-box-lx: configurazione e supporto](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Documentazione sing-box](https://sing-box.sagernet.org/)\n- [Documentazione Xray](https://xtls.github.io/)\n- [Documentazione mihomo](https://wiki.metacubex.one/)\n- [zapret: funzionamento e limitazioni](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Scegli Auto se non sei sicuro di quale motore abbia bisogno il tuo server. Sora controlla il profilo e le impostazioni prima della connessione. Un motore non può aumentare la larghezza di banda del tuo piano: le prestazioni dipendono dal server, dal percorso, dal protocollo e dalla rete.\n\n## Modalità\n\n### Tutto il traffico (TUN)\n\nSora crea un\'interfaccia di rete virtuale e instrada il traffico delle applicazioni attraverso di essa, inclusi TCP e UDP. Utilizzare questa modalità per Telegram, giochi e voce Discord. Le regole possono inviare direttamente siti o programmi specifici o bloccarli. Il servizio di rete necessita dell\'autorizzazione e di un server che supporti il ​​protocollo richiesto.\n\n###Proxy System\n\nSora configura un proxy HTTP/SOCKS locale. Le applicazioni che rispettano le impostazioni proxy del sistema lo utilizzano. Le applicazioni con il proprio stack di rete possono connettersi direttamente; UDP e le chiamate vocali generalmente necessitano di TUN. Questa modalità è adatta ai browser e alle applicazioni con supporto proxy.\n\n### Nessun server\n\nSu Linux, Sora utilizza [zapret](https://github.com/bol-van/zapret) per dividere e rimodellare le richieste HTTP/TLS e ignorare alcuni controlli DPI. Il tuo IP rimane lo stesso e le connessioni vanno direttamente al sito web. I risultati dipendono dal tuo provider e dal metodo di blocco.\n\nL\'integrazione attuale utilizza tpws per HTTP e TLS su TCP. Non bypassa il blocco IP né inoltra UDP e non può garantire le connessioni MTProto di Telegram. Utilizza un server VPN con TUN per voce Discord, chiamate Telegram e questo tipo di restrizioni.\n\n## Motori\n\n### Automatico\n\nSora seleziona un motore installato che supporta l\'intero piano di connessione: protocolli server, trasporti, gruppi, frammentazione e modalità. Una scelta manuale incompatibile viene rifiutata prima di interrompere la connessione corrente. Scegli Auto o un altro motore e applica nuovamente le impostazioni.\n\n###sing-box\n\nI nuovi pacchetti Sora includono [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), un fork di [sing-box](https://github.com/SagerNet/sing-box), aggiungendo XHTTP e VLESS Encryption lato client. Sora riconosce la build e le sue capacità. Una build upstream senza XHTTP non ottiene questa funzionalità solo dal suo nome.\n\nI protocolli supportati includono VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard e i parametri AmneziaWG 1.x/2.x Sora può importare. I profili JSON Xray completi richiedono Xray. I nuovi campi AWG 3.x non possono ancora essere importati. sing-box utilizza una porta di controllo locale protetta da password, che può essere rilevata da altre applicazioni sul computer.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) supporta VLESS, REALITY, XHTTP, VLESS Encryption e la frammentazione TLS. Esegue inoltre i profili Xray completi del provider preservandone il routing e i gruppi. Tali profili non possono essere convertiti automaticamente in un altro motore senza modificarne il comportamento.\n\nLo Xray in bundle ha rimosso l\'impostazione che disabilita la verifica del certificato TLS (`allowInsecure`). Seleziona automaticamente sing-box o mihomo per i server ordinari che richiedono questa impostazione. La selezione di Xray segnala manualmente l\'incompatibilità prima di interrompere la connessione corrente. I profili JSON completi meno recenti necessitano di un profilo provider aggiornato con un certificato verificabile o un pin del certificato.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) supporta i gruppi di fallback e bilanciamento del carico ordinati, XHTTP e AmneziaWG. Sceglilo quando è importante il failover automatico su un server di backup. L\'impostazione di frammentazione TLS di Sora non è disponibile con questo motore.\n\n## Compatibilità con Sora\n\n| Caratteristica | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN e TCP/UDP | Sì | Sì | Sì |\n| XHTTP | Sì | Sì | Sì |\n| VLESS Encryption | Sì | Sì | Sì |\n| Profilo completo Xray | No | Sì | No |\n| TUIC / AnyTLS | Entrambi | No | TUIC |\n| mieru | No | No | Sì |\n| NaiveProxy | Sì | No | No |\n| Frammentazione TLS | Sì | Sì | No |\n| AmneziaWG 1.x/2.x | Sì¹ | No | Sì |\n| Gruppo di fallback ordinato | No | No² | Sì |\n\n¹ I profili con J1/J2/J3/Itime utilizzano mihomo; questi campi non devono mai essere scartati silenziosamente. ² Per un gruppo di profili Xray completi, l\'app seleziona un profilo di backup. Il supporto dipende dalla build installata; controlla la sua versione in Informazioni.\n\n## Pila TUN\n\nLo stack gestisce TCP e UDP all\'interno dell\'interfaccia virtuale. Nel pannello delle modalità, Xray e mihomo offrono gVisor, System, Mixed e MIPS. Ogni motore salva la propria preferenza. Il proxy System e le modalità Serverless non utilizzano questa preferenza.\n\n- **Mixed**: TCP utilizza lo stack di sistema, mentre gVisor gestisce UDP. Questa è l\'impostazione predefinita per mihomo su Linux. Su Windows, Xray e mihomo usano MIPS per impostazione predefinita.\n- **System**: utilizza lo stack di sistema. Prova un\'altra opzione se le applicazioni di rete riscontrano problemi.\n- **gVisor**: gestisce il traffico nello spazio utente.\n- **MIPS**: stack IP di mihomo, disponibile nella versione in bundle 1.19.32.\n\nSu Linux, Xray utilizza il gVisor integrato per impostazione predefinita. System, Mixed e MIPS su Linux utilizzano mihomo come motore TUN, inoltrando TCP e UDP a Xray su un collegamento SOCKS locale autenticato. Xray conserva il protocollo, il profilo del provider e il routing. Queste tre opzioni richiedono uno mihomo installato. Su Windows, Xray utilizza mihomo 1.19.32 o successivo per tutti e quattro gli stack TUN. Protocolli e instradamento restano in Xray. Le regole delle applicazioni in questa combinazione supportano solo connessioni dirette e blocco; su Linux richiedono il gVisor integrato di Xray.\n\nIl bridge esegue un secondo processo. In tre misurazioni inattive su Linux, ha utilizzato circa 32-36 MiB di memoria fisica in più rispetto allo Xray TUN nativo. Questo non misura il carico di download: i costi della CPU e della memoria dipendono dalle connessioni. sing-box non dispone di selettore di stack. Nessuno stack garantisce prestazioni migliori in ogni rete. Scegli uno stack e seleziona Applica e riconnetti per provarlo nella tua rete.\n\n## Applicazione delle impostazioni\n\nLa selezione di un server si riconnette automaticamente. Le impostazioni di modalità, motore, DNS e regole vengono salvate immediatamente; durante una connessione attiva, fare clic su Applica e riconnettersi per utilizzarli. Il riavvio di un motore potrebbe interrompere download e chiamate. I clic ripetuti non avviano connessioni parallele; la disconnessione termina la transizione e rilascia la connessione.\n\nInternet solo tramite VPN blocca il traffico diretto quando un tunnel si interrompe. Colpisce l\'intera macchina. Una disconnessione esplicita rimuove le regole di Sora. Se la pulizia non viene completata, riprova a disconnettersi e ad aprire il registro.\n\n## Documentazione del progetto\n\n- [sing-box-lx: configurazione e supporto](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Documentazione sing-box](https://sing-box.sagernet.org/)\n- [Documentazione Xray](https://xtls.github.io/)\n- [Documentazione mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: funzionamento e limitazioni](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC trasporta TCP attraverso una videochiamata su Jitsi, Yandex Telemost o WB Stream. Importa un link olcrtc:// o un codice QR. Funziona con sing-box, Xray e mihomo nelle modalità proxy e TUN; UDP non è supportato. Entrambe le estremità richiedono versioni OLC2 compatibili. Il progetto originale è archiviato.\n';
 
   @override
   String get probeServers => 'Controlla i server';
@@ -914,36 +914,7 @@ class SIt extends S {
   String get extInstallOne => '1 installazione';
 
   @override
-  String get extBadgeVerified => 'Verificato';
-
-  @override
-  String get extBadgeTop => 'Most popular this week';
-
-  @override
-  String get extBadgeNew => 'Nuovo';
-
-  @override
-  String get extBadgeStaff => 'La squadra Sora';
-
-  @override
-  String get extSideloadShort => 'Non dal catalogo';
-
-  @override
-  String get extSideloadWarning =>
-      'Questa estensione non è presente nel catalogo del team. Solo l\'autore ha garantito per la propria chiave: installala solo se ti fidi dell\'autore.';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'Installa «$name»';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'Aggiorna «$name»';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Questa estensione sarà in grado di:';
+  String get extSideloadWarning => 'Installa solo se ti fidi della chiave autofirmata dell’autore.';
 
   @override
   String get extPermissionsWidened => 'L\'aggiornamento richiede nuove autorizzazioni:';
@@ -1071,9 +1042,6 @@ class SIt extends S {
       'Questo aggiornamento è firmato con una chiave autore diversa rispetto alla versione installata, quindi è stato bloccato. Se ti fidi della nuova chiave, disinstalla l\'estensione e installala di nuovo esplicitamente.';
 
   @override
-  String get extUpdateAvailable => 'Aggiornamento disponibile';
-
-  @override
   String get extDisabled => 'Disattivato';
 
   @override
@@ -1116,10 +1084,6 @@ class SIt extends S {
   String get extConflictsTitle => 'Conflitti di estensione';
 
   @override
-  String get extConflictsIntro =>
-      'Queste estensioni vogliono la stessa cosa. Scegli quale funziona; l’altra resta installata.';
-
-  @override
   String get extConflictTheme => 'Tema dell\'app';
 
   @override
@@ -1139,28 +1103,9 @@ class SIt extends S {
   String get extConflictsResolve => 'Risolvere i conflitti';
 
   @override
-  String get extConflictNote =>
-      'La tua scelta viene salvata su questo dispositivo. Un tema cambia subito; gli hook di rete non vengono eseguiti in questa versione.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versione $version';
   }
-
-  @override
-  String get extAuthor => 'Autore';
-
-  @override
-  String get extRating => 'Valutazione';
-
-  @override
-  String get extInstalls => 'Installazioni';
-
-  @override
-  String get extVersion => 'Versione';
-
-  @override
-  String get extAbout => 'Informazioni su questa estensione';
 
   @override
   String get extPermissionsTitle => 'Autorizzazioni';
@@ -1173,9 +1118,6 @@ class SIt extends S {
 
   @override
   String get extSaveSettings => 'Salva le impostazioni';
-
-  @override
-  String get extSaving => 'Salvataggio…';
 
   @override
   String extUpdateTo(String version) {
@@ -1204,8 +1146,7 @@ class SIt extends S {
   }
 
   @override
-  String get extPanelUnavailable =>
-      'Il pannello non è disponibile. L\'estensione potrebbe essere stata disabilitata o rimossa.';
+  String get extPanelUnavailable => 'Il pannello dell’estensione non è disponibile.';
 
   @override
   String get extPermConnectionsRead => 'Visualizza l\'elenco delle connessioni attive';
@@ -1244,10 +1185,6 @@ class SIt extends S {
   String get extPermBackground => 'Esegui attività in background';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Esegue le attività pianificate anche quando il pannello è chiuso. Puoi metterlo in pausa o modificare la frequenza con cui viene eseguito nelle impostazioni dell\'estensione.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1280,21 +1217,13 @@ class SIt extends S {
   String get extImageFailed => 'Impossibile caricare l\'immagine';
 
   @override
-  String get extRatingHow => 'Come funzionano le valutazioni';
-
-  @override
-  String get extRatingHowBody =>
-      'Le valutazioni utilizzano una media bayesiana: un\'estensione con poche valutazioni rimane quasi al centro finché non votano più persone, quindi una singola recensione a 5 stelle non può spingere una nuova estensione in cima. Le valutazioni recenti pesano più di quelle vecchie e conta solo una valutazione per account.';
-
-  @override
   String get extScreenshots => 'Schermate';
 
   @override
   String get extSortRelevance => 'Rilevanza';
 
   @override
-  String get extPermNetworkDetail =>
-      'Scarica dati da Internet tramite la VPN. Sono consentiti solo gli host qui sotto, tutto il resto è bloccato.';
+  String get extPermNetworkDetail => 'Le richieste VPN sono limitate agli host elencati sotto.';
 
   @override
   String get extBgTitle => 'Attività in background';
@@ -1316,10 +1245,6 @@ class SIt extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ore', one: '# ora');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'L’attività viene eseguita secondo la pianificazione finché Sora è aperto, anche nell’area di notifica. L’intervallo minimo è di 15 minuti.';
 
   @override
   String get extBgDisabledNote => 'Abilita l\'estensione a gestire la sua attività in background.';
@@ -1353,13 +1278,7 @@ class SIt extends S {
   String get qrCopyLink => 'Copia collegamento';
 
   @override
-  String get qrShowLink => 'Mostra collegamento';
-
-  @override
-  String get qrHideLink => 'Nascondi collegamento';
-
-  @override
-  String get qrWarning => 'Questo codice QR contiene i dettagli della connessione. Non mostrarlo agli sconosciuti.';
+  String get qrWarning => 'Condividi il codice solo con persone fidate.';
 
   @override
   String get qrScanHint => 'Scegli uno screenshot o una foto con un codice QR, oppure incolla un link';
@@ -1477,6 +1396,9 @@ class SIt extends S {
 
   @override
   String get sortBy => 'Ordina per';
+
+  @override
+  String get sortSubscription => 'Come nell’abbonamento';
 
   @override
   String get sortPing => 'Ping';
@@ -1816,15 +1738,9 @@ class SIt extends S {
   String get customServerHideSecret => 'Nascondi segreto';
 
   @override
-  String get customServerBadge => 'personalizzato';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Eliminare il server “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Aggiungere manualmente un server: indirizzo, porta e protocollo';
 
   @override
   String get customServerTest => 'Prova';
@@ -2002,10 +1918,6 @@ class SIt extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Per Shadowsocks: metodo:password, ad esempio chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Cattura dei pacchetti';
 
   @override
@@ -2025,8 +1937,7 @@ class SIt extends S {
       'Il team di Sora ha ritirato questa versione dell’estensione perché non è sicura o non funziona.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Non è stato possibile rinnovare l’elenco delle estensioni ritirate. L’installazione è bloccata finché non viene rinnovato: controlla la rete e riprova.';
+  String get extErrRevocationsExpired => 'L’installazione è bloccata fino all’aggiornamento dell’elenco delle revoche.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2073,4 +1984,39 @@ class SIt extends S {
 
   @override
   String get extAssetRejected => 'File dell’estensione rifiutato: colori illeggibili o regole non valide.';
+
+  @override
+  String get extVerifiedSora => 'Verificato da Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Apri';
+
+  @override
+  String get customServerOwn => 'Server personale';
+
+  @override
+  String get customServerPaste => 'Incolla un link';
+
+  @override
+  String get customServerUser => 'Nome utente';
+
+  @override
+  String get customServerPassword => 'Password';
+
+  @override
+  String get customServerSecretRequired => 'Inserisci un valore';
+
+  @override
+  String get customServerLinkInvalid => 'Link del server non valido';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

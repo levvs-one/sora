@@ -128,6 +128,11 @@ func StrictNftRuleset(uid int, policy session.Settings, blocked ...netip.Prefix)
 	}
 	rules := NftRuleset(uid, bypass, blocked...)
 	recovery := ""
+	if policy.OLCRTC {
+		// SFU and ICE addresses are chosen after authentication and may change on
+		// reconnect. Linux nftables uses the dedicated service UID as its boundary.
+		recovery += fmt.Sprintf("\t\tmeta skuid %d accept comment \"sora: olcrtc provider and ICE\"\n", uid)
+	}
 	for _, endpoint := range policy.Endpoints {
 		if endpoint.Protocol != "tcp" && endpoint.Protocol != "udp" {
 			continue

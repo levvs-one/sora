@@ -11,7 +11,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
 import '../kit.dart';
-import '../../ext/catalog.dart';
+import '../../ext/verifier.dart';
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 
@@ -52,56 +52,45 @@ class StarRating extends StatelessWidget {
   }
 }
 
-enum ExtBadgeTone { calm, warn }
-
-/// Small badge chip: verified / top / new / staff, or the sideload warning.
-class ExtBadge extends StatelessWidget {
-  const ExtBadge({super.key, required this.label, this.tone = ExtBadgeTone.calm, this.icon});
-  final String label;
-  final ExtBadgeTone tone;
-  final IconData? icon;
+class VerifiedBadge extends StatelessWidget {
+  const VerifiedBadge({super.key, this.size = 16});
+  final double size;
 
   @override
-  Widget build(BuildContext context) {
-    final palette = Palette.of(context);
-    final fg = tone == ExtBadgeTone.warn ? palette.danger : palette.ink2;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: tone == ExtBadgeTone.warn ? palette.danger.withValues(alpha: 0.1) : palette.field.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[Icon(icon, size: 12, color: fg), const SizedBox(width: 4)],
-          Text(
-            label,
-            style: Styles.caption.copyWith(color: fg, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Tooltip(
+    message: S.of(context).extVerifiedSora,
+    child: Icon(Symbols.verified_rounded, fill: 1, size: size, color: Palette.of(context).verified),
+  );
 }
 
-/// Badges for a catalog entry: verified/top/new/staff.
-List<Widget> catalogBadges(BuildContext context, CatalogEntry e) {
-  final s = S.of(context);
-  final out = <Widget>[];
-  for (final b in e.badges) {
-    switch (b) {
-      case 'verified':
-        out.add(ExtBadge(label: s.extBadgeVerified, icon: Symbols.verified_rounded));
-      case 'top':
-        out.add(ExtBadge(label: s.extBadgeTop, icon: Symbols.trending_up_rounded));
-      case 'new':
-        out.add(ExtBadge(label: s.extBadgeNew, icon: Symbols.fiber_new_rounded));
-      case 'staff':
-        out.add(ExtBadge(label: s.extBadgeStaff, icon: Symbols.shield_rounded));
-    }
-  }
-  return out;
+bool isTeamExtension(InstalledExtension extension) =>
+    (extension.authorKey ?? extension.manifest.author.publicKey).trim() == teamPublicKey;
+
+class ExtensionName extends StatelessWidget {
+  const ExtensionName({super.key, required this.name, required this.verified, this.list = false});
+  final String name;
+  final bool verified;
+  final bool list;
+
+  @override
+  Widget build(BuildContext context) => Text.rich(
+    TextSpan(
+      children: [
+        TextSpan(text: name),
+        if (verified)
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 4),
+              child: VerifiedBadge(size: list ? 14 : 16),
+            ),
+          ),
+      ],
+    ),
+    maxLines: 2,
+    overflow: TextOverflow.ellipsis,
+    style: Styles.bodyStrong.copyWith(fontSize: list ? 15 : 17, color: Palette.of(context).ink),
+  );
 }
 
 /// One catalog/install row. One tap opens the detail; the trailing action is
@@ -113,7 +102,8 @@ class ExtensionCard extends StatelessWidget {
     required this.author,
     this.rating,
     this.installs,
-    required this.badges,
+    this.verified = false,
+    this.sideload = false,
     this.trailing,
     this.subtitle,
     this.onTap,
@@ -127,7 +117,8 @@ class ExtensionCard extends StatelessWidget {
   final String author;
   final double? rating;
   final int? installs;
-  final List<Widget> badges;
+  final bool verified;
+  final bool sideload;
   final Widget? trailing;
   final String? subtitle;
   final VoidCallback? onTap;
@@ -153,7 +144,6 @@ class ExtensionCard extends StatelessWidget {
         opacity: enabled ? 1 : 0.55,
         child: Container(
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -168,15 +158,23 @@ class ExtensionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: Styles.bodyStrong.copyWith(color: palette.ink),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: ExtensionName(name: title, verified: verified, list: true),
+                        ),
+                        if (sideload) ...[
+                          const SizedBox(width: 4),
+                          Tooltip(
+                            message: s.extSideloadWarning,
+                            child: Icon(Symbols.warning_rounded, size: 14, color: palette.danger),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      s.extByAuthor(author),
+                      author,
                       style: Styles.caption.copyWith(color: palette.ink2),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -190,21 +188,22 @@ class ExtensionCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        if (rating != null && rating! > 0) StarRating(rating: rating!),
-                        ...badges,
-                        if (installs != null && installs! > 0)
-                          Text(
-                            installs! == 1 ? s.extInstallOne : s.extInstallsCount(_compact(context, installs!)),
-                            style: Styles.caption.copyWith(color: palette.ink2),
-                          ),
-                      ],
-                    ),
+                    if ((rating ?? 0) > 0 || (installs ?? 0) > 0) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          if (rating != null && rating! > 0) StarRating(rating: rating!),
+                          if (installs != null && installs! > 0)
+                            Text(
+                              installs! == 1 ? s.extInstallOne : s.extInstallsCount(_compact(context, installs!)),
+                              style: Styles.caption.copyWith(color: palette.ink2),
+                            ),
+                        ],
+                      ),
+                    ],
                     ...capabilityLines(
                       context,
                       capabilities: capabilities,
@@ -259,14 +258,14 @@ class PermissionRow extends StatelessWidget {
       label: '${_tierLabel(context)}: $blurb',
       excludeSemantics: true,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, size: 18, color: color),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(blurb, style: Styles.body.copyWith(color: palette.ink)),
+              child: Text(blurb, style: Styles.body.copyWith(fontSize: 14, color: palette.ink)),
             ),
           ],
         ),
@@ -360,39 +359,6 @@ class NetworkHostsList extends StatelessWidget {
       ],
     );
   }
-}
-
-/// "How ratings work" dialog: the published rating methodology in plain
-/// language (extRatingHowBody). Opened from the rating row on the extension
-/// detail page. The formula lives in core/ext/ratings.go and the normative
-/// spec; this dialog is its user-facing summary.
-Future<void> showRatingHowDialog(BuildContext context) {
-  final s = S.of(context), palette = Palette.of(context);
-  return showDialog<void>(
-    context: context,
-    builder: (context) => Dialog(
-      backgroundColor: palette.raised,
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 380),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(s.extRatingHow, style: Styles.title.copyWith(color: palette.ink)),
-              const SizedBox(height: 10),
-              Text(s.extRatingHowBody, style: Styles.body.copyWith(color: palette.ink2)),
-              const SizedBox(height: 16),
-              PrimaryButton(label: s.extOk, onTap: () => Navigator.pop(context)),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }
 
 /// Localized text for store refusals the user can act on.

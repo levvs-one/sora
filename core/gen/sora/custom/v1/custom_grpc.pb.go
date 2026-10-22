@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CustomServers_SaveCustomServer_FullMethodName   = "/sora.custom.v1.CustomServers/SaveCustomServer"
-	CustomServers_ListCustomServers_FullMethodName  = "/sora.custom.v1.CustomServers/ListCustomServers"
-	CustomServers_DeleteCustomServer_FullMethodName = "/sora.custom.v1.CustomServers/DeleteCustomServer"
-	CustomServers_TestCustomServer_FullMethodName   = "/sora.custom.v1.CustomServers/TestCustomServer"
+	CustomServers_PreviewCustomServer_FullMethodName = "/sora.custom.v1.CustomServers/PreviewCustomServer"
+	CustomServers_SaveCustomServer_FullMethodName    = "/sora.custom.v1.CustomServers/SaveCustomServer"
+	CustomServers_ListCustomServers_FullMethodName   = "/sora.custom.v1.CustomServers/ListCustomServers"
+	CustomServers_DeleteCustomServer_FullMethodName  = "/sora.custom.v1.CustomServers/DeleteCustomServer"
+	CustomServers_TestCustomServer_FullMethodName    = "/sora.custom.v1.CustomServers/TestCustomServer"
 )
 
 // CustomServersClient is the client API for CustomServers service.
@@ -41,6 +42,8 @@ const (
 // Credentials are write-only: SaveCustomServer accepts them, List and the
 // other RPCs never return them, and TestCustomServer never sends them.
 type CustomServersClient interface {
+	// Previews only the supplied link, without reading or writing the vault.
+	PreviewCustomServer(ctx context.Context, in *PreviewCustomServerRequest, opts ...grpc.CallOption) (*PreviewCustomServerResponse, error)
 	// SaveCustomServer creates a server (empty id) or updates an existing one.
 	SaveCustomServer(ctx context.Context, in *SaveCustomServerRequest, opts ...grpc.CallOption) (*SaveCustomServerResponse, error)
 	// ListCustomServers returns every stored custom server without credentials.
@@ -61,6 +64,16 @@ type customServersClient struct {
 
 func NewCustomServersClient(cc grpc.ClientConnInterface) CustomServersClient {
 	return &customServersClient{cc}
+}
+
+func (c *customServersClient) PreviewCustomServer(ctx context.Context, in *PreviewCustomServerRequest, opts ...grpc.CallOption) (*PreviewCustomServerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PreviewCustomServerResponse)
+	err := c.cc.Invoke(ctx, CustomServers_PreviewCustomServer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *customServersClient) SaveCustomServer(ctx context.Context, in *SaveCustomServerRequest, opts ...grpc.CallOption) (*SaveCustomServerResponse, error) {
@@ -119,6 +132,8 @@ func (c *customServersClient) TestCustomServer(ctx context.Context, in *TestCust
 // Credentials are write-only: SaveCustomServer accepts them, List and the
 // other RPCs never return them, and TestCustomServer never sends them.
 type CustomServersServer interface {
+	// Previews only the supplied link, without reading or writing the vault.
+	PreviewCustomServer(context.Context, *PreviewCustomServerRequest) (*PreviewCustomServerResponse, error)
 	// SaveCustomServer creates a server (empty id) or updates an existing one.
 	SaveCustomServer(context.Context, *SaveCustomServerRequest) (*SaveCustomServerResponse, error)
 	// ListCustomServers returns every stored custom server without credentials.
@@ -141,6 +156,9 @@ type CustomServersServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCustomServersServer struct{}
 
+func (UnimplementedCustomServersServer) PreviewCustomServer(context.Context, *PreviewCustomServerRequest) (*PreviewCustomServerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PreviewCustomServer not implemented")
+}
 func (UnimplementedCustomServersServer) SaveCustomServer(context.Context, *SaveCustomServerRequest) (*SaveCustomServerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveCustomServer not implemented")
 }
@@ -172,6 +190,24 @@ func RegisterCustomServersServer(s grpc.ServiceRegistrar, srv CustomServersServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CustomServers_ServiceDesc, srv)
+}
+
+func _CustomServers_PreviewCustomServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PreviewCustomServerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomServersServer).PreviewCustomServer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomServers_PreviewCustomServer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomServersServer).PreviewCustomServer(ctx, req.(*PreviewCustomServerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CustomServers_SaveCustomServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -253,6 +289,10 @@ var CustomServers_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "sora.custom.v1.CustomServers",
 	HandlerType: (*CustomServersServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PreviewCustomServer",
+			Handler:    _CustomServers_PreviewCustomServer_Handler,
+		},
 		{
 			MethodName: "SaveCustomServer",
 			Handler:    _CustomServers_SaveCustomServer_Handler,

@@ -21,6 +21,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/levvs-one/sora-client/core/engine"
+
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
 
@@ -111,7 +113,7 @@ func (d ImportDetector) Detect(src []byte) (Detection, error) {
 func hasScheme(s string) bool {
 	for _, l := range strings.Fields(s) {
 		p := strings.ToLower(strings.TrimSpace(l))
-		for _, x := range []string{"vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
+		for _, x := range []string{"mieru://", "mierus://", "naive+https://", "naive+quic://", "olcrtc://", "vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
 			if strings.HasPrefix(p, x) {
 				return true
 			}
@@ -175,6 +177,9 @@ func decodeBase64(s string) ([]byte, bool) {
 // retains additional fields to avoid silently losing unsupported settings
 // during import.
 type OutboundSpec struct {
+	Mieru                                                                                           *engine.Mieru
+	Naive                                                                                           *engine.Naive
+	OLCRTC                                                                                          *engine.OLCRTC
 	DisplayProtocol                                                                                 string
 	ID, DisplayName, Protocol, Transport, Security                                                  string
 	Host                                                                                            string
@@ -203,6 +208,15 @@ func (o OutboundSpec) StableKey() string {
 	material := o.Protocol + "\x00" + o.Host + "\x00" + strconv.Itoa(int(o.Port)) + "\x00" + o.UUID + "\x00" + o.User
 	// Names distinguish profiles sharing an endpoint. Exclude mutable
 	// provider rules so updates preserve saved selections.
+	if o.OLCRTC != nil {
+		material += "\x00" + o.OLCRTC.Provider + "\x00" + o.OLCRTC.Room + "\x00" + o.OLCRTC.Transport
+	}
+	if o.Mieru != nil {
+		material += "\x00" + o.Transport + "\x00" + o.Mieru.PortRange
+	}
+	if o.Naive != nil {
+		material += "\x00" + o.Transport
+	}
 	if o.Protocol == "xray-profile" {
 		material += "\x00" + o.DisplayName
 	}
@@ -297,6 +311,7 @@ func (p LinkParser) Parse(src []byte) (ImportResult, error) {
 func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	r := ImportResult{Format: f}
 	seen := map[string]struct{}{}
+	last := -1
 	for i, l := range strings.Split(s, "\n") {
 		if len(r.Servers) >= p.limit() {
 			r.Report.Unsupported++
@@ -307,7 +322,22 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 		if l == "" {
 			continue
 		}
-		o, e := parseLink(l)
+		if strings.HasPrefix(l, "#") {
+			if strings.HasPrefix(l, "##") && last >= 0 && r.Servers[last].OLCRTC != nil {
+				k, v, ok := strings.Cut(strings.TrimPrefix(l, "##"), ":")
+				if ok {
+					k, v = strings.TrimSpace(k), strings.TrimSpace(v)
+					r.Servers[last].Options["olcrtc-meta-"+k] = v
+					if k == "name" && v != "" && len(v) <= engine.MaxNameBytes {
+						r.Servers[last].DisplayName = v
+						r.Servers[last].CountryCode = countryCode(v)
+					}
+				}
+			}
+			continue
+		}
+		last = -1
+		items, e := parseCommunityLinks(l, p.limit()-len(r.Servers))
 		if e != nil {
 			if errors.Is(e, ErrUnsupported) {
 				r.Report.Unsupported++
@@ -318,15 +348,18 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 			}
 			continue
 		}
-		k := o.StableKey()
-		if _, ok := seen[k]; ok {
-			r.Report.SkippedDuplicates++
-			r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
-			continue
+		for _, o := range items {
+			k := o.StableKey()
+			if _, ok := seen[k]; ok {
+				r.Report.SkippedDuplicates++
+				r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
+				continue
+			}
+			seen[k] = struct{}{}
+			r.Servers = append(r.Servers, o)
+			last = len(r.Servers) - 1
+			r.Report.Imported++
 		}
-		seen[k] = struct{}{}
-		r.Servers = append(r.Servers, o)
-		r.Report.Imported++
 	}
 	if len(r.Servers) == 0 && r.Report.Unsupported == 0 && r.Report.Invalid == 0 {
 		return r, ErrUnsupported
@@ -334,6 +367,9 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	return r, nil
 }
 func parseLink(raw string) (OutboundSpec, error) {
+	if strings.HasPrefix(strings.ToLower(raw), "olcrtc://") {
+		return parseOLCRTC(raw)
+	}
 	u, e := url.Parse(strings.TrimSpace(raw))
 	if e != nil {
 		return OutboundSpec{}, ErrInvalid
@@ -464,12 +500,38 @@ func countryCode(s string) string {
 func parseVMess(u *url.URL) (OutboundSpec, error) {
 	raw := strings.TrimPrefix(u.Opaque, "//")
 	if raw == "" {
-		raw = strings.TrimPrefix(u.Path, "/")
+		raw = u.Host + u.Path
 	}
 	if b, ok := decodeBase64(raw); ok {
 		var v map[string]any
 		if json.Unmarshal(b, &v) == nil {
-			return mapJSONSpec(v, "vmess")
+			if _, standard := v["add"]; standard {
+				// v2rayN share JSON uses different keys from engine configurations.
+				if number(v["aid"]) != 0 || stringValue(v["pcs"]) != "" || stringValue(v["vcn"]) != "" {
+					return OutboundSpec{}, ErrUnsupported
+				}
+				for target, source := range map[string]string{"server": "add", "uuid": "id", "network": "net", "tag": "ps", "security": "tls", "method": "scy"} {
+					v[target] = v[source]
+				}
+				delete(v, "type")
+			}
+			o, err := mapJSONSpec(v, "vmess")
+			o.Path, o.HostHeader = stringValue(v["path"]), stringValue(v["host"])
+			o.ServerName, o.Fingerprint = stringValue(v["sni"]), stringValue(v["fp"])
+			o.AllowInsecure = parseBool(stringValue(v["insecure"]))
+			if alpn := stringValue(v["alpn"]); alpn != "" {
+				o.ALPN = strings.Split(alpn, ",")
+			}
+			if o.Transport == "grpc" {
+				o.ServiceName = o.Path
+			}
+			if o.Security == "" {
+				o.Security = "none"
+			}
+			if o.Cipher == "" {
+				o.Cipher = "auto"
+			}
+			return o, err
 		}
 	}
 	if u.Hostname() == "" {
@@ -514,6 +576,9 @@ func parseWireURL(u *url.URL) (OutboundSpec, error) {
 	return o, o.validate()
 }
 func mapJSONSpec(m map[string]any, fallback string) (OutboundSpec, error) {
+	if kind := stringValue(m["type"]); kind == "mieru" || kind == "naive" {
+		return mapCommunitySpec(m)
+	}
 	o := OutboundSpec{Protocol: fallback, Transport: "tcp", Options: map[string]string{}}
 	if s, ok := m["type"].(string); ok {
 		o.Protocol = s

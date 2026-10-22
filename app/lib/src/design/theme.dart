@@ -19,8 +19,10 @@ class Palette extends ThemeExtension<Palette> {
     required this.raisedField,
     required this.scrim,
     this.accent,
+    this.verified = const Color(0xFF007AFF),
   });
 
+  final Color verified;
   final Color? accent;
   List<Color> get glowColors => accent == null ? spectrum : List.filled(spectrum.length, accent!);
 
@@ -65,6 +67,7 @@ class Palette extends ThemeExtension<Palette> {
   );
 
   static const dark = Palette(
+    verified: Color(0xFF0A84FF),
     background: Color(0xFF0B0B0C),
     surface: Color(0xFF1C1C1E),
     field: Color(0xFF2C2C2E),
@@ -99,6 +102,7 @@ class Palette extends ThemeExtension<Palette> {
     if (other == null) return this;
     return Palette(
       accent: Color.lerp(accent, other.accent, t),
+      verified: Color.lerp(verified, other.verified, t)!,
       background: Color.lerp(background, other.background, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       field: Color.lerp(field, other.field, t)!,

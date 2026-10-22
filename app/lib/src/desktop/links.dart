@@ -7,7 +7,9 @@ sealed class ImportLink {
 final class AddSubscription extends ImportLink {
   const AddSubscription(this.url, {this.name = ''});
 
-  final Uri url;
+  // Full mieru links carry case-sensitive base64 in the authority position.
+  // Uri normalizes that position as a hostname, so retain the original text.
+  final String url;
   final String name;
 }
 
@@ -22,8 +24,8 @@ final class SealedForHapp extends ImportLink {
 const ownSchemes = ['sora', 'happ'];
 
 /// Parses add, install-config, import and import-remote-profile links from
-/// Sora, Happ, v2rayn, Clash, Hiddify and sing-box. Requires an HTTP(S)
-/// subscription URL; returns null for invalid links or percent-encoding.
+/// Sora, Happ, v2rayn, Clash, Hiddify and sing-box, plus community server links.
+/// Returns null for invalid links or percent-encoding.
 ImportLink? parseImportLink(String text) {
   try {
     return _parse(text.trim());
@@ -39,6 +41,12 @@ ImportLink? _parse(String link) {
   if (colon <= 0) return null;
   final scheme = link.substring(0, colon).toLowerCase();
   final rest = link.substring(colon + 3);
+  if (const {'mieru', 'mierus', 'naive+https', 'naive+quic'}.contains(scheme)) {
+    if (link.contains('\n') || link.contains('\r') || rest.isEmpty) return null;
+    final uri = Uri.tryParse(link);
+    if (uri == null || uri.host.isEmpty) return null;
+    return AddSubscription(link);
+  }
 
   // Extract the embedded URL verbatim to preserve its own query and fragment
   // instead of parsing them as part of the import URI.
@@ -80,5 +88,5 @@ ImportLink? _parse(String link) {
 ImportLink? _subscription(String target, String name) {
   final url = Uri.tryParse(target.trim());
   if (url == null || !(url.isScheme('https') || url.isScheme('http')) || url.host.isEmpty) return null;
-  return AddSubscription(url, name: name.trim());
+  return AddSubscription(url.toString(), name: name.trim());
 }

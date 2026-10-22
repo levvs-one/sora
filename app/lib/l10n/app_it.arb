@@ -273,7 +273,7 @@
   "probeServers": "Controlla i server",
   "expiresIn": "{name}: {days, plural, =0{l'abbonamento scade tra poche ore} one{l'abbonamento termina il giorno #} other{l'abbonamento termina tra # giorni}}",
   "groupBest": "{count, plural, one{Server #, il più veloce} other{Server #, i più veloci}}",
-  "modesGuide": "Scegli Auto se non sei sicuro di quale motore abbia bisogno il tuo server. Sora controlla il profilo e le impostazioni prima della connessione. Un motore non può aumentare la larghezza di banda del tuo piano: le prestazioni dipendono dal server, dal percorso, dal protocollo e dalla rete.\n\n## Modalità\n\n### Tutto il traffico (TUN)\n\nSora crea un'interfaccia di rete virtuale e instrada il traffico delle applicazioni attraverso di essa, inclusi TCP e UDP. Utilizzare questa modalità per Telegram, giochi e voce Discord. Le regole possono inviare direttamente siti o programmi specifici o bloccarli. Il servizio di rete necessita dell'autorizzazione e di un server che supporti il ​​protocollo richiesto.\n\n###Proxy System\n\nSora configura un proxy HTTP/SOCKS locale. Le applicazioni che rispettano le impostazioni proxy del sistema lo utilizzano. Le applicazioni con il proprio stack di rete possono connettersi direttamente; UDP e le chiamate vocali generalmente necessitano di TUN. Questa modalità è adatta ai browser e alle applicazioni con supporto proxy.\n\n### Nessun server\n\nSu Linux, Sora utilizza [zapret](https://github.com/bol-van/zapret) per dividere e rimodellare le richieste HTTP/TLS e ignorare alcuni controlli DPI. Il tuo IP rimane lo stesso e le connessioni vanno direttamente al sito web. I risultati dipendono dal tuo provider e dal metodo di blocco.\n\nL'integrazione attuale utilizza tpws per HTTP e TLS su TCP. Non bypassa il blocco IP né inoltra UDP e non può garantire le connessioni MTProto di Telegram. Utilizza un server VPN con TUN per voce Discord, chiamate Telegram e questo tipo di restrizioni.\n\n## Motori\n\n### Automatico\n\nSora seleziona un motore installato che supporta l'intero piano di connessione: protocolli server, trasporti, gruppi, frammentazione e modalità. Una scelta manuale incompatibile viene rifiutata prima di interrompere la connessione corrente. Scegli Auto o un altro motore e applica nuovamente le impostazioni.\n\n###sing-box\n\nI nuovi pacchetti Sora includono [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), un fork di [sing-box](https://github.com/SagerNet/sing-box), aggiungendo XHTTP e VLESS Encryption lato client. Sora riconosce la build e le sue capacità. Una build upstream senza XHTTP non ottiene questa funzionalità solo dal suo nome.\n\nI protocolli supportati includono VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard e i parametri AmneziaWG 1.x/2.x Sora può importare. I profili JSON Xray completi richiedono Xray. I nuovi campi AWG 3.x non possono ancora essere importati. sing-box utilizza una porta di controllo locale protetta da password, che può essere rilevata da altre applicazioni sul computer.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) supporta VLESS, REALITY, XHTTP, VLESS Encryption e la frammentazione TLS. Esegue inoltre i profili Xray completi del provider preservandone il routing e i gruppi. Tali profili non possono essere convertiti automaticamente in un altro motore senza modificarne il comportamento.\n\nLo Xray in bundle ha rimosso l'impostazione che disabilita la verifica del certificato TLS (`allowInsecure`). Seleziona automaticamente sing-box o mihomo per i server ordinari che richiedono questa impostazione. La selezione di Xray segnala manualmente l'incompatibilità prima di interrompere la connessione corrente. I profili JSON completi meno recenti necessitano di un profilo provider aggiornato con un certificato verificabile o un pin del certificato.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) supporta i gruppi di fallback e bilanciamento del carico ordinati, XHTTP e AmneziaWG. Sceglilo quando è importante il failover automatico su un server di backup. L'impostazione di frammentazione TLS di Sora non è disponibile con questo motore.\n\n## Compatibilità con Sora\n\n| Caratteristica | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN e TCP/UDP | Sì | Sì | Sì |\n| XHTTP | Sì | Sì | Sì |\n| VLESS Encryption | Sì | Sì | Sì |\n| Profilo completo Xray | No | Sì | No |\n| TUIC / AnyTLS | Entrambi | No | TUIC |\n| Frammentazione TLS | Sì | Sì | No |\n| AmneziaWG 1.x/2.x | Sì¹ | No | Sì |\n| Gruppo di fallback ordinato | No | No² | Sì |\n\n¹ I profili con J1/J2/J3/Itime utilizzano mihomo; questi campi non devono mai essere scartati silenziosamente. ² Per un gruppo di profili Xray completi, l'app seleziona un profilo di backup. Il supporto dipende dalla build installata; controlla la sua versione in Informazioni.\n\n## Pila TUN\n\nLo stack gestisce TCP e UDP all'interno dell'interfaccia virtuale. Nel pannello delle modalità, Xray e mihomo offrono gVisor, System, Mixed e MIPS. Ogni motore salva la propria preferenza. Il proxy System e le modalità Serverless non utilizzano questa preferenza.\n\n- **Mixed**: TCP utilizza lo stack di sistema, mentre gVisor gestisce UDP. Questa è l'impostazione predefinita per mihomo su Linux. Su Windows, Xray e mihomo usano MIPS per impostazione predefinita.\n- **System**: utilizza lo stack di sistema. Prova un'altra opzione se le applicazioni di rete riscontrano problemi.\n- **gVisor**: gestisce il traffico nello spazio utente.\n- **MIPS**: stack IP di mihomo, disponibile nella versione in bundle 1.19.32.\n\nSu Linux, Xray utilizza il gVisor integrato per impostazione predefinita. System, Mixed e MIPS su Linux utilizzano mihomo come motore TUN, inoltrando TCP e UDP a Xray su un collegamento SOCKS locale autenticato. Xray conserva il protocollo, il profilo del provider e il routing. Queste tre opzioni richiedono uno mihomo installato. Su Windows, Xray utilizza mihomo 1.19.32 o successivo per tutti e quattro gli stack TUN. Protocolli e instradamento restano in Xray. Le regole delle applicazioni in questa combinazione supportano solo connessioni dirette e blocco; su Linux richiedono il gVisor integrato di Xray.\n\nIl bridge esegue un secondo processo. In tre misurazioni inattive su Linux, ha utilizzato circa 32-36 MiB di memoria fisica in più rispetto allo Xray TUN nativo. Questo non misura il carico di download: i costi della CPU e della memoria dipendono dalle connessioni. sing-box non dispone di selettore di stack. Nessuno stack garantisce prestazioni migliori in ogni rete. Scegli uno stack e seleziona Applica e riconnetti per provarlo nella tua rete.\n\n## Applicazione delle impostazioni\n\nLa selezione di un server si riconnette automaticamente. Le impostazioni di modalità, motore, DNS e regole vengono salvate immediatamente; durante una connessione attiva, fare clic su Applica e riconnettersi per utilizzarli. Il riavvio di un motore potrebbe interrompere download e chiamate. I clic ripetuti non avviano connessioni parallele; la disconnessione termina la transizione e rilascia la connessione.\n\nInternet solo tramite VPN blocca il traffico diretto quando un tunnel si interrompe. Colpisce l'intera macchina. Una disconnessione esplicita rimuove le regole di Sora. Se la pulizia non viene completata, riprova a disconnettersi e ad aprire il registro.\n\n## Documentazione del progetto\n\n- [sing-box-lx: configurazione e supporto](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Documentazione sing-box](https://sing-box.sagernet.org/)\n- [Documentazione Xray](https://xtls.github.io/)\n- [Documentazione mihomo](https://wiki.metacubex.one/)\n- [zapret: funzionamento e limitazioni](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n",
+  "modesGuide": "Scegli Auto se non sei sicuro di quale motore abbia bisogno il tuo server. Sora controlla il profilo e le impostazioni prima della connessione. Un motore non può aumentare la larghezza di banda del tuo piano: le prestazioni dipendono dal server, dal percorso, dal protocollo e dalla rete.\n\n## Modalità\n\n### Tutto il traffico (TUN)\n\nSora crea un'interfaccia di rete virtuale e instrada il traffico delle applicazioni attraverso di essa, inclusi TCP e UDP. Utilizzare questa modalità per Telegram, giochi e voce Discord. Le regole possono inviare direttamente siti o programmi specifici o bloccarli. Il servizio di rete necessita dell'autorizzazione e di un server che supporti il ​​protocollo richiesto.\n\n###Proxy System\n\nSora configura un proxy HTTP/SOCKS locale. Le applicazioni che rispettano le impostazioni proxy del sistema lo utilizzano. Le applicazioni con il proprio stack di rete possono connettersi direttamente; UDP e le chiamate vocali generalmente necessitano di TUN. Questa modalità è adatta ai browser e alle applicazioni con supporto proxy.\n\n### Nessun server\n\nSu Linux, Sora utilizza [zapret](https://github.com/bol-van/zapret) per dividere e rimodellare le richieste HTTP/TLS e ignorare alcuni controlli DPI. Il tuo IP rimane lo stesso e le connessioni vanno direttamente al sito web. I risultati dipendono dal tuo provider e dal metodo di blocco.\n\nL'integrazione attuale utilizza tpws per HTTP e TLS su TCP. Non bypassa il blocco IP né inoltra UDP e non può garantire le connessioni MTProto di Telegram. Utilizza un server VPN con TUN per voce Discord, chiamate Telegram e questo tipo di restrizioni.\n\n## Motori\n\n### Automatico\n\nSora seleziona un motore installato che supporta l'intero piano di connessione: protocolli server, trasporti, gruppi, frammentazione e modalità. Una scelta manuale incompatibile viene rifiutata prima di interrompere la connessione corrente. Scegli Auto o un altro motore e applica nuovamente le impostazioni.\n\n###sing-box\n\nI nuovi pacchetti Sora includono [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), un fork di [sing-box](https://github.com/SagerNet/sing-box), aggiungendo XHTTP e VLESS Encryption lato client. Sora riconosce la build e le sue capacità. Una build upstream senza XHTTP non ottiene questa funzionalità solo dal suo nome.\n\nI protocolli supportati includono VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard e i parametri AmneziaWG 1.x/2.x Sora può importare. I profili JSON Xray completi richiedono Xray. I nuovi campi AWG 3.x non possono ancora essere importati. sing-box utilizza una porta di controllo locale protetta da password, che può essere rilevata da altre applicazioni sul computer.\n\n###Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) supporta VLESS, REALITY, XHTTP, VLESS Encryption e la frammentazione TLS. Esegue inoltre i profili Xray completi del provider preservandone il routing e i gruppi. Tali profili non possono essere convertiti automaticamente in un altro motore senza modificarne il comportamento.\n\nLo Xray in bundle ha rimosso l'impostazione che disabilita la verifica del certificato TLS (`allowInsecure`). Seleziona automaticamente sing-box o mihomo per i server ordinari che richiedono questa impostazione. La selezione di Xray segnala manualmente l'incompatibilità prima di interrompere la connessione corrente. I profili JSON completi meno recenti necessitano di un profilo provider aggiornato con un certificato verificabile o un pin del certificato.\n\n###mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) supporta i gruppi di fallback e bilanciamento del carico ordinati, XHTTP e AmneziaWG. Sceglilo quando è importante il failover automatico su un server di backup. L'impostazione di frammentazione TLS di Sora non è disponibile con questo motore.\n\n## Compatibilità con Sora\n\n| Caratteristica | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN e TCP/UDP | Sì | Sì | Sì |\n| XHTTP | Sì | Sì | Sì |\n| VLESS Encryption | Sì | Sì | Sì |\n| Profilo completo Xray | No | Sì | No |\n| TUIC / AnyTLS | Entrambi | No | TUIC |\n| mieru | No | No | Sì |\n| NaiveProxy | Sì | No | No |\n| Frammentazione TLS | Sì | Sì | No |\n| AmneziaWG 1.x/2.x | Sì¹ | No | Sì |\n| Gruppo di fallback ordinato | No | No² | Sì |\n\n¹ I profili con J1/J2/J3/Itime utilizzano mihomo; questi campi non devono mai essere scartati silenziosamente. ² Per un gruppo di profili Xray completi, l'app seleziona un profilo di backup. Il supporto dipende dalla build installata; controlla la sua versione in Informazioni.\n\n## Pila TUN\n\nLo stack gestisce TCP e UDP all'interno dell'interfaccia virtuale. Nel pannello delle modalità, Xray e mihomo offrono gVisor, System, Mixed e MIPS. Ogni motore salva la propria preferenza. Il proxy System e le modalità Serverless non utilizzano questa preferenza.\n\n- **Mixed**: TCP utilizza lo stack di sistema, mentre gVisor gestisce UDP. Questa è l'impostazione predefinita per mihomo su Linux. Su Windows, Xray e mihomo usano MIPS per impostazione predefinita.\n- **System**: utilizza lo stack di sistema. Prova un'altra opzione se le applicazioni di rete riscontrano problemi.\n- **gVisor**: gestisce il traffico nello spazio utente.\n- **MIPS**: stack IP di mihomo, disponibile nella versione in bundle 1.19.32.\n\nSu Linux, Xray utilizza il gVisor integrato per impostazione predefinita. System, Mixed e MIPS su Linux utilizzano mihomo come motore TUN, inoltrando TCP e UDP a Xray su un collegamento SOCKS locale autenticato. Xray conserva il protocollo, il profilo del provider e il routing. Queste tre opzioni richiedono uno mihomo installato. Su Windows, Xray utilizza mihomo 1.19.32 o successivo per tutti e quattro gli stack TUN. Protocolli e instradamento restano in Xray. Le regole delle applicazioni in questa combinazione supportano solo connessioni dirette e blocco; su Linux richiedono il gVisor integrato di Xray.\n\nIl bridge esegue un secondo processo. In tre misurazioni inattive su Linux, ha utilizzato circa 32-36 MiB di memoria fisica in più rispetto allo Xray TUN nativo. Questo non misura il carico di download: i costi della CPU e della memoria dipendono dalle connessioni. sing-box non dispone di selettore di stack. Nessuno stack garantisce prestazioni migliori in ogni rete. Scegli uno stack e seleziona Applica e riconnetti per provarlo nella tua rete.\n\n## Applicazione delle impostazioni\n\nLa selezione di un server si riconnette automaticamente. Le impostazioni di modalità, motore, DNS e regole vengono salvate immediatamente; durante una connessione attiva, fare clic su Applica e riconnettersi per utilizzarli. Il riavvio di un motore potrebbe interrompere download e chiamate. I clic ripetuti non avviano connessioni parallele; la disconnessione termina la transizione e rilascia la connessione.\n\nInternet solo tramite VPN blocca il traffico diretto quando un tunnel si interrompe. Colpisce l'intera macchina. Una disconnessione esplicita rimuove le regole di Sora. Se la pulizia non viene completata, riprova a disconnettersi e ad aprire il registro.\n\n## Documentazione del progetto\n\n- [sing-box-lx: configurazione e supporto](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Documentazione sing-box](https://sing-box.sagernet.org/)\n- [Documentazione Xray](https://xtls.github.io/)\n- [Documentazione mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: funzionamento e limitazioni](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC trasporta TCP attraverso una videochiamata su Jitsi, Yandex Telemost o WB Stream. Importa un link olcrtc:// o un codice QR. Funziona con sing-box, Xray e mihomo nelle modalità proxy e TUN; UDP non è supportato. Entrambe le estremità richiedono versioni OLC2 compatibili. Il progetto originale è archiviato.\n",
   "@deleteSubscription": {
     "placeholders": {
       "name": {
@@ -468,7 +468,6 @@
   "customServerOptional": "Opzionale",
   "customServerShowSecret": "Mostra segreto",
   "customServerHideSecret": "Nascondi segreto",
-  "customServerBadge": "personalizzato",
   "customServerDeleteConfirm": "Eliminare il server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Aggiungere manualmente un server: indirizzo, porta e protocollo",
   "customServerTest": "Prova",
   "leakTestTitle": "Test per perdite di dati",
   "leakTestIntro": "Verifica se il traffico può uscire dal dispositivo al di fuori del tunnel: richieste DNS e ICMP dirette, traffico IPv6 in uscita e resolver di sistema. Esegui il test durante la connessione.",
@@ -561,29 +559,7 @@
     }
   },
   "extInstallOne": "1 installazione",
-  "extBadgeVerified": "Verificato",
-  "extBadgeTop": "Most popular this week",
-  "extBadgeNew": "Nuovo",
-  "extBadgeStaff": "La squadra Sora",
-  "extSideloadShort": "Non dal catalogo",
-  "extSideloadWarning": "Questa estensione non è presente nel catalogo del team. Solo l'autore ha garantito per la propria chiave: installala solo se ti fidi dell'autore.",
-  "extInstallTitle": "Installa «{name}»",
-  "@extInstallTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extUpdateTitle": "Aggiorna «{name}»",
-  "@extUpdateTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "extPermissionsIntro": "Questa estensione sarà in grado di:",
+  "extSideloadWarning": "Installa solo se ti fidi della chiave autofirmata dell’autore.",
   "extPermissionsWidened": "L'aggiornamento richiede nuove autorizzazioni:",
   "extDangerousAck": "Capisco che questi permessi sono seri",
   "extInstall": "Installa",
@@ -631,7 +607,6 @@
   "extErrHttpsOnly": "Sono consentiti solo i collegamenti https://",
   "extErrGeneric": "Qualcosa è andato storto. Per favore riprova.",
   "extErrAuthorKeyChanged": "Questo aggiornamento è firmato con una chiave autore diversa rispetto alla versione installata, quindi è stato bloccato. Se ti fidi della nuova chiave, disinstalla l'estensione e installala di nuovo esplicitamente.",
-  "extUpdateAvailable": "Aggiornamento disponibile",
   "extDisabled": "Disattivato",
   "extToggleEnabled": "Abilita {name}",
   "@extToggleEnabled": {
@@ -665,7 +640,6 @@
   "extPermissionsRemoved": "Non più richiesto:",
   "extUpdateFailedKept": "La versione precedente è ancora installata.",
   "extConflictsTitle": "Conflitti di estensione",
-  "extConflictsIntro": "Queste estensioni vogliono la stessa cosa. Scegli quale funziona; l’altra resta installata.",
   "extConflictTheme": "Tema dell'app",
   "extConflictNetHooks": "Ganci di rete",
   "extConflictWinner": "{name} vince",
@@ -685,7 +659,6 @@
     }
   },
   "extConflictsResolve": "Risolvere i conflitti",
-  "extConflictNote": "La tua scelta viene salvata su questo dispositivo. Un tema cambia subito; gli hook di rete non vengono eseguiti in questa versione.",
   "extVersionLabel": "Versione {version}",
   "@extVersionLabel": {
     "placeholders": {
@@ -694,16 +667,10 @@
       }
     }
   },
-  "extAuthor": "Autore",
-  "extRating": "Valutazione",
-  "extInstalls": "Installazioni",
-  "extVersion": "Versione",
-  "extAbout": "Informazioni su questa estensione",
   "extPermissionsTitle": "Autorizzazioni",
   "extNoPermissions": "Nessuna autorizzazione speciale.",
   "extSettings": "Impostazioni",
   "extSaveSettings": "Salva le impostazioni",
-  "extSaving": "Salvataggio…",
   "extUpdateTo": "Aggiorna alla {version}",
   "@extUpdateTo": {
     "placeholders": {
@@ -738,7 +705,7 @@
       }
     }
   },
-  "extPanelUnavailable": "Il pannello non è disponibile. L'estensione potrebbe essere stata disabilitata o rimossa.",
+  "extPanelUnavailable": "Il pannello dell’estensione non è disponibile.",
   "extPermConnectionsRead": "Visualizza l'elenco delle connessioni attive",
   "extPermServersRead": "Visualizza un elenco dei tuoi server",
   "extPermSettingsRead": "Leggi le impostazioni dell'app",
@@ -751,7 +718,6 @@
   "extPermNetHooks": "Integrazione nel percorso di rete (DPI moduli bypass)",
   "extPermNetFetch": "Richiedi URL dall'elenco consentito",
   "extPermBackground": "Esegui attività in background",
-  "extPermBackgroundDetail": "Esegue le attività pianificate anche quando il pannello è chiuso. Puoi metterlo in pausa o modificare la frequenza con cui viene eseguito nelle impostazioni dell'estensione.",
   "extPermNotYetActive": "Not active in this version of Sora yet, granting it changes nothing today.",
   "extCapBackground": "Viene eseguito in background",
   "extCapNetHook": "Aggiramenti e hook di rete",
@@ -769,11 +735,9 @@
   },
   "extChangelog": "Registro delle modifiche",
   "extImageFailed": "Impossibile caricare l'immagine",
-  "extRatingHow": "Come funzionano le valutazioni",
-  "extRatingHowBody": "Le valutazioni utilizzano una media bayesiana: un'estensione con poche valutazioni rimane quasi al centro finché non votano più persone, quindi una singola recensione a 5 stelle non può spingere una nuova estensione in cima. Le valutazioni recenti pesano più di quelle vecchie e conta solo una valutazione per account.",
   "extScreenshots": "Schermate",
   "extSortRelevance": "Rilevanza",
-  "extPermNetworkDetail": "Scarica dati da Internet tramite la VPN. Sono consentiti solo gli host qui sotto, tutto il resto è bloccato.",
+  "extPermNetworkDetail": "Le richieste VPN sono limitate agli host elencati sotto.",
   "extBgTitle": "Attività in background",
   "extBgEnabled": "Esegui in background",
   "extBgInterval": "Esegui ogni",
@@ -793,7 +757,6 @@
       }
     }
   },
-  "extBgNote": "L’attività viene eseguita secondo la pianificazione finché Sora è aperto, anche nell’area di notifica. L’intervallo minimo è di 15 minuti.",
   "extBgDisabledNote": "Abilita l'estensione a gestire la sua attività in background.",
   "extCapNetwork": "Accesso alla rete",
   "extCapNetworkHosts": "Rete: {hosts}",
@@ -807,9 +770,7 @@
   "qrShareTitle": "Condividi il codice QR",
   "qrScanTitle": "Scansiona il codice QR",
   "qrCopyLink": "Copia collegamento",
-  "qrShowLink": "Mostra collegamento",
-  "qrHideLink": "Nascondi collegamento",
-  "qrWarning": "Questo codice QR contiene i dettagli della connessione. Non mostrarlo agli sconosciuti.",
+  "qrWarning": "Condividi il codice solo con persone fidate.",
   "qrScanHint": "Scegli uno screenshot o una foto con un codice QR, oppure incolla un link",
   "qrFromClipboard": "Incolla dagli appunti",
   "qrNoCode": "Nessun codice QR trovato in questa immagine.",
@@ -847,6 +808,7 @@
   "dnsExpected": "Previsto",
   "dnsActual": "Osservato",
   "sortBy": "Ordina per",
+  "sortSubscription": "Come nell’abbonamento",
   "sortPing": "Ping",
   "sortSpeed": "Velocità",
   "sortName": "Nome",
@@ -996,14 +958,13 @@
   },
   "syncThisDevice": "Questo dispositivo",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Per Shadowsocks: metodo:password, ad esempio chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Cattura dei pacchetti",
   "diagnosticEvents": "Eventi di Windows",
   "diagnosticCapture": "Cattura per 10 secondi",
   "diagnosticRequiresTun": "L'acquisizione dei pacchetti richiede una connessione Sora TUN attiva.",
   "diagnosticUnavailable": "Questa diagnostica non è disponibile su questa piattaforma.",
   "extErrRevoked": "Il team di Sora ha ritirato questa versione dell’estensione perché non è sicura o non funziona.",
-  "extErrRevocationsExpired": "Non è stato possibile rinnovare l’elenco delle estensioni ritirate. L’installazione è bloccata finché non viene rinnovato: controlla la rete e riprova.",
+  "extErrRevocationsExpired": "L’installazione è bloccata fino all’aggiornamento dell’elenco delle revoche.",
   "extRevokedDisabled": "Estensioni ritirate disattivate: {names}",
   "customServerWgPrivateKey": "Chiave privata",
   "customServerWgAddresses": "Indirizzi dell’interfaccia",
@@ -1017,5 +978,23 @@
   "strictKillSwitch": "Blocco di rete rigoroso",
   "strictKillSwitchWarning": "Dopo la connessione blocca il traffico esterno alla VPN anche in caso di arresto anomalo, riavvio o chiusura dell’app. Solo la disconnessione o la disattivazione di questa opzione ripristina l’accesso. Dopo il riavvio del sistema, il blocco riprende solo se è attiva la connessione all’avvio.",
   "extWorkerFailed": "L’attività in background dell’estensione non è riuscita. Controlla il registro dell’estensione.",
-  "extAssetRejected": "File dell’estensione rifiutato: colori illeggibili o regole non valide."
+  "extAssetRejected": "File dell’estensione rifiutato: colori illeggibili o regole non valide.",
+  "extVerifiedSora": "Verificato da Sora",
+  "extReceivedBytes": "{count} B",
+  "@extReceivedBytes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "extOpen": "Apri",
+  "customServerOwn": "Server personale",
+  "customServerPaste": "Incolla un link",
+  "customServerUser": "Nome utente",
+  "customServerPassword": "Password",
+  "customServerSecretRequired": "Inserisci un valore",
+  "customServerLinkInvalid": "Link del server non valido",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -220,6 +220,13 @@ func newSubscriptionID() (string, error) {
 
 // normalizedLink normalizes links for duplicate detection.
 func normalizedLink(raw string) (string, error) {
+	if isLocalServerLink(raw) {
+		parsed, err := (parser.LinkParser{}).Parse([]byte(raw))
+		if err != nil || len(parsed.Servers) == 0 || parsed.Report.Invalid != 0 || parsed.Report.Unsupported != 0 {
+			return "", errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionFormat, "control: invalid server URI")
+		}
+		return strings.TrimSpace(raw), nil
+	}
 	u, err := subscription.ValidateReference(raw)
 	if err != nil {
 		return "", err
@@ -303,7 +310,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	}
 	rec.Name = strings.TrimSpace(in.GetName())
 	rec.UserAgent = agent
-	rec.AutoUpdate = in.GetAutoUpdate()
+	rec.AutoUpdate = in.GetAutoUpdate() && !isLocalServerLink(rec.URL)
 	rec.Interval = interval
 	if err := b.persistLocked(&rec, nil, nil); err != nil {
 		return nil, err
@@ -367,7 +374,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		b.mu.Unlock()
 		return state, nil
 	}
-	if b.srv.fetcher == nil {
+	if b.srv.fetcher == nil && !isLocalServerLink(rec.URL) {
 		b.mu.Unlock()
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionFetch, "control: this core cannot fetch subscriptions")
 	}
@@ -378,11 +385,20 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
-	fetched, err := b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+	var fetched subscription.Result
+	var err error
+	if isLocalServerLink(link) {
+		fetched.Body = []byte(link)
+	} else {
+		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+	}
 	answered := err == nil
 	var servers []importedServer
 	if err == nil {
 		servers, err = b.srv.parsePayload(fetched.Body, serverRefFor(id))
+		if isLocalServerLink(link) && len(servers) == 1 {
+			fetched.Info.Title = servers[0].spec.GetDisplayName()
+		}
 	}
 
 	b.mu.Lock()
@@ -455,7 +471,6 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	for part := parts; part < rec.ListParts; part++ {
 		deletes = append(deletes, listRef(rec.ID, part))
 	}
-	sort.Strings(refs)
 	updated := *rec
 	updated.Servers, updated.ListParts = refs, parts
 	updated.Info = info
@@ -475,7 +490,7 @@ func (rec *subscriptionRecord) interval() time.Duration {
 	switch {
 	case rec.Interval > 0:
 		return rec.Interval
-	case rec.Info.UpdateInterval >= minUpdateInterval:
+	case rec.Info.UpdateInterval >= 5*time.Second:
 		return min(rec.Info.UpdateInterval, maxUpdateInterval)
 	}
 	return defaultUpdateInterval
@@ -776,4 +791,9 @@ func (s *Server) WatchSubscriptions(req *corev1.WatchSubscriptionsRequest, strea
 			}
 		}
 	}
+}
+
+func isLocalServerLink(raw string) bool {
+	scheme, _, ok := strings.Cut(strings.ToLower(strings.TrimSpace(raw)), "://")
+	return ok && (scheme == "olcrtc" || scheme == "mieru" || scheme == "mierus" || scheme == "naive+https" || scheme == "naive+quic")
 }

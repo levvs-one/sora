@@ -213,7 +213,7 @@ func TestSavePersistFailureRestoresCredentials(t *testing.T) {
 
 func TestOpenRejectsInvalidRecords(t *testing.T) {
 	cases := map[string]string{
-		"bad protocol":       `[{"id":"srv1","name":"n","protocol":"socks5","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
+		"bad protocol":       `[{"id":"srv1","name":"n","protocol":"unknown","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
 		"bad address":        `[{"id":"srv1","name":"n","protocol":"vless","address":"999.1.1.1","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
 		"bad port":           `[{"id":"srv1","name":"n","protocol":"vless","address":"example.com","port":0,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
 		"empty name":         `[{"id":"srv1","name":"  ","protocol":"vless","address":"example.com","port":443,"secret_ref":"custom_srv1_cred","created":"2026-01-01T00:00:00Z","updated":"2026-01-01T00:00:00Z"}]`,
@@ -467,7 +467,7 @@ func TestSaveValidationTable(t *testing.T) {
 		mutate func(*Server)
 	}{
 		{"empty name", func(s *Server) { s.Name = "  " }},
-		{"bad protocol", func(s *Server) { s.Protocol = "socks5" }},
+		{"bad protocol", func(s *Server) { s.Protocol = "unknown" }},
 		{"zero port", func(s *Server) { s.Port = 0 }},
 	}
 	for _, tc := range cases {

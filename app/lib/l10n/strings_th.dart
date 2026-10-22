@@ -879,7 +879,7 @@ class STh extends S {
 
   @override
   String get modesGuide =>
-      'เลือกอัตโนมัติหากคุณไม่แน่ใจว่าเซิร์ฟเวอร์ของคุณต้องการเอ็นจิ้นใด Sora ตรวจสอบโปรไฟล์และการตั้งค่าก่อนเชื่อมต่อ กลไกไม่สามารถเพิ่มแบนด์วิธของแผนของคุณได้: ประสิทธิภาพขึ้นอยู่กับเซิร์ฟเวอร์ เส้นทาง โปรโตคอล และเครือข่าย\n\n## โหมด\n\n### การจราจรทั้งหมด (TUN)\n\nSora สร้างอินเทอร์เฟซเครือข่ายเสมือนและกำหนดเส้นทางการรับส่งข้อมูลแอปพลิเคชัน รวมถึง TCP และ UDP ใช้โหมดนี้สำหรับ Telegram เกม และเสียง Discord กฎสามารถส่งไซต์หรือโปรแกรมเฉพาะได้โดยตรงหรือบล็อกไซต์หรือโปรแกรมเหล่านั้น บริการเครือข่ายจำเป็นต้องได้รับอนุญาตและเซิร์ฟเวอร์ที่รองรับโปรโตคอลที่จำเป็น\n\n### พร็อกซี System\n\nSora กำหนดค่าพร็อกซี HTTP/SOCKS ในเครื่อง แอปพลิเคชันที่เคารพการตั้งค่าพร็อกซีของระบบจะใช้งาน แอปพลิเคชันที่มีสแต็กเครือข่ายของตนเองอาจเชื่อมต่อโดยตรง โดยทั่วไป UDP และการโทรด้วยเสียงต้องใช้ TUN โหมดนี้เหมาะกับเบราว์เซอร์และแอปพลิเคชันที่รองรับพร็อกซี\n\n### ไม่มีเซิร์ฟเวอร์\n\nใน Linux นั้น Sora ใช้ [zapret](https://github.com/bol-van/zapret) เพื่อแยกและปรับแต่งคำขอ HTTP/TLS และข้ามการตรวจสอบ DPI บางอย่าง IP ของคุณยังคงเหมือนเดิมและการเชื่อมต่อจะไปยังเว็บไซต์โดยตรง ผลลัพธ์ขึ้นอยู่กับผู้ให้บริการของคุณและวิธีการบล็อก\n\nการรวมปัจจุบันใช้ tpws สำหรับ HTTP และ TLS ผ่าน TCP ไม่หลีกเลี่ยงการบล็อก IP หรือรีเลย์ UDP และไม่สามารถรับประกันการเชื่อมต่อ Telegram ของ MTProto ได้ ใช้เซิร์ฟเวอร์ VPN พร้อม TUN สำหรับเสียง Discord, การโทร Telegram และข้อจำกัดประเภทนี้\n\n## เครื่องยนต์\n\n### ออโต้\n\nSora เลือกเอ็นจิ้นที่ติดตั้งซึ่งสนับสนุนแผนการเชื่อมต่อทั้งหมด: โปรโตคอลเซิร์ฟเวอร์ การขนส่ง กลุ่ม การกระจายตัว และโหมด ตัวเลือกด้วยตนเองที่เข้ากันไม่ได้จะถูกปฏิเสธก่อนที่จะหยุดการเชื่อมต่อปัจจุบัน เลือกอัตโนมัติหรือเครื่องยนต์อื่นแล้วใช้การตั้งค่าอีกครั้ง\n\n### sing-box\n\nแพ็คเกจ Sora ใหม่ประกอบด้วย [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) ซึ่งเป็นทางแยกของ [sing-box](https://github.com/SagerNet/sing-box) โดยเพิ่ม XHTTP และ VLESS Encryption ฝั่งไคลเอ็นต์ Sora จดจำบิลด์และความสามารถของมัน การสร้างอัพสตรีมที่ไม่มี XHTTP จะไม่ได้รับความสามารถนี้จากชื่อเพียงอย่างเดียว\n\nโปรโตคอลที่รองรับ ได้แก่ VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard และพารามิเตอร์ AmneziaWG 1.x/2.x Sora สามารถนำเข้าได้ โปรไฟล์ Xray JSON แบบเต็มต้องใช้ Xray ยังไม่สามารถนำเข้าฟิลด์ AWG 3.x ใหม่ได้ sing-box ใช้พอร์ตควบคุมภายในที่มีการป้องกันด้วยรหัสผ่าน ซึ่งแอปพลิเคชันอื่นบนคอมพิวเตอร์สามารถตรวจพบได้\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) รองรับการแยกส่วน VLESS, REALITY, XHTTP, VLESS Encryption และการกระจายตัวของ TLS นอกจากนี้ยังรันโปรไฟล์ผู้ให้บริการ Xray ที่สมบูรณ์โดยยังคงรักษาการกำหนดเส้นทางและกลุ่มไว้ โปรไฟล์ดังกล่าวไม่สามารถแปลงเป็นเอ็นจิ้นอื่นโดยอัตโนมัติโดยไม่เปลี่ยนพฤติกรรม\n\nXray ที่ให้มาได้ลบการตั้งค่าที่ปิดใช้งานการตรวจสอบใบรับรอง TLS (`allowInsecure`) เลือก sing-box หรือ mihomo อัตโนมัติสำหรับเซิร์ฟเวอร์ทั่วไปที่ต้องการการตั้งค่านี้ การเลือก Xray จะรายงานความไม่เข้ากันด้วยตนเองก่อนที่จะหยุดการเชื่อมต่อปัจจุบัน โปรไฟล์ JSON แบบเต็มรุ่นเก่าต้องมีโปรไฟล์ผู้ให้บริการที่อัปเดตพร้อมใบรับรองที่ตรวจสอบได้หรือ PIN ใบรับรอง\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) รองรับกลุ่มทางเลือกสำรองและกลุ่มบาลานซ์โหลด, XHTTP และ AmneziaWG เลือกเมื่อการเฟลโอเวอร์อัตโนมัติไปยังเซิร์ฟเวอร์สำรองมีความสำคัญ การตั้งค่าการกระจายตัวของ TLS ของ Sora ไม่พร้อมใช้งานกับกลไกนี้\n\n## ความเข้ากันได้ใน Sora\n\n| คุณสมบัติ | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN และ TCP/UDP | ใช่ | ใช่ | ใช่ |\n| XHTTP | ใช่ | ใช่ | ใช่ |\n| VLESS Encryption | ใช่ | ใช่ | ใช่ |\n| โปรไฟล์ Xray แบบเต็ม | ไม่ | ใช่ | ไม่ |\n| TUIC / AnyTLS | ทั้งสอง | ไม่ | TUIC |\n| การกระจายตัวของ TLS | ใช่ | ใช่ | ไม่ |\n| AmneziaWG 1.x/2.x | ใช่¹ | ไม่ | ใช่ |\n| จัดกลุ่มสำรอง | ไม่ | โน² | ใช่ |\n\n¹ โปรไฟล์ที่มี J1/J2/J3/Itime ใช้ mihomo; ฟิลด์เหล่านี้จะต้องไม่ถูกละทิ้งอย่างเงียบๆ ² สำหรับกลุ่มโปรไฟล์ Xray ที่สมบูรณ์ แอปจะเลือกโปรไฟล์สำรอง การสนับสนุนขึ้นอยู่กับบิลด์ที่ติดตั้ง ตรวจสอบเวอร์ชันในเกี่ยวกับ\n\n## กอง TUN\n\nสแต็กจัดการ TCP และ UDP ภายในอินเทอร์เฟซเสมือน ในแผงโหมด Xray และ mihomo มี gVisor, System, Mixed และ MIPS เครื่องยนต์แต่ละตัวจะบันทึกการตั้งค่าของตัวเอง พร็อกซี System และโหมด Serverless ไม่ได้ใช้การกำหนดค่าตามความชอบนี้\n\n- **Mixed**: TCP ใช้สแต็กของระบบ ในขณะที่ gVisor จัดการ UDP นี่เป็นค่าเริ่มต้นสำหรับ mihomo บน Linux ส่วน Windows ใช้ MIPS เป็นค่าเริ่มต้นสำหรับ Xray และ mihomo\n- **System**: ใช้สแต็กระบบ ลองใช้ตัวเลือกอื่นหากแอปพลิเคชันเครือข่ายประสบปัญหา\n- **gVisor**: จัดการการรับส่งข้อมูลในพื้นที่ผู้ใช้\n- **MIPS**: IP Stack ของ mihomo เอง มีให้ใช้งานในเวอร์ชันบันเดิล 1.19.32\n\nบน Linux นั้น Xray จะใช้ gVisor ในตัวเป็นค่าเริ่มต้น System, Mixed และ MIPS บน Linux ใช้ mihomo เป็นกลไก TUN โดยส่งต่อ TCP และ UDP ไปยัง Xray ผ่านลิงก์ SOCKS ท้องถิ่นที่ได้รับการรับรองความถูกต้อง Xray ยังคงรักษาโปรโตคอล โปรไฟล์ผู้ให้บริการ และการกำหนดเส้นทางไว้ ตัวเลือกทั้งสามนี้จำเป็นต้องมี mihomo ที่ติดตั้งไว้ บน Windows Xray ใช้ mihomo 1.19.32 หรือใหม่กว่าสำหรับ TUN ทั้งสี่สแตก โปรโตคอลและการกำหนดเส้นทางยังอยู่ใน Xray กฎแอปในรูปแบบนี้รองรับเฉพาะการเชื่อมต่อโดยตรงและการบล็อก บน Linux กฎเหล่านี้ต้องใช้ gVisor ในตัวของ Xray\n\nบริดจ์รันกระบวนการที่สอง ในการวัดที่ไม่ได้ใช้งานสามครั้งบน Linux นั้น ใช้หน่วยความจำกายภาพมากกว่าประมาณ 32–36 MiB มากกว่า Xray TUN ดั้งเดิม สิ่งนี้ไม่ได้วัดปริมาณการดาวน์โหลด: ต้นทุน CPU และหน่วยความจำขึ้นอยู่กับการเชื่อมต่อ sing-box ไม่มีตัวเลือกสแต็ก ไม่มีสแต็กรับประกันประสิทธิภาพที่ดีขึ้นในทุกเครือข่าย เลือกสแต็กแล้วเลือกใช้และเชื่อมต่อใหม่เพื่อลองใช้ในเครือข่ายของคุณ\n\n## กำลังใช้การตั้งค่า\n\nการเลือกเซิร์ฟเวอร์จะเชื่อมต่อใหม่โดยอัตโนมัติ การตั้งค่าโหมด กลไก DNS และกฎจะถูกบันทึกทันที ในระหว่างการเชื่อมต่อที่ใช้งานอยู่ ให้คลิก ใช้ และเชื่อมต่อใหม่เพื่อใช้งาน การรีสตาร์ทเครื่องยนต์อาจขัดจังหวะการดาวน์โหลดและการโทร การคลิกซ้ำๆ จะไม่เริ่มการเชื่อมต่อแบบขนาน การยกเลิกการเชื่อมต่อจะเป็นการสิ้นสุดการเปลี่ยนแปลงและปล่อยการเชื่อมต่อ\n\nอินเทอร์เน็ตผ่าน VPN เท่านั้นที่จะบล็อกการรับส่งข้อมูลโดยตรงเมื่ออุโมงค์ล่ม มันกระทบทั้งเครื่อง การตัดการเชื่อมต่อที่ชัดเจนจะลบกฎของ Sora หากการล้างข้อมูลไม่เสร็จสิ้น ให้ลองยกเลิกการเชื่อมต่ออีกครั้งและเปิดบันทึก\n\n## เอกสารประกอบโครงการ\n\n- [sing-box-lx: การกำหนดค่าและการสนับสนุน](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [เอกสารประกอบ sing-box](https://sing-box.sagernet.org/)\n- [เอกสารประกอบ Xray](https://xtls.github.io/)\n- [เอกสารประกอบ mihomo](https://wiki.metacubex.one/)\n- [zapret: การทำงานและข้อจำกัด](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'เลือกอัตโนมัติหากคุณไม่แน่ใจว่าเซิร์ฟเวอร์ของคุณต้องการเอ็นจิ้นใด Sora ตรวจสอบโปรไฟล์และการตั้งค่าก่อนเชื่อมต่อ กลไกไม่สามารถเพิ่มแบนด์วิธของแผนของคุณได้: ประสิทธิภาพขึ้นอยู่กับเซิร์ฟเวอร์ เส้นทาง โปรโตคอล และเครือข่าย\n\n## โหมด\n\n### การจราจรทั้งหมด (TUN)\n\nSora สร้างอินเทอร์เฟซเครือข่ายเสมือนและกำหนดเส้นทางการรับส่งข้อมูลแอปพลิเคชัน รวมถึง TCP และ UDP ใช้โหมดนี้สำหรับ Telegram เกม และเสียง Discord กฎสามารถส่งไซต์หรือโปรแกรมเฉพาะได้โดยตรงหรือบล็อกไซต์หรือโปรแกรมเหล่านั้น บริการเครือข่ายจำเป็นต้องได้รับอนุญาตและเซิร์ฟเวอร์ที่รองรับโปรโตคอลที่จำเป็น\n\n### พร็อกซี System\n\nSora กำหนดค่าพร็อกซี HTTP/SOCKS ในเครื่อง แอปพลิเคชันที่เคารพการตั้งค่าพร็อกซีของระบบจะใช้งาน แอปพลิเคชันที่มีสแต็กเครือข่ายของตนเองอาจเชื่อมต่อโดยตรง โดยทั่วไป UDP และการโทรด้วยเสียงต้องใช้ TUN โหมดนี้เหมาะกับเบราว์เซอร์และแอปพลิเคชันที่รองรับพร็อกซี\n\n### ไม่มีเซิร์ฟเวอร์\n\nใน Linux นั้น Sora ใช้ [zapret](https://github.com/bol-van/zapret) เพื่อแยกและปรับแต่งคำขอ HTTP/TLS และข้ามการตรวจสอบ DPI บางอย่าง IP ของคุณยังคงเหมือนเดิมและการเชื่อมต่อจะไปยังเว็บไซต์โดยตรง ผลลัพธ์ขึ้นอยู่กับผู้ให้บริการของคุณและวิธีการบล็อก\n\nการรวมปัจจุบันใช้ tpws สำหรับ HTTP และ TLS ผ่าน TCP ไม่หลีกเลี่ยงการบล็อก IP หรือรีเลย์ UDP และไม่สามารถรับประกันการเชื่อมต่อ Telegram ของ MTProto ได้ ใช้เซิร์ฟเวอร์ VPN พร้อม TUN สำหรับเสียง Discord, การโทร Telegram และข้อจำกัดประเภทนี้\n\n## เครื่องยนต์\n\n### ออโต้\n\nSora เลือกเอ็นจิ้นที่ติดตั้งซึ่งสนับสนุนแผนการเชื่อมต่อทั้งหมด: โปรโตคอลเซิร์ฟเวอร์ การขนส่ง กลุ่ม การกระจายตัว และโหมด ตัวเลือกด้วยตนเองที่เข้ากันไม่ได้จะถูกปฏิเสธก่อนที่จะหยุดการเชื่อมต่อปัจจุบัน เลือกอัตโนมัติหรือเครื่องยนต์อื่นแล้วใช้การตั้งค่าอีกครั้ง\n\n### sing-box\n\nแพ็คเกจ Sora ใหม่ประกอบด้วย [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) ซึ่งเป็นทางแยกของ [sing-box](https://github.com/SagerNet/sing-box) โดยเพิ่ม XHTTP และ VLESS Encryption ฝั่งไคลเอ็นต์ Sora จดจำบิลด์และความสามารถของมัน การสร้างอัพสตรีมที่ไม่มี XHTTP จะไม่ได้รับความสามารถนี้จากชื่อเพียงอย่างเดียว\n\nโปรโตคอลที่รองรับ ได้แก่ VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard และพารามิเตอร์ AmneziaWG 1.x/2.x Sora สามารถนำเข้าได้ โปรไฟล์ Xray JSON แบบเต็มต้องใช้ Xray ยังไม่สามารถนำเข้าฟิลด์ AWG 3.x ใหม่ได้ sing-box ใช้พอร์ตควบคุมภายในที่มีการป้องกันด้วยรหัสผ่าน ซึ่งแอปพลิเคชันอื่นบนคอมพิวเตอร์สามารถตรวจพบได้\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) รองรับการแยกส่วน VLESS, REALITY, XHTTP, VLESS Encryption และการกระจายตัวของ TLS นอกจากนี้ยังรันโปรไฟล์ผู้ให้บริการ Xray ที่สมบูรณ์โดยยังคงรักษาการกำหนดเส้นทางและกลุ่มไว้ โปรไฟล์ดังกล่าวไม่สามารถแปลงเป็นเอ็นจิ้นอื่นโดยอัตโนมัติโดยไม่เปลี่ยนพฤติกรรม\n\nXray ที่ให้มาได้ลบการตั้งค่าที่ปิดใช้งานการตรวจสอบใบรับรอง TLS (`allowInsecure`) เลือก sing-box หรือ mihomo อัตโนมัติสำหรับเซิร์ฟเวอร์ทั่วไปที่ต้องการการตั้งค่านี้ การเลือก Xray จะรายงานความไม่เข้ากันด้วยตนเองก่อนที่จะหยุดการเชื่อมต่อปัจจุบัน โปรไฟล์ JSON แบบเต็มรุ่นเก่าต้องมีโปรไฟล์ผู้ให้บริการที่อัปเดตพร้อมใบรับรองที่ตรวจสอบได้หรือ PIN ใบรับรอง\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) รองรับกลุ่มทางเลือกสำรองและกลุ่มบาลานซ์โหลด, XHTTP และ AmneziaWG เลือกเมื่อการเฟลโอเวอร์อัตโนมัติไปยังเซิร์ฟเวอร์สำรองมีความสำคัญ การตั้งค่าการกระจายตัวของ TLS ของ Sora ไม่พร้อมใช้งานกับกลไกนี้\n\n## ความเข้ากันได้ใน Sora\n\n| คุณสมบัติ | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN และ TCP/UDP | ใช่ | ใช่ | ใช่ |\n| XHTTP | ใช่ | ใช่ | ใช่ |\n| VLESS Encryption | ใช่ | ใช่ | ใช่ |\n| โปรไฟล์ Xray แบบเต็ม | ไม่ | ใช่ | ไม่ |\n| TUIC / AnyTLS | ทั้งสอง | ไม่ | TUIC |\n| mieru | ไม่ | ไม่ | ใช่ |\n| NaiveProxy | ใช่ | ไม่ | ไม่ |\n| การกระจายตัวของ TLS | ใช่ | ใช่ | ไม่ |\n| AmneziaWG 1.x/2.x | ใช่¹ | ไม่ | ใช่ |\n| จัดกลุ่มสำรอง | ไม่ | โน² | ใช่ |\n\n¹ โปรไฟล์ที่มี J1/J2/J3/Itime ใช้ mihomo; ฟิลด์เหล่านี้จะต้องไม่ถูกละทิ้งอย่างเงียบๆ ² สำหรับกลุ่มโปรไฟล์ Xray ที่สมบูรณ์ แอปจะเลือกโปรไฟล์สำรอง การสนับสนุนขึ้นอยู่กับบิลด์ที่ติดตั้ง ตรวจสอบเวอร์ชันในเกี่ยวกับ\n\n## กอง TUN\n\nสแต็กจัดการ TCP และ UDP ภายในอินเทอร์เฟซเสมือน ในแผงโหมด Xray และ mihomo มี gVisor, System, Mixed และ MIPS เครื่องยนต์แต่ละตัวจะบันทึกการตั้งค่าของตัวเอง พร็อกซี System และโหมด Serverless ไม่ได้ใช้การกำหนดค่าตามความชอบนี้\n\n- **Mixed**: TCP ใช้สแต็กของระบบ ในขณะที่ gVisor จัดการ UDP นี่เป็นค่าเริ่มต้นสำหรับ mihomo บน Linux ส่วน Windows ใช้ MIPS เป็นค่าเริ่มต้นสำหรับ Xray และ mihomo\n- **System**: ใช้สแต็กระบบ ลองใช้ตัวเลือกอื่นหากแอปพลิเคชันเครือข่ายประสบปัญหา\n- **gVisor**: จัดการการรับส่งข้อมูลในพื้นที่ผู้ใช้\n- **MIPS**: IP Stack ของ mihomo เอง มีให้ใช้งานในเวอร์ชันบันเดิล 1.19.32\n\nบน Linux นั้น Xray จะใช้ gVisor ในตัวเป็นค่าเริ่มต้น System, Mixed และ MIPS บน Linux ใช้ mihomo เป็นกลไก TUN โดยส่งต่อ TCP และ UDP ไปยัง Xray ผ่านลิงก์ SOCKS ท้องถิ่นที่ได้รับการรับรองความถูกต้อง Xray ยังคงรักษาโปรโตคอล โปรไฟล์ผู้ให้บริการ และการกำหนดเส้นทางไว้ ตัวเลือกทั้งสามนี้จำเป็นต้องมี mihomo ที่ติดตั้งไว้ บน Windows Xray ใช้ mihomo 1.19.32 หรือใหม่กว่าสำหรับ TUN ทั้งสี่สแตก โปรโตคอลและการกำหนดเส้นทางยังอยู่ใน Xray กฎแอปในรูปแบบนี้รองรับเฉพาะการเชื่อมต่อโดยตรงและการบล็อก บน Linux กฎเหล่านี้ต้องใช้ gVisor ในตัวของ Xray\n\nบริดจ์รันกระบวนการที่สอง ในการวัดที่ไม่ได้ใช้งานสามครั้งบน Linux นั้น ใช้หน่วยความจำกายภาพมากกว่าประมาณ 32–36 MiB มากกว่า Xray TUN ดั้งเดิม สิ่งนี้ไม่ได้วัดปริมาณการดาวน์โหลด: ต้นทุน CPU และหน่วยความจำขึ้นอยู่กับการเชื่อมต่อ sing-box ไม่มีตัวเลือกสแต็ก ไม่มีสแต็กรับประกันประสิทธิภาพที่ดีขึ้นในทุกเครือข่าย เลือกสแต็กแล้วเลือกใช้และเชื่อมต่อใหม่เพื่อลองใช้ในเครือข่ายของคุณ\n\n## กำลังใช้การตั้งค่า\n\nการเลือกเซิร์ฟเวอร์จะเชื่อมต่อใหม่โดยอัตโนมัติ การตั้งค่าโหมด กลไก DNS และกฎจะถูกบันทึกทันที ในระหว่างการเชื่อมต่อที่ใช้งานอยู่ ให้คลิก ใช้ และเชื่อมต่อใหม่เพื่อใช้งาน การรีสตาร์ทเครื่องยนต์อาจขัดจังหวะการดาวน์โหลดและการโทร การคลิกซ้ำๆ จะไม่เริ่มการเชื่อมต่อแบบขนาน การยกเลิกการเชื่อมต่อจะเป็นการสิ้นสุดการเปลี่ยนแปลงและปล่อยการเชื่อมต่อ\n\nอินเทอร์เน็ตผ่าน VPN เท่านั้นที่จะบล็อกการรับส่งข้อมูลโดยตรงเมื่ออุโมงค์ล่ม มันกระทบทั้งเครื่อง การตัดการเชื่อมต่อที่ชัดเจนจะลบกฎของ Sora หากการล้างข้อมูลไม่เสร็จสิ้น ให้ลองยกเลิกการเชื่อมต่ออีกครั้งและเปิดบันทึก\n\n## เอกสารประกอบโครงการ\n\n- [sing-box-lx: การกำหนดค่าและการสนับสนุน](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [เอกสารประกอบ sing-box](https://sing-box.sagernet.org/)\n- [เอกสารประกอบ Xray](https://xtls.github.io/)\n- [เอกสารประกอบ mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: การทำงานและข้อจำกัด](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC ส่งข้อมูล TCP ผ่านการสนทนาทางวิดีโอใน Jitsi, Yandex Telemost หรือ WB Stream นำเข้าลิงก์ olcrtc:// หรือคิวอาร์โค้ด ใช้งานได้กับ sing-box, Xray และ mihomo ในโหมดพร็อกซีและ TUN แต่ไม่รองรับ UDP ทั้งสองฝั่งต้องใช้รุ่น OLC2 ที่เข้ากันได้ โครงการต้นฉบับถูกเก็บถาวรแล้ว\n';
 
   @override
   String get probeServers => 'ตรวจสอบเซิร์ฟเวอร์';
@@ -906,36 +906,7 @@ class STh extends S {
   String get extInstallOne => '1 ติดตั้ง';
 
   @override
-  String get extBadgeVerified => 'ตรวจสอบแล้ว';
-
-  @override
-  String get extBadgeTop => 'ฮิตที่สุดในสัปดาห์นี้';
-
-  @override
-  String get extBadgeNew => 'ใหม่';
-
-  @override
-  String get extBadgeStaff => 'ทีมงาน Sora';
-
-  @override
-  String get extSideloadShort => 'ไม่ใช่จากแค็ตตาล็อก';
-
-  @override
-  String get extSideloadWarning =>
-      'ส่วนขยายนี้ไม่ได้มาจากแค็ตตาล็อกของทีม มีเพียงผู้เขียนเท่านั้นที่รับรองรหัสของตน: ติดตั้งเฉพาะเมื่อคุณเชื่อถือผู้เขียนเท่านั้น';
-
-  @override
-  String extInstallTitle(String name) {
-    return 'ติดตั้ง “$name”';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return 'อัปเดต “$name”';
-  }
-
-  @override
-  String get extPermissionsIntro => 'ส่วนขยายนี้จะสามารถ:';
+  String get extSideloadWarning => 'ติดตั้งเฉพาะเมื่อคุณเชื่อถือคีย์ที่ผู้สร้างลงนามเองเท่านั้น';
 
   @override
   String get extPermissionsWidened => 'การอัปเดตจะขอสิทธิ์ใหม่:';
@@ -1061,9 +1032,6 @@ class STh extends S {
       'การอัปเดตนี้ลงนามด้วยรหัสผู้สร้างที่แตกต่างจากเวอร์ชันที่ติดตั้ง ดังนั้นจึงถูกบล็อก หากคุณเชื่อถือคีย์ใหม่ ให้ถอนการติดตั้งส่วนขยายและติดตั้งอีกครั้งอย่างชัดเจน';
 
   @override
-  String get extUpdateAvailable => 'มีการอัปเดตแล้ว';
-
-  @override
   String get extDisabled => 'ปิดใช้งาน';
 
   @override
@@ -1106,9 +1074,6 @@ class STh extends S {
   String get extConflictsTitle => 'ข้อขัดแย้งของส่วนขยาย';
 
   @override
-  String get extConflictsIntro => 'ส่วนขยายเหล่านี้ต้องการสิ่งเดียวกัน เลือกว่าจะให้ตัวไหนทำงาน อีกตัวจะยังติดตั้งอยู่';
-
-  @override
   String get extConflictTheme => 'ธีมแอป';
 
   @override
@@ -1128,28 +1093,9 @@ class STh extends S {
   String get extConflictsResolve => 'แก้ไขข้อขัดแย้ง';
 
   @override
-  String get extConflictNote =>
-      'ระบบจะบันทึกตัวเลือกของคุณไว้ในอุปกรณ์นี้ ธีมจะเปลี่ยนทันที ส่วนฮุกเครือข่ายจะไม่ทำงานในเวอร์ชันนี้';
-
-  @override
   String extVersionLabel(String version) {
     return 'เวอร์ชัน $version';
   }
-
-  @override
-  String get extAuthor => 'ผู้เขียน';
-
-  @override
-  String get extRating => 'เรตติ้ง';
-
-  @override
-  String get extInstalls => 'การติดตั้ง';
-
-  @override
-  String get extVersion => 'เวอร์ชัน';
-
-  @override
-  String get extAbout => 'เกี่ยวกับส่วนขยายนี้';
 
   @override
   String get extPermissionsTitle => 'สิทธิ์';
@@ -1162,9 +1108,6 @@ class STh extends S {
 
   @override
   String get extSaveSettings => 'บันทึกการตั้งค่า';
-
-  @override
-  String get extSaving => 'กำลังบันทึก...';
 
   @override
   String extUpdateTo(String version) {
@@ -1193,7 +1136,7 @@ class STh extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'แผงควบคุมไม่พร้อมใช้งาน ส่วนขยายอาจถูกปิดใช้งานหรือลบออก';
+  String get extPanelUnavailable => 'แผงส่วนขยายไม่พร้อมใช้งาน';
 
   @override
   String get extPermConnectionsRead => 'ดูรายการการเชื่อมต่อที่ใช้งานอยู่';
@@ -1232,10 +1175,6 @@ class STh extends S {
   String get extPermBackground => 'เรียกใช้งานพื้นหลัง';
 
   @override
-  String get extPermBackgroundDetail =>
-      'รันงานที่กำหนดเวลาไว้แม้ในขณะที่แผงปิดอยู่ คุณสามารถหยุดชั่วคราวหรือเปลี่ยนความถี่ในการทำงานได้ในการตั้งค่าส่วนขยาย';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1268,21 +1207,13 @@ class STh extends S {
   String get extImageFailed => 'ไม่สามารถโหลดภาพได้';
 
   @override
-  String get extRatingHow => 'การให้คะแนนทำงานอย่างไร';
-
-  @override
-  String get extRatingHowBody =>
-      'การให้คะแนนใช้ค่าเฉลี่ยแบบเบย์: ส่วนขยายที่มีการให้คะแนนน้อยจะยังคงอยู่ใกล้ตรงกลางจนกว่าผู้คนจะโหวตมากขึ้น ดังนั้นบทวิจารณ์ระดับ 5 ดาวรายการเดียวจึงไม่สามารถผลักดันส่วนขยายใหม่ขึ้นไปด้านบนได้ การให้คะแนนล่าสุดมีน้ำหนักมากกว่าการให้คะแนนแบบเก่า และมีเพียงการให้คะแนนเดียวต่อบัญชีเท่านั้น';
-
-  @override
   String get extScreenshots => 'ภาพหน้าจอ';
 
   @override
   String get extSortRelevance => 'ความเกี่ยวข้อง';
 
   @override
-  String get extPermNetworkDetail =>
-      'ดึงข้อมูลจากอินเทอร์เน็ตผ่าน VPN อนุญาตเฉพาะโฮสต์ในรายการด้านล่าง ที่เหลือถูกบล็อก';
+  String get extPermNetworkDetail => 'คำขอผ่าน VPN เข้าถึงได้เฉพาะโฮสต์ด้านล่างเท่านั้น';
 
   @override
   String get extBgTitle => 'งานเบื้องหลัง';
@@ -1304,10 +1235,6 @@ class STh extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ชั่วโมง');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'งานจะทำงานตามกำหนดเวลาขณะที่ Sora เปิดอยู่ รวมถึงตอนอยู่ในถาดระบบ ช่วงเวลาสั้นที่สุดคือ 15 นาที';
 
   @override
   String get extBgDisabledNote => 'เปิดใช้งานส่วนขยายเพื่อจัดการงานพื้นหลัง';
@@ -1341,13 +1268,7 @@ class STh extends S {
   String get qrCopyLink => 'คัดลอกลิงค์';
 
   @override
-  String get qrShowLink => 'แสดงลิงค์';
-
-  @override
-  String get qrHideLink => 'ซ่อนลิงก์';
-
-  @override
-  String get qrWarning => 'รหัส QR นี้มีรายละเอียดการเชื่อมต่อ อย่าแสดงให้คนแปลกหน้าเห็น';
+  String get qrWarning => 'แชร์รหัสนี้กับคนที่คุณไว้ใจเท่านั้น';
 
   @override
   String get qrScanHint => 'เลือกภาพหน้าจอหรือรูปภาพที่มีคิวอาร์โค้ด หรือวางลิงก์';
@@ -1463,6 +1384,9 @@ class STh extends S {
 
   @override
   String get sortBy => 'เรียงตาม';
+
+  @override
+  String get sortSubscription => 'ตามลำดับในรายการสมัครรับ';
 
   @override
   String get sortPing => 'ปิง';
@@ -1800,15 +1724,9 @@ class STh extends S {
   String get customServerHideSecret => 'ซ่อนความลับ';
 
   @override
-  String get customServerBadge => 'กำหนดเอง';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'ลบเซิร์ฟเวอร์ “$name” หรือไม่';
   }
-
-  @override
-  String get customServerEmptyHint => 'เพิ่มเซิร์ฟเวอร์ด้วยตนเอง: ที่อยู่ พอร์ต และโปรโตคอล';
 
   @override
   String get customServerTest => 'ทดสอบ';
@@ -1977,10 +1895,6 @@ class STh extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'การจับแพ็คเก็ต';
 
   @override
@@ -1999,8 +1913,7 @@ class STh extends S {
   String get extErrRevoked => 'ทีม Sora ได้เพิกถอนส่วนขยายเวอร์ชันนี้ เพราะไม่ปลอดภัยหรือใช้งานไม่ได้';
 
   @override
-  String get extErrRevocationsExpired =>
-      'ต่ออายุรายการส่วนขยายที่ถูกเพิกถอนไม่สำเร็จ การติดตั้งถูกบล็อกจนกว่าจะต่ออายุได้ ตรวจสอบเครือข่ายแล้วลองอีกครั้ง';
+  String get extErrRevocationsExpired => 'การติดตั้งถูกระงับจนกว่าจะอัปเดตรายการส่วนขยายที่ถูกเพิกถอน';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2046,4 +1959,39 @@ class STh extends S {
 
   @override
   String get extAssetRejected => 'ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง';
+
+  @override
+  String get extVerifiedSora => 'ตรวจสอบโดย Sora';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count ไบต์';
+  }
+
+  @override
+  String get extOpen => 'เปิด';
+
+  @override
+  String get customServerOwn => 'เซิร์ฟเวอร์ส่วนตัว';
+
+  @override
+  String get customServerPaste => 'วางลิงก์';
+
+  @override
+  String get customServerUser => 'ชื่อผู้ใช้';
+
+  @override
+  String get customServerPassword => 'รหัสผ่าน';
+
+  @override
+  String get customServerSecretRequired => 'ป้อนค่า';
+
+  @override
+  String get customServerLinkInvalid => 'ลิงก์เซิร์ฟเวอร์ไม่ถูกต้อง';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

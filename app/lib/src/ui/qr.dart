@@ -27,7 +27,6 @@ class QrShareScreen extends StatefulWidget {
 }
 
 class _QrShareScreenState extends State<QrShareScreen> {
-  bool _linkVisible = false;
   bool _copied = false;
   int _copiedStamp = 0;
 
@@ -43,65 +42,84 @@ class _QrShareScreenState extends State<QrShareScreen> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    return Screen(
-      title: widget.title,
-      children: [
-        const SizedBox(height: 8),
-        Center(
-          child: DecoratedBox(
-            // White quiet zone keeps the code scannable in both themes.
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              // A QR code carries no meaning for screen readers; the copy
-              // button below provides the same payload as text.
-              child: ExcludeSemantics(
-                child: QrImageView(
-                  data: widget.payload,
-                  version: QrVersions.auto,
-                  errorCorrectionLevel: QrErrorCorrectLevel.H,
-                  size: 260,
+    final qr = QrCode.fromData(data: widget.payload, errorCorrectLevel: QrErrorCorrectLevel.M);
+    // Prefer whole modules, fitting dense codes into the content width so
+    // Flutter cannot constrain only one side and distort the quiet zone.
+    final moduleSize = (280 / qr.moduleCount).ceilToDouble().clamp(0.0, 360 / (qr.moduleCount + 8));
+    final qrSize = (qr.moduleCount + 8) * moduleSize;
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                child: RoundButton(
+                  icon: Symbols.chevron_left_rounded,
+                  label: MaterialLocalizations.of(context).backButtonTooltip,
+                  onTap: () => Navigator.of(context).maybePop(),
                 ),
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Symbols.warning_rounded, size: 18, color: palette.ink2),
-            const SizedBox(width: 10),
             Expanded(
-              child: Text(s.qrWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 48),
+                        child: SizedBox(
+                          width: 360,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                widget.title,
+                                textAlign: TextAlign.center,
+                                style: Styles.bodyStrong.copyWith(fontSize: 17, color: palette.ink),
+                              ),
+                              const SizedBox(height: 24),
+                              Center(
+                                child: ExcludeSemantics(
+                                  child: QrImageView.withQr(
+                                    key: const ValueKey('subscription-qr'),
+                                    qr: qr,
+                                    errorCorrectionLevel: QrErrorCorrectLevel.M,
+                                    size: qrSize,
+                                    padding: EdgeInsets.all(4 * moduleSize),
+                                    backgroundColor: palette.surface,
+                                    eyeStyle: QrEyeStyle(eyeShape: QrEyeShape.square, color: palette.ink),
+                                    dataModuleStyle: QrDataModuleStyle(
+                                      dataModuleShape: QrDataModuleShape.square,
+                                      color: palette.ink,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              PrimaryButton(label: _copied ? s.copied : s.qrCopyLink, onTap: _copy),
+                              const SizedBox(height: 12),
+                              Text(
+                                s.qrWarning,
+                                textAlign: TextAlign.center,
+                                style: Styles.secondary.copyWith(color: palette.ink2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        PrimaryButton(label: _copied ? s.copied : s.qrCopyLink, onTap: _copy),
-        const SizedBox(height: 8),
-        Center(
-          child: TextButton(
-            onPressed: () => setState(() => _linkVisible = !_linkVisible),
-            child: Text(
-              _linkVisible ? s.qrHideLink : s.qrShowLink,
-              style: Styles.secondary.copyWith(color: palette.ink2),
-            ),
-          ),
-        ),
-        if (_linkVisible)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: DecoratedBox(
-              decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: SelectableText(widget.payload, style: Styles.caption.copyWith(color: palette.ink2)),
-              ),
-            ),
-          ),
-        const SizedBox(height: 8),
-      ],
+      ),
     );
   }
 }
@@ -124,11 +142,22 @@ Future<String?> decodeQrImage(Uint8List encoded) async {
   // RGBLuminanceSource weighs red and blue equally, so the RGBA byte order
   // read as little-endian words gives the same luminance as ARGB.
   final source = RGBLuminanceSource(width, height, rgba.buffer.asInt32List(rgba.offsetInBytes, width * height));
-  for (final bitmap in [BinaryBitmap(HybridBinarizer(source)), BinaryBitmap(GlobalHistogramBinarizer(source))]) {
+  for (final bitmap in [
+    BinaryBitmap(HybridBinarizer(source)),
+    BinaryBitmap(GlobalHistogramBinarizer(source)),
+    // Shared codes use the theme's ink and surface, including light ink
+    // on dark surfaces. ZXing needs an inverted source for those images.
+    BinaryBitmap(HybridBinarizer(source.invert())),
+    BinaryBitmap(GlobalHistogramBinarizer(source.invert())),
+  ]) {
     try {
       final text = QRCodeReader().decode(bitmap, hints: DecodeHints()..put(DecodeHintType.tryHarder)).text.trim();
       if (text.isNotEmpty) return text;
     } on ReaderException {
+      continue;
+    } on ArgumentError {
+      // ZXing can infer version zero from inverted finder patterns. Try
+      // the remaining binarizers rather than abandoning a valid dark QR.
       continue;
     }
   }
@@ -205,7 +234,9 @@ class _QrScanScreenState extends State<QrScanScreen> {
     if (link == null) {
       // The share screen encodes the bare subscription URL, so a plain
       // single-line https link is a subscription too.
-      if (raw.startsWith('https://') && !raw.contains('\n') && Uri.tryParse(raw)?.host.isNotEmpty == true) {
+      if (!raw.contains('\n') &&
+          (raw.toLowerCase().startsWith('olcrtc://') ||
+              raw.startsWith('https://') && Uri.tryParse(raw)?.host.isNotEmpty == true)) {
         navigator.pop();
         await showSubscriptionSheet(navigator.context, link: raw);
         return;

@@ -103,18 +103,23 @@ type proxy struct {
 	Tag    string `yaml:"tag,omitempty"`
 	Dialer string `yaml:"dialer-proxy,omitempty"`
 
-	UUID          string `yaml:"uuid,omitempty"`
-	Flow          string `yaml:"flow,omitempty"`
-	AlterID       *int   `yaml:"alterId,omitempty"` // required by mihomo for vmess, even when 0
-	Cipher        string `yaml:"cipher,omitempty"`
-	Password      string `yaml:"password,omitempty"`
-	Username      string `yaml:"username,omitempty"`
-	Obfs          string `yaml:"obfs,omitempty"`
-	ObfsParam     string `yaml:"obfs-param,omitempty"`
-	ObfsPassword  string `yaml:"obfs-password,omitempty"`
-	Protocol      string `yaml:"protocol,omitempty"`
-	ProtocolParam string `yaml:"protocol-param,omitempty"`
-	TLS           *bool  `yaml:"tls,omitempty"`
+	UUID           string `yaml:"uuid,omitempty"`
+	Flow           string `yaml:"flow,omitempty"`
+	AlterID        *int   `yaml:"alterId,omitempty"` // required by mihomo for vmess, even when 0
+	Cipher         string `yaml:"cipher,omitempty"`
+	Password       string `yaml:"password,omitempty"`
+	Username       string `yaml:"username,omitempty"`
+	MieruTransport string `yaml:"transport,omitempty"`
+	PortRange      string `yaml:"port-range,omitempty"`
+	Multiplexing   string `yaml:"multiplexing,omitempty"`
+	HandshakeMode  string `yaml:"handshake-mode,omitempty"`
+	TrafficPattern string `yaml:"traffic-pattern,omitempty"`
+	Obfs           string `yaml:"obfs,omitempty"`
+	ObfsParam      string `yaml:"obfs-param,omitempty"`
+	ObfsPassword   string `yaml:"obfs-password,omitempty"`
+	Protocol       string `yaml:"protocol,omitempty"`
+	ProtocolParam  string `yaml:"protocol-param,omitempty"`
+	TLS            *bool  `yaml:"tls,omitempty"`
 
 	// Network selects the stream transport. Its options must be nested
 	// because mihomo silently ignores unknown flat keys.

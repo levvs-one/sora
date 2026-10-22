@@ -714,6 +714,7 @@ func (s *Session) settingsLocked() Settings {
 		Reconnect:        s.cfg.Settings.Reconnect,
 		Endpoints:        s.cfg.Settings.Endpoints,
 		AllowLAN:         s.cfg.Settings.AllowLAN,
+		OLCRTC:           s.cfg.Plan.Protocols()[engine.ProtocolOLCRTC],
 		Bypass:           append([]string(nil), s.status.Bypass...),
 		TunnelMode:       s.status.TunnelMode,
 	}

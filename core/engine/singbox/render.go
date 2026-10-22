@@ -200,6 +200,19 @@ func (r *renderer) outbound(o engine.Outbound) (obj, error) {
 	}
 	needsTLS := false
 	switch o.Protocol {
+	case engine.ProtocolNaive:
+		out.set("type", "naive").set("username", o.UserID).set("password", o.Password)
+		out.set("quic", o.Naive.QUIC).set("insecure_concurrency", o.Naive.InsecureConcurrency)
+		if len(o.Naive.ExtraHeaders) > 0 {
+			out["extra_headers"] = o.Naive.ExtraHeaders
+		}
+		tls := obj{"enabled": true}.set("server_name", o.TLS.ServerName)
+		tls.set("certificate", o.Naive.Certificate)
+		out["tls"] = tls
+		if r.plan.Options.Fragment.Enabled {
+			return nil, errors.New("singbox: naive does not support TLS fragmentation")
+		}
+		return out, nil
 	case engine.ProtocolDirect:
 		out["type"] = "direct"
 		return out, nil

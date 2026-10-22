@@ -288,8 +288,8 @@ class Settings {
   /// cannot re-roll the cohort to dodge a rollout or a kill-switch.
   String get installUuid => _store.getString('installUuid') ?? '';
 
-  /// Server list sort: ping, speed or name.
-  String get serverSortMode => _store.getString('serverSortMode') ?? 'ping';
+  /// Server list sort: subscription, ping, speed or name.
+  String get serverSortMode => _store.getString('serverSortMode') ?? 'subscription';
   set serverSortMode(String value) => _store.setString('serverSortMode', value);
 
   /// Automatic server choice: ping, speed or smart (ping 40% + speed 40% +

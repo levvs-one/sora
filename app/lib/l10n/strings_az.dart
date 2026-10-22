@@ -882,7 +882,7 @@ class SAz extends S {
 
   @override
   String get modesGuide =>
-      'Serverinizin hansı mühərrikə ehtiyacı olduğuna əmin deyilsinizsə, Avtomatik seçin. Sora qoşulmazdan əvvəl profili və parametrləri yoxlayır. Mühərrik planınızın bant genişliyini artıra bilməz: performans serverdən, marşrutdan, protokoldan və şəbəkədən asılıdır.\n\n## Rejimlər\n\n### Bütün trafik (TUN)\n\nSora virtual şəbəkə interfeysi yaradır və TCP və UDP daxil olmaqla proqram trafikini onun vasitəsilə yönləndirir. Telegram, oyunlar və Discord səsi üçün bu rejimi istifadə edin. Qaydalar xüsusi saytları və ya proqramları birbaşa göndərə və ya onları bloklaya bilər. Şəbəkə xidmətinə icazə və tələb olunan protokolu dəstəkləyən server lazımdır.\n\n### System proksi\n\nSora yerli HTTP/SOCKS proksisini konfiqurasiya edir. Sistem proxy parametrlərinə hörmət edən proqramlar ondan istifadə edir. Öz şəbəkə yığını olan proqramlar birbaşa qoşula bilər; UDP və səsli zənglər üçün ümumiyyətlə TUN lazımdır. Bu rejim proxy dəstəyi olan brauzerlər və proqramlar üçün uyğundur.\n\n### Server yoxdur\n\nLinux-də Sora HTTP/TLS sorğularını bölmək və yenidən formalaşdırmaq və bəzi DPI yoxlamalarını keçmək üçün [zapret](https://github.com/bol-van/zapret) istifadə edir. IP-niz eyni qalır və bağlantılar birbaşa vebsayta keçir. Nəticələr provayderinizdən və bloklama metodunuzdan asılıdır.\n\nCari inteqrasiya TCP üzərindən HTTP və TLS üçün tpws istifadə edir. O, IP-nin bloklanmasını və ya UDP-nin ötürülməsini keçmir və Telegram-nin MTProto bağlantılarına zəmanət verə bilməz. Discord səs, Telegram zəngləri və bu cür məhdudiyyətlər üçün TUN ilə VPN serverindən istifadə edin.\n\n## Mühərriklər\n\n### Avtomatik\n\nSora bütün qoşulma planını dəstəkləyən quraşdırılmış mühərriki seçir: server protokolları, daşımalar, qruplar, parçalanma və rejim. Uyğun olmayan əl seçimi cari əlaqəni dayandırmazdan əvvəl rədd edilir. Avtomatik və ya başqa mühərriki seçin və parametrləri yenidən tətbiq edin.\n\n### sing-box\n\nYeni Sora paketlərinə müştəri tərəfi XHTTP və VLESS Encryption əlavə edən [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) çəngəl daxildir. Sora quruluşu və onun imkanlarını tanıyır. XHTTP olmadan yuxarı axın quruluşu bu qabiliyyəti təkcə adından əldə etmir.\n\nDəstəklənən protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard və ZX0/parametrləri daxildir. Sora idxal edə bilər. Tam Xray JSON profilləri üçün Xray tələb olunur. Yeni AWG 3.x sahələri hələ idxal edilə bilməz. sing-box, kompüterdəki digər proqramların aşkarlaya biləcəyi parolla qorunan yerli idarəetmə portundan istifadə edir.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption və TLS fraqmentasiyasını dəstəkləyir. O, həmçinin marşrutlaşdırma və qruplarını qoruyarkən Xray tam provayder profillərini idarə edir. Bu cür profillər davranışlarını dəyişdirmədən avtomatik olaraq başqa bir mühərrikə çevrilə bilməz.\n\nBirləşdirilmiş Xray TLS sertifikatının doğrulamasını deaktiv edən ayarı sildi (`allowInsecure`). Bu parametri tələb edən adi serverlər üçün avtomatik sing-box və ya mihomo seçir. Xray seçimi cari əlaqəni dayandırmazdan əvvəl uyğunsuzluğu əl ilə bildirir. Köhnə tam JSON profilləri təsdiq edilə bilən sertifikat və ya sertifikat pininə malik yenilənmiş provayder profilinə ehtiyac duyur.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) sifarişli ehtiyat və yük balanslaşdırma qruplarını, XHTTP və AmneziaWG-ni dəstəkləyir. Yedək serverə avtomatik keçid vacib olduqda onu seçin. Sora-nin TLS parçalanma parametri bu mühərriklə əlçatan deyil.\n\n## Sora-də uyğunluq\n\n| Xüsusiyyət | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN və TCP/UDP | Bəli | Bəli | Bəli |\n| XHTTP | Bəli | Bəli | Bəli |\n| VLESS Encryption | Bəli | Bəli | Bəli |\n| Tam Xray profili | Yox | Bəli | Yox |\n| TUIC / AnyTLS | Hər ikisi | Yox | TUIC |\n| TLS parçalanması | Bəli | Bəli | Yox |\n| AmneziaWG 1.x/2.x | Bəli¹ | Yox | Bəli |\n| Sifarişli ehtiyat qrupu | Yox | No² | Bəli |\n\n¹ J1/J2/J3/Itime ilə profillər mihomo istifadə edir; bu sahələr heç vaxt səssizcə atılmamalıdır. ² Tam Xray profilləri qrupu üçün proqram ehtiyat profili seçir. Dəstək quraşdırılmış quruluşdan asılıdır; Haqqında onun versiyasını yoxlayın.\n\n## TUN yığını\n\nYığın virtual interfeys daxilində TCP və UDP-ni idarə edir. Rejimlər panelində Xray və mihomo gVisor, System, Mixed və MIPS təklif edir. Hər bir mühərrik öz üstünlüklərini saxlayır. System proxy və Serversiz rejimlər bu üstünlükdən istifadə etmir.\n\n- **Mixed**: TCP sistem yığınından istifadə edir, gVisor isə UDP-ni idarə edir. Bu, Linux-da mihomo üçün standartdır. Windows-da Xray və mihomo standart olaraq MIPS istifadə edir.\n- **System**: sistem yığınından istifadə edir. Şəbəkə proqramlarında problem yaranarsa, başqa variantı sınayın.\n- **gVisor**: istifadəçi məkanında trafiki idarə edir.\n- **MIPS**: mihomo-nin 1.19.32 paket versiyasında mövcud olan öz IP yığını.\n\nLinux-də Xray standart olaraq daxili gVisor-dən istifadə edir. Linux-də System, Mixed və MIPS TUN mühərriki kimi mihomo-dən istifadə edir, TCP və UDP-ni təsdiqlənmiş yerli SOCKS linki üzərindən Xray-ə yönləndirir. Xray protokolu, provayder profilini və marşrutu saxlayır. Bu üç seçim quraşdırılmış mihomo tələb edir. Windows-də Xray dörd TUN stekinin hamısı üçün mihomo 1.19.32 və ya daha yeni versiyadan istifadə edir. Protokollar və marşrutlaşdırma Xray-də qalır. Bu bağlantıda tətbiq qaydaları yalnız birbaşa əlaqəni və bloklamanı dəstəkləyir; Linux-də bu qaydalar Xray-in daxili gVisor stekini tələb edir.\n\nKörpü ikinci prosesi həyata keçirir. Linux-də üç boş ölçmədə o, yerli Xray TUN-dan təxminən 32-36 MiB daha çox fiziki yaddaş istifadə etdi. Bu, yükləmə yükünü ölçmür: CPU və yaddaş xərcləri bağlantılardan asılıdır. sing-box-də yığın seçicisi yoxdur. Heç bir yığın hər şəbəkədə daha yaxşı performansa zəmanət vermir. Yığın seçin və onu şəbəkənizdə sınamaq üçün Tətbiq edin və yenidən qoşulun seçin.\n\n## Parametrlər tətbiq edilir\n\nServerin seçilməsi avtomatik olaraq yenidən qoşulur. Rejim, mühərrik, DNS və qayda parametrləri dərhal saxlanılır; aktiv əlaqə zamanı Tətbiq et üzərinə klikləyin və onlardan istifadə etmək üçün yenidən qoşulun. Mühərrikin yenidən işə salınması endirmələri və zəngləri dayandıra bilər. Təkrarlanan kliklər paralel əlaqələri başlatmır; əlaqənin kəsilməsi keçidi bitirir və əlaqəni buraxır.\n\nTunel düşdükdə yalnız VPN vasitəsilə İnternet birbaşa trafiki bloklayır. Bütün maşına təsir edir. Açıq-aşkar əlaqənin kəsilməsi Sora qaydalarını aradan qaldırır. Təmizləmə başa çatmazsa, yenidən ayırmağa cəhd edin və jurnalı açın.\n\n## Layihə sənədləri\n\n- [sing-box-lx: konfiqurasiya və dəstək](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box sənədləri](https://sing-box.sagernet.org/)\n- [Xray sənədləri](https://xtls.github.io/)\n- [mihomo sənədləri](https://wiki.metacubex.one/)\n- [zapret: əməliyyat və məhdudiyyətlər](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n';
+      'Serverinizin hansı mühərrikə ehtiyacı olduğuna əmin deyilsinizsə, Avtomatik seçin. Sora qoşulmazdan əvvəl profili və parametrləri yoxlayır. Mühərrik planınızın bant genişliyini artıra bilməz: performans serverdən, marşrutdan, protokoldan və şəbəkədən asılıdır.\n\n## Rejimlər\n\n### Bütün trafik (TUN)\n\nSora virtual şəbəkə interfeysi yaradır və TCP və UDP daxil olmaqla proqram trafikini onun vasitəsilə yönləndirir. Telegram, oyunlar və Discord səsi üçün bu rejimi istifadə edin. Qaydalar xüsusi saytları və ya proqramları birbaşa göndərə və ya onları bloklaya bilər. Şəbəkə xidmətinə icazə və tələb olunan protokolu dəstəkləyən server lazımdır.\n\n### System proksi\n\nSora yerli HTTP/SOCKS proksisini konfiqurasiya edir. Sistem proxy parametrlərinə hörmət edən proqramlar ondan istifadə edir. Öz şəbəkə yığını olan proqramlar birbaşa qoşula bilər; UDP və səsli zənglər üçün ümumiyyətlə TUN lazımdır. Bu rejim proxy dəstəyi olan brauzerlər və proqramlar üçün uyğundur.\n\n### Server yoxdur\n\nLinux-də Sora HTTP/TLS sorğularını bölmək və yenidən formalaşdırmaq və bəzi DPI yoxlamalarını keçmək üçün [zapret](https://github.com/bol-van/zapret) istifadə edir. IP-niz eyni qalır və bağlantılar birbaşa vebsayta keçir. Nəticələr provayderinizdən və bloklama metodunuzdan asılıdır.\n\nCari inteqrasiya TCP üzərindən HTTP və TLS üçün tpws istifadə edir. O, IP-nin bloklanmasını və ya UDP-nin ötürülməsini keçmir və Telegram-nin MTProto bağlantılarına zəmanət verə bilməz. Discord səs, Telegram zəngləri və bu cür məhdudiyyətlər üçün TUN ilə VPN serverindən istifadə edin.\n\n## Mühərriklər\n\n### Avtomatik\n\nSora bütün qoşulma planını dəstəkləyən quraşdırılmış mühərriki seçir: server protokolları, daşımalar, qruplar, parçalanma və rejim. Uyğun olmayan əl seçimi cari əlaqəni dayandırmazdan əvvəl rədd edilir. Avtomatik və ya başqa mühərriki seçin və parametrləri yenidən tətbiq edin.\n\n### sing-box\n\nYeni Sora paketlərinə müştəri tərəfi XHTTP və VLESS Encryption əlavə edən [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) çəngəl daxildir. Sora quruluşu və onun imkanlarını tanıyır. XHTTP olmadan yuxarı axın quruluşu bu qabiliyyəti təkcə adından əldə etmir.\n\nDəstəklənən protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard və ZX0/parametrləri daxildir. Sora idxal edə bilər. Tam Xray JSON profilləri üçün Xray tələb olunur. Yeni AWG 3.x sahələri hələ idxal edilə bilməz. sing-box, kompüterdəki digər proqramların aşkarlaya biləcəyi parolla qorunan yerli idarəetmə portundan istifadə edir.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption və TLS fraqmentasiyasını dəstəkləyir. O, həmçinin marşrutlaşdırma və qruplarını qoruyarkən Xray tam provayder profillərini idarə edir. Bu cür profillər davranışlarını dəyişdirmədən avtomatik olaraq başqa bir mühərrikə çevrilə bilməz.\n\nBirləşdirilmiş Xray TLS sertifikatının doğrulamasını deaktiv edən ayarı sildi (`allowInsecure`). Bu parametri tələb edən adi serverlər üçün avtomatik sing-box və ya mihomo seçir. Xray seçimi cari əlaqəni dayandırmazdan əvvəl uyğunsuzluğu əl ilə bildirir. Köhnə tam JSON profilləri təsdiq edilə bilən sertifikat və ya sertifikat pininə malik yenilənmiş provayder profilinə ehtiyac duyur.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) sifarişli ehtiyat və yük balanslaşdırma qruplarını, XHTTP və AmneziaWG-ni dəstəkləyir. Yedək serverə avtomatik keçid vacib olduqda onu seçin. Sora-nin TLS parçalanma parametri bu mühərriklə əlçatan deyil.\n\n## Sora-də uyğunluq\n\n| Xüsusiyyət | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN və TCP/UDP | Bəli | Bəli | Bəli |\n| XHTTP | Bəli | Bəli | Bəli |\n| VLESS Encryption | Bəli | Bəli | Bəli |\n| Tam Xray profili | Yox | Bəli | Yox |\n| TUIC / AnyTLS | Hər ikisi | Yox | TUIC |\n| mieru | Yox | Yox | Bəli |\n| NaiveProxy | Bəli | Yox | Yox |\n| TLS parçalanması | Bəli | Bəli | Yox |\n| AmneziaWG 1.x/2.x | Bəli¹ | Yox | Bəli |\n| Sifarişli ehtiyat qrupu | Yox | No² | Bəli |\n\n¹ J1/J2/J3/Itime ilə profillər mihomo istifadə edir; bu sahələr heç vaxt səssizcə atılmamalıdır. ² Tam Xray profilləri qrupu üçün proqram ehtiyat profili seçir. Dəstək quraşdırılmış quruluşdan asılıdır; Haqqında onun versiyasını yoxlayın.\n\n## TUN yığını\n\nYığın virtual interfeys daxilində TCP və UDP-ni idarə edir. Rejimlər panelində Xray və mihomo gVisor, System, Mixed və MIPS təklif edir. Hər bir mühərrik öz üstünlüklərini saxlayır. System proxy və Serversiz rejimlər bu üstünlükdən istifadə etmir.\n\n- **Mixed**: TCP sistem yığınından istifadə edir, gVisor isə UDP-ni idarə edir. Bu, Linux-da mihomo üçün standartdır. Windows-da Xray və mihomo standart olaraq MIPS istifadə edir.\n- **System**: sistem yığınından istifadə edir. Şəbəkə proqramlarında problem yaranarsa, başqa variantı sınayın.\n- **gVisor**: istifadəçi məkanında trafiki idarə edir.\n- **MIPS**: mihomo-nin 1.19.32 paket versiyasında mövcud olan öz IP yığını.\n\nLinux-də Xray standart olaraq daxili gVisor-dən istifadə edir. Linux-də System, Mixed və MIPS TUN mühərriki kimi mihomo-dən istifadə edir, TCP və UDP-ni təsdiqlənmiş yerli SOCKS linki üzərindən Xray-ə yönləndirir. Xray protokolu, provayder profilini və marşrutu saxlayır. Bu üç seçim quraşdırılmış mihomo tələb edir. Windows-də Xray dörd TUN stekinin hamısı üçün mihomo 1.19.32 və ya daha yeni versiyadan istifadə edir. Protokollar və marşrutlaşdırma Xray-də qalır. Bu bağlantıda tətbiq qaydaları yalnız birbaşa əlaqəni və bloklamanı dəstəkləyir; Linux-də bu qaydalar Xray-in daxili gVisor stekini tələb edir.\n\nKörpü ikinci prosesi həyata keçirir. Linux-də üç boş ölçmədə o, yerli Xray TUN-dan təxminən 32-36 MiB daha çox fiziki yaddaş istifadə etdi. Bu, yükləmə yükünü ölçmür: CPU və yaddaş xərcləri bağlantılardan asılıdır. sing-box-də yığın seçicisi yoxdur. Heç bir yığın hər şəbəkədə daha yaxşı performansa zəmanət vermir. Yığın seçin və onu şəbəkənizdə sınamaq üçün Tətbiq edin və yenidən qoşulun seçin.\n\n## Parametrlər tətbiq edilir\n\nServerin seçilməsi avtomatik olaraq yenidən qoşulur. Rejim, mühərrik, DNS və qayda parametrləri dərhal saxlanılır; aktiv əlaqə zamanı Tətbiq et üzərinə klikləyin və onlardan istifadə etmək üçün yenidən qoşulun. Mühərrikin yenidən işə salınması endirmələri və zəngləri dayandıra bilər. Təkrarlanan kliklər paralel əlaqələri başlatmır; əlaqənin kəsilməsi keçidi bitirir və əlaqəni buraxır.\n\nTunel düşdükdə yalnız VPN vasitəsilə İnternet birbaşa trafiki bloklayır. Bütün maşına təsir edir. Açıq-aşkar əlaqənin kəsilməsi Sora qaydalarını aradan qaldırır. Təmizləmə başa çatmazsa, yenidən ayırmağa cəhd edin və jurnalı açın.\n\n## Layihə sənədləri\n\n- [sing-box-lx: konfiqurasiya və dəstək](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box sənədləri](https://sing-box.sagernet.org/)\n- [Xray sənədləri](https://xtls.github.io/)\n- [mihomo sənədləri](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: əməliyyat və məhdudiyyətlər](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP trafikini Jitsi, Yandex Telemost və ya WB Stream videozəngi vasitəsilə ötürür. olcrtc:// keçidini və ya QR kodunu idxal edin. Proksi və TUN rejimlərində sing-box, Xray və mihomo ilə işləyir; UDP dəstəklənmir. Hər iki tərəfə uyğun OLC2 quruluşları lazımdır. İlkin layihə arxivləşdirilib.\n';
 
   @override
   String get probeServers => 'Serverləri yoxlayın';
@@ -909,36 +909,7 @@ class SAz extends S {
   String get extInstallOne => '1 quraşdırma';
 
   @override
-  String get extBadgeVerified => 'Doğrulanmış';
-
-  @override
-  String get extBadgeTop => 'Bu həftə ən populyar';
-
-  @override
-  String get extBadgeNew => 'Yeni';
-
-  @override
-  String get extBadgeStaff => 'Sora komandası';
-
-  @override
-  String get extSideloadShort => 'Kataloqdan deyil';
-
-  @override
-  String get extSideloadWarning =>
-      'Bu genişləndirici komanda kataloqundan deyil. Onların açarına yalnız müəllif zəmanət verib: onu yalnız müəllifə güvəndiyiniz halda quraşdırın.';
-
-  @override
-  String extInstallTitle(String name) {
-    return '«$name» quraşdır';
-  }
-
-  @override
-  String extUpdateTitle(String name) {
-    return '«$name» yenilə';
-  }
-
-  @override
-  String get extPermissionsIntro => 'Bu genişləndirici aşağıdakıları edə biləcək:';
+  String get extSideloadWarning => 'Yalnız müəllifin özünün imzaladığı açara etibar edirsinizsə quraşdırın.';
 
   @override
   String get extPermissionsWidened => 'Yeniləmə yeni icazələr tələb edir:';
@@ -1064,9 +1035,6 @@ class SAz extends S {
       'Bu yeniləmə quraşdırılmış versiyadan fərqli müəllif açarı ilə imzalanıb, ona görə də bloklanıb. Yeni açara güvənirsinizsə, genişləndiricini silin və açıq şəkildə yenidən quraşdırın.';
 
   @override
-  String get extUpdateAvailable => 'Yeniləmə mövcuddur';
-
-  @override
   String get extDisabled => 'Söndürülüb';
 
   @override
@@ -1109,10 +1077,6 @@ class SAz extends S {
   String get extConflictsTitle => 'Genişləndirici münaqişələri';
 
   @override
-  String get extConflictsIntro =>
-      'Bu genişləndirmələr eyni şeyi istəyir. Hansının işləyəcəyini seçin, digəri quraşdırılmış qalacaq.';
-
-  @override
   String get extConflictTheme => 'Tətbiq mövzusu';
 
   @override
@@ -1132,28 +1096,9 @@ class SAz extends S {
   String get extConflictsResolve => 'Münaqişələri həll edin';
 
   @override
-  String get extConflictNote =>
-      'Seçiminiz bu cihazda saxlanılır. Mövzu dərhal dəyişir, şəbəkə hook-ları isə bu versiyada işləmir.';
-
-  @override
   String extVersionLabel(String version) {
     return 'Versiya $version';
   }
-
-  @override
-  String get extAuthor => 'Müəllif';
-
-  @override
-  String get extRating => 'Qiymətləndirmə';
-
-  @override
-  String get extInstalls => 'Quraşdırmalar';
-
-  @override
-  String get extVersion => 'Versiya';
-
-  @override
-  String get extAbout => 'Bu genişləndirici haqqında';
 
   @override
   String get extPermissionsTitle => 'İcazələr';
@@ -1166,9 +1111,6 @@ class SAz extends S {
 
   @override
   String get extSaveSettings => 'Parametrləri yadda saxlayın';
-
-  @override
-  String get extSaving => 'Saxlanır...';
 
   @override
   String extUpdateTo(String version) {
@@ -1197,7 +1139,7 @@ class SAz extends S {
   }
 
   @override
-  String get extPanelUnavailable => 'Panel əlçatan deyil. Genişləndirici söndürülmüş və ya silinmiş ola bilər.';
+  String get extPanelUnavailable => 'Genişlənmə paneli əlçatan deyil.';
 
   @override
   String get extPermConnectionsRead => 'Aktiv qoşulmaların siyahısına baxın';
@@ -1236,10 +1178,6 @@ class SAz extends S {
   String get extPermBackground => 'Fon tapşırıqlarını yerinə yetirin';
 
   @override
-  String get extPermBackgroundDetail =>
-      'Panel bağlı olsa belə, planlaşdırılmış tapşırıqları icra edir. Siz onu dayandıra və ya genişləndirici parametrlərində nə qədər işlədiyini dəyişə bilərsiniz.';
-
-  @override
   String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
 
   @override
@@ -1272,21 +1210,13 @@ class SAz extends S {
   String get extImageFailed => 'Şəkli yükləmək mümkün olmadı';
 
   @override
-  String get extRatingHow => 'Reytinqlər necə işləyir';
-
-  @override
-  String get extRatingHowBody =>
-      'Reytinqlər Bayes ortalamasından istifadə edir: bir neçə reytinqə malik genişləndirici daha çox insan səs verənə qədər ortada qalır, beləliklə, tək 5 ulduzlu baxış yeni genişləndiricini zirvəyə qaldıra bilməz. Son reytinqlər köhnələrdən daha ağırdır və hər hesab üçün yalnız bir reytinq sayılır.';
-
-  @override
   String get extScreenshots => 'Ekran görüntüləri';
 
   @override
   String get extSortRelevance => 'Uyğunluq';
 
   @override
-  String get extPermNetworkDetail =>
-      'İnternetdən VPN vasitəsilə məlumat yükləyir. Yalnız aşağıdakı siyahıdakı hostlara icazə var, qalanları bloklanır.';
+  String get extPermNetworkDetail => 'VPN sorğularına yalnız aşağıdakı hostlar üçün icazə verilir.';
 
   @override
   String get extBgTitle => 'Fon tapşırığı';
@@ -1308,10 +1238,6 @@ class SAz extends S {
     String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
     return '$_temp0';
   }
-
-  @override
-  String get extBgNote =>
-      'Tapşırıq Sora açıq olduqca, o cümlədən tray-də olanda cədvəl üzrə işləyir. Ən qısa interval 15 dəqiqədir.';
 
   @override
   String get extBgDisabledNote => 'Fon tapşırığını idarə etmək üçün genişləndiricini aktivləşdirin.';
@@ -1345,13 +1271,7 @@ class SAz extends S {
   String get qrCopyLink => 'Linki kopyalayın';
 
   @override
-  String get qrShowLink => 'Linki göstər';
-
-  @override
-  String get qrHideLink => 'Linki gizlədin';
-
-  @override
-  String get qrWarning => 'Bu QR kodu əlaqə detallarını ehtiva edir. Yad adamlara göstərməyin.';
+  String get qrWarning => 'Kodu yalnız etibar etdiyiniz şəxslərlə paylaşın.';
 
   @override
   String get qrScanHint => 'QR kodlu ekran görüntüsü və ya foto seçin, ya da keçid yapışdırın';
@@ -1469,6 +1389,9 @@ class SAz extends S {
 
   @override
   String get sortBy => 'Sırala';
+
+  @override
+  String get sortSubscription => 'Abunəlikdəki ardıcıllıqla';
 
   @override
   String get sortPing => 'Ping';
@@ -1807,15 +1730,9 @@ class SAz extends S {
   String get customServerHideSecret => 'Sirri gizlədin';
 
   @override
-  String get customServerBadge => 'fərdi';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” server silinsin?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Serveri əl ilə əlavə edin: ünvan, port və protokol';
 
   @override
   String get customServerTest => 'Test';
@@ -1987,9 +1904,6 @@ class SAz extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks üçün: üsul:parol, məsələn chacha20-ietf-poly1305:parol';
-
-  @override
   String get diagnosticPackets => 'Paket tutma';
 
   @override
@@ -2009,8 +1923,7 @@ class SAz extends S {
       'Sora komandası bu genişləndirmə versiyasını təhlükəli və ya xarab olduğu üçün geri çağırdı.';
 
   @override
-  String get extErrRevocationsExpired =>
-      'Geri çağırılmış genişləndirmələr siyahısı yenilənmədi. Yenilənənə qədər quraşdırma bağlıdır: şəbəkəni yoxlayın və yenidən cəhd edin.';
+  String get extErrRevocationsExpired => 'Ləğv edilmiş genişlənmələr siyahısı yenilənənədək quraşdırma bloklanıb.';
 
   @override
   String extRevokedDisabled(String names) {
@@ -2056,4 +1969,39 @@ class SAz extends S {
 
   @override
   String get extAssetRejected => 'Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.';
+
+  @override
+  String get extVerifiedSora => 'Sora tərəfindən təsdiqlənib';
+
+  @override
+  String extReceivedBytes(String count) {
+    return '$count B';
+  }
+
+  @override
+  String get extOpen => 'Aç';
+
+  @override
+  String get customServerOwn => 'Şəxsi server';
+
+  @override
+  String get customServerPaste => 'Keçid yapışdır';
+
+  @override
+  String get customServerUser => 'İstifadəçi adı';
+
+  @override
+  String get customServerPassword => 'Parol';
+
+  @override
+  String get customServerSecretRequired => 'Dəyər daxil edin';
+
+  @override
+  String get customServerLinkInvalid => 'Server keçidi yanlışdır';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }
