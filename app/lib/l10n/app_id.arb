@@ -468,7 +468,6 @@
   "customServerOptional": "Opsional",
   "customServerShowSecret": "Tampilkan rahasia",
   "customServerHideSecret": "Sembunyikan rahasia",
-  "customServerBadge": "khusus",
   "customServerDeleteConfirm": "Hapus server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Tambahkan server secara manual: alamat, port dan protokol",
   "customServerTest": "Tes",
   "leakTestTitle": "Uji kebocoran data",
   "leakTestIntro": "Memeriksa apakah lalu lintas dapat keluar dari perangkat di luar terowongan: DNS dan ICMP langsung, lalu lintas keluar IPv6, serta resolver sistem. Jalankan saat terhubung.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Perangkat ini",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi",
   "diagnosticPackets": "Penangkapan paket",
   "diagnosticEvents": "Acara Windows",
   "diagnosticCapture": "Tangkap selama 10 detik",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Pemutus jaringan ketat",
   "strictKillSwitchWarning": "Setelah terhubung, memblokir lalu lintas di luar VPN meskipun terjadi kerusakan, mulai ulang, atau aplikasi ditutup. Akses hanya pulih setelah memutus koneksi atau menonaktifkan opsi ini. Setelah perangkat dimulai ulang, pemblokiran berlanjut hanya jika koneksi saat mulai diaktifkan.",
   "extWorkerFailed": "Tugas latar belakang ekstensi gagal. Periksa log ekstensi.",
-  "extAssetRejected": "Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid."
+  "extAssetRejected": "Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.",
+  "customServerOwn": "Server sendiri",
+  "customServerPaste": "Tempel tautan",
+  "customServerUser": "Nama pengguna",
+  "customServerPassword": "Kata sandi",
+  "customServerSecretRequired": "Masukkan nilai",
+  "customServerLinkInvalid": "Tautan server tidak valid",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -1818,15 +1818,9 @@ class SAr extends S {
   String get customServerHideSecret => 'إخفاء السر';
 
   @override
-  String get customServerBadge => 'مخصص';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'حذف الخادم \"$name\"؟';
   }
-
-  @override
-  String get customServerEmptyHint => 'إضافة خادم يدويًا: العنوان والمنفذ والبروتوكول';
 
   @override
   String get customServerTest => 'الاختبار';
@@ -2004,10 +1998,6 @@ class SAr extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'لـ Shadowsocks: الطريقة:كلمة المرور، مثل chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'التقاط الحزمة';
 
   @override
@@ -2073,4 +2063,28 @@ class SAr extends S {
 
   @override
   String get extAssetRejected => 'تم رفض ملف الإضافة: ألوان غير مقروءة أو قواعد غير صالحة.';
+
+  @override
+  String get customServerOwn => 'خادم خاص';
+
+  @override
+  String get customServerPaste => 'لصق رابط';
+
+  @override
+  String get customServerUser => 'اسم المستخدم';
+
+  @override
+  String get customServerPassword => 'كلمة المرور';
+
+  @override
+  String get customServerSecretRequired => 'أدخل قيمة';
+
+  @override
+  String get customServerLinkInvalid => 'رابط الخادم غير صالح';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

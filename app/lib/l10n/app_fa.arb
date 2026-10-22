@@ -468,7 +468,6 @@
   "customServerOptional": "اختیاری",
   "customServerShowSecret": "نمایش راز",
   "customServerHideSecret": "مخفی کردن راز",
-  "customServerBadge": "سفارشی",
   "customServerDeleteConfirm": "سرور \"{name}\" حذف شود؟",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "سرور را به صورت دستی اضافه کنید: آدرس، پورت و پروتکل",
   "customServerTest": "آزمایش",
   "leakTestTitle": "تست نشت داده ها",
   "leakTestIntro": "بررسی می‌کند آیا ترافیک می‌تواند خارج از تونل از دستگاه خارج شود: درخواست‌های مستقیم DNS و ICMP، خروجی IPv6 و تحلیلگرهای نام سیستم. هنگام اتصال اجرا کنید.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "این دستگاه",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password",
   "diagnosticPackets": "ضبط بسته",
   "diagnosticEvents": "رویدادهای ویندوز",
   "diagnosticCapture": "به مدت 10 ثانیه عکس بگیرید",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "قطع اضطراری سخت‌گیرانه",
   "strictKillSwitchWarning": "پس از اتصال، ترافیک خارج از VPN را حتی پس از خرابی، راه‌اندازی مجدد یا خروج از برنامه مسدود می‌کند. دسترسی فقط با قطع اتصال یا خاموش کردن این گزینه برمی‌گردد. پس از راه‌اندازی مجدد دستگاه، مسدودسازی فقط در صورت فعال بودن اتصال هنگام شروع از سر گرفته می‌شود.",
   "extWorkerFailed": "وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.",
-  "extAssetRejected": "فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر."
+  "extAssetRejected": "فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.",
+  "customServerOwn": "سرور شخصی",
+  "customServerPaste": "جای‌گذاری پیوند",
+  "customServerUser": "نام کاربری",
+  "customServerPassword": "گذرواژه",
+  "customServerSecretRequired": "یک مقدار وارد کنید",
+  "customServerLinkInvalid": "پیوند سرور نامعتبر است",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

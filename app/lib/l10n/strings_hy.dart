@@ -1804,15 +1804,9 @@ class SHy extends S {
   String get customServerHideSecret => 'Թաքցնել գաղտնիքը';
 
   @override
-  String get customServerBadge => 'սեփական';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Ջնջե՞լ «$name» սերվերը:';
   }
-
-  @override
-  String get customServerEmptyHint => 'Ձեռքով ավելացրեք սերվեր՝ հասցե, նավահանգիստ և արձանագրություն';
 
   @override
   String get customServerTest => 'Թեստ';
@@ -1987,10 +1981,6 @@ class SHy extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks-ի համար՝ մեթոդ:գաղտնաբառ, օրինակ chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Փաթեթի գրավում';
 
   @override
@@ -2056,4 +2046,28 @@ class SHy extends S {
 
   @override
   String get extAssetRejected => 'Ընդլայնման ֆայլը մերժվել է․ անընթեռնելի գույներ կամ անվավեր կանոններ։';
+
+  @override
+  String get customServerOwn => 'Սեփական սերվեր';
+
+  @override
+  String get customServerPaste => 'Տեղադրել հղում';
+
+  @override
+  String get customServerUser => 'Օգտանուն';
+
+  @override
+  String get customServerPassword => 'Գաղտնաբառ';
+
+  @override
+  String get customServerSecretRequired => 'Մուտքագրեք արժեք';
+
+  @override
+  String get customServerLinkInvalid => 'Սերվերի հղումը սխալ է';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

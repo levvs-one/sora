@@ -1823,15 +1823,9 @@ class SBe extends S {
   String get customServerHideSecret => 'Схаваць сакрэт';
 
   @override
-  String get customServerBadge => 'уласны';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Выдаліць сервер “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Дадайце сервер уручную: адрас, порт і пратакол';
 
   @override
   String get customServerTest => 'Тэст';
@@ -2009,10 +2003,6 @@ class SBe extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Для Shadowsocks: метад:пароль, напрыклад chacha20-ietf-poly1305:пароль';
-
-  @override
   String get diagnosticPackets => 'Захоп пакета';
 
   @override
@@ -2078,4 +2068,28 @@ class SBe extends S {
 
   @override
   String get extAssetRejected => 'Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы.';
+
+  @override
+  String get customServerOwn => 'Свой сервер';
+
+  @override
+  String get customServerPaste => 'Уставіць спасылку';
+
+  @override
+  String get customServerUser => 'Карыстальнік';
+
+  @override
+  String get customServerPassword => 'Пароль';
+
+  @override
+  String get customServerSecretRequired => 'Увядзіце значэнне';
+
+  @override
+  String get customServerLinkInvalid => 'Няправільная спасылка на сервер';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

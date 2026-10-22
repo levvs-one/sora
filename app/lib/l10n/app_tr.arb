@@ -468,7 +468,6 @@
   "customServerOptional": "İsteğe bağlı",
   "customServerShowSecret": "Sırrı göster",
   "customServerHideSecret": "Sırrı gizle",
-  "customServerBadge": "özel",
   "customServerDeleteConfirm": "“{name}” sunucusu silinsin mi?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Sunucuyu manuel olarak ekleyin: adres, bağlantı noktası ve protokol",
   "customServerTest": "Testi",
   "leakTestTitle": "Veri sızıntılarını test edin",
   "leakTestIntro": "Trafiğin tünel dışında cihazdan çıkıp çıkamadığını denetler: doğrudan DNS ve ICMP istekleri, IPv6 çıkışı ve sistem çözümleyicileri. Bağlıyken çalıştırın.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Bu cihaz",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks için: yöntem:parola, örneğin chacha20-ietf-poly1305:parola",
   "diagnosticPackets": "Paket yakalama",
   "diagnosticEvents": "Windows etkinlikleri",
   "diagnosticCapture": "10 saniye boyunca çekim yapın",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Katı ağ kilidi",
   "strictKillSwitchWarning": "Bağlandıktan sonra çökme, yeniden başlatma veya uygulamadan çıkma durumunda bile VPN dışındaki trafiği engeller. Erişim yalnızca bağlantıyı kesince veya bu seçeneği kapatınca geri gelir. Cihaz yeniden başlatıldığında engelleme yalnızca başlangıçta bağlanma etkinse devam eder.",
   "extWorkerFailed": "Uzantının arka plan görevi başarısız oldu. Uzantı günlüğünü kontrol edin.",
-  "extAssetRejected": "Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar."
+  "extAssetRejected": "Uzantı dosyası reddedildi: okunamayan renkler veya geçersiz kurallar.",
+  "customServerOwn": "Kendi sunucun",
+  "customServerPaste": "Bağlantı yapıştır",
+  "customServerUser": "Kullanıcı adı",
+  "customServerPassword": "Parola",
+  "customServerSecretRequired": "Bir değer girin",
+  "customServerLinkInvalid": "Geçersiz sunucu bağlantısı",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -1797,15 +1797,9 @@ class STh extends S {
   String get customServerHideSecret => 'ซ่อนความลับ';
 
   @override
-  String get customServerBadge => 'กำหนดเอง';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'ลบเซิร์ฟเวอร์ “$name” หรือไม่';
   }
-
-  @override
-  String get customServerEmptyHint => 'เพิ่มเซิร์ฟเวอร์ด้วยตนเอง: ที่อยู่ พอร์ต และโปรโตคอล';
 
   @override
   String get customServerTest => 'ทดสอบ';
@@ -1974,10 +1968,6 @@ class STh extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'การจับแพ็คเก็ต';
 
   @override
@@ -2043,4 +2033,28 @@ class STh extends S {
 
   @override
   String get extAssetRejected => 'ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง';
+
+  @override
+  String get customServerOwn => 'เซิร์ฟเวอร์ส่วนตัว';
+
+  @override
+  String get customServerPaste => 'วางลิงก์';
+
+  @override
+  String get customServerUser => 'ชื่อผู้ใช้';
+
+  @override
+  String get customServerPassword => 'รหัสผ่าน';
+
+  @override
+  String get customServerSecretRequired => 'ป้อนค่า';
+
+  @override
+  String get customServerLinkInvalid => 'ลิงก์เซิร์ฟเวอร์ไม่ถูกต้อง';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

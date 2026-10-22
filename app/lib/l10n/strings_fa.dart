@@ -1805,15 +1805,9 @@ class SFa extends S {
   String get customServerHideSecret => 'مخفی کردن راز';
 
   @override
-  String get customServerBadge => 'سفارشی';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'سرور \"$name\" حذف شود؟';
   }
-
-  @override
-  String get customServerEmptyHint => 'سرور را به صورت دستی اضافه کنید: آدرس، پورت و پروتکل';
 
   @override
   String get customServerTest => 'آزمایش';
@@ -1984,10 +1978,6 @@ class SFa extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'برای Shadowsocks: روش:گذرواژه، مثلاً chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'ضبط بسته';
 
   @override
@@ -2053,4 +2043,28 @@ class SFa extends S {
 
   @override
   String get extAssetRejected => 'فایل افزونه رد شد: رنگ‌های ناخوانا یا قوانین نامعتبر.';
+
+  @override
+  String get customServerOwn => 'سرور شخصی';
+
+  @override
+  String get customServerPaste => 'جای‌گذاری پیوند';
+
+  @override
+  String get customServerUser => 'نام کاربری';
+
+  @override
+  String get customServerPassword => 'گذرواژه';
+
+  @override
+  String get customServerSecretRequired => 'یک مقدار وارد کنید';
+
+  @override
+  String get customServerLinkInvalid => 'پیوند سرور نامعتبر است';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

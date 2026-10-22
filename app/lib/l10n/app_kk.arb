@@ -468,7 +468,6 @@
   "customServerOptional": "Қосымша",
   "customServerShowSecret": "Құпияны көрсету",
   "customServerHideSecret": "Құпияны жасыру",
-  "customServerBadge": "жеке",
   "customServerDeleteConfirm": "\"{name}\" серверін жою керек пе?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Серверді қолмен қосыңыз: мекенжай, порт және протокол",
   "customServerTest": "Сынақ",
   "leakTestTitle": "Деректердің ағып кетуіне сынақ",
   "leakTestIntro": "Трафиктің құрылғыдан туннельден тыс шыға алатынын тексереді: тікелей DNS және ICMP сұраулары, IPv6 шығысы және жүйелік резолверлер. Қосылым белсенді кезде іске қосыңыз.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Бұл құрылғы",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks үшін: әдіс:құпиясөз, мысалы chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Пакетті түсіру",
   "diagnosticEvents": "Windows оқиғалары",
   "diagnosticCapture": "10 секундқа түсіріңіз",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Қатаң желі бұғаттауы",
   "strictKillSwitchWarning": "Қосылғаннан кейін ақау, қайта іске қосу немесе қолданбадан шығу кезінде де VPN сыртындағы трафикті бұғаттайды. Қолжетімділік тек қосылымды үзгенде немесе осы параметрді өшіргенде қалпына келеді. Құрылғы қайта жүктелген соң бұғаттау іске қосылғанда қосылу қосулы болса ғана жалғасады.",
   "extWorkerFailed": "Кеңейтімнің фондық тапсырмасы орындалмады. Кеңейтім журналын тексеріңіз.",
-  "extAssetRejected": "Кеңейтім файлы қабылданбады: оқылмайтын түстер немесе жарамсыз ережелер."
+  "extAssetRejected": "Кеңейтім файлы қабылданбады: оқылмайтын түстер немесе жарамсыз ережелер.",
+  "customServerOwn": "Жеке сервер",
+  "customServerPaste": "Сілтемені қою",
+  "customServerUser": "Пайдаланушы",
+  "customServerPassword": "Құпиясөз",
+  "customServerSecretRequired": "Мән енгізіңіз",
+  "customServerLinkInvalid": "Сервер сілтемесі жарамсыз",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

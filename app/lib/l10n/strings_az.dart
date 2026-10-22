@@ -1804,15 +1804,9 @@ class SAz extends S {
   String get customServerHideSecret => 'Sirri gizlədin';
 
   @override
-  String get customServerBadge => 'fərdi';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” server silinsin?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Serveri əl ilə əlavə edin: ünvan, port və protokol';
 
   @override
   String get customServerTest => 'Test';
@@ -1984,9 +1978,6 @@ class SAz extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks üçün: üsul:parol, məsələn chacha20-ietf-poly1305:parol';
-
-  @override
   String get diagnosticPackets => 'Paket tutma';
 
   @override
@@ -2053,4 +2044,28 @@ class SAz extends S {
 
   @override
   String get extAssetRejected => 'Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.';
+
+  @override
+  String get customServerOwn => 'Şəxsi server';
+
+  @override
+  String get customServerPaste => 'Keçid yapışdır';
+
+  @override
+  String get customServerUser => 'İstifadəçi adı';
+
+  @override
+  String get customServerPassword => 'Parol';
+
+  @override
+  String get customServerSecretRequired => 'Dəyər daxil edin';
+
+  @override
+  String get customServerLinkInvalid => 'Server keçidi yanlışdır';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

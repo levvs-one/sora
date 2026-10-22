@@ -468,7 +468,6 @@
   "customServerOptional": "Ихтиёрӣ",
   "customServerShowSecret": "Сиррро нишон диҳед",
   "customServerHideSecret": "Пинҳон кардани асрор",
-  "customServerBadge": "шахсӣ",
   "customServerDeleteConfirm": "Сервери \"{name}\" нест карда шавад?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Серверро дастӣ илова кунед: суроға, порт ва протокол",
   "customServerTest": "Санҷиш",
   "leakTestTitle": "Санҷиши ихроҷи маълумот",
   "leakTestIntro": "Месанҷад, ки трафик метавонад аз дастгоҳ берун аз нақб барояд ё не: дархостҳои мустақими DNS ва ICMP, баромади IPv6 ва ҳалкунандаҳои номи система. Ҳангоми пайвасти фаъол иҷро кунед.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Ин дастгоҳ",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Гирифтани пакет",
   "diagnosticEvents": "Ҳодисаҳои Windows",
   "diagnosticCapture": "Барои 10 сония сабт кунед",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Бастани қатъии шабака",
   "strictKillSwitchWarning": "Пас аз пайвастшавӣ трафики берун аз VPN-ро ҳатто ҳангоми хато, оғози дубора ё баромадан аз барнома мебандад. Дастрасӣ танҳо пас аз қатъи пайваст ё хомӯш кардани ин танзим барқарор мешавад. Пас аз оғози дубораи дастгоҳ бастан танҳо бо фаъол будани пайвастшавӣ ҳангоми оғоз идома меёбад.",
   "extWorkerFailed": "Вазифаи пасзаминаи васеъкунанда иҷро нашуд. Сабтҳои васеъкунандаро санҷед.",
-  "extAssetRejected": "Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст."
+  "extAssetRejected": "Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст.",
+  "customServerOwn": "Сервери шахсӣ",
+  "customServerPaste": "Гузоштани пайванд",
+  "customServerUser": "Номи корбар",
+  "customServerPassword": "Рамз",
+  "customServerSecretRequired": "Қиматро ворид кунед",
+  "customServerLinkInvalid": "Пайванди сервер нодуруст аст",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

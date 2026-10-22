@@ -1807,15 +1807,9 @@ class STg extends S {
   String get customServerHideSecret => 'Пинҳон кардани асрор';
 
   @override
-  String get customServerBadge => 'шахсӣ';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Сервери \"$name\" нест карда шавад?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Серверро дастӣ илова кунед: суроға, порт ва протокол';
 
   @override
   String get customServerTest => 'Санҷиш';
@@ -1987,10 +1981,6 @@ class STg extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Барои Shadowsocks: усул:парол, масалан chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Гирифтани пакет';
 
   @override
@@ -2056,4 +2046,28 @@ class STg extends S {
 
   @override
   String get extAssetRejected => 'Файли васеъкунанда рад шуд: рангҳои нохоно ё қоидаҳои нодуруст.';
+
+  @override
+  String get customServerOwn => 'Сервери шахсӣ';
+
+  @override
+  String get customServerPaste => 'Гузоштани пайванд';
+
+  @override
+  String get customServerUser => 'Номи корбар';
+
+  @override
+  String get customServerPassword => 'Рамз';
+
+  @override
+  String get customServerSecretRequired => 'Қиматро ворид кунед';
+
+  @override
+  String get customServerLinkInvalid => 'Пайванди сервер нодуруст аст';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

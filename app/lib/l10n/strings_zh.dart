@@ -1774,15 +1774,9 @@ class SZh extends S {
   String get customServerHideSecret => '隐藏密钥';
 
   @override
-  String get customServerBadge => '自订';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '要删除服务器「$name」吗？';
   }
-
-  @override
-  String get customServerEmptyHint => '手动添加服务器：地址、端口和协议';
 
   @override
   String get customServerTest => '测试';
@@ -1949,9 +1943,6 @@ class SZh extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => '抓包';
 
   @override
@@ -2015,6 +2006,30 @@ class SZh extends S {
 
   @override
   String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+
+  @override
+  String get customServerOwn => '自有服务器';
+
+  @override
+  String get customServerPaste => '粘贴链接';
+
+  @override
+  String get customServerUser => '用户名';
+
+  @override
+  String get customServerPassword => '密码';
+
+  @override
+  String get customServerSecretRequired => '请输入一个值';
+
+  @override
+  String get customServerLinkInvalid => '服务器链接无效';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3786,15 +3801,9 @@ class SZhHans extends SZh {
   String get customServerHideSecret => '隐藏密钥';
 
   @override
-  String get customServerBadge => '自订';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '要删除服务器「$name」吗？';
   }
-
-  @override
-  String get customServerEmptyHint => '手动添加服务器：地址、端口和协议';
 
   @override
   String get customServerTest => '测试';
@@ -3961,9 +3970,6 @@ class SZhHans extends SZh {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密码，例如 chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => '抓包';
 
   @override
@@ -4027,6 +4033,30 @@ class SZhHans extends SZh {
 
   @override
   String get extAssetRejected => '扩展文件被拒绝：颜色难以辨认或规则无效。';
+
+  @override
+  String get customServerOwn => '自有服务器';
+
+  @override
+  String get customServerPaste => '粘贴链接';
+
+  @override
+  String get customServerUser => '用户名';
+
+  @override
+  String get customServerPassword => '密码';
+
+  @override
+  String get customServerSecretRequired => '请输入一个值';
+
+  @override
+  String get customServerLinkInvalid => '服务器链接无效';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -5799,15 +5829,9 @@ class SZhHant extends SZh {
   String get customServerHideSecret => '隱藏機密資訊';
 
   @override
-  String get customServerBadge => '自訂';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '要刪除伺服器「$name」嗎？';
   }
-
-  @override
-  String get customServerEmptyHint => '手動新增伺服器：位址、連接埠和協定';
 
   @override
   String get customServerTest => '測試';
@@ -5974,9 +5998,6 @@ class SZhHant extends SZh {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks：方法:密碼，例如 chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => '抓包';
 
   @override
@@ -6041,4 +6062,28 @@ class SZhHant extends SZh {
 
   @override
   String get extAssetRejected => '擴充功能檔案遭拒：顏色難以辨認或規則無效。';
+
+  @override
+  String get customServerOwn => '自有伺服器';
+
+  @override
+  String get customServerPaste => '貼上連結';
+
+  @override
+  String get customServerUser => '使用者名稱';
+
+  @override
+  String get customServerPassword => '密碼';
+
+  @override
+  String get customServerSecretRequired => '請輸入一個值';
+
+  @override
+  String get customServerLinkInvalid => '伺服器連結無效';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

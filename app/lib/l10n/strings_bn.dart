@@ -1802,15 +1802,9 @@ class SBn extends S {
   String get customServerHideSecret => 'গোপনীয়তা লুকান';
 
   @override
-  String get customServerBadge => 'নিজস্ব';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '\"$name\" সার্ভার মুছুন?';
   }
-
-  @override
-  String get customServerEmptyHint => 'ম্যানুয়ালি একটি সার্ভার যোগ করুন: ঠিকানা, পোর্ট এবং প্রোটোকল';
 
   @override
   String get customServerTest => 'পরীক্ষা';
@@ -1987,10 +1981,6 @@ class SBn extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks-এর জন্য: method:password, যেমন chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'প্যাকেট ক্যাপচার';
 
   @override
@@ -2056,4 +2046,28 @@ class SBn extends S {
 
   @override
   String get extAssetRejected => 'এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।';
+
+  @override
+  String get customServerOwn => 'নিজস্ব সার্ভার';
+
+  @override
+  String get customServerPaste => 'লিংক পেস্ট করুন';
+
+  @override
+  String get customServerUser => 'ব্যবহারকারীর নাম';
+
+  @override
+  String get customServerPassword => 'পাসওয়ার্ড';
+
+  @override
+  String get customServerSecretRequired => 'একটি মান লিখুন';
+
+  @override
+  String get customServerLinkInvalid => 'সার্ভারের লিংকটি সঠিক নয়';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

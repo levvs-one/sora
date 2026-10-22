@@ -1804,15 +1804,9 @@ class SKk extends S {
   String get customServerHideSecret => 'Құпияны жасыру';
 
   @override
-  String get customServerBadge => 'жеке';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '\"$name\" серверін жою керек пе?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Серверді қолмен қосыңыз: мекенжай, порт және протокол';
 
   @override
   String get customServerTest => 'Сынақ';
@@ -1989,10 +1983,6 @@ class SKk extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks үшін: әдіс:құпиясөз, мысалы chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Пакетті түсіру';
 
   @override
@@ -2058,4 +2048,28 @@ class SKk extends S {
 
   @override
   String get extAssetRejected => 'Кеңейтім файлы қабылданбады: оқылмайтын түстер немесе жарамсыз ережелер.';
+
+  @override
+  String get customServerOwn => 'Жеке сервер';
+
+  @override
+  String get customServerPaste => 'Сілтемені қою';
+
+  @override
+  String get customServerUser => 'Пайдаланушы';
+
+  @override
+  String get customServerPassword => 'Құпиясөз';
+
+  @override
+  String get customServerSecretRequired => 'Мән енгізіңіз';
+
+  @override
+  String get customServerLinkInvalid => 'Сервер сілтемесі жарамсыз';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

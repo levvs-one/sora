@@ -468,7 +468,6 @@
   "customServerOptional": "Кошумча",
   "customServerShowSecret": "Сырды көрсөтүү",
   "customServerHideSecret": "Жашыруун",
-  "customServerBadge": "жеке",
   "customServerDeleteConfirm": "“{name}” сервери жок кылынсынбы?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Серверди кол менен кошуңуз: дарек, порт жана протокол",
   "customServerTest": "Сыноо",
   "leakTestTitle": "Маалыматтын агып кетишин текшерүү",
   "leakTestIntro": "Трафик түзмөктөн туннелден тышкары чыга аларын текшерет: түз DNS жана ICMP сурамдары, IPv6 чыгышы жана системалык резолверлер. Туташуу активдүү кезде иштетиңиз.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Бул аппарат",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Пакетти басып алуу",
   "diagnosticEvents": "Windows окуялары",
   "diagnosticCapture": "10 секундга тартыңыз",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Катуу тармак бөгөтү",
   "strictKillSwitchWarning": "Туташкандан кийин ката, кайра иштетүү же колдонмодон чыгуу учурунда да VPN тышындагы трафикти бөгөттөйт. Жеткиликтүүлүк байланышты үзгөндө же бул жөндөөнү өчүргөндө гана калыбына келет. Түзмөк кайра жүктөлгөндө бөгөттөө ишке киргенде туташуу күйгүзүлгөн болсо гана уланат.",
   "extWorkerFailed": "Кеңейтменин фондогу тапшырмасы аткарылган жок. Кеңейтменин журналын текшериңиз.",
-  "extAssetRejected": "Кеңейтменин файлы четке кагылды: окулбаган түстөр же жараксыз эрежелер."
+  "extAssetRejected": "Кеңейтменин файлы четке кагылды: окулбаган түстөр же жараксыз эрежелер.",
+  "customServerOwn": "Жеке сервер",
+  "customServerPaste": "Шилтемени чаптоо",
+  "customServerUser": "Колдонуучу",
+  "customServerPassword": "Сырсөз",
+  "customServerSecretRequired": "Маани киргизиңиз",
+  "customServerLinkInvalid": "Сервердин шилтемеси туура эмес",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -3429,23 +3429,11 @@ abstract class S {
   /// **'Скрыть секрет'**
   String get customServerHideSecret;
 
-  /// No description provided for @customServerBadge.
-  ///
-  /// In ru, this message translates to:
-  /// **'свой'**
-  String get customServerBadge;
-
   /// No description provided for @customServerDeleteConfirm.
   ///
   /// In ru, this message translates to:
   /// **'Удалить сервер «{name}»?'**
   String customServerDeleteConfirm(String name);
-
-  /// No description provided for @customServerEmptyHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Добавьте сервер вручную: адрес, порт и протокол'**
-  String get customServerEmptyHint;
 
   /// No description provided for @customServerTest.
   ///
@@ -3747,12 +3735,6 @@ abstract class S {
   /// **'Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.'**
   String get syncUnavailableAndroid;
 
-  /// No description provided for @customServerShadowsocksCredentials.
-  ///
-  /// In ru, this message translates to:
-  /// **'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль'**
-  String get customServerShadowsocksCredentials;
-
   /// No description provided for @diagnosticPackets.
   ///
   /// In ru, this message translates to:
@@ -3878,6 +3860,54 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Файл расширения отклонён: нечитаемые цвета или неверные правила.'**
   String get extAssetRejected;
+
+  /// No description provided for @customServerOwn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Свой сервер'**
+  String get customServerOwn;
+
+  /// No description provided for @customServerPaste.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вставить ссылку'**
+  String get customServerPaste;
+
+  /// No description provided for @customServerUser.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пользователь'**
+  String get customServerUser;
+
+  /// No description provided for @customServerPassword.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пароль'**
+  String get customServerPassword;
+
+  /// No description provided for @customServerSecretRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введите значение'**
+  String get customServerSecretRequired;
+
+  /// No description provided for @customServerLinkInvalid.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неверная ссылка на сервер'**
+  String get customServerLinkInvalid;
+
+  /// No description provided for @customServerMethodHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'chacha20-ietf-poly1305'**
+  String get customServerMethodHint;
+
+  /// No description provided for @customServerWgAddressesHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'10.0.0.2/32'**
+  String get customServerWgAddressesHint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

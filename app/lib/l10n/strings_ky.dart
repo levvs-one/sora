@@ -1806,15 +1806,9 @@ class SKy extends S {
   String get customServerHideSecret => 'Жашыруун';
 
   @override
-  String get customServerBadge => 'жеке';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '“$name” сервери жок кылынсынбы?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Серверди кол менен кошуңуз: дарек, порт жана протокол';
 
   @override
   String get customServerTest => 'Сыноо';
@@ -1991,10 +1985,6 @@ class SKy extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks үчүн: ыкма:сырсөз, мисалы chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Пакетти басып алуу';
 
   @override
@@ -2060,4 +2050,28 @@ class SKy extends S {
 
   @override
   String get extAssetRejected => 'Кеңейтменин файлы четке кагылды: окулбаган түстөр же жараксыз эрежелер.';
+
+  @override
+  String get customServerOwn => 'Жеке сервер';
+
+  @override
+  String get customServerPaste => 'Шилтемени чаптоо';
+
+  @override
+  String get customServerUser => 'Колдонуучу';
+
+  @override
+  String get customServerPassword => 'Сырсөз';
+
+  @override
+  String get customServerSecretRequired => 'Маани киргизиңиз';
+
+  @override
+  String get customServerLinkInvalid => 'Сервердин шилтемеси туура эмес';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

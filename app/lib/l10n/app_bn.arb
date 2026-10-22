@@ -468,7 +468,6 @@
   "customServerOptional": "ঐচ্ছিক",
   "customServerShowSecret": "গোপন দেখান",
   "customServerHideSecret": "গোপনীয়তা লুকান",
-  "customServerBadge": "নিজস্ব",
   "customServerDeleteConfirm": "\"{name}\" সার্ভার মুছুন?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "ম্যানুয়ালি একটি সার্ভার যোগ করুন: ঠিকানা, পোর্ট এবং প্রোটোকল",
   "customServerTest": "পরীক্ষা",
   "leakTestTitle": "তথ্য ফাঁস জন্য পরীক্ষা",
   "leakTestIntro": "টানেলের বাইরে দিয়ে ডিভাইস থেকে ট্রাফিক বেরোতে পারে কি না যাচাই করে: সরাসরি DNS ও ICMP অনুরোধ, IPv6 বহির্গমন এবং সিস্টেম রিজলভার। সংযোগ চালু থাকা অবস্থায় পরীক্ষা চালান।",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "এই ডিভাইস",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks-এর জন্য: method:password, যেমন chacha20-ietf-poly1305:password",
   "diagnosticPackets": "প্যাকেট ক্যাপচার",
   "diagnosticEvents": "উইন্ডোজ ইভেন্ট",
   "diagnosticCapture": "10 সেকেন্ডের জন্য ক্যাপচার করুন",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "কঠোর নেটওয়ার্ক অবরোধ",
   "strictKillSwitchWarning": "সংযোগের পর, ক্র্যাশ, পুনরায় চালু বা অ্যাপ বন্ধ হলেও VPN-এর বাইরের ট্র্যাফিক আটকায়। শুধু সংযোগ বিচ্ছিন্ন করলে বা এই বিকল্প বন্ধ করলে প্রবেশাধিকার ফিরে আসে। ডিভাইস পুনরায় চালু হলে শুরুতে সংযোগের বিকল্প চালু থাকলেই অবরোধ আবার কার্যকর হয়।",
   "extWorkerFailed": "এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।",
-  "extAssetRejected": "এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।"
+  "extAssetRejected": "এক্সটেনশনের ফাইল প্রত্যাখ্যাত: অপাঠ্য রং বা অবৈধ নিয়ম।",
+  "customServerOwn": "নিজস্ব সার্ভার",
+  "customServerPaste": "লিংক পেস্ট করুন",
+  "customServerUser": "ব্যবহারকারীর নাম",
+  "customServerPassword": "পাসওয়ার্ড",
+  "customServerSecretRequired": "একটি মান লিখুন",
+  "customServerLinkInvalid": "সার্ভারের লিংকটি সঠিক নয়",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

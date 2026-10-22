@@ -890,7 +890,6 @@
   "customServerOptional": "Необязательно",
   "customServerShowSecret": "Показать секрет",
   "customServerHideSecret": "Скрыть секрет",
-  "customServerBadge": "свой",
   "customServerDeleteConfirm": "Удалить сервер «{name}»?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -899,7 +898,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Добавьте сервер вручную: адрес, порт и протокол",
   "customServerTest": "Проверить",
   "leakTestTitle": "Проверка утечек",
   "leakTestIntro": "Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Это устройство",
   "syncUnavailableAndroid": "Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.",
-  "customServerShadowsocksCredentials": "Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль",
   "diagnosticPackets": "Захват пакетов",
   "diagnosticEvents": "События Windows",
   "diagnosticCapture": "Записать 10 секунд",
@@ -1023,5 +1020,13 @@
   "strictKillSwitch": "Строгий kill switch",
   "strictKillSwitchWarning": "После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.",
   "extWorkerFailed": "Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.",
-  "extAssetRejected": "Файл расширения отклонён: нечитаемые цвета или неверные правила."
+  "extAssetRejected": "Файл расширения отклонён: нечитаемые цвета или неверные правила.",
+  "customServerOwn": "Свой сервер",
+  "customServerPaste": "Вставить ссылку",
+  "customServerUser": "Пользователь",
+  "customServerPassword": "Пароль",
+  "customServerSecretRequired": "Введите значение",
+  "customServerLinkInvalid": "Неверная ссылка на сервер",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

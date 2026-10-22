@@ -468,7 +468,6 @@
   "customServerOptional": "Könüllü",
   "customServerShowSecret": "Sirri göstərin",
   "customServerHideSecret": "Sirri gizlədin",
-  "customServerBadge": "fərdi",
   "customServerDeleteConfirm": "“{name}” server silinsin?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Serveri əl ilə əlavə edin: ünvan, port və protokol",
   "customServerTest": "Test",
   "leakTestTitle": "Məlumat sızması üçün test edin",
   "leakTestIntro": "Trafikin cihazdan tuneldən kənar çıxa bilib-bilmədiyini yoxlayır: birbaşa DNS və ICMP sorğuları, IPv6 çıxışı və sistem həllediciləri. Bağlantı aktiv olduqda başladın.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Bu cihaz",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks üçün: üsul:parol, məsələn chacha20-ietf-poly1305:parol",
   "diagnosticPackets": "Paket tutma",
   "diagnosticEvents": "Windows hadisələri",
   "diagnosticCapture": "10 saniyə çəkin",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Sərt şəbəkə kilidi",
   "strictKillSwitchWarning": "Qoşulduqdan sonra nasazlıq, yenidən başlatma və ya tətbiqdən çıxış zamanı belə VPN xaricindəki trafiki bloklayır. Giriş yalnız əlaqə kəsildikdə və ya bu seçim söndürüldükdə bərpa olunur. Cihaz yenidən başladıqda bloklama yalnız başlanğıcda qoşulma aktivdirsə davam edir.",
   "extWorkerFailed": "Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.",
-  "extAssetRejected": "Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar."
+  "extAssetRejected": "Əlavə faylı rədd edildi: oxunmayan rənglər və ya etibarsız qaydalar.",
+  "customServerOwn": "Şəxsi server",
+  "customServerPaste": "Keçid yapışdır",
+  "customServerUser": "İstifadəçi adı",
+  "customServerPassword": "Parol",
+  "customServerSecretRequired": "Dəyər daxil edin",
+  "customServerLinkInvalid": "Server keçidi yanlışdır",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

@@ -1813,15 +1813,9 @@ class SIt extends S {
   String get customServerHideSecret => 'Nascondi segreto';
 
   @override
-  String get customServerBadge => 'personalizzato';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Eliminare il server “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Aggiungere manualmente un server: indirizzo, porta e protocollo';
 
   @override
   String get customServerTest => 'Prova';
@@ -1999,10 +1993,6 @@ class SIt extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Per Shadowsocks: metodo:password, ad esempio chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Cattura dei pacchetti';
 
   @override
@@ -2070,4 +2060,28 @@ class SIt extends S {
 
   @override
   String get extAssetRejected => 'File dell’estensione rifiutato: colori illeggibili o regole non valide.';
+
+  @override
+  String get customServerOwn => 'Server personale';
+
+  @override
+  String get customServerPaste => 'Incolla un link';
+
+  @override
+  String get customServerUser => 'Nome utente';
+
+  @override
+  String get customServerPassword => 'Password';
+
+  @override
+  String get customServerSecretRequired => 'Inserisci un valore';
+
+  @override
+  String get customServerLinkInvalid => 'Link del server non valido';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

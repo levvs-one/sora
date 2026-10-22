@@ -1812,15 +1812,9 @@ class SFr extends S {
   String get customServerHideSecret => 'Masquer le secret';
 
   @override
-  String get customServerBadge => 'personnalisé';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Supprimer le serveur « $name » ?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Ajouter un serveur manuellement : adresse, port et protocole';
 
   @override
   String get customServerTest => 'Essai';
@@ -1998,10 +1992,6 @@ class SFr extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Pour Shadowsocks : méthode:mot de passe, par exemple chacha20-ietf-poly1305:motdepasse';
-
-  @override
   String get diagnosticPackets => 'Capture de paquets';
 
   @override
@@ -2068,4 +2058,28 @@ class SFr extends S {
 
   @override
   String get extAssetRejected => 'Fichier d’extension refusé : couleurs illisibles ou règles invalides.';
+
+  @override
+  String get customServerOwn => 'Serveur personnel';
+
+  @override
+  String get customServerPaste => 'Coller un lien';
+
+  @override
+  String get customServerUser => 'Identifiant';
+
+  @override
+  String get customServerPassword => 'Mot de passe';
+
+  @override
+  String get customServerSecretRequired => 'Saisissez une valeur';
+
+  @override
+  String get customServerLinkInvalid => 'Lien du serveur invalide';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

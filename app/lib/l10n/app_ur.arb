@@ -468,7 +468,6 @@
   "customServerOptional": "اختیاری",
   "customServerShowSecret": "راز دکھائیں۔",
   "customServerHideSecret": "راز چھپائیں۔",
-  "customServerBadge": "ذاتی",
   "customServerDeleteConfirm": "سرور \"{name}\" کو حذف کریں؟",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "دستی طور پر سرور شامل کریں: ایڈریس، پورٹ اور پروٹوکول",
   "customServerTest": "ٹیسٹ",
   "leakTestTitle": "ڈیٹا لیک کے لیے ٹیسٹ",
   "leakTestIntro": "جانچتا ہے کہ آیا ٹریفک ٹنل کے باہر سے ڈیوائس سے نکل سکتی ہے: براہ راست DNS اور ICMP درخواستیں، IPv6 اخراج اور سسٹم ریزولورز۔ کنکشن فعال ہونے پر چلائیں۔",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "یہ آلہ",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks کے لیے: method:password، مثلاً chacha20-ietf-poly1305:password",
   "diagnosticPackets": "پیکٹ کی گرفتاری",
   "diagnosticEvents": "ونڈوز کے واقعات",
   "diagnosticCapture": "10 سیکنڈ کے لیے کیپچر کریں۔",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "سخت نیٹ ورک بندش",
   "strictKillSwitchWarning": "اتصال کے بعد، خرابی، دوبارہ آغاز یا ایپ بند ہونے پر بھی VPN سے باہر کی ٹریفک روکتا ہے۔ رسائی صرف اتصال منقطع کرنے یا اس اختیار کو بند کرنے سے بحال ہوتی ہے۔ آلہ دوبارہ شروع ہونے پر بندش صرف اسی وقت بحال ہوتی ہے جب آغاز پر اتصال فعال ہو۔",
   "extWorkerFailed": "ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔",
-  "extAssetRejected": "ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔"
+  "extAssetRejected": "ایکسٹینشن کی فائل مسترد: ناقابلِ مطالعہ رنگ یا غلط قواعد۔",
+  "customServerOwn": "ذاتی سرور",
+  "customServerPaste": "لنک پیسٹ کریں",
+  "customServerUser": "صارف کا نام",
+  "customServerPassword": "پاس ورڈ",
+  "customServerSecretRequired": "ایک قدر درج کریں",
+  "customServerLinkInvalid": "سرور کا لنک درست نہیں",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

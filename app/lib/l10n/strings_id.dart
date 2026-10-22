@@ -1804,15 +1804,9 @@ class SId extends S {
   String get customServerHideSecret => 'Sembunyikan rahasia';
 
   @override
-  String get customServerBadge => 'khusus';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Hapus server “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Tambahkan server secara manual: alamat, port dan protokol';
 
   @override
   String get customServerTest => 'Tes';
@@ -1984,10 +1978,6 @@ class SId extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Untuk Shadowsocks: metode:kata sandi, misalnya chacha20-ietf-poly1305:sandi';
-
-  @override
   String get diagnosticPackets => 'Penangkapan paket';
 
   @override
@@ -2053,4 +2043,28 @@ class SId extends S {
 
   @override
   String get extAssetRejected => 'Berkas ekstensi ditolak: warna tidak terbaca atau aturan tidak valid.';
+
+  @override
+  String get customServerOwn => 'Server sendiri';
+
+  @override
+  String get customServerPaste => 'Tempel tautan';
+
+  @override
+  String get customServerUser => 'Nama pengguna';
+
+  @override
+  String get customServerPassword => 'Kata sandi';
+
+  @override
+  String get customServerSecretRequired => 'Masukkan nilai';
+
+  @override
+  String get customServerLinkInvalid => 'Tautan server tidak valid';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

@@ -1778,15 +1778,9 @@ class SJa extends S {
   String get customServerHideSecret => '秘密を隠す';
 
   @override
-  String get customServerBadge => 'カスタム';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'サーバー「$name」を削除しますか?';
   }
-
-  @override
-  String get customServerEmptyHint => 'サーバーを手動で追加します: アドレス、ポート、プロトコル';
 
   @override
   String get customServerTest => 'テスト';
@@ -1953,9 +1947,6 @@ class SJa extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks の場合: 方式:パスワード (例: chacha20-ietf-poly1305:password)';
-
-  @override
   String get diagnosticPackets => 'パケットキャプチャ';
 
   @override
@@ -2020,4 +2011,28 @@ class SJa extends S {
 
   @override
   String get extAssetRejected => '拡張機能のファイルを拒否しました。色が読みにくいか、ルールが無効です。';
+
+  @override
+  String get customServerOwn => '自分のサーバー';
+
+  @override
+  String get customServerPaste => 'リンクを貼り付け';
+
+  @override
+  String get customServerUser => 'ユーザー名';
+
+  @override
+  String get customServerPassword => 'パスワード';
+
+  @override
+  String get customServerSecretRequired => '値を入力してください';
+
+  @override
+  String get customServerLinkInvalid => 'サーバーリンクが無効です';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

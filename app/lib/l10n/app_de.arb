@@ -468,7 +468,6 @@
   "customServerOptional": "Optional",
   "customServerShowSecret": "Geheimnis anzeigen",
   "customServerHideSecret": "Geheimnis verbergen",
-  "customServerBadge": "benutzerdefiniert",
   "customServerDeleteConfirm": "Server „{name}“ löschen?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Fügen Sie einen Server manuell hinzu: Adresse, Port und Protokoll",
   "customServerTest": "Test",
   "leakTestTitle": "Test auf Datenlecks",
   "leakTestIntro": "Prüft, ob Datenverkehr das Gerät am Tunnel vorbei verlassen kann: direkte DNS- und ICMP-Anfragen, IPv6-Ausgang und Systemresolver. Führen Sie den Test bei aktiver Verbindung aus.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Dieses Gerät",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Für Shadowsocks: Methode:Passwort, zum Beispiel chacha20-ietf-poly1305:passwort",
   "diagnosticPackets": "Paketerfassung",
   "diagnosticEvents": "Windows-Ereignisse",
   "diagnosticCapture": "10 Sekunden lang einfangen",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Strikte Netzwerksperre",
   "strictKillSwitchWarning": "Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start.",
   "extWorkerFailed": "Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen. Prüfe das Erweiterungsprotokoll.",
-  "extAssetRejected": "Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln."
+  "extAssetRejected": "Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln.",
+  "customServerOwn": "Eigener Server",
+  "customServerPaste": "Link einfügen",
+  "customServerUser": "Benutzername",
+  "customServerPassword": "Passwort",
+  "customServerSecretRequired": "Wert eingeben",
+  "customServerLinkInvalid": "Ungültiger Serverlink",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

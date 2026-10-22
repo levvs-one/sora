@@ -476,6 +476,8 @@ class Sora extends ChangeNotifier {
       for (final s in _subscriptions.values)
         for (final o in s.outbounds)
           if (seen.add(o.id) && !hidden.contains(o.id)) o,
+      for (final server in customServers)
+        if (server.hasOutbound() && seen.add(server.outbound.id)) server.outbound,
     ];
   }
 
@@ -1709,6 +1711,27 @@ class Sora extends ChangeNotifier {
   /// User-added servers, stored by the core outside subscriptions.
   final List<CustomServer> _customServers = [];
   List<CustomServer> get customServers => List.unmodifiable(_customServers);
+  List<String> customProtocols = [
+    for (final p in CustomProtocol.values)
+      if (p != CustomProtocol.CUSTOM_PROTOCOL_UNSPECIFIED) p.name.replaceFirst('CUSTOM_PROTOCOL_', '').toLowerCase(),
+  ];
+
+  /// Uses the same parser as subscriptions, without persisting the draft.
+  Future<PreviewCustomServerResponse> previewCustomServer(String text) async {
+    final link = _link;
+    if (link == null) throw CoreFailure.unavailable;
+    try {
+      final answer = await link.custom.previewCustomServer(
+        PreviewCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, link: text),
+        options: CallOptions(timeout: const Duration(seconds: 10)),
+      );
+      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      return answer;
+    } on GrpcError catch (error) {
+      if (error.code == StatusCode.unimplemented) throw const CoreFailure('core.api.version_mismatch');
+      rethrow;
+    }
+  }
 
   /// Loads custom servers after the core link opens. The service lands with
   /// the core update; until then the section simply stays empty.
@@ -1724,6 +1747,7 @@ class Sora extends ChangeNotifier {
       _customServers
         ..clear()
         ..addAll(answer.servers);
+      if (answer.protocols.isNotEmpty) customProtocols = answer.protocols.toList();
       recovered('custom-servers');
       notifyListeners();
     } catch (error) {
@@ -1735,16 +1759,25 @@ class Sora extends ChangeNotifier {
   /// Saves a new custom server; the core assigns its id (an empty id creates,
   /// a set id updates). Returns null on success; failures are reported
   /// through the notification stream.
-  Future<CoreFailure?> addCustomServer(CustomServer server) => _call(() async {
+  Future<CoreFailure?> addCustomServer(CustomServer server, {bool replaceCredentials = false}) => _call(() async {
     final link = _link!;
     final answer = await link.custom.saveCustomServer(
-      SaveCustomServerRequest(apiVersion: apiVersion, controlAuthenticator: link.token, server: server),
+      SaveCustomServerRequest(
+        apiVersion: apiVersion,
+        controlAuthenticator: link.token,
+        server: server,
+        replaceCredentials: replaceCredentials,
+      ),
     );
     if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
     // Upsert, not append: the sync bridge re-saves known ids (update path),
     // and appending would duplicate the entry in the list.
-    _customServers.removeWhere((s) => s.id == answer.server.id);
-    _customServers.add(answer.server);
+    final index = _customServers.indexWhere((s) => s.id == answer.server.id);
+    if (index < 0) {
+      _customServers.add(answer.server);
+    } else {
+      _customServers[index] = answer.server;
+    }
     notifyListeners();
     _noteSyncChanged();
   });

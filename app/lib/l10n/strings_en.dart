@@ -1789,15 +1789,9 @@ class SEn extends S {
   String get customServerHideSecret => 'Hide secret';
 
   @override
-  String get customServerBadge => 'custom';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Delete server “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Add a server manually: address, port and protocol';
 
   @override
   String get customServerTest => 'Test';
@@ -1967,10 +1961,6 @@ class SEn extends S {
       'Device sync isn\'t available on Android yet: the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'For Shadowsocks: method:password, for example chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'Packet capture';
 
   @override
@@ -2036,4 +2026,28 @@ class SEn extends S {
 
   @override
   String get extAssetRejected => 'Extension asset rejected: unreadable colors or invalid rules.';
+
+  @override
+  String get customServerOwn => 'Own server';
+
+  @override
+  String get customServerPaste => 'Paste a link';
+
+  @override
+  String get customServerUser => 'Username';
+
+  @override
+  String get customServerPassword => 'Password';
+
+  @override
+  String get customServerSecretRequired => 'Enter a value';
+
+  @override
+  String get customServerLinkInvalid => 'Invalid server link';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

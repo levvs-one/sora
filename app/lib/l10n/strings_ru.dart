@@ -1814,15 +1814,9 @@ class SRu extends S {
   String get customServerHideSecret => 'Скрыть секрет';
 
   @override
-  String get customServerBadge => 'свой';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Удалить сервер «$name»?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Добавьте сервер вручную: адрес, порт и протокол';
 
   @override
   String get customServerTest => 'Проверить';
@@ -2000,10 +1994,6 @@ class SRu extends S {
       'Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Для Shadowsocks: метод:пароль, например chacha20-ietf-poly1305:пароль';
-
-  @override
   String get diagnosticPackets => 'Захват пакетов';
 
   @override
@@ -2069,4 +2059,28 @@ class SRu extends S {
 
   @override
   String get extAssetRejected => 'Файл расширения отклонён: нечитаемые цвета или неверные правила.';
+
+  @override
+  String get customServerOwn => 'Свой сервер';
+
+  @override
+  String get customServerPaste => 'Вставить ссылку';
+
+  @override
+  String get customServerUser => 'Пользователь';
+
+  @override
+  String get customServerPassword => 'Пароль';
+
+  @override
+  String get customServerSecretRequired => 'Введите значение';
+
+  @override
+  String get customServerLinkInvalid => 'Неверная ссылка на сервер';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

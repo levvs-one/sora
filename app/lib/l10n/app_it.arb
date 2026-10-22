@@ -468,7 +468,6 @@
   "customServerOptional": "Opzionale",
   "customServerShowSecret": "Mostra segreto",
   "customServerHideSecret": "Nascondi segreto",
-  "customServerBadge": "personalizzato",
   "customServerDeleteConfirm": "Eliminare il server “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Aggiungere manualmente un server: indirizzo, porta e protocollo",
   "customServerTest": "Prova",
   "leakTestTitle": "Test per perdite di dati",
   "leakTestIntro": "Verifica se il traffico può uscire dal dispositivo al di fuori del tunnel: richieste DNS e ICMP dirette, traffico IPv6 in uscita e resolver di sistema. Esegui il test durante la connessione.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Questo dispositivo",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Per Shadowsocks: metodo:password, ad esempio chacha20-ietf-poly1305:password",
   "diagnosticPackets": "Cattura dei pacchetti",
   "diagnosticEvents": "Eventi di Windows",
   "diagnosticCapture": "Cattura per 10 secondi",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Blocco di rete rigoroso",
   "strictKillSwitchWarning": "Dopo la connessione blocca il traffico esterno alla VPN anche in caso di arresto anomalo, riavvio o chiusura dell’app. Solo la disconnessione o la disattivazione di questa opzione ripristina l’accesso. Dopo il riavvio del sistema, il blocco riprende solo se è attiva la connessione all’avvio.",
   "extWorkerFailed": "L’attività in background dell’estensione non è riuscita. Controlla il registro dell’estensione.",
-  "extAssetRejected": "File dell’estensione rifiutato: colori illeggibili o regole non valide."
+  "extAssetRejected": "File dell’estensione rifiutato: colori illeggibili o regole non valide.",
+  "customServerOwn": "Server personale",
+  "customServerPaste": "Incolla un link",
+  "customServerUser": "Nome utente",
+  "customServerPassword": "Password",
+  "customServerSecretRequired": "Inserisci un valore",
+  "customServerLinkInvalid": "Link del server non valido",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

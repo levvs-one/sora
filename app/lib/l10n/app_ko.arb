@@ -468,7 +468,6 @@
   "customServerOptional": "선택사항",
   "customServerShowSecret": "비밀 표시",
   "customServerHideSecret": "비밀 숨기기",
-  "customServerBadge": "사용자 지정",
   "customServerDeleteConfirm": "서버 \"{name}\"을 삭제하시겠습니까?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "수동으로 서버 추가: 주소, 포트 및 프로토콜",
   "customServerTest": "테스트",
   "leakTestTitle": "데이터 유출 테스트",
   "leakTestIntro": "트래픽이 터널 밖으로 기기를 빠져나갈 수 있는지 확인합니다. 직접 DNS 및 ICMP 요청, IPv6 외부 통신, 시스템 리졸버를 검사합니다. 연결된 상태에서 실행하세요.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "이 장치",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)",
   "diagnosticPackets": "패킷 캡처",
   "diagnosticEvents": "윈도우 이벤트",
   "diagnosticCapture": "10초 동안 캡처",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "엄격한 네트워크 차단",
   "strictKillSwitchWarning": "연결 후에는 충돌, 재시작 또는 앱 종료 후에도 VPN 외부 트래픽을 차단합니다. 연결을 끊거나 이 옵션을 꺼야 접근이 복원됩니다. 기기를 재부팅한 뒤에는 시작 시 연결이 활성화된 경우에만 차단을 재개합니다.",
   "extWorkerFailed": "확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.",
-  "extAssetRejected": "확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다."
+  "extAssetRejected": "확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.",
+  "customServerOwn": "개인 서버",
+  "customServerPaste": "링크 붙여넣기",
+  "customServerUser": "사용자 이름",
+  "customServerPassword": "비밀번호",
+  "customServerSecretRequired": "값을 입력하세요",
+  "customServerLinkInvalid": "잘못된 서버 링크입니다",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

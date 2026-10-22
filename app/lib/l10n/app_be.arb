@@ -468,7 +468,6 @@
   "customServerOptional": "Неабавязкова",
   "customServerShowSecret": "Паказаць сакрэт",
   "customServerHideSecret": "Схаваць сакрэт",
-  "customServerBadge": "уласны",
   "customServerDeleteConfirm": "Выдаліць сервер “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Дадайце сервер уручную: адрас, порт і пратакол",
   "customServerTest": "Тэст",
   "leakTestTitle": "Тэст на ўцечку даных",
   "leakTestIntro": "Правярае, ці можа трафік пакінуць прыладу па-за тунэлем: прамыя запыты DNS і ICMP, выхад IPv6 і сістэмныя рэзолверы. Запускайце пры актыўным злучэнні.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Гэтая прылада",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Для Shadowsocks: метад:пароль, напрыклад chacha20-ietf-poly1305:пароль",
   "diagnosticPackets": "Захоп пакета",
   "diagnosticEvents": "Windows падзеі",
   "diagnosticCapture": "Захоп на 10 секунд",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Строгі kill switch",
   "strictKillSwitchWarning": "Пасля падключэння блакуе трафік па-за VPN нават пасля збою, перазапуску ці выхаду з праграмы. Доступ вернецца толькі пасля адключэння VPN або гэтай налады. Пасля перазагрузкі блакаванне аднаўляецца толькі пры ўключаным падключэнні пры запуску.",
   "extWorkerFailed": "Фонавае заданне пашырэння не выканана. Праверце журнал пашырэння.",
-  "extAssetRejected": "Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы."
+  "extAssetRejected": "Файл пашырэння адхілены: неразборлівыя колеры або няправільныя правілы.",
+  "customServerOwn": "Свой сервер",
+  "customServerPaste": "Уставіць спасылку",
+  "customServerUser": "Карыстальнік",
+  "customServerPassword": "Пароль",
+  "customServerSecretRequired": "Увядзіце значэнне",
+  "customServerLinkInvalid": "Няправільная спасылка на сервер",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

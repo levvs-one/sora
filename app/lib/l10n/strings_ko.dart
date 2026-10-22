@@ -1777,15 +1777,9 @@ class SKo extends S {
   String get customServerHideSecret => '비밀 숨기기';
 
   @override
-  String get customServerBadge => '사용자 지정';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return '서버 \"$name\"을 삭제하시겠습니까?';
   }
-
-  @override
-  String get customServerEmptyHint => '수동으로 서버 추가: 주소, 포트 및 프로토콜';
 
   @override
   String get customServerTest => '테스트';
@@ -1953,9 +1947,6 @@ class SKo extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials => 'Shadowsocks의 경우: 방식:비밀번호 (예: chacha20-ietf-poly1305:password)';
-
-  @override
   String get diagnosticPackets => '패킷 캡처';
 
   @override
@@ -2020,4 +2011,28 @@ class SKo extends S {
 
   @override
   String get extAssetRejected => '확장 기능 파일이 거부되었습니다. 색상이 읽기 어렵거나 규칙이 잘못되었습니다.';
+
+  @override
+  String get customServerOwn => '개인 서버';
+
+  @override
+  String get customServerPaste => '링크 붙여넣기';
+
+  @override
+  String get customServerUser => '사용자 이름';
+
+  @override
+  String get customServerPassword => '비밀번호';
+
+  @override
+  String get customServerSecretRequired => '값을 입력하세요';
+
+  @override
+  String get customServerLinkInvalid => '잘못된 서버 링크입니다';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

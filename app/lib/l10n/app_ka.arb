@@ -468,7 +468,6 @@
   "customServerOptional": "სურვილისამებრ",
   "customServerShowSecret": "საიდუმლოს ჩვენება",
   "customServerHideSecret": "საიდუმლოს დამალვა",
-  "customServerBadge": "საკუთარი",
   "customServerDeleteConfirm": "წაშალოთ სერვერი „{name}“?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "ხელით დაამატეთ სერვერი: მისამართი, პორტი და პროტოკოლი",
   "customServerTest": "ტესტი",
   "leakTestTitle": "ტესტი მონაცემთა გაჟონვისთვის",
   "leakTestIntro": "ამოწმებს, შეუძლია თუ არა ტრაფიკს მოწყობილობიდან გვირაბის გარეთ გასვლა: პირდაპირი DNS და ICMP მოთხოვნები, IPv6 გასასვლელი და სისტემის რეზოლვერები. გაუშვით აქტიური კავშირისას.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "ეს მოწყობილობა",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Shadowsocks-ისთვის: მეთოდი:პაროლი, მაგალითად chacha20-ietf-poly1305:password",
   "diagnosticPackets": "პაკეტის დაჭერა",
   "diagnosticEvents": "Windows-ის მოვლენები",
   "diagnosticCapture": "გადაიღეთ 10 წამის განმავლობაში",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "ქსელის მკაცრი ბლოკირება",
   "strictKillSwitchWarning": "დაკავშირების შემდეგ ბლოკავს VPN-ის გარეთ ტრაფიკს შეფერხების, გადატვირთვის ან აპიდან გასვლის შემდეგაც. წვდომა აღდგება მხოლოდ კავშირის გაწყვეტით ან ამ პარამეტრის გამორთვით. მოწყობილობის გადატვირთვის შემდეგ ბლოკირება განახლდება მხოლოდ გაშვებისას დაკავშირების ჩართვის შემთხვევაში.",
   "extWorkerFailed": "გაფართოების ფონური დავალება ვერ შესრულდა. შეამოწმეთ გაფართოების ჟურნალი.",
-  "extAssetRejected": "გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები."
+  "extAssetRejected": "გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები.",
+  "customServerOwn": "საკუთარი სერვერი",
+  "customServerPaste": "ბმულის ჩასმა",
+  "customServerUser": "მომხმარებელი",
+  "customServerPassword": "პაროლი",
+  "customServerSecretRequired": "შეიყვანეთ მნიშვნელობა",
+  "customServerLinkInvalid": "სერვერის ბმული არასწორია",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

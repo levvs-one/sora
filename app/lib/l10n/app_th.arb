@@ -468,7 +468,6 @@
   "customServerOptional": "ไม่บังคับ",
   "customServerShowSecret": "แสดงความลับ",
   "customServerHideSecret": "ซ่อนความลับ",
-  "customServerBadge": "กำหนดเอง",
   "customServerDeleteConfirm": "ลบเซิร์ฟเวอร์ “{name}” หรือไม่",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "เพิ่มเซิร์ฟเวอร์ด้วยตนเอง: ที่อยู่ พอร์ต และโปรโตคอล",
   "customServerTest": "ทดสอบ",
   "leakTestTitle": "ทดสอบการรั่วไหลของข้อมูล",
   "leakTestIntro": "ตรวจสอบว่าข้อมูลออกจากอุปกรณ์โดยไม่ผ่านอุโมงค์ได้หรือไม่ โดยทดสอบ DNS และ ICMP โดยตรง การเชื่อมต่อขาออก IPv6 และตัวแปลงชื่อของระบบ ให้เรียกใช้ขณะเชื่อมต่ออยู่",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "อุปกรณ์นี้",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "สำหรับ Shadowsocks: วิธี:รหัสผ่าน เช่น chacha20-ietf-poly1305:password",
   "diagnosticPackets": "การจับแพ็คเก็ต",
   "diagnosticEvents": "เหตุการณ์ของวินโดวส์",
   "diagnosticCapture": "จับภาพเป็นเวลา 10 วินาที",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "การตัดเครือข่ายแบบเข้มงวด",
   "strictKillSwitchWarning": "หลังเชื่อมต่อ จะบล็อกการรับส่งข้อมูลนอก VPN แม้เกิดข้อขัดข้อง เริ่มใหม่ หรือออกจากแอป การเข้าถึงจะกลับมาเมื่อยกเลิกการเชื่อมต่อหรือปิดตัวเลือกนี้เท่านั้น หลังรีบูตอุปกรณ์ จะบล็อกต่อเฉพาะเมื่อเปิดการเชื่อมต่อเมื่อเริ่มต้นไว้",
   "extWorkerFailed": "งานเบื้องหลังของส่วนขยายล้มเหลว ตรวจสอบบันทึกของส่วนขยาย",
-  "extAssetRejected": "ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง"
+  "extAssetRejected": "ไฟล์ส่วนขยายถูกปฏิเสธ: สีอ่านยากหรือกฎไม่ถูกต้อง",
+  "customServerOwn": "เซิร์ฟเวอร์ส่วนตัว",
+  "customServerPaste": "วางลิงก์",
+  "customServerUser": "ชื่อผู้ใช้",
+  "customServerPassword": "รหัสผ่าน",
+  "customServerSecretRequired": "ป้อนค่า",
+  "customServerLinkInvalid": "ลิงก์เซิร์ฟเวอร์ไม่ถูกต้อง",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

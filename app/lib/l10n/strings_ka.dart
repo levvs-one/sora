@@ -1804,15 +1804,9 @@ class SKa extends S {
   String get customServerHideSecret => 'საიდუმლოს დამალვა';
 
   @override
-  String get customServerBadge => 'საკუთარი';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'წაშალოთ სერვერი „$name“?';
   }
-
-  @override
-  String get customServerEmptyHint => 'ხელით დაამატეთ სერვერი: მისამართი, პორტი და პროტოკოლი';
 
   @override
   String get customServerTest => 'ტესტი';
@@ -1988,10 +1982,6 @@ class SKa extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Shadowsocks-ისთვის: მეთოდი:პაროლი, მაგალითად chacha20-ietf-poly1305:password';
-
-  @override
   String get diagnosticPackets => 'პაკეტის დაჭერა';
 
   @override
@@ -2057,4 +2047,28 @@ class SKa extends S {
 
   @override
   String get extAssetRejected => 'გაფართოების ფაილი უარყოფილია: წაუკითხავი ფერები ან არასწორი წესები.';
+
+  @override
+  String get customServerOwn => 'საკუთარი სერვერი';
+
+  @override
+  String get customServerPaste => 'ბმულის ჩასმა';
+
+  @override
+  String get customServerUser => 'მომხმარებელი';
+
+  @override
+  String get customServerPassword => 'პაროლი';
+
+  @override
+  String get customServerSecretRequired => 'შეიყვანეთ მნიშვნელობა';
+
+  @override
+  String get customServerLinkInvalid => 'სერვერის ბმული არასწორია';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

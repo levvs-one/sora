@@ -1814,15 +1814,9 @@ class SDe extends S {
   String get customServerHideSecret => 'Geheimnis verbergen';
 
   @override
-  String get customServerBadge => 'benutzerdefiniert';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Server „$name“ löschen?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Fügen Sie einen Server manuell hinzu: Adresse, Port und Protokoll';
 
   @override
   String get customServerTest => 'Test';
@@ -1994,10 +1988,6 @@ class SDe extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Für Shadowsocks: Methode:Passwort, zum Beispiel chacha20-ietf-poly1305:passwort';
-
-  @override
   String get diagnosticPackets => 'Paketerfassung';
 
   @override
@@ -2065,4 +2055,28 @@ class SDe extends S {
 
   @override
   String get extAssetRejected => 'Erweiterungsdatei abgelehnt: unlesbare Farben oder ungültige Regeln.';
+
+  @override
+  String get customServerOwn => 'Eigener Server';
+
+  @override
+  String get customServerPaste => 'Link einfügen';
+
+  @override
+  String get customServerUser => 'Benutzername';
+
+  @override
+  String get customServerPassword => 'Passwort';
+
+  @override
+  String get customServerSecretRequired => 'Wert eingeben';
+
+  @override
+  String get customServerLinkInvalid => 'Ungültiger Serverlink';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }

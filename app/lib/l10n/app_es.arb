@@ -468,7 +468,6 @@
   "customServerOptional": "Opcional",
   "customServerShowSecret": "Mostrar secreto",
   "customServerHideSecret": "Ocultar secreto",
-  "customServerBadge": "personalizado",
   "customServerDeleteConfirm": "¿Eliminar el servidor “{name}”?",
   "@customServerDeleteConfirm": {
     "placeholders": {
@@ -477,7 +476,6 @@
       }
     }
   },
-  "customServerEmptyHint": "Agregar un servidor manualmente: dirección, puerto y protocolo",
   "customServerTest": "Prueba",
   "leakTestTitle": "Prueba de fugas de datos",
   "leakTestIntro": "Comprueba si el tráfico puede salir del dispositivo fuera del túnel: solicitudes directas de DNS e ICMP, salida IPv6 y resolutores del sistema. Ejecute la prueba con la conexión activa.",
@@ -995,7 +993,6 @@
   },
   "syncThisDevice": "Este dispositivo",
   "syncUnavailableAndroid": "Device sync isn't available on Android yet, the sync service can't run there.",
-  "customServerShadowsocksCredentials": "Para Shadowsocks: método:contraseña, por ejemplo chacha20-ietf-poly1305:contraseña",
   "diagnosticPackets": "captura de paquetes",
   "diagnosticEvents": "Eventos de Windows",
   "diagnosticCapture": "Captura durante 10 segundos",
@@ -1016,5 +1013,13 @@
   "strictKillSwitch": "Bloqueo de red estricto",
   "strictKillSwitchWarning": "Tras conectar, bloquea el tráfico fuera de la VPN incluso después de un fallo, reinicio o cierre de la aplicación. Solo desconectar o desactivar esta opción restablece el acceso. Tras reiniciar el equipo, el bloqueo se reanuda solo si está activada la conexión al inicio.",
   "extWorkerFailed": "Falló la tarea en segundo plano de la extensión. Revisa su registro.",
-  "extAssetRejected": "Archivo de extensión rechazado: colores ilegibles o reglas no válidas."
+  "extAssetRejected": "Archivo de extensión rechazado: colores ilegibles o reglas no válidas.",
+  "customServerOwn": "Servidor propio",
+  "customServerPaste": "Pegar un enlace",
+  "customServerUser": "Usuario",
+  "customServerPassword": "Contraseña",
+  "customServerSecretRequired": "Introduce un valor",
+  "customServerLinkInvalid": "Enlace de servidor no válido",
+  "customServerMethodHint": "chacha20-ietf-poly1305",
+  "customServerWgAddressesHint": "10.0.0.2/32"
 }

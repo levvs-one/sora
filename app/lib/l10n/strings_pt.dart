@@ -1807,15 +1807,9 @@ class SPt extends S {
   String get customServerHideSecret => 'Ocultar segredo';
 
   @override
-  String get customServerBadge => 'personalizado';
-
-  @override
   String customServerDeleteConfirm(String name) {
     return 'Excluir servidor “$name”?';
   }
-
-  @override
-  String get customServerEmptyHint => 'Adicione um servidor manualmente: endereço, porta e protocolo';
 
   @override
   String get customServerTest => 'Testar';
@@ -1993,10 +1987,6 @@ class SPt extends S {
       'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
 
   @override
-  String get customServerShadowsocksCredentials =>
-      'Para Shadowsocks: método:senha, por exemplo chacha20-ietf-poly1305:senha';
-
-  @override
   String get diagnosticPackets => 'Captura de pacotes';
 
   @override
@@ -2062,4 +2052,28 @@ class SPt extends S {
 
   @override
   String get extAssetRejected => 'Ficheiro da extensão rejeitado: cores ilegíveis ou regras inválidas.';
+
+  @override
+  String get customServerOwn => 'Servidor próprio';
+
+  @override
+  String get customServerPaste => 'Colar um link';
+
+  @override
+  String get customServerUser => 'Usuário';
+
+  @override
+  String get customServerPassword => 'Senha';
+
+  @override
+  String get customServerSecretRequired => 'Insira um valor';
+
+  @override
+  String get customServerLinkInvalid => 'Link do servidor inválido';
+
+  @override
+  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+
+  @override
+  String get customServerWgAddressesHint => '10.0.0.2/32';
 }
