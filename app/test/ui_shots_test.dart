@@ -58,6 +58,7 @@ void main() {
     await tester.runAsync(() async {
       await Directory(output).create(recursive: true);
       await (FontLoader('Inter')..addFont(rootBundle.load('assets/fonts/InterVariable.ttf'))).load();
+      await (FontLoader('Sora CJK')..addFont(rootBundle.load('assets/fonts/SoraCJK.otf'))).load();
       await (FontLoader(
         'packages/material_symbols_icons/MaterialSymbolsRounded',
       )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
