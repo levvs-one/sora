@@ -258,6 +258,13 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('custom-save')));
     await settleIo(tester);
     final id = sora.customServers.single.id;
+    await open(tester);
+    clipboard = 'trojan://second-secret@example.com:8443#Second';
+    await tester.tap(find.byKey(const ValueKey('custom-paste')));
+    await settleIo(tester);
+    await tester.tap(find.byKey(const ValueKey('custom-save')));
+    await settleIo(tester);
+    final order = sora.customServers.map((server) => server.id).toList();
     await tester.tap(find.byKey(ValueKey('edit-own-server-$id')));
     await tester.pumpAndSettle();
     expect(value(tester, 'name'), draftName);
@@ -266,8 +273,14 @@ void main() {
     await tester.enterText(find.byKey(const ValueKey('custom-name')), 'Updated');
     await tester.tap(find.byKey(const ValueKey('custom-save')));
     await settleIo(tester);
-    expect(sora.customServers.single.id, id);
-    expect(sora.customServers.single.name, 'Updated');
-    expect(sora.customServers.single.hasCredentials_7, isTrue);
+    expect(sora.customServers.map((server) => server.id), order);
+    expect(sora.customServers.first.name, 'Updated');
+    expect(sora.customServers.first.hasCredentials_7, isTrue);
+    expect(sora.customServers.last.name, 'Second');
+    await tester.runAsync(sora.loadCustomServers);
+    await settleIo(tester);
+    expect(sora.customServers.map((server) => server.id), order);
+    expect(sora.customServers.first.name, 'Updated');
+    expect(sora.customServers.first.credentials, isEmpty);
   }, skip: !live);
 }
