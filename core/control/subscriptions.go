@@ -220,6 +220,13 @@ func newSubscriptionID() (string, error) {
 
 // normalizedLink normalizes links for duplicate detection.
 func normalizedLink(raw string) (string, error) {
+	if isOLCRTCLink(raw) {
+		parsed, err := (parser.LinkParser{}).Parse([]byte(raw))
+		if err != nil || len(parsed.Servers) != 1 || parsed.Report.Invalid != 0 || parsed.Report.Unsupported != 0 {
+			return "", errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionFormat, "control: invalid olcrtc URI")
+		}
+		return strings.TrimSpace(raw), nil
+	}
 	u, err := subscription.ValidateReference(raw)
 	if err != nil {
 		return "", err
@@ -303,7 +310,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	}
 	rec.Name = strings.TrimSpace(in.GetName())
 	rec.UserAgent = agent
-	rec.AutoUpdate = in.GetAutoUpdate()
+	rec.AutoUpdate = in.GetAutoUpdate() && !isOLCRTCLink(rec.URL)
 	rec.Interval = interval
 	if err := b.persistLocked(&rec, nil, nil); err != nil {
 		return nil, err
@@ -367,7 +374,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		b.mu.Unlock()
 		return state, nil
 	}
-	if b.srv.fetcher == nil {
+	if b.srv.fetcher == nil && !isOLCRTCLink(rec.URL) {
 		b.mu.Unlock()
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionFetch, "control: this core cannot fetch subscriptions")
 	}
@@ -378,11 +385,20 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
-	fetched, err := b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+	var fetched subscription.Result
+	var err error
+	if isOLCRTCLink(link) {
+		fetched.Body = []byte(link)
+	} else {
+		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+	}
 	answered := err == nil
 	var servers []importedServer
 	if err == nil {
 		servers, err = b.srv.parsePayload(fetched.Body, serverRefFor(id))
+		if isOLCRTCLink(link) && len(servers) == 1 {
+			fetched.Info.Title = servers[0].spec.GetDisplayName()
+		}
 	}
 
 	b.mu.Lock()
@@ -475,7 +491,7 @@ func (rec *subscriptionRecord) interval() time.Duration {
 	switch {
 	case rec.Interval > 0:
 		return rec.Interval
-	case rec.Info.UpdateInterval >= minUpdateInterval:
+	case rec.Info.UpdateInterval >= 5*time.Second:
 		return min(rec.Info.UpdateInterval, maxUpdateInterval)
 	}
 	return defaultUpdateInterval
@@ -776,4 +792,8 @@ func (s *Server) WatchSubscriptions(req *corev1.WatchSubscriptionsRequest, strea
 			}
 		}
 	}
+}
+
+func isOLCRTCLink(raw string) bool {
+	return strings.HasPrefix(strings.ToLower(strings.TrimSpace(raw)), "olcrtc://")
 }

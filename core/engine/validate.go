@@ -69,6 +69,9 @@ func (o Outbound) Identifiers() []string {
 			out = append(out, id)
 		}
 	}
+	if o.OLCRTC != nil {
+		out = append(out, o.OLCRTC.Room)
+	}
 	out = append(out, o.Name)
 	return out
 }
@@ -109,7 +112,7 @@ var validProtocols = map[Protocol]bool{
 	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 	ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
 	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolXrayProfile: true,
-	ProtocolDirect: true,
+	ProtocolDirect: true, ProtocolOLCRTC: true,
 }
 
 // validTransports includes parser outputs and renderer transport names:
@@ -143,6 +146,9 @@ func (o Outbound) Validate() error {
 	}
 	if err := validateServer("outbound "+o.ID, o.Server, !serverless); err != nil {
 		errs = append(errs, err)
+	}
+	if o.Protocol == ProtocolOLCRTC {
+		errs = append(errs, validateOLCRTC(o))
 	}
 	if o.Protocol == ProtocolBypass {
 		errs = append(errs, o.Bypass.validate(o.ID))

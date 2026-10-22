@@ -229,6 +229,26 @@ func TestStrictNftIntegration(t *testing.T) {
 	if !reaches("192.168.50.2") || !reaches("fd00::2") || reaches("2001:db8::2") {
 		t.Fatal("LAN policy incorrect")
 	}
+
+	// Carrier addresses are discovered after joining a room. Only the service
+	// account receives the dynamic exception, and a protocol change removes it.
+	policy.AllowLAN = false
+	policy.OLCRTC = true
+	if err := g.Apply(t.Context(), policy); err != nil {
+		t.Fatal(err)
+	}
+	if !reaches("2001:db8::2") || !strictUDPReachable(t.Context(), "203.0.113.2") {
+		t.Fatal("olcrtc dynamic ICE traffic blocked")
+	}
+	checkOtherUID("other-user")
+	policy.OLCRTC = false
+	if err := g.Apply(t.Context(), policy); err != nil {
+		t.Fatal(err)
+	}
+	if reaches("2001:db8::2") || strictUDPReachable(t.Context(), "203.0.113.2") {
+		t.Fatal("olcrtc exception survived a protocol change")
+	}
+	t.Log("real nft: olcrtc dynamic ICE allowed for service UID only; exception removed on protocol change")
 	if err := g.Release(context.Background()); err != nil {
 		t.Fatal(err)
 	}
