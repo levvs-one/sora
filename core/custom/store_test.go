@@ -502,7 +502,9 @@ func TestProbeTCPReachable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ProbeTCP: %v", err)
 	}
-	if lat <= 0 || lat > 5*time.Second {
+	// A loopback connect can finish within one tick of the Windows clock, so
+	// zero is a valid measurement; reachability is reported separately.
+	if lat < 0 || lat > 5*time.Second {
 		t.Errorf("latency = %v, want within the timeout", lat)
 	}
 }

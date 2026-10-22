@@ -276,7 +276,12 @@ jobs:
       - name: Check install.ps1
         shell: pwsh
         run: |
-          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          # The PowerShell Gallery sometimes answers "no match" for a moment;
+          # retry before treating it as a failure of the script under test.
+          for ($i = 1; $i -le 5; $i++) {
+            try { Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -ErrorAction Stop; break }
+            catch { if ($i -eq 5) { throw }; Start-Sleep -Seconds (10 * $i) }
+          }
           $found = Invoke-ScriptAnalyzer -Path packaging\install\install.ps1 -Severity Warning, Error
           $found | Format-Table -AutoSize
           if ($found) { throw "PSScriptAnalyzer found problems in install.ps1" }
