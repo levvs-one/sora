@@ -1480,6 +1480,9 @@ class SDe extends S {
   String get sortBy => 'Sortieren nach';
 
   @override
+  String get sortSubscription => 'Wie im Abonnement';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

@@ -847,6 +847,7 @@
   "dnsExpected": "প্রত্যাশিত",
   "dnsActual": "পালন করা হয়েছে",
   "sortBy": "দ্বারা সাজান",
+  "sortSubscription": "সাবস্ক্রিপশনের ক্রমে",
   "sortPing": "পিং",
   "sortSpeed": "গতি",
   "sortName": "নাম",

@@ -847,6 +847,7 @@
   "dnsExpected": "Garaşylýar",
   "dnsActual": "Syn edildi",
   "sortBy": "tertipläň",
+  "sortSubscription": "Abunadaky tertipde",
   "sortPing": "Ping",
   "sortSpeed": "Tizlik",
   "sortName": "Ady",

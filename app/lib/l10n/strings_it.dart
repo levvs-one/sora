@@ -1479,6 +1479,9 @@ class SIt extends S {
   String get sortBy => 'Ordina per';
 
   @override
+  String get sortSubscription => 'Come nell’abbonamento';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

@@ -847,6 +847,7 @@
   "dnsExpected": "예상됨",
   "dnsActual": "관찰됨",
   "sortBy": "정렬 기준",
+  "sortSubscription": "구독 순서대로",
   "sortPing": "핑",
   "sortSpeed": "속도",
   "sortName": "이름",

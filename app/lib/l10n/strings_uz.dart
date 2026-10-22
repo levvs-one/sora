@@ -1475,6 +1475,9 @@ class SUz extends S {
   String get sortBy => 'Saralash';
 
   @override
+  String get sortSubscription => 'Obunadagi tartibda';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

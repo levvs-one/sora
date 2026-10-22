@@ -1470,6 +1470,9 @@ class SHy extends S {
   String get sortBy => 'Դասավորել ըստ';
 
   @override
+  String get sortSubscription => 'Բաժանորդագրության հերթականությամբ';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

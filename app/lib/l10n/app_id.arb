@@ -847,6 +847,7 @@
   "dnsExpected": "Diharapkan",
   "dnsActual": "Diamati",
   "sortBy": "Urutkan berdasarkan",
+  "sortSubscription": "Sesuai urutan langganan",
   "sortPing": "Ping",
   "sortSpeed": "Kecepatan",
   "sortName": "Nama",

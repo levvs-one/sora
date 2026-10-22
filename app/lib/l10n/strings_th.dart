@@ -1465,6 +1465,9 @@ class STh extends S {
   String get sortBy => 'เรียงตาม';
 
   @override
+  String get sortSubscription => 'ตามลำดับในรายการสมัครรับ';
+
+  @override
   String get sortPing => 'ปิง';
 
   @override

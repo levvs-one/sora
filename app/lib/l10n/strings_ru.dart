@@ -1481,6 +1481,9 @@ class SRu extends S {
   String get sortBy => 'Сортировать';
 
   @override
+  String get sortSubscription => 'Как в подписке';
+
+  @override
   String get sortPing => 'Пинг';
 
   @override

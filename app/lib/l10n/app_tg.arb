@@ -847,6 +847,7 @@
   "dnsExpected": "Дар назар аст",
   "dnsActual": "мушохида карда шуд",
   "sortBy": "Мураттабсозӣ аз рӯйи",
+  "sortSubscription": "Бо тартиби обуна",
   "sortPing": "Пинг",
   "sortSpeed": "Суръат",
   "sortName": "Ном",

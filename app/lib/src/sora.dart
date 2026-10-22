@@ -1622,8 +1622,8 @@ class Sora extends ChangeNotifier {
         ),
       );
       if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
-      _subscriptions[answer.state.settings.id] = answer.state;
-      notifyListeners();
+      // The watch owns insertion order, including when a save response
+      // races the initial snapshot. Inserting here could overtake it.
       _noteSyncChanged();
       return null;
     } catch (error) {
@@ -2349,7 +2349,9 @@ SessionPlan buildPlan({
     final others = [
       for (final o in ordinary)
         if (o.id != choice) o,
-    ]..sort((a, b) => (latency[a.id] ?? 1 << 30).compareTo(latency[b.id] ?? 1 << 30));
+    ];
+    final order = {for (var i = 0; i < ordinary.length; i++) ordinary[i].id: i};
+    others.sort((a, b) => compareAutoSelect(a.id, b.id, 'ping', latency, bandwidth, providerOrder: order));
     plan.groups.add(
       GroupSpec(
         name: Sora.failoverGroup,
@@ -2448,7 +2450,8 @@ double smartScoreOf(
 }
 
 /// Compares two servers for auto-selection. [mode] is ping, speed or smart;
-/// unknown modes fall back to ping. Ties break by ping.
+/// unknown modes and missing speed measurements fall back to ping.
+/// Equal ranking keys retain the provider order.
 int compareAutoSelect(
   String a,
   String b,
@@ -2456,8 +2459,14 @@ int compareAutoSelect(
   Map<String, int?> latency,
   Map<String, ({int bps, DateTime at})> bandwidth, {
   double? Function(String id)? reliabilityOf,
+  Map<String, int> providerOrder = const {},
 }) {
-  int byPing() => (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
+  int byProvider() => (providerOrder[a] ?? 1 << 30).compareTo(providerOrder[b] ?? 1 << 30);
+  int byPing() {
+    final compared = (latency[a] ?? 1 << 30).compareTo(latency[b] ?? 1 << 30);
+    return compared != 0 ? compared : byProvider();
+  }
+
   switch (mode) {
     case 'speed':
       final x = freshBandwidthOf(bandwidth, a), y = freshBandwidthOf(bandwidth, b);
@@ -2465,7 +2474,7 @@ int compareAutoSelect(
         if (x == null) return 1;
         if (y == null) return -1;
         final bySpeed = y.compareTo(x);
-        if (bySpeed != 0) return bySpeed;
+        return bySpeed != 0 ? bySpeed : byProvider();
       }
       return byPing();
     case 'smart':
@@ -2475,7 +2484,7 @@ int compareAutoSelect(
         bandwidth,
         reliability: reliabilityOf?.call(b),
       ).compareTo(smartScoreOf(a, latency, bandwidth, reliability: reliabilityOf?.call(a)));
-      return bySmart != 0 ? bySmart : byPing();
+      return bySmart != 0 ? bySmart : byProvider();
     default:
       return byPing();
   }
@@ -2490,9 +2499,19 @@ OutboundSpec _fastest(
   String autoSelect = 'ping',
   double? Function(String id)? reliabilityOf,
 }) {
+  final order = {for (var i = 0; i < profiles.length; i++) profiles[i].id: i};
   var best = profiles.first;
   for (final o in profiles) {
-    if (compareAutoSelect(o.id, best.id, autoSelect, latency, bandwidth, reliabilityOf: reliabilityOf) < 0) {
+    if (compareAutoSelect(
+          o.id,
+          best.id,
+          autoSelect,
+          latency,
+          bandwidth,
+          reliabilityOf: reliabilityOf,
+          providerOrder: order,
+        ) <
+        0) {
       best = o;
     }
   }

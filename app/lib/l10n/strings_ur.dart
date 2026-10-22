@@ -1467,6 +1467,9 @@ class SUr extends S {
   String get sortBy => 'ترتیب دیں۔';
 
   @override
+  String get sortSubscription => 'سبسکرپشن کی ترتیب میں';
+
+  @override
   String get sortPing => 'پنگ';
 
   @override

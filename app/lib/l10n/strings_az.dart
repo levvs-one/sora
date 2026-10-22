@@ -1471,6 +1471,9 @@ class SAz extends S {
   String get sortBy => 'Sırala';
 
   @override
+  String get sortSubscription => 'Abunəlikdəki ardıcıllıqla';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

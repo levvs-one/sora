@@ -1472,6 +1472,9 @@ class SKy extends S {
   String get sortBy => 'Сорттоо боюнча';
 
   @override
+  String get sortSubscription => 'Жазылуудагы тартипте';
+
+  @override
   String get sortPing => 'Пинг';
 
   @override

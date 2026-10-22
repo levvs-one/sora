@@ -847,6 +847,7 @@
   "dnsExpected": "esperado",
   "dnsActual": "Observado",
   "sortBy": "Classificar por",
+  "sortSubscription": "Na ordem da assinatura",
   "sortPing": "Ping",
   "sortSpeed": "Velocidade",
   "sortName": "Nome",

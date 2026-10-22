@@ -1471,6 +1471,9 @@ class SKa extends S {
   String get sortBy => 'დალაგება';
 
   @override
+  String get sortSubscription => 'გამოწერის თანმიმდევრობით';
+
+  @override
   String get sortPing => 'პინგი';
 
   @override

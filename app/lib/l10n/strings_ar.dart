@@ -1485,6 +1485,9 @@ class SAr extends S {
   String get sortBy => 'الترتيب حسب';
 
   @override
+  String get sortSubscription => 'حسب ترتيب الاشتراك';
+
+  @override
   String get sortPing => 'بينغ';
 
   @override

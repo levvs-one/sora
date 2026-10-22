@@ -1490,6 +1490,9 @@ class SUk extends S {
   String get sortBy => 'Сортувати за';
 
   @override
+  String get sortSubscription => 'Як у підписці';
+
+  @override
   String get sortPing => 'Пінг';
 
   @override

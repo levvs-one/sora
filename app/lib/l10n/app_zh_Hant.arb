@@ -847,6 +847,7 @@
   "dnsExpected": "預期",
   "dnsActual": "實際",
   "sortBy": "排序方式",
+  "sortSubscription": "依訂閱順序",
   "sortPing": "延遲",
   "sortSpeed": "速度",
   "sortName": "名稱",

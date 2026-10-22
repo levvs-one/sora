@@ -847,6 +847,7 @@
   "dnsExpected": "Очікується",
   "dnsActual": "Дотримується",
   "sortBy": "Сортувати за",
+  "sortSubscription": "Як у підписці",
   "sortPing": "Пінг",
   "sortSpeed": "Швидкість",
   "sortName": "Ім'я",

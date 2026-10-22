@@ -641,6 +641,7 @@
   "dnsExpected": "Expected",
   "dnsActual": "Observed",
   "sortBy": "Sort by",
+  "sortSubscription": "As in subscription",
   "sortPing": "Ping",
   "sortSpeed": "Speed",
   "sortName": "Name",

@@ -1471,6 +1471,9 @@ class SFa extends S {
   String get sortBy => 'مرتب سازی بر اساس';
 
   @override
+  String get sortSubscription => 'به ترتیب اشتراک';
+
+  @override
   String get sortPing => 'پینگ';
 
   @override

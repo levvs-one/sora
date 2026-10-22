@@ -1470,6 +1470,9 @@ class SKk extends S {
   String get sortBy => 'Сұрыптау';
 
   @override
+  String get sortSubscription => 'Жазылымдағы ретпен';
+
+  @override
   String get sortPing => 'Пинг';
 
   @override

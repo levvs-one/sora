@@ -1473,6 +1473,9 @@ class STg extends S {
   String get sortBy => 'Мураттабсозӣ аз рӯйи';
 
   @override
+  String get sortSubscription => 'Бо тартиби обуна';
+
+  @override
   String get sortPing => 'Пинг';
 
   @override

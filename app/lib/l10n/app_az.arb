@@ -847,6 +847,7 @@
   "dnsExpected": "Gözlənilir",
   "dnsActual": "Müşahidə edilmişdir",
   "sortBy": "Sırala",
+  "sortSubscription": "Abunəlikdəki ardıcıllıqla",
   "sortPing": "Ping",
   "sortSpeed": "Sürət",
   "sortName": "Adı",

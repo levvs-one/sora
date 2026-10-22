@@ -1446,6 +1446,9 @@ class SKo extends S {
   String get sortBy => '정렬 기준';
 
   @override
+  String get sortSubscription => '구독 순서대로';
+
+  @override
   String get sortPing => '핑';
 
   @override

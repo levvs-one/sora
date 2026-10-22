@@ -1473,6 +1473,9 @@ class SPt extends S {
   String get sortBy => 'Classificar por';
 
   @override
+  String get sortSubscription => 'Na ordem da assinatura';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

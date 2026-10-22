@@ -847,6 +847,7 @@
   "dnsExpected": "Beklenen",
   "dnsActual": "Gözlemlendi",
   "sortBy": "Sıralama ölçütü",
+  "sortSubscription": "Abonelikteki sırayla",
   "sortPing": "Ping",
   "sortSpeed": "Hız",
   "sortName": "Ad",

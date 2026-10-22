@@ -1491,6 +1491,9 @@ class SBe extends S {
   String get sortBy => 'Сартаваць па';
 
   @override
+  String get sortSubscription => 'Як у падпісцы';
+
+  @override
   String get sortPing => 'Пінг';
 
   @override

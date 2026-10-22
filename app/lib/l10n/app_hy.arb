@@ -847,6 +847,7 @@
   "dnsExpected": "Ակնկալվում էր",
   "dnsActual": "Դիտարկված",
   "sortBy": "Դասավորել ըստ",
+  "sortSubscription": "Բաժանորդագրության հերթականությամբ",
   "sortPing": "Ping",
   "sortSpeed": "Արագություն",
   "sortName": "Անուն",

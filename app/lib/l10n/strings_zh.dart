@@ -1444,6 +1444,9 @@ class SZh extends S {
   String get sortBy => '排序方式';
 
   @override
+  String get sortSubscription => '按订阅顺序';
+
+  @override
   String get sortPing => '延迟';
 
   @override
@@ -3457,6 +3460,9 @@ class SZhHans extends SZh {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '按订阅顺序';
 
   @override
   String get sortPing => '延迟';
@@ -5473,6 +5479,9 @@ class SZhHant extends SZh {
 
   @override
   String get sortBy => '排序方式';
+
+  @override
+  String get sortSubscription => '依訂閱順序';
 
   @override
   String get sortPing => '延遲';

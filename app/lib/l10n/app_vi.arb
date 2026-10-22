@@ -847,6 +847,7 @@
   "dnsExpected": "Dự kiến",
   "dnsActual": "Đã quan sát",
   "sortBy": "Sắp xếp theo",
+  "sortSubscription": "Theo thứ tự đăng ký",
   "sortPing": "Ping",
   "sortSpeed": "Tốc độ",
   "sortName": "Tên",

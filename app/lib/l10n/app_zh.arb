@@ -847,6 +847,7 @@
   "dnsExpected": "预期",
   "dnsActual": "实际",
   "sortBy": "排序方式",
+  "sortSubscription": "按订阅顺序",
   "sortPing": "延迟",
   "sortSpeed": "速度",
   "sortName": "名称",

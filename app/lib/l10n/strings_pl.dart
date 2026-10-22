@@ -1495,6 +1495,9 @@ class SPl extends S {
   String get sortBy => 'Sortuj według';
 
   @override
+  String get sortSubscription => 'Jak w subskrypcji';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

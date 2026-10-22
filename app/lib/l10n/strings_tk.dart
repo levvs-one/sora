@@ -1469,6 +1469,9 @@ class STk extends S {
   String get sortBy => 'tertipläň';
 
   @override
+  String get sortSubscription => 'Abunadaky tertipde';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

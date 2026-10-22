@@ -1457,6 +1457,9 @@ class SEn extends S {
   String get sortBy => 'Sort by';
 
   @override
+  String get sortSubscription => 'As in subscription';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

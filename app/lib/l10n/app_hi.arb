@@ -847,6 +847,7 @@
   "dnsExpected": "अपेक्षित",
   "dnsActual": "अवलोकन किया गया",
   "sortBy": "क्रमबद्ध करें",
+  "sortSubscription": "सदस्यता के क्रम में",
   "sortPing": "पिंग",
   "sortSpeed": "गति",
   "sortName": "नाम",

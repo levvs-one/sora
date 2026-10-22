@@ -1478,6 +1478,9 @@ class SFr extends S {
   String get sortBy => 'Trier par';
 
   @override
+  String get sortSubscription => 'Dans l’ordre de l’abonnement';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

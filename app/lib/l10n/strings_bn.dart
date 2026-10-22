@@ -1468,6 +1468,9 @@ class SBn extends S {
   String get sortBy => 'দ্বারা সাজান';
 
   @override
+  String get sortSubscription => 'সাবস্ক্রিপশনের ক্রমে';
+
+  @override
   String get sortPing => 'পিং';
 
   @override

@@ -1470,6 +1470,9 @@ class STr extends S {
   String get sortBy => 'Sıralama ölçütü';
 
   @override
+  String get sortSubscription => 'Abonelikteki sırayla';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

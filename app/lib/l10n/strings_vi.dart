@@ -1473,6 +1473,9 @@ class SVi extends S {
   String get sortBy => 'Sắp xếp theo';
 
   @override
+  String get sortSubscription => 'Theo thứ tự đăng ký';
+
+  @override
   String get sortPing => 'Ping';
 
   @override

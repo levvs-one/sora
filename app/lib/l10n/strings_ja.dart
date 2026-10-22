@@ -1447,6 +1447,9 @@ class SJa extends S {
   String get sortBy => '並べ替え順';
 
   @override
+  String get sortSubscription => 'サブスクリプションの順序';
+
+  @override
   String get sortPing => 'ピン';
 
   @override

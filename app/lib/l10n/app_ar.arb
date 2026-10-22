@@ -847,6 +847,7 @@
   "dnsExpected": "المنتظر",
   "dnsActual": "ملاحظ",
   "sortBy": "الترتيب حسب",
+  "sortSubscription": "حسب ترتيب الاشتراك",
   "sortPing": "بينغ",
   "sortSpeed": "السرعة",
   "sortName": "الاسم",

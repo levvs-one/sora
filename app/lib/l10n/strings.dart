@@ -2805,6 +2805,12 @@ abstract class S {
   /// **'Сортировать'**
   String get sortBy;
 
+  /// No description provided for @sortSubscription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как в подписке'**
+  String get sortSubscription;
+
   /// No description provided for @sortPing.
   ///
   /// In ru, this message translates to:

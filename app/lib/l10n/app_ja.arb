@@ -847,6 +847,7 @@
   "dnsExpected": "予想される",
   "dnsActual": "観察された",
   "sortBy": "並べ替え順",
+  "sortSubscription": "サブスクリプションの順序",
   "sortPing": "ピン",
   "sortSpeed": "スピード",
   "sortName": "名前",

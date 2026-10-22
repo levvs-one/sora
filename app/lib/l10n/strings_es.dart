@@ -1476,6 +1476,9 @@ class SEs extends S {
   String get sortBy => 'Ordenar por';
 
   @override
+  String get sortSubscription => 'Como en la suscripción';
+
+  @override
   String get sortPing => 'Hacer ping';
 
   @override

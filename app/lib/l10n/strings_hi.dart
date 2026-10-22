@@ -1470,6 +1470,9 @@ class SHi extends S {
   String get sortBy => 'क्रमबद्ध करें';
 
   @override
+  String get sortSubscription => 'सदस्यता के क्रम में';
+
+  @override
   String get sortPing => 'पिंग';
 
   @override

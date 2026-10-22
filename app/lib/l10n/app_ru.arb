@@ -786,6 +786,7 @@
   "dnsExpected": "Ожидалось",
   "dnsActual": "Обнаружено",
   "sortBy": "Сортировать",
+  "sortSubscription": "Как в подписке",
   "sortPing": "Пинг",
   "sortSpeed": "Скорость",
   "sortName": "Имя",

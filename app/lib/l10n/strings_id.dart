@@ -1471,6 +1471,9 @@ class SId extends S {
   String get sortBy => 'Urutkan berdasarkan';
 
   @override
+  String get sortSubscription => 'Sesuai urutan langganan';
+
+  @override
   String get sortPing => 'Ping';
 
   @override
