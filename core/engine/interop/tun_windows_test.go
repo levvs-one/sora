@@ -10,13 +10,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	mathrand "math/rand/v2"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"slices"
-	"strings"
+	"strconv"
 	"testing"
 	"time"
 
@@ -54,21 +55,29 @@ func TestWindowsTunSwitchesCarryTCPAndUDP(t *testing.T) {
 		}
 		_, _ = io.WriteString(w, reply)
 	})
-	// TCP and UDP share one port. Windows reserves different port ranges per
-	// protocol, so a free TCP port can be forbidden for UDP; try another pair.
+	// TCP and UDP share one port. Windows hands out ephemeral ports in order
+	// and reserves blocks of them per protocol, so consecutive ephemeral TCP
+	// ports can all sit inside one UDP reservation. Random candidates below
+	// the dynamic range avoid those blocks; each must bind for both protocols.
 	var (
 		target  *httptest.Server
 		address string
 		udp     net.PacketConn
 		err     error
 	)
-	for range 20 {
-		target = httptest.NewServer(handler)
-		address = strings.TrimPrefix(target.URL, "http://")
-		if udp, err = (&net.ListenConfig{}).ListenPacket(t.Context(), "udp", address); err == nil {
-			break
+	for range 50 {
+		address = net.JoinHostPort("127.0.0.1", strconv.Itoa(20000+mathrand.IntN(25000)))
+		var tcp net.Listener
+		if tcp, err = (&net.ListenConfig{}).Listen(t.Context(), "tcp", address); err != nil {
+			continue
 		}
-		target.Close()
+		if udp, err = (&net.ListenConfig{}).ListenPacket(t.Context(), "udp", address); err != nil {
+			_ = tcp.Close()
+			continue
+		}
+		target = &httptest.Server{Listener: tcp, Config: &http.Server{Handler: handler, ReadHeaderTimeout: 10 * time.Second}}
+		target.Start()
+		break
 	}
 	if err != nil {
 		t.Fatal(err)
