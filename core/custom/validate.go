@@ -2,8 +2,11 @@ package custom
 
 import (
 	"net/netip"
+	"slices"
+	"sort"
 	"strings"
 
+	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/secret"
 )
@@ -29,15 +32,26 @@ const (
 	ProtocolWireGuard   Protocol = "wireguard"
 )
 
-// validProtocol reports whether p is a supported protocol.
-func validProtocol(p Protocol) bool {
-	switch p {
-	case ProtocolVLESS, ProtocolVMESS, ProtocolTrojan, ProtocolShadowsocks, ProtocolWireGuard:
-		return true
-	default:
-		return false
+// Protocols follows the engine catalog so newly supported protocols reach
+// the editor without another client-side list. Internal outbounds have no endpoint.
+func Protocols() []string {
+	seen := map[string]bool{}
+	for _, caps := range engine.Catalog {
+		for p, supported := range caps.Protocols {
+			if supported && p != engine.ProtocolDirect && p != engine.ProtocolXrayProfile {
+				seen[string(p)] = true
+			}
+		}
 	}
+	out := make([]string, 0, len(seen))
+	for p := range seen {
+		out = append(out, p)
+	}
+	sort.Strings(out)
+	return out
 }
+
+func validProtocol(p Protocol) bool { return slices.Contains(Protocols(), string(p)) }
 
 // ValidateID checks a server id. The charset excludes every path separator,
 // so an id can never escape into a path traversal even where one is used in
