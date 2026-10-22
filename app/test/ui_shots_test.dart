@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -22,8 +21,6 @@ import 'package:sora/src/core/link.dart';
 import 'package:sora/src/ui/servers.dart';
 import 'package:sora/src/ui/home.dart';
 import 'package:sora/src/ui/shell.dart';
-import 'package:sora/src/ui/qr.dart';
-import 'package:sora/src/ui/kit.dart';
 import 'package:sora/src/ui/subscription_sheet.dart';
 
 import 'desktop_shell_test.dart' show section, size;
