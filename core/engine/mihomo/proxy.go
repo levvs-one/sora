@@ -25,6 +25,18 @@ func buildProxy(o engine.Outbound) (proxy, error) {
 	px.Port = int(o.Port)
 
 	switch o.Protocol {
+	case engine.ProtocolMieru:
+		if o.Mieru.UDP != nil {
+			px.UDP = o.Mieru.UDP
+		}
+		px.Type, px.Username, px.Password = "mieru", o.UserID, o.Password
+		px.MieruTransport = strings.ToUpper(orDefault(o.Transport.Type, "tcp"))
+		px.PortRange, px.Multiplexing = o.Mieru.PortRange, o.Mieru.Multiplexing
+		px.HandshakeMode, px.TrafficPattern = o.Mieru.HandshakeMode, o.Mieru.TrafficPattern
+		if px.PortRange != "" {
+			px.Port = 0
+		}
+		return px, nil
 	case engine.ProtocolShadowsocks:
 		px.Type = "ss"
 		px.Cipher = orDefault(o.Cipher, "aes-256-gcm")

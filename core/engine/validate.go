@@ -41,6 +41,11 @@ func (o Outbound) Secrets() []string {
 		candidates = append(candidates, p.PreSharedKey)
 	}
 	candidates = append(candidates, profileSecrets(o.Profile)...)
+	if o.Naive != nil {
+		for _, v := range o.Naive.ExtraHeaders {
+			candidates = append(candidates, v)
+		}
+	}
 	out := make([]string, 0, len(candidates))
 	for _, c := range candidates {
 		if len(c) >= 4 {
@@ -112,7 +117,7 @@ var validProtocols = map[Protocol]bool{
 	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 	ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
 	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolXrayProfile: true,
-	ProtocolDirect: true, ProtocolOLCRTC: true,
+	ProtocolDirect: true, ProtocolOLCRTC: true, ProtocolMieru: true, ProtocolNaive: true,
 }
 
 // validTransports includes parser outputs and renderer transport names:
@@ -149,6 +154,9 @@ func (o Outbound) Validate() error {
 	}
 	if o.Protocol == ProtocolOLCRTC {
 		errs = append(errs, validateOLCRTC(o))
+	}
+	if o.Protocol == ProtocolMieru || o.Protocol == ProtocolNaive {
+		errs = append(errs, o.validateCommunity())
 	}
 	if o.Protocol == ProtocolBypass {
 		errs = append(errs, o.Bypass.validate(o.ID))

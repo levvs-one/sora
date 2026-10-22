@@ -220,10 +220,10 @@ func newSubscriptionID() (string, error) {
 
 // normalizedLink normalizes links for duplicate detection.
 func normalizedLink(raw string) (string, error) {
-	if isOLCRTCLink(raw) {
+	if isLocalServerLink(raw) {
 		parsed, err := (parser.LinkParser{}).Parse([]byte(raw))
-		if err != nil || len(parsed.Servers) != 1 || parsed.Report.Invalid != 0 || parsed.Report.Unsupported != 0 {
-			return "", errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionFormat, "control: invalid olcrtc URI")
+		if err != nil || len(parsed.Servers) == 0 || parsed.Report.Invalid != 0 || parsed.Report.Unsupported != 0 {
+			return "", errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionFormat, "control: invalid server URI")
 		}
 		return strings.TrimSpace(raw), nil
 	}
@@ -310,7 +310,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	}
 	rec.Name = strings.TrimSpace(in.GetName())
 	rec.UserAgent = agent
-	rec.AutoUpdate = in.GetAutoUpdate() && !isOLCRTCLink(rec.URL)
+	rec.AutoUpdate = in.GetAutoUpdate() && !isLocalServerLink(rec.URL)
 	rec.Interval = interval
 	if err := b.persistLocked(&rec, nil, nil); err != nil {
 		return nil, err
@@ -374,7 +374,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		b.mu.Unlock()
 		return state, nil
 	}
-	if b.srv.fetcher == nil && !isOLCRTCLink(rec.URL) {
+	if b.srv.fetcher == nil && !isLocalServerLink(rec.URL) {
 		b.mu.Unlock()
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionFetch, "control: this core cannot fetch subscriptions")
 	}
@@ -387,7 +387,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	defer cancel()
 	var fetched subscription.Result
 	var err error
-	if isOLCRTCLink(link) {
+	if isLocalServerLink(link) {
 		fetched.Body = []byte(link)
 	} else {
 		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
@@ -396,7 +396,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	var servers []importedServer
 	if err == nil {
 		servers, err = b.srv.parsePayload(fetched.Body, serverRefFor(id))
-		if isOLCRTCLink(link) && len(servers) == 1 {
+		if isLocalServerLink(link) && len(servers) == 1 {
 			fetched.Info.Title = servers[0].spec.GetDisplayName()
 		}
 	}
@@ -794,6 +794,7 @@ func (s *Server) WatchSubscriptions(req *corev1.WatchSubscriptionsRequest, strea
 	}
 }
 
-func isOLCRTCLink(raw string) bool {
-	return strings.HasPrefix(strings.ToLower(strings.TrimSpace(raw)), "olcrtc://")
+func isLocalServerLink(raw string) bool {
+	scheme, _, ok := strings.Cut(strings.ToLower(strings.TrimSpace(raw)), "://")
+	return ok && (scheme == "olcrtc" || scheme == "mieru" || scheme == "mierus" || scheme == "naive+https" || scheme == "naive+quic")
 }

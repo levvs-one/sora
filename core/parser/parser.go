@@ -113,7 +113,7 @@ func (d ImportDetector) Detect(src []byte) (Detection, error) {
 func hasScheme(s string) bool {
 	for _, l := range strings.Fields(s) {
 		p := strings.ToLower(strings.TrimSpace(l))
-		for _, x := range []string{"olcrtc://", "vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
+		for _, x := range []string{"mieru://", "mierus://", "naive+https://", "naive+quic://", "olcrtc://", "vless://", "vmess://", "trojan://", "ss://", "socks://", "socks5://", "http://", "https://", "hysteria2://", "hy2://", "tuic://", "wireguard://", "wg://"} {
 			if strings.HasPrefix(p, x) {
 				return true
 			}
@@ -177,6 +177,8 @@ func decodeBase64(s string) ([]byte, bool) {
 // retains additional fields to avoid silently losing unsupported settings
 // during import.
 type OutboundSpec struct {
+	Mieru                                                                                           *engine.Mieru
+	Naive                                                                                           *engine.Naive
 	OLCRTC                                                                                          *engine.OLCRTC
 	DisplayProtocol                                                                                 string
 	ID, DisplayName, Protocol, Transport, Security                                                  string
@@ -208,6 +210,12 @@ func (o OutboundSpec) StableKey() string {
 	// provider rules so updates preserve saved selections.
 	if o.OLCRTC != nil {
 		material += "\x00" + o.OLCRTC.Provider + "\x00" + o.OLCRTC.Room + "\x00" + o.OLCRTC.Transport
+	}
+	if o.Mieru != nil {
+		material += "\x00" + o.Transport + "\x00" + o.Mieru.PortRange
+	}
+	if o.Naive != nil {
+		material += "\x00" + o.Transport
 	}
 	if o.Protocol == "xray-profile" {
 		material += "\x00" + o.DisplayName
@@ -329,7 +337,7 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 			continue
 		}
 		last = -1
-		o, e := parseLink(l)
+		items, e := parseCommunityLinks(l, p.limit()-len(r.Servers))
 		if e != nil {
 			if errors.Is(e, ErrUnsupported) {
 				r.Report.Unsupported++
@@ -340,16 +348,18 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 			}
 			continue
 		}
-		k := o.StableKey()
-		if _, ok := seen[k]; ok {
-			r.Report.SkippedDuplicates++
-			r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
-			continue
+		for _, o := range items {
+			k := o.StableKey()
+			if _, ok := seen[k]; ok {
+				r.Report.SkippedDuplicates++
+				r.Report.DuplicateItems = append(r.Report.DuplicateItems, ItemReason{i, "duplicate server"})
+				continue
+			}
+			seen[k] = struct{}{}
+			r.Servers = append(r.Servers, o)
+			last = len(r.Servers) - 1
+			r.Report.Imported++
 		}
-		seen[k] = struct{}{}
-		r.Servers = append(r.Servers, o)
-		last = len(r.Servers) - 1
-		r.Report.Imported++
 	}
 	if len(r.Servers) == 0 && r.Report.Unsupported == 0 && r.Report.Invalid == 0 {
 		return r, ErrUnsupported
@@ -540,6 +550,9 @@ func parseWireURL(u *url.URL) (OutboundSpec, error) {
 	return o, o.validate()
 }
 func mapJSONSpec(m map[string]any, fallback string) (OutboundSpec, error) {
+	if kind := stringValue(m["type"]); kind == "mieru" || kind == "naive" {
+		return mapCommunitySpec(m)
+	}
 	o := OutboundSpec{Protocol: fallback, Transport: "tcp", Options: map[string]string{}}
 	if s, ok := m["type"].(string); ok {
 		o.Protocol = s
