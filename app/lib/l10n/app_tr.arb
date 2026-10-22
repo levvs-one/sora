@@ -62,8 +62,7 @@
   "errEngineMissing": "Bu sunucu için motor bulunamadı",
   "errEngineStart": "Motor çalışmadı",
   "errEngineStopped": "Motor durdu",
-  "errTunnel": "VPN bağlantısı oluşturma izni yok",
-  "errServers": "Sunucu bir hatayla yapılandırıldı",
+  "errTunnel": "Bu VPN modu kullanılamıyor. Başka bir mod seçin veya hizmet izinlerini kontrol edin.",
   "errNetwork": "Sunucuya ulaşılamıyor",
   "errTimeout": "Sunucu zamanında yanıt vermedi",
   "errFirewall": "VPN dışında internet engellenemedi",
@@ -271,8 +270,8 @@
   "modesInfo": "Modlar hakkında",
   "modesGuideTitle": "Modlar ve motorlar",
   "probeServers": "Sunucuları kontrol edin",
-  "expiresIn": "{name}: {days, plural, =0{abonelik birkaç saat içinde bitiyor} one{abonelik # gününde sona eriyor} other{abonelik # gün içinde sona eriyor}}",
-  "groupBest": "{count, plural, one{# sunucusu, en hızlısı} other{# sunucuları, en hızlısı}}",
+  "expiresIn": "{name}: {days, plural, =0{abonelik birkaç saat içinde bitiyor} one{abonelik {days} gününde sona eriyor} other{abonelik {days} gün içinde sona eriyor}}",
+  "groupBest": "{count, plural, one{{count} sunucusu, en hızlısı} other{{count} sunucuları, en hızlısı}}",
   "modesGuide": "Sunucunuzun hangi motora ihtiyacı olduğundan emin değilseniz Otomatik'i seçin. Sora bağlanmadan önce profili ve ayarları kontrol eder. Bir motor planınızın bant genişliğini artıramaz: performans sunucuya, rotaya, protokole ve ağa bağlıdır.\n\n## Modlar\n\n### Tüm trafik (TUN)\n\nSora bir sanal ağ arayüzü oluşturur ve TCP ve UDP dahil olmak üzere uygulama trafiğini bu arayüz üzerinden yönlendirir. Bu modu Telegram, oyunlar ve Discord ses için kullanın. Kurallar belirli siteleri veya programları doğrudan gönderebilir veya engelleyebilir. Ağ hizmetinin izne ve gerekli protokolü destekleyen bir sunucuya ihtiyacı vardır.\n\n### System proxy\n\nSora, yerel bir HTTP/SOCKS proxy'sini yapılandırır. Sistem proxy ayarlarına saygı duyan uygulamalar bunu kullanır. Kendi ağ yığınına sahip uygulamalar doğrudan bağlanabilir; UDP ve sesli aramalar genellikle TUN'a ihtiyaç duyar. Bu mod, proxy desteği olan tarayıcılara ve uygulamalara uygundur.\n\n### Sunucu yok\n\nLinux'de Sora, HTTP/TLS isteklerini bölmek ve yeniden şekillendirmek ve bazı DPI kontrollerini atlamak için [zapret](https://github.com/bol-van/zapret) kullanır. IP'niz aynı kalır ve bağlantılar doğrudan web sitesine gider. Sonuçlar sağlayıcınıza ve engelleme yöntemine bağlıdır.\n\nMevcut entegrasyon HTTP için tpws ve TCP üzerinden TLS kullanıyor. IP engellemeyi veya aktarma UDP'sini atlamaz ve Telegram'nin MTProto bağlantılarını garanti edemez. Discord ses, Telegram aramaları ve bu tür kısıtlamalar için TUN'lu bir VPN sunucusu kullanın.\n\n## Motorlar\n\n### Otomatik\n\nSora, bağlantı planının tamamını destekleyen kurulu bir motoru seçer: sunucu protokolleri, aktarımlar, gruplar, parçalanma ve mod. Uyumsuz bir manuel seçim, mevcut bağlantı durdurulmadan önce reddedilir. Otomatik veya başka bir motoru seçin ve ayarları tekrar uygulayın.\n\n### sing-box\n\nYeni Sora paketleri, istemci tarafı XHTTP ve VLESS Encryption'yi ekleyen [sing-box](https://github.com/SagerNet/sing-box) çatalı olan [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)'yi içerir. Sora, yapıyı ve yeteneklerini tanır. XHTTP'siz bir yukarı akış yapısı bu yeteneği yalnızca adından kazanmaz.\n\nDesteklenen protokoller arasında VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard ve AmneziaWG 1.x/2.x parametreleri bulunur Sora içe aktarabilir. Tam Xray JSON profilleri Xray gerektirir. Yeni AWG 3.x alanları henüz içe aktarılamıyor. sing-box, bilgisayardaki diğer uygulamaların algılayabileceği, parola korumalı bir yerel kontrol bağlantı noktası kullanır.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core), VLESS, REALITY, XHTTP, VLESS Encryption ve TLS parçalanmasını destekler. Ayrıca yönlendirmelerini ve gruplarını korurken sağlayıcı Xray profillerinin tamamını çalıştırır. Bu tür profiller, davranışları değiştirilmeden otomatik olarak başka bir motora dönüştürülemez.\n\nBirlikte verilen Xray, TLS sertifika doğrulamasını devre dışı bırakan ayarı (\"allowInsecure\") kaldırdı. Otomatik, bu ayarı gerektiren sıradan sunucular için sing-box veya mihomo'yi seçer. Xray seçildiğinde, mevcut bağlantı durdurulmadan önce uyumsuzluk manuel olarak raporlanır. Daha eski tam JSON profilleri, doğrulanabilir bir sertifikaya veya sertifika pinine sahip güncellenmiş bir sağlayıcı profiline ihtiyaç duyar.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo), sıralı geri dönüş ve yük dengeleme grupları olan XHTTP ve AmneziaWG'yi destekler. Yedekleme sunucusuna otomatik yük devretme önemli olduğunda bunu seçin. Sora'nin TLS parçalanma ayarı bu motorda kullanılamaz.\n\n## Sora ile uyumluluk\n\n| Özellik | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN ve TCP/UDP | Evet | Evet | Evet |\n| XHTTP | Evet | Evet | Evet |\n| VLESS Encryption | Evet | Evet | Evet |\n| Tam Xray profili | Hayır | Evet | Hayır |\n| TUIC / AnyTLS | Her ikisi de | Hayır | TUIC |\n| mieru | Hayır | Hayır | Evet |\n| NaiveProxy | Evet | Hayır | Hayır |\n| TLS parçalanması | Evet | Evet | Hayır |\n| AmneziaWG 1.x/2.x | Evet¹ | Hayır | Evet |\n| Sıralı yedek grup | Hayır | No² | Evet |\n\n¹ J1/J2/J3/Itime içeren profiller mihomo kullanır; bu alanlar asla sessizce atılmamalıdır. ² Tam Xray profillerinden oluşan bir grup için uygulama bir yedekleme profili seçer. Destek, kurulu yapıya bağlıdır; Hakkında bölümünden sürümünü kontrol edin.\n\n## TUN yığını\n\nYığın, sanal arabirim içindeki TCP ve UDP'yi yönetir. Modlar panelinde Xray ve mihomo, gVisor, System, Mixed ve MIPS'yi sunar. Her motor kendi tercihini kaydeder. System proxy ve Sunucusuz modları bu tercihi kullanmaz.\n\n- **Mixed**: TCP sistem yığınını kullanırken gVisor UDP'yi yönetir. Bu, Linux üzerinde mihomo için varsayılandır. Windows üzerinde Xray ve mihomo varsayılan olarak MIPS kullanır.\n- **System**: sistem yığınını kullanır. Ağ uygulamaları sorunlarla karşılaşırsa başka bir seçeneği deneyin.\n- **gVisor**: kullanıcı alanındaki trafiği yönetir.\n- **MIPS**: mihomo'nin kendi IP yığını, paket halindeki 1.19.32 sürümünde mevcuttur.\n\nLinux'de Xray, varsayılan olarak yerleşik gVisor'yi kullanır. Linux üzerindeki System, Mixed ve MIPS, TUN motoru olarak mihomo'yi kullanır ve kimliği doğrulanmış bir yerel SOCKS bağlantısı üzerinden TCP ve UDP'yi Xray'ye iletir. Xray protokolü, sağlayıcı profilini ve yönlendirmeyi korur. Bu üç seçenek mihomo'nin kurulu olmasını gerektirir. Windows üzerinde Xray, dört TUN yığınının tümü için mihomo 1.19.32 veya daha yenisini kullanır. Protokoller ve yönlendirme Xray içinde kalır. Bu birleşimde uygulama kuralları yalnızca doğrudan bağlantı ve engellemeyi destekler; Linux üzerinde bu kurallar Xray’ın yerleşik gVisor yığınını gerektirir.\n\nKöprü ikinci bir süreci yürütür. Linux üzerindeki üç boşta ölçümde, yerel Xray TUN'dan yaklaşık 32-36 MiB daha fazla fiziksel bellek kullandı. Bu, indirme yükünü ölçmez: CPU ve bellek maliyetleri bağlantılara bağlıdır. sing-box'de yığın seçici yoktur. Hiçbir yığın her ağda daha iyi performansı garanti etmez. Bir yığın seçin ve ağınızda denemek için Uygula ve yeniden bağlan'ı seçin.\n\n## Ayarları uygulama\n\nBir sunucu seçildiğinde otomatik olarak yeniden bağlanır. Mod, motor, DNS ve kural ayarları anında kaydedilir; etkin bir bağlantı sırasında bunları kullanmak için Uygula ve yeniden bağlan'a tıklayın. Motorun yeniden başlatılması indirme ve çağrıların kesintiye uğramasına neden olabilir. Tekrarlanan tıklamalar paralel bağlantıları başlatmaz; bağlantıyı kesmek geçişi sonlandırır ve bağlantıyı serbest bırakır.\n\nYalnızca VPN aracılığıyla İnternet, bir tünel kapandığında doğrudan trafiği engeller. Tüm makineyi etkiler. Açık bir bağlantı kesilmesi Sora'nin kurallarını kaldırır. Temizleme işlemi bitmezse bağlantıyı kesmeyi ve günlüğü açmayı yeniden deneyin.\n\n## Proje dokümantasyonu\n\n- [sing-box-lx: yapılandırma ve destek](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box belgeleri](https://sing-box.sagernet.org/)\n- [Xray belgeleri](https://xtls.github.io/)\n- [mihomo belgeleri](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: çalışma ve sınırlamalar](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC, TCP trafiğini Jitsi, Yandex Telemost veya WB Stream görüntülü araması üzerinden taşır. Bir olcrtc:// bağlantısı veya QR kodu içe aktarın. Proxy ve TUN kiplerinde sing-box, Xray ve mihomo ile çalışır; UDP desteklenmez. Her iki uçta uyumlu OLC2 derlemeleri gerekir. Kaynak proje arşivlenmiştir.\n",
   "@deleteSubscription": {
     "placeholders": {
@@ -491,7 +490,7 @@
     }
   },
   "leakTestAllClear": "Sızıntı bulunamadı",
-  "leakTestFound": "{count, plural, one{# sızıntı bulundu} other{# sızıntı bulundu}}",
+  "leakTestFound": "{count, plural, one{{count} sızıntı bulundu} other{{count} sızıntı bulundu}}",
   "@leakTestFound": {
     "placeholders": {
       "count": {
@@ -741,7 +740,7 @@
   "extBgTitle": "Arka plan görevi",
   "extBgEnabled": "Arka planda çalıştır",
   "extBgInterval": "Çalıştırma aralığı",
-  "extBgMinutes": "{count, plural, one{# dakika} other{# dakika}}",
+  "extBgMinutes": "{count, plural, one{{count} dakika} other{{count} dakika}}",
   "@extBgMinutes": {
     "placeholders": {
       "count": {
@@ -749,7 +748,7 @@
       }
     }
   },
-  "extBgHours": "{count, plural, one{# saat} other{# saat}}",
+  "extBgHours": "{count, plural, one{{count} saat} other{{count} saat}}",
   "@extBgHours": {
     "placeholders": {
       "count": {
@@ -781,7 +780,7 @@
   "connListView": "Liste",
   "connCopyHost": "Ana bilgisayarı kopyala",
   "connAddRule": "Kural ekle",
-  "connConnectionsCount": "{count, plural, one{# bağlantı} other{# bağlantı}}",
+  "connConnectionsCount": "{count, plural, one{{count} bağlantı} other{{count} bağlantı}}",
   "dnsPreset": "Ön Ayar",
   "dnsPresetCloudflare": "Cloudflare",
   "dnsPresetGoogle": "Google",
@@ -820,7 +819,6 @@
   "autoSelectSmart": "Akıllı seçim",
   "coreWatchUnstable": "Sora çekirdeğine olan bağlantı kararsız",
   "watchReconnect": "Yeniden bağlan",
-  "coreRestoringLink": "Sora çekirdeğiyle bağlantı geri yükleniyor…",
   "crashRestoreTitle": "Son oturum kesintiye uğradı",
   "restoreOnCrash": "Bir kilitlenme sonrasında oturumu geri yükleme",
   "crashRestore": "Geri Yükle",
@@ -996,5 +994,25 @@
   "customServerSecretRequired": "Bir değer girin",
   "customServerLinkInvalid": "Geçersiz sunucu bağlantısı",
   "customServerMethodHint": "chacha20-ietf-poly1305",
-  "customServerWgAddressesHint": "10.0.0.2/32"
+  "customServerWgAddressesHint": "10.0.0.2/32",
+  "errInternal": "Sora iç hatası. Günlüğü kaydedip sorunu bildirin.",
+  "errTls": "Sunucu sertifikası reddedildi. Saati kontrol edin veya sağlayıcıya başvurun.",
+  "errFileAccess": "Dosyaya erişilemiyor. İzinleri ve boş alanı kontrol edin.",
+  "errDataLimit": "Çok fazla veri. Daha az öğe seçip yeniden deneyin.",
+  "errCredentials": "Kayıtlı kimlik bilgileri eksik. Sunucuyu yeniden içe aktarın.",
+  "subscriptionStale": "Son güncelleme: {time}",
+  "subscriptionNeverUpdated": "Henüz güncellenmedi. Yeniden deneyin.",
+  "errHttpStatus": "Sunucu isteği reddetti. Bağlantıyı kontrol edin veya sağlayıcıya başvurun.",
+  "errInvalidServer": "Sunucu ayarları eksik veya desteklenmiyor. Aboneliği yenileyin.",
+  "errServerIds": "İki sunucu aynı kimliği kullanıyor. Yeniden içe aktarın.",
+  "errRoutingGroup": "Yönlendirme eksik sunuculara veya bozuk bir gruba başvuruyor. Aboneliği yenileyin.",
+  "errConnections": "Bağlantı listesi kullanılamıyor. Bağlanın veya başka bir motor seçin.",
+  "errLogs": "Bu hizmet günlük tutmuyor. Sora’yı güncelleyin.",
+  "errDiagnostics": "Tanılama toplanamadı. Yeniden deneyin veya günlüğü kaydedin.",
+  "errMissingItem": "İstenen öğe artık yok. Listeyi yenileyin.",
+  "errInvalidRequest": "İstek geçersiz değerler içeriyor. Girdinizi kontrol edip yeniden deneyin.",
+  "errProxyLogin": "Sistem vekili bu girişi desteklemiyor. Yerel vekilin kullanıcı adını ve parolasını kaldırın.",
+  "errLogFilter": "Günlük filtresi geçersiz. Aramayı temizleyip yeniden deneyin.",
+  "errSubRedirect": "Sunucu güvenli olmayan bir adrese yönlendirdi. Sağlayıcınızdan yeni bir bağlantı isteyin.",
+  "errProxySetup": "Sistem vekili yapılandırılamadı. Yeniden bağlanın veya günlüğü açın."
 }

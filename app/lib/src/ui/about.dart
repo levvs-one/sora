@@ -33,18 +33,18 @@ class _AboutScreenState extends State<AboutScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_load()));
   }
 
-  Future<void> _load() async {
+  Future<void> _load({FailureMode mode = FailureMode.background}) async {
     final link = SoraScope.read(context).link;
     if (link == null) return;
     try {
       final answer = await link.stub.getAbout(GetAboutRequest(apiVersion: apiVersion));
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
       if (mounted) {
         SoraScope.read(context).recovered('about');
         setState(() => _about = answer.about);
       }
     } catch (error) {
-      if (mounted) SoraScope.read(context).reportFailure(error, source: 'about');
+      if (mounted) SoraScope.read(context).reportFailure(error, source: 'about', mode: mode);
     }
   }
 
@@ -307,6 +307,10 @@ class _AboutScreenState extends State<AboutScreen> {
             if (!updates.checking && release == null && !sora.settings.checkUpdates)
               Tile(title: s.updateChecksDisabled),
           ],
+        ),
+        BackgroundFailureState(
+          source: 'about',
+          retry: () => unawaited(_load(mode: FailureMode.action)),
         ),
         if (about != null) ...[
           Group(

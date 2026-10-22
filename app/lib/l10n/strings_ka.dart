@@ -226,10 +226,7 @@ class SKa extends S {
   String get errEngineStopped => 'ძრავა გაჩერდა';
 
   @override
-  String get errTunnel => 'VPN კავშირის შექმნის ნებართვა არ არის';
-
-  @override
-  String get errServers => 'სერვერი კონფიგურირებულია შეცდომით';
+  String get errTunnel => 'VPN-ის ეს რეჟიმი მიუწვდომელია. აირჩიეთ სხვა რეჟიმი ან შეამოწმეთ სერვისის ნებართვები.';
 
   @override
   String get errNetwork => 'სერვერთან დაკავშირება შეუძლებელია';
@@ -487,8 +484,8 @@ class SKa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'გამოწერა მთავრდება # დღეში',
-      one: 'გამოწერა მთავრდება # დღეში',
+      other: 'გამოწერა მთავრდება $days დღეში',
+      one: 'გამოწერა მთავრდება $days დღეში',
       zero: 'გამოწერა მთავრდება რამდენიმე საათში',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SKa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# სერვერები, ყველაზე სწრაფი',
-      one: '# სერვერი, ყველაზე სწრაფი',
+      other: '$count სერვერები, ყველაზე სწრაფი',
+      one: '$count სერვერი, ყველაზე სწრაფი',
     );
     return '$_temp0';
   }
@@ -1230,13 +1227,13 @@ class SKa extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# წუთი', one: '# წუთი');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count წუთი', one: '$count წუთი');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# საათი', one: '# საათი');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count საათი', one: '$count საათი');
     return '$_temp0';
   }
 
@@ -1306,7 +1303,7 @@ class SKa extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# კავშირი', one: '# კავშირი');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count კავშირი', one: '$count კავშირი');
     return '$_temp0';
   }
 
@@ -1426,9 +1423,6 @@ class SKa extends S {
 
   @override
   String get watchReconnect => 'ხელახლა დაკავშირება';
-
-  @override
-  String get coreRestoringLink => 'მიმდინარეობს კავშირის აღდგენა Sora ბირთვთან…';
 
   @override
   String get crashRestoreTitle => 'ბოლო სხდომა შეწყდა';
@@ -1767,8 +1761,8 @@ class SKa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'აღმოჩენილია # გაჟონვა',
-      one: 'აღმოჩენილია # გაჟონვა',
+      other: 'აღმოჩენილია $count გაჟონვა',
+      one: 'აღმოჩენილია $count გაჟონვა',
     );
     return '$_temp0';
   }
@@ -2008,4 +2002,68 @@ class SKa extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora-ს შიდა შეცდომა. შეინახეთ ჟურნალი და შეატყობინეთ პრობლემის შესახებ.';
+
+  @override
+  String get errTls => 'სერვერის სერტიფიკატი უარყოფილია. შეამოწმეთ საათი ან დაუკავშირდით პროვაიდერს.';
+
+  @override
+  String get errFileAccess => 'ფაილი მიუწვდომელია. შეამოწმეთ ნებართვები და თავისუფალი ადგილი.';
+
+  @override
+  String get errDataLimit => 'მონაცემები ძალიან ბევრია. აირჩიეთ ნაკლები ელემენტი და სცადეთ ხელახლა.';
+
+  @override
+  String get errCredentials => 'შენახული წვდომის მონაცემები აკლია. სერვერი ხელახლა შემოიტანეთ.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'განახლდა: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'ჯერ არ განახლებულა. სცადეთ ხელახლა.';
+
+  @override
+  String get errHttpStatus => 'სერვერმა მოთხოვნა უარყო. შეამოწმეთ ბმული ან დაუკავშირდით პროვაიდერს.';
+
+  @override
+  String get errInvalidServer => 'სერვერის პარამეტრები არასრულია ან არ არის მხარდაჭერილი. განაახლეთ გამოწერა.';
+
+  @override
+  String get errServerIds => 'ორ სერვერს ერთნაირი იდენტიფიკატორი აქვს. ხელახლა შემოიტანეთ ისინი.';
+
+  @override
+  String get errRoutingGroup => 'მარშრუტი მიუთითებს დაკარგულ სერვერებზე ან დაზიანებულ ჯგუფზე. განაახლეთ გამოწერა.';
+
+  @override
+  String get errConnections => 'კავშირების სია მიუწვდომელია. დაუკავშირდით ან აირჩიეთ სხვა ძრავა.';
+
+  @override
+  String get errLogs => 'ეს სერვისი ჟურნალს არ ინახავს. განაახლეთ Sora.';
+
+  @override
+  String get errDiagnostics => 'დიაგნოსტიკის შეგროვება ვერ მოხერხდა. სცადეთ ხელახლა ან შეინახეთ ჟურნალი.';
+
+  @override
+  String get errMissingItem => 'მოთხოვნილი ელემენტი აღარ არსებობს. განაახლეთ სია.';
+
+  @override
+  String get errInvalidRequest =>
+      'მოთხოვნა არასწორ მნიშვნელობებს შეიცავს. შეამოწმეთ შეყვანილი მონაცემები და გაიმეორეთ.';
+
+  @override
+  String get errProxyLogin =>
+      'სისტემის პროქსი ამ შესვლას არ უჭერს მხარს. წაშალეთ ადგილობრივი პროქსის მომხმარებლის სახელი და პაროლი.';
+
+  @override
+  String get errLogFilter => 'ჟურნალის ფილტრი არასწორია. გაასუფთავეთ ძიება და გაიმეორეთ.';
+
+  @override
+  String get errSubRedirect => 'სერვერმა სახიფათო მისამართზე გადაგამისამართათ. პროვაიდერს ახალი ბმული სთხოვეთ.';
+
+  @override
+  String get errProxySetup => 'სისტემის პროქსი ვერ დაყენდა. ხელახლა დაუკავშირდით ან გახსენით ჟურნალი.';
 }

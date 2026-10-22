@@ -226,10 +226,7 @@ class SHi extends S {
   String get errEngineStopped => 'इंजन बंद हो गया';
 
   @override
-  String get errTunnel => 'वीपीएन कनेक्शन बनाने की अनुमति नहीं';
-
-  @override
-  String get errServers => 'सर्वर एक त्रुटि के साथ कॉन्फ़िगर किया गया है';
+  String get errTunnel => 'यह VPN मोड उपलब्ध नहीं है। दूसरा मोड चुनें या सेवा की अनुमतियाँ जाँचें।';
 
   @override
   String get errNetwork => 'सर्वर तक नहीं पहुंच सकता';
@@ -487,8 +484,8 @@ class SHi extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'सदस्यता # दिनों में समाप्त हो जाती है',
-      one: 'सदस्यता # दिन में समाप्त होती है',
+      other: 'सदस्यता $days दिनों में समाप्त हो जाती है',
+      one: 'सदस्यता $days दिन में समाप्त होती है',
       zero: 'सदस्यता कुछ ही घंटों में समाप्त हो जाती है',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SHi extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# सर्वर, सबसे तेज़',
-      one: '# सर्वर, सबसे तेज़',
+      other: '$count सर्वर, सबसे तेज़',
+      one: '$count सर्वर, सबसे तेज़',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class SHi extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# मिनट', one: '# मिनट');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count मिनट', one: '$count मिनट');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# घंटे', one: '# घंटा');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count घंटे', one: '$count घंटा');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class SHi extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# कनेक्शन', one: '# कनेक्शन');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count कनेक्शन', one: '$count कनेक्शन');
     return '$_temp0';
   }
 
@@ -1424,9 +1421,6 @@ class SHi extends S {
 
   @override
   String get watchReconnect => 'पुनः कनेक्ट करें';
-
-  @override
-  String get coreRestoringLink => 'Sora कोर से कनेक्शन बहाल किया जा रहा है…';
 
   @override
   String get crashRestoreTitle => 'पिछला सत्र बाधित हुआ था';
@@ -1764,7 +1758,7 @@ class SHi extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# लीक मिले', one: '# लीक मिला');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count लीक मिले', one: '$count लीक मिला');
     return '$_temp0';
   }
 
@@ -2002,4 +1996,67 @@ class SHi extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora में आंतरिक त्रुटि। लॉग सहेजें और समस्या की सूचना दें।';
+
+  @override
+  String get errTls => 'सर्वर का प्रमाणपत्र अस्वीकार हुआ। घड़ी जाँचें या प्रदाता से संपर्क करें।';
+
+  @override
+  String get errFileAccess => 'फ़ाइल तक पहुँच नहीं है। अनुमतियाँ और खाली जगह जाँचें।';
+
+  @override
+  String get errDataLimit => 'बहुत ज़्यादा डेटा है। कम आइटम चुनें और फिर कोशिश करें।';
+
+  @override
+  String get errCredentials => 'सहेजी गई लॉगिन जानकारी नहीं मिली। सर्वर फिर से आयात करें।';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'अंतिम अपडेट: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'अभी अपडेट नहीं हुआ। फिर कोशिश करें।';
+
+  @override
+  String get errHttpStatus => 'सर्वर ने अनुरोध अस्वीकार किया। लिंक जाँचें या प्रदाता से संपर्क करें।';
+
+  @override
+  String get errInvalidServer => 'सर्वर की सेटिंग अधूरी या असमर्थित हैं। सदस्यता अपडेट करें।';
+
+  @override
+  String get errServerIds => 'दो सर्वर का पहचानकर्ता एक है। उन्हें फिर से आयात करें।';
+
+  @override
+  String get errRoutingGroup => 'मार्ग लापता सर्वर या खराब समूह की ओर है। सदस्यता अपडेट करें।';
+
+  @override
+  String get errConnections => 'कनेक्शन सूची उपलब्ध नहीं है। कनेक्ट करें या दूसरा इंजन चुनें।';
+
+  @override
+  String get errLogs => 'यह सेवा लॉग नहीं रखती। Sora अपडेट करें।';
+
+  @override
+  String get errDiagnostics => 'निदान एकत्र नहीं हुआ। फिर कोशिश करें या लॉग सहेजें।';
+
+  @override
+  String get errMissingItem => 'माँगा गया आइटम अब मौजूद नहीं है। सूची ताज़ा करें।';
+
+  @override
+  String get errInvalidRequest => 'अनुरोध में अमान्य मान हैं। दर्ज जानकारी जाँचें और फिर कोशिश करें।';
+
+  @override
+  String get errProxyLogin =>
+      'सिस्टम प्रॉक्सी इस लॉगिन का समर्थन नहीं करती। स्थानीय प्रॉक्सी का उपयोगकर्ता नाम और पासवर्ड हटाएँ।';
+
+  @override
+  String get errLogFilter => 'लॉग फ़िल्टर अमान्य है। खोज साफ़ करें और फिर कोशिश करें।';
+
+  @override
+  String get errSubRedirect => 'सर्वर ने असुरक्षित पते पर भेजा। प्रदाता से नया लिंक माँगें।';
+
+  @override
+  String get errProxySetup => 'सिस्टम प्रॉक्सी कॉन्फ़िगर नहीं हुई। फिर कनेक्ट करें या लॉग खोलें।';
 }

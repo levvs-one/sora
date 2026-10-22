@@ -226,10 +226,7 @@ class SUk extends S {
   String get errEngineStopped => 'Мотор зупинився';
 
   @override
-  String get errTunnel => 'Немає дозволу на створення VPN-з’єднання';
-
-  @override
-  String get errServers => 'Сервер налаштовано з помилкою';
+  String get errTunnel => 'Цей режим VPN недоступний. Виберіть інший режим або перевірте права служби.';
 
   @override
   String get errNetwork => 'Не вдається підключитися до сервера';
@@ -487,8 +484,8 @@ class SUk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'термін дії підписки закінчується через # днів',
-      one: 'підписка закінчується через день #',
+      other: 'термін дії підписки закінчується через $days днів',
+      one: 'підписка закінчується через день $days',
       zero: 'підписка закінчується через кілька годин',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SUk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Сервери #, найшвидші',
-      one: 'Сервер #, найшвидший',
+      other: 'Сервери $count, найшвидші',
+      one: 'Сервер $count, найшвидший',
     );
     return '$_temp0';
   }
@@ -1231,10 +1228,10 @@ class SUk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# хвилини',
-      many: '# хвилин',
-      few: '# хвилини',
-      one: '# хвилина',
+      other: '$count хвилини',
+      many: '$count хвилин',
+      few: '$count хвилини',
+      one: '$count хвилина',
     );
     return '$_temp0';
   }
@@ -1244,10 +1241,10 @@ class SUk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# години',
-      many: '# годин',
-      few: '# години',
-      one: '# година',
+      other: '$count години',
+      many: '$count годин',
+      few: '$count години',
+      one: '$count година',
     );
     return '$_temp0';
   }
@@ -1321,10 +1318,10 @@ class SUk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# з’єднання',
-      many: '# з’єднань',
-      few: '# з’єднання',
-      one: '# з’єднання',
+      other: '$count з’єднання',
+      many: '$count з’єднань',
+      few: '$count з’єднання',
+      one: '$count з’єднання',
     );
     return '$_temp0';
   }
@@ -1444,9 +1441,6 @@ class SUk extends S {
 
   @override
   String get watchReconnect => 'Перепідключити';
-
-  @override
-  String get coreRestoringLink => 'Відновлення підключення до ядра Sora…';
 
   @override
   String get crashRestoreTitle => 'Останній сеанс було перервано';
@@ -1785,10 +1779,10 @@ class SUk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Знайдено # витоку',
-      many: 'Знайдено # витоків',
-      few: 'Знайдено # витоки',
-      one: 'Знайдено # витік',
+      other: 'Знайдено $count витоку',
+      many: 'Знайдено $count витоків',
+      few: 'Знайдено $count витоки',
+      one: 'Знайдено $count витік',
     );
     return '$_temp0';
   }
@@ -2030,4 +2024,66 @@ class SUk extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Внутрішня помилка Sora. Збережіть журнал і повідомте про збій.';
+
+  @override
+  String get errTls => 'Сертифікат сервера відхилено. Перевірте годинник або зверніться до провайдера.';
+
+  @override
+  String get errFileAccess => 'Немає доступу до файлу. Перевірте права та вільне місце.';
+
+  @override
+  String get errDataLimit => 'Забагато даних. Виберіть менше елементів і повторіть.';
+
+  @override
+  String get errCredentials => 'Збережені дані доступу втрачено. Імпортуйте сервер знову.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Оновлено: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Ще не оновлювалася. Повторіть.';
+
+  @override
+  String get errHttpStatus => 'Сервер відхилив запит. Перевірте посилання або зверніться до провайдера.';
+
+  @override
+  String get errInvalidServer => 'Налаштування сервера неповні або не підтримуються. Оновіть підписку.';
+
+  @override
+  String get errServerIds => 'Два сервери мають однаковий ідентифікатор. Імпортуйте їх знову.';
+
+  @override
+  String get errRoutingGroup => 'Маршрут посилається на видалені сервери або пошкоджену групу. Оновіть підписку.';
+
+  @override
+  String get errConnections => 'Список підключень недоступний. Підключіться або виберіть інше ядро.';
+
+  @override
+  String get errLogs => 'Ця служба не веде журнал. Оновіть Sora.';
+
+  @override
+  String get errDiagnostics => 'Не вдалося зібрати діагностику. Повторіть або збережіть журнал.';
+
+  @override
+  String get errMissingItem => 'Запитаний елемент більше не існує. Оновіть список.';
+
+  @override
+  String get errInvalidRequest => 'У запиті неправильні значення. Перевірте введені дані та повторіть.';
+
+  @override
+  String get errProxyLogin => 'Системний проксі не підтримує цей вхід. Видаліть логін і пароль локального проксі.';
+
+  @override
+  String get errLogFilter => 'Неправильний фільтр журналу. Очистьте пошук і повторіть.';
+
+  @override
+  String get errSubRedirect => 'Сервер перенаправив на небезпечну адресу. Запитайте нове посилання у провайдера.';
+
+  @override
+  String get errProxySetup => 'Не вдалося налаштувати системний проксі. Перепідключіться або відкрийте журнал.';
 }

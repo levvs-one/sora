@@ -226,10 +226,7 @@ class SVi extends S {
   String get errEngineStopped => 'Động cơ dừng lại';
 
   @override
-  String get errTunnel => 'Không có quyền tạo kết nối VPN';
-
-  @override
-  String get errServers => 'Máy chủ được cấu hình có lỗi';
+  String get errTunnel => 'Chế độ VPN này không khả dụng. Chọn chế độ khác hoặc kiểm tra quyền của dịch vụ.';
 
   @override
   String get errNetwork => 'Không thể truy cập máy chủ';
@@ -487,8 +484,8 @@ class SVi extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'đăng ký kết thúc sau # ngày',
-      one: 'đăng ký kết thúc vào ngày #',
+      other: 'đăng ký kết thúc sau $days ngày',
+      one: 'đăng ký kết thúc vào ngày $days',
       zero: 'đăng ký sẽ kết thúc sau vài giờ nữa',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SVi extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Máy chủ #, nhanh nhất',
-      one: 'Máy chủ #, nhanh nhất',
+      other: 'Máy chủ $count, nhanh nhất',
+      one: 'Máy chủ $count, nhanh nhất',
     );
     return '$_temp0';
   }
@@ -1230,13 +1227,13 @@ class SVi extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# phút');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count phút');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# giờ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count giờ');
     return '$_temp0';
   }
 
@@ -1306,7 +1303,7 @@ class SVi extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# kết nối');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count kết nối');
     return '$_temp0';
   }
 
@@ -1426,9 +1423,6 @@ class SVi extends S {
 
   @override
   String get watchReconnect => 'Kết nối lại';
-
-  @override
-  String get coreRestoringLink => 'Đang khôi phục kết nối tới lõi Sora…';
 
   @override
   String get crashRestoreTitle => 'Phiên cuối cùng bị gián đoạn';
@@ -1763,7 +1757,7 @@ class SVi extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: 'Phát hiện # rò rỉ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: 'Phát hiện $count rò rỉ');
     return '$_temp0';
   }
 
@@ -2003,4 +1997,66 @@ class SVi extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Lỗi nội bộ Sora. Lưu nhật ký và báo cáo sự cố.';
+
+  @override
+  String get errTls => 'Chứng chỉ máy chủ bị từ chối. Kiểm tra đồng hồ hoặc liên hệ nhà cung cấp.';
+
+  @override
+  String get errFileAccess => 'Không thể truy cập tệp. Kiểm tra quyền và dung lượng trống.';
+
+  @override
+  String get errDataLimit => 'Quá nhiều dữ liệu. Chọn ít mục hơn và thử lại.';
+
+  @override
+  String get errCredentials => 'Thiếu thông tin đăng nhập đã lưu. Nhập lại máy chủ.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Cập nhật lần cuối: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Chưa cập nhật. Thử lại.';
+
+  @override
+  String get errHttpStatus => 'Máy chủ từ chối yêu cầu. Kiểm tra liên kết hoặc liên hệ nhà cung cấp.';
+
+  @override
+  String get errInvalidServer => 'Cài đặt máy chủ chưa đầy đủ hoặc không được hỗ trợ. Cập nhật gói đăng ký.';
+
+  @override
+  String get errServerIds => 'Hai máy chủ có cùng mã định danh. Nhập lại chúng.';
+
+  @override
+  String get errRoutingGroup => 'Định tuyến trỏ tới máy chủ bị thiếu hoặc nhóm bị hỏng. Cập nhật gói đăng ký.';
+
+  @override
+  String get errConnections => 'Danh sách kết nối không khả dụng. Kết nối hoặc chọn bộ máy khác.';
+
+  @override
+  String get errLogs => 'Dịch vụ này không lưu nhật ký. Cập nhật Sora.';
+
+  @override
+  String get errDiagnostics => 'Không thể thu thập chẩn đoán. Thử lại hoặc lưu nhật ký.';
+
+  @override
+  String get errMissingItem => 'Mục được yêu cầu không còn tồn tại. Làm mới danh sách.';
+
+  @override
+  String get errInvalidRequest => 'Yêu cầu chứa giá trị không hợp lệ. Kiểm tra dữ liệu nhập và thử lại.';
+
+  @override
+  String get errProxyLogin => 'Proxy hệ thống không hỗ trợ đăng nhập này. Xóa tên người dùng và mật khẩu proxy cục bộ.';
+
+  @override
+  String get errLogFilter => 'Bộ lọc nhật ký không hợp lệ. Xóa nội dung tìm kiếm và thử lại.';
+
+  @override
+  String get errSubRedirect => 'Máy chủ chuyển hướng đến địa chỉ không an toàn. Yêu cầu liên kết mới từ nhà cung cấp.';
+
+  @override
+  String get errProxySetup => 'Không thể cấu hình proxy hệ thống. Kết nối lại hoặc mở nhật ký.';
 }

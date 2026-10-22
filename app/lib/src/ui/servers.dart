@@ -170,6 +170,9 @@ class _ServersScreenState extends State<ServersScreen> {
       SliverToBoxAdapter(
         child: Column(
           children: [
+            const BackgroundFailureState(source: 'probe'),
+            const BackgroundFailureState(source: 'benchmark'),
+            const BackgroundFailureState(source: 'custom-servers'),
             toolbar,
             if (sora.subscriptions.isNotEmpty) ...[const SizedBox(height: 8), search],
           ],
@@ -666,6 +669,7 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
               ),
             ],
           ),
+          if (state.hasLastError()) SubscriptionUpdateState(state: state),
           if (share != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 10, 0),

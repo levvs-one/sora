@@ -226,10 +226,7 @@ class STk extends S {
   String get errEngineStopped => 'Motor saklandy';
 
   @override
-  String get errTunnel => 'VPN birikmesini döretmäge rugsat ýok';
-
-  @override
-  String get errServers => 'Serwer ýalňyşlyk bilen düzüldi';
+  String get errTunnel => 'Bu VPN tertibi elýeterli däl. Başga tertip saýlaň ýa-da hyzmatyň rugsatlaryny barlaň.';
 
   @override
   String get errNetwork => 'Serwere baryp bolmaýar';
@@ -487,8 +484,8 @@ class STk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'abunalyk # günlerinde tamamlanýar',
-      one: 'abunalyk # güni tamamlanýar',
+      other: 'abunalyk $days günlerinde tamamlanýar',
+      one: 'abunalyk $days güni tamamlanýar',
       zero: 'abuna ýazylmak birnäçe sagatdan soň tamamlanýar',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class STk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# serwerleri, iň çalt',
-      one: '# serweri, iň çalt',
+      other: '$count serwerleri, iň çalt',
+      one: '$count serweri, iň çalt',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class STk extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minut', one: '# minut');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count minut', one: '$count minut');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# sagat', one: '# sagat');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count sagat', one: '$count sagat');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class STk extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# birikme', one: '# birikme');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count birikme', one: '$count birikme');
     return '$_temp0';
   }
 
@@ -1423,9 +1420,6 @@ class STk extends S {
 
   @override
   String get watchReconnect => 'Täzeden birik';
-
-  @override
-  String get coreRestoringLink => 'Sora ýadrosyna birikmäni dikeltmek…';
 
   @override
   String get crashRestoreTitle => 'Soňky sessiýa kesildi';
@@ -1760,7 +1754,12 @@ class STk extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# syzma tapyldy', one: '# syzma tapyldy');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count syzma tapyldy',
+      one: '$count syzma tapyldy',
+    );
     return '$_temp0';
   }
 
@@ -1998,4 +1997,66 @@ class STk extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora içki ýalňyşlygy. Žurnaly ýazdyryň we näsazlygy habar beriň.';
+
+  @override
+  String get errTls => 'Serweriň sertifikaty ret edildi. Sagady barlaň ýa-da üpjün edijä ýüz tutuň.';
+
+  @override
+  String get errFileAccess => 'Faýla girip bolmaýar. Rugsatlary we boş ýeri barlaň.';
+
+  @override
+  String get errDataLimit => 'Maglumat aşa köp. Azrak element saýlap, gaýtadan synanyşyň.';
+
+  @override
+  String get errCredentials => 'Ýatda saklanan giriş maglumatlary ýok. Serweri gaýtadan import ediň.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Täzelenen wagty: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Entek täzelenmedi. Gaýtadan synanyşyň.';
+
+  @override
+  String get errHttpStatus => 'Serwer haýyşy ret etdi. Salgyny barlaň ýa-da üpjün edijä ýüz tutuň.';
+
+  @override
+  String get errInvalidServer => 'Serwer sazlamalary doly däl ýa-da goldanylmaýar. Abunalygy täzeläň.';
+
+  @override
+  String get errServerIds => 'Iki serweriň kesgitleýjisi birmeňzeş. Olary gaýtadan import ediň.';
+
+  @override
+  String get errRoutingGroup => 'Marşrut ýok serwerlere ýa-da bozulan topara salgylanýar. Abunalygy täzeläň.';
+
+  @override
+  String get errConnections => 'Birikmeleriň sanawy elýeterli däl. Birigiň ýa-da başga hereketlendiriji saýlaň.';
+
+  @override
+  String get errLogs => 'Bu hyzmat žurnal ýöretmeýär. Sora-ny täzeläň.';
+
+  @override
+  String get errDiagnostics => 'Diagnostikany ýygnap bolmady. Gaýtadan synanyşyň ýa-da žurnaly ýazdyryň.';
+
+  @override
+  String get errMissingItem => 'Soralan element indi ýok. Sanawy täzeläň.';
+
+  @override
+  String get errInvalidRequest => 'Haýyşda nädogry bahalar bar. Girizen maglumatlaryňyzy barlap, gaýtadan synanyşyň.';
+
+  @override
+  String get errProxyLogin => 'Ulgam proksisi bu girişi goldamaýar. Ýerli proksiniň ulanyjy adyny we parolyny aýryň.';
+
+  @override
+  String get errLogFilter => 'Žurnal süzgüji nädogry. Gözlegi arassalap, gaýtadan synanyşyň.';
+
+  @override
+  String get errSubRedirect => 'Serwer howply salga gönükdirdi. Üpjin edijiden täze salgy soraň.';
+
+  @override
+  String get errProxySetup => 'Ulgam proksisini sazlap bolmady. Gaýtadan birigiň ýa-da žurnaly açyň.';
 }

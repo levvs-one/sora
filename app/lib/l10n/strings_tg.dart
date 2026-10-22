@@ -226,10 +226,7 @@ class STg extends S {
   String get errEngineStopped => 'Мотор аз кор монд';
 
   @override
-  String get errTunnel => 'Иҷозат барои эҷоди пайвасти VPN нест';
-
-  @override
-  String get errServers => 'Сервер бо хатогӣ танзим шудааст';
+  String get errTunnel => 'Ин реҷаи VPN дастнорас аст. Реҷаи дигарро интихоб кунед ё иҷозатҳои хидматро санҷед.';
 
   @override
   String get errNetwork => 'Ба сервер расида наметавонад';
@@ -487,8 +484,8 @@ class STg extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'обуна дар рӯзҳои # ба охир мерасад',
-      one: 'обуна дар рӯзи # ба охир мерасад',
+      other: 'обуна дар рӯзҳои $days ба охир мерасад',
+      one: 'обуна дар рӯзи $days ба охир мерасад',
       zero: 'обуна баъди чанд соат ба охир мерасад',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class STg extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Серверҳои #, зудтарин',
-      one: 'Сервери #, зудтарин',
+      other: 'Серверҳои $count, зудтарин',
+      one: 'Сервери $count, зудтарин',
     );
     return '$_temp0';
   }
@@ -1231,13 +1228,13 @@ class STg extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# дақиқа');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count дақиқа');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# соат');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count соат');
     return '$_temp0';
   }
 
@@ -1307,7 +1304,7 @@ class STg extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# пайваст');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count пайваст');
     return '$_temp0';
   }
 
@@ -1427,9 +1424,6 @@ class STg extends S {
 
   @override
   String get watchReconnect => 'Аз нав пайваст кунед';
-
-  @override
-  String get coreRestoringLink => 'Барқарор кардани пайвастшавӣ ба ядрои Sora…';
 
   @override
   String get crashRestoreTitle => 'Сеанси охирин катъ гардид';
@@ -1766,7 +1760,7 @@ class STg extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ихроҷ ёфт шуд');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ихроҷ ёфт шуд');
     return '$_temp0';
   }
 
@@ -2006,4 +2000,67 @@ class STg extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Хатои дохилии Sora. Рӯзномаро захира кунед ва дар бораи хато хабар диҳед.';
+
+  @override
+  String get errTls => 'Сертификати сервер рад шуд. Соатро санҷед ё ба провайдер муроҷиат кунед.';
+
+  @override
+  String get errFileAccess => 'Дастрасӣ ба файл нест. Иҷозатҳо ва ҷойи холиро санҷед.';
+
+  @override
+  String get errDataLimit => 'Маълумот аз ҳад зиёд аст. Унсурҳои камтар интихоб карда, такрор кунед.';
+
+  @override
+  String get errCredentials => 'Маълумоти захирашудаи дастрасӣ нест. Серверро аз нав ворид кунед.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Навсозӣ шуд: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Ҳанӯз навсозӣ нашудааст. Такрор кунед.';
+
+  @override
+  String get errHttpStatus => 'Сервер дархостро рад кард. Пайвандро санҷед ё ба провайдер муроҷиат кунед.';
+
+  @override
+  String get errInvalidServer => 'Танзимоти сервер нопурра аст ё дастгирӣ намешавад. Обунаро навсозӣ кунед.';
+
+  @override
+  String get errServerIds => 'Ду сервер як шиноса доранд. Онҳоро аз нав ворид кунед.';
+
+  @override
+  String get errRoutingGroup => 'Масир ба серверҳои нестшуда ё гурӯҳи вайрон ишора мекунад. Обунаро навсозӣ кунед.';
+
+  @override
+  String get errConnections => 'Рӯйхати пайвастҳо дастнорас аст. Пайваст шавед ё муҳаррики дигарро интихоб кунед.';
+
+  @override
+  String get errLogs => 'Ин хидмат рӯзнома намебарад. Sora-ро навсозӣ кунед.';
+
+  @override
+  String get errDiagnostics => 'Ҷамъоварии ташхис нашуд. Такрор кунед ё рӯзномаро захира кунед.';
+
+  @override
+  String get errMissingItem => 'Унсури дархостшуда дигар вуҷуд надорад. Рӯйхатро навсозӣ кунед.';
+
+  @override
+  String get errInvalidRequest => 'Дархост арзишҳои нодуруст дорад. Маълумоти воридшударо санҷида, такрор кунед.';
+
+  @override
+  String get errProxyLogin =>
+      'Проксии низом ин вурудро дастгирӣ намекунад. Ном ва гузарвожаи проксии маҳаллиро нест кунед.';
+
+  @override
+  String get errLogFilter => 'Филтри рӯзнома нодуруст аст. Ҷустуҷӯро тоза карда, такрор кунед.';
+
+  @override
+  String get errSubRedirect => 'Сервер ба суроғаи хатарнок равона кард. Аз провайдер пайванди нав пурсед.';
+
+  @override
+  String get errProxySetup => 'Танзими проксии низом нашуд. Аз нав пайваст шавед ё рӯзномаро кушоед.';
 }

@@ -226,10 +226,7 @@ class SKy extends S {
   String get errEngineStopped => 'Мотор токтоп калды';
 
   @override
-  String get errTunnel => 'VPN туташуусун түзүүгө уруксат жок';
-
-  @override
-  String get errServers => 'Сервер ката менен конфигурацияланган';
+  String get errTunnel => 'Бул VPN режими жеткиликсиз. Башка режимди тандаңыз же кызматтын уруксаттарын текшериңиз.';
 
   @override
   String get errNetwork => 'Серверге жете албай жатат';
@@ -487,8 +484,8 @@ class SKy extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'жазылуу # күндөрү аяктайт',
-      one: 'жазылуу # күнү аяктайт',
+      other: 'жазылуу $days күндөрү аяктайт',
+      one: 'жазылуу $days күнү аяктайт',
       zero: 'жазылуу бир нече саатта аяктайт',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SKy extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# серверлери, эң ылдам',
-      one: '# сервери, эң ылдам',
+      other: '$count серверлери, эң ылдам',
+      one: '$count сервери, эң ылдам',
     );
     return '$_temp0';
   }
@@ -1230,13 +1227,13 @@ class SKy extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# мүнөт', one: '# мүнөт');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count мүнөт', one: '$count мүнөт');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# саат', one: '# саат');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count саат', one: '$count саат');
     return '$_temp0';
   }
 
@@ -1306,7 +1303,7 @@ class SKy extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# туташуу', one: '# туташуу');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count туташуу', one: '$count туташуу');
     return '$_temp0';
   }
 
@@ -1426,9 +1423,6 @@ class SKy extends S {
 
   @override
   String get watchReconnect => 'Кайра туташтыруу';
-
-  @override
-  String get coreRestoringLink => 'Sora өзөгү менен байланыш калыбына келтирилүүдө…';
 
   @override
   String get crashRestoreTitle => 'Акыркы сессия үзгүлтүккө учурады';
@@ -1768,8 +1762,8 @@ class SKy extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# маалымат агып кетүүсү табылды',
-      one: '# маалымат агып кетүүсү табылды',
+      other: '$count маалымат агып кетүүсү табылды',
+      one: '$count маалымат агып кетүүсү табылды',
     );
     return '$_temp0';
   }
@@ -2010,4 +2004,67 @@ class SKy extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora ички катасы. Журналды сактап, көйгөйдү кабарлаңыз.';
+
+  @override
+  String get errTls => 'Сервердин сертификаты кабыл алынган жок. Саатты текшериңиз же провайдерге кайрылыңыз.';
+
+  @override
+  String get errFileAccess => 'Файлга кирүү мүмкүн эмес. Уруксаттарды жана бош орунду текшериңиз.';
+
+  @override
+  String get errDataLimit => 'Маалымат өтө көп. Азыраак нерсе тандап, кайра аракет кылыңыз.';
+
+  @override
+  String get errCredentials => 'Сакталган кирүү маалыматтары жок. Серверди кайра импорттоңуз.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Жаңыртылган убакыт: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Азырынча жаңыртылган жок. Кайра аракет кылыңыз.';
+
+  @override
+  String get errHttpStatus => 'Сервер сурамды четке какты. Шилтемени текшериңиз же провайдерге кайрылыңыз.';
+
+  @override
+  String get errInvalidServer => 'Сервер жөндөөлөрү толук эмес же колдоого алынбайт. Жазылууну жаңыртыңыз.';
+
+  @override
+  String get errServerIds => 'Эки сервердин идентификатору бирдей. Аларды кайра импорттоңуз.';
+
+  @override
+  String get errRoutingGroup => 'Маршрут жок серверлерге же бузулган топко шилтейт. Жазылууну жаңыртыңыз.';
+
+  @override
+  String get errConnections => 'Туташуулар тизмеси жеткиликсиз. Туташыңыз же башка кыймылдаткыч тандаңыз.';
+
+  @override
+  String get errLogs => 'Бул кызмат журнал жүргүзбөйт. Sora-ны жаңыртыңыз.';
+
+  @override
+  String get errDiagnostics => 'Диагностика чогултулган жок. Кайталаңыз же журналды сактаңыз.';
+
+  @override
+  String get errMissingItem => 'Суралган нерсе мындан ары жок. Тизмени жаңыртыңыз.';
+
+  @override
+  String get errInvalidRequest => 'Сурамда жараксыз маанилер бар. Киргизилген маалыматтарды текшерип, кайталаңыз.';
+
+  @override
+  String get errProxyLogin =>
+      'Системалык прокси бул кирүүнү колдобойт. Жергиликтүү проксинин колдонуучу атын жана сырсөзүн алып салыңыз.';
+
+  @override
+  String get errLogFilter => 'Журнал чыпкасы жараксыз. Издөөнү тазалап, кайталаңыз.';
+
+  @override
+  String get errSubRedirect => 'Сервер кооптуу дарекке багыттады. Провайдерден жаңы шилтеме сураңыз.';
+
+  @override
+  String get errProxySetup => 'Системалык прокси жөндөлгөн жок. Кайра туташыңыз же журналды ачыңыз.';
 }

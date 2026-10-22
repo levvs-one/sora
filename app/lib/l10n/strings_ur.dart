@@ -226,10 +226,7 @@ class SUr extends S {
   String get errEngineStopped => 'انجن رک گیا۔';
 
   @override
-  String get errTunnel => 'VPN کنکشن بنانے کی اجازت نہیں ہے۔';
-
-  @override
-  String get errServers => 'سرور ایک خرابی کے ساتھ ترتیب دیا گیا ہے۔';
+  String get errTunnel => 'یہ VPN موڈ دستیاب نہیں۔ دوسرا موڈ منتخب کریں یا سروس کی اجازتیں چیک کریں۔';
 
   @override
   String get errNetwork => 'سرور تک نہیں پہنچ سکتا';
@@ -487,8 +484,8 @@ class SUr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'سبسکرپشن # دنوں میں ختم ہو جاتی ہے۔',
-      one: 'رکنیت # دن میں ختم ہو جاتی ہے۔',
+      other: 'سبسکرپشن $days دنوں میں ختم ہو جاتی ہے۔',
+      one: 'رکنیت $days دن میں ختم ہو جاتی ہے۔',
       zero: 'رکنیت چند گھنٹوں میں ختم ہو جاتی ہے۔',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SUr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# سرورز، تیز ترین',
-      one: '# سرور، تیز ترین',
+      other: '$count سرورز، تیز ترین',
+      one: '$count سرور، تیز ترین',
     );
     return '$_temp0';
   }
@@ -1227,13 +1224,13 @@ class SUr extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# منٹ', one: '# منٹ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count منٹ', one: '$count منٹ');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# گھنٹے', one: '# گھنٹہ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count گھنٹے', one: '$count گھنٹہ');
     return '$_temp0';
   }
 
@@ -1303,7 +1300,7 @@ class SUr extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# کنکشن', one: '# کنکشن');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count کنکشن', one: '$count کنکشن');
     return '$_temp0';
   }
 
@@ -1422,9 +1419,6 @@ class SUr extends S {
 
   @override
   String get watchReconnect => 'دوبارہ جڑیں۔';
-
-  @override
-  String get coreRestoringLink => 'Sora کور سے کنکشن بحال ہو رہا ہے…';
 
   @override
   String get crashRestoreTitle => 'آخری سیشن میں خلل پڑا تھا۔';
@@ -1763,7 +1757,7 @@ class SUr extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# لیک ملے', one: '# لیک ملا');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count لیک ملے', one: '$count لیک ملا');
     return '$_temp0';
   }
 
@@ -2003,4 +1997,66 @@ class SUr extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora میں اندرونی خرابی۔ لاگ محفوظ کریں اور مسئلے کی اطلاع دیں۔';
+
+  @override
+  String get errTls => 'سرور کا سرٹیفکیٹ مسترد ہو گیا۔ گھڑی چیک کریں یا فراہم کنندہ سے رابطہ کریں۔';
+
+  @override
+  String get errFileAccess => 'فائل تک رسائی نہیں۔ اجازتیں اور خالی جگہ چیک کریں۔';
+
+  @override
+  String get errDataLimit => 'ڈیٹا بہت زیادہ ہے۔ کم آئٹمز منتخب کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get errCredentials => 'محفوظ لاگ ان معلومات موجود نہیں۔ سرور دوبارہ درآمد کریں۔';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'آخری اپ ڈیٹ: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'ابھی اپ ڈیٹ نہیں ہوا۔ دوبارہ کوشش کریں۔';
+
+  @override
+  String get errHttpStatus => 'سرور نے درخواست مسترد کر دی۔ لنک چیک کریں یا فراہم کنندہ سے رابطہ کریں۔';
+
+  @override
+  String get errInvalidServer => 'سرور کی ترتیبات نامکمل یا غیر معاون ہیں۔ سبسکرپشن اپ ڈیٹ کریں۔';
+
+  @override
+  String get errServerIds => 'دو سروروں کا شناخت کنندہ ایک ہے۔ انہیں دوبارہ درآمد کریں۔';
+
+  @override
+  String get errRoutingGroup => 'راستہ غیر موجود سروروں یا خراب گروپ کی طرف ہے۔ سبسکرپشن اپ ڈیٹ کریں۔';
+
+  @override
+  String get errConnections => 'کنکشن کی فہرست دستیاب نہیں۔ جڑیں یا دوسرا انجن منتخب کریں۔';
+
+  @override
+  String get errLogs => 'یہ سروس لاگ نہیں رکھتی۔ Sora اپ ڈیٹ کریں۔';
+
+  @override
+  String get errDiagnostics => 'تشخیص جمع نہیں ہو سکی۔ دوبارہ کوشش کریں یا لاگ محفوظ کریں۔';
+
+  @override
+  String get errMissingItem => 'مطلوبہ آئٹم اب موجود نہیں۔ فہرست تازہ کریں۔';
+
+  @override
+  String get errInvalidRequest => 'درخواست میں غلط قدریں ہیں۔ درج کردہ معلومات چیک کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get errProxyLogin => 'سسٹم پراکسی اس لاگ ان کی معاونت نہیں کرتی۔ مقامی پراکسی کا صارف نام اور پاس ورڈ ہٹائیں۔';
+
+  @override
+  String get errLogFilter => 'لاگ فلٹر غلط ہے۔ تلاش صاف کریں اور دوبارہ کوشش کریں۔';
+
+  @override
+  String get errSubRedirect => 'سرور نے غیر محفوظ پتے پر بھیج دیا۔ فراہم کنندہ سے نیا لنک مانگیں۔';
+
+  @override
+  String get errProxySetup => 'سسٹم پراکسی ترتیب نہیں دی جا سکی۔ دوبارہ جڑیں یا لاگ کھولیں۔';
 }

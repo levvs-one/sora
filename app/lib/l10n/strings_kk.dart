@@ -226,10 +226,7 @@ class SKk extends S {
   String get errEngineStopped => 'Қозғалтқыш тоқтады';
 
   @override
-  String get errTunnel => 'VPN қосылымын жасауға рұқсат жоқ';
-
-  @override
-  String get errServers => 'Сервер қатемен конфигурацияланған';
+  String get errTunnel => 'Бұл VPN режимі қолжетімсіз. Басқа режимді таңдаңыз немесе қызмет рұқсаттарын тексеріңіз.';
 
   @override
   String get errNetwork => 'Серверге қол жеткізу мүмкін емес';
@@ -487,8 +484,8 @@ class SKk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'жазылым # күндері аяқталады',
-      one: 'жазылым # күні аяқталады',
+      other: 'жазылым $days күндері аяқталады',
+      one: 'жазылым $days күні аяқталады',
       zero: 'жазылым бірнеше сағатта аяқталады',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SKk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# серверлері, ең жылдам',
-      one: '# сервері, ең жылдам',
+      other: '$count серверлері, ең жылдам',
+      one: '$count сервері, ең жылдам',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class SKk extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# минут', one: '# минут');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count минут', one: '$count минут');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# сағат', one: '# сағат');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count сағат', one: '$count сағат');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class SKk extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# қосылым', one: '# қосылым');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count қосылым', one: '$count қосылым');
     return '$_temp0';
   }
 
@@ -1424,9 +1421,6 @@ class SKk extends S {
 
   @override
   String get watchReconnect => 'Қайта қосыңыз';
-
-  @override
-  String get coreRestoringLink => 'Ядромен байланыс қалпына келтірілуде…';
 
   @override
   String get crashRestoreTitle => 'Соңғы сессия үзілді';
@@ -1766,8 +1760,8 @@ class SKk extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# дерек ағуы анықталды',
-      one: '# дерек ағуы анықталды',
+      other: '$count дерек ағуы анықталды',
+      one: '$count дерек ағуы анықталды',
     );
     return '$_temp0';
   }
@@ -2008,4 +2002,67 @@ class SKk extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora ішкі қатесі. Журналды сақтап, ақау туралы хабарлаңыз.';
+
+  @override
+  String get errTls => 'Сервер сертификаты қабылданбады. Сағатты тексеріңіз немесе провайдерге хабарласыңыз.';
+
+  @override
+  String get errFileAccess => 'Файлға қолжетімсіз. Рұқсаттар мен бос орынды тексеріңіз.';
+
+  @override
+  String get errDataLimit => 'Дерек тым көп. Азырақ элемент таңдап, қайталап көріңіз.';
+
+  @override
+  String get errCredentials => 'Сақталған кіру деректері жоқ. Серверді қайта импорттаңыз.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Жаңартылған уақыты: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Әлі жаңартылмады. Қайталап көріңіз.';
+
+  @override
+  String get errHttpStatus => 'Сервер сұрауды қабылдамады. Сілтемені тексеріңіз немесе провайдерге хабарласыңыз.';
+
+  @override
+  String get errInvalidServer => 'Сервер баптаулары толық емес немесе қолдау көрсетілмейді. Жазылымды жаңартыңыз.';
+
+  @override
+  String get errServerIds => 'Екі сервердің идентификаторы бірдей. Оларды қайта импорттаңыз.';
+
+  @override
+  String get errRoutingGroup => 'Бағыт жоқ серверлерге немесе бүлінген топқа сілтейді. Жазылымды жаңартыңыз.';
+
+  @override
+  String get errConnections => 'Қосылымдар тізімі қолжетімсіз. Қосылыңыз немесе басқа қозғалтқыш таңдаңыз.';
+
+  @override
+  String get errLogs => 'Бұл қызмет журнал жүргізбейді. Sora-ны жаңартыңыз.';
+
+  @override
+  String get errDiagnostics => 'Диагностика жиналмады. Қайталап көріңіз немесе журналды сақтаңыз.';
+
+  @override
+  String get errMissingItem => 'Сұралған элемент енді жоқ. Тізімді жаңартыңыз.';
+
+  @override
+  String get errInvalidRequest => 'Сұрауда жарамсыз мәндер бар. Енгізілген деректерді тексеріп, қайталаңыз.';
+
+  @override
+  String get errProxyLogin =>
+      'Жүйелік прокси бұл кіруді қолдамайды. Жергілікті проксидің пайдаланушы аты мен құпиясөзін өшіріңіз.';
+
+  @override
+  String get errLogFilter => 'Журнал сүзгісі жарамсыз. Іздеуді тазалап, қайталаңыз.';
+
+  @override
+  String get errSubRedirect => 'Сервер қауіпті мекенжайға бағыттады. Провайдерден жаңа сілтеме сұраңыз.';
+
+  @override
+  String get errProxySetup => 'Жүйелік прокси бапталмады. Қайта қосылыңыз немесе журналды ашыңыз.';
 }

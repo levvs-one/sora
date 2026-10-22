@@ -318,7 +318,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('automatic recovery stops after two retries and records one notification', (tester) async {
+    testWidgets('automatic recovery stops after two retries and keeps the failure in the page', (tester) async {
       final sora = await start(tester);
       final before = sora.history.length;
       final url = speedtestServices[0].url;
@@ -340,7 +340,8 @@ void main() {
       }
       await tester.pump(const Duration(seconds: 50));
       expect(created, 3);
-      expect(sora.history.length, before + 1);
+      expect(sora.history.length, before);
+      expect(sora.backgroundFailure('speedtest:$url')?.key, 'app.speedtest_page');
       expect(find.byKey(const ValueKey('speedtest-reload')), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();

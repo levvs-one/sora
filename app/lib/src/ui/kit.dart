@@ -632,7 +632,12 @@ Future<void> openLink(BuildContext context, String link) async {
   try {
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) throw const CoreFailure('app.browser_unavailable');
   } catch (_) {
-    sora.reportFailure(const CoreFailure('app.browser_unavailable'), source: 'browser', action: '');
+    sora.reportFailure(
+      const CoreFailure('app.browser_unavailable'),
+      source: 'browser',
+      action: '',
+      mode: FailureMode.action,
+    );
   }
 }
 
@@ -721,33 +726,96 @@ Future<T?> push<T>(BuildContext context, Widget screen) {
   );
 }
 
+/// Background failures stay at their source while recovery is pending.
+class BackgroundFailureState extends StatelessWidget {
+  const BackgroundFailureState({super.key, required this.source, this.retry});
+  final String source;
+  final VoidCallback? retry;
+
+  @override
+  Widget build(BuildContext context) {
+    final failure = SoraScope.of(context).backgroundFailure(source);
+    if (failure == null) return const SizedBox.shrink();
+    final s = S.of(context), palette = Palette.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(describe(s, failure), style: Styles.caption.copyWith(color: palette.ink2)),
+          ),
+          if (retry != null) RoundButton(icon: Symbols.refresh_rounded, label: s.refresh, onTap: retry),
+        ],
+      ),
+    );
+  }
+}
+
 /// Returns a localized UI message for a core or app failure.
 String describe(S s, CoreFailure failure) {
   final key = failure.key;
   return switch (key) {
-    'app.core_unavailable' => s.errCore,
-    'app.no_servers' => s.errNoServers,
+    'app.core_unavailable' => '${s.errCore}. ${s.syncRetry}.',
+    'app.no_servers' || 'core.plan.empty' => s.errNoServers,
     'app.browser_unavailable' => s.speedtestExternalFailed,
-    'core.auth.unauthenticated' || 'core.auth.permission_denied' => s.errAuth,
+    'app.speedtest_page' => s.speedtestPageFailed,
+    'app.speedtest_runtime' => s.speedtestUnavailable,
+    'app.extension_worker' => s.extWorkerFailed,
+    'app.extension_asset' => s.extAssetRejected,
+    'app.file_access' => s.errFileAccess,
+    'app.http_status' || 'core.subscription.status' =>
+      'HTTP${failure.httpStatus == null ? '' : ' ${failure.httpStatus}'}: ${s.errHttpStatus}',
+    'core.auth.unauthenticated' || 'core.auth.permission_denied' => '${s.errAuth}. ${s.syncRetry}.',
     'core.api.version_mismatch' => s.errVersion,
     'core.session.busy' => s.errBusy,
-    'core.engine.binary_missing' => s.errEngineMissing,
+    'core.engine.binary_missing' => '${s.errEngineMissing}. ${s.updateCheck}.',
     'core.plan.engine_unsupported' => s.errEngineUnsupported,
     'core.guard.restore_failed' => s.errRestore,
     'core.session.unknown' || 'core.session.required' => s.errSessionEnded,
-    'core.engine.start_failed' => s.errEngineStart,
-    'core.engine.stopped' || 'core.engine.restart_budget_spent' => s.errEngineStopped,
+    'core.engine.start_failed' => '${s.errEngineStart}. ${s.openLogs}.',
+    'core.engine.stopped' ||
+    'core.engine.restart_budget_spent' ||
+    'core.engine.unstable' => '${s.errEngineStopped}. ${s.retryConnect}.',
     'core.plan.tunnel_unsupported' => s.errTunnel,
-    'core.guard.firewall_failed' => s.errFirewall,
-    'core.network.timeout' || 'core.request.deadline_exceeded' => s.errTimeout,
-    'core.network.failed' || 'core.network.connection_refused' || 'core.tls.certificate' => s.errNetwork,
+    'core.guard.firewall_failed' => '${s.errFirewall}. ${s.openLogs}.',
+    'core.guard.proxy_failed' => s.errProxySetup,
+    'core.network.timeout' || 'core.request.deadline_exceeded' => '${s.errTimeout}. ${s.syncRetry}.',
+    'core.network.failed' || 'core.network.connection_refused' => s.extErrNetwork,
+    'core.tls.certificate' => s.errTls,
     'core.subscription.duplicate' => s.errSubDuplicate,
-    'core.subscription.limit' => s.errSubLimit,
-    'core.subscription.scheme_unsupported' || 'core.subscription.redirect_rejected' => s.errSubScheme,
-    'core.subscription.format_unknown' || 'core.request.invalid' => s.errSubFormat,
-    'core.subscription.no_servers' || 'core.subscription.empty' => s.errSubEmpty,
-    'core.subscription.fetch_failed' || 'core.subscription.status' || 'core.subscription.too_large' => s.errSubFetch,
-    'core.secret.store_corrupt' || 'core.secret.store_unavailable' => s.errSecretStore,
+    'core.subscription.limit' => '${s.errSubLimit}. ${s.delete}.',
+    'core.subscription.scheme_unsupported' => s.errSubScheme,
+    'core.subscription.redirect_rejected' => s.errSubRedirect,
+    'core.subscription.format_unknown' => '${s.errSubFormat}. ${s.support}.',
+    'core.request.invalid' => s.errInvalidRequest,
+    'core.subscription.no_servers' || 'core.subscription.empty' => '${s.errSubEmpty}. ${s.support}.',
+    'core.subscription.fetch_failed' => '${s.errSubFetch}. ${s.syncRetry}.',
+    'core.subscription.not_found' => s.errMissingItem,
+    'core.subscription.interval_invalid' => '${s.updateInterval}: ${s.invalidValue}. ${s.intervalProvider}.',
+    'core.subscription.too_large' ||
+    'core.request.too_large' ||
+    'core.plan.too_large' ||
+    'core.secret.too_large' ||
+    'core.probe.too_many' ||
+    'core.diagnostics.too_large' ||
+    'core.logs.export_failed' => s.errDataLimit,
+    'core.secret.store_corrupt' || 'core.secret.store_unavailable' => '${s.errSecretStore}. ${s.openLogs}.',
+    'core.secret.not_found' || 'core.secret.reference_invalid' => s.errCredentials,
+    'core.plan.outbounds_invalid' => s.errInvalidServer,
+    'core.plan.duplicate_id' => s.errServerIds,
+    'core.plan.unknown_target' || 'core.plan.groups_invalid' => s.errRoutingGroup,
+    'core.plan.rule_invalid' || 'core.plan.bypass_invalid' => '${s.rules}: ${s.ruleInvalid}. ${s.edit}.',
+    'core.plan.dns_invalid' => '${s.dns}: ${s.customServerAddressInvalid}. ${s.edit}.',
+    'core.plan.local_proxy_invalid' => s.errProxyLogin,
+    'core.logs.unavailable' => s.errLogs,
+    'core.logs.filter_invalid' => s.errLogFilter,
+    'core.connections.unavailable' => s.errConnections,
+    'core.probe.invalid_endpoint' => '${s.customServerAddressInvalid}. ${s.edit}.',
+    'core.probe.no_endpoints' => s.errNoServers,
+    'core.diagnostics.failed' => s.errDiagnostics,
+    'core.generic.not_found' => s.errMissingItem,
+    'core.request.cancelled' => s.cancel,
+    'core.internal.unexpected' => s.errInternal,
     'app.core_watch_unstable' => s.coreWatchUnstable,
     'app.benchmark_unsupported' => s.errBenchmarkUnsupported,
     'chainUnsupported' => s.chainUnsupported,
@@ -755,7 +823,6 @@ String describe(S s, CoreFailure failure) {
     'chainTooFew' => s.chainTooFew,
     'chainTooMany' => s.chainTooMany,
     'chainDuplicate' => s.chainDuplicate,
-    _ when key.startsWith('core.plan.') => s.errServers,
-    _ => s.errGeneric,
+    _ => s.errInternal,
   };
 }

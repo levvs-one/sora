@@ -226,10 +226,7 @@ class SAz extends S {
   String get errEngineStopped => 'Mühərrik dayandı';
 
   @override
-  String get errTunnel => 'VPN bağlantısı yaratmaq icazəsi yoxdur';
-
-  @override
-  String get errServers => 'Server xəta ilə konfiqurasiya edilib';
+  String get errTunnel => 'Bu VPN rejimi əlçatan deyil. Başqa rejim seçin və ya xidmət icazələrini yoxlayın.';
 
   @override
   String get errNetwork => 'Serverə daxil olmaq mümkün deyil';
@@ -487,8 +484,8 @@ class SAz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'abunə # günlərində başa çatır',
-      one: 'abunə # günündə başa çatır',
+      other: 'abunə $days günlərində başa çatır',
+      one: 'abunə $days günündə başa çatır',
       zero: 'abunə bir neçə saat ərzində başa çatır',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SAz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# serverləri, ən sürətli',
-      one: '# server, ən sürətli',
+      other: '$count serverləri, ən sürətli',
+      one: '$count server, ən sürətli',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class SAz extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# dəqiqə', one: '# dəqiqə');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count dəqiqə', one: '$count dəqiqə');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# saat', one: '# saat');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count saat', one: '$count saat');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class SAz extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# bağlantı', one: '# bağlantı');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count bağlantı', one: '$count bağlantı');
     return '$_temp0';
   }
 
@@ -1425,9 +1422,6 @@ class SAz extends S {
 
   @override
   String get watchReconnect => 'Yenidən qoşun';
-
-  @override
-  String get coreRestoringLink => 'Sora nüvəsi ilə əlaqə bərpa edilir...';
 
   @override
   String get crashRestoreTitle => 'Son seans yarımçıq kəsildi';
@@ -1763,7 +1757,12 @@ class SAz extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# sızma tapıldı', one: '# sızma tapıldı');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sızma tapıldı',
+      one: '$count sızma tapıldı',
+    );
     return '$_temp0';
   }
 
@@ -2004,4 +2003,68 @@ class SAz extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora daxili xətası. Jurnalı saxlayın və problemi bildirin.';
+
+  @override
+  String get errTls => 'Server sertifikatı rədd edildi. Saatı yoxlayın və ya provayderlə əlaqə saxlayın.';
+
+  @override
+  String get errFileAccess => 'Fayla giriş yoxdur. İcazələri və boş yeri yoxlayın.';
+
+  @override
+  String get errDataLimit => 'Həddindən çox məlumat. Daha az element seçib yenidən cəhd edin.';
+
+  @override
+  String get errCredentials => 'Saxlanmış giriş məlumatları yoxdur. Serveri yenidən idxal edin.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Son yenilənmə: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Hələ yenilənməyib. Yenidən cəhd edin.';
+
+  @override
+  String get errHttpStatus => 'Server sorğunu rədd etdi. Keçidi yoxlayın və ya provayderlə əlaqə saxlayın.';
+
+  @override
+  String get errInvalidServer => 'Server ayarları natamamdır və ya dəstəklənmir. Abunəliyi yeniləyin.';
+
+  @override
+  String get errServerIds => 'İki server eyni identifikatordan istifadə edir. Onları yenidən idxal edin.';
+
+  @override
+  String get errRoutingGroup =>
+      'Marşrut mövcud olmayan serverlərə və ya zədələnmiş qrupa istinad edir. Abunəliyi yeniləyin.';
+
+  @override
+  String get errConnections => 'Bağlantı siyahısı əlçatan deyil. Qoşulun və ya başqa mühərrik seçin.';
+
+  @override
+  String get errLogs => 'Bu xidmət jurnal saxlamır. Sora-nı yeniləyin.';
+
+  @override
+  String get errDiagnostics => 'Diaqnostika toplana bilmədi. Yenidən cəhd edin və ya jurnalı saxlayın.';
+
+  @override
+  String get errMissingItem => 'Sorğulanan element artıq mövcud deyil. Siyahını yeniləyin.';
+
+  @override
+  String get errInvalidRequest => 'Sorğuda etibarsız dəyərlər var. Daxil etdiklərinizi yoxlayıb yenidən cəhd edin.';
+
+  @override
+  String get errProxyLogin =>
+      'Sistem proksisi bu girişi dəstəkləmir. Yerli proksinin istifadəçi adını və parolunu silin.';
+
+  @override
+  String get errLogFilter => 'Jurnal filtri etibarsızdır. Axtarışı təmizləyib yenidən cəhd edin.';
+
+  @override
+  String get errSubRedirect => 'Server təhlükəli ünvana yönləndirdi. Provayderdən yeni keçid istəyin.';
+
+  @override
+  String get errProxySetup => 'Sistem proksisi qurula bilmədi. Yenidən qoşulun və ya jurnalı açın.';
 }

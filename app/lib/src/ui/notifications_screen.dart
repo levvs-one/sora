@@ -79,8 +79,10 @@ class NotificationRow extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(notice.title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
-          const SizedBox(height: 4),
-          Text(notice.body, style: Styles.secondary.copyWith(color: palette.ink2)),
+          if (notice.body.isNotEmpty && notice.body != notice.title) ...[
+            const SizedBox(height: 4),
+            Text(notice.body, style: Styles.secondary.copyWith(color: palette.ink2)),
+          ],
           if (action != null)
             Padding(
               padding: const EdgeInsets.only(top: 12),

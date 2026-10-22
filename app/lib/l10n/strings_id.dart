@@ -226,10 +226,7 @@ class SId extends S {
   String get errEngineStopped => 'Mesinnya berhenti';
 
   @override
-  String get errTunnel => 'Tidak ada izin untuk membuat koneksi VPN';
-
-  @override
-  String get errServers => 'Server dikonfigurasi dengan kesalahan';
+  String get errTunnel => 'Mode VPN ini tidak tersedia. Pilih mode lain atau periksa izin layanan.';
 
   @override
   String get errNetwork => 'Tidak dapat menjangkau server';
@@ -487,8 +484,8 @@ class SId extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'langganan berakhir dalam # hari',
-      one: 'langganan berakhir pada hari #',
+      other: 'langganan berakhir dalam $days hari',
+      one: 'langganan berakhir pada hari $days',
       zero: 'langganan berakhir dalam beberapa jam',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SId extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Server #, tercepat',
-      one: 'Server #, tercepat',
+      other: 'Server $count, tercepat',
+      one: 'Server $count, tercepat',
     );
     return '$_temp0';
   }
@@ -1230,13 +1227,13 @@ class SId extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# menit');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count menit');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# jam');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count jam');
     return '$_temp0';
   }
 
@@ -1306,7 +1303,7 @@ class SId extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# koneksi');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count koneksi');
     return '$_temp0';
   }
 
@@ -1426,9 +1423,6 @@ class SId extends S {
 
   @override
   String get watchReconnect => 'Sambungkan kembali';
-
-  @override
-  String get coreRestoringLink => 'Memulihkan koneksi ke inti Sora…';
 
   @override
   String get crashRestoreTitle => 'Sesi terakhir diinterupsi';
@@ -1764,7 +1758,7 @@ class SId extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# kebocoran ditemukan');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count kebocoran ditemukan');
     return '$_temp0';
   }
 
@@ -2004,4 +1998,67 @@ class SId extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Kesalahan internal Sora. Simpan log dan laporkan masalahnya.';
+
+  @override
+  String get errTls => 'Sertifikat server ditolak. Periksa jam atau hubungi penyedia.';
+
+  @override
+  String get errFileAccess => 'Tidak dapat mengakses berkas. Periksa izin dan ruang kosong.';
+
+  @override
+  String get errDataLimit => 'Terlalu banyak data. Pilih lebih sedikit item dan coba lagi.';
+
+  @override
+  String get errCredentials => 'Kredensial tersimpan tidak ditemukan. Impor server lagi.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Terakhir diperbarui: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Belum diperbarui. Coba lagi.';
+
+  @override
+  String get errHttpStatus => 'Server menolak permintaan. Periksa tautan atau hubungi penyedia.';
+
+  @override
+  String get errInvalidServer => 'Pengaturan server tidak lengkap atau tidak didukung. Perbarui langganan.';
+
+  @override
+  String get errServerIds => 'Dua server memiliki pengenal yang sama. Impor ulang keduanya.';
+
+  @override
+  String get errRoutingGroup => 'Rute mengarah ke server yang hilang atau grup rusak. Perbarui langganan.';
+
+  @override
+  String get errConnections => 'Daftar koneksi tidak tersedia. Hubungkan atau pilih mesin lain.';
+
+  @override
+  String get errLogs => 'Layanan ini tidak menyimpan log. Perbarui Sora.';
+
+  @override
+  String get errDiagnostics => 'Tidak dapat mengumpulkan diagnostik. Coba lagi atau simpan log.';
+
+  @override
+  String get errMissingItem => 'Item yang diminta sudah tidak ada. Segarkan daftar.';
+
+  @override
+  String get errInvalidRequest => 'Permintaan berisi nilai yang tidak valid. Periksa masukan dan coba lagi.';
+
+  @override
+  String get errProxyLogin =>
+      'Proksi sistem tidak mendukung login ini. Hapus nama pengguna dan kata sandi proksi lokal.';
+
+  @override
+  String get errLogFilter => 'Filter log tidak valid. Hapus pencarian dan coba lagi.';
+
+  @override
+  String get errSubRedirect => 'Server mengalihkan ke alamat tidak aman. Minta tautan baru dari penyedia.';
+
+  @override
+  String get errProxySetup => 'Tidak dapat mengatur proksi sistem. Hubungkan ulang atau buka log.';
 }

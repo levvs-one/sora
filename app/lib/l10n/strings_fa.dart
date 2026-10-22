@@ -226,10 +226,7 @@ class SFa extends S {
   String get errEngineStopped => 'موتور خاموش شد';
 
   @override
-  String get errTunnel => 'هیچ مجوزی برای ایجاد اتصال VPN وجود ندارد';
-
-  @override
-  String get errServers => 'سرور با یک خطا پیکربندی شده است';
+  String get errTunnel => 'این حالت VPN در دسترس نیست. حالت دیگری انتخاب کنید یا مجوزهای سرویس را بررسی کنید.';
 
   @override
   String get errNetwork => 'دسترسی به سرور امکان پذیر نیست';
@@ -487,8 +484,8 @@ class SFa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'اشتراک در روزهای # به پایان می رسد',
-      one: 'اشتراک در روز # به پایان می رسد',
+      other: 'اشتراک در روزهای $days به پایان می رسد',
+      one: 'اشتراک در روز $days به پایان می رسد',
       zero: 'اشتراک در چند ساعت به پایان می رسد',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SFa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'سرورهای #، سریعترین',
-      one: 'سرور #، سریعترین',
+      other: 'سرورهای $count، سریعترین',
+      one: 'سرور $count، سریعترین',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class SFa extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# دقیقه', one: '# دقیقه');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count دقیقه', one: '$count دقیقه');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ساعت', one: '# ساعت');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ساعت', one: '$count ساعت');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class SFa extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# اتصال', one: '# اتصال');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count اتصال', one: '$count اتصال');
     return '$_temp0';
   }
 
@@ -1425,9 +1422,6 @@ class SFa extends S {
 
   @override
   String get watchReconnect => 'دوباره وصل شوید';
-
-  @override
-  String get coreRestoringLink => 'در حال بازیابی اتصال به هسته Sora…';
 
   @override
   String get crashRestoreTitle => 'آخرین جلسه قطع شد';
@@ -1764,7 +1758,12 @@ class SFa extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# نشت پیدا شد', one: '# نشت پیدا شد');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نشت پیدا شد',
+      one: '$count نشت پیدا شد',
+    );
     return '$_temp0';
   }
 
@@ -2003,4 +2002,67 @@ class SFa extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'خطای داخلی Sora. گزارش را ذخیره کنید و مشکل را اطلاع دهید.';
+
+  @override
+  String get errTls => 'گواهی سرور رد شد. ساعت را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.';
+
+  @override
+  String get errFileAccess => 'دسترسی به فایل ممکن نیست. مجوزها و فضای خالی را بررسی کنید.';
+
+  @override
+  String get errDataLimit => 'داده‌ها بیش از حد هستند. موارد کمتری انتخاب کنید و دوباره تلاش کنید.';
+
+  @override
+  String get errCredentials => 'اطلاعات ورود ذخیره‌شده موجود نیست. سرور را دوباره وارد کنید.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'آخرین به‌روزرسانی: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'هنوز به‌روزرسانی نشده است. دوباره تلاش کنید.';
+
+  @override
+  String get errHttpStatus => 'سرور درخواست را رد کرد. پیوند را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.';
+
+  @override
+  String get errInvalidServer => 'تنظیمات سرور ناقص است یا پشتیبانی نمی‌شود. اشتراک را به‌روز کنید.';
+
+  @override
+  String get errServerIds => 'دو سرور شناسه یکسان دارند. آن‌ها را دوباره وارد کنید.';
+
+  @override
+  String get errRoutingGroup => 'مسیر به سرورهای ناموجود یا گروه خراب اشاره می‌کند. اشتراک را به‌روز کنید.';
+
+  @override
+  String get errConnections => 'فهرست اتصال‌ها در دسترس نیست. متصل شوید یا موتور دیگری انتخاب کنید.';
+
+  @override
+  String get errLogs => 'این سرویس گزارش نگه نمی‌دارد. Sora را به‌روز کنید.';
+
+  @override
+  String get errDiagnostics => 'جمع‌آوری عیب‌یابی ممکن نشد. دوباره تلاش کنید یا گزارش را ذخیره کنید.';
+
+  @override
+  String get errMissingItem => 'مورد درخواستی دیگر وجود ندارد. فهرست را تازه‌سازی کنید.';
+
+  @override
+  String get errInvalidRequest => 'درخواست شامل مقادیر نامعتبر است. ورودی را بررسی کرده و دوباره تلاش کنید.';
+
+  @override
+  String get errProxyLogin =>
+      'پروکسی سیستم از این ورود پشتیبانی نمی‌کند. نام کاربری و گذرواژه پروکسی محلی را حذف کنید.';
+
+  @override
+  String get errLogFilter => 'فیلتر گزارش نامعتبر است. جستجو را پاک کرده و دوباره تلاش کنید.';
+
+  @override
+  String get errSubRedirect => 'سرور به نشانی ناامن هدایت کرد. از ارائه‌دهنده پیوند جدید بخواهید.';
+
+  @override
+  String get errProxySetup => 'تنظیم پروکسی سیستم ممکن نشد. دوباره متصل شوید یا گزارش را باز کنید.';
 }

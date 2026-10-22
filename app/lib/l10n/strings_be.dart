@@ -226,10 +226,7 @@ class SBe extends S {
   String get errEngineStopped => 'Рухавік спыніўся';
 
   @override
-  String get errTunnel => 'Няма дазволу на стварэнне злучэння VPN';
-
-  @override
-  String get errServers => 'Сервер наладжаны з памылкай';
+  String get errTunnel => 'Гэты рэжым VPN недаступны. Выберыце іншы рэжым або праверце правы службы.';
 
   @override
   String get errNetwork => 'Немагчыма падключыцца да сервера';
@@ -487,8 +484,8 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'падпіска заканчваецца праз # дзён',
-      one: 'падпіска заканчваецца праз дзень #',
+      other: 'падпіска заканчваецца праз $days дзён',
+      one: 'падпіска заканчваецца праз дзень $days',
       zero: 'падпіска заканчваецца праз некалькі гадзін',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Серверы #, самыя хуткія',
-      one: 'Сервер #, самы хуткі',
+      other: 'Серверы $count, самыя хуткія',
+      one: 'Сервер $count, самы хуткі',
     );
     return '$_temp0';
   }
@@ -1231,10 +1228,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# хвіліны',
-      many: '# хвілін',
-      few: '# хвіліны',
-      one: '# хвіліна',
+      other: '$count хвіліны',
+      many: '$count хвілін',
+      few: '$count хвіліны',
+      one: '$count хвіліна',
     );
     return '$_temp0';
   }
@@ -1244,10 +1241,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# гадзіны',
-      many: '# гадзін',
-      few: '# гадзіны',
-      one: '# гадзіна',
+      other: '$count гадзіны',
+      many: '$count гадзін',
+      few: '$count гадзіны',
+      one: '$count гадзіна',
     );
     return '$_temp0';
   }
@@ -1321,10 +1318,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# злучэння',
-      many: '# злучэнняў',
-      few: '# злучэнні',
-      one: '# злучэнне',
+      other: '$count злучэння',
+      many: '$count злучэнняў',
+      few: '$count злучэнні',
+      one: '$count злучэнне',
     );
     return '$_temp0';
   }
@@ -1445,9 +1442,6 @@ class SBe extends S {
 
   @override
   String get watchReconnect => 'Перападключыць';
-
-  @override
-  String get coreRestoringLink => 'Аднаўленне злучэння з ядром Sora…';
 
   @override
   String get crashRestoreTitle => 'Апошні сеанс быў перапынены';
@@ -1785,10 +1779,10 @@ class SBe extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Знойдзена # уцечкі',
-      many: 'Знойдзена # уцечак',
-      few: 'Знойдзены # уцечкі',
-      one: 'Знойдзена # уцечка',
+      other: 'Знойдзена $count уцечкі',
+      many: 'Знойдзена $count уцечак',
+      few: 'Знойдзены $count уцечкі',
+      one: 'Знойдзена $count уцечка',
     );
     return '$_temp0';
   }
@@ -2028,4 +2022,67 @@ class SBe extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Унутраная памылка Sora. Захавайце журнал і паведаміце пра збой.';
+
+  @override
+  String get errTls => 'Сертыфікат сервера адхілены. Праверце гадзіннік або звярніцеся да правайдара.';
+
+  @override
+  String get errFileAccess => 'Няма доступу да файла. Праверце правы і вольнае месца.';
+
+  @override
+  String get errDataLimit => 'Занадта шмат даных. Выберыце менш элементаў і паўтарыце.';
+
+  @override
+  String get errCredentials => 'Захаваныя даныя доступу страчаныя. Імпартуйце сервер зноў.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Абноўлена: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Яшчэ не абнаўлялася. Паўтарыце.';
+
+  @override
+  String get errHttpStatus => 'Сервер адхіліў запыт. Праверце спасылку або звярніцеся да правайдара.';
+
+  @override
+  String get errInvalidServer => 'Налады сервера няпоўныя або не падтрымліваюцца. Абнавіце падпіску.';
+
+  @override
+  String get errServerIds => 'Два серверы маюць аднолькавы ідэнтыфікатар. Імпартуйце іх зноў.';
+
+  @override
+  String get errRoutingGroup => 'Маршрут спасылаецца на выдаленыя серверы або пашкоджаную групу. Абнавіце падпіску.';
+
+  @override
+  String get errConnections => 'Спіс падключэнняў недаступны. Падключыцеся або выберыце іншае ядро.';
+
+  @override
+  String get errLogs => 'Гэта служба не вядзе журнал. Абнавіце Sora.';
+
+  @override
+  String get errDiagnostics => 'Не ўдалося сабраць дыягностыку. Паўтарыце або захавайце журнал.';
+
+  @override
+  String get errMissingItem => 'Запытаны элемент больш не існуе. Абнавіце спіс.';
+
+  @override
+  String get errInvalidRequest => 'У запыце няправільныя значэнні. Праверце ўведзеныя даныя і паўтарыце.';
+
+  @override
+  String get errProxyLogin =>
+      'Сістэмны проксі не падтрымлівае гэты ўваход. Прыбярыце лагін і пароль лакальнага проксі.';
+
+  @override
+  String get errLogFilter => 'Няправільны фільтр журнала. Ачысціце пошук і паўтарыце.';
+
+  @override
+  String get errSubRedirect => 'Сервер перанакіраваў на небяспечны адрас. Запытайце новую спасылку ў правайдара.';
+
+  @override
+  String get errProxySetup => 'Не ўдалося наладзіць сістэмны проксі. Перападключыцеся або адкрыйце журнал.';
 }

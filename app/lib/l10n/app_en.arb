@@ -78,8 +78,7 @@
   "errEngineMissing": "No engine found for this server",
   "errEngineStart": "The engine did not start",
   "errEngineStopped": "The engine stopped",
-  "errTunnel": "No permission to create the VPN connection",
-  "errServers": "The server is configured with an error",
+  "errTunnel": "This VPN mode is unavailable. Choose another mode or check service permissions.",
   "errNetwork": "Cannot reach the server",
   "errTimeout": "The server did not answer in time",
   "errFirewall": "Could not block the internet outside the VPN",
@@ -161,10 +160,10 @@
   "ruleBlock": "Block",
   "failover": "Switch on failure",
   "connectOnStart": "Connect on start",
-  "expiresIn": "{name}: the subscription ends in {days, plural, =0{a few hours} one{# day} other{# days}}",
+  "expiresIn": "{name}: the subscription ends in {days, plural, =0{a few hours} one{{days} day} other{{days} days}}",
   "trafficLow": "{name}: {left} left",
   "ruleInvalid": "This does not look like a site, an IP or a program",
-  "groupBest": "{count, plural, one{# server} other{# servers}}, the fastest",
+  "groupBest": "{count, plural, one{{count} server} other{{count} servers}}, the fastest",
   "tunnelMode": "Mode",
   "tunnelProxy": "System proxy",
   "proxyAddress": "Proxy address",
@@ -527,7 +526,7 @@
   "extBgTitle": "Background task",
   "extBgEnabled": "Run in the background",
   "extBgInterval": "Run every",
-  "extBgMinutes": "{count, plural, one{# minute} other{# minutes}}",
+  "extBgMinutes": "{count, plural, one{{count} minute} other{{count} minutes}}",
   "@extBgMinutes": {
     "placeholders": {
       "count": {
@@ -535,7 +534,7 @@
       }
     }
   },
-  "extBgHours": "{count, plural, one{# hour} other{# hours}}",
+  "extBgHours": "{count, plural, one{{count} hour} other{{count} hours}}",
   "@extBgHours": {
     "placeholders": {
       "count": {
@@ -577,7 +576,7 @@
   "connListView": "As list",
   "connCopyHost": "Copy host",
   "connAddRule": "Add rule",
-  "connConnectionsCount": "{count, plural, one{# connection} other{# connections}}",
+  "connConnectionsCount": "{count, plural, one{{count} connection} other{{count} connections}}",
   "dnsPreset": "Preset",
   "dnsPresetCloudflare": "Cloudflare",
   "dnsPresetGoogle": "Google",
@@ -616,7 +615,6 @@
   "autoSelectSmart": "Smart choice",
   "coreWatchUnstable": "The link to the core is unstable",
   "watchReconnect": "Reconnect",
-  "coreRestoringLink": "Restoring the link to the core…",
   "crashRestoreTitle": "The last session was interrupted",
   "restoreOnCrash": "Restore session after a crash",
   "crashRestore": "Restore",
@@ -733,7 +731,7 @@
     }
   },
   "leakTestAllClear": "No leaks found",
-  "leakTestFound": "{count, plural, one{# leak found} other{# leaks found}}",
+  "leakTestFound": "{count, plural, one{{count} leak found} other{{count} leaks found}}",
   "@leakTestFound": {
     "placeholders": {
       "count": {
@@ -851,5 +849,25 @@
   "customServerSecretRequired": "Enter a value",
   "customServerLinkInvalid": "Invalid server link",
   "customServerMethodHint": "chacha20-ietf-poly1305",
-  "customServerWgAddressesHint": "10.0.0.2/32"
+  "customServerWgAddressesHint": "10.0.0.2/32",
+  "errInternal": "Sora hit an internal error. Export the log and report it.",
+  "errTls": "Server certificate rejected. Check the clock or contact the provider.",
+  "errFileAccess": "Cannot access the file. Check permissions and free space.",
+  "errDataLimit": "Too much data. Select fewer items and retry.",
+  "errCredentials": "Saved credentials are missing. Import the server again.",
+  "subscriptionStale": "Last updated: {time}",
+  "subscriptionNeverUpdated": "Not updated yet. Retry.",
+  "errHttpStatus": "The server rejected the request. Check the link or contact your provider.",
+  "errInvalidServer": "Server settings are incomplete or unsupported. Refresh the subscription.",
+  "errServerIds": "Two servers share an identifier. Import them again.",
+  "errRoutingGroup": "Routing refers to missing servers or a broken group. Refresh the subscription.",
+  "errConnections": "Connections are unavailable. Connect or choose another engine to view them.",
+  "errLogs": "This service has no log record. Update Sora.",
+  "errDiagnostics": "Could not collect diagnostics. Try again or save the log.",
+  "errMissingItem": "The requested item no longer exists. Refresh the list.",
+  "errInvalidRequest": "The request contains invalid values. Check your input and retry.",
+  "errProxyLogin": "The system proxy cannot use this login. Remove the local proxy username and password.",
+  "errLogFilter": "The log filter is invalid. Clear the search and retry.",
+  "errSubRedirect": "The server redirected to an unsafe address. Ask your provider for a new link.",
+  "errProxySetup": "Could not configure the system proxy. Reconnect or open the log."
 }

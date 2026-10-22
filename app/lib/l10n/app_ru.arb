@@ -151,8 +151,7 @@
   "errEngineMissing": "Не найдено ядро для этого сервера",
   "errEngineStart": "Ядро не запустилось",
   "errEngineStopped": "Ядро остановилось",
-  "errTunnel": "Нет прав на создание VPN-подключения",
-  "errServers": "Сервер настроен с ошибкой",
+  "errTunnel": "Этот режим VPN недоступен. Выберите другой режим или проверьте права службы.",
   "errNetwork": "Нет связи с сервером",
   "errTimeout": "Сервер не ответил вовремя",
   "errFirewall": "Не удалось включить блокировку интернета без VPN",
@@ -262,7 +261,7 @@
   "ruleBlock": "Блокировать",
   "failover": "Переключаться при сбое",
   "connectOnStart": "Подключаться при запуске",
-  "expiresIn": "{name}: подписка закончится через {days, plural, =0{несколько часов} one{# день} few{# дня} other{# дней}}",
+  "expiresIn": "{name}: подписка закончится через {days, plural, =0{несколько часов} one{{days} день} few{{days} дня} other{{days} дней}}",
   "trafficLow": "{name}: осталось {left}",
   "ruleInvalid": "Не похоже на сайт, IP или программу",
   "@expiresIn": {
@@ -285,7 +284,7 @@
       }
     }
   },
-  "groupBest": "{count, plural, one{# сервер} few{# сервера} other{# серверов}}, самый быстрый",
+  "groupBest": "{count, plural, one{{count} сервер} few{{count} сервера} other{{count} серверов}}, самый быстрый",
   "@groupBest": {
     "placeholders": {
       "count": {
@@ -672,7 +671,7 @@
   "extBgTitle": "Фоновая задача",
   "extBgEnabled": "Выполнять в фоне",
   "extBgInterval": "Запускать каждые",
-  "extBgMinutes": "{count, plural, one{# минуту} few{# минуты} other{# минут}}",
+  "extBgMinutes": "{count, plural, one{{count} минуту} few{{count} минуты} other{{count} минут}}",
   "@extBgMinutes": {
     "placeholders": {
       "count": {
@@ -680,7 +679,7 @@
       }
     }
   },
-  "extBgHours": "{count, plural, one{# час} few{# часа} other{# часов}}",
+  "extBgHours": "{count, plural, one{{count} час} few{{count} часа} other{{count} часов}}",
   "@extBgHours": {
     "placeholders": {
       "count": {
@@ -722,7 +721,7 @@
   "connListView": "Списком",
   "connCopyHost": "Скопировать хост",
   "connAddRule": "Добавить правило",
-  "connConnectionsCount": "{count, plural, one{# соединение} few{# соединения} other{# соединений}}",
+  "connConnectionsCount": "{count, plural, one{{count} соединение} few{{count} соединения} other{{count} соединений}}",
   "dnsPreset": "Пресет",
   "dnsPresetCloudflare": "Cloudflare",
   "dnsPresetGoogle": "Google",
@@ -761,7 +760,6 @@
   "autoSelectSmart": "Умный выбор",
   "coreWatchUnstable": "Связь с ядром нестабильна",
   "watchReconnect": "Переподключить",
-  "coreRestoringLink": "Восстанавливаю связь с ядром…",
   "crashRestoreTitle": "Прошлое соединение оборвалось",
   "restoreOnCrash": "Восстанавливать сессию после сбоя",
   "crashRestore": "Восстановить",
@@ -878,7 +876,7 @@
     }
   },
   "leakTestAllClear": "Утечек не найдено",
-  "leakTestFound": "{count, plural, one{Найдена # утечка} few{Найдены # утечки} other{Найдено # утечек}}",
+  "leakTestFound": "{count, plural, one{Найдена {count} утечка} few{Найдены {count} утечки} other{Найдено {count} утечек}}",
   "@leakTestFound": {
     "placeholders": {
       "count": {
@@ -1003,5 +1001,26 @@
   "customServerSecretRequired": "Введите значение",
   "customServerLinkInvalid": "Неверная ссылка на сервер",
   "customServerMethodHint": "chacha20-ietf-poly1305",
-  "customServerWgAddressesHint": "10.0.0.2/32"
+  "customServerWgAddressesHint": "10.0.0.2/32",
+  "errInternal": "Внутренняя ошибка Sora. Сохраните журнал и сообщите о сбое.",
+  "errTls": "Сертификат сервера отклонён. Проверьте часы или обратитесь к провайдеру.",
+  "errFileAccess": "Нет доступа к файлу. Проверьте права и свободное место.",
+  "errDataLimit": "Слишком много данных. Выберите меньше элементов и повторите.",
+  "errCredentials": "Сохранённые данные доступа потеряны. Импортируйте сервер заново.",
+  "subscriptionStale": "Обновлено: {time}",
+  "subscriptionNeverUpdated": "Ещё не обновлялась. Повторите.",
+  "@subscriptionStale": {"placeholders": {"time": {"type": "String"}}},
+  "errHttpStatus": "Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.",
+  "errInvalidServer": "Настройки сервера неполные или не поддерживаются. Обновите подписку.",
+  "errServerIds": "У двух серверов одинаковый идентификатор. Импортируйте их заново.",
+  "errRoutingGroup": "Маршрут ссылается на удалённые серверы или повреждённую группу. Обновите подписку.",
+  "errConnections": "Список подключений недоступен. Подключитесь или выберите другое ядро.",
+  "errLogs": "Эта служба не ведёт журнал. Обновите Sora.",
+  "errDiagnostics": "Не удалось собрать диагностику. Повторите или сохраните журнал.",
+  "errMissingItem": "Запрошенный элемент больше не существует. Обновите список.",
+  "errInvalidRequest": "В запросе неверные значения. Проверьте введённые данные и повторите.",
+  "errProxyLogin": "Системный прокси не поддерживает этот вход. Уберите логин и пароль локального прокси.",
+  "errLogFilter": "Неверный фильтр журнала. Очистите поиск и повторите.",
+  "errSubRedirect": "Сервер перенаправил на небезопасный адрес. Запросите новую ссылку у провайдера.",
+  "errProxySetup": "Не удалось настроить системный прокси. Переподключитесь или откройте журнал."
 }

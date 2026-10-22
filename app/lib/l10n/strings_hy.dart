@@ -226,10 +226,7 @@ class SHy extends S {
   String get errEngineStopped => 'Շարժիչը կանգ առավ';
 
   @override
-  String get errTunnel => 'VPN կապ ստեղծելու թույլտվություն չկա';
-
-  @override
-  String get errServers => 'Սերվերը կազմաձևված է սխալով';
+  String get errTunnel => 'Այս VPN ռեժիմն անհասանելի է։ Ընտրեք այլ ռեժիմ կամ ստուգեք ծառայության թույլտվությունները։';
 
   @override
   String get errNetwork => 'Հնարավոր չէ հասնել սերվերին';
@@ -487,8 +484,8 @@ class SHy extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'բաժանորդագրությունն ավարտվում է # օրից',
-      one: 'բաժանորդագրությունն ավարտվում է # օրը',
+      other: 'բաժանորդագրությունն ավարտվում է $days օրից',
+      one: 'բաժանորդագրությունն ավարտվում է $days օրը',
       zero: 'բաժանորդագրությունն ավարտվում է մի քանի ժամից',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SHy extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# սերվերներ, ամենաարագը',
-      one: '# սերվեր, ամենաարագը',
+      other: '$count սերվերներ, ամենաարագը',
+      one: '$count սերվեր, ամենաարագը',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class SHy extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# րոպե', one: '# րոպե');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count րոպե', one: '$count րոպե');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ժամ', one: '# ժամ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ժամ', one: '$count ժամ');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class SHy extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# կապ', one: '# կապ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count կապ', one: '$count կապ');
     return '$_temp0';
   }
 
@@ -1424,9 +1421,6 @@ class SHy extends S {
 
   @override
   String get watchReconnect => 'Նորից միացեք';
-
-  @override
-  String get coreRestoringLink => 'Կապը վերականգնվում է Sora միջուկին…';
 
   @override
   String get crashRestoreTitle => 'Վերջին նիստն ընդհատվեց';
@@ -1766,8 +1760,8 @@ class SHy extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Հայտնաբերվել է # արտահոսք',
-      one: 'Հայտնաբերվել է # արտահոսք',
+      other: 'Հայտնաբերվել է $count արտահոսք',
+      one: 'Հայտնաբերվել է $count արտահոսք',
     );
     return '$_temp0';
   }
@@ -2006,4 +2000,68 @@ class SHy extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora-ի ներքին սխալ։ Պահպանեք մատյանը և հայտնեք խնդրի մասին։';
+
+  @override
+  String get errTls => 'Սերվերի վկայագիրը մերժվել է։ Ստուգեք ժամացույցը կամ դիմեք մատակարարին։';
+
+  @override
+  String get errFileAccess => 'Ֆայլը հասանելի չէ։ Ստուգեք թույլտվությունները և ազատ տարածքը։';
+
+  @override
+  String get errDataLimit => 'Տվյալները շատ են։ Ընտրեք ավելի քիչ տարրեր և կրկին փորձեք։';
+
+  @override
+  String get errCredentials => 'Պահպանված մուտքի տվյալները բացակայում են։ Կրկին ներմուծեք սերվերը։';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Թարմացվել է՝ $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Դեռ չի թարմացվել։ Կրկին փորձեք։';
+
+  @override
+  String get errHttpStatus => 'Սերվերը մերժել է հարցումը։ Ստուգեք հղումը կամ դիմեք մատակարարին։';
+
+  @override
+  String get errInvalidServer => 'Սերվերի կարգավորումները թերի են կամ չեն աջակցվում։ Թարմացրեք բաժանորդագրությունը։';
+
+  @override
+  String get errServerIds => 'Երկու սերվեր ունեն նույն նույնացուցիչը։ Կրկին ներմուծեք դրանք։';
+
+  @override
+  String get errRoutingGroup =>
+      'Երթուղին հղվում է բացակայող սերվերների կամ վնասված խմբի։ Թարմացրեք բաժանորդագրությունը։';
+
+  @override
+  String get errConnections => 'Միացումների ցանկն անհասանելի է։ Միացեք կամ ընտրեք այլ շարժիչ։';
+
+  @override
+  String get errLogs => 'Այս ծառայությունը մատյան չի պահում։ Թարմացրեք Sora-ն։';
+
+  @override
+  String get errDiagnostics => 'Չհաջողվեց հավաքել ախտորոշումը։ Կրկին փորձեք կամ պահպանեք մատյանը։';
+
+  @override
+  String get errMissingItem => 'Հարցված տարրն այլևս գոյություն չունի։ Թարմացրեք ցանկը։';
+
+  @override
+  String get errInvalidRequest => 'Հարցումը սխալ արժեքներ է պարունակում։ Ստուգեք մուտքագրածը և կրկին փորձեք։';
+
+  @override
+  String get errProxyLogin =>
+      'Համակարգի պրոքսին չի աջակցում այս մուտքը։ Հեռացրեք տեղային պրոքսիի օգտանունն ու գաղտնաբառը։';
+
+  @override
+  String get errLogFilter => 'Մատյանի զտիչը սխալ է։ Մաքրեք որոնումը և կրկին փորձեք։';
+
+  @override
+  String get errSubRedirect => 'Սերվերը վերահղել է վտանգավոր հասցեի։ Մատակարարից նոր հղում խնդրեք։';
+
+  @override
+  String get errProxySetup => 'Չհաջողվեց կարգավորել համակարգի պրոքսին։ Վերամիացեք կամ բացեք մատյանը։';
 }

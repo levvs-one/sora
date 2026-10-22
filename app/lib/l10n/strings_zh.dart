@@ -226,10 +226,7 @@ class SZh extends S {
   String get errEngineStopped => '发动机停了';
 
   @override
-  String get errTunnel => '无权创建 VPN 连接';
-
-  @override
-  String get errServers => '服务器配置有错误';
+  String get errTunnel => '此 VPN 模式不可用。请选择其他模式或检查服务权限。';
 
   @override
   String get errNetwork => '无法到达服务器';
@@ -487,8 +484,8 @@ class SZh extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '订阅将在 # 天后结束',
-      one: '订阅于 # 天结束',
+      other: '订阅将在 $days 天后结束',
+      one: '订阅于 $days 天结束',
       zero: '订阅将在几个小时后结束',
     );
     return '$name: $_temp0';
@@ -504,7 +501,7 @@ class SZh extends S {
 
   @override
   String groupBest(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#服务器，最快', one: '#服务器，最快');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count服务器，最快', one: '$count服务器，最快');
     return '$_temp0';
   }
 
@@ -1212,13 +1209,13 @@ class SZh extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分钟');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 分钟');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 小时');
     return '$_temp0';
   }
 
@@ -1288,7 +1285,7 @@ class SZh extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 个连接');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 个连接');
     return '$_temp0';
   }
 
@@ -1405,9 +1402,6 @@ class SZh extends S {
 
   @override
   String get watchReconnect => '重新连接';
-
-  @override
-  String get coreRestoringLink => '正在恢复与核心的连接…';
 
   @override
   String get crashRestoreTitle => '上次会话意外中断';
@@ -1739,7 +1733,7 @@ class SZh extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '发现 # 处泄漏');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '发现 $count 处泄漏');
     return '$_temp0';
   }
 
@@ -1974,6 +1968,68 @@ class SZh extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora 内部错误。请保存日志并报告问题。';
+
+  @override
+  String get errTls => '服务器证书被拒绝。请检查系统时间或联系服务提供商。';
+
+  @override
+  String get errFileAccess => '无法访问文件。请检查权限和可用空间。';
+
+  @override
+  String get errDataLimit => '数据过多。请减少所选项目后重试。';
+
+  @override
+  String get errCredentials => '保存的凭据丢失。请重新导入服务器。';
+
+  @override
+  String subscriptionStale(String time) {
+    return '上次更新：$time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => '尚未更新。请重试。';
+
+  @override
+  String get errHttpStatus => '服务器拒绝了请求。请检查链接或联系服务提供商。';
+
+  @override
+  String get errInvalidServer => '服务器设置不完整或不受支持。请更新订阅。';
+
+  @override
+  String get errServerIds => '两个服务器使用了相同的标识符。请重新导入。';
+
+  @override
+  String get errRoutingGroup => '路由指向缺失的服务器或损坏的分组。请更新订阅。';
+
+  @override
+  String get errConnections => '无法显示连接列表。请连接或选择其他内核。';
+
+  @override
+  String get errLogs => '此服务不保存日志。请更新 Sora。';
+
+  @override
+  String get errDiagnostics => '无法收集诊断信息。请重试或保存日志。';
+
+  @override
+  String get errMissingItem => '请求的项目已不存在。请刷新列表。';
+
+  @override
+  String get errInvalidRequest => '请求包含无效值。请检查输入后重试。';
+
+  @override
+  String get errProxyLogin => '系统代理不支持此登录方式。请移除本地代理的用户名和密码。';
+
+  @override
+  String get errLogFilter => '日志筛选条件无效。请清空搜索后重试。';
+
+  @override
+  String get errSubRedirect => '服务器重定向到了不安全的地址。请向服务提供商索取新链接。';
+
+  @override
+  String get errProxySetup => '无法配置系统代理。请重新连接或打开日志。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2197,10 +2253,7 @@ class SZhHans extends SZh {
   String get errEngineStopped => '发动机停了';
 
   @override
-  String get errTunnel => '无权创建 VPN 连接';
-
-  @override
-  String get errServers => '服务器配置有错误';
+  String get errTunnel => '此 VPN 模式不可用。请选择其他模式或检查服务权限。';
 
   @override
   String get errNetwork => '无法到达服务器';
@@ -2458,8 +2511,8 @@ class SZhHans extends SZh {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '订阅将在 # 天后结束',
-      one: '订阅于 # 天结束',
+      other: '订阅将在 $days 天后结束',
+      one: '订阅于 $days 天结束',
       zero: '订阅将在几个小时后结束',
     );
     return '$name: $_temp0';
@@ -2475,7 +2528,7 @@ class SZhHans extends SZh {
 
   @override
   String groupBest(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#服务器，最快', one: '#服务器，最快');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count服务器，最快', one: '$count服务器，最快');
     return '$_temp0';
   }
 
@@ -3183,13 +3236,13 @@ class SZhHans extends SZh {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分钟');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 分钟');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小时');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 小时');
     return '$_temp0';
   }
 
@@ -3259,7 +3312,7 @@ class SZhHans extends SZh {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 个连接');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 个连接');
     return '$_temp0';
   }
 
@@ -3376,9 +3429,6 @@ class SZhHans extends SZh {
 
   @override
   String get watchReconnect => '重新连接';
-
-  @override
-  String get coreRestoringLink => '正在恢复与核心的连接…';
 
   @override
   String get crashRestoreTitle => '上次会话意外中断';
@@ -3710,7 +3760,7 @@ class SZhHans extends SZh {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '发现 # 处泄漏');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '发现 $count 处泄漏');
     return '$_temp0';
   }
 
@@ -3945,6 +3995,68 @@ class SZhHans extends SZh {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora 内部错误。请保存日志并报告问题。';
+
+  @override
+  String get errTls => '服务器证书被拒绝。请检查系统时间或联系服务提供商。';
+
+  @override
+  String get errFileAccess => '无法访问文件。请检查权限和可用空间。';
+
+  @override
+  String get errDataLimit => '数据过多。请减少所选项目后重试。';
+
+  @override
+  String get errCredentials => '保存的凭据丢失。请重新导入服务器。';
+
+  @override
+  String subscriptionStale(String time) {
+    return '上次更新：$time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => '尚未更新。请重试。';
+
+  @override
+  String get errHttpStatus => '服务器拒绝了请求。请检查链接或联系服务提供商。';
+
+  @override
+  String get errInvalidServer => '服务器设置不完整或不受支持。请更新订阅。';
+
+  @override
+  String get errServerIds => '两个服务器使用了相同的标识符。请重新导入。';
+
+  @override
+  String get errRoutingGroup => '路由指向缺失的服务器或损坏的分组。请更新订阅。';
+
+  @override
+  String get errConnections => '无法显示连接列表。请连接或选择其他内核。';
+
+  @override
+  String get errLogs => '此服务不保存日志。请更新 Sora。';
+
+  @override
+  String get errDiagnostics => '无法收集诊断信息。请重试或保存日志。';
+
+  @override
+  String get errMissingItem => '请求的项目已不存在。请刷新列表。';
+
+  @override
+  String get errInvalidRequest => '请求包含无效值。请检查输入后重试。';
+
+  @override
+  String get errProxyLogin => '系统代理不支持此登录方式。请移除本地代理的用户名和密码。';
+
+  @override
+  String get errLogFilter => '日志筛选条件无效。请清空搜索后重试。';
+
+  @override
+  String get errSubRedirect => '服务器重定向到了不安全的地址。请向服务提供商索取新链接。';
+
+  @override
+  String get errProxySetup => '无法配置系统代理。请重新连接或打开日志。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4168,10 +4280,7 @@ class SZhHant extends SZh {
   String get errEngineStopped => '引擎停了';
 
   @override
-  String get errTunnel => '無權建立 VPN 連接';
-
-  @override
-  String get errServers => '伺服器配置有錯誤';
+  String get errTunnel => '此 VPN 模式無法使用。請選擇其他模式或檢查服務權限。';
 
   @override
   String get errNetwork => '無法到達伺服器';
@@ -4429,8 +4538,8 @@ class SZhHant extends SZh {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '訂閱將在 # 天後結束',
-      one: '訂閱於 # 天結束',
+      other: '訂閱將在 $days 天後結束',
+      one: '訂閱於 $days 天結束',
       zero: '訂閱將在幾個小時後結束',
     );
     return '$name: $_temp0';
@@ -4446,7 +4555,7 @@ class SZhHant extends SZh {
 
   @override
   String groupBest(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#伺服器，最快', one: '#伺服器，最快');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count伺服器，最快', one: '$count伺服器，最快');
     return '$_temp0';
   }
 
@@ -5154,13 +5263,13 @@ class SZhHant extends SZh {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分鐘');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 分鐘');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 小時');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 小時');
     return '$_temp0';
   }
 
@@ -5230,7 +5339,7 @@ class SZhHant extends SZh {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 個連接');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 個連接');
     return '$_temp0';
   }
 
@@ -5347,9 +5456,6 @@ class SZhHant extends SZh {
 
   @override
   String get watchReconnect => '重新連接';
-
-  @override
-  String get coreRestoringLink => '正在恢復與核心的連接…';
 
   @override
   String get crashRestoreTitle => '上次工作階段意外中斷';
@@ -5681,7 +5787,7 @@ class SZhHant extends SZh {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '發現 # 處洩漏');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '發現 $count 處洩漏');
     return '$_temp0';
   }
 
@@ -5917,4 +6023,66 @@ class SZhHant extends SZh {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora 內部錯誤。請儲存日誌並回報問題。';
+
+  @override
+  String get errTls => '伺服器憑證遭拒。請檢查系統時間或聯絡服務供應商。';
+
+  @override
+  String get errFileAccess => '無法存取檔案。請檢查權限和可用空間。';
+
+  @override
+  String get errDataLimit => '資料過多。請減少所選項目後重試。';
+
+  @override
+  String get errCredentials => '儲存的憑證遺失。請重新匯入伺服器。';
+
+  @override
+  String subscriptionStale(String time) {
+    return '上次更新：$time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => '尚未更新。請重試。';
+
+  @override
+  String get errHttpStatus => '伺服器拒絕了請求。請檢查連結或聯絡服務供應商。';
+
+  @override
+  String get errInvalidServer => '伺服器設定不完整或不受支援。請更新訂閱。';
+
+  @override
+  String get errServerIds => '兩個伺服器使用了相同的識別碼。請重新匯入。';
+
+  @override
+  String get errRoutingGroup => '路由指向遺失的伺服器或損壞的群組。請更新訂閱。';
+
+  @override
+  String get errConnections => '無法顯示連線清單。請連線或選擇其他核心。';
+
+  @override
+  String get errLogs => '此服務不儲存日誌。請更新 Sora。';
+
+  @override
+  String get errDiagnostics => '無法收集診斷資訊。請重試或儲存日誌。';
+
+  @override
+  String get errMissingItem => '請求的項目已不存在。請重新整理清單。';
+
+  @override
+  String get errInvalidRequest => '請求包含無效值。請檢查輸入後重試。';
+
+  @override
+  String get errProxyLogin => '系統代理不支援此登入方式。請移除本機代理的使用者名稱和密碼。';
+
+  @override
+  String get errLogFilter => '日誌篩選條件無效。請清空搜尋後重試。';
+
+  @override
+  String get errSubRedirect => '伺服器重新導向至不安全的位址。請向服務供應商索取新連結。';
+
+  @override
+  String get errProxySetup => '無法設定系統代理。請重新連線或開啟日誌。';
 }

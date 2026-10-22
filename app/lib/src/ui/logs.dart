@@ -95,7 +95,7 @@ class _LogsScreenState extends State<LogsScreen> {
     },
   );
 
-  Future<void> _reload() async {
+  Future<void> _reload({FailureMode mode = FailureMode.background}) async {
     if (!mounted) return;
     final revision = ++_revision;
     final link = SoraScope.read(context).link;
@@ -109,7 +109,7 @@ class _LogsScreenState extends State<LogsScreen> {
       final page = await link.stub.queryLogs(
         QueryLogsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, filter: _filter, limit: 500),
       );
-      if (page.hasError()) throw CoreFailure(page.error.userMessageKey);
+      if (page.hasError()) throw CoreFailure.fromWire(page.error);
       if (!mounted || revision != _revision || link != SoraScope.read(context).link) return;
       setState(() {
         _entries = page.entries.toList();
@@ -135,11 +135,15 @@ class _LogsScreenState extends State<LogsScreen> {
               if (mounted && revision == _revision) _arrive(entry);
             },
             onError: (Object e) {
-              if (mounted && revision == _revision) SoraScope.read(context).reportFailure(e, source: 'logs');
+              if (mounted && revision == _revision) {
+                SoraScope.read(context).reportFailure(e, source: 'logs', mode: mode);
+              }
             },
           );
     } catch (error) {
-      if (mounted && revision == _revision) SoraScope.read(context).reportFailure(error, source: 'logs');
+      if (mounted && revision == _revision) {
+        SoraScope.read(context).reportFailure(error, source: 'logs', mode: mode);
+      }
     }
   }
 
@@ -157,7 +161,7 @@ class _LogsScreenState extends State<LogsScreen> {
           limit: 500,
         ),
       );
-      if (page.hasError()) throw CoreFailure(page.error.userMessageKey);
+      if (page.hasError()) throw CoreFailure.fromWire(page.error);
       if (!mounted || revision != _revision || _link != link) return;
       final known = _entries.map((e) => e.sequence).toSet();
       setState(() {
@@ -165,7 +169,9 @@ class _LogsScreenState extends State<LogsScreen> {
         _before = page.beforeSequence;
       });
     } catch (error) {
-      if (mounted && revision == _revision) SoraScope.read(context).reportFailure(error, source: 'logs');
+      if (mounted && revision == _revision) {
+        SoraScope.read(context).reportFailure(error, source: 'logs', mode: FailureMode.background);
+      }
     } finally {
       if (revision == _revision) _olderLoading = false;
     }
@@ -203,7 +209,8 @@ class _LogsScreenState extends State<LogsScreen> {
           LogExportFormat.LOG_EXPORT_FORMAT_JSON_LINES,
           LogExportFormat.LOG_EXPORT_FORMAT_CSV,
         ].contains(format)) {
-      SoraScope.read(context).reportFailure(const CoreFailure('core.api.version_mismatch'), source: 'logs');
+      SoraScope.read(context)
+          .reportFailure(const CoreFailure('core.api.version_mismatch'), source: 'logs', mode: FailureMode.action);
       return;
     }
     final name = _filename(extension);
@@ -218,13 +225,13 @@ class _LogsScreenState extends State<LogsScreen> {
           category: category,
         ),
       );
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
       if (!mounted) return;
       final place = await getSaveLocation(suggestedName: name);
       if (place == null) return;
       await File(place.path).writeAsBytes(answer.data, flush: true);
     } catch (error) {
-      if (mounted) SoraScope.read(context).reportFailure(error, source: 'logs');
+      if (mounted) SoraScope.read(context).reportFailure(error, source: 'logs', mode: FailureMode.action);
     }
   }
 
@@ -235,7 +242,7 @@ class _LogsScreenState extends State<LogsScreen> {
       final answer = await link.stub.clearLogs(
         ClearLogsRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
       );
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
       if (mounted) {
         setState(() {
           _entries = [];
@@ -244,7 +251,7 @@ class _LogsScreenState extends State<LogsScreen> {
         });
       }
     } catch (error) {
-      if (mounted) SoraScope.read(context).reportFailure(error, source: 'logs');
+      if (mounted) SoraScope.read(context).reportFailure(error, source: 'logs', mode: FailureMode.action);
     }
   }
 
@@ -304,7 +311,7 @@ class _LogsScreenState extends State<LogsScreen> {
           _capture = request;
         });
         final answer = await request;
-        if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+        if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
         data = answer.archive;
         if (!mounted || _capture != request) return;
       }
@@ -312,7 +319,9 @@ class _LogsScreenState extends State<LogsScreen> {
       final place = await getSaveLocation(suggestedName: name);
       if (place != null) await File(place.path).writeAsBytes(data, flush: true);
     } catch (error) {
-      if (mounted && (request == null || _capture == request)) sora.reportFailure(error, source: 'diagnostics');
+      if (mounted && (request == null || _capture == request)) {
+        sora.reportFailure(error, source: 'diagnostics', mode: FailureMode.action);
+      }
     } finally {
       if (mounted && _capture == request) setState(() => _capture = null);
     }
@@ -428,6 +437,10 @@ class _LogsScreenState extends State<LogsScreen> {
               ),
             ),
       children: [
+        BackgroundFailureState(
+          source: 'logs',
+          retry: () => unawaited(_reload(mode: FailureMode.action)),
+        ),
         Segments<LogLevel>(
           value: _level,
           choices: {

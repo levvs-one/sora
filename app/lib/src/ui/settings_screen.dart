@@ -56,20 +56,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_readLog()));
   }
 
-  Future<void> _readLog() async {
+  Future<void> _readLog({FailureMode mode = FailureMode.background}) async {
     final link = SoraScope.read(context).link;
     if (link == null) return;
     try {
       final answer = await link.stub.getLogSettings(
         GetLogSettingsRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
       );
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
       if (mounted) {
         SoraScope.read(context).recovered('log-settings');
         setState(() => _log = answer.settings);
       }
     } catch (error) {
-      if (mounted) SoraScope.read(context).reportFailure(error, source: 'log-settings');
+      if (mounted) SoraScope.read(context).reportFailure(error, source: 'log-settings', mode: mode);
       // Keep log navigation available when core settings cannot be loaded.
     }
   }
@@ -85,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final answer = await link.stub.setLogSettings(
         SetLogSettingsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, settings: next),
       );
-      if (answer.hasError()) throw CoreFailure(answer.error.userMessageKey);
+      if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
       if (mounted) {
         SoraScope.read(context).recovered('log-settings');
         setState(() => _log = answer.settings);
@@ -93,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (error) {
       if (mounted) {
         setState(() => _log = current);
-        SoraScope.read(context).reportFailure(error, source: 'log-settings');
+        SoraScope.read(context).reportFailure(error, source: 'log-settings', mode: FailureMode.action);
       }
     }
   }
@@ -165,6 +165,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Screen(
       title: s.settings,
       children: [
+        BackgroundFailureState(
+          source: 'log-settings',
+          retry: () => unawaited(_readLog(mode: FailureMode.action)),
+        ),
         if (sora.needsReconnect) ...[const ConnectionChanges(), const SizedBox(height: 16)],
         Group(
           children: [

@@ -226,10 +226,7 @@ class SUz extends S {
   String get errEngineStopped => 'Dvigatel to\'xtadi';
 
   @override
-  String get errTunnel => 'VPN ulanishini yaratishga ruxsat yo\'q';
-
-  @override
-  String get errServers => 'Server xato bilan sozlangan';
+  String get errTunnel => 'Bu VPN rejimi mavjud emas. Boshqa rejimni tanlang yoki xizmat ruxsatlarini tekshiring.';
 
   @override
   String get errNetwork => 'Serverga ulanib boʻlmadi';
@@ -487,8 +484,8 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'obuna # kunlarda tugaydi',
-      one: 'obuna # kunida tugaydi',
+      other: 'obuna $days kunlarda tugaydi',
+      one: 'obuna $days kunida tugaydi',
       zero: 'obuna bir necha soat ichida tugaydi',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# serverlari, eng tez',
-      one: '# server, eng tezkor',
+      other: '$count serverlari, eng tez',
+      one: '$count server, eng tezkor',
     );
     return '$_temp0';
   }
@@ -1232,13 +1229,13 @@ class SUz extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# daqiqa', one: '# daqiqa');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count daqiqa', one: '$count daqiqa');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# soat', one: '# soat');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count soat', one: '$count soat');
     return '$_temp0';
   }
 
@@ -1309,7 +1306,7 @@ class SUz extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ulanish', one: '# ulanish');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ulanish', one: '$count ulanish');
     return '$_temp0';
   }
 
@@ -1429,9 +1426,6 @@ class SUz extends S {
 
   @override
   String get watchReconnect => 'Qayta ulaning';
-
-  @override
-  String get coreRestoringLink => 'Sora yadrosiga ulanish tiklanmoqda…';
 
   @override
   String get crashRestoreTitle => 'Oxirgi seans uzildi';
@@ -1771,8 +1765,8 @@ class SUz extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# ta sizib chiqish aniqlandi',
-      one: '# ta sizib chiqish aniqlandi',
+      other: '$count ta sizib chiqish aniqlandi',
+      one: '$count ta sizib chiqish aniqlandi',
     );
     return '$_temp0';
   }
@@ -2013,4 +2007,68 @@ class SUz extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora ichki xatosi. Jurnalni saqlang va muammo haqida xabar bering.';
+
+  @override
+  String get errTls => 'Server sertifikati rad etildi. Soatni tekshiring yoki provayderga murojaat qiling.';
+
+  @override
+  String get errFileAccess => 'Faylga kirib bo‘lmaydi. Ruxsatlar va bo‘sh joyni tekshiring.';
+
+  @override
+  String get errDataLimit => 'Ma’lumot juda ko‘p. Kamroq element tanlab, qayta urinib ko‘ring.';
+
+  @override
+  String get errCredentials => 'Saqlangan kirish ma’lumotlari yo‘q. Serverni qayta import qiling.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Yangilangan vaqt: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Hali yangilanmagan. Qayta urinib ko‘ring.';
+
+  @override
+  String get errHttpStatus => 'Server so‘rovni rad etdi. Havolani tekshiring yoki provayderga murojaat qiling.';
+
+  @override
+  String get errInvalidServer => 'Server sozlamalari to‘liq emas yoki qo‘llanmaydi. Obunani yangilang.';
+
+  @override
+  String get errServerIds => 'Ikki server bir xil identifikatorga ega. Ularni qayta import qiling.';
+
+  @override
+  String get errRoutingGroup => 'Yo‘nalish yo‘q serverlarga yoki buzilgan guruhga ishora qilmoqda. Obunani yangilang.';
+
+  @override
+  String get errConnections => 'Ulanishlar ro‘yxati mavjud emas. Ulaning yoki boshqa mexanizmni tanlang.';
+
+  @override
+  String get errLogs => 'Bu xizmat jurnal yuritmaydi. Sora’ni yangilang.';
+
+  @override
+  String get errDiagnostics => 'Diagnostika yig‘ilmadi. Qayta urining yoki jurnalni saqlang.';
+
+  @override
+  String get errMissingItem => 'So‘ralgan element endi mavjud emas. Ro‘yxatni yangilang.';
+
+  @override
+  String get errInvalidRequest =>
+      'So‘rovda noto‘g‘ri qiymatlar bor. Kiritilgan ma’lumotlarni tekshirib, qayta urining.';
+
+  @override
+  String get errProxyLogin =>
+      'Tizim proksisi bu kirishni qo‘llamaydi. Mahalliy proksi foydalanuvchi nomi va parolini o‘chiring.';
+
+  @override
+  String get errLogFilter => 'Jurnal filtri noto‘g‘ri. Qidiruvni tozalab, qayta urining.';
+
+  @override
+  String get errSubRedirect => 'Server xavfli manzilga yo‘naltirdi. Provayderdan yangi havola so‘rang.';
+
+  @override
+  String get errProxySetup => 'Tizim proksisi sozlanmadi. Qayta ulaning yoki jurnalni oching.';
 }

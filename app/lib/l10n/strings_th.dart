@@ -226,10 +226,7 @@ class STh extends S {
   String get errEngineStopped => 'เครื่องยนต์หยุดทำงาน';
 
   @override
-  String get errTunnel => 'ไม่ได้รับอนุญาตให้สร้างการเชื่อมต่อ VPN';
-
-  @override
-  String get errServers => 'เซิร์ฟเวอร์ได้รับการกำหนดค่าโดยมีข้อผิดพลาด';
+  String get errTunnel => 'โหมด VPN นี้ไม่พร้อมใช้งาน เลือกโหมดอื่นหรือตรวจสอบสิทธิ์ของบริการ';
 
   @override
   String get errNetwork => 'ไม่สามารถเข้าถึงเซิร์ฟเวอร์ได้';
@@ -487,8 +484,8 @@ class STh extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'การสมัครสมาชิกจะสิ้นสุดใน # วัน',
-      one: 'การสมัครสมาชิกจะสิ้นสุดในวัน #',
+      other: 'การสมัครสมาชิกจะสิ้นสุดใน $days วัน',
+      one: 'การสมัครสมาชิกจะสิ้นสุดในวัน $days',
       zero: 'การสมัครสมาชิกจะสิ้นสุดในอีกไม่กี่ชั่วโมง',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class STh extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'เซิร์ฟเวอร์ # เร็วที่สุด',
-      one: 'เซิร์ฟเวอร์ # เร็วที่สุด',
+      other: 'เซิร์ฟเวอร์ $count เร็วที่สุด',
+      one: 'เซิร์ฟเวอร์ $count เร็วที่สุด',
     );
     return '$_temp0';
   }
@@ -1226,13 +1223,13 @@ class STh extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# นาที');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count นาที');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ชั่วโมง');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ชั่วโมง');
     return '$_temp0';
   }
 
@@ -1302,7 +1299,7 @@ class STh extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# การเชื่อมต่อ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count การเชื่อมต่อ');
     return '$_temp0';
   }
 
@@ -1420,9 +1417,6 @@ class STh extends S {
 
   @override
   String get watchReconnect => 'เชื่อมต่อใหม่';
-
-  @override
-  String get coreRestoringLink => 'กำลังคืนค่าการเชื่อมต่อกับ Sora คอร์...';
 
   @override
   String get crashRestoreTitle => 'เซสชั่นสุดท้ายถูกขัดจังหวะ';
@@ -1757,7 +1751,7 @@ class STh extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: 'พบการรั่วไหล # รายการ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: 'พบการรั่วไหล $count รายการ');
     return '$_temp0';
   }
 
@@ -1994,4 +1988,66 @@ class STh extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'เกิดข้อผิดพลาดภายใน Sora บันทึกบันทึกเหตุการณ์แล้วรายงานปัญหา';
+
+  @override
+  String get errTls => 'ใบรับรองเซิร์ฟเวอร์ถูกปฏิเสธ ตรวจสอบเวลาหรือติดต่อผู้ให้บริการ';
+
+  @override
+  String get errFileAccess => 'เข้าถึงไฟล์ไม่ได้ ตรวจสอบสิทธิ์และพื้นที่ว่าง';
+
+  @override
+  String get errDataLimit => 'ข้อมูลมากเกินไป เลือกรายการให้น้อยลงแล้วลองอีกครั้ง';
+
+  @override
+  String get errCredentials => 'ไม่พบข้อมูลเข้าสู่ระบบที่บันทึกไว้ นำเข้าเซิร์ฟเวอร์อีกครั้ง';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'อัปเดตล่าสุด: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'ยังไม่ได้อัปเดต ลองอีกครั้ง';
+
+  @override
+  String get errHttpStatus => 'เซิร์ฟเวอร์ปฏิเสธคำขอ ตรวจสอบลิงก์หรือติดต่อผู้ให้บริการ';
+
+  @override
+  String get errInvalidServer => 'การตั้งค่าเซิร์ฟเวอร์ไม่ครบหรือไม่รองรับ อัปเดตการสมัครสมาชิก';
+
+  @override
+  String get errServerIds => 'เซิร์ฟเวอร์สองตัวใช้รหัสเดียวกัน นำเข้าใหม่อีกครั้ง';
+
+  @override
+  String get errRoutingGroup => 'เส้นทางอ้างถึงเซิร์ฟเวอร์ที่หายไปหรือกลุ่มที่เสียหาย อัปเดตการสมัครสมาชิก';
+
+  @override
+  String get errConnections => 'รายการการเชื่อมต่อไม่พร้อมใช้งาน เชื่อมต่อหรือเลือกเอนจินอื่น';
+
+  @override
+  String get errLogs => 'บริการนี้ไม่เก็บบันทึกเหตุการณ์ อัปเดต Sora';
+
+  @override
+  String get errDiagnostics => 'รวบรวมการวินิจฉัยไม่ได้ ลองอีกครั้งหรือบันทึกบันทึกเหตุการณ์';
+
+  @override
+  String get errMissingItem => 'รายการที่ขอไม่มีแล้ว รีเฟรชรายการ';
+
+  @override
+  String get errInvalidRequest => 'คำขอมีค่าที่ไม่ถูกต้อง ตรวจสอบข้อมูลที่ป้อนแล้วลองอีกครั้ง';
+
+  @override
+  String get errProxyLogin => 'พร็อกซีระบบไม่รองรับการเข้าสู่ระบบนี้ ลบชื่อผู้ใช้และรหัสผ่านของพร็อกซีภายใน';
+
+  @override
+  String get errLogFilter => 'ตัวกรองบันทึกเหตุการณ์ไม่ถูกต้อง ล้างการค้นหาแล้วลองอีกครั้ง';
+
+  @override
+  String get errSubRedirect => 'เซิร์ฟเวอร์เปลี่ยนเส้นทางไปยังที่อยู่ที่ไม่ปลอดภัย ขอรับลิงก์ใหม่จากผู้ให้บริการ';
+
+  @override
+  String get errProxySetup => 'ตั้งค่าพร็อกซีระบบไม่ได้ เชื่อมต่อใหม่หรือเปิดบันทึกเหตุการณ์';
 }

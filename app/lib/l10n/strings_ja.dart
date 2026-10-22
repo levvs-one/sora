@@ -226,10 +226,7 @@ class SJa extends S {
   String get errEngineStopped => 'エンジンが止まってしまった';
 
   @override
-  String get errTunnel => 'VPN接続を作成する権限がありません';
-
-  @override
-  String get errServers => 'サーバーの構成にエラーがあります';
+  String get errTunnel => 'このVPNモードは利用できません。別のモードを選ぶかサービスの権限を確認してください。';
 
   @override
   String get errNetwork => 'サーバーにアクセスできません';
@@ -487,8 +484,8 @@ class SJa extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'サブスクリプションはあと # 日で終了します',
-      one: 'サブスクリプションは # 日に終了します',
+      other: 'サブスクリプションはあと $days 日で終了します',
+      one: 'サブスクリプションは $days 日に終了します',
       zero: 'サブスクリプションは数時間後に終了します',
     );
     return '$name: $_temp0';
@@ -504,7 +501,7 @@ class SJa extends S {
 
   @override
   String groupBest(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# サーバー、最速', one: '# サーバー、最速');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count サーバー、最速', one: '$count サーバー、最速');
     return '$_temp0';
   }
 
@@ -1214,13 +1211,13 @@ class SJa extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 分');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 分');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 時間');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 時間');
     return '$_temp0';
   }
 
@@ -1290,7 +1287,7 @@ class SJa extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 件の接続');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 件の接続');
     return '$_temp0';
   }
 
@@ -1407,9 +1404,6 @@ class SJa extends S {
 
   @override
   String get watchReconnect => '再接続';
-
-  @override
-  String get coreRestoringLink => 'Sora コアへの接続を復元しています…';
 
   @override
   String get crashRestoreTitle => '最後のセッションが中断されました';
@@ -1742,7 +1736,7 @@ class SJa extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# 件の漏えいを検出');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count 件の漏えいを検出');
     return '$_temp0';
   }
 
@@ -1978,4 +1972,66 @@ class SJa extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Soraの内部エラーです。ログを保存して問題を報告してください。';
+
+  @override
+  String get errTls => 'サーバー証明書が拒否されました。時計を確認するか提供元に連絡してください。';
+
+  @override
+  String get errFileAccess => 'ファイルにアクセスできません。権限と空き容量を確認してください。';
+
+  @override
+  String get errDataLimit => 'データが多すぎます。項目を減らして再試行してください。';
+
+  @override
+  String get errCredentials => '保存済みの認証情報がありません。サーバーを再インポートしてください。';
+
+  @override
+  String subscriptionStale(String time) {
+    return '最終更新: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'まだ更新されていません。再試行してください。';
+
+  @override
+  String get errHttpStatus => 'サーバーがリクエストを拒否しました。リンクを確認するか提供元に連絡してください。';
+
+  @override
+  String get errInvalidServer => 'サーバー設定が不完全か未対応です。サブスクリプションを更新してください。';
+
+  @override
+  String get errServerIds => '2つのサーバーの識別子が同じです。再インポートしてください。';
+
+  @override
+  String get errRoutingGroup => '経路が存在しないサーバーや壊れたグループを参照しています。サブスクリプションを更新してください。';
+
+  @override
+  String get errConnections => '接続一覧を表示できません。接続するか別のエンジンを選んでください。';
+
+  @override
+  String get errLogs => 'このサービスにはログ記録がありません。Soraを更新してください。';
+
+  @override
+  String get errDiagnostics => '診断を収集できませんでした。再試行するかログを保存してください。';
+
+  @override
+  String get errMissingItem => '要求された項目は存在しません。一覧を更新してください。';
+
+  @override
+  String get errInvalidRequest => 'リクエストに無効な値があります。入力を確認して再試行してください。';
+
+  @override
+  String get errProxyLogin => 'システムプロキシはこの認証に対応していません。ローカルプロキシのユーザー名とパスワードを削除してください。';
+
+  @override
+  String get errLogFilter => 'ログフィルターが無効です。検索を消去して再試行してください。';
+
+  @override
+  String get errSubRedirect => 'サーバーが安全でないアドレスに転送しました。提供元に新しいリンクを依頼してください。';
+
+  @override
+  String get errProxySetup => 'システムプロキシを設定できませんでした。再接続するかログを開いてください。';
 }

@@ -219,7 +219,7 @@ void main() {
     final sora = await start(tester);
     final before = tester.getRect(find.byKey(const ValueKey('current-server')));
     sora.failure = const CoreFailure('core.engine.start_failed');
-    sora.reportFailure(sora.failure!);
+    sora.reportFailure(sora.failure!, mode: FailureMode.action);
     await tester.pumpAndSettle();
     final home = find.descendant(of: find.byType(HomeScreen), matching: find.byType(Text));
     expect(

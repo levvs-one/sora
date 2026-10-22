@@ -226,10 +226,7 @@ class SKo extends S {
   String get errEngineStopped => '엔진이 멈췄다';
 
   @override
-  String get errTunnel => 'VPN 연결을 생성할 수 있는 권한이 없습니다.';
-
-  @override
-  String get errServers => '서버가 오류로 구성되었습니다';
+  String get errTunnel => '이 VPN 모드는 사용할 수 없습니다. 다른 모드를 선택하거나 서비스 권한을 확인하세요.';
 
   @override
   String get errNetwork => '서버에 연결할 수 없습니다';
@@ -487,8 +484,8 @@ class SKo extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: '구독이 #일 후에 종료됩니다',
-      one: '구독은 #일에 종료됩니다',
+      other: '구독이 $days일 후에 종료됩니다',
+      one: '구독은 $days일에 종료됩니다',
       zero: '구독이 몇 시간 후에 종료됩니다',
     );
     return '$name: $_temp0';
@@ -504,7 +501,7 @@ class SKo extends S {
 
   @override
   String groupBest(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '가장 빠른 # 서버', one: '가장 빠른 # 서버');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '가장 빠른 $count 서버', one: '가장 빠른 $count 서버');
     return '$_temp0';
   }
 
@@ -1213,13 +1210,13 @@ class SKo extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#분');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count분');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '#시간');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count시간');
     return '$_temp0';
   }
 
@@ -1289,7 +1286,7 @@ class SKo extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '연결 #개');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '연결 $count개');
     return '$_temp0';
   }
 
@@ -1406,9 +1403,6 @@ class SKo extends S {
 
   @override
   String get watchReconnect => '다시 연결';
-
-  @override
-  String get coreRestoringLink => 'Sora 코어에 대한 연결을 복원하는 중…';
 
   @override
   String get crashRestoreTitle => '마지막 세션이 중단되었습니다.';
@@ -1742,7 +1736,7 @@ class SKo extends S {
 
   @override
   String leakTestFound(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '유출 #건 발견');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '유출 $count건 발견');
     return '$_temp0';
   }
 
@@ -1978,4 +1972,66 @@ class SKo extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora 내부 오류입니다. 로그를 저장하고 문제를 신고하세요.';
+
+  @override
+  String get errTls => '서버 인증서가 거부되었습니다. 시계를 확인하거나 제공업체에 문의하세요.';
+
+  @override
+  String get errFileAccess => '파일에 접근할 수 없습니다. 권한과 여유 공간을 확인하세요.';
+
+  @override
+  String get errDataLimit => '데이터가 너무 많습니다. 항목을 줄이고 다시 시도하세요.';
+
+  @override
+  String get errCredentials => '저장된 인증 정보가 없습니다. 서버를 다시 가져오세요.';
+
+  @override
+  String subscriptionStale(String time) {
+    return '마지막 업데이트: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => '아직 업데이트되지 않았습니다. 다시 시도하세요.';
+
+  @override
+  String get errHttpStatus => '서버가 요청을 거부했습니다. 링크를 확인하거나 제공업체에 문의하세요.';
+
+  @override
+  String get errInvalidServer => '서버 설정이 불완전하거나 지원되지 않습니다. 구독을 업데이트하세요.';
+
+  @override
+  String get errServerIds => '두 서버의 식별자가 같습니다. 다시 가져오세요.';
+
+  @override
+  String get errRoutingGroup => '경로가 없는 서버나 손상된 그룹을 참조합니다. 구독을 업데이트하세요.';
+
+  @override
+  String get errConnections => '연결 목록을 볼 수 없습니다. 연결하거나 다른 엔진을 선택하세요.';
+
+  @override
+  String get errLogs => '이 서비스는 로그를 보관하지 않습니다. Sora를 업데이트하세요.';
+
+  @override
+  String get errDiagnostics => '진단을 수집하지 못했습니다. 다시 시도하거나 로그를 저장하세요.';
+
+  @override
+  String get errMissingItem => '요청한 항목이 더 이상 없습니다. 목록을 새로고침하세요.';
+
+  @override
+  String get errInvalidRequest => '요청에 잘못된 값이 있습니다. 입력을 확인하고 다시 시도하세요.';
+
+  @override
+  String get errProxyLogin => '시스템 프록시는 이 로그인을 지원하지 않습니다. 로컬 프록시의 사용자 이름과 암호를 제거하세요.';
+
+  @override
+  String get errLogFilter => '로그 필터가 잘못되었습니다. 검색을 지우고 다시 시도하세요.';
+
+  @override
+  String get errSubRedirect => '서버가 안전하지 않은 주소로 이동시켰습니다. 제공업체에 새 링크를 요청하세요.';
+
+  @override
+  String get errProxySetup => '시스템 프록시를 설정하지 못했습니다. 다시 연결하거나 로그를 여세요.';
 }

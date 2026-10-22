@@ -47,6 +47,7 @@ class _Core extends CoreControlServiceBase {
     ),
   ];
   SessionPlan? plan;
+  final subscriptionChanges = StreamController<SubscriptionState>.broadcast();
   final events = StreamController<CoreEvent>.broadcast();
   final logs = StreamController<LogEntry>.broadcast();
   final logQueries = <LogFilter>[];
@@ -62,6 +63,7 @@ class _Core extends CoreControlServiceBase {
   ];
 
   Future<void> close() async {
+    await subscriptionChanges.close();
     await events.close();
     await logs.close();
   }
@@ -110,8 +112,10 @@ class _Core extends CoreControlServiceBase {
       GetStatsResponse(stats: StatsTick());
 
   @override
-  Stream<SubscriptionState> watchSubscriptions(ServiceCall call, WatchSubscriptionsRequest request) =>
-      Stream.fromIterable(subscriptions);
+  Stream<SubscriptionState> watchSubscriptions(ServiceCall call, WatchSubscriptionsRequest request) async* {
+    yield* Stream.fromIterable(subscriptions);
+    yield* subscriptionChanges.stream;
+  }
 
   @override
   Stream<ProbeResult> probeServers(ServiceCall call, ProbeServersRequest request) async* {

@@ -226,10 +226,7 @@ class SFr extends S {
   String get errEngineStopped => 'Le moteur s\'est arrêté';
 
   @override
-  String get errTunnel => 'Aucune autorisation pour créer la connexion VPN';
-
-  @override
-  String get errServers => 'Le serveur est configuré avec une erreur';
+  String get errTunnel => 'Ce mode VPN est indisponible. Choisissez un autre mode ou vérifiez les droits du service.';
 
   @override
   String get errNetwork => 'Impossible d\'atteindre le serveur';
@@ -487,8 +484,8 @@ class SFr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'l\'abonnement se termine dans les jours #',
-      one: 'l\'abonnement se termine le jour #',
+      other: 'l\'abonnement se termine dans les jours $days',
+      one: 'l\'abonnement se termine le jour $days',
       zero: 'l\'abonnement se termine dans quelques heures',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SFr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Serveurs #, les plus rapides',
-      one: 'Serveur #, le plus rapide',
+      other: 'Serveurs $count, les plus rapides',
+      one: 'Serveur $count, le plus rapide',
     );
     return '$_temp0';
   }
@@ -1234,13 +1231,13 @@ class SFr extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# minutes', one: '# minute');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count minutes', one: '$count minute');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# heures', one: '# heure');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count heures', one: '$count heure');
     return '$_temp0';
   }
 
@@ -1311,7 +1308,12 @@ class SFr extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# connexions', one: '# connexion');
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count connexions',
+      one: '$count connexion',
+    );
     return '$_temp0';
   }
 
@@ -1431,9 +1433,6 @@ class SFr extends S {
 
   @override
   String get watchReconnect => 'Reconnecter';
-
-  @override
-  String get coreRestoringLink => 'Rétablissement de la connexion au noyau Sora…';
 
   @override
   String get crashRestoreTitle => 'La dernière séance a été interrompue';
@@ -1773,8 +1772,8 @@ class SFr extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# fuites détectées',
-      one: '# fuite détectée',
+      other: '$count fuites détectées',
+      one: '$count fuite détectée',
     );
     return '$_temp0';
   }
@@ -2017,4 +2016,69 @@ class SFr extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Erreur interne de Sora. Enregistrez le journal et signalez le problème.';
+
+  @override
+  String get errTls => 'Certificat du serveur refusé. Vérifiez l’horloge ou contactez le fournisseur.';
+
+  @override
+  String get errFileAccess => 'Accès au fichier impossible. Vérifiez les droits et l’espace libre.';
+
+  @override
+  String get errDataLimit => 'Trop de données. Sélectionnez moins d’éléments et réessayez.';
+
+  @override
+  String get errCredentials => 'Identifiants enregistrés introuvables. Importez à nouveau le serveur.';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'Dernière mise à jour : $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'Pas encore mis à jour. Réessayez.';
+
+  @override
+  String get errHttpStatus => 'Le serveur a refusé la demande. Vérifiez le lien ou contactez le fournisseur.';
+
+  @override
+  String get errInvalidServer => 'Paramètres du serveur incomplets ou non pris en charge. Actualisez l’abonnement.';
+
+  @override
+  String get errServerIds => 'Deux serveurs ont le même identifiant. Importez-les à nouveau.';
+
+  @override
+  String get errRoutingGroup =>
+      'Le routage renvoie à des serveurs absents ou à un groupe endommagé. Actualisez l’abonnement.';
+
+  @override
+  String get errConnections => 'Liste des connexions indisponible. Connectez-vous ou choisissez un autre moteur.';
+
+  @override
+  String get errLogs => 'Ce service ne conserve pas de journal. Mettez Sora à jour.';
+
+  @override
+  String get errDiagnostics => 'Impossible de recueillir le diagnostic. Réessayez ou enregistrez le journal.';
+
+  @override
+  String get errMissingItem => 'L’élément demandé n’existe plus. Actualisez la liste.';
+
+  @override
+  String get errInvalidRequest => 'La demande contient des valeurs incorrectes. Vérifiez la saisie et réessayez.';
+
+  @override
+  String get errProxyLogin =>
+      'Le proxy système ne prend pas en charge cette connexion. Retirez l’identifiant et le mot de passe du proxy local.';
+
+  @override
+  String get errLogFilter => 'Filtre du journal incorrect. Effacez la recherche et réessayez.';
+
+  @override
+  String get errSubRedirect =>
+      'Le serveur a redirigé vers une adresse non sûre. Demandez un nouveau lien au fournisseur.';
+
+  @override
+  String get errProxySetup => 'Impossible de configurer le proxy système. Reconnectez-vous ou ouvrez le journal.';
 }

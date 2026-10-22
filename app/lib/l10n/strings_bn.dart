@@ -226,10 +226,7 @@ class SBn extends S {
   String get errEngineStopped => 'ইঞ্জিন থেমে গেল';
 
   @override
-  String get errTunnel => 'ভিপিএন সংযোগ তৈরি করার অনুমতি নেই';
-
-  @override
-  String get errServers => 'সার্ভারটি একটি ত্রুটির সাথে কনফিগার করা হয়েছে৷';
+  String get errTunnel => 'এই VPN মোড উপলব্ধ নয়। অন্য মোড বেছে নিন বা পরিষেবার অনুমতি পরীক্ষা করুন।';
 
   @override
   String get errNetwork => 'সার্ভারে পৌঁছানো যাচ্ছে না';
@@ -487,8 +484,8 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(
       days,
       locale: localeName,
-      other: 'সদস্যতা # দিনের মধ্যে শেষ হয়',
-      one: 'সদস্যতা # দিনে শেষ হয়',
+      other: 'সদস্যতা $days দিনের মধ্যে শেষ হয়',
+      one: 'সদস্যতা $days দিনে শেষ হয়',
       zero: 'সাবস্ক্রিপশন কয়েক ঘন্টার মধ্যে শেষ হয়',
     );
     return '$name: $_temp0';
@@ -507,8 +504,8 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '# সার্ভার, দ্রুততম',
-      one: '# সার্ভার, দ্রুততম',
+      other: '$count সার্ভার, দ্রুততম',
+      one: '$count সার্ভার, দ্রুততম',
     );
     return '$_temp0';
   }
@@ -1229,13 +1226,13 @@ class SBn extends S {
 
   @override
   String extBgMinutes(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# মিনিট', one: '# মিনিট');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count মিনিট', one: '$count মিনিট');
     return '$_temp0';
   }
 
   @override
   String extBgHours(int count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# ঘণ্টা', one: '# ঘণ্টা');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count ঘণ্টা', one: '$count ঘণ্টা');
     return '$_temp0';
   }
 
@@ -1305,7 +1302,7 @@ class SBn extends S {
 
   @override
   String connConnectionsCount(num count) {
-    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '# সংযোগ', one: '# সংযোগ');
+    String _temp0 = intl.Intl.pluralLogic(count, locale: localeName, other: '$count সংযোগ', one: '$count সংযোগ');
     return '$_temp0';
   }
 
@@ -1424,9 +1421,6 @@ class SBn extends S {
 
   @override
   String get watchReconnect => 'পুনরায় সংযোগ করুন';
-
-  @override
-  String get coreRestoringLink => 'Sora কোরে সংযোগ পুনরুদ্ধার করা হচ্ছে...';
 
   @override
   String get crashRestoreTitle => 'শেষ অধিবেশন বিঘ্নিত হয়';
@@ -1766,8 +1760,8 @@ class SBn extends S {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '#টি লিক পাওয়া গেছে',
-      one: '#টি লিক পাওয়া গেছে',
+      other: '$countটি লিক পাওয়া গেছে',
+      one: '$countটি লিক পাওয়া গেছে',
     );
     return '$_temp0';
   }
@@ -2008,4 +2002,68 @@ class SBn extends S {
 
   @override
   String get customServerWgAddressesHint => '10.0.0.2/32';
+
+  @override
+  String get errInternal => 'Sora-তে অভ্যন্তরীণ ত্রুটি। লগ সংরক্ষণ করে সমস্যাটি জানান।';
+
+  @override
+  String get errTls => 'সার্ভারের সার্টিফিকেট প্রত্যাখ্যাত। ঘড়ি পরীক্ষা করুন বা প্রদানকারীর সাথে যোগাযোগ করুন।';
+
+  @override
+  String get errFileAccess => 'ফাইল অ্যাক্সেস করা যাচ্ছে না। অনুমতি ও খালি জায়গা পরীক্ষা করুন।';
+
+  @override
+  String get errDataLimit => 'ডেটা অনেক বেশি। কম আইটেম বেছে নিয়ে আবার চেষ্টা করুন।';
+
+  @override
+  String get errCredentials => 'সংরক্ষিত লগইন তথ্য নেই। সার্ভারটি আবার আমদানি করুন।';
+
+  @override
+  String subscriptionStale(String time) {
+    return 'সর্বশেষ আপডেট: $time';
+  }
+
+  @override
+  String get subscriptionNeverUpdated => 'এখনও আপডেট হয়নি। আবার চেষ্টা করুন।';
+
+  @override
+  String get errHttpStatus =>
+      'সার্ভার অনুরোধটি প্রত্যাখ্যান করেছে। লিংক পরীক্ষা করুন বা প্রদানকারীর সাথে যোগাযোগ করুন।';
+
+  @override
+  String get errInvalidServer => 'সার্ভারের সেটিংস অসম্পূর্ণ বা সমর্থিত নয়। সাবস্ক্রিপশন আপডেট করুন।';
+
+  @override
+  String get errServerIds => 'দুটি সার্ভারের শনাক্তকারী একই। সেগুলো আবার আমদানি করুন।';
+
+  @override
+  String get errRoutingGroup => 'রুটটি অনুপস্থিত সার্ভার বা ক্ষতিগ্রস্ত গ্রুপে নির্দেশ করে। সাবস্ক্রিপশন আপডেট করুন।';
+
+  @override
+  String get errConnections => 'সংযোগের তালিকা পাওয়া যাচ্ছে না। সংযোগ করুন বা অন্য ইঞ্জিন বেছে নিন।';
+
+  @override
+  String get errLogs => 'এই পরিষেবা লগ রাখে না। Sora আপডেট করুন।';
+
+  @override
+  String get errDiagnostics => 'ডায়াগনস্টিক সংগ্রহ করা যায়নি। আবার চেষ্টা করুন বা লগ সংরক্ষণ করুন।';
+
+  @override
+  String get errMissingItem => 'অনুরোধ করা আইটেম আর নেই। তালিকা রিফ্রেশ করুন।';
+
+  @override
+  String get errInvalidRequest => 'অনুরোধে অবৈধ মান রয়েছে। ইনপুট পরীক্ষা করে আবার চেষ্টা করুন।';
+
+  @override
+  String get errProxyLogin =>
+      'সিস্টেম প্রক্সি এই লগইন সমর্থন করে না। স্থানীয় প্রক্সির ব্যবহারকারীর নাম ও পাসওয়ার্ড সরান।';
+
+  @override
+  String get errLogFilter => 'লগ ফিল্টার অবৈধ। অনুসন্ধান মুছে আবার চেষ্টা করুন।';
+
+  @override
+  String get errSubRedirect => 'সার্ভার একটি অনিরাপদ ঠিকানায় পাঠিয়েছে। প্রদানকারীর কাছে নতুন লিংক চান।';
+
+  @override
+  String get errProxySetup => 'সিস্টেম প্রক্সি সেট করা যায়নি। আবার সংযোগ করুন বা লগ খুলুন।';
 }

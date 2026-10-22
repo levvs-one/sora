@@ -15,6 +15,16 @@ import 'package:sora/src/ui/kit.dart';
 import 'package:sora/src/ui/addserver.dart';
 import 'package:sora/src/ui/qr.dart';
 import 'package:sora/src/ui/subscription.dart';
+import 'package:sora/src/ui/notifications_screen.dart';
+import 'package:sora/src/ui/connections.dart';
+import 'package:sora/src/ui/logs.dart';
+import 'package:sora/src/ui/settings_screen.dart';
+import 'package:sora/src/ui/about.dart';
+import 'package:sora/src/ui/program_picker.dart';
+import 'package:sora/src/ui/speedtest.dart';
+import 'package:sora/src/notifications.dart';
+import 'package:sora/src/generated/sora/core/v1/core_control.pb.dart';
+import 'package:protobuf/well_known_types/google/protobuf/timestamp.pb.dart';
 import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
@@ -30,6 +40,202 @@ import 'extension_ui_test.dart' show extensionScreenshots;
 
 void main() {
   extensionScreenshots();
+  testWidgets('error policy noisy day screenshots', (tester) async {
+    addTearDown(tester.view.reset);
+    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    const icons = MethodChannel('xdg_icons'), iconEvents = MethodChannel('xdg_icons/events');
+    messenger.setMockMethodCallHandler(icons, (call) async {
+      expect(call.method, 'lookupIcon');
+      return null;
+    });
+    messenger.setMockMethodCallHandler(iconEvents, (call) async => null);
+    addTearDown(() {
+      messenger.setMockMethodCallHandler(icons, null);
+      messenger.setMockMethodCallHandler(iconEvents, null);
+    });
+    size(tester, 1440, 900);
+    final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
+    await tester.runAsync(() async {
+      await Directory(output).create(recursive: true);
+      await (FontLoader('Inter')..addFont(rootBundle.load('assets/fonts/InterVariable.ttf'))).load();
+      await (FontLoader(
+        'packages/material_symbols_icons/MaterialSymbolsRounded',
+      )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
+    });
+    for (final language in ['ru', 'en']) {
+      for (final theme in ['light', 'dark']) {
+        SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+        final settings = await Settings.load();
+        await settings.completeTour();
+        settings
+          ..language = language
+          ..theme = theme
+          ..animations = false;
+        final sora = DesktopState(settings);
+        final s = sora.strings;
+        final capture = GlobalKey();
+        Future<void> save(String name) async {
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull, reason: name);
+          final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+          await tester.runAsync(() async {
+            final image = await boundary.toImage(pixelRatio: 1);
+            final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+            final path = '$output/errors-$name-$language-$theme.png';
+            await File(path).writeAsBytes(bytes);
+            image.dispose();
+            debugPrint(path);
+          });
+        }
+
+        await tester.pumpWidget(
+          RepaintBoundary(
+            key: capture,
+            child: SoraApp(sora: sora),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final navigator = Navigator.of(tester.element(find.byType(ServersScreen)));
+        final now = DateTime.now();
+        final old = <AppNotification>[];
+        // Synthetic counts reproduce the reported classes, never the owner's history.
+        for (var round = 0; round < 38; round++) {
+          void add(String title, String body, String action) => old.add(
+            AppNotification(
+              time: now.subtract(Duration(minutes: round * 20)),
+              title: title,
+              body: body,
+              action: action,
+              argument: action == 'subscription' ? 'travel' : '',
+            ),
+          );
+          add(s.errGeneric, s.errGeneric, 'logs');
+          if (round < 20) add(s.noticeFailed, s.customServerLinkInvalid, 'connect');
+          if (round < 30) add(s.errGeneric, [s.errSubFetch, s.errTimeout, s.errSubEmpty][round % 3], 'subscription');
+          if (round < 6) add(s.errGeneric, s.errCore, 'logs');
+        }
+        old.insertAll(0, [
+          AppNotification(
+            time: now,
+            title: s.subscription,
+            body: s.expiresIn('Travel', 1).replaceAll('1', '#'),
+            action: 'subscription',
+            argument: 'travel',
+          ),
+          AppNotification(
+            time: now,
+            title: 'SpeedSmart',
+            body: lookupS(const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')).speedtestPageFailed,
+            action: 'speedtest',
+          ),
+        ]);
+        expect(old, hasLength(96));
+        sora.history = old;
+        sora.notifyListeners();
+        unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const NotificationsScreen())));
+        await save('notifications-before');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        await sora.clearNotifications();
+        for (var round = 0; round < 38; round++) {
+          sora.reportFailure(
+            const CoreFailure('core.internal.unexpected'),
+            mode: FailureMode.background,
+            source: 'logs',
+          );
+          if (round < 20) {
+            sora.reportFailure(
+              const CoreFailure('core.plan.outbounds_invalid'),
+              mode: FailureMode.action,
+              source: 'connect',
+              action: 'connect',
+            );
+          }
+          if (round < 30) {
+            sora.reportFailure(
+              CoreFailure(
+                ['core.subscription.fetch_failed', 'core.network.timeout', 'core.subscription.no_servers'][round % 3],
+              ),
+              mode: FailureMode.background,
+              source: 'subscription:travel',
+              action: 'subscription',
+              argument: 'travel',
+            );
+          }
+          if (round < 6) {
+            sora.reportFailure(CoreFailure.unavailable, mode: FailureMode.background, source: 'core');
+            sora.recovered('core');
+          }
+        }
+        expect(sora.history.length, 1);
+        await save('action-toast');
+        await sora.recordNotification(
+          AppNotification(
+            time: now,
+            title: s.subscription,
+            body: s.expiresIn('Travel', 1),
+            action: 'subscription',
+            argument: 'travel',
+          ),
+        );
+        expect(sora.history, hasLength(2));
+        sora.recovered('logs');
+        sora.recovered('subscription:travel');
+        // Existing servers remain visible while the latest provider refresh has failed.
+        sora.subscription.lastError = SoraError(userMessageKey: 'core.network.timeout');
+        sora.subscription.lastUpdate = Timestamp.fromDateTime(now.subtract(const Duration(days: 2)));
+        sora.notifyListeners();
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 6));
+        await tester.pumpAndSettle();
+        await save('subscription-row');
+        unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const SubscriptionsScreen())));
+        await save('subscription-list');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const SubscriptionScreen(id: 'travel'))));
+        await save('subscription-detail');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const NotificationsScreen())));
+        await save('notifications-after');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        for (final entry in <(String, Widget)>[
+          ('logs', const LogsScreen()),
+          ('connections', const ConnectionsScreen()),
+          ('settings', const SettingsScreen()),
+          ('about', const AboutScreen()),
+        ]) {
+          final source = entry.$1 == 'settings' ? 'log-settings' : entry.$1;
+          sora.reportFailure(const CoreFailure('core.network.timeout'), mode: FailureMode.background, source: source);
+          unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => entry.$2)));
+          await save(entry.$1);
+          navigator.pop();
+          sora.recovered(source);
+          await tester.pumpAndSettle();
+        }
+        unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const Scaffold(body: SpeedtestScreen()))));
+        await tester.pumpAndSettle();
+        await save('speedtest');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        unawaited(chooseProgram(navigator.context));
+        await tester.pump();
+        for (var i = 0; i < 8; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
+          await tester.pump();
+        }
+        await save('program-picker');
+        navigator.pop();
+        await tester.pumpAndSettle();
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        await tester.pumpAndSettle();
+      }
+    }
+  }, skip: Platform.environment['SORA_SHOTS'] == null);
+
   testWidgets('desktop section screenshots', (tester) async {
     final previousShadows = debugDisableShadows;
     debugDisableShadows = false;
