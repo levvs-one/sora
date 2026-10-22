@@ -316,6 +316,44 @@ void main() {
         await tester.pump(const Duration(seconds: 6));
         await tester.pumpAndSettle();
         await save('subscription-row');
+        final history = List<AppNotification>.of(sora.history);
+        for (final (cause, key, detail) in [
+          ('timeout', 'core.network.timeout', ''),
+          ('empty', 'core.subscription.no_servers', ''),
+          ('http403', 'core.subscription.status', 'HTTP 403'),
+        ]) {
+          final wire = SoraError(userMessageKey: key, detailRedacted: detail);
+          final failure = CoreFailure.fromWire(wire);
+          final text = describe(s, failure);
+          sora.subscription.lastError = wire;
+          sora.notifyListeners();
+          await tester.pumpAndSettle();
+          expect(find.text(text), findsOneWidget);
+          await save('msgs-subscription-$cause');
+          sora.reportFailure(
+            failure,
+            mode: FailureMode.action,
+            source: 'subscription:travel',
+            action: 'subscription',
+            argument: 'travel',
+          );
+          await tester.pumpAndSettle();
+          expect(find.byType(Dismissible), findsOneWidget);
+          expect(find.text(text), findsNWidgets(2));
+          final title = find.descendant(of: find.byType(Dismissible), matching: find.text(text));
+          final paragraph = tester.renderObject<RenderParagraph>(
+            find.descendant(of: title, matching: find.byType(RichText)),
+          );
+          expect(paragraph.maxLines, isNull);
+          expect(paragraph.didExceedMaxLines, isFalse);
+          await save('msgs-toast-$cause');
+          await tester.pump(const Duration(seconds: 6));
+          await tester.pumpAndSettle();
+          sora.recovered('subscription:travel');
+        }
+        sora.history = history;
+        sora.subscription.lastError = SoraError(userMessageKey: 'core.network.timeout');
+        sora.notifyListeners();
         unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const SubscriptionsScreen())));
         await save('subscription-list');
         navigator.pop();
