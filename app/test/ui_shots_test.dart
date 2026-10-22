@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,9 @@ import 'package:sora/src/core/link.dart';
 import 'package:sora/src/ui/servers.dart';
 import 'package:sora/src/ui/home.dart';
 import 'package:sora/src/ui/shell.dart';
+import 'package:sora/src/ui/qr.dart';
+import 'package:sora/src/ui/kit.dart';
+import 'package:sora/src/ui/subscription_sheet.dart';
 
 import 'desktop_shell_test.dart' show section, size;
 import 'fixtures/desktop_state.dart';
@@ -167,6 +171,30 @@ void main() {
           await tester.tap(find.byKey(const ValueKey('mode-button')));
           await tester.pumpAndSettle();
           await save('$output/modes-${width.toInt()}x${height.toInt()}-$theme.png');
+          await tester.ensureVisible(find.byKey(const ValueKey('modes-info')));
+          await tester.tap(find.byKey(const ValueKey('modes-info')));
+          await tester.pumpAndSettle();
+          await tester.ensureVisible(find.text('OLCRTC').last);
+          await save('$output/olcrtc-guide-${width.toInt()}x${height.toInt()}-$theme.png');
+          Navigator.of(tester.element(find.byKey(const ValueKey('modes-guide')))).pop();
+          await tester.pumpAndSettle();
+          final screenContext = tester.element(find.byType(ShellScope));
+          unawaited(push<void>(screenContext, const QrScanScreen()));
+          await tester.pumpAndSettle();
+          await save('$output/olcrtc-qr-${width.toInt()}x${height.toInt()}-$theme.png');
+          const olcrtcLink =
+              'olcrtc://jitsi?datachannel@https://meet.example.org/myroom#'
+              'd823fa01cb3e0609b67322f7cf984c4ee2e4ce2e294936fc24ef38c9e59f4799'
+              r'$RU / olc free sub';
+          Navigator.of(tester.element(find.byType(QrScanScreen))).pop();
+          await tester.pumpAndSettle();
+          unawaited(showSubscriptionSheet(screenContext, link: olcrtcLink));
+          await tester.pumpAndSettle();
+          expect(
+            find.byType(TextField).evaluate().any((e) => (e.widget as TextField).controller?.text == olcrtcLink),
+            isTrue,
+          );
+          await save('$output/olcrtc-import-${width.toInt()}x${height.toInt()}-$theme.png');
           await tester.sendKeyEvent(LogicalKeyboardKey.escape);
           await tester.pumpAndSettle();
           for (final notice in [
