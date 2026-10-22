@@ -346,7 +346,7 @@
   "sidebarToggle": "Развернуть меню",
   "more": "Ещё",
   "less": "Свернуть",
-  "notificationsEmpty": "Здесь появятся события подключения и подписок",
+  "notificationsEmpty": "Нет уведомлений",
   "retryConnect": "Подключиться снова",
   "openLogs": "Открыть логи",
   "tourReplay": "Показать гайд снова",
@@ -1017,5 +1017,19 @@
   "errProxyLogin": "Системный прокси не поддерживает этот вход. Уберите логин и пароль локального прокси.",
   "errLogFilter": "Неверный фильтр журнала. Очистите поиск и повторите.",
   "errSubRedirect": "Сервер перенаправил на небезопасный адрес. Запросите новую ссылку у провайдера.",
-  "errProxySetup": "Не удалось настроить системный прокси. Переподключитесь или откройте журнал."
+  "errProxySetup": "Не удалось настроить системный прокси. Переподключитесь или откройте журнал.",
+  "notificationsToday": "Сегодня",
+  "notificationsYesterday": "Вчера",
+  "notificationsMarkRead": "Прочитать все",
+  "notificationsUnread": "Не прочитано",
+  "desktopNotifications": "Системные уведомления",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

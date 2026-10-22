@@ -183,7 +183,7 @@
   "sidebarToggle": "Yan panelə keçin",
   "more": "Daha çox",
   "less": "Daha az",
-  "notificationsEmpty": "Bağlantı və abunə hadisələri burada görünəcək",
+  "notificationsEmpty": "Bildiriş yoxdur",
   "retryConnect": "Bağlantıya yenidən cəhd edin",
   "openLogs": "Qeydləri açın",
   "tourReplay": "Bələdçini yenidən göstərin",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Sistem proksisi bu girişi dəstəkləmir. Yerli proksinin istifadəçi adını və parolunu silin.",
   "errLogFilter": "Jurnal filtri etibarsızdır. Axtarışı təmizləyib yenidən cəhd edin.",
   "errSubRedirect": "Server təhlükəli ünvana yönləndirdi. Provayderdən yeni keçid istəyin.",
-  "errProxySetup": "Sistem proksisi qurula bilmədi. Yenidən qoşulun və ya jurnalı açın."
+  "errProxySetup": "Sistem proksisi qurula bilmədi. Yenidən qoşulun və ya jurnalı açın.",
+  "notificationsToday": "Bu gün",
+  "notificationsYesterday": "Dünən",
+  "notificationsMarkRead": "Hamısını oxunmuş say",
+  "notificationsUnread": "Oxunmayıb",
+  "desktopNotifications": "Masaüstü bildirişləri",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

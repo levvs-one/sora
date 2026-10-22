@@ -622,7 +622,7 @@ class SEn extends S {
   String get less => 'Less';
 
   @override
-  String get notificationsEmpty => 'Connection and subscription events will appear here';
+  String get notificationsEmpty => 'No notifications';
 
   @override
   String get retryConnect => 'Retry connection';
@@ -2043,4 +2043,27 @@ class SEn extends S {
 
   @override
   String get errProxySetup => 'Could not configure the system proxy. Reconnect or open the log.';
+
+  @override
+  String get notificationsToday => 'Today';
+
+  @override
+  String get notificationsYesterday => 'Yesterday';
+
+  @override
+  String get notificationsMarkRead => 'Mark all as read';
+
+  @override
+  String get notificationsUnread => 'Unread';
+
+  @override
+  String get desktopNotifications => 'Desktop notifications';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

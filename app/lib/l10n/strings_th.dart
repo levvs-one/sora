@@ -627,7 +627,7 @@ class STh extends S {
   String get less => 'น้อย';
 
   @override
-  String get notificationsEmpty => 'กิจกรรมการเชื่อมต่อและการสมัครสมาชิกจะปรากฏที่นี่';
+  String get notificationsEmpty => 'ไม่มีการแจ้งเตือน';
 
   @override
   String get retryConnect => 'ลองเชื่อมต่ออีกครั้ง';
@@ -2035,4 +2035,27 @@ class STh extends S {
 
   @override
   String get errProxySetup => 'ตั้งค่าพร็อกซีระบบไม่ได้ เชื่อมต่อใหม่หรือเปิดบันทึกเหตุการณ์';
+
+  @override
+  String get notificationsToday => 'วันนี้';
+
+  @override
+  String get notificationsYesterday => 'เมื่อวาน';
+
+  @override
+  String get notificationsMarkRead => 'ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว';
+
+  @override
+  String get notificationsUnread => 'ยังไม่ได้อ่าน';
+
+  @override
+  String get desktopNotifications => 'การแจ้งเตือนบนเดสก์ท็อป';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

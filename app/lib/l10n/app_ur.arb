@@ -183,7 +183,7 @@
   "sidebarToggle": "سائڈبار کو ٹوگل کریں۔",
   "more": "مزید",
   "less": "کم",
-  "notificationsEmpty": "کنکشن اور سبسکرپشن ایونٹس یہاں ظاہر ہوں گے۔",
+  "notificationsEmpty": "کوئی اطلاع نہیں",
   "retryConnect": "کنکشن کی دوبارہ کوشش کریں۔",
   "openLogs": "نوشتہ جات کھولیں۔",
   "tourReplay": "دوبارہ گائیڈ دکھائیں۔",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "سسٹم پراکسی اس لاگ ان کی معاونت نہیں کرتی۔ مقامی پراکسی کا صارف نام اور پاس ورڈ ہٹائیں۔",
   "errLogFilter": "لاگ فلٹر غلط ہے۔ تلاش صاف کریں اور دوبارہ کوشش کریں۔",
   "errSubRedirect": "سرور نے غیر محفوظ پتے پر بھیج دیا۔ فراہم کنندہ سے نیا لنک مانگیں۔",
-  "errProxySetup": "سسٹم پراکسی ترتیب نہیں دی جا سکی۔ دوبارہ جڑیں یا لاگ کھولیں۔"
+  "errProxySetup": "سسٹم پراکسی ترتیب نہیں دی جا سکی۔ دوبارہ جڑیں یا لاگ کھولیں۔",
+  "notificationsToday": "آج",
+  "notificationsYesterday": "کل",
+  "notificationsMarkRead": "سب کو پڑھا ہوا نشان لگائیں",
+  "notificationsUnread": "بغیر پڑھا ہوا",
+  "desktopNotifications": "ڈیسک ٹاپ اطلاعات",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

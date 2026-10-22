@@ -125,10 +125,10 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('notification dates use bold Inter on uniform cards', (tester) async {
+  testWidgets('notification rows use compact Inter titles and regular tabular timestamps', (tester) async {
     final sora = await start(tester);
     await section(tester, 5);
-    expect(find.byIcon(Symbols.done_all_rounded), findsNothing);
+    expect(find.byKey(const ValueKey('notifications-read-all')), findsOneWidget);
     final rows = find.byType(NotificationRow);
     expect(rows, findsNWidgets(3));
     final dates = find.descendant(
@@ -137,8 +137,9 @@ void main() {
         (w) =>
             w is Text &&
             w.style?.fontFamily == 'Inter' &&
-            w.style?.fontWeight == FontWeight.w600 &&
-            w.style?.fontSize == 12,
+            w.style?.fontWeight == FontWeight.w400 &&
+            w.style?.fontSize == 12 &&
+            (w.data?.contains(':') ?? false),
       ),
     );
     expect(dates, findsNWidgets(3));
@@ -148,6 +149,11 @@ void main() {
         .map((w) => w.style)
         .toSet();
     expect(styles, hasLength(1));
+    expect(styles.single!.fontSize, 14);
+    expect(styles.single!.fontWeight, FontWeight.w600);
+    for (final row in rows.evaluate()) {
+      expect(tester.getSize(find.byWidget(row.widget)).height, inInclusiveRange(52, 64));
+    }
   });
 
   testWidgets('first launch has one subscription action and no premature service failure', (tester) async {

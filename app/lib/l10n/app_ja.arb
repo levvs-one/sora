@@ -183,7 +183,7 @@
   "sidebarToggle": "サイドバーの切り替え",
   "more": "もっと",
   "less": "少ない",
-  "notificationsEmpty": "接続イベントとサブスクリプション イベントがここに表示されます",
+  "notificationsEmpty": "通知はありません",
   "retryConnect": "接続を再試行します",
   "openLogs": "ログを開く",
   "tourReplay": "ガイドを再度表示する",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "システムプロキシはこの認証に対応していません。ローカルプロキシのユーザー名とパスワードを削除してください。",
   "errLogFilter": "ログフィルターが無効です。検索を消去して再試行してください。",
   "errSubRedirect": "サーバーが安全でないアドレスに転送しました。提供元に新しいリンクを依頼してください。",
-  "errProxySetup": "システムプロキシを設定できませんでした。再接続するかログを開いてください。"
+  "errProxySetup": "システムプロキシを設定できませんでした。再接続するかログを開いてください。",
+  "notificationsToday": "今日",
+  "notificationsYesterday": "昨日",
+  "notificationsMarkRead": "すべて既読にする",
+  "notificationsUnread": "未読",
+  "desktopNotifications": "デスクトップ通知",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

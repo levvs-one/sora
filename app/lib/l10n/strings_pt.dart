@@ -627,7 +627,7 @@ class SPt extends S {
   String get less => 'Menos';
 
   @override
-  String get notificationsEmpty => 'Os eventos de conexão e assinatura aparecerão aqui';
+  String get notificationsEmpty => 'Sem notificações';
 
   @override
   String get retryConnect => 'Tentar novamente a conexão';
@@ -2053,4 +2053,27 @@ class SPt extends S {
 
   @override
   String get errProxySetup => 'Não foi possível configurar o proxy do sistema. Reconecte ou abra o registro.';
+
+  @override
+  String get notificationsToday => 'Hoje';
+
+  @override
+  String get notificationsYesterday => 'Ontem';
+
+  @override
+  String get notificationsMarkRead => 'Marcar tudo como lido';
+
+  @override
+  String get notificationsUnread => 'Não lida';
+
+  @override
+  String get desktopNotifications => 'Notificações da área de trabalho';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

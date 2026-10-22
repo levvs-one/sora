@@ -201,7 +201,7 @@
   "sidebarToggle": "Toggle sidebar",
   "more": "More",
   "less": "Less",
-  "notificationsEmpty": "Connection and subscription events will appear here",
+  "notificationsEmpty": "No notifications",
   "retryConnect": "Retry connection",
   "openLogs": "Open logs",
   "tourReplay": "Show guide again",
@@ -864,5 +864,19 @@
   "errProxyLogin": "The system proxy cannot use this login. Remove the local proxy username and password.",
   "errLogFilter": "The log filter is invalid. Clear the search and retry.",
   "errSubRedirect": "The server redirected to an unsafe address. Ask your provider for a new link.",
-  "errProxySetup": "Could not configure the system proxy. Reconnect or open the log."
+  "errProxySetup": "Could not configure the system proxy. Reconnect or open the log.",
+  "notificationsToday": "Today",
+  "notificationsYesterday": "Yesterday",
+  "notificationsMarkRead": "Mark all as read",
+  "notificationsUnread": "Unread",
+  "desktopNotifications": "Desktop notifications",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

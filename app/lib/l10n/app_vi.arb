@@ -183,7 +183,7 @@
   "sidebarToggle": "Chuyển đổi thanh bên",
   "more": "Hơn",
   "less": "Ít hơn",
-  "notificationsEmpty": "Sự kiện kết nối và đăng ký sẽ xuất hiện ở đây",
+  "notificationsEmpty": "Không có thông báo",
   "retryConnect": "Thử lại kết nối",
   "openLogs": "Mở nhật ký",
   "tourReplay": "Hiển thị lại hướng dẫn",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Proxy hệ thống không hỗ trợ đăng nhập này. Xóa tên người dùng và mật khẩu proxy cục bộ.",
   "errLogFilter": "Bộ lọc nhật ký không hợp lệ. Xóa nội dung tìm kiếm và thử lại.",
   "errSubRedirect": "Máy chủ chuyển hướng đến địa chỉ không an toàn. Yêu cầu liên kết mới từ nhà cung cấp.",
-  "errProxySetup": "Không thể cấu hình proxy hệ thống. Kết nối lại hoặc mở nhật ký."
+  "errProxySetup": "Không thể cấu hình proxy hệ thống. Kết nối lại hoặc mở nhật ký.",
+  "notificationsToday": "Hôm nay",
+  "notificationsYesterday": "Hôm qua",
+  "notificationsMarkRead": "Đánh dấu tất cả đã đọc",
+  "notificationsUnread": "Chưa đọc",
+  "desktopNotifications": "Thông báo trên màn hình",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

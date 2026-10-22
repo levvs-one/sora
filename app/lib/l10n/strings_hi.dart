@@ -627,7 +627,7 @@ class SHi extends S {
   String get less => 'कम';
 
   @override
-  String get notificationsEmpty => 'कनेक्शन और सदस्यता ईवेंट यहां दिखाई देंगे';
+  String get notificationsEmpty => 'कोई सूचना नहीं';
 
   @override
   String get retryConnect => 'कनेक्शन पुनः प्रयास करें';
@@ -2044,4 +2044,27 @@ class SHi extends S {
 
   @override
   String get errProxySetup => 'सिस्टम प्रॉक्सी कॉन्फ़िगर नहीं हुई। फिर कनेक्ट करें या लॉग खोलें।';
+
+  @override
+  String get notificationsToday => 'आज';
+
+  @override
+  String get notificationsYesterday => 'कल';
+
+  @override
+  String get notificationsMarkRead => 'सभी को पढ़ा हुआ चिह्नित करें';
+
+  @override
+  String get notificationsUnread => 'अपठित';
+
+  @override
+  String get desktopNotifications => 'डेस्कटॉप सूचनाएँ';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

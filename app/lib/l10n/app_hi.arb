@@ -183,7 +183,7 @@
   "sidebarToggle": "साइडबार टॉगल करें",
   "more": "अधिक",
   "less": "कम",
-  "notificationsEmpty": "कनेक्शन और सदस्यता ईवेंट यहां दिखाई देंगे",
+  "notificationsEmpty": "कोई सूचना नहीं",
   "retryConnect": "कनेक्शन पुनः प्रयास करें",
   "openLogs": "लॉग खोलें",
   "tourReplay": "गाइड फिर से दिखाएँ",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "सिस्टम प्रॉक्सी इस लॉगिन का समर्थन नहीं करती। स्थानीय प्रॉक्सी का उपयोगकर्ता नाम और पासवर्ड हटाएँ।",
   "errLogFilter": "लॉग फ़िल्टर अमान्य है। खोज साफ़ करें और फिर कोशिश करें।",
   "errSubRedirect": "सर्वर ने असुरक्षित पते पर भेजा। प्रदाता से नया लिंक माँगें।",
-  "errProxySetup": "सिस्टम प्रॉक्सी कॉन्फ़िगर नहीं हुई। फिर कनेक्ट करें या लॉग खोलें।"
+  "errProxySetup": "सिस्टम प्रॉक्सी कॉन्फ़िगर नहीं हुई। फिर कनेक्ट करें या लॉग खोलें।",
+  "notificationsToday": "आज",
+  "notificationsYesterday": "कल",
+  "notificationsMarkRead": "सभी को पढ़ा हुआ चिह्नित करें",
+  "notificationsUnread": "अपठित",
+  "desktopNotifications": "डेस्कटॉप सूचनाएँ",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

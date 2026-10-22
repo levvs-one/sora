@@ -183,7 +183,7 @@
   "sidebarToggle": "Перемкнути бічну панель",
   "more": "більше",
   "less": "менше",
-  "notificationsEmpty": "Тут відображатимуться події підключення та підписки",
+  "notificationsEmpty": "Немає сповіщень",
   "retryConnect": "Повторити підключення",
   "openLogs": "Відкриті журнали",
   "tourReplay": "Знову показати посібник",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Системний проксі не підтримує цей вхід. Видаліть логін і пароль локального проксі.",
   "errLogFilter": "Неправильний фільтр журналу. Очистьте пошук і повторіть.",
   "errSubRedirect": "Сервер перенаправив на небезпечну адресу. Запитайте нове посилання у провайдера.",
-  "errProxySetup": "Не вдалося налаштувати системний проксі. Перепідключіться або відкрийте журнал."
+  "errProxySetup": "Не вдалося налаштувати системний проксі. Перепідключіться або відкрийте журнал.",
+  "notificationsToday": "Сьогодні",
+  "notificationsYesterday": "Учора",
+  "notificationsMarkRead": "Прочитати всі",
+  "notificationsUnread": "Не прочитано",
+  "desktopNotifications": "Системні сповіщення",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

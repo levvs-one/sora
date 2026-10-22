@@ -621,7 +621,7 @@ class SJa extends S {
   String get less => '少ない';
 
   @override
-  String get notificationsEmpty => '接続イベントとサブスクリプション イベントがここに表示されます';
+  String get notificationsEmpty => '通知はありません';
 
   @override
   String get retryConnect => '接続を再試行します';
@@ -2019,4 +2019,27 @@ class SJa extends S {
 
   @override
   String get errProxySetup => 'システムプロキシを設定できませんでした。再接続するかログを開いてください。';
+
+  @override
+  String get notificationsToday => '今日';
+
+  @override
+  String get notificationsYesterday => '昨日';
+
+  @override
+  String get notificationsMarkRead => 'すべて既読にする';
+
+  @override
+  String get notificationsUnread => '未読';
+
+  @override
+  String get desktopNotifications => 'デスクトップ通知';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

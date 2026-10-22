@@ -628,7 +628,7 @@ class SEs extends S {
   String get less => 'Menos';
 
   @override
-  String get notificationsEmpty => 'Los eventos de conexión y suscripción aparecerán aquí';
+  String get notificationsEmpty => 'No hay notificaciones';
 
   @override
   String get retryConnect => 'Reintentar conexión';
@@ -2063,4 +2063,27 @@ class SEs extends S {
 
   @override
   String get errProxySetup => 'No se pudo configurar el proxy del sistema. Reconecte o abra el registro.';
+
+  @override
+  String get notificationsToday => 'Hoy';
+
+  @override
+  String get notificationsYesterday => 'Ayer';
+
+  @override
+  String get notificationsMarkRead => 'Marcar todo como leído';
+
+  @override
+  String get notificationsUnread => 'Sin leer';
+
+  @override
+  String get desktopNotifications => 'Notificaciones del escritorio';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

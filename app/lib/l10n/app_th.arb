@@ -183,7 +183,7 @@
   "sidebarToggle": "สลับแถบด้านข้าง",
   "more": "มากกว่า",
   "less": "น้อย",
-  "notificationsEmpty": "กิจกรรมการเชื่อมต่อและการสมัครสมาชิกจะปรากฏที่นี่",
+  "notificationsEmpty": "ไม่มีการแจ้งเตือน",
   "retryConnect": "ลองเชื่อมต่ออีกครั้ง",
   "openLogs": "เปิดบันทึก",
   "tourReplay": "แสดงคำแนะนำอีกครั้ง",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "พร็อกซีระบบไม่รองรับการเข้าสู่ระบบนี้ ลบชื่อผู้ใช้และรหัสผ่านของพร็อกซีภายใน",
   "errLogFilter": "ตัวกรองบันทึกเหตุการณ์ไม่ถูกต้อง ล้างการค้นหาแล้วลองอีกครั้ง",
   "errSubRedirect": "เซิร์ฟเวอร์เปลี่ยนเส้นทางไปยังที่อยู่ที่ไม่ปลอดภัย ขอรับลิงก์ใหม่จากผู้ให้บริการ",
-  "errProxySetup": "ตั้งค่าพร็อกซีระบบไม่ได้ เชื่อมต่อใหม่หรือเปิดบันทึกเหตุการณ์"
+  "errProxySetup": "ตั้งค่าพร็อกซีระบบไม่ได้ เชื่อมต่อใหม่หรือเปิดบันทึกเหตุการณ์",
+  "notificationsToday": "วันนี้",
+  "notificationsYesterday": "เมื่อวาน",
+  "notificationsMarkRead": "ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว",
+  "notificationsUnread": "ยังไม่ได้อ่าน",
+  "desktopNotifications": "การแจ้งเตือนบนเดสก์ท็อป",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

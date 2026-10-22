@@ -627,7 +627,7 @@ class SUz extends S {
   String get less => 'Ozroq';
 
   @override
-  String get notificationsEmpty => 'Ulanish va obuna hodisalari shu yerda paydo bo‘ladi';
+  String get notificationsEmpty => 'Bildirishnomalar yoʻq';
 
   @override
   String get retryConnect => 'Qayta ulanishni sinab ko\'ring';
@@ -2056,4 +2056,27 @@ class SUz extends S {
 
   @override
   String get errProxySetup => 'Tizim proksisi sozlanmadi. Qayta ulaning yoki jurnalni oching.';
+
+  @override
+  String get notificationsToday => 'Bugun';
+
+  @override
+  String get notificationsYesterday => 'Kecha';
+
+  @override
+  String get notificationsMarkRead => 'Barchasini oʻqilgan deb belgilash';
+
+  @override
+  String get notificationsUnread => 'Oʻqilmagan';
+
+  @override
+  String get desktopNotifications => 'Ish stoli bildirishnomalari';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

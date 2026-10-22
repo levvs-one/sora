@@ -183,7 +183,7 @@
   "sidebarToggle": "Kenar çubuğunu aç/kapat",
   "more": "Daha",
   "less": "Az",
-  "notificationsEmpty": "Bağlantı ve abonelik etkinlikleri burada görünecek",
+  "notificationsEmpty": "Bildirim yok",
   "retryConnect": "Bağlantıyı yeniden dene",
   "openLogs": "Günlükleri aç",
   "tourReplay": "Kılavuzu tekrar göster",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Sistem vekili bu girişi desteklemiyor. Yerel vekilin kullanıcı adını ve parolasını kaldırın.",
   "errLogFilter": "Günlük filtresi geçersiz. Aramayı temizleyip yeniden deneyin.",
   "errSubRedirect": "Sunucu güvenli olmayan bir adrese yönlendirdi. Sağlayıcınızdan yeni bir bağlantı isteyin.",
-  "errProxySetup": "Sistem vekili yapılandırılamadı. Yeniden bağlanın veya günlüğü açın."
+  "errProxySetup": "Sistem vekili yapılandırılamadı. Yeniden bağlanın veya günlüğü açın.",
+  "notificationsToday": "Bugün",
+  "notificationsYesterday": "Dün",
+  "notificationsMarkRead": "Tümünü okundu işaretle",
+  "notificationsUnread": "Okunmadı",
+  "desktopNotifications": "Masaüstü bildirimleri",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

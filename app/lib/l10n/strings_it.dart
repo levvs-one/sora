@@ -628,7 +628,7 @@ class SIt extends S {
   String get less => 'Meno';
 
   @override
-  String get notificationsEmpty => 'Gli eventi di connessione e abbonamento verranno visualizzati qui';
+  String get notificationsEmpty => 'Nessuna notifica';
 
   @override
   String get retryConnect => 'Riprovare la connessione';
@@ -2068,4 +2068,27 @@ class SIt extends S {
 
   @override
   String get errProxySetup => 'Impossibile configurare il proxy di sistema. Riconnettiti o apri il registro.';
+
+  @override
+  String get notificationsToday => 'Oggi';
+
+  @override
+  String get notificationsYesterday => 'Ieri';
+
+  @override
+  String get notificationsMarkRead => 'Segna tutto come letto';
+
+  @override
+  String get notificationsUnread => 'Non letto';
+
+  @override
+  String get desktopNotifications => 'Notifiche desktop';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

@@ -627,7 +627,7 @@ class STk extends S {
   String get less => 'Az';
 
   @override
-  String get notificationsEmpty => 'Baglanyşyk we abuna wakalary şu ýerde peýda bolar';
+  String get notificationsEmpty => 'Habarnama ýok';
 
   @override
   String get retryConnect => 'Birikdirmek';
@@ -2044,4 +2044,27 @@ class STk extends S {
 
   @override
   String get errProxySetup => 'Ulgam proksisini sazlap bolmady. Gaýtadan birigiň ýa-da žurnaly açyň.';
+
+  @override
+  String get notificationsToday => 'Şu gün';
+
+  @override
+  String get notificationsYesterday => 'Düýn';
+
+  @override
+  String get notificationsMarkRead => 'Ählisini okalan diýip belle';
+
+  @override
+  String get notificationsUnread => 'Okalmadyk';
+
+  @override
+  String get desktopNotifications => 'Iş stoly habarnamalary';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

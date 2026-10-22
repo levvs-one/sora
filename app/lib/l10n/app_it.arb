@@ -183,7 +183,7 @@
   "sidebarToggle": "Attiva/disattiva la barra laterale",
   "more": "Di più",
   "less": "Meno",
-  "notificationsEmpty": "Gli eventi di connessione e abbonamento verranno visualizzati qui",
+  "notificationsEmpty": "Nessuna notifica",
   "retryConnect": "Riprovare la connessione",
   "openLogs": "Apri i log",
   "tourReplay": "Mostra di nuovo la guida",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Il proxy di sistema non supporta questo accesso. Rimuovi utente e password del proxy locale.",
   "errLogFilter": "Filtro del registro non valido. Cancella la ricerca e riprova.",
   "errSubRedirect": "Il server ha reindirizzato a un indirizzo non sicuro. Chiedi un nuovo link al fornitore.",
-  "errProxySetup": "Impossibile configurare il proxy di sistema. Riconnettiti o apri il registro."
+  "errProxySetup": "Impossibile configurare il proxy di sistema. Riconnettiti o apri il registro.",
+  "notificationsToday": "Oggi",
+  "notificationsYesterday": "Ieri",
+  "notificationsMarkRead": "Segna tutto come letto",
+  "notificationsUnread": "Non letto",
+  "desktopNotifications": "Notifiche desktop",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

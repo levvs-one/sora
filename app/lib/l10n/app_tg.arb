@@ -183,7 +183,7 @@
   "sidebarToggle": "Паҳлӯи паҳлӯро иваз кунед",
   "more": "Бештар",
   "less": "Камтар",
-  "notificationsEmpty": "Ҳодисаҳои пайвастшавӣ ва обуна дар ин ҷо пайдо мешаванд",
+  "notificationsEmpty": "Огоҳӣ нест",
   "retryConnect": "Пайвастшавӣ аз нав кӯшиш кунед",
   "openLogs": "Сабтҳоро кушоед",
   "tourReplay": "Боз роҳнамо нишон диҳед",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Проксии низом ин вурудро дастгирӣ намекунад. Ном ва гузарвожаи проксии маҳаллиро нест кунед.",
   "errLogFilter": "Филтри рӯзнома нодуруст аст. Ҷустуҷӯро тоза карда, такрор кунед.",
   "errSubRedirect": "Сервер ба суроғаи хатарнок равона кард. Аз провайдер пайванди нав пурсед.",
-  "errProxySetup": "Танзими проксии низом нашуд. Аз нав пайваст шавед ё рӯзномаро кушоед."
+  "errProxySetup": "Танзими проксии низом нашуд. Аз нав пайваст шавед ё рӯзномаро кушоед.",
+  "notificationsToday": "Имрӯз",
+  "notificationsYesterday": "Дирӯз",
+  "notificationsMarkRead": "Ҳамаро хондашуда қайд кардан",
+  "notificationsUnread": "Хонданашуда",
+  "desktopNotifications": "Огоҳиҳои мизи корӣ",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

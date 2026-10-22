@@ -627,7 +627,7 @@ class SId extends S {
   String get less => 'Lebih sedikit';
 
   @override
-  String get notificationsEmpty => 'Peristiwa koneksi dan langganan akan muncul di sini';
+  String get notificationsEmpty => 'Tidak ada notifikasi';
 
   @override
   String get retryConnect => 'Coba lagi koneksi';
@@ -2046,4 +2046,27 @@ class SId extends S {
 
   @override
   String get errProxySetup => 'Tidak dapat mengatur proksi sistem. Hubungkan ulang atau buka log.';
+
+  @override
+  String get notificationsToday => 'Hari ini';
+
+  @override
+  String get notificationsYesterday => 'Kemarin';
+
+  @override
+  String get notificationsMarkRead => 'Tandai semua sudah dibaca';
+
+  @override
+  String get notificationsUnread => 'Belum dibaca';
+
+  @override
+  String get desktopNotifications => 'Notifikasi desktop';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

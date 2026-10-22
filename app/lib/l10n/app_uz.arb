@@ -183,7 +183,7 @@
   "sidebarToggle": "Yon panelni almashtirish",
   "more": "Ko'proq",
   "less": "Ozroq",
-  "notificationsEmpty": "Ulanish va obuna hodisalari shu yerda paydo bo‘ladi",
+  "notificationsEmpty": "Bildirishnomalar yoʻq",
   "retryConnect": "Qayta ulanishni sinab ko'ring",
   "openLogs": "Jurnallarni oching",
   "tourReplay": "Yo‘riqnomani yana ko‘rsatish",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Tizim proksisi bu kirishni qo‘llamaydi. Mahalliy proksi foydalanuvchi nomi va parolini o‘chiring.",
   "errLogFilter": "Jurnal filtri noto‘g‘ri. Qidiruvni tozalab, qayta urining.",
   "errSubRedirect": "Server xavfli manzilga yo‘naltirdi. Provayderdan yangi havola so‘rang.",
-  "errProxySetup": "Tizim proksisi sozlanmadi. Qayta ulaning yoki jurnalni oching."
+  "errProxySetup": "Tizim proksisi sozlanmadi. Qayta ulaning yoki jurnalni oching.",
+  "notificationsToday": "Bugun",
+  "notificationsYesterday": "Kecha",
+  "notificationsMarkRead": "Barchasini oʻqilgan deb belgilash",
+  "notificationsUnread": "Oʻqilmagan",
+  "desktopNotifications": "Ish stoli bildirishnomalari",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

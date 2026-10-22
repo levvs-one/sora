@@ -183,7 +183,7 @@
   "sidebarToggle": "사이드바 전환",
   "more": "더",
   "less": "더 적은",
-  "notificationsEmpty": "연결 및 구독 이벤트가 여기에 표시됩니다.",
+  "notificationsEmpty": "알림 없음",
   "retryConnect": "연결 재시도",
   "openLogs": "로그 열기",
   "tourReplay": "가이드 다시 표시",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "시스템 프록시는 이 로그인을 지원하지 않습니다. 로컬 프록시의 사용자 이름과 암호를 제거하세요.",
   "errLogFilter": "로그 필터가 잘못되었습니다. 검색을 지우고 다시 시도하세요.",
   "errSubRedirect": "서버가 안전하지 않은 주소로 이동시켰습니다. 제공업체에 새 링크를 요청하세요.",
-  "errProxySetup": "시스템 프록시를 설정하지 못했습니다. 다시 연결하거나 로그를 여세요."
+  "errProxySetup": "시스템 프록시를 설정하지 못했습니다. 다시 연결하거나 로그를 여세요.",
+  "notificationsToday": "오늘",
+  "notificationsYesterday": "어제",
+  "notificationsMarkRead": "모두 읽음으로 표시",
+  "notificationsUnread": "읽지 않음",
+  "desktopNotifications": "데스크톱 알림",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

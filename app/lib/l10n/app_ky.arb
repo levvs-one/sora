@@ -183,7 +183,7 @@
   "sidebarToggle": "Каптал тилкесин которуштуруу",
   "more": "Дагы",
   "less": "Азыраак",
-  "notificationsEmpty": "Туташуу жана жазылуу окуялары бул жерде көрүнөт",
+  "notificationsEmpty": "Билдирмелер жок",
   "retryConnect": "Кайталануу",
   "openLogs": "Ачык журналдар",
   "tourReplay": "Жолду кайра көрсөтүү",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Системалык прокси бул кирүүнү колдобойт. Жергиликтүү проксинин колдонуучу атын жана сырсөзүн алып салыңыз.",
   "errLogFilter": "Журнал чыпкасы жараксыз. Издөөнү тазалап, кайталаңыз.",
   "errSubRedirect": "Сервер кооптуу дарекке багыттады. Провайдерден жаңы шилтеме сураңыз.",
-  "errProxySetup": "Системалык прокси жөндөлгөн жок. Кайра туташыңыз же журналды ачыңыз."
+  "errProxySetup": "Системалык прокси жөндөлгөн жок. Кайра туташыңыз же журналды ачыңыз.",
+  "notificationsToday": "Бүгүн",
+  "notificationsYesterday": "Кечээ",
+  "notificationsMarkRead": "Баарын окулду деп белгилөө",
+  "notificationsUnread": "Окула элек",
+  "desktopNotifications": "Тутум билдирмелери",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

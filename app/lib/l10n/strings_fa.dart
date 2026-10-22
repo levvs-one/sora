@@ -627,7 +627,7 @@ class SFa extends S {
   String get less => 'کمتر';
 
   @override
-  String get notificationsEmpty => 'رویدادهای اتصال و اشتراک در اینجا ظاهر می شوند';
+  String get notificationsEmpty => 'اعلانی وجود ندارد';
 
   @override
   String get retryConnect => 'اتصال را دوباره امتحان کنید';
@@ -2050,4 +2050,27 @@ class SFa extends S {
 
   @override
   String get errProxySetup => 'تنظیم پروکسی سیستم ممکن نشد. دوباره متصل شوید یا گزارش را باز کنید.';
+
+  @override
+  String get notificationsToday => 'امروز';
+
+  @override
+  String get notificationsYesterday => 'دیروز';
+
+  @override
+  String get notificationsMarkRead => 'علامت‌گذاری همه به‌عنوان خوانده‌شده';
+
+  @override
+  String get notificationsUnread => 'خوانده‌نشده';
+
+  @override
+  String get desktopNotifications => 'اعلان‌های دسکتاپ';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

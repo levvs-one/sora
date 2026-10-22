@@ -627,7 +627,7 @@ class SHy extends S {
   String get less => 'Ավելի քիչ';
 
   @override
-  String get notificationsEmpty => 'Կապի և բաժանորդագրության իրադարձությունները կհայտնվեն այստեղ';
+  String get notificationsEmpty => 'Ծանուցումներ չկան';
 
   @override
   String get retryConnect => 'Կրկին փորձեք կապը';
@@ -2049,4 +2049,27 @@ class SHy extends S {
 
   @override
   String get errProxySetup => 'Չհաջողվեց կարգավորել համակարգի պրոքսին։ Վերամիացեք կամ բացեք մատյանը։';
+
+  @override
+  String get notificationsToday => 'Այսօր';
+
+  @override
+  String get notificationsYesterday => 'Երեկ';
+
+  @override
+  String get notificationsMarkRead => 'Բոլորը նշել որպես կարդացված';
+
+  @override
+  String get notificationsUnread => 'Չկարդացված';
+
+  @override
+  String get desktopNotifications => 'Համակարգային ծանուցումներ';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

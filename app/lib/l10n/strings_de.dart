@@ -628,7 +628,7 @@ class SDe extends S {
   String get less => 'Weniger';
 
   @override
-  String get notificationsEmpty => 'Hier werden Verbindungs- und Abonnementereignisse angezeigt';
+  String get notificationsEmpty => 'Keine Mitteilungen';
 
   @override
   String get retryConnect => 'Verbindung erneut versuchen';
@@ -2075,4 +2075,27 @@ class SDe extends S {
   @override
   String get errProxySetup =>
       'Systemproxy konnte nicht eingerichtet werden. Verbinden Sie sich erneut oder öffnen Sie das Protokoll.';
+
+  @override
+  String get notificationsToday => 'Heute';
+
+  @override
+  String get notificationsYesterday => 'Gestern';
+
+  @override
+  String get notificationsMarkRead => 'Alle als gelesen markieren';
+
+  @override
+  String get notificationsUnread => 'Ungelesen';
+
+  @override
+  String get desktopNotifications => 'Desktop-Mitteilungen';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

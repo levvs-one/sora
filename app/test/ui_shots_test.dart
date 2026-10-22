@@ -23,6 +23,7 @@ import 'package:sora/src/ui/about.dart';
 import 'package:sora/src/ui/program_picker.dart';
 import 'package:sora/src/ui/speedtest.dart';
 import 'package:sora/src/notifications.dart';
+import 'package:sora/src/desktop/desktop.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pb.dart';
 import 'package:protobuf/well_known_types/google/protobuf/timestamp.pb.dart';
 import 'package:sora/src/ext/store.dart';
@@ -40,6 +41,131 @@ import 'extension_ui_test.dart' show extensionScreenshots;
 
 void main() {
   extensionScreenshots();
+  testWidgets('compact notification and settings screenshots', (tester) async {
+    addTearDown(tester.view.reset);
+    final output = '${Platform.environment['HOME']!}/.local/share/sora-dev/shots';
+    await tester.runAsync(() async {
+      await Directory(output).create(recursive: true);
+      await (FontLoader('Inter')..addFont(rootBundle.load('assets/fonts/InterVariable.ttf'))).load();
+      await (FontLoader(
+        'packages/material_symbols_icons/MaterialSymbolsRounded',
+      )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
+    });
+    for (final language in ['ru', 'en']) {
+      for (final theme in ['light', 'dark']) {
+        SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+        final settings = await Settings.load();
+        await settings.completeTour();
+        settings
+          ..language = language
+          ..theme = theme
+          ..animations = false;
+        final sora = DesktopState(settings)..history = [];
+        sora.subscription.outbounds.first.displayName = 'Amsterdam';
+        final navigator = GlobalKey<NavigatorState>();
+        final capture = GlobalKey();
+        final desktop = Desktop(sora, navigator);
+        size(tester, 1000, 720);
+        await tester.pumpWidget(
+          RepaintBoundary(
+            key: capture,
+            child: SoraApp(sora: sora, navigator: navigator, desktop: desktop),
+          ),
+        );
+        await tester.pumpAndSettle();
+        tester.widget<ShellScope>(find.byType(ShellScope)).select(4);
+        await tester.pumpAndSettle();
+        Future<void> save(String name) async {
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull, reason: '$name $language $theme');
+          final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+          await tester.runAsync(() async {
+            final image = await boundary.toImage(pixelRatio: 1);
+            final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+            final path = '$output/polish112-$name-$language-$theme.png';
+            await File(path).writeAsBytes(bytes);
+            image.dispose();
+            debugPrint(path);
+          });
+        }
+
+        await save('notifications-empty');
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final s = sora.strings;
+        AppNotification event(Notice event, DateTime time, {bool read = false}) {
+          final n = sora.notificationFor(event);
+          return AppNotification(
+            time: time,
+            title: n.title,
+            body: n.body,
+            action: n.action,
+            failureKey: n.failureKey,
+            read: read,
+          );
+        }
+
+        // Synthetic events follow the fixed failure classes and never read owner data.
+        sora.history = [
+          event(
+            const ConnectionFailed(CoreFailure('core.plan.outbounds_invalid')),
+            today.add(const Duration(hours: 14, minutes: 45)),
+          ),
+          for (final seconds in [90, 45, 0])
+            event(
+              const ServerSwitched('Amsterdam', backup: true),
+              today.add(Duration(hours: 14, minutes: 30, seconds: seconds)),
+            ),
+          AppNotification(
+            time: today.add(const Duration(hours: 11, minutes: 20)),
+            title: s.subscription,
+            body: s.expiresIn('Travel', 1),
+            action: 'subscription',
+            argument: 'travel',
+          ),
+          AppNotification(
+            time: today.subtract(const Duration(hours: 5)),
+            title: s.errTimeout,
+            body: '',
+            action: 'subscription',
+            argument: 'travel',
+            failureKey: 'core.network.timeout',
+            read: true,
+          ),
+          event(const ConnectionRestored(), today.subtract(const Duration(hours: 6)), read: true),
+          AppNotification(
+            time: today.subtract(const Duration(days: 3, hours: 4)),
+            title: s.updateAvailable('1.1.1'),
+            body: s.updateOpenAbout,
+            action: 'update',
+            read: true,
+          ),
+        ];
+        sora.notifyListeners();
+        await save('notifications-day');
+        expect(find.text(s.notificationRepeat(3)), findsOneWidget);
+        size(tester, 420, 800);
+        await save('notifications-compact');
+        size(tester, 1000, 720);
+        tester.widget<ShellScope>(find.byType(ShellScope)).select(5);
+        await tester.pumpAndSettle();
+        final toggle = find.byKey(const ValueKey('desktop-notifications'));
+        await save('settings-notifications-on');
+        await tester.tap(find.descendant(of: toggle, matching: find.text(s.desktopNotifications)));
+        await tester.pumpAndSettle();
+        expect(settings.notifications, isFalse);
+        expect((await Settings.load()).notifications, isFalse);
+        await save('settings-notifications-off');
+        size(tester, 420, 800);
+        await Scrollable.ensureVisible(tester.element(toggle), alignment: 0.7);
+        await save('settings-compact');
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        await tester.pumpAndSettle();
+      }
+    }
+  }, skip: Platform.environment['SORA_SHOTS'] == null);
+
   testWidgets('error policy noisy day screenshots', (tester) async {
     addTearDown(tester.view.reset);
     final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;

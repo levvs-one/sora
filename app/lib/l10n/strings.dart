@@ -1278,7 +1278,7 @@ abstract class S {
   /// No description provided for @notificationsEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Здесь появятся события подключения и подписок'**
+  /// **'Нет уведомлений'**
   String get notificationsEmpty;
 
   /// No description provided for @retryConnect.
@@ -3878,6 +3878,42 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Не удалось настроить системный прокси. Переподключитесь или откройте журнал.'**
   String get errProxySetup;
+
+  /// No description provided for @notificationsToday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня'**
+  String get notificationsToday;
+
+  /// No description provided for @notificationsYesterday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вчера'**
+  String get notificationsYesterday;
+
+  /// No description provided for @notificationsMarkRead.
+  ///
+  /// In ru, this message translates to:
+  /// **'Прочитать все'**
+  String get notificationsMarkRead;
+
+  /// No description provided for @notificationsUnread.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не прочитано'**
+  String get notificationsUnread;
+
+  /// No description provided for @desktopNotifications.
+  ///
+  /// In ru, this message translates to:
+  /// **'Системные уведомления'**
+  String get desktopNotifications;
+
+  /// No description provided for @notificationRepeat.
+  ///
+  /// In ru, this message translates to:
+  /// **'x{count}'**
+  String notificationRepeat(int count);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

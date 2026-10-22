@@ -627,7 +627,7 @@ class STr extends S {
   String get less => 'Az';
 
   @override
-  String get notificationsEmpty => 'Bağlantı ve abonelik etkinlikleri burada görünecek';
+  String get notificationsEmpty => 'Bildirim yok';
 
   @override
   String get retryConnect => 'Bağlantıyı yeniden dene';
@@ -2051,4 +2051,27 @@ class STr extends S {
 
   @override
   String get errProxySetup => 'Sistem vekili yapılandırılamadı. Yeniden bağlanın veya günlüğü açın.';
+
+  @override
+  String get notificationsToday => 'Bugün';
+
+  @override
+  String get notificationsYesterday => 'Dün';
+
+  @override
+  String get notificationsMarkRead => 'Tümünü okundu işaretle';
+
+  @override
+  String get notificationsUnread => 'Okunmadı';
+
+  @override
+  String get desktopNotifications => 'Masaüstü bildirimleri';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

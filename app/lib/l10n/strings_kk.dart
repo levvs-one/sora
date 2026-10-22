@@ -627,7 +627,7 @@ class SKk extends S {
   String get less => 'Аздау';
 
   @override
-  String get notificationsEmpty => 'Қосылым және жазылым оқиғалары осы жерде пайда болады';
+  String get notificationsEmpty => 'Хабарландырулар жоқ';
 
   @override
   String get retryConnect => 'Қосылымды қайталап көріңіз';
@@ -2050,4 +2050,27 @@ class SKk extends S {
 
   @override
   String get errProxySetup => 'Жүйелік прокси бапталмады. Қайта қосылыңыз немесе журналды ашыңыз.';
+
+  @override
+  String get notificationsToday => 'Бүгін';
+
+  @override
+  String get notificationsYesterday => 'Кеше';
+
+  @override
+  String get notificationsMarkRead => 'Барлығын оқылған деп белгілеу';
+
+  @override
+  String get notificationsUnread => 'Оқылмаған';
+
+  @override
+  String get desktopNotifications => 'Жүйелік хабарландырулар';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

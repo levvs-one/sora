@@ -183,7 +183,7 @@
   "sidebarToggle": "Бүйірлік тақтаны ауыстыру",
   "more": "Көбірек",
   "less": "Аздау",
-  "notificationsEmpty": "Қосылым және жазылым оқиғалары осы жерде пайда болады",
+  "notificationsEmpty": "Хабарландырулар жоқ",
   "retryConnect": "Қосылымды қайталап көріңіз",
   "openLogs": "Журналдарды ашыңыз",
   "tourReplay": "Нұсқаулықты қайта көрсетіңіз",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Жүйелік прокси бұл кіруді қолдамайды. Жергілікті проксидің пайдаланушы аты мен құпиясөзін өшіріңіз.",
   "errLogFilter": "Журнал сүзгісі жарамсыз. Іздеуді тазалап, қайталаңыз.",
   "errSubRedirect": "Сервер қауіпті мекенжайға бағыттады. Провайдерден жаңа сілтеме сұраңыз.",
-  "errProxySetup": "Жүйелік прокси бапталмады. Қайта қосылыңыз немесе журналды ашыңыз."
+  "errProxySetup": "Жүйелік прокси бапталмады. Қайта қосылыңыз немесе журналды ашыңыз.",
+  "notificationsToday": "Бүгін",
+  "notificationsYesterday": "Кеше",
+  "notificationsMarkRead": "Барлығын оқылған деп белгілеу",
+  "notificationsUnread": "Оқылмаған",
+  "desktopNotifications": "Жүйелік хабарландырулар",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

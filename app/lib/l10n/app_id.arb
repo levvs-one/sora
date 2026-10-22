@@ -183,7 +183,7 @@
   "sidebarToggle": "Alihkan bilah sisi",
   "more": "Lagi",
   "less": "Lebih sedikit",
-  "notificationsEmpty": "Peristiwa koneksi dan langganan akan muncul di sini",
+  "notificationsEmpty": "Tidak ada notifikasi",
   "retryConnect": "Coba lagi koneksi",
   "openLogs": "Buka log",
   "tourReplay": "Tampilkan panduan lagi",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Proksi sistem tidak mendukung login ini. Hapus nama pengguna dan kata sandi proksi lokal.",
   "errLogFilter": "Filter log tidak valid. Hapus pencarian dan coba lagi.",
   "errSubRedirect": "Server mengalihkan ke alamat tidak aman. Minta tautan baru dari penyedia.",
-  "errProxySetup": "Tidak dapat mengatur proksi sistem. Hubungkan ulang atau buka log."
+  "errProxySetup": "Tidak dapat mengatur proksi sistem. Hubungkan ulang atau buka log.",
+  "notificationsToday": "Hari ini",
+  "notificationsYesterday": "Kemarin",
+  "notificationsMarkRead": "Tandai semua sudah dibaca",
+  "notificationsUnread": "Belum dibaca",
+  "desktopNotifications": "Notifikasi desktop",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -224,10 +225,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.closeToTray,
                 onChanged: (v) => set((x) => x.closeToTray = v, replan: false),
               ),
-              SwitchTile(
-                title: s.notifications,
-                value: settings.notifications,
-                onChanged: (v) => set((x) => x.notifications = v, replan: false),
+              Tile(
+                key: const ValueKey('desktop-notifications'),
+                title: s.desktopNotifications,
+                titleStyle: Styles.secondary.copyWith(fontSize: 14),
+                onTap: () => set((x) => x.notifications = !settings.notifications, replan: false),
+                trailing: CupertinoSwitch(
+                  value: settings.notifications,
+                  onChanged: (v) => set((x) => x.notifications = v, replan: false),
+                  activeTrackColor: palette.ink,
+                  inactiveTrackColor: palette.field,
+                  thumbColor: palette.surface,
+                ),
               ),
             ],
           ],

@@ -627,7 +627,7 @@ class SBn extends S {
   String get less => 'কম';
 
   @override
-  String get notificationsEmpty => 'সংযোগ এবং সদস্যতা ইভেন্ট এখানে প্রদর্শিত হবে';
+  String get notificationsEmpty => 'কোনো বিজ্ঞপ্তি নেই';
 
   @override
   String get retryConnect => 'সংযোগ পুনরায় চেষ্টা করুন';
@@ -2051,4 +2051,27 @@ class SBn extends S {
 
   @override
   String get errProxySetup => 'সিস্টেম প্রক্সি সেট করা যায়নি। আবার সংযোগ করুন বা লগ খুলুন।';
+
+  @override
+  String get notificationsToday => 'আজ';
+
+  @override
+  String get notificationsYesterday => 'গতকাল';
+
+  @override
+  String get notificationsMarkRead => 'সব পঠিত হিসেবে চিহ্নিত করুন';
+
+  @override
+  String get notificationsUnread => 'অপঠিত';
+
+  @override
+  String get desktopNotifications => 'ডেস্কটপ বিজ্ঞপ্তি';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

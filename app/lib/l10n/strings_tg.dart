@@ -627,7 +627,7 @@ class STg extends S {
   String get less => 'Камтар';
 
   @override
-  String get notificationsEmpty => 'Ҳодисаҳои пайвастшавӣ ва обуна дар ин ҷо пайдо мешаванд';
+  String get notificationsEmpty => 'Огоҳӣ нест';
 
   @override
   String get retryConnect => 'Пайвастшавӣ аз нав кӯшиш кунед';
@@ -2048,4 +2048,27 @@ class STg extends S {
 
   @override
   String get errProxySetup => 'Танзими проксии низом нашуд. Аз нав пайваст шавед ё рӯзномаро кушоед.';
+
+  @override
+  String get notificationsToday => 'Имрӯз';
+
+  @override
+  String get notificationsYesterday => 'Дирӯз';
+
+  @override
+  String get notificationsMarkRead => 'Ҳамаро хондашуда қайд кардан';
+
+  @override
+  String get notificationsUnread => 'Хонданашуда';
+
+  @override
+  String get desktopNotifications => 'Огоҳиҳои мизи корӣ';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

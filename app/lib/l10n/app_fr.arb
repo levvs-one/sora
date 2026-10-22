@@ -183,7 +183,7 @@
   "sidebarToggle": "Basculer la barre latérale",
   "more": "Plus",
   "less": "Moins",
-  "notificationsEmpty": "Les événements de connexion et d'abonnement apparaîtront ici",
+  "notificationsEmpty": "Aucune notification",
   "retryConnect": "Réessayer la connexion",
   "openLogs": "Journaux ouverts",
   "tourReplay": "Afficher à nouveau le guide",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Le proxy système ne prend pas en charge cette connexion. Retirez l’identifiant et le mot de passe du proxy local.",
   "errLogFilter": "Filtre du journal incorrect. Effacez la recherche et réessayez.",
   "errSubRedirect": "Le serveur a redirigé vers une adresse non sûre. Demandez un nouveau lien au fournisseur.",
-  "errProxySetup": "Impossible de configurer le proxy système. Reconnectez-vous ou ouvrez le journal."
+  "errProxySetup": "Impossible de configurer le proxy système. Reconnectez-vous ou ouvrez le journal.",
+  "notificationsToday": "Aujourd’hui",
+  "notificationsYesterday": "Hier",
+  "notificationsMarkRead": "Tout marquer comme lu",
+  "notificationsUnread": "Non lu",
+  "desktopNotifications": "Notifications du bureau",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

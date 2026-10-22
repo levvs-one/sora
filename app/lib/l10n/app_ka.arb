@@ -183,7 +183,7 @@
   "sidebarToggle": "გვერდითი ზოლის გადართვა",
   "more": "მეტი",
   "less": "ნაკლები",
-  "notificationsEmpty": "კავშირისა და გამოწერის მოვლენები აქ გამოჩნდება",
+  "notificationsEmpty": "შეტყობინებები არ არის",
   "retryConnect": "ხელახლა სცადეთ კავშირი",
   "openLogs": "გახსენით ჟურნალები",
   "tourReplay": "ხელახლა აჩვენე სახელმძღვანელო",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "სისტემის პროქსი ამ შესვლას არ უჭერს მხარს. წაშალეთ ადგილობრივი პროქსის მომხმარებლის სახელი და პაროლი.",
   "errLogFilter": "ჟურნალის ფილტრი არასწორია. გაასუფთავეთ ძიება და გაიმეორეთ.",
   "errSubRedirect": "სერვერმა სახიფათო მისამართზე გადაგამისამართათ. პროვაიდერს ახალი ბმული სთხოვეთ.",
-  "errProxySetup": "სისტემის პროქსი ვერ დაყენდა. ხელახლა დაუკავშირდით ან გახსენით ჟურნალი."
+  "errProxySetup": "სისტემის პროქსი ვერ დაყენდა. ხელახლა დაუკავშირდით ან გახსენით ჟურნალი.",
+  "notificationsToday": "დღეს",
+  "notificationsYesterday": "გუშინ",
+  "notificationsMarkRead": "ყველას წაკითხულად მონიშვნა",
+  "notificationsUnread": "წაუკითხავი",
+  "desktopNotifications": "დესკტოპის შეტყობინებები",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

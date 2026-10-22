@@ -628,7 +628,7 @@ class SPl extends S {
   String get less => 'Mniej';
 
   @override
-  String get notificationsEmpty => 'Tutaj pojawią się zdarzenia połączenia i subskrypcji';
+  String get notificationsEmpty => 'Brak powiadomień';
 
   @override
   String get retryConnect => 'Ponów próbę połączenia';
@@ -2077,4 +2077,27 @@ class SPl extends S {
 
   @override
   String get errProxySetup => 'Nie udało się ustawić serwera proxy systemu. Połącz ponownie lub otwórz dziennik.';
+
+  @override
+  String get notificationsToday => 'Dzisiaj';
+
+  @override
+  String get notificationsYesterday => 'Wczoraj';
+
+  @override
+  String get notificationsMarkRead => 'Oznacz wszystko jako przeczytane';
+
+  @override
+  String get notificationsUnread => 'Nieprzeczytane';
+
+  @override
+  String get desktopNotifications => 'Powiadomienia na pulpicie';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

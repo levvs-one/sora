@@ -627,7 +627,7 @@ class SUr extends S {
   String get less => 'کم';
 
   @override
-  String get notificationsEmpty => 'کنکشن اور سبسکرپشن ایونٹس یہاں ظاہر ہوں گے۔';
+  String get notificationsEmpty => 'کوئی اطلاع نہیں';
 
   @override
   String get retryConnect => 'کنکشن کی دوبارہ کوشش کریں۔';
@@ -2044,4 +2044,27 @@ class SUr extends S {
 
   @override
   String get errProxySetup => 'سسٹم پراکسی ترتیب نہیں دی جا سکی۔ دوبارہ جڑیں یا لاگ کھولیں۔';
+
+  @override
+  String get notificationsToday => 'آج';
+
+  @override
+  String get notificationsYesterday => 'کل';
+
+  @override
+  String get notificationsMarkRead => 'سب کو پڑھا ہوا نشان لگائیں';
+
+  @override
+  String get notificationsUnread => 'بغیر پڑھا ہوا';
+
+  @override
+  String get desktopNotifications => 'ڈیسک ٹاپ اطلاعات';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

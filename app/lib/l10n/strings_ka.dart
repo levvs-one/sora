@@ -627,7 +627,7 @@ class SKa extends S {
   String get less => 'ნაკლები';
 
   @override
-  String get notificationsEmpty => 'კავშირისა და გამოწერის მოვლენები აქ გამოჩნდება';
+  String get notificationsEmpty => 'შეტყობინებები არ არის';
 
   @override
   String get retryConnect => 'ხელახლა სცადეთ კავშირი';
@@ -2051,4 +2051,27 @@ class SKa extends S {
 
   @override
   String get errProxySetup => 'სისტემის პროქსი ვერ დაყენდა. ხელახლა დაუკავშირდით ან გახსენით ჟურნალი.';
+
+  @override
+  String get notificationsToday => 'დღეს';
+
+  @override
+  String get notificationsYesterday => 'გუშინ';
+
+  @override
+  String get notificationsMarkRead => 'ყველას წაკითხულად მონიშვნა';
+
+  @override
+  String get notificationsUnread => 'წაუკითხავი';
+
+  @override
+  String get desktopNotifications => 'დესკტოპის შეტყობინებები';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

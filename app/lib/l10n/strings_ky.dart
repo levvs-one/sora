@@ -627,7 +627,7 @@ class SKy extends S {
   String get less => 'Азыраак';
 
   @override
-  String get notificationsEmpty => 'Туташуу жана жазылуу окуялары бул жерде көрүнөт';
+  String get notificationsEmpty => 'Билдирмелер жок';
 
   @override
   String get retryConnect => 'Кайталануу';
@@ -2052,4 +2052,27 @@ class SKy extends S {
 
   @override
   String get errProxySetup => 'Системалык прокси жөндөлгөн жок. Кайра туташыңыз же журналды ачыңыз.';
+
+  @override
+  String get notificationsToday => 'Бүгүн';
+
+  @override
+  String get notificationsYesterday => 'Кечээ';
+
+  @override
+  String get notificationsMarkRead => 'Баарын окулду деп белгилөө';
+
+  @override
+  String get notificationsUnread => 'Окула элек';
+
+  @override
+  String get desktopNotifications => 'Тутум билдирмелери';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

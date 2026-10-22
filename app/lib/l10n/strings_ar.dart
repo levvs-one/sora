@@ -627,7 +627,7 @@ class SAr extends S {
   String get less => 'أقل';
 
   @override
-  String get notificationsEmpty => 'ستظهر أحداث الاتصال والاشتراك هنا';
+  String get notificationsEmpty => 'لا توجد إشعارات';
 
   @override
   String get retryConnect => 'أعد محاولة الاتصال';
@@ -2070,4 +2070,27 @@ class SAr extends S {
 
   @override
   String get errProxySetup => 'تعذر إعداد وكيل النظام. أعد الاتصال أو افتح السجل.';
+
+  @override
+  String get notificationsToday => 'اليوم';
+
+  @override
+  String get notificationsYesterday => 'أمس';
+
+  @override
+  String get notificationsMarkRead => 'تحديد الكل كمقروء';
+
+  @override
+  String get notificationsUnread => 'غير مقروء';
+
+  @override
+  String get desktopNotifications => 'إشعارات سطح المكتب';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

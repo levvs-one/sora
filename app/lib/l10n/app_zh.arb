@@ -183,7 +183,7 @@
   "sidebarToggle": "切换侧边栏",
   "more": "更多的",
   "less": "较少的",
-  "notificationsEmpty": "连接和订阅事件将出现在这里",
+  "notificationsEmpty": "暂无通知",
   "retryConnect": "重试连接",
   "openLogs": "打开日志",
   "tourReplay": "再次显示指南",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "系统代理不支持此登录方式。请移除本地代理的用户名和密码。",
   "errLogFilter": "日志筛选条件无效。请清空搜索后重试。",
   "errSubRedirect": "服务器重定向到了不安全的地址。请向服务提供商索取新链接。",
-  "errProxySetup": "无法配置系统代理。请重新连接或打开日志。"
+  "errProxySetup": "无法配置系统代理。请重新连接或打开日志。",
+  "notificationsToday": "今天",
+  "notificationsYesterday": "昨天",
+  "notificationsMarkRead": "全部标为已读",
+  "notificationsUnread": "未读",
+  "desktopNotifications": "桌面通知",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

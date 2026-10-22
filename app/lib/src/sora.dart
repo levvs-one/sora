@@ -313,8 +313,8 @@ class Sora extends ChangeNotifier {
     return _saveHistory();
   }
 
-  Future<void> markNotificationsRead() {
-    history = history.map((n) => n.markRead()).toList();
+  Future<void> markNotificationsRead({List<AppNotification>? notices}) {
+    history = history.map((n) => notices == null || notices.contains(n) ? n.markRead() : n).toList();
     notifyListeners();
     return _saveHistory();
   }

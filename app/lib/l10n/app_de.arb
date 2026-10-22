@@ -183,7 +183,7 @@
   "sidebarToggle": "Seitenleiste umschalten",
   "more": "Mehr",
   "less": "Weniger",
-  "notificationsEmpty": "Hier werden Verbindungs- und Abonnementereignisse angezeigt",
+  "notificationsEmpty": "Keine Mitteilungen",
   "retryConnect": "Verbindung erneut versuchen",
   "openLogs": "Protokolle öffnen",
   "tourReplay": "Guide erneut anzeigen",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Der Systemproxy unterstützt diese Anmeldung nicht. Entfernen Sie Benutzername und Passwort des lokalen Proxys.",
   "errLogFilter": "Ungültiger Protokollfilter. Leeren Sie die Suche und versuchen Sie es erneut.",
   "errSubRedirect": "Der Server hat an eine unsichere Adresse umgeleitet. Fordern Sie beim Anbieter einen neuen Link an.",
-  "errProxySetup": "Systemproxy konnte nicht eingerichtet werden. Verbinden Sie sich erneut oder öffnen Sie das Protokoll."
+  "errProxySetup": "Systemproxy konnte nicht eingerichtet werden. Verbinden Sie sich erneut oder öffnen Sie das Protokoll.",
+  "notificationsToday": "Heute",
+  "notificationsYesterday": "Gestern",
+  "notificationsMarkRead": "Alle als gelesen markieren",
+  "notificationsUnread": "Ungelesen",
+  "desktopNotifications": "Desktop-Mitteilungen",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

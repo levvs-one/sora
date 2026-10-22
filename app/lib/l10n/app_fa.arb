@@ -183,7 +183,7 @@
   "sidebarToggle": "نوار کناری را تغییر دهید",
   "more": "بیشتر",
   "less": "کمتر",
-  "notificationsEmpty": "رویدادهای اتصال و اشتراک در اینجا ظاهر می شوند",
+  "notificationsEmpty": "اعلانی وجود ندارد",
   "retryConnect": "اتصال را دوباره امتحان کنید",
   "openLogs": "لاگ ها را باز کنید",
   "tourReplay": "راهنما را دوباره نشان دهید",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "پروکسی سیستم از این ورود پشتیبانی نمی‌کند. نام کاربری و گذرواژه پروکسی محلی را حذف کنید.",
   "errLogFilter": "فیلتر گزارش نامعتبر است. جستجو را پاک کرده و دوباره تلاش کنید.",
   "errSubRedirect": "سرور به نشانی ناامن هدایت کرد. از ارائه‌دهنده پیوند جدید بخواهید.",
-  "errProxySetup": "تنظیم پروکسی سیستم ممکن نشد. دوباره متصل شوید یا گزارش را باز کنید."
+  "errProxySetup": "تنظیم پروکسی سیستم ممکن نشد. دوباره متصل شوید یا گزارش را باز کنید.",
+  "notificationsToday": "امروز",
+  "notificationsYesterday": "دیروز",
+  "notificationsMarkRead": "علامت‌گذاری همه به‌عنوان خوانده‌شده",
+  "notificationsUnread": "خوانده‌نشده",
+  "desktopNotifications": "اعلان‌های دسکتاپ",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

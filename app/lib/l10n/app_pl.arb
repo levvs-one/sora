@@ -183,7 +183,7 @@
   "sidebarToggle": "Przełącz pasek boczny",
   "more": "Więcej",
   "less": "Mniej",
-  "notificationsEmpty": "Tutaj pojawią się zdarzenia połączenia i subskrypcji",
+  "notificationsEmpty": "Brak powiadomień",
   "retryConnect": "Ponów próbę połączenia",
   "openLogs": "Otwórz logi",
   "tourReplay": "Pokaż przewodnik ponownie",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Serwer proxy systemu nie obsługuje tego logowania. Usuń użytkownika i hasło lokalnego proxy.",
   "errLogFilter": "Nieprawidłowy filtr dziennika. Wyczyść wyszukiwanie i ponów.",
   "errSubRedirect": "Serwer przekierował na niebezpieczny adres. Poproś dostawcę o nowy link.",
-  "errProxySetup": "Nie udało się ustawić serwera proxy systemu. Połącz ponownie lub otwórz dziennik."
+  "errProxySetup": "Nie udało się ustawić serwera proxy systemu. Połącz ponownie lub otwórz dziennik.",
+  "notificationsToday": "Dzisiaj",
+  "notificationsYesterday": "Wczoraj",
+  "notificationsMarkRead": "Oznacz wszystko jako przeczytane",
+  "notificationsUnread": "Nieprzeczytane",
+  "desktopNotifications": "Powiadomienia na pulpicie",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

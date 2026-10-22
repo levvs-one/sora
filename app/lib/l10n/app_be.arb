@@ -183,7 +183,7 @@
   "sidebarToggle": "Пераключыць бакавую панэль",
   "more": "больш",
   "less": "менш",
-  "notificationsEmpty": "Тут з'явяцца падзеі падключэння і падпіскі",
+  "notificationsEmpty": "Няма апавяшчэнняў",
   "retryConnect": "Паўтарыце падключэнне",
   "openLogs": "Адкрытыя лагі",
   "tourReplay": "Зноў паказаць кіраўніцтва",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Сістэмны проксі не падтрымлівае гэты ўваход. Прыбярыце лагін і пароль лакальнага проксі.",
   "errLogFilter": "Няправільны фільтр журнала. Ачысціце пошук і паўтарыце.",
   "errSubRedirect": "Сервер перанакіраваў на небяспечны адрас. Запытайце новую спасылку ў правайдара.",
-  "errProxySetup": "Не ўдалося наладзіць сістэмны проксі. Перападключыцеся або адкрыйце журнал."
+  "errProxySetup": "Не ўдалося наладзіць сістэмны проксі. Перападключыцеся або адкрыйце журнал.",
+  "notificationsToday": "Сёння",
+  "notificationsYesterday": "Учора",
+  "notificationsMarkRead": "Прачытаць усе",
+  "notificationsUnread": "Не прачытана",
+  "desktopNotifications": "Сістэмныя апавяшчэнні",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

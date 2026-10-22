@@ -627,7 +627,7 @@ class SAz extends S {
   String get less => 'Daha az';
 
   @override
-  String get notificationsEmpty => 'Bağlantı və abunə hadisələri burada görünəcək';
+  String get notificationsEmpty => 'Bildiriş yoxdur';
 
   @override
   String get retryConnect => 'Bağlantıya yenidən cəhd edin';
@@ -2052,4 +2052,27 @@ class SAz extends S {
 
   @override
   String get errProxySetup => 'Sistem proksisi qurula bilmədi. Yenidən qoşulun və ya jurnalı açın.';
+
+  @override
+  String get notificationsToday => 'Bu gün';
+
+  @override
+  String get notificationsYesterday => 'Dünən';
+
+  @override
+  String get notificationsMarkRead => 'Hamısını oxunmuş say';
+
+  @override
+  String get notificationsUnread => 'Oxunmayıb';
+
+  @override
+  String get desktopNotifications => 'Masaüstü bildirişləri';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

@@ -627,7 +627,7 @@ class SBe extends S {
   String get less => 'менш';
 
   @override
-  String get notificationsEmpty => 'Тут з\'явяцца падзеі падключэння і падпіскі';
+  String get notificationsEmpty => 'Няма апавяшчэнняў';
 
   @override
   String get retryConnect => 'Паўтарыце падключэнне';
@@ -2070,4 +2070,27 @@ class SBe extends S {
 
   @override
   String get errProxySetup => 'Не ўдалося наладзіць сістэмны проксі. Перападключыцеся або адкрыйце журнал.';
+
+  @override
+  String get notificationsToday => 'Сёння';
+
+  @override
+  String get notificationsYesterday => 'Учора';
+
+  @override
+  String get notificationsMarkRead => 'Прачытаць усе';
+
+  @override
+  String get notificationsUnread => 'Не прачытана';
+
+  @override
+  String get desktopNotifications => 'Сістэмныя апавяшчэнні';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

@@ -621,7 +621,7 @@ class SKo extends S {
   String get less => '더 적은';
 
   @override
-  String get notificationsEmpty => '연결 및 구독 이벤트가 여기에 표시됩니다.';
+  String get notificationsEmpty => '알림 없음';
 
   @override
   String get retryConnect => '연결 재시도';
@@ -2019,4 +2019,27 @@ class SKo extends S {
 
   @override
   String get errProxySetup => '시스템 프록시를 설정하지 못했습니다. 다시 연결하거나 로그를 여세요.';
+
+  @override
+  String get notificationsToday => '오늘';
+
+  @override
+  String get notificationsYesterday => '어제';
+
+  @override
+  String get notificationsMarkRead => '모두 읽음으로 표시';
+
+  @override
+  String get notificationsUnread => '읽지 않음';
+
+  @override
+  String get desktopNotifications => '데스크톱 알림';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

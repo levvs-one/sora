@@ -627,7 +627,7 @@ class SUk extends S {
   String get less => 'менше';
 
   @override
-  String get notificationsEmpty => 'Тут відображатимуться події підключення та підписки';
+  String get notificationsEmpty => 'Немає сповіщень';
 
   @override
   String get retryConnect => 'Повторити підключення';
@@ -2071,4 +2071,27 @@ class SUk extends S {
 
   @override
   String get errProxySetup => 'Не вдалося налаштувати системний проксі. Перепідключіться або відкрийте журнал.';
+
+  @override
+  String get notificationsToday => 'Сьогодні';
+
+  @override
+  String get notificationsYesterday => 'Учора';
+
+  @override
+  String get notificationsMarkRead => 'Прочитати всі';
+
+  @override
+  String get notificationsUnread => 'Не прочитано';
+
+  @override
+  String get desktopNotifications => 'Системні сповіщення';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

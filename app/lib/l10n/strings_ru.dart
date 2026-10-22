@@ -629,7 +629,7 @@ class SRu extends S {
   String get less => 'Свернуть';
 
   @override
-  String get notificationsEmpty => 'Здесь появятся события подключения и подписок';
+  String get notificationsEmpty => 'Нет уведомлений';
 
   @override
   String get retryConnect => 'Подключиться снова';
@@ -2066,4 +2066,27 @@ class SRu extends S {
 
   @override
   String get errProxySetup => 'Не удалось настроить системный прокси. Переподключитесь или откройте журнал.';
+
+  @override
+  String get notificationsToday => 'Сегодня';
+
+  @override
+  String get notificationsYesterday => 'Вчера';
+
+  @override
+  String get notificationsMarkRead => 'Прочитать все';
+
+  @override
+  String get notificationsUnread => 'Не прочитано';
+
+  @override
+  String get desktopNotifications => 'Системные уведомления';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

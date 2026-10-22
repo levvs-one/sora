@@ -183,7 +183,7 @@
   "sidebarToggle": "Միացնել կողագոտին",
   "more": "Ավելին",
   "less": "Ավելի քիչ",
-  "notificationsEmpty": "Կապի և բաժանորդագրության իրադարձությունները կհայտնվեն այստեղ",
+  "notificationsEmpty": "Ծանուցումներ չկան",
   "retryConnect": "Կրկին փորձեք կապը",
   "openLogs": "Բացեք տեղեկամատյանները",
   "tourReplay": "Կրկին ցուցադրեք ուղեցույցը",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Համակարգի պրոքսին չի աջակցում այս մուտքը։ Հեռացրեք տեղային պրոքսիի օգտանունն ու գաղտնաբառը։",
   "errLogFilter": "Մատյանի զտիչը սխալ է։ Մաքրեք որոնումը և կրկին փորձեք։",
   "errSubRedirect": "Սերվերը վերահղել է վտանգավոր հասցեի։ Մատակարարից նոր հղում խնդրեք։",
-  "errProxySetup": "Չհաջողվեց կարգավորել համակարգի պրոքսին։ Վերամիացեք կամ բացեք մատյանը։"
+  "errProxySetup": "Չհաջողվեց կարգավորել համակարգի պրոքսին։ Վերամիացեք կամ բացեք մատյանը։",
+  "notificationsToday": "Այսօր",
+  "notificationsYesterday": "Երեկ",
+  "notificationsMarkRead": "Բոլորը նշել որպես կարդացված",
+  "notificationsUnread": "Չկարդացված",
+  "desktopNotifications": "Համակարգային ծանուցումներ",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

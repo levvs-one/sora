@@ -183,7 +183,7 @@
   "sidebarToggle": "تبديل الشريط الجانبي",
   "more": "أكثر",
   "less": "أقل",
-  "notificationsEmpty": "ستظهر أحداث الاتصال والاشتراك هنا",
+  "notificationsEmpty": "لا توجد إشعارات",
   "retryConnect": "أعد محاولة الاتصال",
   "openLogs": "فتح السجلات",
   "tourReplay": "أظهر الدليل مرة أخرى",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "وكيل النظام لا يدعم هذا الدخول. أزل اسم مستخدم الوكيل المحلي وكلمة مروره.",
   "errLogFilter": "مرشح السجل غير صالح. امسح البحث وحاول مجددًا.",
   "errSubRedirect": "أعاد الخادم التوجيه إلى عنوان غير آمن. اطلب رابطًا جديدًا من المزود.",
-  "errProxySetup": "تعذر إعداد وكيل النظام. أعد الاتصال أو افتح السجل."
+  "errProxySetup": "تعذر إعداد وكيل النظام. أعد الاتصال أو افتح السجل.",
+  "notificationsToday": "اليوم",
+  "notificationsYesterday": "أمس",
+  "notificationsMarkRead": "تحديد الكل كمقروء",
+  "notificationsUnread": "غير مقروء",
+  "desktopNotifications": "إشعارات سطح المكتب",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

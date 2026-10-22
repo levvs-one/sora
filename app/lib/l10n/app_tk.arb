@@ -183,7 +183,7 @@
   "sidebarToggle": "Gapdal paneli çalyşyň",
   "more": "Has köp",
   "less": "Az",
-  "notificationsEmpty": "Baglanyşyk we abuna wakalary şu ýerde peýda bolar",
+  "notificationsEmpty": "Habarnama ýok",
   "retryConnect": "Birikdirmek",
   "openLogs": "Surnallary açyň",
   "tourReplay": "Guideene-de gollanma görkez",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "Ulgam proksisi bu girişi goldamaýar. Ýerli proksiniň ulanyjy adyny we parolyny aýryň.",
   "errLogFilter": "Žurnal süzgüji nädogry. Gözlegi arassalap, gaýtadan synanyşyň.",
   "errSubRedirect": "Serwer howply salga gönükdirdi. Üpjin edijiden täze salgy soraň.",
-  "errProxySetup": "Ulgam proksisini sazlap bolmady. Gaýtadan birigiň ýa-da žurnaly açyň."
+  "errProxySetup": "Ulgam proksisini sazlap bolmady. Gaýtadan birigiň ýa-da žurnaly açyň.",
+  "notificationsToday": "Şu gün",
+  "notificationsYesterday": "Düýn",
+  "notificationsMarkRead": "Ählisini okalan diýip belle",
+  "notificationsUnread": "Okalmadyk",
+  "desktopNotifications": "Iş stoly habarnamalary",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

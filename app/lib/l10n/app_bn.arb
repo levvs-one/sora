@@ -183,7 +183,7 @@
   "sidebarToggle": "সাইডবার টগল করুন",
   "more": "আরও",
   "less": "কম",
-  "notificationsEmpty": "সংযোগ এবং সদস্যতা ইভেন্ট এখানে প্রদর্শিত হবে",
+  "notificationsEmpty": "কোনো বিজ্ঞপ্তি নেই",
   "retryConnect": "সংযোগ পুনরায় চেষ্টা করুন",
   "openLogs": "লগ খুলুন",
   "tourReplay": "আবার গাইড দেখান",
@@ -1009,5 +1009,19 @@
   "errProxyLogin": "সিস্টেম প্রক্সি এই লগইন সমর্থন করে না। স্থানীয় প্রক্সির ব্যবহারকারীর নাম ও পাসওয়ার্ড সরান।",
   "errLogFilter": "লগ ফিল্টার অবৈধ। অনুসন্ধান মুছে আবার চেষ্টা করুন।",
   "errSubRedirect": "সার্ভার একটি অনিরাপদ ঠিকানায় পাঠিয়েছে। প্রদানকারীর কাছে নতুন লিংক চান।",
-  "errProxySetup": "সিস্টেম প্রক্সি সেট করা যায়নি। আবার সংযোগ করুন বা লগ খুলুন।"
+  "errProxySetup": "সিস্টেম প্রক্সি সেট করা যায়নি। আবার সংযোগ করুন বা লগ খুলুন।",
+  "notificationsToday": "আজ",
+  "notificationsYesterday": "গতকাল",
+  "notificationsMarkRead": "সব পঠিত হিসেবে চিহ্নিত করুন",
+  "notificationsUnread": "অপঠিত",
+  "desktopNotifications": "ডেস্কটপ বিজ্ঞপ্তি",
+  "notificationRepeat": "x{count}",
+  "@notificationRepeat": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  }
 }

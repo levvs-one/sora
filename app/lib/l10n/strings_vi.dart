@@ -627,7 +627,7 @@ class SVi extends S {
   String get less => 'Ít hơn';
 
   @override
-  String get notificationsEmpty => 'Sự kiện kết nối và đăng ký sẽ xuất hiện ở đây';
+  String get notificationsEmpty => 'Không có thông báo';
 
   @override
   String get retryConnect => 'Thử lại kết nối';
@@ -2044,4 +2044,27 @@ class SVi extends S {
 
   @override
   String get errProxySetup => 'Không thể cấu hình proxy hệ thống. Kết nối lại hoặc mở nhật ký.';
+
+  @override
+  String get notificationsToday => 'Hôm nay';
+
+  @override
+  String get notificationsYesterday => 'Hôm qua';
+
+  @override
+  String get notificationsMarkRead => 'Đánh dấu tất cả đã đọc';
+
+  @override
+  String get notificationsUnread => 'Chưa đọc';
+
+  @override
+  String get desktopNotifications => 'Thông báo trên màn hình';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

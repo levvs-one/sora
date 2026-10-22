@@ -621,7 +621,7 @@ class SZh extends S {
   String get less => '较少的';
 
   @override
-  String get notificationsEmpty => '连接和订阅事件将出现在这里';
+  String get notificationsEmpty => '暂无通知';
 
   @override
   String get retryConnect => '重试连接';
@@ -2015,6 +2015,29 @@ class SZh extends S {
 
   @override
   String get errProxySetup => '无法配置系统代理。请重新连接或打开日志。';
+
+  @override
+  String get notificationsToday => '今天';
+
+  @override
+  String get notificationsYesterday => '昨天';
+
+  @override
+  String get notificationsMarkRead => '全部标为已读';
+
+  @override
+  String get notificationsUnread => '未读';
+
+  @override
+  String get desktopNotifications => '桌面通知';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2633,7 +2656,7 @@ class SZhHans extends SZh {
   String get less => '较少的';
 
   @override
-  String get notificationsEmpty => '连接和订阅事件将出现在这里';
+  String get notificationsEmpty => '暂无通知';
 
   @override
   String get retryConnect => '重试连接';
@@ -4027,6 +4050,29 @@ class SZhHans extends SZh {
 
   @override
   String get errProxySetup => '无法配置系统代理。请重新连接或打开日志。';
+
+  @override
+  String get notificationsToday => '今天';
+
+  @override
+  String get notificationsYesterday => '昨天';
+
+  @override
+  String get notificationsMarkRead => '全部标为已读';
+
+  @override
+  String get notificationsUnread => '未读';
+
+  @override
+  String get desktopNotifications => '桌面通知';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4645,7 +4691,7 @@ class SZhHant extends SZh {
   String get less => '較少的';
 
   @override
-  String get notificationsEmpty => '連接和訂閱事件將出現在這裡';
+  String get notificationsEmpty => '暫無通知';
 
   @override
   String get retryConnect => '重試連接';
@@ -6040,4 +6086,27 @@ class SZhHant extends SZh {
 
   @override
   String get errProxySetup => '無法設定系統代理。請重新連線或開啟日誌。';
+
+  @override
+  String get notificationsToday => '今天';
+
+  @override
+  String get notificationsYesterday => '昨天';
+
+  @override
+  String get notificationsMarkRead => '全部標為已讀';
+
+  @override
+  String get notificationsUnread => '未讀';
+
+  @override
+  String get desktopNotifications => '桌面通知';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }

@@ -628,7 +628,7 @@ class SFr extends S {
   String get less => 'Moins';
 
   @override
-  String get notificationsEmpty => 'Les événements de connexion et d\'abonnement apparaîtront ici';
+  String get notificationsEmpty => 'Aucune notification';
 
   @override
   String get retryConnect => 'Réessayer la connexion';
@@ -2066,4 +2066,27 @@ class SFr extends S {
 
   @override
   String get errProxySetup => 'Impossible de configurer le proxy système. Reconnectez-vous ou ouvrez le journal.';
+
+  @override
+  String get notificationsToday => 'Aujourd’hui';
+
+  @override
+  String get notificationsYesterday => 'Hier';
+
+  @override
+  String get notificationsMarkRead => 'Tout marquer comme lu';
+
+  @override
+  String get notificationsUnread => 'Non lu';
+
+  @override
+  String get desktopNotifications => 'Notifications du bureau';
+
+  @override
+  String notificationRepeat(int count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.decimalPattern(localeName);
+    final String countString = countNumberFormat.format(count);
+
+    return 'x$countString';
+  }
 }
