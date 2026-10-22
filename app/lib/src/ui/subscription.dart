@@ -76,6 +76,17 @@ class SubscriptionScreen extends StatelessWidget {
     final hours = chosen.hasUpdateInterval() ? chosen.updateInterval.seconds.toInt() ~/ 3600 : 0;
     return Screen(
       title: state.displayName,
+      actions: [
+        Tooltip(
+          message: s.qrShareTitle,
+          child: RoundButton(
+            key: ValueKey('share-subscription-sheet-$id'),
+            icon: Symbols.qr_code_rounded,
+            label: s.qrShareTitle,
+            onTap: () => unawaited(shareSubscriptionQr(context, state)),
+          ),
+        ),
+      ],
       children: [
         Group(
           children: [

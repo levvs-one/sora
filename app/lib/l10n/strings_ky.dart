@@ -1346,13 +1346,7 @@ class SKy extends S {
   String get qrCopyLink => 'Шилтемени көчүрүү';
 
   @override
-  String get qrShowLink => 'Шилтемени көрсөтүү';
-
-  @override
-  String get qrHideLink => 'Шилтемени жашыруу';
-
-  @override
-  String get qrWarning => 'Бул QR код туташуу чоо-жайын камтыйт. Бейтааныш адамдарга көрсөтпөңүз.';
+  String get qrWarning => 'Кодду ишенген адамдарга гана көрсөтүңүз.';
 
   @override
   String get qrScanHint => 'QR коду бар скриншотту же сүрөттү тандаңыз, же шилтемени коюңуз';

@@ -1348,13 +1348,7 @@ class SPt extends S {
   String get qrCopyLink => 'Copiar link';
 
   @override
-  String get qrShowLink => 'Mostrar link';
-
-  @override
-  String get qrHideLink => 'Ocultar link';
-
-  @override
-  String get qrWarning => 'Este código QR contém detalhes de conexão. Não mostre para estranhos.';
+  String get qrWarning => 'Compartilhe o código apenas com pessoas de confiança.';
 
   @override
   String get qrScanHint => 'Escolha uma captura ou foto com um código QR, ou cole um link';

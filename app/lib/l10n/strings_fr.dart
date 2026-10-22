@@ -1352,13 +1352,7 @@ class SFr extends S {
   String get qrCopyLink => 'Copier le lien';
 
   @override
-  String get qrShowLink => 'Afficher le lien';
-
-  @override
-  String get qrHideLink => 'Masquer le lien';
-
-  @override
-  String get qrWarning => 'Ce code QR contient les détails de connexion. Ne le montrez pas à des étrangers.';
+  String get qrWarning => 'Ne partagez ce code qu’avec des personnes de confiance.';
 
   @override
   String get qrScanHint => 'Choisissez une capture ou une photo avec un code QR, ou collez un lien';

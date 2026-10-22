@@ -1353,13 +1353,7 @@ class SIt extends S {
   String get qrCopyLink => 'Copia collegamento';
 
   @override
-  String get qrShowLink => 'Mostra collegamento';
-
-  @override
-  String get qrHideLink => 'Nascondi collegamento';
-
-  @override
-  String get qrWarning => 'Questo codice QR contiene i dettagli della connessione. Non mostrarlo agli sconosciuti.';
+  String get qrWarning => 'Condividi il codice solo con persone fidate.';
 
   @override
   String get qrScanHint => 'Scegli uno screenshot o una foto con un codice QR, oppure incolla un link';

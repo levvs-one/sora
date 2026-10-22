@@ -1347,13 +1347,7 @@ class SVi extends S {
   String get qrCopyLink => 'Sao chép liên kết';
 
   @override
-  String get qrShowLink => 'Hiển thị liên kết';
-
-  @override
-  String get qrHideLink => 'Ẩn liên kết';
-
-  @override
-  String get qrWarning => 'Mã QR này chứa chi tiết kết nối. Đừng cho người lạ xem.';
+  String get qrWarning => 'Chỉ chia sẻ mã này với người bạn tin tưởng.';
 
   @override
   String get qrScanHint => 'Chọn ảnh chụp màn hình hoặc ảnh có mã QR, hoặc dán liên kết';

@@ -2565,22 +2565,10 @@ abstract class S {
   /// **'Скопировать ссылку'**
   String get qrCopyLink;
 
-  /// No description provided for @qrShowLink.
-  ///
-  /// In ru, this message translates to:
-  /// **'Показать ссылку'**
-  String get qrShowLink;
-
-  /// No description provided for @qrHideLink.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скрыть ссылку'**
-  String get qrHideLink;
-
   /// No description provided for @qrWarning.
   ///
   /// In ru, this message translates to:
-  /// **'QR-код содержит данные для подключения. Не показывайте его посторонним.'**
+  /// **'Показывайте код только тем, кому доверяете.'**
   String get qrWarning;
 
   /// No description provided for @qrScanHint.

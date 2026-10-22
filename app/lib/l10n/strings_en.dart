@@ -1333,13 +1333,7 @@ class SEn extends S {
   String get qrCopyLink => 'Copy link';
 
   @override
-  String get qrShowLink => 'Show link';
-
-  @override
-  String get qrHideLink => 'Hide link';
-
-  @override
-  String get qrWarning => 'This QR code contains connection details. Do not show it to strangers.';
+  String get qrWarning => 'Only share this code with people you trust.';
 
   @override
   String get qrScanHint => 'Choose a screenshot or photo with a QR code, or paste a link';

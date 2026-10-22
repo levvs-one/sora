@@ -1323,13 +1323,7 @@ class SKo extends S {
   String get qrCopyLink => '링크 복사';
 
   @override
-  String get qrShowLink => '링크 표시';
-
-  @override
-  String get qrHideLink => '링크 숨기기';
-
-  @override
-  String get qrWarning => '이 QR 코드에는 연결 세부정보가 포함되어 있습니다. 낯선 사람에게 보여주지 마세요.';
+  String get qrWarning => '신뢰하는 사람에게만 코드를 공유하세요.';
 
   @override
   String get qrScanHint => 'QR 코드가 있는 스크린샷이나 사진을 선택하거나 링크를 붙여 넣으세요';

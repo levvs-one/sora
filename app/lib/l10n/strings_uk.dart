@@ -1358,13 +1358,7 @@ class SUk extends S {
   String get qrCopyLink => 'Копіювати посилання';
 
   @override
-  String get qrShowLink => 'Показати посилання';
-
-  @override
-  String get qrHideLink => 'Приховати посилання';
-
-  @override
-  String get qrWarning => 'Цей код QR містить деталі підключення. Не показуйте його стороннім.';
+  String get qrWarning => 'Показуйте код лише тим, кому довіряєте.';
 
   @override
   String get qrScanHint => 'Виберіть знімок екрана або фото з QR-кодом чи вставте посилання';

@@ -1350,13 +1350,7 @@ class SRu extends S {
   String get qrCopyLink => 'Скопировать ссылку';
 
   @override
-  String get qrShowLink => 'Показать ссылку';
-
-  @override
-  String get qrHideLink => 'Скрыть ссылку';
-
-  @override
-  String get qrWarning => 'QR-код содержит данные для подключения. Не показывайте его посторонним.';
+  String get qrWarning => 'Показывайте код только тем, кому доверяете.';
 
   @override
   String get qrScanHint => 'Выберите снимок экрана или фото с QR-кодом либо вставьте ссылку';

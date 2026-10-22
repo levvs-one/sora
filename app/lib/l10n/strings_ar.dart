@@ -1352,13 +1352,7 @@ class SAr extends S {
   String get qrCopyLink => 'نسخ الرابط';
 
   @override
-  String get qrShowLink => 'إظهار الرابط';
-
-  @override
-  String get qrHideLink => 'إخفاء الرابط';
-
-  @override
-  String get qrWarning => 'يحتوي هذا الرمز QR على تفاصيل الاتصال. لا تظهر ذلك للغرباء.';
+  String get qrWarning => 'لا تشارك الرمز إلا مع من تثق بهم.';
 
   @override
   String get qrScanHint => 'اختر لقطة شاشة أو صورة تحتوي على رمز QR، أو الصق رابطًا';

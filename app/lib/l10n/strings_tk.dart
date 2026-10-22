@@ -1345,13 +1345,7 @@ class STk extends S {
   String get qrCopyLink => 'Baglanyşygy göçüriň';
 
   @override
-  String get qrShowLink => 'Baglanyşyk görkeziň';
-
-  @override
-  String get qrHideLink => 'Baglanyşygy gizläň';
-
-  @override
-  String get qrWarning => 'Bu QR kody birikme maglumatlaryny öz içine alýar. Nätanyş adamlara görkezmäň.';
+  String get qrWarning => 'Kody diňe ynanýan adamlaryňyz bilen paýlaşyň.';
 
   @override
   String get qrScanHint => 'QR kodly ekran suratyny ýa-da suraty saýlaň, ýa-da salgyny goýuň';

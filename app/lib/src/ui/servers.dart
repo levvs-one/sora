@@ -176,7 +176,6 @@ class _ServersScreenState extends State<ServersScreen> {
     final slivers = <Widget>[
       SliverToBoxAdapter(child: Column(children: [toolbar, const SizedBox(height: 8), search])),
       SliverToBoxAdapter(child: automatic),
-      const SliverToBoxAdapter(child: _CustomServersCard()),
       // Typing filters the subscription sections only: the toolbar, search
       // field and custom card keep their state instead of the whole screen
       // rebuilding on every keystroke.
@@ -252,6 +251,7 @@ class _ServersScreenState extends State<ServersScreen> {
           return SliverMainAxisGroup(slivers: sections);
         },
       ),
+      const SliverToBoxAdapter(child: _CustomServersCard()),
     ];
     if (!widget.scrollable) {
       return SliverPadding(
@@ -633,6 +633,15 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     onTap: () => unawaited(sora.refreshSubscription(state.settings.id)),
                   ),
                 ),
+              Tooltip(
+                message: s.qrShareTitle,
+                child: RoundButton(
+                  key: ValueKey('share-subscription-${state.settings.id}'),
+                  icon: Symbols.qr_code_rounded,
+                  label: s.qrShareTitle,
+                  onTap: () => unawaited(shareSubscriptionQr(context, state)),
+                ),
+              ),
               MenuAnchor(
                 alignmentOffset: const Offset(-150, 4),
                 menuChildren: [
@@ -641,7 +650,6 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     _item(context, s.providerWebsite, () => unawaited(openLink(context, info.webPageUrl))),
                   if (info.supportUrl.isNotEmpty)
                     _item(context, s.support, () => unawaited(openLink(context, info.supportUrl))),
-                  _item(context, s.qrShareTitle, () => unawaited(_shareQr(context, state))),
                   _item(
                     context,
                     s.subscriptionSettings,
@@ -707,7 +715,7 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
 
 /// Fetches the subscription link and shows it as a QR code. Failures are
 /// reported through the standard failure pipeline; nothing raw is shown.
-Future<void> _shareQr(BuildContext context, SubscriptionState state) async {
+Future<void> shareSubscriptionQr(BuildContext context, SubscriptionState state) async {
   final sora = SoraScope.read(context);
   final url = await sora.fetchSubscriptionLink(state.settings.id);
   if (url != null && context.mounted) {

@@ -1343,13 +1343,7 @@ class SBn extends S {
   String get qrCopyLink => 'কপি লিঙ্ক';
 
   @override
-  String get qrShowLink => 'লিঙ্ক দেখান';
-
-  @override
-  String get qrHideLink => 'লিঙ্ক লুকান';
-
-  @override
-  String get qrWarning => 'এই QR কোডটিতে সংযোগের বিবরণ রয়েছে। অপরিচিতদের দেখাবেন না।';
+  String get qrWarning => 'শুধু বিশ্বস্ত ব্যক্তিদের কোডটি দেখান।';
 
   @override
   String get qrScanHint => 'QR কোডসহ একটি স্ক্রিনশট বা ছবি বেছে নিন, অথবা একটি লিংক পেস্ট করুন';

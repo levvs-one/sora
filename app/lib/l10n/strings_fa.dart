@@ -1345,13 +1345,7 @@ class SFa extends S {
   String get qrCopyLink => 'پیوند را کپی کنید';
 
   @override
-  String get qrShowLink => 'نمایش پیوند';
-
-  @override
-  String get qrHideLink => 'پنهان کردن پیوند';
-
-  @override
-  String get qrWarning => 'این کد QR حاوی جزئیات اتصال است. آن را به غریبه ها نشان ندهید.';
+  String get qrWarning => 'کد را فقط با افراد مورد اعتماد به اشتراک بگذارید.';
 
   @override
   String get qrScanHint => 'یک اسکرین‌شات یا عکس دارای کد QR انتخاب کنید یا پیوندی را جای‌گذاری کنید';

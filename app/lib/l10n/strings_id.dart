@@ -1345,13 +1345,7 @@ class SId extends S {
   String get qrCopyLink => 'Salin tautan';
 
   @override
-  String get qrShowLink => 'Tampilkan tautan';
-
-  @override
-  String get qrHideLink => 'Sembunyikan tautan';
-
-  @override
-  String get qrWarning => 'Kode QR ini berisi detail koneksi. Jangan perlihatkan kepada orang asing.';
+  String get qrWarning => 'Bagikan kode ini hanya kepada orang yang Anda percaya.';
 
   @override
   String get qrScanHint => 'Pilih tangkapan layar atau foto berisi kode QR, atau tempel tautan';

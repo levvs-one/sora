@@ -1345,13 +1345,7 @@ class SKk extends S {
   String get qrCopyLink => 'Сілтемені көшіру';
 
   @override
-  String get qrShowLink => 'Сілтемені көрсету';
-
-  @override
-  String get qrHideLink => 'Сілтемені жасыру';
-
-  @override
-  String get qrWarning => 'Бұл QR кодында қосылым мәліметтері бар. Оны бейтаныс адамдарға көрсетпеңіз.';
+  String get qrWarning => 'Кодты тек сенімді адамдармен бөлісіңіз.';
 
   @override
   String get qrScanHint => 'QR коды бар скриншотты не фотоны таңдаңыз немесе сілтемені қойыңыз';
