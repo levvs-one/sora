@@ -1399,21 +1399,6 @@ class SDe extends S {
   String get dnsActual => 'Beobachtet';
 
   @override
-  String get sortBy => 'Sortieren nach';
-
-  @override
-  String get sortSubscription => 'Wie im Abonnement';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Geschwindigkeit';
-
-  @override
-  String get sortName => 'Name';
-
-  @override
   String get measureSpeed => 'Geschwindigkeit messen';
 
   @override

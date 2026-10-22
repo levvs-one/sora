@@ -2319,14 +2319,6 @@ class Sora extends ChangeNotifier {
   /// Cancels an in-flight benchmark; partial results are kept.
   Future<void> cancelBenchmark() => _benchmarkCall?.cancel() ?? Future.value();
 
-  /// Compares two servers for list sorting: ping, speed, smart or name.
-  int compareServers(String a, String b, String mode) {
-    if (mode == 'name') {
-      return displayNameOf(a).toLowerCase().compareTo(displayNameOf(b).toLowerCase());
-    }
-    return compareAutoSelect(a, b, mode, latency, bandwidth, reliabilityOf: reliabilityOf);
-  }
-
   /// The server the smart auto-select ranks first right now, with the metrics
   /// behind the choice. Null when there is nothing to rank or nothing
   /// measured yet; the UI shows no "why" badge then.

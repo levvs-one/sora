@@ -1409,21 +1409,6 @@ class SPl extends S {
   String get dnsActual => 'Zaobserwowano';
 
   @override
-  String get sortBy => 'Sortuj według';
-
-  @override
-  String get sortSubscription => 'Jak w subskrypcji';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Prędkość';
-
-  @override
-  String get sortName => 'Imię';
-
-  @override
   String get measureSpeed => 'Zmierz prędkość';
 
   @override

@@ -1385,21 +1385,6 @@ class SAz extends S {
   String get dnsActual => 'Müşahidə edilmişdir';
 
   @override
-  String get sortBy => 'Sırala';
-
-  @override
-  String get sortSubscription => 'Abunəlikdəki ardıcıllıqla';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Sürət';
-
-  @override
-  String get sortName => 'Adı';
-
-  @override
   String get measureSpeed => 'Sürəti ölçün';
 
   @override

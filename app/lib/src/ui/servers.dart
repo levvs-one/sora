@@ -69,13 +69,6 @@ class _ServersScreenState extends State<ServersScreen> {
     final sora = SoraScope.of(context);
     final s = S.of(context);
     final palette = Palette.of(context);
-    final sortMode = sora.settings.serverSortMode;
-    String sortLabel(String mode) => switch (mode) {
-      'subscription' => s.sortSubscription,
-      'speed' => s.sortSpeed,
-      'name' => s.sortName,
-      _ => s.sortPing,
-    };
     final actions = [
       if (sora.probing)
         SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
@@ -93,23 +86,6 @@ class _ServersScreenState extends State<ServersScreen> {
           label: s.measureSpeed,
           onTap: sora.canBenchmark ? () => push<void>(context, const BenchmarkScreen()) : null,
         ),
-      MenuAnchor(
-        menuChildren: [
-          for (final mode in ['subscription', 'ping', 'speed', 'name'])
-            MenuItemButton(
-              onPressed: () => unawaited(sora.change((x) => x.serverSortMode = mode, replan: false)),
-              leadingIcon: sortMode == mode
-                  ? Icon(Symbols.check_rounded, size: 18, color: palette.ink)
-                  : const SizedBox(width: 18),
-              child: Text(sortLabel(mode)),
-            ),
-        ],
-        builder: (context, controller, child) => RoundButton(
-          icon: Symbols.sort_rounded,
-          label: '${s.sortBy}: ${sortLabel(sortMode)}',
-          onTap: () => controller.isOpen ? controller.close() : controller.open(),
-        ),
-      ),
       _tourTarget(
         0,
         RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
@@ -186,19 +162,9 @@ class _ServersScreenState extends State<ServersScreen> {
         valueListenable: _search,
         builder: (context, value, _) {
           final query = value.text.trim().toLowerCase();
-          // One shared cache per build pass: the sort step and the rows both
-          // need each group entry's prospective active member (see
-          // sortServerEntries), so it is computed once, not per comparison and
-          // again per row.
-          final shownCache = <Entry, OutboundSpec?>{};
           final sections = <Widget>[];
           for (final subscription in sora.subscriptions) {
-            final entries = sortServerEntries(
-              _matching(_visibleEntries(subscription, sora), query),
-              sora,
-              subscription.outbounds,
-              shownCache,
-            );
+            final entries = _matching(_visibleEntries(subscription, sora), query);
             if (query.isNotEmpty && entries.isEmpty) continue;
             sections.add(
               SliverPadding(
@@ -229,17 +195,7 @@ class _ServersScreenState extends State<ServersScreen> {
                             itemCount: entries.length,
                             itemBuilder: (_, index) {
                               final entry = entries[index];
-                              // Keyed by entry id: rows re-sort on every
-                              // probe tick and sort-mode change, and the
-                              // row's Pressable/Image state must follow the
-                              // server, not the position it lands in.
-                              return _ServerRow(
-                                key: ValueKey(entry.id),
-                                id: entry.id,
-                                name: entry.name,
-                                entry: entry,
-                                shownCache: shownCache,
-                              );
+                              return _ServerRow(key: ValueKey(entry.id), id: entry.id, name: entry.name, entry: entry);
                             },
                             separatorBuilder: (_, _) =>
                                 Divider(height: 1, thickness: 1, indent: 8, endIndent: 8, color: separator),
@@ -311,65 +267,17 @@ List<Entry> _visibleEntries(SubscriptionState subscription, Sora sora) {
     if (visible == null) continue;
     out.addAll(visible.applyRenames(override.renames));
   }
-  return out;
-}
-
-/// Sorts server entries by the user's sort mode.
-///
-/// [shownCache] optionally collects each group entry's prospective active
-/// member: the sort keys and the rows below both need it, and [pickMember]
-/// scans every member; computing it once per entry per build pass instead
-/// of once per sort comparison plus once per row removes the probe-tick
-/// hotspot (latency ticks rebuild this screen about three times a second).
-List<Entry> sortServerEntries(
-  List<Entry> entries,
-  Sora sora,
-  List<OutboundSpec> providerOrder, [
-  Map<Entry, OutboundSpec?>? shownCache,
-]) {
-  final mode = sora.settings.serverSortMode;
-  // Overrides can split a group, so use the provider positions of the
-  // remaining members rather than the order in which overrides emitted rows.
-  final positions = {for (var i = 0; i < providerOrder.length; i++) providerOrder[i].id: i};
-  final order = {
-    for (final entry in entries)
-      entry: entry.members.map((member) => positions[member.id]!).reduce((a, b) => a < b ? a : b),
+  // A split or hidden first member moves a group to its first visible member.
+  final byMember = {
+    for (final entry in out)
+      for (final member in entry.members) member.id: entry,
   };
-  int byProvider(Entry a, Entry b) => order[a]!.compareTo(order[b]!);
-  if (mode == 'subscription') {
-    entries.sort(byProvider);
-    return entries;
-  }
-  if (mode == 'name') {
-    // Sort keys are computed once per pass, not per comparison (the
-    // benchmark screen's pattern, same as the key map below): the
-    // comparator lowercased both names on every comparison, and this runs
-    // on every probe-tick rebuild. The values are pure in the entry name,
-    // so the order is identical.
-    final nameKeys = {for (final e in entries) e: e.name.toLowerCase()};
-    entries.sort((a, b) {
-      final compared = nameKeys[a]!.compareTo(nameKeys[b]!);
-      return compared != 0 ? compared : byProvider(a, b);
-    });
-    return entries;
-  }
-  // Groups are represented by the prospective active member (the same one
-  // whose metrics the row shows), so the visible numbers match the sort order.
-  // Keys are computed once per entry: keyOf used to call pickMember on every
-  // comparison (O(n log n) member scans per build).
-  String keyOf(Entry e) {
-    if (!e.isGroup) return e.id;
-    final shown = pickMember(e, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode);
-    shownCache?[e] = shown;
-    return shown.id;
-  }
-
-  final keys = {for (final e in entries) e: keyOf(e)};
-  entries.sort((a, b) {
-    final compared = sora.compareServers(keys[a]!, keys[b]!, mode);
-    return compared != 0 ? compared : byProvider(a, b);
-  });
-  return entries;
+  final emitted = <String>{};
+  return [
+    for (final member in subscription.outbounds)
+      if (byMember[member.id] case final entry?)
+        if (emitted.add(entry.id)) entry,
+  ];
 }
 
 final _flagPrefix = RegExp(r'^([\u{1F1E6}-\u{1F1FF}]{2})\s*', unicode: true);
@@ -402,7 +310,7 @@ InlineSpan serverNameSpan(String name) {
 }
 
 class _ServerRow extends StatelessWidget {
-  const _ServerRow({super.key, required this.id, required this.name, this.entry, this.shownCache});
+  const _ServerRow({super.key, required this.id, required this.name, this.entry});
 
   final String id;
   final String name;
@@ -410,23 +318,17 @@ class _ServerRow extends StatelessWidget {
   /// Group data when multiple servers share a name.
   final Entry? entry;
 
-  /// Prospective active members computed during sorting in the same build
-  /// pass; consulted before recomputing [pickMember].
-  final Map<Entry, OutboundSpec?>? shownCache;
-
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context);
     final palette = Palette.of(context);
     final s = S.of(context);
     final chosen = sora.selected == id;
-    // Use the prospective active member's latency for a group row. The same
-    // member supplies the wire-level flow shown in the badge below. The sort
-    // step already computed it for this build pass (see sortServerEntries).
-    final OutboundSpec? shown = entry == null || !entry!.isGroup
+    final OutboundSpec? shown = entry == null
         ? null
-        : shownCache?[entry!] ??
-              pickMember(entry!, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode);
+        : entry!.isGroup
+        ? pickMember(entry!, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode)
+        : entry!.members.single;
     final measuredId = shown?.id ?? id;
     final measured = sora.latency.containsKey(measuredId);
     final ms = sora.latency[measuredId];

@@ -1366,21 +1366,6 @@ class SKo extends S {
   String get dnsActual => '관찰됨';
 
   @override
-  String get sortBy => '정렬 기준';
-
-  @override
-  String get sortSubscription => '구독 순서대로';
-
-  @override
-  String get sortPing => '핑';
-
-  @override
-  String get sortSpeed => '속도';
-
-  @override
-  String get sortName => '이름';
-
-  @override
   String get measureSpeed => '속도 측정';
 
   @override

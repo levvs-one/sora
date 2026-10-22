@@ -1382,21 +1382,6 @@ class SUr extends S {
   String get dnsActual => 'مشاہدہ کیا گیا۔';
 
   @override
-  String get sortBy => 'ترتیب دیں۔';
-
-  @override
-  String get sortSubscription => 'سبسکرپشن کی ترتیب میں';
-
-  @override
-  String get sortPing => 'پنگ';
-
-  @override
-  String get sortSpeed => 'رفتار';
-
-  @override
-  String get sortName => 'نام';
-
-  @override
   String get measureSpeed => 'رفتار کی پیمائش کریں۔';
 
   @override

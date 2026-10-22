@@ -1385,21 +1385,6 @@ class STr extends S {
   String get dnsActual => 'Gözlemlendi';
 
   @override
-  String get sortBy => 'Sıralama ölçütü';
-
-  @override
-  String get sortSubscription => 'Abonelikteki sırayla';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Hız';
-
-  @override
-  String get sortName => 'Ad';
-
-  @override
   String get measureSpeed => 'Hızı ölç';
 
   @override

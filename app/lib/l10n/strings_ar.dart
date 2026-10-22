@@ -1405,21 +1405,6 @@ class SAr extends S {
   String get dnsActual => 'ملاحظ';
 
   @override
-  String get sortBy => 'الترتيب حسب';
-
-  @override
-  String get sortSubscription => 'حسب ترتيب الاشتراك';
-
-  @override
-  String get sortPing => 'بينغ';
-
-  @override
-  String get sortSpeed => 'السرعة';
-
-  @override
-  String get sortName => 'الاسم';
-
-  @override
   String get measureSpeed => 'قياس السرعة';
 
   @override

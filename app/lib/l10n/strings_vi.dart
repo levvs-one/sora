@@ -1386,21 +1386,6 @@ class SVi extends S {
   String get dnsActual => 'Đã quan sát';
 
   @override
-  String get sortBy => 'Sắp xếp theo';
-
-  @override
-  String get sortSubscription => 'Theo thứ tự đăng ký';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Tốc độ';
-
-  @override
-  String get sortName => 'Tên';
-
-  @override
   String get measureSpeed => 'Đo tốc độ';
 
   @override

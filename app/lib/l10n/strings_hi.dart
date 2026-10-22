@@ -1384,21 +1384,6 @@ class SHi extends S {
   String get dnsActual => 'अवलोकन किया गया';
 
   @override
-  String get sortBy => 'क्रमबद्ध करें';
-
-  @override
-  String get sortSubscription => 'सदस्यता के क्रम में';
-
-  @override
-  String get sortPing => 'पिंग';
-
-  @override
-  String get sortSpeed => 'गति';
-
-  @override
-  String get sortName => 'नाम';
-
-  @override
   String get measureSpeed => 'गति मापें';
 
   @override

@@ -1405,21 +1405,6 @@ class SBe extends S {
   String get dnsActual => 'Назіраецца';
 
   @override
-  String get sortBy => 'Сартаваць па';
-
-  @override
-  String get sortSubscription => 'Як у падпісцы';
-
-  @override
-  String get sortPing => 'Пінг';
-
-  @override
-  String get sortSpeed => 'Хуткасць';
-
-  @override
-  String get sortName => 'Імя';
-
-  @override
   String get measureSpeed => 'Вымераць хуткасць';
 
   @override

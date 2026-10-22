@@ -1387,21 +1387,6 @@ class STg extends S {
   String get dnsActual => 'мушохида карда шуд';
 
   @override
-  String get sortBy => 'Мураттабсозӣ аз рӯйи';
-
-  @override
-  String get sortSubscription => 'Бо тартиби обуна';
-
-  @override
-  String get sortPing => 'Пинг';
-
-  @override
-  String get sortSpeed => 'Суръат';
-
-  @override
-  String get sortName => 'Ном';
-
-  @override
   String get measureSpeed => 'Суръатро чен кунед';
 
   @override

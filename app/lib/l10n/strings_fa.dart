@@ -1385,21 +1385,6 @@ class SFa extends S {
   String get dnsActual => 'مشاهده شد';
 
   @override
-  String get sortBy => 'مرتب سازی بر اساس';
-
-  @override
-  String get sortSubscription => 'به ترتیب اشتراک';
-
-  @override
-  String get sortPing => 'پینگ';
-
-  @override
-  String get sortSpeed => 'سرعت';
-
-  @override
-  String get sortName => 'نام';
-
-  @override
   String get measureSpeed => 'اندازه گیری سرعت';
 
   @override

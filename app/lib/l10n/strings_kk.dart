@@ -1384,21 +1384,6 @@ class SKk extends S {
   String get dnsActual => 'Бақыланады';
 
   @override
-  String get sortBy => 'Сұрыптау';
-
-  @override
-  String get sortSubscription => 'Жазылымдағы ретпен';
-
-  @override
-  String get sortPing => 'Пинг';
-
-  @override
-  String get sortSpeed => 'Жылдамдық';
-
-  @override
-  String get sortName => 'Аты';
-
-  @override
   String get measureSpeed => 'Жылдамдықты өлшеңіз';
 
   @override

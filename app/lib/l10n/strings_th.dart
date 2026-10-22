@@ -1380,21 +1380,6 @@ class STh extends S {
   String get dnsActual => 'สังเกตแล้ว';
 
   @override
-  String get sortBy => 'เรียงตาม';
-
-  @override
-  String get sortSubscription => 'ตามลำดับในรายการสมัครรับ';
-
-  @override
-  String get sortPing => 'ปิง';
-
-  @override
-  String get sortSpeed => 'ความเร็ว';
-
-  @override
-  String get sortName => 'ชื่อ';
-
-  @override
   String get measureSpeed => 'วัดความเร็ว';
 
   @override

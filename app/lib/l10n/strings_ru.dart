@@ -1401,21 +1401,6 @@ class SRu extends S {
   String get dnsActual => 'Обнаружено';
 
   @override
-  String get sortBy => 'Сортировать';
-
-  @override
-  String get sortSubscription => 'Как в подписке';
-
-  @override
-  String get sortPing => 'Пинг';
-
-  @override
-  String get sortSpeed => 'Скорость';
-
-  @override
-  String get sortName => 'Имя';
-
-  @override
   String get measureSpeed => 'Замерить скорость';
 
   @override

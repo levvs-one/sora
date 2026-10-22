@@ -1404,21 +1404,6 @@ class SUk extends S {
   String get dnsActual => 'Дотримується';
 
   @override
-  String get sortBy => 'Сортувати за';
-
-  @override
-  String get sortSubscription => 'Як у підписці';
-
-  @override
-  String get sortPing => 'Пінг';
-
-  @override
-  String get sortSpeed => 'Швидкість';
-
-  @override
-  String get sortName => 'Ім\'я';
-
-  @override
   String get measureSpeed => 'Виміряйте швидкість';
 
   @override

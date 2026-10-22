@@ -1387,21 +1387,6 @@ class SPt extends S {
   String get dnsActual => 'Observado';
 
   @override
-  String get sortBy => 'Classificar por';
-
-  @override
-  String get sortSubscription => 'Na ordem da assinatura';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Velocidade';
-
-  @override
-  String get sortName => 'Nome';
-
-  @override
   String get measureSpeed => 'Medir velocidade';
 
   @override

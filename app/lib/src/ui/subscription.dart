@@ -208,8 +208,10 @@ class _OverrideSection extends StatelessWidget {
     if (state == null) return const SizedBox.shrink();
     final override = sora.overrides.of(subscriptionId);
     final names = {for (final o in state.outbounds) o.id: o.displayName};
-    final edited = {...override.renames.keys, ...override.hidden}.where(names.containsKey).toList()
-      ..sort((a, b) => names[a]!.toLowerCase().compareTo(names[b]!.toLowerCase()));
+    final edited = [
+      for (final server in state.outbounds)
+        if (override.renames.containsKey(server.id) || override.hidden.contains(server.id)) server.id,
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

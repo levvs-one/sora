@@ -1396,21 +1396,6 @@ class SFr extends S {
   String get dnsActual => 'Observé';
 
   @override
-  String get sortBy => 'Trier par';
-
-  @override
-  String get sortSubscription => 'Dans l’ordre de l’abonnement';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Vitesse';
-
-  @override
-  String get sortName => 'Nom';
-
-  @override
   String get measureSpeed => 'Mesurer la vitesse';
 
   @override

@@ -1386,21 +1386,6 @@ class SKy extends S {
   String get dnsActual => 'байкалган';
 
   @override
-  String get sortBy => 'Сорттоо боюнча';
-
-  @override
-  String get sortSubscription => 'Жазылуудагы тартипте';
-
-  @override
-  String get sortPing => 'Пинг';
-
-  @override
-  String get sortSpeed => 'Ылдамдык';
-
-  @override
-  String get sortName => 'Аты-жөнү';
-
-  @override
   String get measureSpeed => 'Ылдамдыкты өлчөө';
 
   @override

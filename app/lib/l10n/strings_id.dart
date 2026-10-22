@@ -1386,21 +1386,6 @@ class SId extends S {
   String get dnsActual => 'Diamati';
 
   @override
-  String get sortBy => 'Urutkan berdasarkan';
-
-  @override
-  String get sortSubscription => 'Sesuai urutan langganan';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Kecepatan';
-
-  @override
-  String get sortName => 'Nama';
-
-  @override
   String get measureSpeed => 'Ukur kecepatan';
 
   @override

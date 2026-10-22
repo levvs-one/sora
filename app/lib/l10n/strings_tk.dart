@@ -1383,21 +1383,6 @@ class STk extends S {
   String get dnsActual => 'Syn edildi';
 
   @override
-  String get sortBy => 'tertipläň';
-
-  @override
-  String get sortSubscription => 'Abunadaky tertipde';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Tizlik';
-
-  @override
-  String get sortName => 'Ady';
-
-  @override
   String get measureSpeed => 'Tizligi ölçäň';
 
   @override

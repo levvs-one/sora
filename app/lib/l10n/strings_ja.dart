@@ -1367,21 +1367,6 @@ class SJa extends S {
   String get dnsActual => '観察された';
 
   @override
-  String get sortBy => '並べ替え順';
-
-  @override
-  String get sortSubscription => 'サブスクリプションの順序';
-
-  @override
-  String get sortPing => 'ピン';
-
-  @override
-  String get sortSpeed => 'スピード';
-
-  @override
-  String get sortName => '名前';
-
-  @override
   String get measureSpeed => '速度を測定する';
 
   @override

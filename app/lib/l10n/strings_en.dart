@@ -1382,21 +1382,6 @@ class SEn extends S {
   String get dnsActual => 'Observed';
 
   @override
-  String get sortBy => 'Sort by';
-
-  @override
-  String get sortSubscription => 'As in subscription';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Speed';
-
-  @override
-  String get sortName => 'Name';
-
-  @override
   String get measureSpeed => 'Measure speed';
 
   @override

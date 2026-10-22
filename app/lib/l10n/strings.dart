@@ -2655,36 +2655,6 @@ abstract class S {
   /// **'Обнаружено'**
   String get dnsActual;
 
-  /// No description provided for @sortBy.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сортировать'**
-  String get sortBy;
-
-  /// No description provided for @sortSubscription.
-  ///
-  /// In ru, this message translates to:
-  /// **'Как в подписке'**
-  String get sortSubscription;
-
-  /// No description provided for @sortPing.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пинг'**
-  String get sortPing;
-
-  /// No description provided for @sortSpeed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скорость'**
-  String get sortSpeed;
-
-  /// No description provided for @sortName.
-  ///
-  /// In ru, this message translates to:
-  /// **'Имя'**
-  String get sortName;
-
   /// No description provided for @measureSpeed.
   ///
   /// In ru, this message translates to:

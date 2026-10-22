@@ -1384,21 +1384,6 @@ class SHy extends S {
   String get dnsActual => 'Դիտարկված';
 
   @override
-  String get sortBy => 'Դասավորել ըստ';
-
-  @override
-  String get sortSubscription => 'Բաժանորդագրության հերթականությամբ';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Արագություն';
-
-  @override
-  String get sortName => 'Անուն';
-
-  @override
   String get measureSpeed => 'Չափել արագությունը';
 
   @override

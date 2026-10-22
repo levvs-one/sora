@@ -1394,21 +1394,6 @@ class SEs extends S {
   String get dnsActual => 'Observado';
 
   @override
-  String get sortBy => 'Ordenar por';
-
-  @override
-  String get sortSubscription => 'Como en la suscripción';
-
-  @override
-  String get sortPing => 'Hacer ping';
-
-  @override
-  String get sortSpeed => 'Velocidad';
-
-  @override
-  String get sortName => 'Nombre';
-
-  @override
   String get measureSpeed => 'Medir velocidad';
 
   @override

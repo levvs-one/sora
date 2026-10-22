@@ -1398,21 +1398,6 @@ class SIt extends S {
   String get dnsActual => 'Osservato';
 
   @override
-  String get sortBy => 'Ordina per';
-
-  @override
-  String get sortSubscription => 'Come nell’abbonamento';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Velocità';
-
-  @override
-  String get sortName => 'Nome';
-
-  @override
   String get measureSpeed => 'Misurare la velocità';
 
   @override

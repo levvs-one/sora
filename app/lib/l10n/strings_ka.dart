@@ -1386,21 +1386,6 @@ class SKa extends S {
   String get dnsActual => 'დაფიქსირდა';
 
   @override
-  String get sortBy => 'დალაგება';
-
-  @override
-  String get sortSubscription => 'გამოწერის თანმიმდევრობით';
-
-  @override
-  String get sortPing => 'პინგი';
-
-  @override
-  String get sortSpeed => 'სიჩქარე';
-
-  @override
-  String get sortName => 'სახელი';
-
-  @override
   String get measureSpeed => 'გაზომეთ სიჩქარე';
 
   @override

@@ -1365,21 +1365,6 @@ class SZh extends S {
   String get dnsActual => '实际';
 
   @override
-  String get sortBy => '排序方式';
-
-  @override
-  String get sortSubscription => '按订阅顺序';
-
-  @override
-  String get sortPing => '延迟';
-
-  @override
-  String get sortSpeed => '速度';
-
-  @override
-  String get sortName => '名称';
-
-  @override
   String get measureSpeed => '测量速度';
 
   @override
@@ -3392,21 +3377,6 @@ class SZhHans extends SZh {
   String get dnsActual => '实际';
 
   @override
-  String get sortBy => '排序方式';
-
-  @override
-  String get sortSubscription => '按订阅顺序';
-
-  @override
-  String get sortPing => '延迟';
-
-  @override
-  String get sortSpeed => '速度';
-
-  @override
-  String get sortName => '名称';
-
-  @override
   String get measureSpeed => '测量速度';
 
   @override
@@ -5417,21 +5387,6 @@ class SZhHant extends SZh {
 
   @override
   String get dnsActual => '實際';
-
-  @override
-  String get sortBy => '排序方式';
-
-  @override
-  String get sortSubscription => '依訂閱順序';
-
-  @override
-  String get sortPing => '延遲';
-
-  @override
-  String get sortSpeed => '速度';
-
-  @override
-  String get sortName => '名稱';
 
   @override
   String get measureSpeed => '測量速度';

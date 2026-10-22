@@ -1389,21 +1389,6 @@ class SUz extends S {
   String get dnsActual => 'Kuzatilgan';
 
   @override
-  String get sortBy => 'Saralash';
-
-  @override
-  String get sortSubscription => 'Obunadagi tartibda';
-
-  @override
-  String get sortPing => 'Ping';
-
-  @override
-  String get sortSpeed => 'Tezlik';
-
-  @override
-  String get sortName => 'Nomi';
-
-  @override
   String get measureSpeed => 'Tezlikni o\'lchash';
 
   @override

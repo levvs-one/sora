@@ -650,20 +650,6 @@ void main() {
             await settleLive();
             await tester.ensureVisible(share);
             await save('subscription-share-header', language, theme);
-            await tester.tap(
-              find.byWidgetPredicate((w) => w is RoundButton && (w.label?.startsWith(s.sortBy) ?? false)),
-            );
-            await tester.pumpAndSettle();
-            expect(find.text(s.sortSubscription), findsOneWidget);
-            expect(
-              tester.getTopLeft(find.text(s.sortSubscription)).dy,
-              lessThan(tester.getTopLeft(find.text(s.sortPing)).dy),
-            );
-            await save('subscription-sort-menu', language, theme);
-            await tester.tap(
-              find.byWidgetPredicate((w) => w is RoundButton && (w.label?.startsWith(s.sortBy) ?? false)),
-            );
-            await tester.pumpAndSettle();
             await tester.tap(share);
             await settleLive();
             expect(find.byType(QrShareScreen), findsOneWidget);
