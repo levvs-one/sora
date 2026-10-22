@@ -11,6 +11,10 @@ void main() {
   testWidgets('a shared QR code reads back from a PNG', (tester) async {
     for (final link in [
       'https://sub.example.com/s/3f9a?name=Travel',
+      'mieru://CjoKCUNvbW11bml0eRIZCgVhbGljZRIQcHJpdmF0ZS1wYXNzd29yZBoSCgkxMjcuMC4wLjEaBQi7AxAC',
+      'mierus://alice:password@example.com?profile=Community&port=443&protocol=TCP',
+      'naive+https://alice:password@example.com:443/#Community',
+      'naive+quic://alice:password@example.com:443/#Community',
       'olcrtc://jitsi?datachannel@https://meet.example.org/myroom#'
           'd823fa01cb3e0609b67322f7cf984c4ee2e4ce2e294936fc24ef38c9e59f4799'
           r'$RU / olc free sub',
