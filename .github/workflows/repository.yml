@@ -205,6 +205,11 @@ jobs:
         run: |
           if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
+      - name: Diagnose the worker memory budget
+        working-directory: core
+        shell: bash
+        continue-on-error: true
+        run: go test -v -count=15 -run 'TestJavaScriptProcess/memory_budget' ./ext 2>&1 | grep -E 'RUN|PASS|FAIL|stopped after|javascript_test'
       - name: Test the core on Windows
         working-directory: core
         shell: bash
