@@ -209,6 +209,10 @@ jobs:
         working-directory: core
         shell: bash
         run: go test ./...
+      - name: Repeat extension worker resource budgets
+        working-directory: core
+        shell: bash
+        run: go test -count=20 -run 'TestJavaScriptProcess/(memory|CPU)_budget' ./ext
       - name: Build the core
         working-directory: core
         shell: bash

@@ -18,12 +18,12 @@ import (
 	"github.com/dop251/goja/parser"
 )
 
-// Worker budgets bound committed memory, CPU time, wall time and source size.
+// Worker budgets bound process memory, CPU time, wall time and source size.
 const (
 	WorkerMemoryBytes = 128 << 20
 	// workerOSMemoryBytes is the hard OS backstop. The Go runtime maps heap
 	// in 64 MiB arenas, so an OS limit at the budget itself fails runtime
-	// start-up on some kernels; watchWorkerHeap enforces the budget instead.
+	// start-up on some kernels; the parent enforces the budget instead.
 	workerOSMemoryBytes = 4 * WorkerMemoryBytes
 	WorkerCPUSeconds    = 2
 	WorkerWallTimeout   = 30 * time.Second
@@ -54,27 +54,98 @@ func RunJavaScriptProcess(ctx context.Context, source string, event string, call
 	return runJavaScriptCommand(ctx, cmd, source, event, call)
 }
 
-func runJavaScriptCommand(ctx context.Context, cmd *exec.Cmd, source string, event string, call WorkerCall) error {
+func runJavaScriptCommand(ctx context.Context, cmd *exec.Cmd, source string, event string, call WorkerCall) (result error) {
 	if len(source) > MaxWorkerSource {
 		return errors.New("worker source exceeds 1 MiB")
 	}
-	input, err := cmd.StdinPipe()
+	ctx, cancel := context.WithCancelCause(ctx)
+	defer cancel(nil)
+	inputReader, input, err := os.Pipe()
 	if err != nil {
 		return err
 	}
+	defer func() { _ = inputReader.Close() }()
 	defer func() { _ = input.Close() }()
-	output, err := cmd.StdoutPipe()
+	output, outputWriter, err := os.Pipe()
 	if err != nil {
 		return err
 	}
-	// OOM dumps can be large and carry script data; only the first line of
-	// a Go runtime failure is kept, which names the cause and nothing else.
-	fatal := &runtimeFailure{}
-	cmd.Stderr = fatal
-	if err = cmd.Start(); err != nil {
+	defer func() { _ = output.Close() }()
+	defer func() { _ = outputWriter.Close() }()
+	stderr, stderrWriter, err := os.Pipe()
+	if err != nil {
 		return err
 	}
-	defer func() { _ = cmd.Process.Kill(); _ = cmd.Wait() }()
+	defer func() { _ = stderr.Close() }()
+	defer func() { _ = stderrWriter.Close() }()
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = inputReader, outputWriter, stderrWriter
+	worker, err := startWorkerCommand(cmd)
+	if err != nil {
+		return err
+	}
+	defer worker.close()
+	_ = inputReader.Close()
+	_ = outputWriter.Close()
+	_ = stderrWriter.Close()
+	// Drain even a fatal runtime dump so pipe capacity cannot delay exit.
+	fatal := &runtimeFailure{}
+	stderrDone := make(chan struct{})
+	go func() { _, _ = io.Copy(fatal, stderr); close(stderrDone) }()
+	stop := make(chan struct{})
+	monitored := make(chan error, 1)
+	go func() { monitored <- monitorWorker(ctx, worker, stop, cancel) }()
+	defer func() {
+		close(stop)
+		budgetErr := <-monitored
+		if final, err := worker.usage(); budgetErr == nil {
+			if errors.Is(err, errWorkerMemoryBudget) || errors.Is(err, errWorkerCPUBudget) {
+				budgetErr = err
+			} else if err == nil && final.memory > WorkerMemoryBytes {
+				budgetErr = errWorkerMemoryBudget
+			} else if err == nil && final.cpu >= WorkerCPUSeconds*time.Second {
+				budgetErr = errWorkerCPUBudget
+			}
+		}
+		_ = worker.process.Kill()
+		state, waitErr := worker.wait()
+		<-stderrDone
+		if budgetErr != nil {
+			result = budgetErr
+			return
+		}
+		if ctx.Err() != nil {
+			result = context.Cause(ctx)
+			return
+		}
+		if errors.Is(waitErr, errWorkerMemoryBudget) || errors.Is(waitErr, errWorkerCPUBudget) {
+			result = waitErr
+			return
+		}
+		if state != nil {
+			switch state.ExitCode() {
+			case workerHeapExceeded:
+				result = errWorkerMemoryBudget
+				return
+			case workerCPUExceeded:
+				result = errWorkerCPUBudget
+				return
+			}
+			if state.UserTime()+state.SystemTime() >= WorkerCPUSeconds*time.Second {
+				result = errWorkerCPUBudget
+				return
+			}
+		}
+		if line := fatal.line(); strings.Contains(line, "out of memory") || strings.Contains(line, "cannot allocate memory") || (strings.HasPrefix(line, "runtime: VirtualAlloc") && strings.Contains(line, "failed")) {
+			result = errWorkerMemoryBudget
+			return
+		}
+		if result == nil && waitErr != nil {
+			result = fmt.Errorf("worker process: %w", waitErr)
+			if line := fatal.line(); line != "" {
+				result = fmt.Errorf("%w: %s", result, line)
+			}
+		}
+	}()
 	enc := json.NewEncoder(input)
 	if err = enc.Encode(workerInput{Source: source, SessionKind: event}); err != nil {
 		return err
@@ -105,16 +176,53 @@ func runJavaScriptCommand(ctx context.Context, cmd *exec.Cmd, source string, eve
 	if err = scan.Err(); err != nil {
 		return err
 	}
-	if err = cmd.Wait(); err != nil {
-		if ctx.Err() != nil {
-			return ctx.Err()
+	return nil
+}
+
+var (
+	errWorkerMemoryBudget = errors.New("extension worker exceeded its memory budget")
+	errWorkerCPUBudget    = errors.New("extension worker exceeded its CPU budget")
+)
+
+type workerUsage struct {
+	memory uint64
+	cpu    time.Duration
+}
+
+type workerProcess struct {
+	process *os.Process
+	wait    func() (*os.ProcessState, error)
+	usage   func() (workerUsage, error)
+	close   func()
+}
+
+func monitorWorker(ctx context.Context, worker *workerProcess, stop <-chan struct{}, cancel context.CancelCauseFunc) error {
+	ticker := time.NewTicker(20 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		usage, err := worker.usage()
+		switch {
+		case err != nil:
+			err = fmt.Errorf("read worker resource usage: %w", err)
+		case usage.memory > WorkerMemoryBytes:
+			err = errWorkerMemoryBudget
+		case usage.cpu >= WorkerCPUSeconds*time.Second:
+			err = errWorkerCPUBudget
 		}
-		if line := fatal.line(); line != "" {
-			return fmt.Errorf("worker process: %w: %s", err, line)
+		if err != nil {
+			cancel(err)
+			_ = worker.process.Kill()
+			return err
 		}
-		return fmt.Errorf("worker process: %w", err)
+		select {
+		case <-stop:
+			return nil
+		case <-ctx.Done():
+			_ = worker.process.Kill()
+			return nil
+		case <-ticker.C:
+		}
 	}
-	return ctx.Err()
 }
 
 // JavaScriptMain is entered before service startup. The child has no store,
@@ -229,8 +337,8 @@ const (
 
 // watchWorkerBudget ends the worker once its live heap or its CPU time
 // passes the budget. The OS limits (rlimits, a Windows job) stay as the
-// backstop, but whether and how they bite differs per platform and per
-// host job nesting, and this check behaves the same everywhere.
+// backstop. The parent independently samples OS accounting because this
+// goroutine cannot run during a runtime freeze or a stuck allocation.
 func watchWorkerBudget(heap uint64, cpu time.Duration) {
 	sample := []metrics.Sample{{Name: "/memory/classes/heap/objects:bytes"}}
 	for range time.Tick(20 * time.Millisecond) {
