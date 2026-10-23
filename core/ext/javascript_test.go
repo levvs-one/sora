@@ -92,7 +92,7 @@ func TestJavaScriptProcess(t *testing.T) {
 		timeout      time.Duration
 	}{
 		{"wall timeout", "while (true) {}", 250 * time.Millisecond},
-		{"CPU budget", "while (true) {}", 8 * time.Second},
+		{"CPU budget", "while (true) {}", WorkerWallTimeout},
 		{"memory budget", "const arrays=[]; while(true) arrays.push(new Uint8Array(8*1024*1024));", 8 * time.Second},
 		{"memory budget large allocation", "const bytes = new Uint8Array(1024*1024*1024);", 8 * time.Second},
 		{"promise rejection", "Promise.reject(new Error('uncaught'));", 8 * time.Second},
@@ -116,8 +116,9 @@ func TestJavaScriptProcess(t *testing.T) {
 			if strings.HasPrefix(tc.name, "memory budget") && !errors.Is(err, errWorkerMemoryBudget) {
 				t.Fatalf("wrong memory budget error: %v", err)
 			}
-			if tc.name == "CPU budget" && time.Since(started) > 6*time.Second {
-				t.Fatal("CPU budget did not terminate the worker")
+			// CPU time excludes scheduling delays on shared CI runners.
+			if tc.name == "CPU budget" && ctx.Err() != nil {
+				t.Fatal("CPU budget only ended at wall timeout")
 			}
 			if strings.HasPrefix(tc.name, "memory budget") && ctx.Err() != nil {
 				t.Fatal("memory exhaustion only ended at wall timeout")
@@ -143,7 +144,7 @@ func TestJavaScriptParentBudget(t *testing.T) {
 		{"memory", errWorkerMemoryBudget}, {"CPU", errWorkerCPUBudget},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(t.Context(), 8*time.Second)
+			ctx, cancel := context.WithTimeout(t.Context(), WorkerWallTimeout)
 			defer cancel()
 			started := time.Now()
 			err := runJavaScriptCommand(ctx, exec.CommandContext(ctx, binary, tc.name), "", "", func(context.Context, json.RawMessage) (json.RawMessage, error) {
