@@ -94,24 +94,69 @@ func TestJavaScriptProcess(t *testing.T) {
 		{"wall timeout", "while (true) {}", 250 * time.Millisecond},
 		{"CPU budget", "while (true) {}", 8 * time.Second},
 		{"memory budget", "const arrays=[]; while(true) arrays.push(new Uint8Array(8*1024*1024));", 8 * time.Second},
+		{"memory budget large allocation", "const bytes = new Uint8Array(1024*1024*1024);", 8 * time.Second},
 		{"promise rejection", "Promise.reject(new Error('uncaught'));", 8 * time.Second},
 		{"unfinished promise", "await new Promise(() => {});", 8 * time.Second},
 		{"call budget", "for(let i=0;i<1000;i++) console.log(i);", 8 * time.Second},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.name == "memory budget large allocation" && runtime.GOOS != "windows" {
+				t.Skip("Windows job commit rejection")
+			}
 			ctx, cancel := context.WithTimeout(t.Context(), tc.timeout)
 			defer cancel()
 			started := time.Now()
-			if err := runJavaScriptCommand(ctx, exec.CommandContext(ctx, binary, "--extension-worker"), tc.source, "session.disconnected", bridge); err == nil {
+			err := runJavaScriptCommand(ctx, exec.CommandContext(ctx, binary, "--extension-worker"), tc.source, "session.disconnected", bridge)
+			if err == nil {
 				t.Fatal("hostile worker succeeded")
+			}
+			if tc.name == "CPU budget" && !errors.Is(err, errWorkerCPUBudget) {
+				t.Fatalf("wrong CPU budget error: %v", err)
+			}
+			if strings.HasPrefix(tc.name, "memory budget") && !errors.Is(err, errWorkerMemoryBudget) {
+				t.Fatalf("wrong memory budget error: %v", err)
 			}
 			if tc.name == "CPU budget" && time.Since(started) > 6*time.Second {
 				t.Fatal("CPU budget did not terminate the worker")
 			}
-			if tc.name == "memory budget" && ctx.Err() != nil {
+			if strings.HasPrefix(tc.name, "memory budget") && ctx.Err() != nil {
 				t.Fatal("memory exhaustion only ended at wall timeout")
 			}
 			t.Logf("isolated worker stopped after %s", time.Since(started))
+		})
+	}
+}
+
+func TestJavaScriptParentBudget(t *testing.T) {
+	binary := filepath.Join(t.TempDir(), "budget-worker")
+	if runtime.GOOS == "windows" {
+		binary += ".exe"
+	}
+	build := exec.CommandContext(t.Context(), "go", "build", "-o", binary, "./testdata/budget-worker")
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build worker without watchdog: %v\n%s", err, output)
+	}
+	for _, tc := range []struct {
+		name string
+		want error
+	}{
+		{"memory", errWorkerMemoryBudget}, {"CPU", errWorkerCPUBudget},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(t.Context(), 8*time.Second)
+			defer cancel()
+			started := time.Now()
+			err := runJavaScriptCommand(ctx, exec.CommandContext(ctx, binary, tc.name), "", "", func(context.Context, json.RawMessage) (json.RawMessage, error) {
+				t.Error("worker without watchdog unexpectedly called the host")
+				return nil, errors.New("unexpected worker call")
+			})
+			if !errors.Is(err, tc.want) {
+				t.Fatalf("parent budget enforcement: got %v, want %v", err, tc.want)
+			}
+			if ctx.Err() != nil {
+				t.Fatal("parent only stopped worker at wall timeout")
+			}
+			t.Logf("parent stopped worker without watchdog after %s: %v", time.Since(started), err)
 		})
 	}
 }
