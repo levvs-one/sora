@@ -195,9 +195,10 @@ class Settings {
   int get probeTimeout => _store.getInt('probeTimeout') ?? 0;
   set probeTimeout(int value) => _store.setInt('probeTimeout', value);
 
-  /// zapret handshake splitting for bypass mode. Defaults match the strategy
-  /// verified with real traffic by the interop test.
-  List<String> get splitPos => _store.getStringList('splitPos') ?? const ['1', 'midsld'];
+  /// Windows uses native ByeDPI byte offsets; tpws domain markers are Linux-only.
+  static List<String> get defaultSplitPos => Platform.isWindows ? const ['1'] : const ['1', 'midsld'];
+
+  List<String> get splitPos => _store.getStringList('splitPos') ?? defaultSplitPos;
   set splitPos(List<String> value) => _store.setStringList('splitPos', value);
   bool get disorder => _store.getBool('disorder') ?? true;
   set disorder(bool value) => _store.setBool('disorder', value);

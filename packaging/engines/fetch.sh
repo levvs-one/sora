@@ -68,6 +68,18 @@ if [[ "$found" -ne 3 ]]; then
 	exit 1
 fi
 
+# Windows uses a native, driver-free SOCKS reshaper; packet interception is
+# deliberately not part of this backend. Its upstream release is MIT licensed.
+if [[ "$arch" == windows-amd64 ]]; then
+ byedpi_digest=70d2c94147193cb915f9c6eb5144b8d404dacbcfa90bda2383b6b211afafa456
+ byedpi_file="$work/byedpi.zip"
+ curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$byedpi_file" 'https://github.com/hufrea/byedpi/releases/download/v0.17.3/byedpi-17.3-x86_64-w64.zip'
+ echo "$byedpi_digest  $byedpi_file" | sha256sum --check --quiet --strict
+ unzip -p "$byedpi_file" ciadpi.exe >"$dest/byedpi.exe"
+ install -m 0644 "$(dirname "$0")/byedpi.LICENSE" "$dest/byedpi.LICENSE"
+ echo 'byedpi windows-amd64: verified v0.17.3'
+fi
+
 # The archived upstream has no binary releases. Keep its wire implementation
 # unchanged and verify the complete source archive before invoking the Go build.
 if [[ "$arch" != win7-* ]]; then

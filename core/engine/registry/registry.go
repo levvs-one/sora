@@ -56,10 +56,9 @@ type Registry struct {
 	preference []engine.Kind
 	// base is the configuration every engine instance starts from.
 	base supervise.Config
-	// tpws is zapret's proxy for bypass outbounds; empty when not
-	// installed.
-	tpws   string
-	olcrtc supervise.Binary
+	// bypassBinary is the platform's loopback DPI proxy, never a client path.
+	bypassBinary string
+	olcrtc       supervise.Binary
 
 	mu   sync.Mutex
 	last engine.Selection
@@ -71,9 +70,13 @@ type Registry struct {
 func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Registry {
 	r := &Registry{binaries: map[engine.Kind]supervise.Binary{}, preference: engine.DefaultPreference, base: base}
 	if enginesDir != "" {
-		candidate := filepath.Join(enginesDir, "tpws")
-		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 { //nolint:gosec // the engines directory is set by the service, not by a client
-			r.tpws = candidate
+		name := "tpws"
+		if runtime.GOOS == "windows" {
+			name = "byedpi.exe"
+		}
+		candidate := filepath.Join(enginesDir, name)
+		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && (runtime.GOOS == "windows" || info.Mode().Perm()&0o111 != 0) { //nolint:gosec // the engines directory is set by the service, not by a client
+			r.bypassBinary = candidate
 		}
 	}
 	r.olcrtc, _ = olcrtc.Discover(ctx, enginesDir)
@@ -122,7 +125,7 @@ func (r *Registry) Usable() bool { return len(r.binaries) > 0 }
 
 // BypassAvailable reports whether the serverless engine can run on this platform.
 func (r *Registry) BypassAvailable() bool {
-	return runtime.GOOS == "linux" && r.tpws != "" && r.Usable()
+	return (runtime.GOOS == "linux" || runtime.GOOS == "windows") && r.bypassBinary != "" && r.Usable()
 }
 
 // LastSelection returns the latest engine choice and rejection reasons for
@@ -175,9 +178,9 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		withBypass := bypass.Has(p)
 		// Missing installations use the missing-engine key rather than
 		// an invalid-plan error.
-		if withBypass && r.tpws == "" {
+		if withBypass && r.bypassBinary == "" {
 			return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
-				"registry: bypass outbounds need zapret's tpws in the engines directory")
+				"registry: the platform DPI bypass proxy is missing from the engines directory")
 		}
 		// Select capabilities against the SOCKS5 plan produced by
 		// bypass rewriting.
@@ -211,7 +214,7 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 			built = olcrtc.Wrap(built, r.olcrtc.Path, filepath.Join(r.base.HomeDir, "olcrtc"), r.base.Logs)
 		}
 		if withBypass {
-			built = bypass.Wrap(built, r.tpws, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs)
+			built = bypass.Wrap(built, r.bypassBinary, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs)
 		}
 		return built, nil
 	}
@@ -385,7 +388,7 @@ func measureThroughController(build func(supervise.Config) (engine.Engine, error
 // BenchmarkEngine uses isolated state and a fresh listener for one temporary
 // measurement. The caller owns home and removes it after closing the engine.
 func (r *Registry) BenchmarkEngine(ctx context.Context, plan *engine.Plan, home string) (engine.Engine, error) {
-	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, tpws: r.tpws, olcrtc: r.olcrtc}
+	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, bypassBinary: r.bypassBinary, olcrtc: r.olcrtc}
 	isolated.base.HomeDir = home
 	isolated.base.LocalPort = 0
 	return isolated.Factory()(ctx, plan)

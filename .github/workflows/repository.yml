@@ -224,6 +224,13 @@ jobs:
       - name: Fetch and verify the engines
         shell: bash
         run: packaging/engines/fetch.sh windows-amd64 dist/windows/engines
+      - name: Native Windows DPI proxy carries HTTP and TLS
+        working-directory: core
+        shell: pwsh
+        run: |
+          $env:SORA_BYPASS_BIN = (Resolve-Path '../dist/windows/engines/byedpi.exe').Path
+          go test -count=1 -v ./engine/bypass -run '^TestNativeWindowsProxyCarriesHTTPAndTLS$' -timeout 30s
+          if ($LASTEXITCODE -ne 0) { throw 'Native DPI transport or rejected-plan preservation failed' }
       - name: TCP, UDP and bulk throughput through every Windows TUN stack
         working-directory: core
         shell: pwsh
@@ -248,7 +255,7 @@ jobs:
         working-directory: app
         run: |
           flutter pub get
-          flutter test test/app_test.dart
+          flutter test test/app_test.dart test/dpi_defaults_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Windows defaults and plan tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Build the installer
@@ -256,6 +263,16 @@ jobs:
         run: |
           choco install innosetup --version 6.7.1 --no-progress -y
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ env.SORA_VERSION }} packaging\windows\sora.iss
+      - name: Inspect Windows release security
+        shell: pwsh
+        run: |
+          & .\packaging\windows\check-security.ps1 -Path @('dist', 'app/build/windows/x64/runner/Release') -ReportPath "$env:RUNNER_TEMP/windows-security.json"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-security-evidence
+          path: ${{ runner.temp }}/windows-security.json
+          if-no-files-found: ignore
       - name: Screenshots of the installer
         shell: pwsh
         run: |
@@ -286,9 +303,11 @@ jobs:
             try { Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -ErrorAction Stop; break }
             catch { if ($i -eq 5) { throw }; Start-Sleep -Seconds (10 * $i) }
           }
-          $found = Invoke-ScriptAnalyzer -Path packaging\install\install.ps1 -Severity Warning, Error
+          $found = foreach ($script in @('packaging/install/install.ps1', 'packaging/windows/check-security.ps1')) {
+            Invoke-ScriptAnalyzer -Path $script -Severity Warning, Error
+          }
           $found | Format-Table -AutoSize
-          if ($found) { throw "PSScriptAnalyzer found problems in install.ps1" }
+          if ($found) { throw "PSScriptAnalyzer found problems in Windows packaging scripts" }
       - name: Install with install.ps1 and check the service
         shell: pwsh
         run: |
