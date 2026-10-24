@@ -128,7 +128,8 @@ func cmdSignFile(args []string) int {
 	if err := fs.Parse(reorderArgs(args, nil)); err != nil {
 		return 1
 	}
-	if *keyPath == "" || (!teamRoles[*role] && !(len(*role) <= 84 && releaseRolePattern.MatchString(*role))) || fs.NArg() != 1 {
+	validRole := teamRoles[*role] || (len(*role) <= 84 && releaseRolePattern.MatchString(*role))
+	if *keyPath == "" || !validRole || fs.NArg() != 1 {
 		return errUsage("usage: sora-ext sign-file --key team.key --role catalog.json|revocations.json|release:vVERSION:SHA256SUMS <file>")
 	}
 	key, err := keyutil.Load(*keyPath)

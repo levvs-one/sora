@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"regexp"
 
 	"github.com/levvs-one/sora-client/core/ext"
@@ -20,11 +19,16 @@ func verifyRelease(directory, version, publicKey string) error {
 	if !releaseVersionPattern.MatchString(version) || len(version) > 64 {
 		return fmt.Errorf("release: invalid stable version")
 	}
-	payload, err := readReleaseFile(filepath.Join(directory, "SHA256SUMS"), 1024*1024)
+	root, err := os.OpenRoot(directory)
+	if err != nil {
+		return fmt.Errorf("release: %w", err)
+	}
+	defer func() { _ = root.Close() }()
+	payload, err := readReleaseFile(root, "SHA256SUMS", 1024*1024)
 	if err != nil {
 		return err
 	}
-	signature, err := readReleaseFile(filepath.Join(directory, "SHA256SUMS.minisig"), 8192)
+	signature, err := readReleaseFile(root, "SHA256SUMS.minisig", 8192)
 	if err != nil {
 		return err
 	}
@@ -34,32 +38,32 @@ func verifyRelease(directory, version, publicKey string) error {
 	return nil
 }
 
-func readReleaseFile(path string, limit int64) ([]byte, error) {
-	info, err := os.Lstat(path)
+func readReleaseFile(root *os.Root, name string, limit int64) ([]byte, error) {
+	info, err := root.Lstat(name)
 	if err != nil {
 		return nil, fmt.Errorf("release: %w", err)
 	}
 	if !info.Mode().IsRegular() || info.Size() == 0 || info.Size() > limit {
-		return nil, fmt.Errorf("release: %s must be a nonempty regular file of at most %d bytes", filepath.Base(path), limit)
+		return nil, fmt.Errorf("release: %s must be a nonempty regular file of at most %d bytes", name, limit)
 	}
-	file, err := os.Open(path)
+	file, err := root.Open(name)
 	if err != nil {
 		return nil, fmt.Errorf("release: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 	opened, err := file.Stat()
 	if err != nil {
 		return nil, err
 	}
 	if !os.SameFile(info, opened) {
-		return nil, fmt.Errorf("release: %s changed while opening", filepath.Base(path))
+		return nil, fmt.Errorf("release: %s changed while opening", name)
 	}
 	data, err := io.ReadAll(io.LimitReader(file, limit+1))
 	if err != nil {
 		return nil, err
 	}
 	if len(data) == 0 || int64(len(data)) > limit {
-		return nil, fmt.Errorf("release: invalid %s size", filepath.Base(path))
+		return nil, fmt.Errorf("release: invalid %s size", name)
 	}
 	return data, nil
 }

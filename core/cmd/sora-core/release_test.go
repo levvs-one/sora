@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"aead.dev/minisign"
+
 	"github.com/levvs-one/sora-client/core/ext"
 )
 
