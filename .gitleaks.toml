@@ -28,3 +28,22 @@ regexes = [
   # A warning code name, not a key.
   '''shadowsocks-2022-bad-key''',
 ]
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Shared OLCRTC fixture used with example.org and the local SFU"
+condition = "AND"
+regexTarget = "secret"
+paths = [
+  '''^app/test/live_olcrtc_test\.dart$''',
+  '''^core/control/olcrtc_test\.go$''',
+  '''^core/engine/olcrtc/live_test\.go$''',
+  '''^core/engine/olcrtc/render_test\.go$''',
+  '''^core/engine/registry/olcrtc_test\.go$''',
+  '''^core/parser/olcrtc_test\.go$''',
+]
+regexes = [
+  '''^d823fa01cb3e0609b67322f7cf984c4ee2e4ce2e294936fc24ef38c9e59f4799$''',
+]
