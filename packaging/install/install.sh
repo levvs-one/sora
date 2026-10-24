@@ -1,16 +1,12 @@
 #!/bin/sh
-# Installs Sora on Linux in one command:
-#
-#   curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
-#
-# It finds the latest release, downloads the packages for this distribution
-# and processor, checks them against the release's SHA256SUMS and installs
-# them with the system's package manager, so updates and removal stay the
-# package manager's too. Nothing is installed when a checksum does not match.
+# Run a previously authenticated copy, never a downloaded script pipe.
+# SORA_VERIFIER names a previously trusted core, default /usr/bin/sora-core.
+# Neither a downloaded script nor a downloaded verifier authenticates itself.
+# Signature verification precedes package download and package-manager calls.
 #
 # SORA_VERSION=1.0.3 installs that release instead of the latest.
 # SORA_DIST=<directory> installs packages already in that directory, with
-# their SHA256SUMS; CI checks the packages it built this way.
+# signed SHA256SUMS; CI uses an isolated verifier with a temporary test key.
 set -eu
 
 repo=https://github.com/levvs-one/sora
@@ -20,6 +16,15 @@ die() {
 	printf 'sora: %s\n' "$*" >&2
 	exit 1
 }
+
+verifier=${SORA_VERIFIER:-/usr/bin/sora-core}
+case "$verifier" in /*) ;; *) die 'SORA_VERIFIER must be an absolute path to a previously trusted core' ;; esac
+verifier=$(readlink -f -- "$verifier") || die 'could not resolve the trusted verifier'
+[ -f "$verifier" ] && [ -x "$verifier" ] || die 'a previously authenticated sora-core verifier is required; see docs/security/release-signatures.md'
+if [ -n "${SORA_DIST:-}" ]; then
+	distribution=$(cd "$SORA_DIST" && pwd -P)
+	case "$verifier" in "$distribution"/*) die 'do not trust a verifier supplied with the downloads' ;; esac
+fi
 
 case "$(uname -m)" in
 x86_64 | amd64) deb_arch=amd64 rpm_arch=x86_64 arch_arch=x86_64 with_app=yes ;;
@@ -68,6 +73,10 @@ else
 	fi
 fi
 
+if [ "${#version}" -gt 64 ] || ! printf '%s\n' "$version" | grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'; then
+	die 'not a stable release of Sora'
+fi
+
 case "$manager" in
 apt) files="sora-core_${version}_${deb_arch}.deb" app="sora_${version}_${deb_arch}.deb" ;;
 dnf | zypper) files="sora-core-${version}-1.${rpm_arch}.rpm" app="sora-${version}-1.${rpm_arch}.rpm" ;;
@@ -84,7 +93,15 @@ else
 fi
 
 say "sora: installing $version with $manager"
-for name in SHA256SUMS $files; do
+verified=no
+for name in SHA256SUMS SHA256SUMS.minisig $files; do
+	case "$name" in
+	SHA256SUMS | SHA256SUMS.minisig) ;;
+	*) if [ "$verified" = no ]; then
+		"$verifier" -verify-release "$work" -release-version "$version" || die 'release signature rejected; nothing was installed'
+		verified=yes
+	fi ;;
+	esac
 	if [ -n "${SORA_DIST:-}" ]; then
 		cp "$SORA_DIST/$name" "$work/$name" || die "$name is not in $SORA_DIST"
 	else
@@ -95,7 +112,7 @@ done
 (
 	cd "$work"
 	for name in $files; do
-		grep -E "  \\*?$name\$" SHA256SUMS >>expected || die "$name is not in SHA256SUMS"
+		awk -v name="$name" 'length($1) == 64 && $1 !~ /[^0-9a-fA-F]/ && (substr($0, 67) == name || substr($0, 67) == "*" name) {print tolower($1) "  " name; count++} END {if (count != 1) exit 1}' SHA256SUMS >>expected || die "$name needs exactly one checksum"
 	done
 	sha256sum -c --quiet expected || die "a download does not match SHA256SUMS; nothing was installed"
 )

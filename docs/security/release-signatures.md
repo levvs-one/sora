@@ -1,9 +1,9 @@
 # Release signatures
 
-The native verifier, Windows/Linux in-app updater and Linux rollback enforce the
-signature contract below. The privileged Linux helper repeats verification on
-its private snapshot before running a package manager. Initial installers and
-authenticated bootstrap remain unfinished; S2 is still open.
+The native verifier, Windows/Linux install scripts, in-app updater and Linux
+rollback enforce the signature contract below. The privileged Linux helper
+repeats verification on its private snapshot before running a package manager.
+The first-install trust prerequisites below are mandatory; S2 is still open.
 
 ## Trust boundary
 
@@ -22,7 +22,54 @@ The root must be trusted before running the verifier. A newly downloaded
 installer, script or verifier cannot authenticate itself. Never describe
 `curl | sh` or `irm | iex` from the same release as authenticated bootstrap.
 Initial installation still needs an independently authenticated distribution
-path. No production key was created, copied or used to sign test data here.
+path for those prerequisites. No production key was created, copied or used to
+sign test data here.
+
+## Initial installation
+
+Use a previously authenticated local copy of the installer script. Both scripts
+require a previously trusted `sora-core` verifier, defaulting to
+`/usr/bin/sora-core` or `%ProgramFiles%\Sora\core\sora-core.exe`. An absolute
+`SORA_VERIFIER` path can select a separately authenticated build. It is never
+downloaded automatically and cannot come from the `SORA_DIST` directory.
+
+For a first installation, build the verifier from an independently authenticated,
+reviewed source checkout with the pinned root, or obtain it through another
+authenticated distribution channel. Compiling arbitrary freshly downloaded
+source does not establish that trust. An older installed core without this
+verification command is also rejected. For an already authenticated checkout:
+
+```sh
+(cd core && go build -trimpath -o ../trusted-verifier ./cmd/sora-core)
+SORA_VERIFIER="$PWD/trusted-verifier" sh packaging/install/install.sh
+```
+
+```powershell
+Push-Location core
+go build -trimpath -o ../trusted-verifier.exe ./cmd/sora-core
+if ($LASTEXITCODE -ne 0) { throw 'Verifier build failed' }
+Pop-Location
+$env:SORA_VERIFIER = (Resolve-Path ./trusted-verifier.exe).Path
+& ./packaging/install/install.ps1
+```
+
+These are bootstrap prerequisites for reviewed distributions, not a consumer
+one-command trust solution. A signed Windows installer or trusted Linux package
+channel still needs release-owner provisioning before a general release.
+
+The scripts copy/download only the manifest and detached signature initially,
+then invoke that trusted verifier with the requested stable version. A rejection
+stops before package download, UAC or package-manager execution. Packages are
+copied into the private working snapshot and hashed; missing or duplicate
+checksum entries are rejected. No unsigned compatibility fallback is provided.
+
+CI prepares separate test inputs with a short-lived key, builds a verifier from
+a temporary source copy with that test root and deletes the private key. The
+repository and shipped core retain the production root. These tools and signed
+test manifests are outside the uploaded release assets. The rejection suite uses
+actual Minisign verification and intercepts only the final installation boundary
+(a Linux namespace or PowerShell process-launch interception); full package
+installation is exercised separately by the platform jobs.
 
 ## Contract
 
@@ -120,7 +167,8 @@ An older installed native verifier that does not understand the command also
 causes the helper to refuse installation. Publishing signatures or re-signing an
 old release is a separate release action; this change performs neither.
 
-Still required by S2: enforcement in both initial installers, the reviewed
-transition, a publication gate that keeps the private key outside CI, authenticated
-bootstrap, key rotation/revocation and real installation/elevation rejection tests
-on both platforms. Windows does not yet implement automatic rollback.
+Still required by S2: the reviewed transition, a publication gate that keeps the
+private key outside CI, a provisioned consumer bootstrap channel, signed artifact
+sizes/platform/architecture metadata, key rotation/revocation and the remaining
+real installation/elevation rejection matrix. Windows does not yet implement
+automatic rollback.

@@ -311,10 +311,15 @@ jobs:
       - name: Install with install.ps1 and check the service
         shell: pwsh
         run: |
-          # The same script people run, on the installer this job built.
+          python packaging/install/test_installers.py
+          if ($LASTEXITCODE -ne 0) { throw 'Installer signature rejection tests failed' }
           $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
-          "$((Get-FileHash -Algorithm SHA256 $setup.FullName).Hash.ToLowerInvariant())  $($setup.Name)" | Set-Content -Encoding ascii dist\SHA256SUMS
-          $env:SORA_DIST = "$PWD\dist"
+          New-Item -ItemType Directory install-test | Out-Null
+          Copy-Item -LiteralPath $setup.FullName -Destination install-test
+          python packaging/install/prepare_test_release.py install-test $env:SORA_VERSION test-tools
+          if ($LASTEXITCODE -ne 0) { throw 'Signed installer fixture preparation failed' }
+          $env:SORA_DIST = "$PWD\install-test"
+          $env:SORA_VERIFIER = "$PWD\test-tools\sora-verifier.exe"
           & .\packaging\install\install.ps1
           # Silent setup must reopen the app as well as install the service.
           for ($i = 0; $i -lt 30; $i++) {
@@ -557,10 +562,12 @@ jobs:
         # The same script people run, on the packages this job built.
         run: |
           shellcheck packaging/install/install.sh
+          sudo apt-get install -y -qq bubblewrap
+          python3 packaging/install/test_installers.py
           mkdir -p install-test
           cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
-          (cd install-test && sha256sum -- * > SHA256SUMS)
-          SORA_DIST=install-test sh packaging/install/install.sh
+          python3 packaging/install/prepare_test_release.py install-test "$SORA_VERSION" test-tools
+          SORA_DIST=install-test SORA_VERIFIER="$PWD/test-tools/sora-verifier" sh packaging/install/install.sh
           for _ in $(seq 1 30); do systemctl is-active --quiet sora-core && break; sleep 1; done
           systemctl is-active sora-core
           test -x /usr/bin/sora
@@ -568,9 +575,9 @@ jobs:
           # Distribution mirrors drop a download now and then. A package that
           # does not install fails all three runs.
           retry() { for _ in 1 2; do "$@" && return; sleep 15; done; "$@"; }
-          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION fedora:latest \
+          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION -e SORA_VERIFIER=/w/test-tools/sora-verifier fedora:latest \
             sh -c 'dnf -y -q install systemd >/dev/null && sh packaging/install/install.sh && rpm -q sora sora-core'
-          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION archlinux:latest \
+          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION -e SORA_VERIFIER=/w/test-tools/sora-verifier archlinux:latest \
             sh -c 'pacman -Sy --noconfirm >/dev/null && sh packaging/install/install.sh && pacman -Q sora sora-core'
       - uses: actions/upload-artifact@v6
         with:
