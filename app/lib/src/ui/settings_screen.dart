@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/material.dart';
@@ -49,7 +50,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Match core validation to reject invalid settings before connection.
   static final _range = RegExp(r'^\d{1,5}-\d{1,5}$');
   static final _packets = RegExp(r'^(tlshello|\d{1,3}-\d{1,3})$');
-  static final _position = RegExp(r'^(-?\d{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-]\d{1,4})?)$');
+  static final _position = Platform.isWindows
+      ? RegExp(r'^-?\d{1,4}$')
+      : RegExp(r'^(-?\d{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-]\d{1,4})?)$');
 
   @override
   void initState() {
@@ -343,17 +346,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.splitPos.join(', '),
                 onTap: () => _edit(
                   title: s.splitPos,
-                  hint: s.splitPosHint,
+                  hint: Platform.isWindows ? '1, 2' : s.splitPosHint,
                   initial: settings.splitPos.join(', '),
                   valid: (v) => _parts(v).every(_position.hasMatch),
-                  apply: (x, v) => x.splitPos = v.isEmpty ? const ['1', 'midsld'] : _parts(v),
+                  apply: (x, v) => x.splitPos = v.isEmpty ? Settings.defaultSplitPos : _parts(v),
                 ),
               ),
               SwitchTile(title: s.disorder, value: settings.disorder, onChanged: (v) => set((x) => x.disorder = v)),
               ChoiceTile<String>(
                 title: s.tlsRecord,
                 value: settings.tlsRecord,
-                choices: {'': s.tlsRecordNo, 'sniext': s.tlsRecordSni, '1': s.tlsRecordFirst},
+                choices: {'': s.tlsRecordNo, if (!Platform.isWindows) 'sniext': s.tlsRecordSni, '1': s.tlsRecordFirst},
                 onChanged: (v) => set((x) => x.tlsRecord = v),
               ),
               SwitchTile(title: s.hostCase, value: settings.hostCase, onChanged: (v) => set((x) => x.hostCase = v)),
