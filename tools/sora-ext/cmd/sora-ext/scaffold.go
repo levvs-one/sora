@@ -78,9 +78,12 @@ name.pub (public). Prints the public key line for the manifest.
 	case "sign-file":
 		fmt.Print(`Usage:
   sora-ext sign-file --key team.key --role catalog.json|revocations.json <file>
+  sora-ext sign-file --key team.key --role release:v1.2.3:SHA256SUMS SHA256SUMS
 
 Signs a team document with the trusted comment the app checks
 (timestamp, role and sha256) and writes <file>.minisig next to it.
+Release signatures bind the manifest to one stable version; a signature
+for v1.2.3 cannot authorize v1.2.4. Keep the private key outside CI.
 `)
 	case "publish":
 		fmt.Print(`Usage:
