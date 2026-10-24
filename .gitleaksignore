@@ -1,0 +1,8 @@
+# Reviewed immutable test fixtures in historical prototype branches.
+# Their contexts and the original #309 report are recorded in
+# docs/security/secret-scan-309.md. New commits and values remain scanned.
+94f58292708b6dc5e235708afe4355d3f347b5f7:core/parser/fuzz_extra_test.go:generic-api-key:49
+23a094b9098a3d509c338e6f459904b42b1cc12f:core/engine/olcwrap/render_test.go:generic-api-key:10
+c8597cd0b5638c1693d6bbe8fe611da07a9d027f:apple/SoraCore/Tests/SoraCoreTests/Config/LibboxConfigBuilderTests.swift:generic-api-key:104
+c8597cd0b5638c1693d6bbe8fe611da07a9d027f:apple/SoraCore/Tests/SoraCoreTests/Config/ProfileFixtures.swift:generic-api-key:9
+c8597cd0b5638c1693d6bbe8fe611da07a9d027f:apple/SoraCore/Tests/SoraCoreTests/Config/ProfileFixtures.swift:generic-api-key:11
