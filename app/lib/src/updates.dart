@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ import 'package:http/io_client.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 import 'settings.dart';
+import 'ext/verifier.dart';
 
 const appVersion = String.fromEnvironment('SORA_VERSION', defaultValue: 'dev');
 const releaseRepository = 'https://github.com/levvs-one/sora';
@@ -28,9 +30,6 @@ enum UpdateConnection { idle, connected, changing, unknown }
 enum UpdateError { network, release, checksum, installation, connecting, unsupported, rollback, rollbackCache }
 
 /// Visible phase of an in-flight update flow.
-/// There is deliberately no "verifying" stage: file hashes are checked
-/// against the manifest, but releases are not signed yet, so the UI must
-/// not claim verification.
 enum UpdateStage { idle, checking, downloading, installing }
 
 class UpdateFailure implements Exception {
@@ -142,6 +141,7 @@ class SoraRelease {
       // Published Sora packages use a three-part stable version in filenames.
       if (json['draft'] != false ||
           json['prerelease'] != false ||
+          version.length > 64 ||
           !RegExp(r'^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$').hasMatch(version)) {
         throw const UpdateFailure(UpdateError.release);
       }
@@ -301,6 +301,7 @@ class AppUpdater extends ChangeNotifier {
     bool? windows,
     Future<bool> Function()? canElevate,
     Directory Function(String fromVersion)? rollbackDir,
+    this._signingPublicKey = teamPublicKey,
   }) : _client = client ?? (() => IOClient(HttpClient()..findProxy = HttpClient.findProxyFromEnvironment)),
        _run = run ?? ((exe, args) => Process.run(exe, args)),
        _executable = executable ?? Platform.resolvedExecutable,
@@ -321,6 +322,8 @@ class AppUpdater extends ChangeNotifier {
   final UpdateProcess _run;
   final String _executable;
   final bool _windows;
+  // Tests use an ephemeral signing identity; production pins the compiled root.
+  final String _signingPublicKey;
 
   /// Test seam for the rollback cache location: production uses the
   /// XDG cache dir, tests point it at a temp directory.
@@ -593,6 +596,34 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
+  Future<String> _signedManifest(SoraRelease release, Directory directory) async {
+    final sums = release.asset('SHA256SUMS');
+    final signature = release.asset('SHA256SUMS.minisig');
+    if (sums.size < 1 || sums.size > 1024 * 1024 || signature.size < 1 || signature.size > 8192) {
+      throw const UpdateFailure(UpdateError.release);
+    }
+    final payload = Uint8List.fromList(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+    final signatureBytes = await _fetch(signature.url, limit: 8192, size: signature.size);
+    final String manifest;
+    try {
+      await verifyPayload(
+        _signingPublicKey,
+        utf8.decode(signatureBytes),
+        'release:v${release.version}:SHA256SUMS',
+        payload,
+      );
+      manifest = utf8.decode(payload);
+    } on SignatureError {
+      throw const UpdateFailure(UpdateError.release);
+    } on FormatException {
+      throw const UpdateFailure(UpdateError.release);
+    }
+    if (_cancelled || _disposed) throw const UpdateFailure(UpdateError.network);
+    await File('${directory.path}/SHA256SUMS').writeAsBytes(payload, flush: true);
+    await File('${directory.path}/SHA256SUMS.minisig').writeAsBytes(signatureBytes, flush: true);
+    return manifest;
+  }
+
   /// The caller provides desktop launch/quit operations so tests never elevate.
   Future<void> install({
     required Future<bool> Function() confirmDrop,
@@ -617,14 +648,13 @@ class AppUpdater extends ChangeNotifier {
       final names = _windows ? ['Sora-Setup-${release.version}-x64.exe'] : installation!.filenames(release.version);
       // Resolve the whole pair before downloading or invoking any installer.
       final assets = [for (final name in names) release.asset(name)];
-      final sums = release.asset('SHA256SUMS');
+      release.asset('SHA256SUMS.minisig');
       if (_work != null) await _work!.delete(recursive: true);
       final work = _work = await Directory.systemTemp.createTemp('sora-update-');
-      final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+      final manifest = await _signedManifest(release, work);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
-      await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
       // Progress spans the whole download phase, so the bar fills once across
       // all package files instead of restarting at zero for every file.
       final totalSize = assets.fold<int>(0, (sum, asset) => sum + asset.size);
@@ -642,10 +672,8 @@ class AppUpdater extends ChangeNotifier {
           progressTotal: totalSize,
         );
         downloaded += asset.size;
-        // Integrity check only: the file hash must match the manifest, which
-        // the TLS transport to GitHub authenticates. Releases are not signed
-        // yet, so the UI must not present this step as signature
-        // verification.
+        // The signature authenticates the manifest; this binds each package
+        // to its signed hash before any installer handoff.
         await verifyUpdateFile(file, manifest, asset.name);
       }
       _guard();
@@ -737,8 +765,8 @@ class AppUpdater extends ChangeNotifier {
   ///   mismatch → no rollback, error + manual command instead).
   /// A marker naming any other build, or a corrupt one, is cleared
   /// silently: its premise is void and it must never trigger a downgrade.
-  /// No-op on Windows: the in-app path is blocked fail-closed there (A2),
-  /// so a marker can never exist.
+  /// This health-check marker belongs to the Linux update path.
+  /// Windows does not yet implement automatic rollback.
   Future<void> checkPendingUpdate({
     required bool Function() coreHealthy,
     required Future<void> Function() restart,
@@ -819,13 +847,27 @@ class AppUpdater extends ChangeNotifier {
         debugPrint('[updates] no rollback cache for ${marker.from}; cannot roll back');
         throw const UpdateFailure(UpdateError.rollback);
       }
-      // Re-verify against the cached manifest: the cache was hash-verified
-      // at download time, but it lived on user-writable disk since.
-      final manifestFile = File('${dir.path}/SHA256SUMS');
-      if (!await manifestFile.exists()) {
-        throw const UpdateFailure(UpdateError.rollback);
+      // Both manifest and packages lived on user-writable disk since download.
+      // Bound reads independently of mutable file lengths before verification.
+      final metadata = <Uint8List>[];
+      for (final (name, limit) in [('SHA256SUMS', 1024 * 1024), ('SHA256SUMS.minisig', 8192)]) {
+        final bytes = BytesBuilder(copy: false);
+        await for (final chunk in File(
+          '${dir.path}/$name',
+        ).openRead(0, limit + 1).timeout(const Duration(seconds: 5))) {
+          bytes.add(chunk);
+          if (bytes.length > limit) throw const UpdateFailure(UpdateError.rollback);
+        }
+        if (bytes.isEmpty) throw const UpdateFailure(UpdateError.rollback);
+        metadata.add(bytes.takeBytes());
       }
-      final manifest = await manifestFile.readAsString();
+      await verifyPayload(
+        _signingPublicKey,
+        utf8.decode(metadata[1]),
+        'release:v${marker.from}:SHA256SUMS',
+        metadata[0],
+      );
+      final manifest = utf8.decode(metadata[0]);
       final names = installation.filenames(marker.from);
       final paths = <String>[];
       for (final name in names) {
@@ -886,7 +928,7 @@ class AppUpdater extends ChangeNotifier {
     return Directory('$base/sora/rollback/$fromVersion');
   }
 
-  /// Downloads and hash-verifies the currently installed release's packages
+  /// Authenticates the manifest and hash-verifies the installed release's packages
   /// into the rollback cache, so a broken update can be reverted offline.
   /// Any failure (network, missing release assets, hash mismatch) aborts the
   /// whole update (fail-closed): installing without a rollback path is not
@@ -908,13 +950,11 @@ class AppUpdater extends ChangeNotifier {
       if (previous.version != from) throw const UpdateFailure(UpdateError.release);
       final names = installation.filenames(previous.version);
       final assets = [for (final name in names) previous.asset(name)];
-      final sums = previous.asset('SHA256SUMS');
       await dir.create(recursive: true);
-      final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+      final manifest = await _signedManifest(previous, dir);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
-      await File('${dir.path}/SHA256SUMS').writeAsString(manifest, flush: true);
       for (final asset in assets) {
         final file = File('${dir.path}/${asset.name}');
         await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);

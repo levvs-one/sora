@@ -35,14 +35,21 @@ class UpdateHelperTest(unittest.TestCase):
             (self.downloads / name).write_bytes(data)
             checksums.append(hashlib.sha256(data).hexdigest() + "  " + name + "\n")
         (self.downloads / "SHA256SUMS").write_text("".join(checksums))
+        # Crypto is exercised by the native/Dart signature tests. This suite
+        # isolates the helper's snapshot, invocation and installer boundary.
+        (self.downloads / "SHA256SUMS.minisig").write_text("verifier contract fixture\n")
         return files
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
-                   installed="1.0.4", extra=()):
-        recorder = 'printf "%s\\n" "$@" > /tmp/test/calls'
+                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False):
+        recorder = '[ -f /tmp/test/verification ] && printf "%s\\n" "$@" > /tmp/test/calls'
         # The query fakes also report the installed sora-core version
         # (TEST_INSTALLED) for the helper's downgrade protection.
         scripts = {
+            "sora-core": '[ "$#" = 4 ] && [ "$1" = -verify-release ] && [ "$3" = -release-version ] &&'
+                         ' [ "$4" = 1.0.5 ]; case "$2" in /var/tmp/sora-update.*) ;; *) exit 1;; esac;'
+                         ' [ -f "$2/SHA256SUMS" ] && [ -f "$2/SHA256SUMS.minisig" ];'
+                         ' printf "%s\\n" "$@" > /tmp/test/verification; [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]',
             "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) case "$2" in'
                           " -f='${Version}') echo \"$TEST_INSTALLED\";; *) echo installed;; esac;;"
                           " *) exit 1;; esac",
@@ -59,6 +66,8 @@ class UpdateHelperTest(unittest.TestCase):
             "apt-get": recorder,
             "zypper" if zypper else "dnf": recorder,
         }
+        if missing_verifier:
+            del scripts["sora-core"]
         command = [
             "bwrap", "--unshare-all", "--share-net", "--uid", "0", "--gid", "0", "--die-with-parent",
             "--ro-bind", "/", "/", "--tmpfs", "/run", "--tmpfs", "/tmp",
@@ -74,6 +83,8 @@ class UpdateHelperTest(unittest.TestCase):
             command += ["--setenv", "TEST_VERSION", "1.0.4"]
         if dependency_failure:
             command += ["--setenv", "TEST_DEPENDENCY_FAILURE", "1"]
+        if signature_failure:
+            command += ["--setenv", "TEST_SIGNATURE_FAILURE", "1"]
         command += ["--", "/bin/sh", "/tmp/test/sora-update", format, version, "/tmp/test/downloads", *extra]
         return subprocess.run(command, capture_output=True, text=True, timeout=10)
 
@@ -109,6 +120,10 @@ class UpdateHelperTest(unittest.TestCase):
                 packages = [item for item in arguments if item.startswith("/var/tmp/")]
                 self.assertEqual([pathlib.Path(item).name for item in packages], files)
                 self.assertEqual(len(packages), 2)
+                verification = (self.root / "verification").read_text().splitlines()
+                self.assertEqual(verification[0], "-verify-release")
+                self.assertTrue(verification[1].startswith("/var/tmp/sora-update."))
+                self.assertEqual(verification[2:], ["-release-version", "1.0.5"])
                 (self.root / "calls").unlink()
 
     def test_arch_dependency_failure_leaves_the_installed_pair_untouched(self):
@@ -120,7 +135,7 @@ class UpdateHelperTest(unittest.TestCase):
         self.assertEqual(arguments, ["-S", "--noconfirm", "--needed", "gst-plugins-good"])
 
     def test_reject_corrupt_missing_duplicate_and_symlink_inputs(self):
-        for problem in ["corrupt", "missing", "duplicate", "symlink", "metadata", "version", "format"]:
+        for problem in ["corrupt", "missing", "duplicate", "symlink", "missing-signature", "signature-symlink", "metadata", "version", "format"]:
             with self.subTest(problem=problem):
                 for item in self.downloads.iterdir():
                     item.unlink()
@@ -136,6 +151,12 @@ class UpdateHelperTest(unittest.TestCase):
                     target = self.downloads / files[0]
                     target.unlink()
                     target.symlink_to(files[1])
+                elif problem == "missing-signature":
+                    (self.downloads / "SHA256SUMS.minisig").unlink()
+                elif problem == "signature-symlink":
+                    target = self.downloads / "SHA256SUMS.minisig"
+                    target.unlink()
+                    target.symlink_to("SHA256SUMS")
                 result = self.run_helper(
                     "unknown" if problem == "format" else "deb",
                     version="1.0.5;touch /tmp/test/escaped" if problem == "version" else "1.0.5",
@@ -143,6 +164,19 @@ class UpdateHelperTest(unittest.TestCase):
                 )
                 self.assertNotIn("bwrap:", result.stderr)
                 self.assertNotEqual(result.returncode, 0, result.stdout)
+                self.assertFalse((self.root / "calls").exists())
+                self.assertFalse((self.root / "escaped").exists())
+
+    def test_untrusted_release_or_missing_installed_verifier_never_installs(self):
+        self.prepare("deb")
+        downloaded = self.downloads / "sora-core"
+        downloaded.write_text("#!/bin/sh\nprintf used > /tmp/test/escaped\nexit 0\n")
+        downloaded.chmod(0o755)
+        for arguments in ({"signature_failure": True}, {"missing_verifier": True}):
+            with self.subTest(arguments=arguments):
+                result = self.run_helper("deb", **arguments)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("release signature verification failed", result.stderr)
                 self.assertFalse((self.root / "calls").exists())
                 self.assertFalse((self.root / "escaped").exists())
 

@@ -1,8 +1,9 @@
 # Release signatures
 
-The native verifier and signing command implement the signature contract below.
-Installation, in-app updates and rollback do not enforce it yet. S2 remains open
-until those callers verify signatures before executing downloaded code.
+The native verifier, Windows/Linux in-app updater and Linux rollback enforce the
+signature contract below. The privileged Linux helper repeats verification on
+its private snapshot before running a package manager. Initial installers and
+authenticated bootstrap remain unfinished; S2 is still open.
 
 ## Trust boundary
 
@@ -32,6 +33,14 @@ three-component decimal version without leading zeroes, at most 64 characters.
 The payload digest and trusted comment are authenticated by the existing
 Minisign implementation. A catalog signature or another version's signature is
 rejected even when its payload is identical.
+
+The app downloads the signature before any package, authenticates the exact
+manifest bytes, then persists both files for the helper and rollback. Rollback
+rechecks the signature before trusting cached hashes; replacing a package and
+its checksum together does not authorize a downgrade. Network and cached metadata
+are bounded to the same 1 MiB/8 KiB limits as the native command. Production uses
+the compiled team root; tests inject an ephemeral public identity in code, never
+from settings, the environment or downloaded assets.
 
 Using a previously trusted build of sora-ext, on the signing machine:
 
@@ -74,8 +83,8 @@ The C project's README recommends its successor minizign for new features. The
 Go library's release is older than two years: maintenance is a recorded audit
 risk, not evidence of an independently audited crypto implementation. No new
 dependency is installed. Native compatibility is checked with the repository's
-Go toolchain and a Windows cross-build; updater integration still needs Dart
-interoperability tests.
+Go toolchain and a Windows cross-build. The updater tests verify signatures made
+by the Go CLI using the existing Dart implementation.
 
 ## Validation and remaining acceptance
 
@@ -85,8 +94,33 @@ files, non-regular inputs and ambiguous command flags. They also check that
 verification does not create core state and that the native trust root agrees
 with the application's team key.
 
-Still required by S2: signature enforcement in both installers and the updater,
-signed rollback-cache verification, a publication gate that keeps the private key
-outside CI, authenticated bootstrap, key rotation/revocation and a full successful
-installation plus rejection matrix on both supported platforms. This change
-does not publish or re-sign an existing release.
+The fifteen committed signature fixtures were generated with `sora-ext sign-file`
+and one temporary test key, whose private part was deleted. They cover the current
+Windows/deb/rpm/Arch test payloads, previous Linux payloads, and signatures for an
+incorrect version or catalog role over otherwise identical bytes. No production
+key signed those fixtures. The updater rejection matrix exercises every supported
+package format and checks that untrusted metadata stops before package download,
+elevation, manual-install suggestions or restart. Cached package-plus-manifest
+tampering, missing signatures and oversized metadata are also rejected.
+
+The Linux namespace suite checks the private snapshot, installed-verifier
+invocation and installer boundary using stubbed OS queries and a verifier stub.
+It covers verifier rejection/absence, missing/symlinked signatures and ignores a
+downloaded fake verifier. Cryptographic correctness is exercised separately by
+the native tests and Go-to-Dart fixtures; this is not a real package installation
+or Windows elevation test.
+
+## Signed-release transition
+
+There is no unsigned fallback. Previously published unsigned releases cannot be
+installed by this updater or used as rollback targets. Before shipping it, the
+release owner must independently authenticate and sign both the new manifest and
+the previous Linux rollback release, or establish another reviewed transition.
+An older installed native verifier that does not understand the command also
+causes the helper to refuse installation. Publishing signatures or re-signing an
+old release is a separate release action; this change performs neither.
+
+Still required by S2: enforcement in both initial installers, the reviewed
+transition, a publication gate that keeps the private key outside CI, authenticated
+bootstrap, key rotation/revocation and real installation/elevation rejection tests
+on both platforms. Windows does not yet implement automatic rollback.
