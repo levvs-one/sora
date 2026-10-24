@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/levvs-one/sora-client/core/ext"
@@ -118,6 +119,8 @@ func cmdSign(args []string) int {
 // revocation list and the other way round.
 var teamRoles = map[string]bool{"catalog.json": true, "revocations.json": true}
 
+var releaseRolePattern = regexp.MustCompile(`^release:v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*):SHA256SUMS$`)
+
 func cmdSignFile(args []string) int {
 	fs := flag.NewFlagSet("sign-file", flag.ContinueOnError)
 	keyPath := fs.String("key", "", "")
@@ -125,8 +128,9 @@ func cmdSignFile(args []string) int {
 	if err := fs.Parse(reorderArgs(args, nil)); err != nil {
 		return 1
 	}
-	if *keyPath == "" || !teamRoles[*role] || fs.NArg() != 1 {
-		return errUsage("usage: sora-ext sign-file --key team.key --role catalog.json|revocations.json <file>")
+	validRole := teamRoles[*role] || (len(*role) <= 84 && releaseRolePattern.MatchString(*role))
+	if *keyPath == "" || !validRole || fs.NArg() != 1 {
+		return errUsage("usage: sora-ext sign-file --key team.key --role catalog.json|revocations.json|release:vVERSION:SHA256SUMS <file>")
 	}
 	key, err := keyutil.Load(*keyPath)
 	if err != nil {

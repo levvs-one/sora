@@ -78,12 +78,14 @@ fi
 
 work=$(mktemp -d /var/tmp/sora-update.XXXXXXXX)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-for name in SHA256SUMS $files; do
+for name in SHA256SUMS SHA256SUMS.minisig $files; do
     if [ ! -f "$source/$name" ] || [ -L "$source/$name" ]; then die 'downloads must be regular files'; fi
     cp -P -- "$source/$name" "$work/$name"
     # cp -P preserves a symlink raced into the source, which is then rejected.
     if [ ! -f "$work/$name" ] || [ -L "$work/$name" ]; then die 'a download changed during copying'; fi
 done
+# Use the installed trust root, never a verifier supplied with the download.
+/usr/bin/sora-core -verify-release "$work" -release-version "$version" || die 'release signature verification failed; nothing was installed'
 cd "$work"
 for name in $files; do
     # Match the filename literally, including the dots in release versions.
