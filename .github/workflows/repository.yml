@@ -257,8 +257,8 @@ jobs:
         working-directory: app
         run: |
           flutter pub get
-          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart
-          if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan and metadata tests failed' }
+          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart
+          if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan, metadata or extension package tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Build the installer
         shell: pwsh

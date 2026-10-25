@@ -7,8 +7,10 @@ import (
 	"encoding/hex"
 	"io"
 	"path"
+	"regexp"
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/levvs-one/sora-client/core/errs"
 )
@@ -56,6 +58,15 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 			"ext: the package has too many files (%d)", len(zr.File))
 	}
+	names := make([]string, 0, len(zr.File))
+	for _, file := range zr.File {
+		if !file.FileInfo().IsDir() {
+			names = append(names, file.Name)
+		}
+	}
+	if err := checkPackagePaths(names); err != nil {
+		return nil, err
+	}
 	files := make(map[string][]byte, len(zr.File))
 	var total int64
 	for _, f := range zr.File {
@@ -67,12 +78,6 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 			continue
 		}
 		name := f.Name
-		// Zip-slip and layout rules: relative, forward slashes, no
-		// traversal, no absolute paths, no directories escaping the root.
-		if !isSafeArchivePath(name) {
-			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
-				"ext: the package contains an unsafe path %q", name)
-		}
 		if f.UncompressedSize64 > maxSingleFile {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: file %q exceeds %d bytes", name, maxSingleFile)
@@ -106,10 +111,6 @@ func readArchive(zr *zip.Reader) (*Package, error) {
 		if total > maxUncompressedBytes {
 			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
 				"ext: the package content exceeds %d bytes", maxUncompressedBytes)
-		}
-		if _, dup := files[name]; dup {
-			return nil, errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid,
-				"ext: duplicate path %q", name)
 		}
 		files[name] = data
 	}
@@ -199,8 +200,11 @@ func isHexDigest(s string) bool {
 	return true
 }
 
+var reservedArchiveStem = regexp.MustCompile(`^(CON|PRN|AUX|NUL|CONIN\$|CONOUT\$|COM[1-9¹²³]|LPT[1-9¹²³])$`)
+var shortArchiveStem = regexp.MustCompile(`~[0-9]+$`)
+
 func isSafeArchivePath(name string) bool {
-	if name == "" || len(name) > 512 {
+	if name == "" || len(name) > 512 || !utf8.ValidString(name) {
 		return false
 	}
 	// The package format mandates forward slashes (§1). A backslash is
@@ -208,14 +212,19 @@ func isSafeArchivePath(name string) bool {
 	// it is a separator: "..\..\evil" or "C:\evil" would escape the
 	// target directory there. Colons are rejected for the same reason
 	// (drive letters, NTFS alternate data streams like "panel.html:evil").
-	if strings.ContainsAny(name, "\\:") {
+	if strings.ContainsAny(name, "\\:<>\"|?*") {
 		return false
+	}
+	for _, r := range name {
+		if r < 0x20 {
+			return false
+		}
 	}
 	if !strings.HasPrefix(name, "./") && (path.IsAbs(name) || strings.HasPrefix(name, "/")) {
 		return false
 	}
 	clean := path.Clean(name)
-	if clean == "." || clean == "/" || strings.HasPrefix(clean, "..") {
+	if clean == "." || clean == "/" || clean == ".." || strings.HasPrefix(clean, "../") {
 		return false
 	}
 	// Only the canonical name is accepted: "./panel.html", "a//b" and
@@ -230,11 +239,51 @@ func isSafeArchivePath(name string) bool {
 		return false
 	}
 	for _, part := range strings.Split(clean, "/") {
-		if part == "" || part == "." || part == ".." {
+		if part == "" || part == "." || part == ".." || len(part) > 255 || strings.HasSuffix(part, ".") || strings.HasSuffix(part, " ") {
+			return false
+		}
+		stem, extension, _ := strings.Cut(part, ".")
+		stem = strings.ToUpper(strings.TrimRight(stem, " "))
+		if reservedArchiveStem.MatchString(stem) {
+			return false
+		}
+		// An explicit DOS short-name spelling can alias another signed member
+		// on NTFS volumes that generate 8.3 names. Do not rewrite signed names.
+		if utf8.RuneCountInString(stem) <= 8 && !strings.Contains(extension, ".") && utf8.RuneCountInString(extension) <= 3 && shortArchiveStem.MatchString(stem) {
 			return false
 		}
 	}
 	return true
+}
+
+func checkPackagePaths(names []string) error {
+	if len(names) > maxPackageFiles {
+		return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: too many package paths")
+	}
+	ordered := make([]struct{ name, key string }, 0, len(names))
+	for _, name := range names {
+		if !isSafeArchivePath(name) {
+			return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: unsafe package path %q", name)
+		}
+		// A separator sorts before every legal filename character, so dir.js
+		// cannot separate dir from dir/entry and hide a file/directory clash.
+		ordered = append(ordered, struct{ name, key string }{name, strings.ReplaceAll(strings.ToUpper(name), "/", "\x00")})
+	}
+	sort.Slice(ordered, func(i, j int) bool { return ordered[i].key < ordered[j].key })
+	var previousName, previousKey []string
+	for i, entry := range ordered {
+		if i > 0 && (entry.key == ordered[i-1].key || strings.HasPrefix(entry.key, ordered[i-1].key+"\x00")) {
+			return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: ambiguous package path %q", entry.name)
+		}
+		names, keys := strings.Split(entry.name, "/"), strings.Split(entry.key, "\x00")
+		for j := 0; j < len(keys) && j < len(previousKey) && keys[j] == previousKey[j]; j++ {
+			if names[j] != previousName[j] {
+				return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: inconsistent package directory path %q", entry.name)
+			}
+		}
+		previousName, previousKey = names, keys
+	}
+	return nil
 }
 
 // Verify checks the package integrity and authenticity:
@@ -308,6 +357,16 @@ func (p *Package) checkDeclaredEntries() error {
 // is self-attested, so verifying against it would let a package smuggle
 // in its own trust anchor (D1).
 func (p *Package) VerifyWithKey(authorKeyLine string) error {
+	if len(p.Files) > maxPackageFiles {
+		return errs.Newf(errs.CodeInvalidArgument, KeyPackageInvalid, "ext: too many package paths")
+	}
+	names := make([]string, 0, len(p.Files))
+	for name := range p.Files {
+		names = append(names, name)
+	}
+	if err := checkPackagePaths(names); err != nil {
+		return err
+	}
 	if err := p.checkDeclaredEntries(); err != nil {
 		return err
 	}

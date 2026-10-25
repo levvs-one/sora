@@ -35,6 +35,10 @@ const String manifestName = 'sora-extension.json';
 const String checksumsName = 'checksums.txt';
 const String signatureName = 'signature.minisig';
 
+final _invalidArchiveCharacters = RegExp(r'[\\:<>"|?*\x00-\x1f]');
+final _reservedArchiveStem = RegExp(r'^(CON|PRN|AUX|NUL|CONIN\$|CONOUT\$|COM[1-9¹²³]|LPT[1-9¹²³])$');
+final _shortArchiveStem = RegExp(r'~[0-9]+$');
+
 /// An opened, not yet trusted .soraext archive.
 class ExtPackage {
   ExtPackage._(this.files, this.manifest);
@@ -78,14 +82,20 @@ class ExtPackage {
     if (headers.length > _maxPackageFiles) {
       throw PackageError('too many files (${headers.length})');
     }
+    _checkPaths(headers.where((h) => !h.filename.endsWith('/')).map((h) => h.filename));
     // Phase 2: fail fast on declared sizes, before any inflation.
     var declaredTotal = 0;
     var compressedTotal = 0;
     for (final h in headers) {
       final name = h.filename;
       if (name.endsWith('/')) continue; // directory entry
-      if (!_isSafePath(name)) throw PackageError('unsafe path "$name"');
-      if (h.generalPurposeBitFlag & 0x1 != 0) {
+      final local = h.file;
+      if (local == null ||
+          local.filename != name ||
+          local.compressionMethod != (h.compressionMethod == 0 ? CompressionType.none : CompressionType.deflate)) {
+        throw PackageError('local ZIP metadata does not match its directory');
+      }
+      if (h.generalPurposeBitFlag & 0x1 != 0 || local.flags & 0x1 != 0) {
         throw PackageError('file "$name" is encrypted');
       }
       // 0 = stored, 8 = deflated. Anything else the decoder may not even
@@ -120,22 +130,23 @@ class ExtPackage {
     } catch (e) {
       throw PackageError('not a zip archive: $e');
     }
+    _checkPaths(archive.files.where((f) => f.isFile).map((f) => f.name));
     final files = <String, Uint8List>{};
     var total = 0;
     for (final f in archive.files) {
       if (!f.isFile) continue;
       final name = f.name;
-      if (!_isSafePath(name)) throw PackageError('unsafe path "$name"');
-      if (files.containsKey(name)) throw PackageError('duplicate path "$name"');
-      final sink = _CappedOutput(_maxSingleFile, name);
+      if (f.size < 0 || f.size > _maxSingleFile) throw PackageError('file size exceeds $_maxSingleFile bytes');
+      // archive >=4.5.2 bounds every decoder write, including LZ77 backrefs,
+      // to the validated declared size. Keep that limit in the ZIP library.
+      final sink = OutputMemoryStream();
       try {
         f.decompress(sink);
-      } on PackageError {
-        rethrow;
       } catch (e) {
         throw PackageError('cannot decompress "$name": $e');
       }
       final content = sink.getBytes();
+      if (content.length > _maxSingleFile) throw PackageError('file size exceeds $_maxSingleFile bytes');
       total += content.length;
       if (total > _maxUncompressedBytes) {
         throw PackageError('content exceeds $_maxUncompressedBytes bytes');
@@ -169,6 +180,7 @@ class ExtPackage {
   /// the manifest's own key would let a package smuggle in its own trust
   /// anchor.
   Future<void> verify({String? authorKeyLine}) async {
+    _checkPaths(files.keys);
     // Mirrors core/ext checkDeclaredEntries: a package that declares an
     // entry but does not ship the file would install an extension whose
     // panel 404s or whose worker never starts. Refuse it here, at the
@@ -214,17 +226,59 @@ class ExtPackage {
 
   static bool _isSafePath(String name) {
     if (name.isEmpty || name.length > 512) return false;
+    final encoded = utf8.encode(name);
+    if (encoded.length > 512 || utf8.decode(encoded) != name) return false;
     // Mirrors core/ext isSafeArchivePath: a backslash is never legitimate in
     // an archive path, and on the Windows extractor it is a separator
     // ("..\\..\\evil"); a colon is a drive letter or an NTFS alternate data
     // stream ("C:\\evil", "panel.html:evil").
-    if (name.contains('\\') || name.contains(':')) return false;
+    if (_invalidArchiveCharacters.hasMatch(name)) return false;
     if (name.startsWith('/')) return false;
     final parts = name.split('/');
     for (final p in parts) {
-      if (p.isEmpty || p == '.' || p == '..') return false;
+      if (p.isEmpty || p == '.' || p == '..' || utf8.encode(p).length > 255 || p.endsWith('.') || p.endsWith(' ')) {
+        return false;
+      }
+      final dot = p.indexOf('.');
+      final stem = (dot < 0 ? p : p.substring(0, dot)).replaceFirst(RegExp(r' +$'), '').toUpperCase();
+      final extension = dot < 0 ? '' : p.substring(dot + 1);
+      if (_reservedArchiveStem.hasMatch(stem)) return false;
+      if (stem.runes.length <= 8 &&
+          !extension.contains('.') &&
+          extension.runes.length <= 3 &&
+          _shortArchiveStem.hasMatch(stem)) {
+        return false;
+      }
     }
     return true;
+  }
+
+  static void _checkPaths(Iterable<String> paths) {
+    final ordered = <({String name, String key})>[];
+    for (final name in paths) {
+      if (ordered.length >= _maxPackageFiles) throw PackageError('too many package paths');
+      if (!_isSafePath(name)) throw PackageError('unsafe package path ${jsonEncode(name)}');
+      // Sort a directory's descendants before siblings such as dir.js.
+      ordered.add((name: name, key: name.toUpperCase().replaceAll('/', '\u0000')));
+    }
+    ordered.sort((a, b) => a.key.compareTo(b.key));
+    var previousNames = <String>[];
+    var previousKeys = <String>[];
+    for (var i = 0; i < ordered.length; i++) {
+      final entry = ordered[i];
+      if (i > 0 && (entry.key == ordered[i - 1].key || entry.key.startsWith('${ordered[i - 1].key}\u0000'))) {
+        throw PackageError('ambiguous package path ${jsonEncode(entry.name)}');
+      }
+      final names = entry.name.split('/');
+      final keys = entry.key.split('\u0000');
+      for (var j = 0; j < keys.length && j < previousKeys.length && keys[j] == previousKeys[j]; j++) {
+        if (names[j] != previousNames[j]) {
+          throw PackageError('inconsistent package directory path ${jsonEncode(entry.name)}');
+        }
+      }
+      previousNames = names;
+      previousKeys = keys;
+    }
   }
 
   static Map<String, String> _parseChecksums(String text) {
@@ -247,46 +301,5 @@ class ExtPackage {
     }
     if (out.isEmpty) throw PackageError('checksums.txt is empty');
     return out;
-  }
-}
-
-/// An [OutputMemoryStream] that throws [PackageError] instead of growing
-/// past [limit] bytes. Every write path the inflater can use is capped:
-/// [writeByte]/[writeBytes] carry the streamed deflate output (the native
-/// decoder writes decoded chunks through [writeBytes], so the cap trips
-/// mid-inflation and a lying header cannot cause unbounded in-memory
-/// expansion) and [writeStream] covers stored entries and whole-buffer
-/// copies. (package:archive 4.0.7 has no back-reference write path: LZ77
-/// matches are expanded inside the decoder, never through this sink.)
-class _CappedOutput extends OutputMemoryStream {
-  _CappedOutput(this._limit, this._name);
-
-  final int _limit;
-  final String _name;
-  var _written = 0;
-
-  PackageError _tooBig() => PackageError('file "$_name" exceeds $_limit bytes');
-
-  @override
-  void writeByte(int value) {
-    if (_written + 1 > _limit) throw _tooBig();
-    _written += 1;
-    super.writeByte(value);
-  }
-
-  @override
-  void writeBytes(List<int> bytes, {int? length}) {
-    final n = length ?? bytes.length;
-    if (_written + n > _limit) throw _tooBig();
-    _written += n;
-    super.writeBytes(bytes, length: length);
-  }
-
-  @override
-  void writeStream(InputStream stream) {
-    final n = stream.length;
-    if (_written + n > _limit) throw _tooBig();
-    _written += n;
-    super.writeStream(stream);
   }
 }
