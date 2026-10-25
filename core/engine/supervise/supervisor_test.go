@@ -39,6 +39,9 @@ func TestMain(m *testing.M) {
 }
 
 func fakeEngine(mode string) int {
+	if strings.HasPrefix(mode, "probe-") {
+		return fakeProbe(mode)
+	}
 	if mode == envFixtureMode {
 		for _, key := range envFixtureKeys {
 			if os.Getenv(key) != "" {

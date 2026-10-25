@@ -1,7 +1,6 @@
 package supervise
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -45,6 +44,28 @@ type Prober struct {
 	Pattern *regexp.Regexp
 }
 
+const maxProbeOutput = 64 << 10
+
+var errProbeOutputLimit = errors.New("version output exceeds 64 KiB")
+
+type probeOutput struct {
+	data     [maxProbeOutput]byte
+	size     int
+	overflow bool
+	cancel   context.CancelFunc
+}
+
+func (out *probeOutput) Write(p []byte) (int, error) {
+	n := copy(out.data[out.size:], p)
+	out.size += n
+	if n < len(p) {
+		out.overflow = true
+		out.cancel()
+		return n, errProbeOutputLimit
+	}
+	return n, nil
+}
+
 // Probe runs version arguments and recognises the reported engine build.
 func (pr Prober) Probe(ctx context.Context, path string) (Binary, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -52,13 +73,21 @@ func (pr Prober) Probe(ctx context.Context, path string) (Binary, error) {
 	cmd := exec.CommandContext(ctx, path, pr.Args...) //nolint:gosec // path is a discovery candidate and the arguments are literals
 	HideWindow(cmd)
 	cmd.Env = SafeEnv()
-	var out bytes.Buffer
+	cmd.WaitDelay = time.Second
+	// A shared comparable writer makes os/exec serialize both streams. Cancel
+	// on overflow so a version command cannot keep filling or holding the pipe.
+	out := probeOutput{cancel: cancel}
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	if err := cmd.Run(); err != nil {
-		return Binary{}, fmt.Errorf("%s: probe failed: %w: %s", pr.Kind, err, strings.TrimSpace(out.String()))
+	err := cmd.Run()
+	if out.overflow {
+		return Binary{}, fmt.Errorf("%s: probe failed: %w", pr.Kind, errProbeOutputLimit)
 	}
-	first, _, _ := strings.Cut(strings.TrimSpace(out.String()), "\n")
+	output := string(out.data[:out.size])
+	if err != nil {
+		return Binary{}, fmt.Errorf("%s: probe failed: %w: %s", pr.Kind, err, strings.TrimSpace(output))
+	}
+	first, _, _ := strings.Cut(strings.TrimSpace(output), "\n")
 	match := pr.Pattern.FindStringSubmatch(strings.TrimSpace(first))
 	if match == nil {
 		return Binary{}, fmt.Errorf("%s: unexpected version output %q", pr.Kind, first)
@@ -68,7 +97,7 @@ func (pr Prober) Probe(ctx context.Context, path string) (Binary, error) {
 		return Binary{}, err
 	}
 	b := Binary{Kind: pr.Kind, Path: path, Version: version, Goos: runtime.GOOS, Goarch: runtime.GOARCH}
-	for _, line := range strings.Split(out.String(), "\n") {
+	for _, line := range strings.Split(output, "\n") {
 		if tags, ok := strings.CutPrefix(strings.TrimSpace(line), "Tags:"); ok {
 			b.BuildTags = strings.Split(strings.TrimSpace(tags), ",")
 		}
