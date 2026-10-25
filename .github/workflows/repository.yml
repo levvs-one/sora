@@ -204,15 +204,15 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq gcc pkg-config ninja-build valac bison gettext libglib2.0-dev libgsf-1-dev libgcab-dev libxml2-dev uuid-dev python3-venv
+          sudo apt-get install -y -qq gcc pkg-config ninja-build valac bison gettext gobject-introspection libgirepository1.0-dev libglib2.0-dev libgsf-1-dev libgcab-dev libxml2-dev uuid-dev python3-venv
           fixture_tool_root="$RUNNER_TEMP/msi-tool"
           mkdir -p "$fixture_tool_root/src"
-          curl -fsSL --connect-timeout 15 --max-time 120 https://download.gnome.org/sources/msitools/0.106/msitools-0.106.tar.xz -o "$fixture_tool_root/source.tar.xz"
+          curl -fsSL --connect-timeout 15 --max-time 120 --max-filesize 437664 https://download.gnome.org/sources/msitools/0.106/msitools-0.106.tar.xz -o "$fixture_tool_root/source.tar.xz"
           printf '%s  %s\n' 1ed34279cf8080f14f1b8f10e649474125492a089912e7ca70e59dfa2e5a659b "$fixture_tool_root/source.tar.xz" | sha256sum -c -
           tar -xJf "$fixture_tool_root/source.tar.xz" --strip-components=1 -C "$fixture_tool_root/src"
           python3 -m venv "$fixture_tool_root/venv"
           "$fixture_tool_root/venv/bin/pip" --disable-pip-version-check install meson==1.12.1
-          "$fixture_tool_root/venv/bin/meson" setup "$fixture_tool_root/build" "$fixture_tool_root/src" --prefix="$fixture_tool_root/install" --libdir=lib -Dintrospection=false
+          "$fixture_tool_root/venv/bin/meson" setup "$fixture_tool_root/build" "$fixture_tool_root/src" --prefix="$fixture_tool_root/install" --libdir=lib -Dintrospection=true
           "$fixture_tool_root/venv/bin/meson" compile -C "$fixture_tool_root/build"
           "$fixture_tool_root/venv/bin/meson" install -C "$fixture_tool_root/build"
           env PATH="$fixture_tool_root/install/bin:$PATH" LD_LIBRARY_PATH="$fixture_tool_root/install/lib" python3 -B packaging/windows/build_msi_fixture.py "$RUNNER_TEMP/msi-fixtures"

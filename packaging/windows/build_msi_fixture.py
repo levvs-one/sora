@@ -12,6 +12,9 @@ import uuid
 
 
 def build(output):
+    version = subprocess.check_output(["wixl", "--version"], text=True, timeout=10).strip()
+    if version != "0.106":
+        raise RuntimeError(f"Expected the reviewed wixl 0.106 compiler, got {version}")
     output.mkdir(parents=True, exist_ok=False)
     source = Path(__file__).resolve().parent
     upgrade, component, old, new = ["{" + str(uuid.uuid4()).upper() + "}" for _ in range(4)]
