@@ -6,6 +6,7 @@ toolchain go1.27.3
 
 require (
 	aead.dev/minisign v0.3.0
+	code.dny.dev/ssrf v0.3.0
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/dop251/goja v0.0.0-20261020172427-7b1a02208696
 	github.com/enfein/mieru/v3 v3.38.1
