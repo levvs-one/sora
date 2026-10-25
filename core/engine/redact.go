@@ -89,7 +89,7 @@ func (e *maskedError) Unwrap() error { return e.cause }
 
 var (
 	uuidPattern     = regexp.MustCompile(`(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
-	keyValuePattern = regexp.MustCompile(`(?i)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|psk|public[_-]?key|short[_-]?id|spider[_-]?x)\b([=: ]+)(\S+)`)
+	keyValuePattern = regexp.MustCompile(`(?is)\b(uuid|password|passwd|secret|token|private[_-]?key|preshared[_-]?key|pre-shared-key|obfs[_-]?password|psk|public[_-]?key|short[_-]?id|spider[_-]?x)\b(["']?)([\s=:]+)(\[masked\]|"(?:\\.|[^"\\])*(?:"|(?:\\)?$)|'(?:''|\\.|[^'\\])*(?:'|(?:\\)?$)|[^\s,;}\]]+)`)
 	userInfoPattern = regexp.MustCompile(`(?i)\b(https?|socks5|vless|vmess|trojan|ss|hysteria2|hy2|tuic|wireguard|wg)://[^/\s@]+@`)
 )
 
@@ -97,7 +97,16 @@ var (
 // exact values are unknown.
 func maskPatterns(s string) string {
 	s = userInfoPattern.ReplaceAllString(s, "${1}://[masked]@")
-	s = keyValuePattern.ReplaceAllString(s, "${1}${2}[masked]")
+	s = keyValuePattern.ReplaceAllStringFunc(s, func(match string) string {
+		fields := keyValuePattern.FindStringSubmatch(match)
+		quote := fields[2]
+		if strings.HasPrefix(fields[4], `"`) || strings.HasPrefix(fields[4], "'") {
+			quote = fields[4][:1]
+		}
+		// Preserve structured string syntax and mask the entire quoted
+		// value, including escaped quotes and spaces, instead of one word.
+		return fields[1] + fields[2] + fields[3] + quote + "[masked]" + quote
+	})
 	s = uuidPattern.ReplaceAllString(s, "[masked]")
 	return s
 }
