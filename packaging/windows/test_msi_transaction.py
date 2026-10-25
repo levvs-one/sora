@@ -45,10 +45,13 @@ def verify(directory):
                 if observation.exists():
                     observation.unlink()
                 log = logs / f"{phase}.log"
+                # Msiexec quotes property values, unlike the CRT's whole-argument quoting.
+                command = subprocess.list2cmdline([
+                    "msiexec.exe", "/i", str(directory / f"{name}.msi"), "/qn", "/norestart", "/L*v", str(log),
+                ]) + f' INSTALLFOLDER="{target}" OBSERVATION="{observation}" PROBEFAIL={int(fail)}'
+                (logs / f"{phase}-command.txt").write_text(command + "\n", encoding="utf-8")
                 result = subprocess.run(
-                    ["msiexec.exe", "/i", str(directory / f"{name}.msi"), "/qn", "/norestart",
-                     "/L*v", str(log), f"INSTALLFOLDER={target}", f"OBSERVATION={observation}",
-                     f"PROBEFAIL={int(fail)}"],
+                    command,
                     capture_output=True, timeout=120,
                 )
                 if (result.returncode == 0) == fail:
