@@ -75,7 +75,7 @@ class UpdateHelperTest(unittest.TestCase):
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
         ]
         command += ["--setenv", "TEST_INSTALLED", installed]
-        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut"]:
+        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut", "wc"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
         for name, body in scripts.items():
             command += ["--ro-bind", str(self.script(name, body)), "/usr/bin/" + name]
@@ -179,6 +179,33 @@ class UpdateHelperTest(unittest.TestCase):
                 self.assertIn("release signature verification failed", result.stderr)
                 self.assertFalse((self.root / "calls").exists())
                 self.assertFalse((self.root / "escaped").exists())
+
+    def test_declared_release_metadata_is_snapshotted_and_hash_checked(self):
+        for problem in ("valid", "empty", "missing", "corrupt", "symlink", "oversize", "unlisted"):
+            with self.subTest(problem=problem):
+                for item in self.downloads.iterdir():
+                    item.unlink()
+                self.prepare("deb")
+                metadata = self.downloads / "release.json"
+                metadata.write_bytes(b"" if problem == "empty" else b'{"schema":1}\n')
+                sums = self.downloads / "SHA256SUMS"
+                if problem != "unlisted":
+                    sums.write_text(sums.read_text() + hashlib.sha256(metadata.read_bytes()).hexdigest() + "  release.json\n")
+                if problem == "missing":
+                    metadata.unlink()
+                elif problem == "corrupt":
+                    metadata.write_bytes(b"changed\n")
+                elif problem == "symlink":
+                    metadata.unlink()
+                    metadata.symlink_to("SHA256SUMS")
+                elif problem == "oversize":
+                    metadata.write_bytes(b"x" * (1048576 + 1))
+                result = self.run_helper("deb")
+                self.assertNotIn("bwrap:", result.stderr)
+                self.assertEqual(result.returncode == 0, problem == "valid", result.stdout + result.stderr)
+                self.assertEqual((self.root / "calls").exists(), problem == "valid")
+                if (self.root / "calls").exists():
+                    (self.root / "calls").unlink()
 
 
 if __name__ == "__main__":

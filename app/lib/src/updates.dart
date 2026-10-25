@@ -11,6 +11,7 @@ import 'package:pub_semver/pub_semver.dart';
 
 import 'settings.dart';
 import 'ext/verifier.dart';
+import 'release_metadata.dart';
 
 const appVersion = String.fromEnvironment('SORA_VERSION', defaultValue: 'dev');
 const releaseRepository = 'https://github.com/levvs-one/sora';
@@ -178,10 +179,16 @@ String expectedHash(String manifest, String name) {
   return hashes.single;
 }
 
-Future<void> verifyUpdateFile(File file, String manifest, String name) async {
+Future<void> verifyUpdateFile(File file, String manifest, String name, {int? size}) async {
   final expected = expectedHash(manifest, name);
-  final actual = await sha256.bind(file.openRead()).first;
-  if (actual.toString() != expected) throw const UpdateFailure(UpdateError.checksum);
+  final length = await file.length();
+  if (length < 1 || length > ReleaseMetadata.maxArtifactBytes || (size != null && length != size)) {
+    throw const UpdateFailure(UpdateError.checksum);
+  }
+  final actual = await sha256.bind(file.openRead(0, length + 1)).first;
+  if (actual.toString() != expected || await file.length() != length) {
+    throw const UpdateFailure(UpdateError.checksum);
+  }
 }
 
 /// Marker written to settings after a Linux update's privileged helper
@@ -596,7 +603,43 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
-  Future<String> _signedManifest(SoraRelease release, Directory directory) async {
+  ReleaseMetadata _parseMetadata(List<int> bytes, String manifest, String version) {
+    final digest = sha256.convert(bytes).toString();
+    if (digest != expectedHash(manifest, ReleaseMetadata.filename)) {
+      throw const UpdateFailure(UpdateError.checksum);
+    }
+    try {
+      final metadata = ReleaseMetadata.parse(bytes, version);
+      if (metadata.checksumManifest(digest) != manifest) throw const FormatException('Inconsistent checksum manifest');
+      return metadata;
+    } on FormatException {
+      throw const UpdateFailure(UpdateError.release);
+    }
+  }
+
+  List<ReleaseAsset> _boundAssets(List<ReleaseAsset> assets, ReleaseMetadata? metadata) {
+    final bounded = <ReleaseAsset>[];
+    for (final asset in assets) {
+      if (metadata == null) {
+        if (asset.size < 1 || asset.size > ReleaseMetadata.maxArtifactBytes) {
+          throw const UpdateFailure(UpdateError.release);
+        }
+        bounded.add(asset);
+      } else {
+        final entry = metadata.artifacts[asset.name];
+        if (entry == null || entry.os != (_windows ? 'windows' : 'linux') || entry.arch != 'amd64') {
+          throw const UpdateFailure(UpdateError.release);
+        }
+        bounded.add(ReleaseAsset(asset.name, asset.url, entry.size));
+      }
+    }
+    return bounded;
+  }
+
+  Future<({String manifest, ReleaseMetadata? metadata})> _signedManifest(
+    SoraRelease release,
+    Directory directory,
+  ) async {
     final sums = release.asset('SHA256SUMS');
     final signature = release.asset('SHA256SUMS.minisig');
     if (sums.size < 1 || sums.size > 1024 * 1024 || signature.size < 1 || signature.size > 8192) {
@@ -618,10 +661,21 @@ class AppUpdater extends ChangeNotifier {
     } on FormatException {
       throw const UpdateFailure(UpdateError.release);
     }
+    ReleaseMetadata? metadata;
+    List<int>? metadataBytes;
+    if (ReleaseMetadata.referenced(manifest)) {
+      final asset = release.asset(ReleaseMetadata.filename);
+      if (asset.size > ReleaseMetadata.maxBytes) throw const UpdateFailure(UpdateError.release);
+      metadataBytes = await _fetch(asset.url, limit: ReleaseMetadata.maxBytes, size: asset.size);
+      metadata = _parseMetadata(metadataBytes, manifest, release.version);
+    }
     if (_cancelled || _disposed) throw const UpdateFailure(UpdateError.network);
     await File('${directory.path}/SHA256SUMS').writeAsBytes(payload, flush: true);
     await File('${directory.path}/SHA256SUMS.minisig').writeAsBytes(signatureBytes, flush: true);
-    return manifest;
+    if (metadataBytes != null) {
+      await File('${directory.path}/${ReleaseMetadata.filename}').writeAsBytes(metadataBytes, flush: true);
+    }
+    return (manifest: manifest, metadata: metadata);
   }
 
   /// The caller provides desktop launch/quit operations so tests never elevate.
@@ -647,11 +701,13 @@ class AppUpdater extends ChangeNotifier {
       if (!_windows && installation == null) throw const UpdateFailure(UpdateError.unsupported);
       final names = _windows ? ['Sora-Setup-${release.version}-x64.exe'] : installation!.filenames(release.version);
       // Resolve the whole pair before downloading or invoking any installer.
-      final assets = [for (final name in names) release.asset(name)];
+      var assets = [for (final name in names) release.asset(name)];
       release.asset('SHA256SUMS.minisig');
       if (_work != null) await _work!.delete(recursive: true);
       final work = _work = await Directory.systemTemp.createTemp('sora-update-');
-      final manifest = await _signedManifest(release, work);
+      final verified = await _signedManifest(release, work);
+      final manifest = verified.manifest;
+      assets = _boundAssets(assets, verified.metadata);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
@@ -674,7 +730,7 @@ class AppUpdater extends ChangeNotifier {
         downloaded += asset.size;
         // The signature authenticates the manifest; this binds each package
         // to its signed hash before any installer handoff.
-        await verifyUpdateFile(file, manifest, asset.name);
+        await verifyUpdateFile(file, manifest, asset.name, size: asset.size);
       }
       _guard();
       if (connection() == UpdateConnection.connected && !await confirmDrop()) return;
@@ -816,6 +872,16 @@ class AppUpdater extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
+  Future<Uint8List> _cachedMetadataFile(Directory dir, String name, int limit) async {
+    final bytes = BytesBuilder(copy: false);
+    await for (final chunk in File('${dir.path}/$name').openRead(0, limit + 1).timeout(const Duration(seconds: 5))) {
+      bytes.add(chunk);
+      if (bytes.length > limit) throw const UpdateFailure(UpdateError.rollback);
+    }
+    if (bytes.isEmpty) throw const UpdateFailure(UpdateError.rollback);
+    return bytes.takeBytes();
+  }
+
   /// Rolls back to [marker.from] using the verified rollback cache.
   /// Fail-closed at every step: missing cache, hash mismatch, no elevation
   /// or a failed helper run → no downgrade happens; the error and a manual
@@ -849,32 +915,33 @@ class AppUpdater extends ChangeNotifier {
       }
       // Both manifest and packages lived on user-writable disk since download.
       // Bound reads independently of mutable file lengths before verification.
-      final metadata = <Uint8List>[];
-      for (final (name, limit) in [('SHA256SUMS', 1024 * 1024), ('SHA256SUMS.minisig', 8192)]) {
-        final bytes = BytesBuilder(copy: false);
-        await for (final chunk in File(
-          '${dir.path}/$name',
-        ).openRead(0, limit + 1).timeout(const Duration(seconds: 5))) {
-          bytes.add(chunk);
-          if (bytes.length > limit) throw const UpdateFailure(UpdateError.rollback);
+      final payload = await _cachedMetadataFile(dir, 'SHA256SUMS', 1024 * 1024);
+      final signature = await _cachedMetadataFile(dir, 'SHA256SUMS.minisig', 8192);
+      await verifyPayload(_signingPublicKey, utf8.decode(signature), 'release:v${marker.from}:SHA256SUMS', payload);
+      final manifest = utf8.decode(payload);
+      ReleaseMetadata? metadata;
+      if (ReleaseMetadata.referenced(manifest)) {
+        try {
+          metadata = _parseMetadata(
+            await _cachedMetadataFile(dir, ReleaseMetadata.filename, ReleaseMetadata.maxBytes),
+            manifest,
+            marker.from,
+          );
+        } on Object {
+          throw const UpdateFailure(UpdateError.rollback);
         }
-        if (bytes.isEmpty) throw const UpdateFailure(UpdateError.rollback);
-        metadata.add(bytes.takeBytes());
       }
-      await verifyPayload(
-        _signingPublicKey,
-        utf8.decode(metadata[1]),
-        'release:v${marker.from}:SHA256SUMS',
-        metadata[0],
-      );
-      final manifest = utf8.decode(metadata[0]);
       final names = installation.filenames(marker.from);
       final paths = <String>[];
       for (final name in names) {
         final file = File('${dir.path}/$name');
         if (!await file.exists()) throw const UpdateFailure(UpdateError.rollback);
         try {
-          await verifyUpdateFile(file, manifest, name);
+          final entry = metadata?.artifacts[name];
+          if (metadata != null && (entry == null || entry.os != 'linux' || entry.arch != 'amd64')) {
+            throw const UpdateFailure(UpdateError.rollback);
+          }
+          await verifyUpdateFile(file, manifest, name, size: entry?.size);
         } on UpdateFailure {
           debugPrint('[updates] rollback cache hash mismatch for $name; refusing to roll back');
           throw const UpdateFailure(UpdateError.rollback);
@@ -949,16 +1016,18 @@ class AppUpdater extends ChangeNotifier {
       final previous = SoraRelease.parse(utf8.decode(bytes));
       if (previous.version != from) throw const UpdateFailure(UpdateError.release);
       final names = installation.filenames(previous.version);
-      final assets = [for (final name in names) previous.asset(name)];
+      var assets = [for (final name in names) previous.asset(name)];
       await dir.create(recursive: true);
-      final manifest = await _signedManifest(previous, dir);
+      final verified = await _signedManifest(previous, dir);
+      final manifest = verified.manifest;
+      assets = _boundAssets(assets, verified.metadata);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
       for (final asset in assets) {
         final file = File('${dir.path}/${asset.name}');
         await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
-        await verifyUpdateFile(file, manifest, asset.name);
+        await verifyUpdateFile(file, manifest, asset.name, size: asset.size);
       }
       debugPrint('[updates] rollback cache ready for $from (${assets.length} packages, hashes verified)');
     } on UpdateFailure catch (e) {

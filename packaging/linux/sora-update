@@ -78,7 +78,9 @@ fi
 
 work=$(mktemp -d /var/tmp/sora-update.XXXXXXXX)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-for name in SHA256SUMS SHA256SUMS.minisig $files; do
+snapshot_files="SHA256SUMS SHA256SUMS.minisig $files"
+if [ -e "$source/release.json" ] || [ -L "$source/release.json" ]; then snapshot_files="$snapshot_files release.json"; fi
+for name in $snapshot_files; do
     if [ ! -f "$source/$name" ] || [ -L "$source/$name" ]; then die 'downloads must be regular files'; fi
     cp -P -- "$source/$name" "$work/$name"
     # cp -P preserves a symlink raced into the source, which is then rejected.
@@ -87,7 +89,15 @@ done
 # Use the installed trust root, never a verifier supplied with the download.
 /usr/bin/sora-core -verify-release "$work" -release-version "$version" || die 'release signature verification failed; nothing was installed'
 cd "$work"
-for name in $files; do
+checked_files=$files
+if grep -Eq ' [ *]release[.]json$' SHA256SUMS; then
+    if [ ! -f release.json ] || [ ! -s release.json ] || [ -L release.json ]; then die 'release metadata is missing or empty'; fi
+    [ "$(wc -c <release.json)" -le 1048576 ] || die 'release metadata is too large'
+    checked_files="$checked_files release.json"
+elif [ -e release.json ]; then
+    die 'release metadata is not authenticated by the checksum manifest'
+fi
+for name in $checked_files; do
     # Match the filename literally, including the dots in release versions.
     awk -v name="$name" 'length($1) == 64 && $1 !~ /[^0-9a-fA-F]/ && (substr($0, 67) == name || substr($0, 67) == "*" name) {print tolower($1) "  " name; count++} END {if (count != 1) exit 1}' SHA256SUMS >>expected || die 'missing or duplicate checksum'
 done
