@@ -75,9 +75,19 @@ func TestReleaseSignatureTrustBoundary(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			err = verifyRelease(dir, version, key)
+			verified, verifyErr := verifyRelease(dir, version, key)
+			err = verifyErr
 			if (err == nil) != (test == "valid") {
 				t.Fatalf("verification: %v", err)
+			}
+			if test == "valid" {
+				size, err := verified.artifactSize("sora_1.2.3_amd64.deb", "linux/amd64", "1.2.3")
+				if err != nil || size != 0 {
+					t.Fatalf("signed legacy size: %d, %v", size, err)
+				}
+				if _, err := verified.artifactSize("sora-core_1.2.3_amd64.deb", "linux/amd64", "1.2.3"); err == nil {
+					t.Fatal("missing legacy checksum accepted")
+				}
 			}
 		})
 	}
@@ -87,6 +97,10 @@ func TestReleaseVerifierRejectsAmbiguousCommandsWithoutStartingCore(t *testing.T
 	data := filepath.Join(t.TempDir(), "must-not-be-created")
 	t.Setenv("SORA_DATA_DIR", data)
 	for _, args := range [][]string{
+		{"-release-artifact="},
+		{"-release-target", "linux/amd64", "-print-token"},
+		{"-verify-release", t.TempDir(), "-release-version", "1.2.3", "-release-artifact", "sora_1.2.3_amd64.deb"},
+		{"-verify-release", t.TempDir(), "-release-version", "1.2.3", "-release-target", "linux/amd64"},
 		{"-verify-release=", "-release-version=", "-uninstall-service"},
 		{"-release-version=", "-print-token"},
 		{"-release-version", "1.2.3"},

@@ -1,6 +1,7 @@
 """Create signed CI inputs without changing the shipped core or using team keys."""
 
 import hashlib
+import json
 import os
 from pathlib import Path
 import re
@@ -8,6 +9,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+
+from release_manifest import write_release_manifest
 
 
 def prepare(distribution, version, output):
@@ -44,11 +47,7 @@ def prepare(distribution, version, output):
         release.write_text(text)
         subprocess.run(["go", "build", "-buildvcs=false", "-trimpath", "-ldflags=-s -w", "-o", str(verifier), "./cmd/sora-core"], cwd=source, env=env, check=True)
         sums = distribution / "SHA256SUMS"
-        lines = []
-        for package in packages:
-            with package.open("rb") as stream:
-                lines.append(f"{hashlib.file_digest(stream, 'sha256').hexdigest()}  {package.name}\n")
-        sums.write_bytes("".join(lines).encode("ascii"))
+        write_release_manifest(distribution, version)
         subprocess.run([str(signer), "sign-file", "--key", str(key.with_suffix(".key")), "--role", f"release:v{version}:SHA256SUMS", str(sums)], check=True, stdout=subprocess.DEVNULL)
         subprocess.run([str(verifier), "-verify-release", str(distribution), "-release-version", version], check=True)
         duplicate = output / "duplicate"
@@ -56,6 +55,33 @@ def prepare(distribution, version, output):
         duplicate_sums = duplicate / "SHA256SUMS"
         duplicate_sums.write_bytes(sums.read_bytes() * 2)
         subprocess.run([str(signer), "sign-file", "--key", str(key.with_suffix(".key")), "--role", f"release:v{version}:SHA256SUMS", str(duplicate_sums)], check=True, stdout=subprocess.DEVNULL)
+        original = json.loads((distribution / "release.json").read_bytes())
+        for problem in ("os", "arch", "zero-size", "wrong-size", "version", "duplicate-key", "legacy"):
+            document = json.loads(json.dumps(original))
+            entry = document["artifacts"][0]
+            if problem == "os":
+                entry["os"] = "other"
+            elif problem == "arch":
+                entry["arch"] = "other"
+            elif problem == "zero-size":
+                entry["size"] = 0
+            elif problem == "wrong-size":
+                for artifact in document["artifacts"]:
+                    artifact["size"] += 1
+            elif problem == "version":
+                document["version"] = "1.2.4"
+            variant = output / ("metadata-" + problem)
+            variant.mkdir()
+            hashes = {artifact["name"]: artifact["sha256"] for artifact in original["artifacts"]}
+            if problem != "legacy":
+                data = (json.dumps(document, sort_keys=True, separators=(",", ":")) + "\n").encode("ascii")
+                if problem == "duplicate-key":
+                    data = data.replace(b'"schema":1', b'"schema":1,"schema":1')
+                (variant / "release.json").write_bytes(data)
+                hashes["release.json"] = hashlib.sha256(data).hexdigest()
+            payload = variant / "SHA256SUMS"
+            payload.write_bytes("".join(f"{hashes[name]}  {name}\n" for name in sorted(hashes)).encode("ascii"))
+            subprocess.run([str(signer), "sign-file", "--key", str(key.with_suffix(".key")), "--role", f"release:v{version}:SHA256SUMS", str(payload)], check=True, stdout=subprocess.DEVNULL)
     print(verifier)
 
 

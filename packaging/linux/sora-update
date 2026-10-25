@@ -98,6 +98,14 @@ elif [ -e release.json ]; then
     die 'release metadata is not authenticated by the checksum manifest'
 fi
 for name in $checked_files; do
+    if [ "$name" != release.json ]; then
+        size=$(/usr/bin/sora-core -verify-release "$work" -release-version "$version" -release-artifact "$name" -release-target linux/amd64) || die 'artifact metadata rejected'
+        case "$size" in '' | *[!0-9]*) die 'invalid verifier size response' ;; esac
+        if [ "${#size}" -gt 10 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
+        bytes=$(wc -c <"$name")
+        if [ "$bytes" -lt 1 ] || [ "$bytes" -gt 2147483648 ]; then die 'invalid package size'; fi
+        if [ "$size" -gt 0 ] && [ "$bytes" -ne "$size" ]; then die 'signed package size mismatch'; fi
+    fi
     # Match the filename literally, including the dots in release versions.
     awk -v name="$name" 'length($1) == 64 && $1 !~ /[^0-9a-fA-F]/ && (substr($0, 67) == name || substr($0, 67) == "*" name) {print tolower($1) "  " name; count++} END {if (count != 1) exit 1}' SHA256SUMS >>expected || die 'missing or duplicate checksum'
 done

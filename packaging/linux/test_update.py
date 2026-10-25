@@ -41,15 +41,18 @@ class UpdateHelperTest(unittest.TestCase):
         return files
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
-                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False):
+                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size="0"):
         recorder = '[ -f /tmp/test/verification ] && printf "%s\\n" "$@" > /tmp/test/calls'
         # The query fakes also report the installed sora-core version
         # (TEST_INSTALLED) for the helper's downgrade protection.
         scripts = {
-            "sora-core": '[ "$#" = 4 ] && [ "$1" = -verify-release ] && [ "$3" = -release-version ] &&'
+            "sora-core": '[ "$1" = -verify-release ] && [ "$3" = -release-version ] &&'
                          ' [ "$4" = 1.0.5 ]; case "$2" in /var/tmp/sora-update.*) ;; *) exit 1;; esac;'
                          ' [ -f "$2/SHA256SUMS" ] && [ -f "$2/SHA256SUMS.minisig" ];'
-                         ' printf "%s\\n" "$@" > /tmp/test/verification; [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]',
+                         ' [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]; case "$#" in'
+                         ' 4) printf "%s\\n" "$@" > /tmp/test/verification;;'
+                         ' 8) [ "$5" = -release-artifact ] && [ "$7" = -release-target ] && [ "$8" = linux/amd64 ];'
+                         ' printf "%s\\n" "$TEST_SIGNED_SIZE";; *) exit 1;; esac',
             "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) case "$2" in'
                           " -f='${Version}') echo \"$TEST_INSTALLED\";; *) echo installed;; esac;;"
                           " *) exit 1;; esac",
@@ -75,6 +78,7 @@ class UpdateHelperTest(unittest.TestCase):
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
         ]
         command += ["--setenv", "TEST_INSTALLED", installed]
+        command += ["--setenv", "TEST_SIGNED_SIZE", signed_size]
         for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut", "wc"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
         for name, body in scripts.items():
@@ -206,6 +210,15 @@ class UpdateHelperTest(unittest.TestCase):
                 self.assertEqual((self.root / "calls").exists(), problem == "valid")
                 if (self.root / "calls").exists():
                     (self.root / "calls").unlink()
+
+    def test_size_query_is_required_and_enforced_before_installation(self):
+        self.prepare("deb")
+        for size in ("1", "999", "2147483649", "", "verified", "1;touch /tmp/test/escaped"):
+            with self.subTest(size=size):
+                result = self.run_helper("deb", signed_size=size)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertFalse((self.root / "calls").exists())
+                self.assertFalse((self.root / "escaped").exists())
 
 
 if __name__ == "__main__":

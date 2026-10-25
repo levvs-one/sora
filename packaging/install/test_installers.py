@@ -25,7 +25,7 @@ class InstallerSignatureTest(unittest.TestCase):
         prepare(cls.inputs, "1.2.3", cls.tools)
         cls.script = Path(__file__).with_name("install.ps1" if os.name == "nt" else "install.sh").resolve()
 
-    def run_installer(self, variant):
+    def run_installer(self, variant, shell="pwsh"):
         with tempfile.TemporaryDirectory(prefix="case-", dir=self.root) as directory:
             case = Path(directory)
             distribution = case / "distribution"
@@ -45,10 +45,25 @@ class InstallerSignatureTest(unittest.TestCase):
             elif variant == "duplicate checksum":
                 for name in ("SHA256SUMS", "SHA256SUMS.minisig"):
                     shutil.copyfile(self.tools / "duplicate" / name, distribution / name)
+            elif variant.startswith("metadata-"):
+                prepared = self.tools / variant
+                if prepared.is_dir():
+                    (distribution / "release.json").unlink()
+                    for item in prepared.iterdir():
+                        shutil.copyfile(item, distribution / item.name)
+                elif variant == "metadata-missing":
+                    (distribution / "release.json").unlink()
+                elif variant == "metadata-tamper":
+                    (distribution / "release.json").write_bytes(b"changed\n")
+                elif variant == "metadata-oversize":
+                    (distribution / "release.json").write_bytes(b"x" * (1048576 + 1))
+                elif variant == "metadata-symlink":
+                    (distribution / "release.json").unlink()
+                    (distribution / "release.json").symlink_to("SHA256SUMS")
             elif variant == "modified package":
                 for package in distribution.iterdir():
-                    if package.name not in ("SHA256SUMS", "SHA256SUMS.minisig"):
-                        package.write_bytes(b"tampered package\n")
+                    if package.name.endswith((".exe", ".deb", ".rpm", ".pkg.tar.zst")):
+                        package.write_bytes(b"x" * package.stat().st_size)
             elif variant == "missing verifier":
                 verifier = case / "absent-verifier"
             elif variant == "downloaded verifier":
@@ -61,15 +76,16 @@ class InstallerSignatureTest(unittest.TestCase):
                 # This intercepts only the final OS execution boundary; signature
                 # verification runs the real native verifier with the fixture root.
                 driver = case / "driver.ps1"
-                driver.write_text("function Start-Process { throw 'INSTALL_BOUNDARY_REACHED' }\n& $env:SORA_INSTALL_SCRIPT\n")
+                driver.write_text("function Start-Process { [IO.File]::WriteAllText($env:SORA_INSTALL_MARKER, 'reached'); throw 'INSTALL_BOUNDARY_REACHED' }\n& $env:SORA_INSTALL_SCRIPT\n")
                 env["SORA_INSTALL_SCRIPT"] = str(self.script)
-                result = subprocess.run(["pwsh", "-NoProfile", "-File", str(driver)], env=env, text=True, capture_output=True, timeout=30)
-                reached = "INSTALL_BOUNDARY_REACHED" in result.stdout + result.stderr
+                env["SORA_INSTALL_MARKER"] = str(case / "installation")
+                result = subprocess.run([shell, "-NoProfile", "-File", str(driver)], env=env, text=True, capture_output=True, timeout=30)
+                reached = (case / "installation").exists()
             else:
                 command = ["bwrap", "--unshare-all", "--uid", "0", "--gid", "0", "--die-with-parent",
                            "--ro-bind", "/", "/", "--tmpfs", "/usr/bin", "--tmpfs", "/tmp", "--dev", "/dev",
                            "--bind", str(self.root), "/tmp/test"]
-                for name in ("sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "readlink"):
+                for name in ("sh", "id", "uname", "rm", "grep", "awk", "mktemp", "sha256sum", "readlink", "head", "wc"):
                     command += ["--ro-bind", str(Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
                 boundary = case / "apt-get"
                 boundary.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > /tmp/test/' + case.name + '/installation\n')
@@ -98,6 +114,29 @@ class InstallerSignatureTest(unittest.TestCase):
                 result, reached = self.run_installer(variant)
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertFalse(reached, result.stdout + result.stderr)
+                if variant == "modified package":
+                    self.assertIn("does not match SHA256SUMS", result.stdout + result.stderr)
+
+    def test_signed_metadata_rejections_never_reach_installation(self):
+        variants = ("os", "arch", "zero-size", "wrong-size", "version", "duplicate-key", "missing", "tamper", "oversize")
+        if os.name != "nt":
+            variants += ("symlink",)
+        for variant in variants:
+            with self.subTest(variant=variant):
+                result, reached = self.run_installer("metadata-" + variant)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertFalse(reached, result.stdout + result.stderr)
+
+    def test_signed_legacy_format_remains_explicitly_supported(self):
+        result, reached = self.run_installer("metadata-legacy")
+        self.assertTrue(reached, result.stdout + result.stderr)
+
+    @unittest.skipUnless(os.name == "nt", "Windows PowerShell 5.1 compatibility")
+    def test_windows_powershell_51_bounds_local_streams(self):
+        for variant in ("valid", "metadata-wrong-size", "metadata-legacy", "metadata-oversize"):
+            with self.subTest(variant=variant):
+                result, reached = self.run_installer(variant, shell="powershell.exe")
+                self.assertEqual(reached, variant in ("valid", "metadata-legacy"), result.stdout + result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Linux namespace startup control")
     def test_sandbox_setup_failure_is_not_an_installer_rejection(self):

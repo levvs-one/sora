@@ -57,11 +57,24 @@ These are bootstrap prerequisites for reviewed distributions, not a consumer
 one-command trust solution. A signed Windows installer or trusted Linux package
 channel still needs release-owner provisioning before a general release.
 
-The scripts copy/download only the manifest and detached signature initially,
-then invoke that trusted verifier with the requested stable version. A rejection
+The scripts first copy/download bounded manifest and detached signature files,
+and `release.json` when the checksum table declares it. That declaration may
+cause only a bounded metadata fetch before authentication. The trusted verifier
+then checks the requested stable version, signature and declared JSON. A rejection
 stops before package download, UAC or package-manager execution. Packages are
 copied into the private working snapshot and hashed; missing or duplicate
-checksum entries are rejected. No unsigned compatibility fallback is provided.
+checksum entries are rejected. An authenticated artifact query checks the selected
+OS/architecture and returns its signed byte size before copying or streaming that
+package. An exact length check also runs before installation. No unsigned
+compatibility fallback is provided.
+
+Network installation on Linux requires curl 8.4 or later: earlier versions do
+not enforce `--max-filesize` on chunked responses. Older curl is rejected before
+downloads; authenticated local `SORA_DIST` installation remains supported. Local
+copies use bounded `head` reads, and network transfers require HTTPS redirects,
+size and time limits. Windows uses the existing .NET HttpClient with response
+headers first, a separately timed bounded stream, and the same loop for local
+inputs. No extra PowerShell module or runtime is downloaded.
 
 CI prepares separate test inputs with a short-lived key, builds a verifier from
 a temporary source copy with that test root and deletes the private key. The
@@ -109,13 +122,21 @@ Using a previously trusted build of sora-core, before using the manifest:
 sora-core -verify-release /path/to/private-release-snapshot -release-version 1.2.3
 ```
 
-The command verifies the manifest signature, not the package files. Its success
-message says exactly that. Callers must subsequently check each package's hash,
+The command verifies the manifest signature and any declared metadata, not the
+package files. Callers must subsequently check each package's hash,
 expected name, platform and architecture before installation. Signature checking
 does not authorize a downgrade; the caller's version policy remains required.
 
-The native command accepts only these two flags, including when a supplied value
-is empty. It exits before core construction, token access, service registration
+The native command accepts the two required flags, optionally with both
+`-release-artifact NAME -release-target OS/ARCH`. This query repeats authentication
+and prints only the signed size as a decimal integer. Zero identifies a signed
+legacy manifest without JSON; callers retain a 2 GiB ceiling and verify its
+checksum, never interpret zero as an unlimited download. An unknown artifact,
+missing checksum or target mismatch fails. A verifier predating the query refuses
+the flags and cannot silently authorize an installation.
+
+Empty or incomplete verification/query flags and unrelated operator flags are
+rejected. Verification exits before core construction, token access, service registration
 or network configuration. Manifest and signature inputs must be nonempty regular
 files, at most 1 MiB and 8 KiB respectively. Use a private snapshot of downloads;
 this command is not a replacement for privileged caller ownership/TOCTOU checks.
@@ -139,6 +160,33 @@ risk, not evidence of an independently audited crypto implementation. No new
 dependency is installed. Native compatibility is checked with the repository's
 Go toolchain and a Windows cross-build. The updater tests verify signatures made
 by the Go CLI using the existing Dart implementation.
+
+### Native metadata dependencies
+
+On 25 October 2026, the existing Go module requires Go 1.26.9 with toolchain
+1.27.3. Standard `encoding/json`, `crypto/sha256` and `sort` provide decoding,
+hashing and canonical table ordering with zero new dependencies. Protocol-specific
+target/size rules and a byte-for-byte re-encoding check reject ambiguity left by
+the general JSON decoder, including duplicate or case-folded keys. No JSON parser
+or cryptography is implemented locally.
+
+| Considered library | Latest release | Stars | Open issues including PRs | Go module zip | License | Minimum Go |
+| --- | --- | ---: | ---: | ---: | --- | --- |
+| [jsonschema/v6](https://github.com/santhosh-tekuri/jsonschema) | v6.0.3, 2026-08-06 | 1289 | 47 | 94453 B | Apache-2.0 | 1.21 |
+| [go-json](https://github.com/goccy/go-json) | v0.11.2, 2026-09-30 | 3753 | 19 | 643927 B | MIT | 1.23 |
+
+Both are active and compatible with the toolchain. JSON Schema adds a schema
+compiler and two declared module requirements but cannot replace the wire-format
+byte comparison; go-json replaces a parser that is already available and still
+needs the same domain checks. Standard JSON is sufficient; no package is added
+or experimental JSON implementation enabled. Figures come from the repositories'
+release/license/go.mod metadata and proxy.golang.org module archives.
+
+The existing curl client and .NET HttpClient are reused for transport. See the
+[curl size-limit contract](https://curl.se/docs/manpage.html#--max-filesize) and
+[HttpCompletionOption timeout scope](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpcompletionoption).
+The latter requires a separate content-read deadline when using response headers
+first; relying on HttpClient.Timeout alone would leave that read unbounded.
 
 ## Validation and remaining acceptance
 
@@ -192,14 +240,15 @@ manifest and JSON and enforces target and size again before invoking the helper.
 The root-owned Linux helper snapshots any supplied JSON, requires it when the
 signed checksum table declares it, and checks its nonempty, bounded contents
 against that table before the package manager runs. An unlisted JSON is rejected.
-The helper still relies on package inspection for the installed target; it does
-not independently parse schema 1. Native verifier and initial-install scripts
-still authenticate checksum manifests without enforcing JSON fields. Their
-metadata integration remains part of S2.
+The helper now invokes the installed native verifier to parse schema 1 and query
+each package's signed size and expected Linux/amd64 target on that root-owned
+snapshot. It also retains its own checksum, length and package-manager metadata
+checks. Initial-install scripts use the same native query with the detected target,
+including Linux arm64 core packages; Windows selects the existing amd64 build.
 
 Previously signed manifests without a JSON reference remain accepted by the
-existing signature and version policies, including Linux rollback. Their size
-comes from the API with a hard 2 GiB ceiling, not authenticated size metadata.
+existing signature and version policies, including Linux rollback. In the app,
+their size comes from the API with a hard 2 GiB ceiling, not authenticated metadata.
 This is explicit signed-format compatibility, not unsigned fallback. New producer
 output always declares JSON in the signed checksum table. The release transition
 must determine when legacy signed formats can be retired before claiming that
@@ -212,6 +261,22 @@ and tampering, incorrect API package sizes, chunked-response overflow and offlin
 rollback cache failures. Tests intercept only the final privileged handoff. The
 same metadata tests also run in the native Windows CI job; helper contract tests
 cover valid, empty, missing, corrupt, symlinked, oversized and unlisted snapshots.
+
+Native Go tests consume the same producer/signer fixtures as Dart and reject
+signed malformed documents and missing, replaced, oversized or linked JSON.
+The initial-install rejection matrix uses real signatures and intercepts only
+the final package-manager/Windows process boundary; a separate marker records
+actual entry into that boundary. Windows PowerShell 5.1 and PowerShell 7 exercise
+the bounded local-copy path. Package hashing uses .NET SHA-256 directly, including
+environments where the optional Get-FileHash command is unavailable.
+
+A Linux Go test serves the fixture bytes over loopback TLS with a temporary
+test CA trusted only by that curl process. It forces chunked transfer without
+Content-Length and checks valid, truncated/oversized package, tampered/oversized/
+missing JSON and old-curl rejection cases. Packages cannot be requested before
+metadata authentication. These tests perform no host installation, sudo, service
+or network-configuration changes. Windows HTTP response timing and real elevation
+failures still need separate isolated validation.
 
 Tests generate ephemeral keys and exercise actual signatures: altered payload,
 wrong key, untrusted signer, wrong version, catalog replay, missing/oversized
@@ -246,8 +311,7 @@ causes the helper to refuse installation. Publishing signatures or re-signing an
 old release is a separate release action; this change performs neither.
 
 Still required by S2: the reviewed transition, a publication gate that keeps the
-private key outside CI, a provisioned consumer bootstrap channel, metadata
-enforcement in native/initial-install consumers, key rotation/revocation and the
+private key outside CI, a provisioned consumer bootstrap channel, key rotation/revocation and the
 remaining real installation/elevation rejection matrix. Windows does not yet
 implement automatic rollback. Do not publish a release before the signed-release
 transition is ready.

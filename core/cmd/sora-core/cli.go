@@ -21,21 +21,23 @@ import (
 
 // flags holds operator settings with defaults for a standard installation.
 type flags struct {
-	dataDir        string
-	enginesDir     string
-	engine         string
-	localPort      int
-	bypass         string
-	socket         string
-	logLevel       string
-	check          bool
-	fileKeys       bool
-	showVersion    bool
-	install        bool
-	uninstall      bool
-	showToken      bool
-	verifyRelease  string
-	releaseVersion string
+	dataDir         string
+	enginesDir      string
+	engine          string
+	localPort       int
+	bypass          string
+	socket          string
+	logLevel        string
+	check           bool
+	fileKeys        bool
+	showVersion     bool
+	install         bool
+	uninstall       bool
+	showToken       bool
+	verifyRelease   string
+	releaseVersion  string
+	releaseArtifact string
+	releaseTarget   string
 }
 
 func main() {
@@ -86,24 +88,39 @@ func run(ctx context.Context, arguments []string) error {
 	set.BoolVar(&f.showToken, "print-token", false, "print the control plane token and exit")
 	set.StringVar(&f.verifyRelease, "verify-release", "", "verify the signed SHA256SUMS in a release directory and exit")
 	set.StringVar(&f.releaseVersion, "release-version", "", "expected stable release version for -verify-release (e.g. 1.2.3)")
+	set.StringVar(&f.releaseArtifact, "release-artifact", "", "with -release-target, print this authenticated artifact's byte size (0 for signed legacy manifests)")
+	set.StringVar(&f.releaseTarget, "release-target", "", "expected artifact OS/architecture, e.g. linux/amd64")
 	if err := set.Parse(arguments); err != nil {
 		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyUnauthenticated)
 	}
-	verification, invalid := false, set.NArg() != 0
+	verification, artifactQuery, invalid := false, false, set.NArg() != 0
 	set.Visit(func(option *flag.Flag) {
-		if option.Name == "verify-release" || option.Name == "release-version" {
+		switch option.Name {
+		case "verify-release", "release-version":
 			verification = true
-		} else {
+		case "release-artifact", "release-target":
+			verification, artifactQuery = true, true
+		default:
 			invalid = true
 		}
 	})
 	if verification {
-		if invalid || f.verifyRelease == "" || f.releaseVersion == "" {
+		if invalid || f.verifyRelease == "" || f.releaseVersion == "" ||
+			(artifactQuery && (f.releaseArtifact == "" || f.releaseTarget == "")) {
 			return errs.Newf(errs.CodeInvalidArgument, errs.KeyUnauthenticated,
-				"release verification requires only -verify-release and -release-version")
+				"release verification requires -verify-release and -release-version, optionally both -release-artifact and -release-target; other flags are forbidden")
 		}
-		if err := verifyRelease(f.verifyRelease, f.releaseVersion, releasePublicKey); err != nil {
+		manifest, err := verifyRelease(f.verifyRelease, f.releaseVersion, releasePublicKey)
+		if err != nil {
 			return err
+		}
+		if artifactQuery {
+			size, err := manifest.artifactSize(f.releaseArtifact, f.releaseTarget, f.releaseVersion)
+			if err != nil {
+				return err
+			}
+			fmt.Println(size)
+			return nil
 		}
 		fmt.Printf("verified release %s SHA256SUMS signature\n", f.releaseVersion)
 		return nil

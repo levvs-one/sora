@@ -8,6 +8,7 @@
 # SORA_DIST=<directory> installs packages already in that directory, with
 # signed SHA256SUMS; CI uses an isolated verifier with a temporary test key.
 set -eu
+umask 077
 
 repo=https://github.com/levvs-one/sora
 
@@ -57,7 +58,24 @@ fi
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT INT TERM
 
-fetch() { curl -fsSL --proto '=https' --tlsv1.2 -o "$2" "$1"; }
+if [ -z "${SORA_DIST:-}" ]; then
+	# Older curl does not enforce --max-filesize on chunked responses.
+	curl_ok=$(curl --version | awk 'NR == 1 {split($2, v, "."); if (v[1] > 8 || (v[1] == 8 && v[2] >= 4)) print "yes"; exit}')
+	[ "$curl_ok" = yes ] || die 'network installation requires curl 8.4 or later for bounded downloads; authenticated local SORA_DIST remains supported'
+fi
+
+fetch() {
+	_name=$1 _limit=$2
+	if [ -n "${SORA_DIST:-}" ]; then
+		if [ ! -f "$SORA_DIST/$_name" ] || [ -L "$SORA_DIST/$_name" ]; then die 'release inputs must be regular files'; fi
+		head -c "$((_limit + 1))" -- "$SORA_DIST/$_name" >"$work/$_name" || die "could not copy $_name"
+	else
+		curl -q -fsSL --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 600 \
+			--max-filesize "$_limit" -o "$work/$_name" "$repo/releases/download/v$version/$_name" || die "could not download $_name within its size limit"
+	fi
+	_bytes=$(wc -c <"$work/$_name")
+	if [ "$_bytes" -lt 1 ] || [ "$_bytes" -gt "$_limit" ]; then die "invalid $_name size"; fi
+}
 
 if [ -n "${SORA_DIST:-}" ]; then
 	version=${SORA_VERSION:?SORA_VERSION is needed with SORA_DIST}
@@ -95,20 +113,18 @@ else
 fi
 
 say "sora: installing $version with $manager"
-verified=no
-for name in SHA256SUMS SHA256SUMS.minisig $files; do
-	case "$name" in
-	SHA256SUMS | SHA256SUMS.minisig) ;;
-	*) if [ "$verified" = no ]; then
-		"$verifier" -verify-release "$work" -release-version "$version" || die 'release signature rejected; nothing was installed'
-		verified=yes
-	fi ;;
-	esac
-	if [ -n "${SORA_DIST:-}" ]; then
-		cp "$SORA_DIST/$name" "$work/$name" || die "$name is not in $SORA_DIST"
-	else
-		fetch "$repo/releases/download/v$version/$name" "$work/$name" || die "could not download $name"
-	fi
+fetch SHA256SUMS 1048576
+fetch SHA256SUMS.minisig 8192
+if grep -Eq ' [ *]release[.]json$' "$work/SHA256SUMS"; then fetch release.json 1048576; fi
+"$verifier" -verify-release "$work" -release-version "$version" || die 'release signature or metadata rejected; nothing was installed'
+for name in $files; do
+	size=$("$verifier" -verify-release "$work" -release-version "$version" -release-artifact "$name" -release-target "linux/$deb_arch") || die 'artifact metadata rejected'
+	case "$size" in '' | *[!0-9]*) die 'invalid verifier size response' ;; esac
+	if [ "${#size}" -gt 10 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
+	limit=$size
+	if [ "$limit" -eq 0 ]; then limit=2147483648; fi
+	fetch "$name" "$limit"
+	if [ "$size" -gt 0 ] && [ "$(wc -c <"$work/$name")" -ne "$size" ]; then die 'signed package size mismatch'; fi
 done
 
 (

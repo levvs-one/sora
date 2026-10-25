@@ -42,24 +42,73 @@ if ($version.Length -gt 64 -or $version -notmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-
 $name = "Sora-Setup-$version-x64.exe"
 $work = Join-Path ([IO.Path]::GetTempPath()) ("sora-" + [Guid]::NewGuid())
 New-Item -ItemType Directory -Path $work | Out-Null
-try {
-    foreach ($file in @('SHA256SUMS', 'SHA256SUMS.minisig', $name)) {
-        if ($file -eq $name) {
-            & $verifier -verify-release $work -release-version $version
-            if ($LASTEXITCODE -ne 0) { throw 'The release signature was rejected; nothing was installed.' }
-        }
-        $target = Join-Path $work $file
+Add-Type -AssemblyName System.Net.Http
+$downloadClient = [Net.Http.HttpClient]::new()
+function Receive-ReleaseFile([string]$File, [long]$Limit) {
+    $inputStream = $null; $outputStream = $null; $response = $null
+    $deadline = [Threading.CancellationTokenSource]::new()
+    $deadline.CancelAfter(600000)
+    try {
         if ($env:SORA_DIST) {
-            Copy-Item (Join-Path $env:SORA_DIST $file) $target
+            $source = Get-Item -LiteralPath (Join-Path $env:SORA_DIST $File)
+            if ($source.PSIsContainer -or ($source.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Release inputs must be regular files.' }
+            $inputStream = [IO.File]::OpenRead($source.FullName)
         } else {
-            Invoke-WebRequest -UseBasicParsing "$repo/releases/download/v$version/$file" -OutFile $target
+            $response = $downloadClient.GetAsync("$repo/releases/download/v$version/$File", [Net.Http.HttpCompletionOption]::ResponseHeadersRead, $deadline.Token).GetAwaiter().GetResult()
+            [void]$response.EnsureSuccessStatusCode()
+            if ($response.RequestMessage.RequestUri.Scheme -ne 'https' -or $response.Content.Headers.ContentLength -gt $Limit) { throw 'Invalid download scheme or size.' }
+            $streamTask = $response.Content.ReadAsStreamAsync()
+            $streamTask.Wait($deadline.Token)
+            $inputStream = $streamTask.GetAwaiter().GetResult()
         }
+        $outputStream = [IO.File]::Create((Join-Path $work $File))
+        $buffer = [byte[]]::new(65536)
+        [long]$total = 0
+        while ($true) {
+            $readTask = $inputStream.ReadAsync($buffer, 0, $buffer.Length, $deadline.Token)
+            # Bound the wait even if a stream cannot cancel an in-flight read.
+            $readTask.Wait($deadline.Token)
+            $count = $readTask.GetAwaiter().GetResult()
+            if ($count -eq 0) { break }
+            $total += $count
+            if ($total -gt $Limit) { throw "$File exceeds its download size limit." }
+            $outputStream.Write($buffer, 0, $count)
+        }
+        if ($total -eq 0) { throw "$File is empty." }
+    } finally {
+        if ($outputStream) { $outputStream.Dispose() }
+        if ($inputStream) { $inputStream.Dispose() }
+        if ($response) { $response.Dispose() }
+        $deadline.Dispose()
     }
+}
+try {
+    Receive-ReleaseFile 'SHA256SUMS' 1048576
+    Receive-ReleaseFile 'SHA256SUMS.minisig' 8192
+    if (Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -cmatch ' [ *]release[.]json$' }) {
+        Receive-ReleaseFile 'release.json' 1048576
+    }
+    & $verifier -verify-release $work -release-version $version
+    if ($LASTEXITCODE -ne 0) { throw 'The release signature or metadata was rejected; nothing was installed.' }
+    $sizeText = & $verifier -verify-release $work -release-version $version -release-artifact $name -release-target 'windows/amd64'
+    if ($LASTEXITCODE -ne 0 -or $sizeText -notmatch '^(0|[1-9][0-9]{0,9})$') { throw 'Invalid verifier size response.' }
+    [long]$signedSize = $sizeText
+    if ($signedSize -gt 2147483648) { throw 'Invalid verifier size response.' }
+    $limit = if ($signedSize -eq 0) { 2147483648 } else { $signedSize }
+    Receive-ReleaseFile $name $limit
+    if ($signedSize -gt 0 -and (Get-Item -LiteralPath (Join-Path $work $name)).Length -ne $signedSize) { throw 'Signed package size mismatch.' }
     $pattern = "^([0-9a-f]{64})\s+\*?$([regex]::Escape($name))$"
     $lines = @(Get-Content (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -match $pattern })
     if ($lines.Count -ne 1 -or $lines[0] -notmatch $pattern) { throw "$name needs exactly one entry in SHA256SUMS." }
     $expected = $Matches[1]
-    $actual = (Get-FileHash -Algorithm SHA256 (Join-Path $work $name)).Hash.ToLowerInvariant()
+    $hash = [Security.Cryptography.SHA256]::Create()
+    $package = [IO.File]::OpenRead((Join-Path $work $name))
+    try {
+        $actual = [BitConverter]::ToString($hash.ComputeHash($package)).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $package.Dispose()
+        $hash.Dispose()
+    }
     if ($actual -ne $expected) { throw "$name does not match SHA256SUMS; nothing was installed." }
 
     Write-Output "sora: installing $version"
@@ -69,6 +118,7 @@ try {
     if ($setup.ExitCode -ne 0) { throw "The installer ended with code $($setup.ExitCode)." }
     Write-Output 'sora: installed. Sora is in the Start menu; its icon lives in the tray.'
 } finally {
+    $downloadClient.Dispose()
     $resolvedWork = [IO.Path]::GetFullPath($work)
     if ([IO.Path]::GetDirectoryName($resolvedWork).TrimEnd('\') -ne [IO.Path]::GetTempPath().TrimEnd('\')) { throw 'Unexpected temporary directory; refusing cleanup.' }
     Remove-Item -LiteralPath $resolvedWork -Recurse -Force -ErrorAction SilentlyContinue

@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"regexp"
+	"sort"
+	"strings"
 
 	"github.com/levvs-one/sora-client/core/ext"
 )
@@ -14,28 +19,169 @@ import (
 const releasePublicKey = "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
 
 var releaseVersionPattern = regexp.MustCompile(`^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$`)
+var releaseChecksumPattern = regexp.MustCompile(`^([0-9a-fA-F]{64}) [ *](.+)$`)
+var releaseHashPattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
-func verifyRelease(directory, version, publicKey string) error {
+// Field order is part of schema 1's canonical Python/Dart/Go wire format.
+type releaseArtifact struct {
+	Arch   string `json:"arch"`
+	Name   string `json:"name"`
+	OS     string `json:"os"`
+	SHA256 string `json:"sha256"`
+	Size   int64  `json:"size"`
+}
+
+type releaseMetadata struct {
+	Artifacts []releaseArtifact `json:"artifacts"`
+	Schema    int               `json:"schema"`
+	Version   string            `json:"version"`
+}
+
+type releaseManifest struct {
+	payload  []byte
+	metadata *releaseMetadata
+}
+
+func verifyRelease(directory, version, publicKey string) (*releaseManifest, error) {
 	if !releaseVersionPattern.MatchString(version) || len(version) > 64 {
-		return fmt.Errorf("release: invalid stable version")
+		return nil, fmt.Errorf("release: invalid stable version")
 	}
 	root, err := os.OpenRoot(directory)
 	if err != nil {
-		return fmt.Errorf("release: %w", err)
+		return nil, fmt.Errorf("release: %w", err)
 	}
 	defer func() { _ = root.Close() }()
 	payload, err := readReleaseFile(root, "SHA256SUMS", 1024*1024)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	signature, err := readReleaseFile(root, "SHA256SUMS.minisig", 8192)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if err := ext.VerifyPayload(publicKey, string(signature), "release:v"+version+":SHA256SUMS", payload); err != nil {
-		return fmt.Errorf("release: untrusted SHA256SUMS: %w", err)
+		return nil, fmt.Errorf("release: untrusted SHA256SUMS: %w", err)
 	}
-	return nil
+	manifest := &releaseManifest{payload: payload}
+	for _, line := range strings.Split(string(payload), "\n") {
+		line = strings.TrimSuffix(line, "\r")
+		if !strings.HasSuffix(line, " release.json") && !strings.HasSuffix(line, "*release.json") {
+			continue
+		}
+		data, err := readReleaseFile(root, "release.json", 1024*1024)
+		if err != nil {
+			return nil, err
+		}
+		manifest.metadata, err = parseReleaseMetadata(data, payload, version)
+		if err != nil {
+			return nil, err
+		}
+		break
+	}
+	return manifest, nil
+}
+
+func parseReleaseMetadata(data, payload []byte, version string) (*releaseMetadata, error) {
+	digest := fmt.Sprintf("%x", sha256.Sum256(data))
+	expected, err := releaseChecksum(payload, "release.json")
+	if err != nil || digest != expected {
+		return nil, fmt.Errorf("release: metadata checksum mismatch")
+	}
+	var metadata releaseMetadata
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&metadata); err != nil {
+		return nil, fmt.Errorf("release: invalid metadata: %w", err)
+	}
+	if metadata.Schema != 1 || metadata.Version != version || len(metadata.Artifacts) == 0 || len(metadata.Artifacts) > 128 {
+		return nil, fmt.Errorf("release: unsupported metadata version or artifact count")
+	}
+	hashes := map[string]string{"release.json": digest}
+	previous := ""
+	for _, artifact := range metadata.Artifacts {
+		osName, arch := releaseArtifactTarget(artifact.Name, version)
+		if artifact.Name <= previous || osName == "" || artifact.OS != osName || artifact.Arch != arch ||
+			artifact.Size < 1 || artifact.Size > 2*1024*1024*1024 || !releaseHashPattern.MatchString(artifact.SHA256) {
+			return nil, fmt.Errorf("release: invalid artifact metadata")
+		}
+		previous = artifact.Name
+		hashes[artifact.Name] = artifact.SHA256
+	}
+	canonical, err := json.Marshal(metadata)
+	if err != nil || !bytes.Equal(append(canonical, '\n'), data) {
+		return nil, fmt.Errorf("release: noncanonical metadata")
+	}
+	names := make([]string, 0, len(hashes))
+	for name := range hashes {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	var checksums strings.Builder
+	for _, name := range names {
+		fmt.Fprintf(&checksums, "%s  %s\n", hashes[name], name)
+	}
+	if checksums.String() != string(payload) {
+		return nil, fmt.Errorf("release: metadata and checksum manifest disagree")
+	}
+	return &metadata, nil
+}
+
+func releaseChecksum(payload []byte, name string) (string, error) {
+	value, count := "", 0
+	for _, line := range strings.Split(string(payload), "\n") {
+		match := releaseChecksumPattern.FindStringSubmatch(strings.TrimSuffix(line, "\r"))
+		if match != nil && match[2] == name {
+			value, count = strings.ToLower(match[1]), count+1
+		}
+	}
+	if count != 1 {
+		return "", fmt.Errorf("release: missing or duplicate artifact checksum")
+	}
+	return value, nil
+}
+
+func (manifest *releaseManifest) artifactSize(name, target, version string) (int64, error) {
+	osName, arch := releaseArtifactTarget(name, version)
+	if osName == "" || osName+"/"+arch != target || arch == "any" {
+		return 0, fmt.Errorf("release: artifact does not match the requested target")
+	}
+	if _, err := releaseChecksum(manifest.payload, name); err != nil {
+		return 0, err
+	}
+	if manifest.metadata == nil {
+		// Zero means authenticated legacy checksum, with no signed size.
+		return 0, nil
+	}
+	for _, artifact := range manifest.metadata.Artifacts {
+		if artifact.Name == name {
+			return artifact.Size, nil
+		}
+	}
+	return 0, fmt.Errorf("release: artifact is not in metadata")
+}
+
+func releaseArtifactTarget(name, version string) (string, string) {
+	if name == "Sora-Setup-"+version+"-x64.exe" {
+		return "windows", "amd64"
+	}
+	if name == "install.ps1" {
+		return "windows", "any"
+	}
+	if name == "install.sh" {
+		return "linux", "any"
+	}
+	for _, pair := range [][2]string{{"amd64", "x86_64"}, {"arm64", "aarch64"}} {
+		for _, pkg := range []string{"sora-core", "sora"} {
+			if pkg == "sora" && pair[0] == "arm64" {
+				continue
+			}
+			if name == pkg+"_"+version+"_"+pair[0]+".deb" || name == pkg+"-"+version+"-1."+pair[1]+".rpm" ||
+				name == pkg+"-"+version+"-1-"+pair[1]+".pkg.tar.zst" {
+				return "linux", pair[0]
+			}
+		}
+	}
+	return "", ""
 }
 
 func readReleaseFile(root *os.Root, name string, limit int64) ([]byte, error) {
