@@ -180,6 +180,99 @@ shared directory immutable. Declared OS/architecture are not independent PE/ELF
 inspection. Consumer bootstrap, release-owner approval and the signed-release
 transition remain required before any public release.
 
+## Protected GitHub publication path
+
+`.github/workflows/release-gate.yml` supplies a manual, two-phase publication
+path; `packaging/release/gate.py` is its policy and transport entry point. The
+workflow builds the pinned-root native verifier from the reviewed workflow
+commit on `main`, never from release assets or the release tag. A private
+temporary snapshot holds downloads, separately from that verifier. The signing
+key remains outside CI. Nothing in this path signs a release.
+
+The read-only preflight requires the repository's immutable-release setting,
+an existing `release` environment with explicit User reviewers and self-review
+disabled, and a custom deployment policy selecting only the `main` branch.
+Missing policy or credentials fail before package downloads. Teams are refused
+because this path does not have permission to prove their current membership.
+The policy API needs Administration(read), which `GITHUB_TOKEN` cannot request.
+Provision a separate, narrowly scoped `SORA_RELEASE_POLICY_TOKEN` with repository
+Administration(read) and Actions(read), using the owner's approved credential
+management. Do not copy a developer's existing CLI token into Actions.
+
+The publishing job additionally requires a recorded environment approval by a
+different configured reviewer. Bypassing an environment does not create that
+approval. The REST environment representation does not expose the admin-bypass
+setting; this code does not invent or claim to inspect it. Configure bypass
+restrictions separately as defence in depth. Review history does not bind an
+approval to a run attempt, so write operations refuse reruns: use a new manual
+dispatch, with a new approval, after any failure. The workflow also verifies its
+repository, main-branch source, path, run SHA and initiating actor through the API.
+
+Each dispatch specifies the stable version tag, the independently approved full
+source commit and one stage:
+
+1. `verify` only authenticates policy, tag and complete signed snapshot.
+2. `publish-prerelease` repeats verification after approval, publishes a draft
+   with `prerelease=true` and `make_latest=false`, then requires an immutable
+   result with the same asset IDs, names, sizes and digests and the expected tag
+   commit. An already frozen, matching prerelease is checked without another write.
+3. `promote` accepts only an already immutable release, downloads and verifies
+   every signed file again, then sets the stable/latest flags after a separate
+   approval. A matching immutable stable release is an idempotent success.
+
+GitHub draft uploads and publication are not atomic. A concurrent change after
+the last draft check can enter the initial prerelease. The postcondition detects
+it and refuses stable promotion; it cannot retract already published bytes.
+No automatic deletion, retry, repair or stable fallback occurs. A failed freeze
+needs release-owner investigation. Immutability must be enabled before the
+freeze; old mutable releases are refused rather than being retroactively trusted.
+GitHub permits prerelease/latest changes on immutable releases while keeping
+their tag and assets locked. See [immutable release guarantees](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).
+
+Downloads use the existing authenticated `gh api` for metadata queries
+and curl 8.4+ for bounded HTTPS asset streams. Asset URLs are constructed from
+validated numeric GitHub IDs, not supplied URLs. The token header goes through
+curl's stdin configuration, stays out of process arguments, and is not forwarded
+to another origin. Metadata bounds are fixed; package bounds come from the
+authenticated JSON. API digests bind the snapshot to the frozen asset identity;
+the independent Minisign signature and native full profile authenticate bytes.
+The Python standard library handles orchestration, JSON and hashing; there is
+no new HTTP, authentication, retry or cryptography implementation/dependency.
+The gate rejects gh output above 2 MiB after the client returns, and projects at
+most sixteen assets to reject an oversized matrix. This is not a transport-level
+memory bound on gh's own JSON decoder; package streams have the enforced curl
+byte limit described above.
+
+Upstream snapshot on 25 October 2026 (open counts include PRs):
+
+| Candidate | Latest release | Stars / open | Distribution | License / runtime |
+| --- | --- | --- | --- | --- |
+| [GitHub CLI](https://github.com/cli/cli) | v2.103.2, 2026-10-23 | 46738 / 1098 | Linux amd64 archive 15031001 B | MIT; standalone |
+| [curl](https://github.com/curl/curl) | 8.23.0, 2026-10-14 | 43240 / 88 | source archive 2990916 B | curl permissive license; standalone |
+| [Requests](https://github.com/psf/requests) | 2.34.2, 2026-05-14 | 54651 / 244 | wheel 73075 B | Apache-2.0; Python >=3.10 |
+
+Reuse the existing gh/curl clients and Python 3.12+ standard library: Requests
+would add four runtime dependencies without replacing gh's existing authentication
+or curl's streaming limit. Tests use actual native Minisign/file verification
+with the public fixture root in a temporary source copy; GitHub API/write and
+transport boundaries are simulated. They do not publish or configure anything.
+
+On 25 October 2026, the repository policy endpoint reported immutable releases
+disabled and no environments existed. This workflow is prepared code, not a
+provisioned or live-tested production gate. Do not dispatch a publishing stage
+until the owner explicitly approves configuration and the software publication.
+After approved setup, first run `verify` and review its outcome. A YAML environment
+name alone is not protection and may create an unprotected environment.
+
+This is the supported publication path, not a claim that all GitHub writers are
+technically restricted to it. Existing draft-build workflow permissions and
+repository administrators remain separate write channels. Protect workflow/source
+changes and inventory/restrict other writers before claiming repository-wide
+enforcement. The tag/commit comparison is not build provenance: schema 1 does not
+sign the build source commit, and this gate does not prove how binaries were built.
+Consumer bootstrap, unsigned transition, rotation/revocation, Authenticode and the
+remaining failure/elevation matrix remain open S2 requirements.
+
 ## Implementation choice
 
 Snapshot of upstream metadata on 24 October 2026:

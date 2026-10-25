@@ -1,0 +1,111 @@
+name: Protected release gate
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/release-gate.yml
+      - packaging/release/**
+      - core/**
+      - app/test/fixtures/releases/metadata.json
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Verify, freeze as an immutable prerelease, or promote an immutable release
+        type: choice
+        options: [verify, publish-prerelease, promote]
+        default: verify
+        required: true
+      tag:
+        description: Stable tag, for example v1.2.3
+        required: true
+        type: string
+      source_commit:
+        description: Independently approved full release source commit
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: protected-release-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: core/go.mod
+          cache-dependency-path: core/go.sum
+      - run: python3 -B -m unittest discover -s packaging/release -p 'test_*.py' -v
+
+  preflight:
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'levvs-one/sora' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: core/go.mod
+          cache-dependency-path: core/go.sum
+      - name: Build verifier from reviewed workflow source
+        working-directory: core
+        run: go build -trimpath -o "$RUNNER_TEMP/sora-release-verifier" ./cmd/sora-core
+      - name: Read-only policy and signed snapshot preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SORA_RELEASE_POLICY_TOKEN: ${{ secrets.SORA_RELEASE_POLICY_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          RELEASE_STAGE: ${{ inputs.stage }}
+        run: >-
+          python3 -B packaging/release/gate.py --tag "$RELEASE_TAG" --commit "$SOURCE_COMMIT"
+          --verifier "$RUNNER_TEMP/sora-release-verifier" --stage "$RELEASE_STAGE"
+
+  publish:
+    needs: preflight
+    if: inputs.stage != 'verify'
+    environment: release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: core/go.mod
+          cache-dependency-path: core/go.sum
+      - name: Build verifier from reviewed workflow source
+        working-directory: core
+        run: go build -trimpath -o "$RUNNER_TEMP/sora-release-verifier" ./cmd/sora-core
+      - name: Reauthenticate before the approved release operation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SORA_RELEASE_POLICY_TOKEN: ${{ secrets.SORA_RELEASE_POLICY_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          RELEASE_STAGE: ${{ inputs.stage }}
+        run: >-
+          python3 -B packaging/release/gate.py --tag "$RELEASE_TAG" --commit "$SOURCE_COMMIT"
+          --verifier "$RUNNER_TEMP/sora-release-verifier" --stage "$RELEASE_STAGE" --execute
