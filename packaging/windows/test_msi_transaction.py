@@ -17,11 +17,18 @@ def verify(directory):
         raise RuntimeError("MSI installations are restricted to the disposable Windows CI runner")
     metadata = json.loads((directory / "fixture.json").read_text(encoding="utf-8"))
     products = [metadata[name] for name in ("old", "new")]
-    if len(set(products)) != 2:
+    service = metadata.get("service")
+    if service:
+        if not service.startswith("SoraMSIFixture-") or len(bytes.fromhex(service.removeprefix("SoraMSIFixture-"))) != 16:
+            raise RuntimeError("Refusing to inspect any non-fixture service")
+        products.append(metadata["broken"])
+        if subprocess.run(["sc.exe", "query", service], capture_output=True, timeout=10).returncode != 1060:
+            raise RuntimeError("Refusing to touch an existing or unqueryable service")
+    if len(set(products)) != len(products):
         raise RuntimeError("Fixture product identities must differ")
     for product in products:
         uuid.UUID(product)
-    for name in ("old.msi", "new.msi"):
+    for name in (["old.msi", "new.msi", "broken.msi"] if service else ["old.msi", "new.msi"]):
         if hashlib.sha256((directory / name).read_bytes()).hexdigest() != metadata["sha256"][name]:
             raise RuntimeError("Fixture artifact changed after table validation")
     msi = ctypes.WinDLL(str(Path(os.environ["SystemRoot"]) / "System32" / "msi.dll"))
@@ -36,12 +43,15 @@ def verify(directory):
         root = Path(temporary)
         target = root / "installation"
         observation = root / "observation.json"
+        phases = [
+            ("baseline", "old", False, False, "old\n", True),
+            ("rejected-new-payload", "new", True, True, "old\n", True),
+            ("committed-new-payload", "new", False, False, "new\n", True),
+        ]
+        if service:
+            phases.insert(1, ("failed-service-start", "broken", False, True, "old\n", False))
         try:
-            for phase, name, fail, expected in (
-                ("baseline", "old", False, "old\n"),
-                ("rejected-new-payload", "new", True, "old\n"),
-                ("committed-new-payload", "new", False, "new\n"),
-            ):
+            for phase, name, fail, refused, expected, has_observation in phases:
                 if observation.exists():
                     observation.unlink()
                 log = logs / f"{phase}.log"
@@ -54,18 +64,30 @@ def verify(directory):
                     command,
                     capture_output=True, timeout=120,
                 )
-                if (result.returncode == 0) == fail:
+                if (result.returncode == 0) == refused:
                     raise RuntimeError(f"{phase}: unexpected installer exit {result.returncode}; see {log}")
-                observed = json.loads(observation.read_text(encoding="utf-8"))
-                if observed != {"observed": name + "\n", "expected": name, "failed": fail}:
+                observed = json.loads(observation.read_text(encoding="utf-8")) if observation.exists() else None
+                if has_observation and observed != {"observed": name + "\n", "expected": name, "failed": fail}:
                     raise RuntimeError(f"{phase}: new payload was not observed before completion")
+                if not has_observation and observed is not None:
+                    raise RuntimeError("Failed service startup reached the post-readiness commit action")
                 if (target / "payload.txt").read_text(encoding="utf-8") != expected:
                     raise RuntimeError(f"{phase}: final bytes do not match the committed installation")
-                old_state, new_state = [state(product) for product in products]
-                if (old_state, new_state) != ((5, -1) if phase != "committed-new-payload" else (-1, 5)):
-                    raise RuntimeError(f"{phase}: inconsistent MSI product states {old_state}/{new_state}")
-                print(json.dumps({"phase": phase, "exit": result.returncode, "observed": observed,
-                                  "installed": expected, "old_state": old_state, "new_state": new_state}), flush=True)
+                states = [state(product) for product in products]
+                wanted = [-1, 5] if phase == "committed-new-payload" else [5, -1]
+                if states != wanted + ([-1] if service else []):
+                    raise RuntimeError(f"{phase}: inconsistent MSI product states {states}")
+                health = None
+                if service:
+                    ready = subprocess.run([str(target / "service.exe"), "check", service, expected.strip()],
+                                           capture_output=True, text=True, check=True, timeout=15)
+                    health = json.loads(ready.stdout)
+                    if health["version"] != expected.strip() or not health["pipe_pid"] or health["pipe_pid"] != health["scm_pid"]:
+                        raise RuntimeError("Readiness did not identify the restored/committed service")
+                evidence = {"phase": phase, "exit": result.returncode, "observed": observed,
+                            "installed": expected, "product_states": states, "health": health}
+                (logs / f"{phase}.json").write_text(json.dumps(evidence) + "\n", encoding="utf-8")
+                print(json.dumps(evidence), flush=True)
         finally:
             for index, product in enumerate(products):
                 if state(product) in (1, 5):
@@ -77,9 +99,14 @@ def verify(directory):
                         raise RuntimeError("Fixture uninstall did not complete")
         if (target / "payload.txt").exists() or (target / "probe.exe").exists():
             raise RuntimeError("Fixture uninstall retained an installed file")
+        if service and (target / "service.exe").exists():
+            raise RuntimeError("Fixture uninstall retained the service executable")
+        if service and subprocess.run(["sc.exe", "query", service], capture_output=True, timeout=10).returncode != 1060:
+            raise RuntimeError("Fixture uninstall retained the service registration")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         raise SystemExit("expected a validated fixture artifact directory")
     verify(Path(sys.argv[1]).resolve())
+    verify(Path(sys.argv[1]).resolve() / "service")

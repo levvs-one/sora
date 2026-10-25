@@ -24,7 +24,7 @@ This guard prevents accidental local use; an environment variable is not a
 security sandbox. The fixture executable only reads/writes planted files and
 has no service, network, route or firewall code. Detailed MSI logs are retained.
 
-## Verified construction, pending execution
+## Per-user transaction evidence
 
 Local wixl 0.106 successfully built both x64 packages. Exported MSI tables prove
 `InstallInitialize=1500 < RemoveExistingProducts=1501 < ProcessComponents=1600`
@@ -38,8 +38,46 @@ packages, verified against the existing public distribution keyring; no package
 was installed on the owner or home-pc. CI builds the same upstream 0.106 from
 the pinned 437,664-byte source archive (SHA-256
 `1ed34279cf8080f14f1b8f10e649474125492a089912e7ca70e59dfa2e5a659b`).
-The native rollback result still awaits Windows CI. Compilation/table checks
-alone do not demonstrate restored files or an accepted readiness decision.
+Native Windows run 40245959213, job 121328115049 passed on commit `560a1f63`:
+baseline returned 0, the checked post-copy action returned 1 and MSI returned
+1603, retry returned 0, and uninstall returned 0. The test required old bytes
+and product states `(5, -1)` after rejection and new bytes/states `(-1, 5)`
+after commit. Artifact `windows-msi-transaction-evidence` (12618662790) contains
+verbose MSI logs and all three native command lines. Compilation/table checks
+alone would not establish these outcomes. Initial introspection and native
+property-quoting setup failures were corrected before this evidence.
+
+## LocalSystem service transaction probe
+
+A second, per-machine profile adds a fresh `SoraMSIFixture-<random identity>`
+service; it never registers or queries `SoraCore`. Existing `x/sys/windows/svc`
+and `go-winio` implement the finite fixture and its private named pipe, without
+new project dependencies. The fixture has no engine, routes, firewall, network
+listener or access to Sora settings. Only the disposable Windows CI runner
+executes it; local construction does not change any SCM registration.
+
+The native MSI tables own service registration, start, stop and removal. The
+deferred checked gate runs after `StartServices` and before the post-copy refusal
+action, inside `InstallInitialize`/`InstallFinalize`. It requires both `Running`
+and an expected version reply whose kernel pipe-server PID equals the SCM PID
+queried before and after the reply. This is a fixture identity check, not a
+complete process-lifetime or general IPC-authentication policy.
+
+The required outcomes are baseline old service, refusal of an executable that
+fails during `StartPending`, refusal after new service readiness and new file
+observation, successful retry, and removal of files/product/service registrations.
+Both rejected upgrades must restore old bytes, old product registration and a
+running old-version pipe response. A saved JSON record reports each result.
+The native service profile result still awaits CI; local cross-build/table
+inspection is construction evidence only.
+
+Local construction requires explicit removal sequence 1501: with multiple
+custom actions wixl's relative ordering produced 5903, caught by the existing
+table assertion before execution. The service table is inspected for own-process,
+demand-start, passwordless LocalSystem and wait/start/stop/uninstall flags. The
+compiler does not implement the parsed `Vital` service flag, so no protection
+is attributed to that XML attribute. The separate checked readiness action is
+mandatory. The runner checks removal using the native missing-service error.
 
 ## Tool choice
 
@@ -71,6 +109,10 @@ not completion of S5 or permission to publish a new packaging family.
 Sources: [Windows Installer rollback](https://learn.microsoft.com/en-us/windows/win32/msi/rollback-installation),
 [removal sequencing](https://learn.microsoft.com/en-us/windows/win32/msi/removeexistingproducts-action),
 [deferred actions](https://learn.microsoft.com/en-us/windows/win32/msi/deferred-execution-custom-actions),
+[service installation](https://learn.microsoft.com/en-us/windows/win32/msi/serviceinstall-table),
+[service lifecycle](https://learn.microsoft.com/en-us/windows/win32/msi/servicecontrol-table),
+[pipe server process identity](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnamedpipeserverprocessid),
+[SCM process identity](https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicestatusex),
 [msitools 0.106](https://download.gnome.org/sources/msitools/0.106/),
 [WiX terms](https://docs.firegiant.com/wix/osmf/),
 [Velopack Windows layout](https://docs.velopack.io/packaging/operating-systems/windows),
