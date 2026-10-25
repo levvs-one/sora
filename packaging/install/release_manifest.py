@@ -1,6 +1,7 @@
 """Build release metadata and checksums; signing remains outside the CI job."""
 
 import hashlib
+from itertools import islice
 import json
 import os
 from pathlib import Path
@@ -42,9 +43,10 @@ def write_release_manifest(directory, version):
         target = directory / name
         if target.exists() or target.is_symlink():
             raise FileExistsError(f"refusing to replace existing release metadata: {name}")
-    paths = sorted(directory.iterdir(), key=lambda path: path.name)
+    paths = list(islice(directory.iterdir(), MAX_ARTIFACTS + 1))
     if not 1 <= len(paths) <= MAX_ARTIFACTS:
         raise ValueError("expected between 1 and 128 release artifacts")
+    paths.sort(key=lambda path: path.name)
     artifacts = []
     for path in paths:
         before = path.lstat()

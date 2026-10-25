@@ -110,6 +110,15 @@ class ReleaseManifestTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 release_manifest.write_release_manifest(self.root, "1.2.3")
 
+    def test_too_many_files_are_rejected_before_hashing(self):
+        self.artifact("install.sh")
+        self.artifact("install.ps1")
+        with patch.object(release_manifest, "MAX_ARTIFACTS", 1):
+            with patch.object(release_manifest.hashlib, "file_digest") as hashing:
+                with self.assertRaises(ValueError):
+                    release_manifest.write_release_manifest(self.root, "1.2.3")
+                hashing.assert_not_called()
+
     def test_existing_metadata_is_never_replaced(self):
         self.artifact("install.sh")
         for name in release_manifest.OUTPUT_NAMES:
