@@ -215,6 +215,12 @@ jobs:
         working-directory: core
         shell: bash
         run: go test -count=20 -run 'TestJavaScriptProcess/(memory|CPU)_budget' ./ext
+      - name: Installer refuses replacement until the service stops
+        shell: pwsh
+        run: |
+          choco install innosetup --version 6.7.1 --no-progress -y
+          python -B packaging/windows/test_service_stop.py
+          if ($LASTEXITCODE -ne 0) { throw 'Installer service-stop gate failed' }
       - name: Build the core
         working-directory: core
         shell: bash
@@ -263,7 +269,6 @@ jobs:
       - name: Build the installer
         shell: pwsh
         run: |
-          choco install innosetup --version 6.7.1 --no-progress -y
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ env.SORA_VERSION }} packaging\windows\sora.iss
       - name: Inspect Windows release security
         shell: pwsh
@@ -346,6 +351,23 @@ jobs:
             & "${env:ProgramFiles}\Sora\core\sora-core.exe" -check -data-dir "${env:ProgramData}\Sora" -engines-dir "${env:ProgramFiles}\Sora\core\engines"
             throw "SoraCore is not running"
           }
+      - name: Upgrade the running installation before pipe checks
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
+          $upgrade = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/LOG=upgrade.log' -PassThru
+          if (-not $upgrade.WaitForExit(120000)) { throw 'Upgrade did not finish within two minutes' }
+          if ($upgrade.ExitCode -ne 0) {
+            Get-Content upgrade.log -Tail 40
+            throw "Upgrade failed: $($upgrade.ExitCode)"
+          }
+          for ($i = 0; $i -lt 30; $i++) {
+            $service = Get-Service SoraCore -ErrorAction SilentlyContinue
+            if ($service -and $service.Status -eq 'Running') { break }
+            Start-Sleep -Seconds 1
+          }
+          if (-not $service -or $service.Status -ne 'Running') { throw 'Upgrade did not restart SoraCore' }
+          Get-Process sora -ErrorAction SilentlyContinue | Stop-Process
       - name: The app reaches the installed core over the pipe
         working-directory: app
         env:

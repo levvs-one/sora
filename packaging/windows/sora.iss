@@ -74,6 +74,8 @@ ru.HappLinks=Открывать в Sora ссылки happ:// от провайд
 en.HappLinks=Open happ:// links from providers in Sora
 ru.Links=Ссылки:
 en.Links=Links:
+ru.ServiceStopFailed=Не удалось остановить службу Sora. Файлы не заменены. Повторите установку.
+en.ServiceStopFailed=Could not stop the Sora service. Files were not replaced. Try the installation again.
 ru.WebViewMissing=Для встроенной проверки скорости нужен Microsoft Edge WebView2 Runtime. Скачайте Evergreen Standalone Installer (x64) с https://developer.microsoft.com/microsoft-edge/webview2/ и установите его. До этого используйте кнопку "Открыть в браузере".
 en.WebViewMissing=Embedded speed tests require Microsoft Edge WebView2 Runtime. Download and install the Evergreen Standalone Installer (x64) from https://developer.microsoft.com/microsoft-edge/webview2/. Until then, use "Open in browser".
 
@@ -97,8 +99,9 @@ Root: HKA; Subkey: "Software\Classes\happ\shell\open\command"; ValueType: string
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "io.github.levvs_one.sora"; Flags: uninsdeletevalue dontcreatekey
 
 [Files]
-Source: "..\..\app\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+; PrepareToInstall extracts the new core before replacing any installed files.
 Source: "..\..\dist\windows\sora-core.exe"; DestDir: "{app}\core"; Flags: ignoreversion
+Source: "..\..\app\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ; Device sync runs per user next to sora.exe, where the app looks for it.
 Source: "..\..\dist\windows\sora-sync.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\dist\windows\engines\*"; DestDir: "{app}\core\engines"; Flags: ignoreversion
@@ -182,7 +185,10 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   Code: Integer;
 begin
-  Exec(ExpandConstant('{sys}\sc.exe'), 'stop SoraCore', '', SW_HIDE, ewWaitUntilTerminated, Code);
-  Sleep(1500);
   Result := '';
+  ExtractTemporaryFile('sora-core.exe');
+  if not Exec(ExpandConstant('{tmp}\sora-core.exe'), '-stop-service', '', SW_HIDE, ewWaitUntilTerminated, Code) then
+    Result := CustomMessage('ServiceStopFailed')
+  else if Code <> 0 then
+    Result := CustomMessage('ServiceStopFailed');
 end;
