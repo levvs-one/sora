@@ -341,6 +341,16 @@ or Windows elevation test.
 
 ## Signed-release transition
 
+On 25 October 2026, the authenticated GitHub release API returned eleven visible
+release records. None listed `SHA256SUMS.minisig`, `release.json` or a separate
+`.sig`/`.asc`/`.minisig` asset. The latest stable releases v1.1.2, v1.1.1 and
+v1.1.0 carried checksum manifests and the expected package matrix. This inventory
+checks asset metadata, not package provenance, embedded Authenticode signatures
+or releases distributed outside GitHub. It provides no evidence of an existing
+production population that requires the draft legacy signed-manifest format.
+Retiring that temporary compatibility path needs an explicit transition policy;
+do not confuse fixture compatibility with deployed-client compatibility.
+
 There is no unsigned fallback. Previously published unsigned releases cannot be
 installed by this updater or used as rollback targets. Before shipping it, the
 release owner must independently authenticate and sign both the new manifest and
