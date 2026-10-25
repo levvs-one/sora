@@ -43,7 +43,8 @@ def write_release_manifest(directory, version):
         target = directory / name
         if target.exists() or target.is_symlink():
             raise FileExistsError(f"refusing to replace existing release metadata: {name}")
-    paths = list(islice(directory.iterdir(), MAX_ARTIFACTS + 1))
+    with os.scandir(directory) as entries:
+        paths = [Path(entry.path) for entry in islice(entries, MAX_ARTIFACTS + 1)]
     if not 1 <= len(paths) <= MAX_ARTIFACTS:
         raise ValueError("expected between 1 and 128 release artifacts")
     paths.sort(key=lambda path: path.name)

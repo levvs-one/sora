@@ -113,11 +113,22 @@ class ReleaseManifestTest(unittest.TestCase):
     def test_too_many_files_are_rejected_before_hashing(self):
         self.artifact("install.sh")
         self.artifact("install.ps1")
-        with patch.object(release_manifest, "MAX_ARTIFACTS", 1):
+        with release_manifest.os.scandir(self.root) as actual:
+            entry = next(actual)
+        enumerated = []
+
+        def many_entries():
+            for _ in range(1000):
+                enumerated.append(1)
+                yield entry
+
+        with patch.object(release_manifest.os, "scandir") as scanning, patch.object(release_manifest, "MAX_ARTIFACTS", 1):
+            scanning.return_value.__enter__.return_value = many_entries()
             with patch.object(release_manifest.hashlib, "file_digest") as hashing:
                 with self.assertRaises(ValueError):
                     release_manifest.write_release_manifest(self.root, "1.2.3")
                 hashing.assert_not_called()
+        self.assertEqual(len(enumerated), 2)
 
     def test_existing_metadata_is_never_replaced(self):
         self.artifact("install.sh")
