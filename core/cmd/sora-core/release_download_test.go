@@ -23,7 +23,7 @@ import (
 
 // A test subprocess uses the production verifier with a public fixture identity.
 // The shipped CLI and its pinned production root are never changed.
-func TestInstallerVerifierProcess(t *testing.T) {
+func TestInstallerVerifierProcess(_ *testing.T) {
 	if os.Getenv("SORA_INSTALLER_VERIFIER_TEST") != "1" {
 		return
 	}
@@ -95,11 +95,12 @@ func TestInstallerBoundsChunkedHTTPSDownloads(t *testing.T) {
 					body = []byte(record["signature"])
 				case "release.json":
 					body = []byte(record["metadata"])
-					if scenario == "metadata overflow" {
+					switch scenario {
+					case "metadata overflow":
 						body = make([]byte, 1024*1024+1)
-					} else if scenario == "metadata tamper" {
+					case "metadata tamper":
 						body = append(body, ' ')
-					} else if scenario == "metadata missing" {
+					case "metadata missing":
 						http.NotFound(w, r)
 						return
 					}
@@ -114,9 +115,10 @@ func TestInstallerBoundsChunkedHTTPSDownloads(t *testing.T) {
 					if _, err := os.Stat(verified); err != nil {
 						t.Error("package requested before authenticating metadata")
 					}
-					if scenario == "package overflow" {
+					switch scenario {
+					case "package overflow":
 						body = append(body, '!')
-					} else if scenario == "package truncated" {
+					case "package truncated":
 						body = body[:2]
 					}
 				}
