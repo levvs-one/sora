@@ -27,6 +27,16 @@ func TestIsolatedXrayExternalAssetTraversalFixture(t *testing.T) {
 		t.Skip("bubblewrap is required for the native asset fixture")
 	}
 	fixture := t.TempDir()
+	// A root CI test's user namespace cannot traverse the runner-owned home.
+	// Stage the verified binary under the same owner as the planted files.
+	engineBytes, err := os.ReadFile(binary)
+	if err != nil {
+		t.Fatal(err)
+	}
+	binary = filepath.Join(fixture, "xray")
+	if err := os.WriteFile(binary, engineBytes, 0o500); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.Mkdir(filepath.Join(fixture, "assets"), 0o700); err != nil {
 		t.Fatal(err)
 	}
