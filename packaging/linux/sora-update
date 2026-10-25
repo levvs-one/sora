@@ -78,15 +78,8 @@ fi
 
 work=$(mktemp -d /var/tmp/sora-update.XXXXXXXX)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-snapshot_files="SHA256SUMS SHA256SUMS.minisig $files"
-if [ -e "$source/release.json" ] || [ -L "$source/release.json" ]; then snapshot_files="$snapshot_files release.json"; fi
-for name in $snapshot_files; do
-    if [ ! -f "$source/$name" ] || [ -L "$source/$name" ]; then die 'downloads must be regular files'; fi
-    cp -P -- "$source/$name" "$work/$name"
-    # cp -P preserves a symlink raced into the source, which is then rejected.
-    if [ ! -f "$work/$name" ] || [ -L "$work/$name" ]; then die 'a download changed during copying'; fi
-done
 # Use the installed trust root, never a verifier supplied with the download.
+/usr/bin/sora-core -prepare-update "$format" -release-version "$version" "$source" "$work" || die 'release snapshot verification failed; nothing was installed'
 /usr/bin/sora-core -verify-release "$work" -release-version "$version" || die 'release signature verification failed; nothing was installed'
 cd "$work"
 checked_files=$files

@@ -1,6 +1,7 @@
 """Exercise the privileged helper in a mount/user namespace with no host writes."""
 
 import hashlib
+import os
 import pathlib
 import shutil
 import subprocess
@@ -41,12 +42,22 @@ class UpdateHelperTest(unittest.TestCase):
         return files
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
-                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size="0"):
+                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size="0", old_verifier=False,
+                   native_verifier=False):
         recorder = '[ -f /tmp/test/verification ] && printf "%s\\n" "$@" > /tmp/test/calls'
         # The query fakes also report the installed sora-core version
         # (TEST_INSTALLED) for the helper's downgrade protection.
         scripts = {
-            "sora-core": '[ "$1" = -verify-release ] && [ "$3" = -release-version ] &&'
+            "sora-core": 'if [ "$1" = -prepare-update ]; then [ "${TEST_OLD_VERIFIER:-0}" = 0 ];'
+                         ' [ "$3" = -release-version ] && [ "$4" = 1.0.5 ];'
+                         ' [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]; case "$6" in /var/tmp/sora-update.*) ;; *) exit 1;; esac;'
+                         ' case "$2" in deb) files="sora-core_1.0.5_amd64.deb sora_1.0.5_amd64.deb";;'
+                         ' rpm) files="sora-core-1.0.5-1.x86_64.rpm sora-1.0.5-1.x86_64.rpm";;'
+                         ' arch) files="sora-core-1.0.5-1-x86_64.pkg.tar.zst sora-1.0.5-1-x86_64.pkg.tar.zst";; *) exit 1;; esac;'
+                         ' if [ -e "$5/release.json" ] || [ -L "$5/release.json" ]; then files="$files release.json"; fi;'
+                         ' for name in SHA256SUMS SHA256SUMS.minisig $files; do'
+                         ' [ -f "$5/$name" ] && [ ! -L "$5/$name" ]; cp -P -- "$5/$name" "$6/$name"; done; exit 0; fi;'
+                         ' [ "$1" = -verify-release ] && [ "$3" = -release-version ] &&'
                          ' [ "$4" = 1.0.5 ]; case "$2" in /var/tmp/sora-update.*) ;; *) exit 1;; esac;'
                          ' [ -f "$2/SHA256SUMS" ] && [ -f "$2/SHA256SUMS.minisig" ];'
                          ' [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]; case "$#" in'
@@ -71,6 +82,9 @@ class UpdateHelperTest(unittest.TestCase):
         }
         if missing_verifier:
             del scripts["sora-core"]
+        if native_verifier:
+            scripts["sora-core"] = '/tmp/test/test-tools/sora-verifier "$@"; if [ "$1" = -verify-release ] && [ "$#" = 4 ]; then' \
+                                   ' printf "%s\\n" "$@" > /tmp/test/verification; fi'
         command = [
             "bwrap", "--unshare-all", "--share-net", "--uid", "0", "--gid", "0", "--die-with-parent",
             "--ro-bind", "/", "/", "--tmpfs", "/run", "--tmpfs", "/tmp",
@@ -89,6 +103,8 @@ class UpdateHelperTest(unittest.TestCase):
             command += ["--setenv", "TEST_DEPENDENCY_FAILURE", "1"]
         if signature_failure:
             command += ["--setenv", "TEST_SIGNATURE_FAILURE", "1"]
+        if old_verifier:
+            command += ["--setenv", "TEST_OLD_VERIFIER", "1"]
         command += ["--", "/bin/sh", "/tmp/test/sora-update", format, version, "/tmp/test/downloads", *extra]
         return subprocess.run(command, capture_output=True, text=True, timeout=10)
 
@@ -176,11 +192,11 @@ class UpdateHelperTest(unittest.TestCase):
         downloaded = self.downloads / "sora-core"
         downloaded.write_text("#!/bin/sh\nprintf used > /tmp/test/escaped\nexit 0\n")
         downloaded.chmod(0o755)
-        for arguments in ({"signature_failure": True}, {"missing_verifier": True}):
+        for arguments in ({"signature_failure": True}, {"missing_verifier": True}, {"old_verifier": True}):
             with self.subTest(arguments=arguments):
                 result = self.run_helper("deb", **arguments)
                 self.assertNotEqual(result.returncode, 0)
-                self.assertIn("release signature verification failed", result.stderr)
+                self.assertIn("release snapshot verification failed", result.stderr)
                 self.assertFalse((self.root / "calls").exists())
                 self.assertFalse((self.root / "escaped").exists())
 
@@ -219,6 +235,26 @@ class UpdateHelperTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertFalse((self.root / "calls").exists())
                 self.assertFalse((self.root / "escaped").exists())
+
+    def test_real_native_snapshot_and_signature_before_package_manager(self):
+        self.prepare("deb")
+        for name in ("SHA256SUMS", "SHA256SUMS.minisig"):
+            (self.downloads / name).unlink()
+        tools = self.root / "test-tools"
+        builder = pathlib.Path(__file__).resolve().parents[1] / "install/prepare_test_release.py"
+        prepared = subprocess.run(["python3", "-B", str(builder), str(self.downloads), "1.0.5", str(tools)],
+                                  capture_output=True, text=True, timeout=180, env={**os.environ, "CGO_ENABLED": "0"})
+        self.assertEqual(prepared.returncode, 0, prepared.stdout + prepared.stderr)
+        result = self.run_helper("deb", native_verifier=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.root / "calls").exists())
+        (self.root / "calls").unlink()
+        (self.root / "verification").unlink()
+        (self.downloads / "sora_1.0.5_amd64.deb").write_bytes(b"tampered")
+        refused = self.run_helper("deb", native_verifier=True)
+        self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
+        self.assertIn("release snapshot verification failed", refused.stderr)
+        self.assertFalse((self.root / "calls").exists())
 
 
 if __name__ == "__main__":

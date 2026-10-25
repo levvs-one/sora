@@ -39,6 +39,7 @@ type flags struct {
 	releaseArtifact string
 	releaseTarget   string
 	releaseFiles    bool
+	prepareUpdate   string
 }
 
 func main() {
@@ -92,8 +93,24 @@ func run(ctx context.Context, arguments []string) error {
 	set.StringVar(&f.releaseArtifact, "release-artifact", "", "with -release-target, print this authenticated artifact's byte size (0 for signed legacy manifests)")
 	set.StringVar(&f.releaseTarget, "release-target", "", "expected artifact OS/architecture, e.g. linux/amd64")
 	set.BoolVar(&f.releaseFiles, "verify-release-files", false, "with release verification, require the complete schema 1 snapshot and verify every artifact file")
+	set.StringVar(&f.prepareUpdate, "prepare-update", "", "Linux: copy and authenticate an update pair (deb/rpm/arch); requires -release-version and source/destination directories")
 	if err := set.Parse(arguments); err != nil {
 		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyUnauthenticated)
+	}
+	preparation := false
+	set.Visit(func(option *flag.Flag) { preparation = preparation || option.Name == "prepare-update" })
+	if preparation {
+		invalid := set.NArg() != 2 || f.prepareUpdate == "" || f.releaseVersion == ""
+		set.Visit(func(option *flag.Flag) {
+			if option.Name != "prepare-update" && option.Name != "release-version" {
+				invalid = true
+			}
+		})
+		if invalid {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyUnauthenticated,
+				"update preparation requires -prepare-update FORMAT -release-version VERSION SOURCE DESTINATION; other flags are forbidden")
+		}
+		return prepareUpdateSnapshot(ctx, f.prepareUpdate, f.releaseVersion, set.Arg(0), set.Arg(1), releasePublicKey)
 	}
 	verification, artifactQuery, invalid := false, false, set.NArg() != 0
 	set.Visit(func(option *flag.Flag) {

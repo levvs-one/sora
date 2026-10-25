@@ -5,6 +5,12 @@ rollback enforce the signature contract below. The privileged Linux helper
 repeats verification on its private snapshot before running a package manager.
 The first-install trust prerequisites below are mandatory; S2 is still open.
 
+The Linux helper now prepares its private pair with the installed core's
+`-prepare-update` mode, authenticating metadata before bounded package copies.
+See the [privileged snapshot boundary](privileged-update-snapshot.md) for file
+descriptor, permissions, cancellation and old-core rejection guarantees. The
+core and helper must be distributed together through the reviewed transition.
+
 ## Trust boundary
 
 An attacker controlling GitHub release assets can replace both a package and its
