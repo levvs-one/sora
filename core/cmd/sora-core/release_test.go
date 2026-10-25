@@ -81,6 +81,9 @@ func TestReleaseSignatureTrustBoundary(t *testing.T) {
 				t.Fatalf("verification: %v", err)
 			}
 			if test == "valid" {
+				if err := verified.verifyArtifactFiles(context.Background(), dir); err == nil {
+					t.Fatal("legacy manifest passed the full publication profile")
+				}
 				size, err := verified.artifactSize("sora_1.2.3_amd64.deb", "linux/amd64", "1.2.3")
 				if err != nil || size != 0 {
 					t.Fatalf("signed legacy size: %d, %v", size, err)
@@ -97,6 +100,10 @@ func TestReleaseVerifierRejectsAmbiguousCommandsWithoutStartingCore(t *testing.T
 	data := filepath.Join(t.TempDir(), "must-not-be-created")
 	t.Setenv("SORA_DATA_DIR", data)
 	for _, args := range [][]string{
+		{"-verify-release-files"},
+		{"-verify-release", t.TempDir(), "-release-version", "1.2.3", "-verify-release-files=false"},
+		{"-verify-release", t.TempDir(), "-release-version", "1.2.3", "-verify-release-files", "-release-artifact", "sora_1.2.3_amd64.deb", "-release-target", "linux/amd64"},
+		{"-verify-release", t.TempDir(), "-release-version", "1.2.3", "-verify-release-files", "-install-service"},
 		{"-release-artifact="},
 		{"-release-target", "linux/amd64", "-print-token"},
 		{"-verify-release", t.TempDir(), "-release-version", "1.2.3", "-release-artifact", "sora_1.2.3_amd64.deb"},

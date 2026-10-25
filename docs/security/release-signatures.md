@@ -141,6 +141,45 @@ or network configuration. Manifest and signature inputs must be nonempty regular
 files, at most 1 MiB and 8 KiB respectively. Use a private snapshot of downloads;
 this command is not a replacement for privileged caller ownership/TOCTOU checks.
 
+## Complete snapshot verification before publication
+
+The manifest-only command above intentionally works before packages have been
+downloaded. To check the complete release snapshot with a previously authenticated
+verifier, use the stricter profile:
+
+```sh
+sora-core -verify-release /path/to/private-release-snapshot \
+  -release-version 1.2.3 -verify-release-files
+```
+
+This mode requires schema 1 metadata and its complete current matrix: the Windows
+amd64 installer, both installation scripts, six Linux amd64 packages and three
+Linux arm64 core packages. Legacy manifests and an otherwise correctly signed
+partial matrix fail this publication preflight. An artifact/target query cannot
+be combined with this mode, and explicitly disabling its boolean flag is rejected.
+
+Every artifact must be a regular file of exactly the signed length. Hashing uses
+a bounded stream, checks file identity when opening and size/modification time
+after reading, and compares SHA-256. Cancellation closes the active input file
+instead of leaving Ctrl+C waiting for every large package hash. Metadata bytes
+must still equal those that were authenticated. Directory enumeration reads at most the expected count plus
+one and rejects missing or unlisted entries, including an extra report or nested
+directory. Keep generated reports outside the private snapshot.
+
+The command reads files and exits before constructing the core; it does not
+download, sign, install or publish anything. Its success message explicitly says
+that all twelve artifact files were verified. General install and rollback paths
+continue to use their existing signature and selected-artifact policies.
+
+This is the file-verification component of a publication gate, not enforcement of
+repository publishing permissions or a complete independent gate. The supported
+publication workflow still needs to invoke it with an independently trusted
+verifier and protect the verified asset set until publication. Use an owned,
+private snapshot without concurrent writers; these checks do not make an arbitrary
+shared directory immutable. Declared OS/architecture are not independent PE/ELF
+inspection. Consumer bootstrap, release-owner approval and the signed-release
+transition remain required before any public release.
+
 ## Implementation choice
 
 Snapshot of upstream metadata on 24 October 2026:

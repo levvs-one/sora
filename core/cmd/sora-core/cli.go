@@ -38,6 +38,7 @@ type flags struct {
 	releaseVersion  string
 	releaseArtifact string
 	releaseTarget   string
+	releaseFiles    bool
 }
 
 func main() {
@@ -90,6 +91,7 @@ func run(ctx context.Context, arguments []string) error {
 	set.StringVar(&f.releaseVersion, "release-version", "", "expected stable release version for -verify-release (e.g. 1.2.3)")
 	set.StringVar(&f.releaseArtifact, "release-artifact", "", "with -release-target, print this authenticated artifact's byte size (0 for signed legacy manifests)")
 	set.StringVar(&f.releaseTarget, "release-target", "", "expected artifact OS/architecture, e.g. linux/amd64")
+	set.BoolVar(&f.releaseFiles, "verify-release-files", false, "with release verification, require the complete schema 1 snapshot and verify every artifact file")
 	if err := set.Parse(arguments); err != nil {
 		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyUnauthenticated)
 	}
@@ -100,19 +102,31 @@ func run(ctx context.Context, arguments []string) error {
 			verification = true
 		case "release-artifact", "release-target":
 			verification, artifactQuery = true, true
+		case "verify-release-files":
+			verification = true
+			if !f.releaseFiles {
+				invalid = true
+			}
 		default:
 			invalid = true
 		}
 	})
 	if verification {
 		if invalid || f.verifyRelease == "" || f.releaseVersion == "" ||
-			(artifactQuery && (f.releaseArtifact == "" || f.releaseTarget == "")) {
+			(artifactQuery && (f.releaseArtifact == "" || f.releaseTarget == "" || f.releaseFiles)) {
 			return errs.Newf(errs.CodeInvalidArgument, errs.KeyUnauthenticated,
-				"release verification requires -verify-release and -release-version, optionally both -release-artifact and -release-target; other flags are forbidden")
+				"release verification requires -verify-release and -release-version, optionally an artifact/target pair or -verify-release-files; other flags are forbidden")
 		}
 		manifest, err := verifyRelease(f.verifyRelease, f.releaseVersion, releasePublicKey)
 		if err != nil {
 			return err
+		}
+		if f.releaseFiles {
+			if err := manifest.verifyArtifactFiles(ctx, f.verifyRelease); err != nil {
+				return err
+			}
+			fmt.Printf("verified release %s signature, metadata and all %d artifact files\n", f.releaseVersion, len(manifest.metadata.Artifacts))
+			return nil
 		}
 		if artifactQuery {
 			size, err := manifest.artifactSize(f.releaseArtifact, f.releaseTarget, f.releaseVersion)

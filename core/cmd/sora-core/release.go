@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -38,8 +40,10 @@ type releaseMetadata struct {
 }
 
 type releaseManifest struct {
-	payload  []byte
-	metadata *releaseMetadata
+	payload       []byte
+	signature     []byte
+	metadataBytes []byte
+	metadata      *releaseMetadata
 }
 
 func verifyRelease(directory, version, publicKey string) (*releaseManifest, error) {
@@ -62,7 +66,7 @@ func verifyRelease(directory, version, publicKey string) (*releaseManifest, erro
 	if err := ext.VerifyPayload(publicKey, string(signature), "release:v"+version+":SHA256SUMS", payload); err != nil {
 		return nil, fmt.Errorf("release: untrusted SHA256SUMS: %w", err)
 	}
-	manifest := &releaseManifest{payload: payload}
+	manifest := &releaseManifest{payload: payload, signature: signature}
 	for _, line := range strings.Split(string(payload), "\n") {
 		line = strings.TrimSuffix(line, "\r")
 		if !strings.HasSuffix(line, " release.json") && !strings.HasSuffix(line, "*release.json") {
@@ -76,9 +80,101 @@ func verifyRelease(directory, version, publicKey string) (*releaseManifest, erro
 		if err != nil {
 			return nil, err
 		}
+		manifest.metadataBytes = data
 		break
 	}
 	return manifest, nil
+}
+
+func (manifest *releaseManifest) verifyArtifactFiles(ctx context.Context, directory string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	// Schema 1 has twelve distinct allowed names: Windows, two scripts and
+	// nine Linux packages. Publication requires that complete supported matrix.
+	if manifest.metadata == nil || len(manifest.metadata.Artifacts) != 12 {
+		return fmt.Errorf("release: full verification requires the complete schema 1 artifact matrix")
+	}
+	root, err := os.OpenRoot(directory)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = root.Close() }()
+	expected := map[string]bool{"SHA256SUMS": true, "SHA256SUMS.minisig": true, "release.json": true}
+	for _, artifact := range manifest.metadata.Artifacts {
+		expected[artifact.Name] = true
+		if err := verifyReleaseArtifactFile(ctx, root, artifact); err != nil {
+			return err
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	for name, authenticated := range map[string][]byte{
+		"SHA256SUMS": manifest.payload, "SHA256SUMS.minisig": manifest.signature, "release.json": manifest.metadataBytes,
+	} {
+		current, err := readReleaseFile(root, name, int64(len(authenticated)))
+		if err != nil || !bytes.Equal(current, authenticated) {
+			return fmt.Errorf("release: %s changed after authentication", name)
+		}
+	}
+	entries, err := root.Open(".")
+	if err != nil {
+		return err
+	}
+	defer func() { _ = entries.Close() }()
+	// Read at most the expected count plus one, even for an attacker-sized dir.
+	names, err := entries.Readdirnames(len(expected) + 1)
+	if err != nil && !errors.Is(err, io.EOF) {
+		return err
+	}
+	if len(names) != len(expected) {
+		return fmt.Errorf("release: snapshot has missing or unlisted files")
+	}
+	for _, name := range names {
+		if !expected[name] {
+			return fmt.Errorf("release: snapshot has an unlisted file")
+		}
+	}
+	return ctx.Err()
+}
+
+func verifyReleaseArtifactFile(ctx context.Context, root *os.Root, artifact releaseArtifact) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	info, err := root.Lstat(artifact.Name)
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() || info.Size() != artifact.Size {
+		return fmt.Errorf("release: %s is not a regular file of the signed size", artifact.Name)
+	}
+	file, err := root.Open(artifact.Name)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = file.Close() }()
+	// NotifyContext otherwise swallows Ctrl+C while a large local hash runs.
+	stop := context.AfterFunc(ctx, func() { _ = file.Close() })
+	defer stop()
+	opened, err := file.Stat()
+	if err != nil || !os.SameFile(info, opened) || info.Size() != opened.Size() {
+		return fmt.Errorf("release: %s changed while opening", artifact.Name)
+	}
+	digest := sha256.New()
+	count, err := io.Copy(digest, io.LimitReader(file, artifact.Size+1))
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if err != nil || count != artifact.Size || fmt.Sprintf("%x", digest.Sum(nil)) != artifact.SHA256 {
+		return fmt.Errorf("release: %s checksum or size mismatch", artifact.Name)
+	}
+	after, err := file.Stat()
+	if err != nil || after.Size() != info.Size() || !after.ModTime().Equal(info.ModTime()) {
+		return fmt.Errorf("release: %s changed while hashing", artifact.Name)
+	}
+	return nil
 }
 
 func parseReleaseMetadata(data, payload []byte, version string) (*releaseMetadata, error) {
