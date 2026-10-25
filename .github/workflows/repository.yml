@@ -355,10 +355,11 @@ jobs:
         shell: pwsh
         run: |
           $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
-          $upgrade = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/LOG=upgrade.log' -PassThru
+          $log = Join-Path $env:RUNNER_TEMP 'sora-upgrade.log'
+          $upgrade = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$log`"" -PassThru
           if (-not $upgrade.WaitForExit(120000)) { throw 'Upgrade did not finish within two minutes' }
           if ($upgrade.ExitCode -ne 0) {
-            Get-Content upgrade.log -Tail 40
+            Get-Content -LiteralPath $log -Tail 40
             throw "Upgrade failed: $($upgrade.ExitCode)"
           }
           for ($i = 0; $i -lt 30; $i++) {
@@ -367,7 +368,18 @@ jobs:
             Start-Sleep -Seconds 1
           }
           if (-not $service -or $service.Status -ne 'Running') { throw 'Upgrade did not restart SoraCore' }
+          for ($i = 0; $i -lt 30; $i++) {
+            if (Get-Process sora -ErrorAction SilentlyContinue) { break }
+            Start-Sleep -Seconds 1
+          }
+          if (-not (Get-Process sora -ErrorAction SilentlyContinue)) { throw 'Upgrade did not reopen Sora' }
           Get-Process sora -ErrorAction SilentlyContinue | Stop-Process
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-upgrade-evidence
+          path: ${{ runner.temp }}/sora-upgrade.log
+          if-no-files-found: ignore
       - name: The app reaches the installed core over the pipe
         working-directory: app
         env:

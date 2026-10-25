@@ -39,10 +39,13 @@ then performs a real same-version upgrade of its running test installation
 before the existing pipe and traffic checks.
 
 Local verification covers native SCM fixtures (including 30.04-second expiry),
-Linux CLI/release/preparation tests, formatting, lint and workflow checks. Inno
-is not installed on the owner's machine: the compiled installer cases and real
-SCM upgrade still require the new hosted Windows CI result. Do not infer them
-from the local unit results.
+Linux CLI/release/preparation tests, formatting, lint and workflow checks.
+Hosted Windows job 121310678966 on b220c940 passed the complete core tests and
+the compiled preparation-event matrix (success, refusal, launch failure and
+extraction failure). Inno was not installed on the owner's machine. The full
+real SCM upgrade/IPC/traffic checks still await CI; they are not established by
+the preparation fixtures. The upgrade test separately waits for GUI relaunch
+and retains its installer log as an artifact.
 
 ## Choice and remaining work
 
