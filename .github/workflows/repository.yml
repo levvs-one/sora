@@ -490,6 +490,14 @@ jobs:
         run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ../../dist/sora-sync ./cmd/sora-sync
       - name: Fetch and verify the engines
         run: packaging/engines/fetch.sh ${{ matrix.arch }} dist/engines
+      - name: Xray profile geodata in an isolated filesystem
+        if: matrix.arch == 'amd64'
+        working-directory: core
+        run: |
+          sudo apt-get install -y -qq bubblewrap
+          go test -race -c -o "$RUNNER_TEMP/sora-profile-assets-tests" ./engine/xray
+          sudo env "SORA_ENGINES_DIR=$PWD/../dist/engines" "$RUNNER_TEMP/sora-profile-assets-tests" \
+            -test.v -test.run '^TestIsolatedXrayExternalAssetTraversalFixture$' -test.timeout 45s
       - name: Xray TUN replacement, TCP/UDP DNS and extension fetch through every engine
         if: matrix.arch == 'amd64'
         working-directory: core
@@ -564,7 +572,6 @@ jobs:
         # The same script people run, on the packages this job built.
         run: |
           shellcheck packaging/install/install.sh
-          sudo apt-get install -y -qq bubblewrap
           # The hosted runner restricts loopback setup in unprivileged namespaces.
           sudo env "PATH=$PATH" python3 -B packaging/install/test_installers.py
           mkdir -p install-test

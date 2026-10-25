@@ -110,7 +110,14 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	}
 	cfg["inbounds"] = sessionInbounds(p, rt)
 	frame(cfg, p, rt)
-	return json.Marshal(cfg)
+	raw, err := json.Marshal(cfg)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateProfileAssets(raw); err != nil {
+		return nil, err
+	}
+	return raw, nil
 }
 
 // probeProfile prefixes tags and references so profiles share one probe
