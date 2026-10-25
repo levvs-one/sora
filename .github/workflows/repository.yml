@@ -25,6 +25,8 @@ jobs:
         run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
       - name: Run actionlint
         run: ./actionlint -color
+      - name: Check release metadata producer
+        run: python3 -B packaging/install/test_release_manifest.py
 
   proto:
     name: Proto
@@ -607,9 +609,8 @@ jobs:
           merge-multiple: true
       - name: Install scripts
         run: cp packaging/install/install.sh packaging/install/install.ps1 dist/
-      - name: Checksums
-        working-directory: dist
-        run: sha256sum -- * > SHA256SUMS
+      - name: Release metadata and checksums
+        run: python3 -B packaging/install/release_manifest.py dist "${GITHUB_REF_NAME#v}"
       - name: Draft the release
         env:
           GH_TOKEN: ${{ github.token }}

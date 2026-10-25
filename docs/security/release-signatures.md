@@ -142,6 +142,38 @@ by the Go CLI using the existing Dart implementation.
 
 ## Validation and remaining acceptance
 
+### Release metadata producer
+
+The release-draft workflow generates `release.json` and `SHA256SUMS` with
+`python3 -B packaging/install/release_manifest.py DIST VERSION`. It does not
+sign or publish anything. Signing the resulting SHA256SUMS with the independent
+key also binds the exact `release.json` bytes through their listed SHA-256.
+
+Schema 1 contains `schema`, `version` and `artifacts`. Each artifact records
+`name`, `os`, `arch`, `size` in bytes and lowercase `sha256`. Artifact names are
+sorted; JSON uses sorted keys, compact separators, ASCII and one final newline.
+There are no timestamps or absolute paths in the document. `release.json` is
+listed in SHA256SUMS and is not recursively listed in its own artifact array.
+
+The producer recognizes the existing Windows x64 installer, Linux deb/rpm/Arch
+packages for amd64/arm64, and the two installation scripts. ARM64 has only the
+core package. Script architecture is `any`; executable/package architecture is
+derived from the existing build filename contract. This is a declared target,
+not an independent PE/ELF architecture inspection. Unknown names or a mixture of
+versions fail instead of being silently assigned a platform.
+
+Inputs must be regular, nonempty files, at most 2 GiB each and 128 files total.
+Symlinks/directories and changes detected during hashing are rejected. Existing
+metadata or a detached signature is never overwritten. Tests cover all current
+artifact names, deterministic output, standard sha256sum compatibility, metadata
+tampering, invalid inputs, stale outputs and a file mutation during hashing.
+
+This completes metadata generation only. Current install/update consumers still
+use the signed checksum manifest and do not enforce `release.json` platform or
+size fields. Integrating that enforcement, including bounded package downloads,
+remains required by S2. Do not describe the producer as completed client-side
+protection or publish a release before the signed-release transition is ready.
+
 Tests generate ephemeral keys and exercise actual signatures: altered payload,
 wrong key, untrusted signer, wrong version, catalog replay, missing/oversized
 files, non-regular inputs and ambiguous command flags. They also check that
