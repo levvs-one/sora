@@ -73,11 +73,11 @@ type ImportDetector struct{ MaxItems int }
 // Detect identifies src's format. Empty or oversized input returns an empty
 // Detection; other errors include the best format guess.
 func (d ImportDetector) Detect(src []byte) (Detection, error) {
-	if len(src) == 0 || strings.TrimSpace(string(src)) == "" {
-		return Detection{}, ErrEmptySource
-	}
 	if len(src) > MaxInputSize {
 		return Detection{}, ErrInputTooLarge
+	}
+	if len(src) == 0 || strings.TrimSpace(string(src)) == "" {
+		return Detection{}, ErrEmptySource
 	}
 	s := strings.TrimSpace(string(src))
 	low := strings.ToLower(s)
@@ -313,11 +313,6 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 	seen := map[string]struct{}{}
 	last := -1
 	for i, l := range strings.Split(s, "\n") {
-		if len(r.Servers) >= p.limit() {
-			r.Report.Unsupported++
-			r.Report.UnsupportedItems = append(r.Report.UnsupportedItems, ItemReason{i, "item limit exceeded"})
-			continue
-		}
 		l = strings.TrimSpace(l)
 		if l == "" {
 			continue
@@ -337,6 +332,11 @@ func (p LinkParser) parseList(s string, f Format) (ImportResult, error) {
 			continue
 		}
 		last = -1
+		if len(r.Servers) >= p.limit() {
+			r.Report.Unsupported++
+			r.Report.UnsupportedItems = append(r.Report.UnsupportedItems, ItemReason{i, "item limit exceeded"})
+			continue
+		}
 		items, e := parseCommunityLinks(l, p.limit()-len(r.Servers))
 		if e != nil {
 			if errors.Is(e, ErrUnsupported) {
@@ -684,6 +684,11 @@ func (p LinkParser) parseJSON(b []byte, f Format) (ImportResult, error) {
 	// two specs with the same identity (and duplicate UI keys).
 	seen := map[string]struct{}{}
 	for i, it := range items {
+		if len(r.Servers) >= p.limit() {
+			r.Report.Unsupported++
+			r.Report.UnsupportedItems = append(r.Report.UnsupportedItems, ItemReason{i, "item limit exceeded"})
+			continue
+		}
 		m, ok := it.(map[string]any)
 		if !ok {
 			continue
@@ -817,6 +822,11 @@ func (p LinkParser) parseYAML(b []byte) (ImportResult, error) {
 	// Deduplicate by StableKey exactly as parseList does (see parseJSON).
 	seen := map[string]struct{}{}
 	for i, m := range root.Proxies {
+		if len(r.Servers) >= p.limit() {
+			r.Report.Unsupported++
+			r.Report.UnsupportedItems = append(r.Report.UnsupportedItems, ItemReason{i, "item limit exceeded"})
+			continue
+		}
 		o, e := mapJSONSpec(m, "")
 		if e != nil {
 			r.Report.Invalid++
