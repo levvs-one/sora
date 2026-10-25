@@ -190,8 +190,41 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           python3 packaging/linux/test_update.py -v
 
+  msi-rollback-fixture:
+    name: Build native MSI rollback probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: core/go.mod
+          cache: false
+      - name: Build pinned open-source MSI compiler and fixtures
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc pkg-config ninja-build valac bison gettext libglib2.0-dev libgsf-1-dev libgcab-dev libxml2-dev uuid-dev python3-venv
+          fixture_tool_root="$RUNNER_TEMP/msi-tool"
+          mkdir -p "$fixture_tool_root/src"
+          curl -fsSL --connect-timeout 15 --max-time 120 https://download.gnome.org/sources/msitools/0.106/msitools-0.106.tar.xz -o "$fixture_tool_root/source.tar.xz"
+          printf '%s  %s\n' 1ed34279cf8080f14f1b8f10e649474125492a089912e7ca70e59dfa2e5a659b "$fixture_tool_root/source.tar.xz" | sha256sum -c -
+          tar -xJf "$fixture_tool_root/source.tar.xz" --strip-components=1 -C "$fixture_tool_root/src"
+          python3 -m venv "$fixture_tool_root/venv"
+          "$fixture_tool_root/venv/bin/pip" --disable-pip-version-check install meson==1.12.1
+          "$fixture_tool_root/venv/bin/meson" setup "$fixture_tool_root/build" "$fixture_tool_root/src" --prefix="$fixture_tool_root/install" --libdir=lib -Dintrospection=false
+          "$fixture_tool_root/venv/bin/meson" compile -C "$fixture_tool_root/build"
+          "$fixture_tool_root/venv/bin/meson" install -C "$fixture_tool_root/build"
+          env PATH="$fixture_tool_root/install/bin:$PATH" LD_LIBRARY_PATH="$fixture_tool_root/install/lib" python3 -B packaging/windows/build_msi_fixture.py "$RUNNER_TEMP/msi-fixtures"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: msi-transaction-fixtures
+          path: ${{ runner.temp }}/msi-fixtures
+          if-no-files-found: error
+
   windows:
     name: Windows
+    needs: [msi-rollback-fixture]
     timeout-minutes: 90
     # The whole chain on a real Windows: build, install the service with the
     # installer, reach it from the app over the named pipe, uninstall.
@@ -207,6 +240,21 @@ jobs:
         run: |
           if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v8
+        with:
+          name: msi-transaction-fixtures
+          path: ${{ runner.temp }}/msi-fixtures
+      - name: Native MSI restores old bytes when post-copy readiness fails
+        shell: pwsh
+        run: |
+          python -B packaging/windows/test_msi_transaction.py "$env:RUNNER_TEMP\msi-fixtures"
+          if ($LASTEXITCODE -ne 0) { throw 'Native MSI rollback or commit control failed' }
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-msi-transaction-evidence
+          path: ${{ runner.temp }}/msi-fixtures/logs
+          if-no-files-found: ignore
       - name: Test the core on Windows
         working-directory: core
         shell: bash
