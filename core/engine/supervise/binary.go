@@ -45,12 +45,13 @@ type Prober struct {
 	Pattern *regexp.Regexp
 }
 
-// Probe runs version arguments and verifies the binary's identity before use.
+// Probe runs version arguments and recognises the reported engine build.
 func (pr Prober) Probe(ctx context.Context, path string) (Binary, error) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, path, pr.Args...) //nolint:gosec // path is a discovery candidate and the arguments are literals
 	HideWindow(cmd)
+	cmd.Env = SafeEnv()
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out

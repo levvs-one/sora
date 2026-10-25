@@ -39,6 +39,20 @@ func TestMain(m *testing.M) {
 }
 
 func fakeEngine(mode string) int {
+	if mode == envFixtureMode {
+		for _, key := range envFixtureKeys {
+			if os.Getenv(key) != "" {
+				_, _ = os.Stderr.WriteString("fixture inherited a forbidden parent environment key\n")
+				return 7
+			}
+		}
+		if os.Getenv("LANG") != "sora-env-fixture" {
+			_, _ = os.Stderr.WriteString("fixture lost its allowed runtime environment\n")
+			return 8
+		}
+		_, _ = os.Stdout.WriteString("fixture 9.8.7\n")
+		return 0
+	}
 	raw, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return 3
