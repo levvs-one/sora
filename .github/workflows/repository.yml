@@ -563,7 +563,8 @@ jobs:
         run: |
           shellcheck packaging/install/install.sh
           sudo apt-get install -y -qq bubblewrap
-          python3 packaging/install/test_installers.py
+          # The hosted runner restricts loopback setup in unprivileged namespaces.
+          sudo env "PATH=$PATH" python3 -B packaging/install/test_installers.py
           mkdir -p install-test
           cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
           python3 packaging/install/prepare_test_release.py install-test "$SORA_VERSION" test-tools

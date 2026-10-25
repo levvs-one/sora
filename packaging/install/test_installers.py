@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from prepare_test_release import prepare
 
@@ -75,10 +76,14 @@ class InstallerSignatureTest(unittest.TestCase):
                 boundary.chmod(0o755)
                 command += ["--ro-bind", str(boundary), "/usr/bin/apt-get"]
                 mounted = Path("/tmp/test")
+                shutil.copyfile(self.script, case / "install.sh")
                 command += ["--setenv", "PATH", "/usr/bin", "--setenv", "TMPDIR", "/tmp",
                             "--setenv", "SORA_VERSION", version, "--setenv", "SORA_DIST", str(mounted / distribution.relative_to(self.root)),
-                            "--setenv", "SORA_VERIFIER", str(mounted / verifier.relative_to(self.root)), "--", "/usr/bin/sh", str(self.script)]
+                            "--setenv", "SORA_VERIFIER", str(mounted / verifier.relative_to(self.root)), "--", "/usr/bin/sh", "-c",
+                            'printf "%s\\n" SORA_INSTALLER_SANDBOX_READY; exec /usr/bin/sh "$1"',
+                            "sora-installer-test", str(mounted / case.name / "install.sh")]
                 result = subprocess.run(command, text=True, capture_output=True, timeout=30)
+                self.assertIn("SORA_INSTALLER_SANDBOX_READY\n", result.stdout, result.stdout + result.stderr)
                 reached = (case / "installation").exists()
             return result, reached
 
@@ -93,6 +98,13 @@ class InstallerSignatureTest(unittest.TestCase):
                 result, reached = self.run_installer(variant)
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertFalse(reached, result.stdout + result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "Linux namespace startup control")
+    def test_sandbox_setup_failure_is_not_an_installer_rejection(self):
+        failure = subprocess.CompletedProcess([], 1, "", "bwrap: namespace setup denied\n")
+        with patch("subprocess.run", return_value=failure):
+            with self.assertRaisesRegex(AssertionError, "SORA_INSTALLER_SANDBOX_READY"):
+                self.run_installer("missing signature")
 
 
 if __name__ == "__main__":

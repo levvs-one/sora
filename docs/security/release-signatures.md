@@ -71,6 +71,13 @@ actual Minisign verification and intercepts only the final installation boundary
 (a Linux namespace or PowerShell process-launch interception); full package
 installation is exercised separately by the platform jobs.
 
+The Linux suite requires a working network namespace and asserts that its
+sandbox started in every case, including rejection cases. A namespace setup
+failure is a test failure, not an accepted signature rejection. The hosted
+Ubuntu job runs the suite with sudo to permit namespace setup; it keeps network
+isolation and the read-only host mount instead of disabling those boundaries.
+Only the private fixture directory is mounted writable inside the sandbox.
+
 ## Contract
 
 The payload is the exact SHA256SUMS bytes. The detached file is

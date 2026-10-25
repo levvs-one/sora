@@ -30,7 +30,7 @@ def prepare(distribution, version, output):
     with tempfile.TemporaryDirectory(prefix="sora-installer-test-key-") as temporary:
         private = Path(temporary)
         signer = private / ("sora-ext.exe" if os.name == "nt" else "sora-ext")
-        subprocess.run(["go", "build", "-o", str(signer), "./cmd/sora-ext"], cwd=repo / "tools/sora-ext", env=env, check=True)
+        subprocess.run(["go", "build", "-buildvcs=false", "-o", str(signer), "./cmd/sora-ext"], cwd=repo / "tools/sora-ext", env=env, check=True)
         key = private / "ephemeral"
         subprocess.run([str(signer), "keygen", "-o", str(key)], check=True, stdout=subprocess.DEVNULL)
         public = key.with_suffix(".pub").read_text().splitlines()[-1]
@@ -42,7 +42,7 @@ def prepare(distribution, version, output):
         if count != 1:
             raise ValueError("test trust-root substitution did not match exactly once")
         release.write_text(text)
-        subprocess.run(["go", "build", "-trimpath", "-ldflags=-s -w", "-o", str(verifier), "./cmd/sora-core"], cwd=source, env=env, check=True)
+        subprocess.run(["go", "build", "-buildvcs=false", "-trimpath", "-ldflags=-s -w", "-o", str(verifier), "./cmd/sora-core"], cwd=source, env=env, check=True)
         sums = distribution / "SHA256SUMS"
         lines = []
         for package in packages:
