@@ -203,7 +203,7 @@ jobs:
       - name: Version
         shell: bash
         run: |
-          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.0.$GITHUB_RUN_NUMBER; fi
+          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
       - name: Test the core on Windows
         working-directory: core
@@ -474,7 +474,7 @@ jobs:
       - name: Version
         shell: bash
         run: |
-          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.0~$GITHUB_RUN_NUMBER; fi
+          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
       - name: Install nfpm
         run: |

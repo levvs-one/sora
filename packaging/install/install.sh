@@ -20,7 +20,9 @@ die() {
 verifier=${SORA_VERIFIER:-/usr/bin/sora-core}
 case "$verifier" in /*) ;; *) die 'SORA_VERIFIER must be an absolute path to a previously trusted core' ;; esac
 verifier=$(readlink -f -- "$verifier") || die 'could not resolve the trusted verifier'
-[ -f "$verifier" ] && [ -x "$verifier" ] || die 'a previously authenticated sora-core verifier is required; see docs/security/release-signatures.md'
+if [ ! -f "$verifier" ] || [ ! -x "$verifier" ]; then
+	die 'a previously authenticated sora-core verifier is required; see docs/security/release-signatures.md'
+fi
 if [ -n "${SORA_DIST:-}" ]; then
 	distribution=$(cd "$SORA_DIST" && pwd -P)
 	case "$verifier" in "$distribution"/*) die 'do not trust a verifier supplied with the downloads' ;; esac
