@@ -37,7 +37,7 @@
   dialog[open] { animation: open-info 180ms ease-out; }
   dialog::backdrop { background: rgb(0 0 0 / .28); }
   dialog p { margin: 16px 0 24px; }
-  dialog form { display: flex; justify-content: flex-end; }
+  .dialog-actions { display: flex; justify-content: flex-end; }
   @keyframes open-info { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   @media (max-width: 380px) { body { padding: 16px 12px; } th, td { padding: 12px 8px; } }
@@ -60,7 +60,7 @@
 <dialog id="about" aria-labelledby="about-title" aria-describedby="about-description">
   <h2 id="about-title">Hello Panel</h2>
   <p id="about-description">Shows live connections and their traffic counters through the Sora extension API. Connect Sora to see activity. You control access in the extension permissions.</p>
-  <form method="dialog"><button id="close-info" autofocus>Close</button></form>
+  <div class="dialog-actions"><button id="close-info" type="button" autofocus>Close</button></div>
 </dialog>
 <script>
   const content = document.getElementById('content');
@@ -127,7 +127,10 @@
   }
 
   const about = document.getElementById('about');
-  document.getElementById('info').addEventListener('click', () => about.showModal());
+  const info = document.getElementById('info');
+  info.addEventListener('click', () => about.showModal());
+  document.getElementById('close-info').addEventListener('click', () => about.close());
+  about.addEventListener('close', () => info.focus());
   refresh.addEventListener('click', () => { void load(true); });
   document.getElementById('notify').addEventListener('click', () => { void notice('The extension API works.'); });
   if (window.soraExt && window.soraExt.onEvent) {

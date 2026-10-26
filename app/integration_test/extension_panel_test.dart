@@ -119,7 +119,7 @@ void main() {
               try {
                 document = await controller
                     .runJavaScriptReturningResult(
-                      "JSON.stringify({url:location.href,state:document.readyState,api:typeof window.soraExt,host:typeof window.SoraExtHost,content:document.getElementById('content')?.textContent,proof:window.nativePanelProof})",
+                      "JSON.stringify({url:location.href,state:document.readyState,api:typeof window.soraExt,host:typeof window.SoraExtHost,content:document.getElementById('content')?.textContent,aboutOpen:document.getElementById('about')?.open,focus:document.activeElement?.id,proof:window.nativePanelProof})",
                     )
                     .timeout(const Duration(seconds: 2));
               } catch (error) {
