@@ -143,6 +143,20 @@ class _AddServerScreenState extends State<AddServerScreen> {
       'presharedKey',
       'allowedIps',
       'keepalive',
+      'server_name',
+      'fingerprint',
+      'public_key',
+      'short_id',
+      'spider_x',
+      'path',
+      'host_header',
+      'service_name',
+      'mode',
+      'alpn',
+      'flow',
+      'encryption',
+      'obfs_param',
+      'port_range',
     ])
       key: TextEditingController(),
   };
@@ -151,10 +165,49 @@ class _AddServerScreenState extends State<AddServerScreen> {
   Map<String, String> _material = {};
   late String _protocol;
   String _transport = '', _security = '';
-  bool _saving = false, _pasting = false, _filling = false;
+  bool _saving = false, _pasting = false, _filling = false, _peer = false;
   bool get _wireGuard => _protocol == 'wireguard';
+  bool get _stream => ['vless', 'vmess', 'trojan'].contains(_protocol);
+  bool get _manual => [
+    'vless',
+    'vmess',
+    'trojan',
+    'shadowsocks',
+    'wireguard',
+    'socks5',
+    'http',
+    'hysteria2',
+    'tuic',
+    'anytls',
+    'mieru',
+    'naive',
+  ].contains(_protocol);
+  bool get _webPath => ['ws', 'h2', 'httpupgrade', 'xhttp'].contains(_transport);
+  Iterable<String> get _options => [
+    if (_stream && _webPath) ...['path', 'host_header'],
+    if (_stream && _transport == 'grpc') 'service_name',
+    if (_stream && _transport == 'xhttp') 'mode',
+    if (_protocol == 'vless') ...[if (_transport == 'tcp' && _security != 'none') 'flow', 'encryption'],
+    if (_security != 'none' && _security.isNotEmpty) ...[
+      'server_name',
+      if (_protocol != 'naive') 'alpn',
+      if (_stream || ['socks5', 'http'].contains(_protocol)) 'fingerprint',
+      if (_security == 'reality') ...['public_key', 'short_id', 'spider_x'],
+    ],
+    if (_protocol == 'hysteria2') 'obfs_param',
+    if (_protocol == 'mieru' && !_keepStored) 'port_range',
+  ];
+  String get _defaultSecurity =>
+      ['shadowsocks', 'wireguard', 'socks5', 'http', 'mieru'].contains(_protocol) ? 'none' : 'tls';
+  String get _defaultTransport => ['wireguard', 'hysteria2', 'tuic'].contains(_protocol) ? 'udp' : 'tcp';
   bool get _keepStored =>
       widget.server != null && _protocol == customServerProtocol(widget.server!) && _material.isEmpty;
+  bool get _nextPeer =>
+      _wireGuard &&
+      !_peer &&
+      _material.isEmpty &&
+      (!_keepStored ||
+          ['credentials', 'addresses', 'peerKey', 'presharedKey', 'allowedIps', 'keepalive'].any(_touched.contains));
   bool get _busy => _saving || _pasting;
   String _text(String key) => _fields[key]!.text;
   WireGuardInput get _wg => (
@@ -173,8 +226,8 @@ class _AddServerScreenState extends State<AddServerScreen> {
     _fields['name']!.text = server?.name ?? '';
     _fields['address']!.text = server?.address ?? '';
     _fields['port']!.text = server == null ? '' : '${server.port}';
-    _transport = server?.transport ?? '';
-    _security = server?.security ?? '';
+    _transport = server?.transport.isNotEmpty == true ? server!.transport : _defaultTransport;
+    _security = server?.security.isNotEmpty == true ? server!.security : _defaultSecurity;
     _fields['allowedIps']!.text = '0.0.0.0/0, ::/0';
     for (final entry in _fields.entries) {
       entry.value.addListener(() {
@@ -219,11 +272,16 @@ class _AddServerScreenState extends State<AddServerScreen> {
         }
       }
     } else if (!_keepStored) {
-      if (_text('credentials').isEmpty && !['http', 'socks5'].contains(_protocol)) {
+      if (!_manual && _material.isEmpty) errors['credentials'] = s.customServerLinkInvalid;
+      if (_manual && _text('credentials').isEmpty && !['http', 'socks5', 'naive'].contains(_protocol)) {
         errors['credentials'] = s.customServerSecretRequired;
       }
       if (_protocol == 'shadowsocks' && _text('method').trim().isEmpty) errors['method'] = s.customServerSecretRequired;
       if (_protocol == 'tuic' && _text('password').isEmpty) errors['password'] = s.customServerSecretRequired;
+      if (_protocol == 'mieru' && _text('user').isEmpty) errors['user'] = s.customServerSecretRequired;
+    }
+    if (_security == 'reality' && (!_keepStored || _touched.contains('security')) && _text('public_key').isEmpty) {
+      errors['public_key'] = s.customServerSecretRequired;
     }
     return errors;
   }
@@ -251,8 +309,9 @@ class _AddServerScreenState extends State<AddServerScreen> {
       _fields['address']!.text = server.address;
       _fields['port']!.text = '${server.port}';
       _protocol = customServerProtocol(server);
-      _transport = server.transport;
-      _security = server.security;
+      _peer = false;
+      _transport = server.transport.isEmpty ? _defaultTransport : server.transport;
+      _security = server.security.isEmpty ? _defaultSecurity : server.security;
       _material = material;
       _fields['credentials']!.text =
           material[_wireGuard
@@ -261,8 +320,11 @@ class _AddServerScreenState extends State<AddServerScreen> {
               ? 'uuid'
               : 'password'] ??
           '';
-      for (final key in ['method', 'user', 'password', 'addresses']) {
+      for (final key in ['method', 'user', 'password', 'addresses', ..._options]) {
         _fields[key]!.text = material[key] ?? '';
+      }
+      if (_protocol == 'mieru' && material['mieru'] != null) {
+        _fields['port_range']!.text = (jsonDecode(material['mieru']!) as Map)['PortRange'] as String? ?? '';
       }
       _fields['peerKey']!.text = peer['PublicKey'] as String? ?? '';
       _fields['presharedKey']!.text = peer['PreSharedKey'] as String? ?? '';
@@ -294,6 +356,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
   }
 
   String _document() {
+    if (!_manual && _material.isNotEmpty) return jsonEncode(_material);
     if (_keepStored && !_touched.any((key) => !['name', 'address', 'port'].contains(key))) return '';
     final values = {..._material};
     void put(String field, String key) {
@@ -325,8 +388,37 @@ class _AddServerScreenState extends State<AddServerScreen> {
     } else {
       put('credentials', ['vless', 'vmess', 'tuic'].contains(_protocol) ? 'uuid' : 'password');
       if (_protocol == 'shadowsocks') put('method', 'method');
-      if (['socks5', 'http'].contains(_protocol)) put('user', 'user');
+      if (['socks5', 'http', 'mieru', 'naive'].contains(_protocol)) put('user', 'user');
       if (_protocol == 'tuic') put('password', 'password');
+    }
+    for (final field in _options) {
+      if (!_keepStored || _touched.contains(field)) {
+        values[field] = field == 'obfs_param' ? _text(field) : _text(field).trim();
+      }
+    }
+    if (!_keepStored || _touched.contains('security')) values['security'] = _security;
+    if ((_touched.contains('transport') && _transport != 'tcp') ||
+        (_touched.contains('security') && _security == 'none')) {
+      values['flow'] = '';
+    }
+    if (_protocol == 'hysteria2' && (!_keepStored || _touched.contains('obfs_param'))) {
+      values['obfs'] = _text('obfs_param').isEmpty ? '' : 'salamander';
+    }
+    // Native option blobs are write-only; flat edits must not replace unseen settings.
+    if (_protocol == 'mieru' && !_keepStored) {
+      final native = values['mieru'] == null
+          ? <String, dynamic>{}
+          : jsonDecode(values['mieru']!) as Map<String, dynamic>;
+      if (!_keepStored || _touched.contains('port_range')) native['PortRange'] = _text('port_range').trim();
+      values['mieru'] = jsonEncode(native);
+      values.remove('port_range');
+    }
+    if (_protocol == 'naive' && !_keepStored) {
+      final native = values['naive'] == null
+          ? <String, dynamic>{}
+          : jsonDecode(values['naive']!) as Map<String, dynamic>;
+      native['QUIC'] = _transport == 'udp';
+      values['naive'] = jsonEncode(native);
     }
     return jsonEncode(values);
   }
@@ -368,7 +460,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
   }
 
   void _changeProtocol(String value) {
-    if (value == _protocol) return;
+    if (_busy || value == _protocol) return;
     _filling = true;
     for (final entry in _fields.entries) {
       if (!['name', 'address', 'port'].contains(entry.key)) entry.value.clear();
@@ -377,11 +469,12 @@ class _AddServerScreenState extends State<AddServerScreen> {
     _filling = false;
     setState(() {
       _protocol = value;
+      _peer = false;
       _material = {};
       final original = widget.server;
       final restoring = original != null && customServerProtocol(original) == value;
-      _transport = restoring ? original.transport : '';
-      _security = restoring ? original.security : '';
+      _transport = restoring && original.transport.isNotEmpty ? original.transport : _defaultTransport;
+      _security = restoring && original.security.isNotEmpty ? original.security : _defaultSecurity;
       _touched.removeWhere((key) => !['name', 'address', 'port'].contains(key));
     });
   }
@@ -454,89 +547,232 @@ class _AddServerScreenState extends State<AddServerScreen> {
                               const SizedBox(height: 16),
                               Group(
                                 children: [
+                                  ChoiceTile<String>(
+                                    key: const ValueKey('custom-protocol'),
+                                    title: s.customServerProtocol,
+                                    value: _protocol,
+                                    choices: {for (final p in protocols) p: p.toUpperCase()},
+                                    onChanged: _changeProtocol,
+                                  ),
                                   _field('name', s.customServerName),
+                                  _field('address', s.customServerAddress),
+                                  _field('port', s.customServerPort, digits: true),
+                                ],
+                              ),
+                              if (_manual) ...[
+                                Heading(
+                                  _wireGuard
+                                      ? 'WireGuard'
+                                      : '${_protocol.toUpperCase()} · ${s.customServerCredentials}',
+                                ),
+                                if (_wireGuard)
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: [
-                                        Text(s.customServerProtocol, style: Styles.row.copyWith(color: palette.ink)),
-                                        const SizedBox(height: 8),
-                                        MenuAnchor(
-                                          menuChildren: [
-                                            for (final p in protocols)
-                                              MenuItemButton(
-                                                onPressed: () => _changeProtocol(p),
-                                                child: Text(p.toUpperCase(), style: style),
-                                              ),
-                                          ],
-                                          builder: (context, controller, _) => OutlinedButton(
-                                            key: const ValueKey('custom-protocol'),
-                                            onPressed: _busy
-                                                ? null
-                                                : () => controller.isOpen ? controller.close() : controller.open(),
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor: palette.ink,
-                                              minimumSize: const Size(double.infinity, 48),
-                                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                                              side: BorderSide(color: palette.field),
-                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Expanded(child: Text(_protocol.toUpperCase(), style: style)),
-                                                Icon(Symbols.unfold_more_rounded, size: 18, color: palette.ink),
-                                              ],
-                                            ),
-                                          ),
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: Segments<bool>(
+                                      key: const ValueKey('custom-wg-section'),
+                                      value: _peer,
+                                      choices: {false: s.customServerWgInterface, true: s.customServerWgPeer},
+                                      onChanged: (v) {
+                                        if (!_busy) setState(() => _peer = v);
+                                      },
+                                    ),
+                                  ),
+                                if (!_wireGuard || !_peer)
+                                  Group(
+                                    children: [
+                                      if (['socks5', 'http', 'mieru', 'naive'].contains(_protocol))
+                                        _field(
+                                          'user',
+                                          s.customServerUser,
+                                          info: _protocol == 'mieru' ? null : s.customServerOptional,
                                         ),
-                                      ],
-                                    ),
+                                      if (_protocol == 'shadowsocks') _field('method', s.customServerCipher),
+                                      _field(
+                                        'credentials',
+                                        _wireGuard
+                                            ? s.customServerWgPrivateKey
+                                            : ['vless', 'vmess', 'tuic'].contains(_protocol)
+                                            ? 'UUID'
+                                            : s.customServerPassword,
+                                        secret: true,
+                                        info: _keepStored
+                                            ? s.customServerOptional
+                                            : _wireGuard
+                                            ? s.customServerWgKeyInvalid
+                                            : null,
+                                      ),
+                                      if (_protocol == 'tuic') _field('password', s.customServerPassword, secret: true),
+                                      if (_wireGuard)
+                                        _field(
+                                          'addresses',
+                                          s.customServerWgAddresses,
+                                          info: s.customServerWgCidrInvalid,
+                                        ),
+                                    ],
                                   ),
-                                  _field('address', s.customServerAddress, info: s.customServerAddressHint),
-                                  _field('port', s.customServerPort, info: s.customServerPortInvalid, digits: true),
-                                ],
-                              ),
-                              Group(
-                                children: [
-                                  _field(
-                                    'credentials',
-                                    _wireGuard
-                                        ? s.customServerWgPrivateKey
-                                        : ['vless', 'vmess', 'tuic'].contains(_protocol)
-                                        ? 'UUID'
-                                        : s.customServerPassword,
-                                    secret: true,
-                                    info: _wireGuard
-                                        ? s.customServerWgKeyInvalid
-                                        : _keepStored
-                                        ? s.customServerOptional
-                                        : null,
+                                if (_wireGuard && _peer)
+                                  Group(
+                                    children: [
+                                      _field('peerKey', s.customServerWgPeerKey, info: s.customServerWgKeyInvalid),
+                                      _field(
+                                        'allowedIps',
+                                        s.customServerWgAllowedIps,
+                                        info: s.customServerWgCidrInvalid,
+                                      ),
+                                      ExpansionTile(
+                                        key: const ValueKey('custom-wg-peer-options'),
+                                        title: Text(
+                                          s.customServerOptions,
+                                          style: Styles.body.copyWith(color: palette.ink),
+                                        ),
+                                        enabled: !_busy,
+                                        minTileHeight: 48,
+                                        iconColor: palette.ink,
+                                        collapsedIconColor: palette.ink,
+                                        shape: const Border(),
+                                        collapsedShape: const Border(),
+                                        expansionAnimationStyle: AnimationStyle(
+                                          duration: Motion.of(context, const Duration(milliseconds: 180)),
+                                        ),
+                                        children: [
+                                          _field(
+                                            'presharedKey',
+                                            s.customServerWgPresharedKey,
+                                            secret: true,
+                                            info: '${s.customServerOptional}. ${s.customServerWgKeyInvalid}',
+                                          ),
+                                          _field(
+                                            'keepalive',
+                                            s.customServerWgKeepalive,
+                                            digits: true,
+                                            info: '${s.customServerOptional}. ${s.customServerWgKeepaliveInvalid}',
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                  if (_protocol == 'shadowsocks')
-                                    _field('method', s.probeMethod, info: s.customServerMethodHint),
-                                  if (['socks5', 'http'].contains(_protocol))
-                                    _field('user', s.customServerUser, info: s.customServerOptional),
-                                  if (_protocol == 'tuic') _field('password', s.customServerPassword, secret: true),
-                                  if (_wireGuard) ...[
-                                    _field('addresses', s.customServerWgAddresses, info: s.customServerWgCidrInvalid),
-                                    _field('peerKey', s.customServerWgPeerKey, info: s.customServerWgKeyInvalid),
-                                    _field(
-                                      'presharedKey',
-                                      s.customServerWgPresharedKey,
-                                      secret: true,
-                                      info: '${s.customServerOptional}. ${s.customServerWgKeyInvalid}',
-                                    ),
-                                    _field('allowedIps', s.customServerWgAllowedIps, info: s.customServerWgCidrInvalid),
-                                    _field(
-                                      'keepalive',
-                                      s.customServerWgKeepalive,
-                                      digits: true,
-                                      info: '${s.customServerOptional}. ${s.customServerWgKeepaliveInvalid}',
-                                    ),
-                                  ],
-                                ],
-                              ),
+                                if (!_wireGuard && _protocol != 'shadowsocks')
+                                  Group(
+                                    children: [
+                                      ExpansionTile(
+                                        key: ValueKey('custom-options-$_protocol'),
+                                        title: Row(
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                s.customServerOptions,
+                                                style: Styles.body.copyWith(color: palette.ink),
+                                              ),
+                                            ),
+                                            InfoButton(
+                                              title: s.customServerOptions,
+                                              description: s.customServerOptionsInfo,
+                                            ),
+                                          ],
+                                        ),
+                                        enabled: !_busy,
+                                        minTileHeight: 48,
+                                        textColor: palette.ink,
+                                        collapsedTextColor: palette.ink,
+                                        iconColor: palette.ink,
+                                        collapsedIconColor: palette.ink,
+                                        shape: const Border(),
+                                        collapsedShape: const Border(),
+                                        expansionAnimationStyle: AnimationStyle(
+                                          duration: Motion.of(context, const Duration(milliseconds: 180)),
+                                        ),
+                                        children: [
+                                          if (_stream || _protocol == 'mieru' || (_protocol == 'naive' && !_keepStored))
+                                            ChoiceTile<String>(
+                                              key: const ValueKey('custom-transport'),
+                                              title: s.customServerTransport,
+                                              value: _transport,
+                                              choices: {
+                                                for (final v
+                                                    in _stream
+                                                        ? ['tcp', 'ws', 'grpc', 'h2', 'httpupgrade', 'xhttp']
+                                                        : ['tcp', 'udp'])
+                                                  v: v.toUpperCase(),
+                                              },
+                                              onChanged: (v) {
+                                                if (_busy) return;
+                                                setState(() {
+                                                  _transport = v;
+                                                  _touched.add('transport');
+                                                });
+                                              },
+                                            ),
+                                          if (_stream || ['socks5', 'http'].contains(_protocol))
+                                            ChoiceTile<String>(
+                                              key: const ValueKey('custom-security'),
+                                              title: s.customServerSecurity,
+                                              value: _security,
+                                              choices: {
+                                                'none': s.tlsRecordNo,
+                                                'tls': 'TLS',
+                                                if (_protocol == 'vless') 'reality': 'REALITY',
+                                              },
+                                              onChanged: (v) {
+                                                if (_busy) return;
+                                                setState(() {
+                                                  _security = v;
+                                                  _touched.add('security');
+                                                });
+                                              },
+                                            ),
+                                          for (final key in _options)
+                                            if (key == 'mode')
+                                              ChoiceTile<String>(
+                                                key: const ValueKey('custom-mode'),
+                                                title: 'XHTTP · mode',
+                                                value: _text('mode'),
+                                                choices: {
+                                                  '': s.engineAuto,
+                                                  'auto': 'auto',
+                                                  'packet-up': 'packet-up',
+                                                  'stream-up': 'stream-up',
+                                                  'stream-one': 'stream-one',
+                                                  if (![
+                                                    '',
+                                                    'auto',
+                                                    'packet-up',
+                                                    'stream-up',
+                                                    'stream-one',
+                                                  ].contains(_text('mode')))
+                                                    _text('mode'): _text('mode'),
+                                                },
+                                                onChanged: (v) {
+                                                  if (!_busy) _fields['mode']!.text = v;
+                                                },
+                                              )
+                                            else
+                                              _field(
+                                                key,
+                                                switch (key) {
+                                                  'server_name' => 'SNI',
+                                                  'fingerprint' => 'uTLS',
+                                                  'alpn' => 'ALPN',
+                                                  'public_key' => 'REALITY · ${s.customServerWgPeerKey}',
+                                                  'short_id' => 'REALITY · Short ID',
+                                                  'spider_x' => 'REALITY · SpiderX',
+                                                  'path' => 'Path',
+                                                  'host_header' => 'HTTP Host',
+                                                  'service_name' => 'gRPC · serviceName',
+                                                  'mode' => 'XHTTP · mode',
+                                                  'flow' => 'VLESS · flow',
+                                                  'encryption' => 'VLESS · encryption',
+                                                  'obfs_param' => 'Salamander · ${s.customServerPassword}',
+                                                  'port_range' => 'Mieru · ${s.customServerPort}',
+                                                  _ => key,
+                                                },
+                                                secret: key == 'obfs_param',
+                                                info: null,
+                                              ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                              ],
                             ],
                           ),
                         ),
@@ -545,9 +781,19 @@ class _AddServerScreenState extends State<AddServerScreen> {
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                         child: PrimaryButton(
                           key: const ValueKey('custom-save'),
-                          label: s.save,
+                          label: _nextPeer ? s.tourNext : s.save,
                           busy: _saving,
-                          onTap: _busy || problems.isNotEmpty ? null : _save,
+                          onTap:
+                              _busy ||
+                                  problems.keys.any(
+                                    (k) =>
+                                        !_nextPeer ||
+                                        ['name', 'address', 'port', 'credentials', 'addresses'].contains(k),
+                                  )
+                              ? null
+                              : _nextPeer
+                              ? () => setState(() => _peer = true)
+                              : _save,
                         ),
                       ),
                     ],
@@ -566,7 +812,9 @@ class _AddServerScreenState extends State<AddServerScreen> {
     final editingWireGuard =
         _wireGuard &&
         ['credentials', 'addresses', 'peerKey', 'presharedKey', 'allowedIps', 'keepalive'].any(_touched.contains);
-    final error = _touched.contains(key) || editingWireGuard ? _problems()[key] : null;
+    final error = _touched.contains(key) || editingWireGuard || (key == 'public_key' && _touched.contains('security'))
+        ? _problems()[key]
+        : null;
     final last =
         key ==
         switch (_protocol) {
@@ -600,6 +848,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
             child: TextField(
               key: ValueKey('custom-$key'),
               controller: _fields[key],
+              textDirection: key == 'name' ? null : TextDirection.ltr,
               enabled: !_busy,
               obscureText: secret && !_revealed.contains(key),
               autocorrect: false,

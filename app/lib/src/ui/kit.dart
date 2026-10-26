@@ -590,7 +590,7 @@ class Segments<T> extends StatelessWidget {
         children: [
           Positioned.fill(
             child: AnimatedAlign(
-              alignment: Alignment(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
+              alignment: AlignmentDirectional(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
               duration: Motion.of(context, Motion.medium),
               curve: Motion.curve,
               child: FractionallySizedBox(

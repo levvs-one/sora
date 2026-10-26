@@ -206,11 +206,11 @@ void main() {
     );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
-    final info = find.byKey(ValueKey('info-${sora.strings.customServerPort}'));
+    final info = find.byKey(ValueKey('info-${sora.strings.customServerOptions}'));
     await tester.ensureVisible(info);
     await tester.tap(info);
     await tester.pumpAndSettle();
-    expect(find.text(sora.strings.customServerPortInvalid), findsOneWidget);
+    expect(find.text(sora.strings.customServerOptionsInfo), findsOneWidget);
     await shot(tester, 'info-narrow-large');
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();

@@ -245,6 +245,9 @@ void main() {
       if (name == 'socks') expect(value(tester, 'user'), 'user');
       if (fixture['protocol'] == 'wireguard') {
         expect(value(tester, 'addresses'), '10.7.0.2/32');
+        await tester.ensureVisible(find.byKey(const ValueKey('custom-wg-section')));
+        await tester.tap(find.text('Peer'));
+        await tester.pumpAndSettle();
         expect(value(tester, 'peerKey'), 'Z84J2IelR9ch3k8VtlVhhs5ycBUlXA7wHBWcBrjqnAw=');
       }
       expect(saveEnabled(tester), isTrue, reason: name);
