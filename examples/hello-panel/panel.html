@@ -5,79 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hello Panel</title>
 <style>
-  :root { color-scheme: dark light; }
-  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; }
-  h1 { font-size: 18px; margin: 0 0 4px; }
-  p.sub { opacity: .65; margin: 0 0 16px; font-size: 13px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid rgba(127,127,127,.25); }
-  th { opacity: .6; font-weight: 600; }
-  .empty { opacity: .6; padding: 24px 0; text-align: center; }
-  .err { color: #b3261e; padding: 12px; border: 1px solid currentColor; border-radius: 8px; }
-  .row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
-  button { padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(127,127,127,.4); background: transparent; color: inherit; cursor: pointer; }
-  button:hover { background: rgba(127,127,127,.15); }
+  @font-face { font-family: Inter; src: url("fonts/InterVariable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+  :root { color-scheme: light dark; --paper: #f5f5f7; --surface: #fff; --ink: #202124; --line: #dddde2; --accent: #186b49; --hover: #e9f1ed; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #191a1c; --surface: #242629; --ink: #f0f0f2; --line: #414349; --accent: #7bd5a7; --hover: #303c35; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px 16px; background: var(--paper); color: var(--ink); font: 400 15px/1.5 Inter, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; }
+  .heading { display: flex; align-items: center; gap: 4px; margin-bottom: 20px; }
+  h1, h2 { font-size: 20px; line-height: 1.3; font-weight: 600; margin: 0; }
+  button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; transition: background-color 180ms ease, transform 180ms ease; }
+  button:hover { background: var(--hover); }
+  button:active { transform: translateY(1px); }
+  button:disabled { cursor: wait; border-style: dashed; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  #info { width: 44px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; }
+  #info:hover { background: var(--hover); }
+  #info svg { width: 20px; height: 20px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  #refresh { border-color: var(--accent); }
+  #content { background: var(--surface); border-radius: 16px; overflow-x: auto; }
+  .empty { padding: 28px 20px; margin: 0; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--ink); }
+  th { font-weight: 600; }
+  td { overflow-wrap: anywhere; }
+  td:nth-last-child(-n+2) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: 0; }
+  dialog { width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); font: inherit; }
+  dialog[open] { animation: open-info 180ms ease-out; }
+  dialog::backdrop { background: rgb(0 0 0 / .28); }
+  dialog p { margin: 16px 0 24px; }
+  dialog form { display: flex; justify-content: flex-end; }
+  @keyframes open-info { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  @media (max-width: 380px) { body { padding: 16px 12px; } th, td { padding: 12px 8px; } }
 </style>
 </head>
 <body>
-<h1>Hello, Sora!</h1>
-<p class="sub">This panel reads live connections through the extension API.</p>
-<div class="row">
-  <button id="refresh">Refresh</button>
-  <button id="notify">Send test notification</button>
-</div>
-<div id="content"><div class="empty">Loading…</div></div>
+<main>
+  <div class="heading">
+    <h1>Hello Panel</h1>
+    <button id="info" type="button" aria-label="About Hello Panel" aria-haspopup="dialog" aria-controls="about">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg>
+    </button>
+  </div>
+  <div class="actions">
+    <button id="refresh" type="button">Refresh</button>
+    <button id="notify" type="button">Test notification</button>
+  </div>
+  <div id="content" aria-live="polite"><p class="empty">No connections loaded.</p></div>
+</main>
+<dialog id="about" aria-labelledby="about-title" aria-describedby="about-description">
+  <h2 id="about-title">Hello Panel</h2>
+  <p id="about-description">Shows live connections and their traffic counters through the Sora extension API. Connect Sora to see activity. You control access in the extension permissions.</p>
+  <form method="dialog"><button id="close-info" autofocus>Close</button></form>
+</dialog>
 <script>
   const content = document.getElementById('content');
+  const refresh = document.getElementById('refresh');
+  let loading = false;
 
-  function fmtBytes(n) {
+  function fmtBytes(value) {
+    let n = Number(value);
+    if (!Number.isFinite(n) || n < 0) n = 0;
     if (n < 1024) return n + ' B';
-    const u = ['KB', 'MB', 'GB', 'TB'];
+    const units = ['KB', 'MB', 'GB', 'TB'];
     let i = -1;
-    do { n /= 1024; i++; } while (n >= 1024 && i < u.length - 1);
-    return n.toFixed(1) + ' ' + u[i];
+    do { n /= 1024; i++; } while (n >= 1024 && i < units.length - 1);
+    return n.toFixed(1) + ' ' + units[i];
   }
 
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, c => ({
+  function esc(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[c]));
   }
 
-  async function load() {
+  async function notice(message) {
     try {
-      const conns = await window.soraExt.call('getConnections');
-      if (!conns || conns.length === 0) {
-        content.innerHTML = '<div class="empty">No active connections.</div>';
-        return;
-      }
-      let html = '<table><tr><th>Process</th><th>Host</th><th>Down</th><th>Up</th></tr>';
-      for (const c of conns) {
-        html += '<tr><td>' + esc(c.process || '-') + '</td><td>' + esc(c.host || '-') +
-          '</td><td>' + fmtBytes(c.down_bytes || 0) + '</td><td>' + fmtBytes(c.up_bytes || 0) + '</td></tr>';
-      }
-      content.innerHTML = html + '</table>';
-    } catch (e) {
-      content.innerHTML = '<div class="err">Could not load connections: ' + esc(e && e.message || e) + '</div>';
+      await window.soraExt.call('notify', {title: 'Hello Panel', body: message});
+    } catch (error) {
+      // A revoked notification permission also applies to failure notices.
+      console.warn('Hello Panel notification unavailable', error && error.code || 'unavailable');
     }
   }
 
-  document.getElementById('refresh').addEventListener('click', load);
-  document.getElementById('notify').addEventListener('click', async () => {
+  async function load(interactive = false) {
+    if (loading) return;
+    loading = true;
+    refresh.disabled = true;
+    refresh.setAttribute('aria-busy', 'true');
     try {
-      await window.soraExt.call('notify', {title: 'Hello Panel', body: 'The extension API works.'});
-    } catch (e) { /* surfaced in the panel console */ }
-  });
-
-  // Live updates when the session state changes.
-  if (window.soraExt && window.soraExt.onEvent) {
-    window.soraExt.onEvent((kind) => {
-      if (kind === 'session.connected' || kind === 'session.disconnected') load();
-    });
+      const connections = await window.soraExt.call('getConnections');
+      if (!connections || connections.length === 0) {
+        content.innerHTML = '<p class="empty">No active connections.</p>';
+        return;
+      }
+      let html = '<table><thead><tr><th scope="col">Process</th><th scope="col">Host</th><th scope="col">Down</th><th scope="col">Up</th></tr></thead><tbody>';
+      for (const connection of connections) {
+        html += '<tr><td>' + esc(connection.process || '—') + '</td><td>' + esc(connection.host || '—') +
+          '</td><td>' + fmtBytes(connection.down_bytes) + '</td><td>' + fmtBytes(connection.up_bytes) + '</td></tr>';
+      }
+      content.innerHTML = html + '</tbody></table>';
+    } catch (error) {
+      const code = error && error.code;
+      if (code === 'not-connected') {
+        content.innerHTML = '<p class="empty">Connect Sora to see active connections.</p>';
+      }
+      if (interactive) {
+        await notice(code === 'permission-denied'
+          ? 'Allow connection access in the extension permissions to refresh this panel.'
+          : code === 'not-connected' ? 'Connect Sora before refreshing connections.' : 'Connections could not be refreshed.');
+      }
+    } finally {
+      loading = false;
+      refresh.disabled = false;
+      refresh.setAttribute('aria-busy', 'false');
+    }
   }
 
-  load();
-  setInterval(load, 5000);
+  const about = document.getElementById('about');
+  document.getElementById('info').addEventListener('click', () => about.showModal());
+  refresh.addEventListener('click', () => { void load(true); });
+  document.getElementById('notify').addEventListener('click', () => { void notice('The extension API works.'); });
+  if (window.soraExt && window.soraExt.onEvent) {
+    window.soraExt.onEvent((kind) => {
+      if (kind === 'session.connected' || kind === 'session.disconnected') void load();
+    });
+  }
+  void load();
+  setInterval(() => { void load(); }, 5000);
 </script>
 </body>
 </html>

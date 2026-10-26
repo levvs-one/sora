@@ -26,3 +26,14 @@ sora-ext sign --key author.key hello-panel.soraext
 Then install `hello-panel.soraext` with "Install from file". A sideloaded
 package is trusted on first use by the key in its manifest; it is not a
 catalog extension.
+
+
+The 1.0.1 source keeps descriptions behind the info button, uses the native
+HTML dialog for focus/Escape handling, and reports explicit refresh failures
+through the granted notification API. Automatic disconnected refreshes are
+quiet. The bundled Inter font and its original OFL licence are served locally;
+the panel makes no external font or data requests.
+
+This source update does not replace the signed 1.0.0 package in extensions/.
+Publishing a catalog update still requires normal author/team signatures and
+separate publication approval.
