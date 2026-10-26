@@ -15,6 +15,8 @@ import uuid
 def verify(directory):
     if os.name != "nt" or os.environ.get("GITHUB_ACTIONS") != "true":
         raise RuntimeError("MSI installations are restricted to the disposable Windows CI runner")
+    import winreg
+
     metadata = json.loads((directory / "fixture.json").read_text(encoding="utf-8"))
     products = [metadata[name] for name in ("old", "new")]
     service = metadata.get("service")
@@ -35,6 +37,15 @@ def verify(directory):
     state = msi.MsiQueryProductStateW
     state.argtypes = [wintypes.LPCWSTR]
     state.restype = ctypes.c_int
+    kernel = ctypes.WinDLL(str(Path(os.environ["SystemRoot"]) / "System32" / "kernel32.dll"), use_last_error=True)
+    open_file = kernel.CreateFileW
+    open_file.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID,
+                          wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    open_file.restype = wintypes.HANDLE
+    close_handle = kernel.CloseHandle
+    close_handle.argtypes = [wintypes.HANDLE]
+    close_handle.restype = wintypes.BOOL
+    invalid_handle = ctypes.c_void_p(-1).value
     if any(state(product) != -1 for product in products):
         raise RuntimeError("Refusing to overwrite an existing fixture registration")
     logs = directory / "logs"
@@ -45,6 +56,7 @@ def verify(directory):
         observation = root / "observation.json"
         phases = [
             ("baseline", "old", False, False, "old\n", True),
+            ("locked-new-payload", "new", False, True, "old\n", False),
             ("rejected-new-payload", "new", True, True, "old\n", True),
             ("committed-new-payload", "new", False, False, "new\n", True),
         ]
@@ -59,27 +71,62 @@ def verify(directory):
                 command = subprocess.list2cmdline([
                     "msiexec.exe", "/i", str(directory / f"{name}.msi"), "/qn", "/norestart", "/L*v!", str(log),
                 ]) + f' INSTALLFOLDER="{target}" OBSERVATION="{observation}" PROBEFAIL={int(fail)}'
+                locked = phase == "locked-new-payload"
+                handle = None
+                if locked:
+                    # Do not let Restart Manager terminate the process holding the test lock.
+                    command += " MSIRESTARTMANAGERCONTROL=Disable"
                 (logs / f"{phase}-command.txt").write_text(command + "\n", encoding="utf-8")
                 try:
+                    if locked:
+                        handle = open_file(str(target / "payload.txt"), 0x80000000, 1, None, 3, 0x80, None)
+                        if handle == invalid_handle:
+                            handle = None
+                            raise ctypes.WinError(ctypes.get_last_error())
+                        check = open_file(str(target / "payload.txt"), 0x40000000, 7, None, 3, 0x80, None)
+                        if check != invalid_handle:
+                            close_handle(check)
+                            raise RuntimeError("The fixture file lock did not block writes")
+                        if ctypes.get_last_error() != 32:
+                            raise RuntimeError("The lock positive control did not report a sharing violation")
                     result = subprocess.run(command, capture_output=True, timeout=120)
                 except subprocess.TimeoutExpired:
                     if service:
                         snapshot = subprocess.run(["sc.exe", "queryex", service], capture_output=True, timeout=10)
                         (logs / f"{phase}-scm.txt").write_bytes(snapshot.stdout + snapshot.stderr)
                     raise
+                finally:
+                    if handle is not None and not close_handle(handle):
+                        raise ctypes.WinError(ctypes.get_last_error())
+                if locked and result.returncode != 1603:
+                    raise RuntimeError(f"A locked upgrade must refuse without a reboot: exit {result.returncode}")
+                if locked:
+                    logged = log.read_bytes()
+                    if b"InstallValidate" not in logged and "InstallValidate".encode("utf-16-le") not in logged:
+                        raise RuntimeError("The locked upgrade did not reach native installation validation")
                 if (result.returncode == 0) == refused:
                     raise RuntimeError(f"{phase}: unexpected installer exit {result.returncode}; see {log}")
                 observed = json.loads(observation.read_text(encoding="utf-8")) if observation.exists() else None
                 if has_observation and observed != {"observed": name + "\n", "expected": name, "failed": fail}:
                     raise RuntimeError(f"{phase}: new payload was not observed before completion")
                 if not has_observation and observed is not None:
-                    raise RuntimeError("Failed service startup reached the post-readiness commit action")
+                    raise RuntimeError("A refused startup/copy reached the post-readiness commit action")
                 if (target / "payload.txt").read_text(encoding="utf-8") != expected:
                     raise RuntimeError(f"{phase}: final bytes do not match the committed installation")
                 states = [state(product) for product in products]
                 wanted = [-1, 5] if phase == "committed-new-payload" else [5, -1]
                 if states != wanted + ([-1] if service else []):
                     raise RuntimeError(f"{phase}: inconsistent MSI product states {states}")
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                                    r"SYSTEM\CurrentControlSet\Control\Session Manager", access=winreg.KEY_QUERY_VALUE) as key:
+                    try:
+                        pending, kind = winreg.QueryValueEx(key, "PendingFileRenameOperations")
+                    except FileNotFoundError:
+                        pending, kind = [], winreg.REG_MULTI_SZ
+                if kind != winreg.REG_MULTI_SZ or not isinstance(pending, list):
+                    raise RuntimeError("Cannot inspect the reboot replacement queue")
+                if any(str(root).casefold() in path.casefold() for path in pending):
+                    raise RuntimeError("The fixture retained a queued file operation after the transaction")
                 health = None
                 if service:
                     ready = subprocess.run([str(target / "service.exe"), "check", service, expected.strip()],
@@ -90,7 +137,8 @@ def verify(directory):
                     if health["version"] != expected.strip() or not health["pipe_pid"] or health["pipe_pid"] != health["scm_pid"]:
                         raise RuntimeError("Readiness did not identify the restored/committed service")
                 evidence = {"phase": phase, "exit": result.returncode, "observed": observed,
-                            "installed": expected, "product_states": states, "health": health}
+                            "installed": expected, "product_states": states, "health": health,
+                            "lock_confirmed": locked, "pending_fixture_renames": 0}
                 (logs / f"{phase}.json").write_text(json.dumps(evidence) + "\n", encoding="utf-8")
                 print(json.dumps(evidence), flush=True)
         finally:
