@@ -2113,4 +2113,12 @@ class SHi extends S {
   String extAvailableOn(String platforms) {
     return 'इन पर उपलब्ध: $platforms।';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret सभी Windows ऐप के लिए पोर्ट 80 और 443 पर TCP ट्रैफ़िक बदलता है। यह VPN नहीं है। Windows फिर से शुरू होने तक WinDivert ड्राइवर लोड रह सकता है।';
+
+  @override
+  String get winwsRequirements =>
+      'मूल Windows x64, WLANAPI और सत्यापित WinDivert पैकेज आवश्यक हैं। यदि Windows ड्राइवर को रोकता है, तो यह मोड उपलब्ध नहीं होगा।';
 }

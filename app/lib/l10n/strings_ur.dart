@@ -2114,4 +2114,12 @@ class SUr extends S {
   String extAvailableOn(String platforms) {
     return 'ان پلیٹ فارمز پر دستیاب: $platforms۔';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret تمام Windows ایپس کے لیے پورٹ 80 اور443 پر TCP ٹریفک تبدیل کرتا ہے۔ یہ VPN نہیں ہے۔ WinDivert ڈرائیور Windows دوبارہ شروع ہونے تک لوڈ رہ سکتا ہے۔';
+
+  @override
+  String get winwsRequirements =>
+      'مقامی Windows x64، WLANAPI اور تصدیق شدہ WinDivert پیکیج درکار ہیں۔ اگر Windows ڈرائیور کو بلاک کرے تو یہ موڈ دستیاب نہیں ہوگا۔';
 }

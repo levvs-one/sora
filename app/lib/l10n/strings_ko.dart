@@ -2085,4 +2085,12 @@ class SKo extends S {
   String extAvailableOn(String platforms) {
     return '지원 플랫폼: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret은 모든 Windows 앱에서 포트80과443을 통해 TCP 트래픽을 변경합니다. VPN이 아닙니다. WinDivert 드라이버는 Windows를 다시 시작할 때까지 로드된 상태로 남을 수 있습니다.';
+
+  @override
+  String get winwsRequirements =>
+      '네이티브 Windows x64, WLANAPI 및 검증된 WinDivert 패키지가 필요합니다. Windows가 드라이버를 차단하면 이 모드를 사용할 수 없습니다.';
 }

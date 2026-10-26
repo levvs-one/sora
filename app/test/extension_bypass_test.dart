@@ -105,7 +105,7 @@ void main() {
     expect(result.exitCode, 0, reason: '${args.first}: ${result.stderr}');
   }
 
-  Future<ExtPackage> signed({String? id, Map<String, dynamic>? descriptor}) async {
+  Future<ExtPackage> signed({String? id, String? version, Map<String, dynamic>? descriptor}) async {
     final root = await Directory('${fixture.path}/src-${DateTime.now().microsecondsSinceEpoch}').create();
     for (final entity in source.listSync().whereType<File>()) {
       await entity.copy('${root.path}/${entity.uri.pathSegments.last}');
@@ -114,6 +114,7 @@ void main() {
     final manifest = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
     (manifest['author'] as Map<String, dynamic>)['public_key'] = publicKey;
     if (id != null) manifest['id'] = id;
+    if (version != null) manifest['version'] = version;
     await file.writeAsString(jsonEncode(manifest));
     if (descriptor != null) await File('${root.path}/hook.json').writeAsString(jsonEncode(descriptor));
     final output = '${root.path}.soraext';
@@ -250,8 +251,15 @@ void main() {
     final damaged = Map<String, Uint8List>.from(pkg.files);
     damaged['hook.json'] = utf8.encode('{}');
     await expectLater(install(ExtPackage.fromFiles(damaged, pkg.manifest)), throwsA(isA<PackageError>()));
-    final descriptor = jsonDecode(File('${source.path}/hook.json').readAsStringSync()) as Map<String, dynamic>;
-    descriptor['backend'] = Platform.isWindows ? 'tpws' : 'byedpi';
+    final descriptor = {
+      'hook_version': 2,
+      'backend': Platform.isWindows ? 'tpws' : 'byedpi',
+      'profiles': {
+        'TCP+TLS': {
+          'splitPos': ['1'],
+        },
+      },
+    };
     await expectLater(install(await signed(descriptor: descriptor)), throwsA(isA<ExtAssetError>()));
     expect(store.installed, isEmpty);
     expect(dir.listSync().whereType<Directory>(), isEmpty);
@@ -374,8 +382,16 @@ void main() {
         await tester.pump();
       }
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('DPI'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.pumpAndSettle();
       expect(find.text('DPI'), findsOneWidget);
       expect(find.text('TCP+TLS'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text(sora.strings.trayConnect),
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       expect(find.text(sora.strings.trayConnect), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (Platform.environment['SORA_SHOTS'] != null) {
@@ -417,6 +433,104 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     });
   }
+
+  test('Windows signed Winws needs native capability and fresh host consent per author/version', () async {
+    final descriptor =
+        jsonDecode(File('../extensions/sources/zapret/hook.json').readAsStringSync()) as Map<String, dynamic>;
+    final winws = await signed(id: 'org.sora.winws-fixture', descriptor: descriptor);
+    await install(winws);
+    final settings = await Settings.load();
+    final sora = Sora(settings, extensions: store);
+    ownedBySora = true;
+    addTearDown(sora.dispose);
+    final choice = store.bypassProfiles.single.choiceId;
+    expect(store.bypassProfiles.single.systemWide, true);
+    final before = sora.selected;
+    await sora.select(choice);
+    expect(sora.selected, before);
+    final key = sora.systemFilterConsentKey(choice)!;
+    expect(sora.approveSystemFilter(choice, key), false);
+    sora.coreCapabilities.add('serverless-winws');
+    expect(sora.approveSystemFilter(choice, 'wrong author/version'), false);
+    expect(sora.approveSystemFilter(choice, key), true);
+    await sora.select(choice);
+    expect(sora.currentPlan.outbounds.single.protocol, 'winws');
+    final updated = await signed(id: winws.manifest.id, version: '1.0.1', descriptor: descriptor);
+    await install(updated);
+    expect(sora.needsSystemFilterConsent(choice), true);
+    expect(sora.approveSystemFilter(choice, key), false);
+    final reloaded = ExtensionStore(dir: dir.path);
+    await reloaded.load();
+    final restarted = Sora(settings, extensions: reloaded)..coreCapabilities.add('serverless-winws');
+    addTearDown(restarted.dispose);
+    expect(restarted.needsSystemFilterConsent(choice), true);
+  }, skip: !Platform.isWindows ? 'requires native Windows app platform; no driver is loaded' : false);
+
+  testWidgets('Windows scope info and Escape do not consent; explicit selection does', (tester) async {
+    late Sora sora;
+    late String choice;
+    await tester.runAsync(() async {
+      final descriptor =
+          jsonDecode(File('../extensions/sources/zapret/hook.json').readAsStringSync()) as Map<String, dynamic>;
+      await install(await signed(id: 'org.sora.winws-fixture', descriptor: descriptor));
+      final settings = await Settings.load();
+      settings.animations = false;
+      settings.language = 'en';
+      sora = Sora(settings, extensions: store)..coreCapabilities.add('serverless-winws');
+      ownedBySora = true;
+      choice = store.bypassProfiles.single.choiceId;
+    });
+    addTearDown(sora.dispose);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 740);
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: MotionScope(
+          enabled: false,
+          child: MaterialApp(
+            theme: buildTheme(Brightness.light),
+            locale: const Locale('en'),
+            localizationsDelegates: S.localizationsDelegates,
+            supportedLocales: S.supportedLocales,
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.6)),
+              child: child!,
+            ),
+            home: const Scaffold(body: ModeButton()),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('mode-button')));
+    await tester.pumpAndSettle();
+    final name = store.get('org.sora.winws-fixture')!.manifest.name;
+    await tester.tap(find.byKey(ValueKey('info-$name')));
+    await tester.pumpAndSettle();
+    expect(find.text(sora.strings.winwsScopeWarning), findsOneWidget);
+    expect(sora.needsSystemFilterConsent(choice), true);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(name));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('system-filter-consent')), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(sora.selected, isNot(choice));
+    await tester.tap(find.text(name));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(sora.strings.chooseEngine(name)));
+    for (var i = 0; i < 10; i++) {
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pump();
+    }
+    expect(sora.selected, choice);
+    expect(sora.needsSystemFilterConsent(choice), false);
+    expect(sora.currentPlan.outbounds.single.protocol, 'winws');
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  }, skip: !Platform.isWindows);
 
   group('actual private gRPC transport', () {
     late _Core core;

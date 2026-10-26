@@ -16,7 +16,7 @@ func (p *Plan) IsVPNTarget(target string) bool {
 		visiting[id] = true
 		defer delete(visiting, id)
 		if o, ok := p.OutboundByID(id); ok {
-			if !validProtocols[o.Protocol] || o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass || o.Protocol == ProtocolXrayProfile {
+			if !validProtocols[o.Protocol] || o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass || o.Protocol == ProtocolWinws || o.Protocol == ProtocolXrayProfile {
 				return false
 			}
 			return o.Via == "" || check(o.Via)

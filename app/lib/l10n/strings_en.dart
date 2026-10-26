@@ -2117,4 +2117,12 @@ class SEn extends S {
   String extAvailableOn(String platforms) {
     return 'Available on: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret changes TCP traffic on ports 80 and 443 for every Windows app. It is not a VPN. The WinDivert driver may remain loaded until Windows restarts.';
+
+  @override
+  String get winwsRequirements =>
+      'Requires native Windows x64, WLANAPI and the verified WinDivert bundle. If Windows blocks the driver, this mode is unavailable.';
 }

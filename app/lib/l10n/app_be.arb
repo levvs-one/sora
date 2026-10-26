@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Інтэрфейс",
   "customServerWgPeer": "Пір",
   "customServerOptionsInfo": "Укажыце параметры транспарту і TLS з налад правайдара або ўстаўце спасылку на сервер.",
-  "extAvailableOn": "Даступна на: {platforms}."
+  "extAvailableOn": "Даступна на: {platforms}.",
+  "winwsScopeWarning": "Zapret змяняе TCP-трафік на партах 80 і 443 для ўсіх праграм Windows. Гэта не VPN. Драйвер WinDivert можа заставацца загружаным да перазапуску Windows.",
+  "winwsRequirements": "Патрэбныя Windows x64 без эмуляцыі, WLANAPI і правераны камплект WinDivert. Калі Windows блакуе драйвер, гэты рэжым недаступны."
 }

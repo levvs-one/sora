@@ -60,3 +60,46 @@ func TestBypassProjectInvalidDescriptorFailsBeforePack(t *testing.T) {
 		t.Fatalf("%+v", result)
 	}
 }
+
+func TestPlatformBypassScopeAndBackendPairing(t *testing.T) {
+	base := map[string]any{"hook_version": 3, "platforms": map[string]any{
+		"linux":   map[string]any{"backend": "tpws", "profiles": map[string]any{"TCP": map[string]any{"splitPos": []string{"1"}}}},
+		"windows": map[string]any{"backend": "winws", "scope": "system-tcp-80-443", "profiles": map[string]any{"TCP": map[string]any{"splitPos": []string{"1"}}}},
+	}}
+	raw, err := json.Marshal(base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := validateBypassAsset(raw); err != nil {
+		t.Fatal(err)
+	}
+	for _, mutate := range []func(map[string]any){
+		func(d map[string]any) { d["backend"] = "tpws" },
+		func(d map[string]any) { d["platforms"].(map[string]any)["android"] = map[string]any{} },
+		func(d map[string]any) { d["platforms"].(map[string]any)["windows"].(map[string]any)["scope"] = "all" },
+		func(d map[string]any) { delete(d["platforms"].(map[string]any)["windows"].(map[string]any), "scope") },
+		func(d map[string]any) { d["platforms"].(map[string]any)["linux"].(map[string]any)["backend"] = "winws" },
+		func(d map[string]any) {
+			d["platforms"].(map[string]any)["windows"].(map[string]any)["executable"] = "winws.exe"
+		},
+		func(d map[string]any) {
+			d["platforms"].(map[string]any)["windows"].(map[string]any)["profiles"].(map[string]any)["TCP"].(map[string]any)["oob"] = true
+		},
+		func(d map[string]any) {
+			d["platforms"].(map[string]any)["windows"].(map[string]any)["profiles"].(map[string]any)["TCP"].(map[string]any)["tlsRecord"] = "1"
+		},
+	} {
+		var doc map[string]any
+		if err := json.Unmarshal(raw, &doc); err != nil {
+			t.Fatal(err)
+		}
+		mutate(doc)
+		bad, err := json.Marshal(doc)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := validateBypassAsset(bad); err == nil {
+			t.Fatalf("accepted %s", bad)
+		}
+	}
+}

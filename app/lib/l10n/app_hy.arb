@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Միջերես",
   "customServerWgPeer": "Հասակակից",
   "customServerOptionsInfo": "Օգտագործեք մատակարարի տրամադրած փոխադրման և TLS կարգավորումները կամ տեղադրեք սերվերի հղումը։",
-  "extAvailableOn": "Հասանելի է՝ {platforms}։"
+  "extAvailableOn": "Հասանելի է՝ {platforms}։",
+  "winwsScopeWarning": "Zapret-ը փոխում է TCP տրաֆիկը 80 և 443 պորտերով՝ Windows-ի բոլոր հավելվածների համար։ Սա VPN չէ։ WinDivert դրայվերը կարող է բեռնված մնալ մինչև Windows-ի վերագործարկումը։",
+  "winwsRequirements": "Պահանջվում են Windows x64՝ առանց էմուլյացիայի, WLANAPI և ստուգված WinDivert փաթեթը։ Եթե Windows-ը արգելափակում է դրայվերը, այս ռեժիմն անհասանելի է։"
 }

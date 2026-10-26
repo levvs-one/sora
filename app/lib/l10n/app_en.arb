@@ -896,5 +896,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "winwsScopeWarning": "Zapret changes TCP traffic on ports 80 and 443 for every Windows app. It is not a VPN. The WinDivert driver may remain loaded until Windows restarts.",
+  "winwsRequirements": "Requires native Windows x64, WLANAPI and the verified WinDivert bundle. If Windows blocks the driver, this mode is unavailable."
 }

@@ -2081,6 +2081,13 @@ class SZh extends S {
   String extAvailableOn(String platforms) {
     return '适用平台：$platforms。';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret 会修改所有 Windows 应用通过80和443端口传输的 TCP 流量。它不是 VPN。WinDivert 驱动程序可能会保持加载，直到 Windows 重新启动。';
+
+  @override
+  String get winwsRequirements => '需要原生 Windows x64、WLANAPI 和经过验证的 WinDivert 组件包。如果 Windows 阻止驱动程序，此模式将不可用。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4159,6 +4166,13 @@ class SZhHans extends SZh {
   String extAvailableOn(String platforms) {
     return '适用平台：$platforms。';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret 会修改所有 Windows 应用通过80和443端口传输的 TCP 流量。它不是 VPN。WinDivert 驱动程序可能会保持加载，直到 Windows 重新启动。';
+
+  @override
+  String get winwsRequirements => '需要原生 Windows x64、WLANAPI 和经过验证的 WinDivert 组件包。如果 Windows 阻止驱动程序，此模式将不可用。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6238,4 +6252,11 @@ class SZhHant extends SZh {
   String extAvailableOn(String platforms) {
     return '適用平台：$platforms。';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret 會修改所有 Windows 應用程式透過80和443連接埠傳送的 TCP 流量。它不是 VPN。WinDivert 驅動程式可能會持續載入，直到 Windows 重新啟動。';
+
+  @override
+  String get winwsRequirements => '需要原生 Windows x64、WLANAPI 和經過驗證的 WinDivert 元件套件。如果 Windows 封鎖驅動程式，此模式將無法使用。';
 }

@@ -2121,4 +2121,12 @@ class SKa extends S {
   String extAvailableOn(String platforms) {
     return 'ხელმისაწვდომია: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret ცვლის TCP ტრაფიკს 80 და 443 პორტებზე Windows-ის ყველა აპისთვის. ეს VPN არ არის. WinDivert-ის დრაივერი შეიძლება Windows-ის გადატვირთვამდე ჩატვირთული დარჩეს.';
+
+  @override
+  String get winwsRequirements =>
+      'საჭიროა Windows x64 ემულაციის გარეშე, WLANAPI და შემოწმებული WinDivert პაკეტი. თუ Windows დრაივერს ბლოკავს, ეს რეჟიმი მიუწვდომელია.';
 }

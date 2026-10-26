@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
 import '../kit.dart';
+import '../modes.dart';
 import '../../ext/catalog.dart';
 import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
@@ -443,6 +444,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     final store = ExtScope.of(context);
     setState(() => _saving = true);
     try {
+      if (!await ensureSystemFilterConsent(context, '$extensionBypassPrefix$id') || !mounted) return;
       await store.setSettings(id, _settings ?? await store.getSettings(id));
       final profile = store.bypassProfile('$extensionBypassPrefix$id');
       if (profile == null) throw ExtAssetError('bypass profile is unavailable');
@@ -450,7 +452,9 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       final sora = SoraScope.read(context);
       await sora.change((settings) => settings.tunnel = 'tun', replan: false);
       await sora.select(profile.choiceId);
-      if (sora.phase == Phase.off || sora.phase == Phase.offline) await sora.connect();
+      if (sora.selected == profile.choiceId && (sora.phase == Phase.off || sora.phase == Phase.offline)) {
+        await sora.connect();
+      }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).extAssetRejected)));

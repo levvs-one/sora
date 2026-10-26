@@ -2123,4 +2123,12 @@ class SHy extends S {
   String extAvailableOn(String platforms) {
     return 'Հասանելի է՝ $platforms։';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret-ը փոխում է TCP տրաֆիկը 80 և 443 պորտերով՝ Windows-ի բոլոր հավելվածների համար։ Սա VPN չէ։ WinDivert դրայվերը կարող է բեռնված մնալ մինչև Windows-ի վերագործարկումը։';
+
+  @override
+  String get winwsRequirements =>
+      'Պահանջվում են Windows x64՝ առանց էմուլյացիայի, WLANAPI և ստուգված WinDivert փաթեթը։ Եթե Windows-ը արգելափակում է դրայվերը, այս ռեժիմն անհասանելի է։';
 }

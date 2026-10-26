@@ -2102,4 +2102,12 @@ class STh extends S {
   String extAvailableOn(String platforms) {
     return 'ใช้ได้บน: $platforms';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret เปลี่ยนทราฟฟิก TCPบนพอร์ต 80 และ 443 สำหรับแอป Windows ทั้งหมด นี่ไม่ใช่ VPN ไดรเวอร์ WinDivert อาจยังโหลดอยู่จนกว่าจะรีสตาร์ต Windows';
+
+  @override
+  String get winwsRequirements =>
+      'ต้องใช้ Windows x64 แบบเนทีฟ, WLANAPI และชุด WinDivert ที่ตรวจสอบแล้ว หาก Windows บล็อกไดรเวอร์ โหมดนี้จะใช้งานไม่ได้';
 }

@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Интерфейс",
   "customServerWgPeer": "Пир",
   "customServerOptionsInfo": "Провайдердин транспорт жана TLS параметрлерин киргизиңиз же сервердин шилтемесин чаптаңыз.",
-  "extAvailableOn": "Жеткиликтүү платформалар: {platforms}."
+  "extAvailableOn": "Жеткиликтүү платформалар: {platforms}.",
+  "winwsScopeWarning": "Zapret бардык Windows колдонмолору үчүн 80 жана 443 портторундагы TCP трафигин өзгөртөт. Бул VPN эмес. WinDivert драйвери Windows кайра иштетилгенге чейин жүктөлгөн бойдон калышы мүмкүн.",
+  "winwsRequirements": "Эмуляциясыз Windows x64, WLANAPI жана текшерилген WinDivert топтому керек. Windows драйверди бөгөттөсө, бул режим жеткиликсиз."
 }

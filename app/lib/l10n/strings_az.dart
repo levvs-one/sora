@@ -2125,4 +2125,12 @@ class SAz extends S {
   String extAvailableOn(String platforms) {
     return 'Bu platformalarda mövcuddur: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret bütün Windows tətbiqləri üçün 80 və 443 portlarında TCP trafikini dəyişir. Bu, VPN deyil. WinDivert drayveri Windows yenidən başladılana qədər yüklənmiş qala bilər.';
+
+  @override
+  String get winwsRequirements =>
+      'Emulyasiyasız Windows x64, WLANAPI və yoxlanmış WinDivert paketi tələb olunur. Windows drayveri bloklayarsa, bu rejim əlçatan deyil.';
 }

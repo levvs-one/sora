@@ -2138,4 +2138,12 @@ class SAr extends S {
   String extAvailableOn(String platforms) {
     return 'متاح على: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'يغيّر Zapret حركة TCP عبر المنفذين 80 و 443 لجميع تطبيقات Windows. ليس VPN. قد يبقى برنامج تشغيل WinDivert محمّلًا حتى إعادة تشغيل Windows.';
+
+  @override
+  String get winwsRequirements =>
+      'يلزم Windows x64 أصلي وWLANAPI وحزمة WinDivert موثّقة. إذا حظر Windows برنامج التشغيل، فلن يتوفر هذا الوضع.';
 }

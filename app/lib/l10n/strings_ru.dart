@@ -2138,4 +2138,12 @@ class SRu extends S {
   String extAvailableOn(String platforms) {
     return 'Доступно на: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret изменяет TCP-трафик на портах 80 и 443 для всех приложений Windows. Это не VPN. Драйвер WinDivert может оставаться загруженным до перезагрузки Windows.';
+
+  @override
+  String get winwsRequirements =>
+      'Нужны Windows x64 без эмуляции, WLANAPI и проверенный комплект WinDivert. Если Windows блокирует драйвер, этот режим недоступен.';
 }

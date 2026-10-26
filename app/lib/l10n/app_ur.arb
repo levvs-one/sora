@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "انٹرفیس",
   "customServerWgPeer": "پیئر",
   "customServerOptionsInfo": "فراہم کنندہ کی ٹرانسپورٹ اور TLS ترتیبات استعمال کریں یا سرور کا لنک پیسٹ کریں۔",
-  "extAvailableOn": "ان پلیٹ فارمز پر دستیاب: {platforms}۔"
+  "extAvailableOn": "ان پلیٹ فارمز پر دستیاب: {platforms}۔",
+  "winwsScopeWarning": "Zapret تمام Windows ایپس کے لیے پورٹ 80 اور443 پر TCP ٹریفک تبدیل کرتا ہے۔ یہ VPN نہیں ہے۔ WinDivert ڈرائیور Windows دوبارہ شروع ہونے تک لوڈ رہ سکتا ہے۔",
+  "winwsRequirements": "مقامی Windows x64، WLANAPI اور تصدیق شدہ WinDivert پیکیج درکار ہیں۔ اگر Windows ڈرائیور کو بلاک کرے تو یہ موڈ دستیاب نہیں ہوگا۔"
 }

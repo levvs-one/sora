@@ -3980,6 +3980,18 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Доступно на: {platforms}.'**
   String extAvailableOn(String platforms);
+
+  /// No description provided for @winwsScopeWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Zapret изменяет TCP-трафик на портах 80 и 443 для всех приложений Windows. Это не VPN. Драйвер WinDivert может оставаться загруженным до перезагрузки Windows.'**
+  String get winwsScopeWarning;
+
+  /// No description provided for @winwsRequirements.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нужны Windows x64 без эмуляции, WLANAPI и проверенный комплект WinDivert. Если Windows блокирует драйвер, этот режим недоступен.'**
+  String get winwsRequirements;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

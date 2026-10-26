@@ -225,11 +225,21 @@ jobs:
           if-no-files-found: error
 
   windows-zapret-compatibility:
-    name: Windows Zapret loader compatibility
+    name: Windows Zapret runtime compatibility
     runs-on: windows-latest
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: core/go.mod
+          cache: false
+      - name: Build actual native runtime boundary tests
+        shell: pwsh
+        working-directory: core
+        run: |
+          go test -c -o "$env:RUNNER_TEMP/winws-native-test.exe" ./engine/winws
+          if ($LASTEXITCODE -ne 0) { throw 'Winws native fixture build failed' }
       - name: Download pinned upstream archive
         shell: pwsh
         run: |
@@ -239,6 +249,7 @@ jobs:
         shell: pwsh
         env:
           SORA_ISOLATED_ZAPRET_TEST: '1'
+          SORA_WINWS_NATIVE_TEST: ${{ runner.temp }}/winws-native-test.exe
         run: |
           python -B packaging/windows/test_zapret_compatibility.py "$env:RUNNER_TEMP/zapret-v72.13.zip" "$env:RUNNER_TEMP/sora-zapret-loader" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/zapret-loader-evidence.log"
           if ($LASTEXITCODE -ne 0) { throw 'Native Zapret loader compatibility failed' }
@@ -342,7 +353,7 @@ jobs:
         working-directory: app
         run: |
           flutter pub get
-          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart
+          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart test/winws_profile_test.dart test/extension_bypass_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan, metadata or extension package tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Native signed extension panel and bridge

@@ -17,6 +17,52 @@ Future<void> showModes(BuildContext context) async {
   if (info == true && navigator.mounted) await push<void>(navigator.context, const ModesGuideScreen());
 }
 
+/// Consent belongs to the host UI and this app launch, not extension settings.
+Future<bool> ensureSystemFilterConsent(BuildContext context, String choice) async {
+  final sora = SoraScope.read(context);
+  final profile = sora.extensions.bypassProfile(choice);
+  if (profile == null || !profile.systemWide) return true;
+  final available = sora.bypassProfileAvailable(profile);
+  if (available && !sora.needsSystemFilterConsent(choice)) return true;
+  final key = sora.systemFilterConsentKey(choice);
+  final s = S.of(context), palette = Palette.of(context);
+  final accepted = await showDialog<bool>(
+    context: context,
+    barrierColor: palette.scrim,
+    animationStyle: AnimationStyle(
+      duration: Motion.of(context, Motion.medium),
+      reverseDuration: Motion.of(context, Motion.medium),
+    ),
+    builder: (context) => AlertDialog(
+      key: const ValueKey('system-filter-consent'),
+      scrollable: true,
+      backgroundColor: palette.raised,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      constraints: const BoxConstraints(maxWidth: 420),
+      insetPadding: const EdgeInsets.all(24),
+      title: Text(profile.name, style: Styles.heading.copyWith(color: palette.ink)),
+      content: Text(
+        available ? s.winwsScopeWarning : s.winwsRequirements,
+        style: Styles.body.copyWith(color: palette.ink, height: 1.5),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(available ? s.cancel : s.close, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+        ),
+        if (available)
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(s.chooseEngine(profile.name), style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          ),
+      ],
+    ),
+  );
+  return accepted == true && context.mounted && key != null && sora.approveSystemFilter(choice, key);
+}
+
 Future<void> connectFromHome(BuildContext context) async {
   final sora = SoraScope.read(context);
   if (sora.phase == Phase.off && !sora.cleanupPending && sora.servers.isEmpty && !sora.bypassSelected) {
@@ -60,6 +106,7 @@ Future<void> connectFromHome(BuildContext context) async {
     }
     return;
   }
+  if (sora.phase == Phase.off && !await ensureSystemFilterConsent(context, sora.selected)) return;
   await sora.toggle();
 }
 
@@ -109,14 +156,21 @@ class _Modes extends StatelessWidget {
     final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
     final settings = sora.settings;
     final current = sora.bypassSelected ? sora.selected : settings.tunnel;
-    Widget choice(String key, String title, bool selected, VoidCallback choose) => ListTile(
+    Widget choice(String key, String title, bool selected, VoidCallback choose, {String? info}) => ListTile(
       key: ValueKey(key),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       minTileHeight: 52,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       selected: selected,
       selectedTileColor: palette.field,
-      title: Text(title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+      title: Row(
+        children: [
+          Flexible(
+            child: Text(title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          ),
+          if (info != null) InfoButton(title: title, description: info),
+        ],
+      ),
       onTap: choose,
       trailing: SizedBox(
         width: 24,
@@ -125,6 +179,7 @@ class _Modes extends StatelessWidget {
     );
     Future<void> mode(String value) async {
       if (sora.extensions.bypassProfile(value) != null) {
+        if (!await ensureSystemFilterConsent(context, value) || !context.mounted) return;
         await sora.change((settings) => settings.tunnel = 'tun', replan: false);
         await sora.select(value);
         return;
@@ -151,10 +206,15 @@ class _Modes extends StatelessWidget {
           ('tun', s.tunMode),
           ('proxy', s.tunnelProxy),
           if (sora.serverlessAvailable) ('bypass', s.serverBypass),
-          if (sora.serverlessAvailable)
-            for (final profile in sora.extensions.bypassProfiles) (profile.choiceId, profile.name),
+          for (final profile in sora.extensions.bypassProfiles) (profile.choiceId, profile.name),
         ])
-          choice('mode-$value', title, current == value, () => unawaited(mode(value))),
+          choice(
+            'mode-$value',
+            title,
+            current == value,
+            () => unawaited(mode(value)),
+            info: sora.extensions.bypassProfile(value)?.systemWide == true ? s.winwsScopeWarning : null,
+          ),
       ],
     );
     final engines = Column(

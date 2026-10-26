@@ -2115,4 +2115,12 @@ class STk extends S {
   String extAvailableOn(String platforms) {
     return 'Elýeterli platformalar: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret ähli Windows programmalary üçin 80 we 443 portlarynda TCP traffigini üýtgedýär. Bu VPN däl. WinDivert draýweri Windows täzeden açylýança ýüklenen bolup galyp biler.';
+
+  @override
+  String get winwsRequirements =>
+      'Emulýasiýasyz Windows x64, WLANAPI we barlanan WinDivert toplumy gerek. Windows draýweri petiklese, bu režim elýeterli däl.';
 }

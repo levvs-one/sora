@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Interfeys",
   "customServerWgPeer": "Tengdosh",
   "customServerOptionsInfo": "Provayder bergan transport va TLS sozlamalarini kiriting yoki server havolasini joylashtiring.",
-  "extAvailableOn": "Mavjud platformalar: {platforms}."
+  "extAvailableOn": "Mavjud platformalar: {platforms}.",
+  "winwsScopeWarning": "Zapret barcha Windows ilovalarining 80 va 443 portlari orqali TCP trafigini o‘zgartiradi. Bu VPN emas. WinDivert drayveri Windows qayta ishga tushirilguncha yuklangan holda qolishi mumkin.",
+  "winwsRequirements": "Emulyatsiyasiz Windows x64, WLANAPI va tekshirilgan WinDivert to‘plami kerak. Windows drayverni bloklasa, bu rejim ishlamaydi."
 }

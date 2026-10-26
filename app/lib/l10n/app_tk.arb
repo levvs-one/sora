@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Interfeýs",
   "customServerWgPeer": "Deňdeş",
   "customServerOptionsInfo": "Üpjin edijiniň geçiriş we TLS sazlamalaryny giriziň ýa-da serwer salgysyny goýuň.",
-  "extAvailableOn": "Elýeterli platformalar: {platforms}."
+  "extAvailableOn": "Elýeterli platformalar: {platforms}.",
+  "winwsScopeWarning": "Zapret ähli Windows programmalary üçin 80 we 443 portlarynda TCP traffigini üýtgedýär. Bu VPN däl. WinDivert draýweri Windows täzeden açylýança ýüklenen bolup galyp biler.",
+  "winwsRequirements": "Emulýasiýasyz Windows x64, WLANAPI we barlanan WinDivert toplumy gerek. Windows draýweri petiklese, bu režim elýeterli däl."
 }

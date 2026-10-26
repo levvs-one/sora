@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "ინტერფეისი",
   "customServerWgPeer": "პირი",
   "customServerOptionsInfo": "გამოიყენეთ პროვაიდერის გადაცემისა და TLS პარამეტრები ან ჩასვით სერვერის ბმული.",
-  "extAvailableOn": "ხელმისაწვდომია: {platforms}."
+  "extAvailableOn": "ხელმისაწვდომია: {platforms}.",
+  "winwsScopeWarning": "Zapret ცვლის TCP ტრაფიკს 80 და 443 პორტებზე Windows-ის ყველა აპისთვის. ეს VPN არ არის. WinDivert-ის დრაივერი შეიძლება Windows-ის გადატვირთვამდე ჩატვირთული დარჩეს.",
+  "winwsRequirements": "საჭიროა Windows x64 ემულაციის გარეშე, WLANAPI და შემოწმებული WinDivert პაკეტი. თუ Windows დრაივერს ბლოკავს, ეს რეჟიმი მიუწვდომელია."
 }

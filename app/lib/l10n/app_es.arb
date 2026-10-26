@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Interfaz",
   "customServerWgPeer": "Par",
   "customServerOptionsInfo": "Usa los ajustes de transporte y TLS de tu proveedor o pega un enlace del servidor.",
-  "extAvailableOn": "Disponible en: {platforms}."
+  "extAvailableOn": "Disponible en: {platforms}.",
+  "winwsScopeWarning": "Zapret modifica el tráfico TCP en los puertos 80 y 443 de todas las aplicaciones de Windows. No es una VPN. El controlador WinDivert puede permanecer cargado hasta reiniciar Windows.",
+  "winwsRequirements": "Requiere Windows x64 nativo, WLANAPI y el paquete WinDivert verificado. Si Windows bloquea el controlador, este modo no estará disponible."
 }

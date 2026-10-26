@@ -257,7 +257,12 @@ class ExtensionStore extends ChangeNotifier {
           _validateSettingsValues(m.settingsSchema, settings);
           final strategy = descriptor.select(settings);
           descriptors[inst.id] = descriptor;
-          bypass[inst.id] = ExtensionBypassProfile(extensionId: inst.id, name: m.name, strategy: strategy);
+          bypass[inst.id] = ExtensionBypassProfile(
+            extensionId: inst.id,
+            name: m.name,
+            backend: descriptor.backend,
+            strategy: strategy,
+          );
         }
       } catch (e) {
         runtimeErrors[inst.id] = e.toString();

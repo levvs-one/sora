@@ -2121,4 +2121,12 @@ class SFa extends S {
   String extAvailableOn(String platforms) {
     return 'در دسترس در: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret ترافیک TCP در درگاه‌های 80 و 443 را برای همهٔ برنامه‌های Windows تغییر می‌دهد. این VPN نیست. ممکن است درایور WinDivert تا راه‌اندازی دوبارهٔ Windows بارگذاری‌شده بماند.';
+
+  @override
+  String get winwsRequirements =>
+      'به Windows x64 بومی، WLANAPI و بستهٔ تأییدشدهٔ WinDivert نیاز است. اگر Windows درایور را مسدود کند، این حالت در دسترس نیست.';
 }

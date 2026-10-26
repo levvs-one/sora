@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "الواجهة",
   "customServerWgPeer": "النظير",
   "customServerOptionsInfo": "استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم.",
-  "extAvailableOn": "متاح على: {platforms}."
+  "extAvailableOn": "متاح على: {platforms}.",
+  "winwsScopeWarning": "يغيّر Zapret حركة TCP عبر المنفذين 80 و 443 لجميع تطبيقات Windows. ليس VPN. قد يبقى برنامج تشغيل WinDivert محمّلًا حتى إعادة تشغيل Windows.",
+  "winwsRequirements": "يلزم Windows x64 أصلي وWLANAPI وحزمة WinDivert موثّقة. إذا حظر Windows برنامج التشغيل، فلن يتوفر هذا الوضع."
 }

@@ -1,13 +1,24 @@
 # Zapret profiles
 
-This extension selects profiles for the existing Linux host backend.
-It does not install a native executable, driver or operating-system component.
-The profile is selected explicitly as a serverless mode; manual Sora settings
-are retained. Disabling or uninstalling the selected extension stops its session.
+One signed descriptor selects platform-specific profiles: Linux uses the existing
+host TPWS backend; native Windows x64 uses the host's pinned Winws/WinDivert
+bundle. This extension supplies no executable, DLL, driver, script or native path.
 
-The source is prepared for normal author-signed package/catalog publication;
-there is no production package or catalog entry yet. Integration tests use a
-separate temporary author identity. Windows WinDivert support is a separate unfinished adapter and is not claimed by this Linux descriptor.
+Windows mode shapes TCP traffic on ports 80 and 443 for every application.
+The pinned upstream LAN exclusions are not a complete IANA address classifier.
+It is not a VPN or a per-application filter. Sora requires its advertised native
+capability and explicit host consent for this author/version during each app
+launch. The scope cannot be widened by extension settings. Unsupported Windows
+architectures, missing WLANAPI, unverified components or driver rejection refuse
+the mode; protection settings are never weakened. Driver and platform coverage
+must be validated on the supported images before publication.
 
-The `net.hooks` permission is dangerous and requires the existing explicit
-installation consent. No profile guarantees evasion in every network.
+Shutdown closes Sora's processes/filter handles. It never stops or deletes the
+shared WinDivert service. The driver can remain loaded until a normal Windows
+restart. Native component licences and complete upstream sources accompany the
+host bundle. No profile guarantees evasion in every network.
+
+The sources are not a published package or catalog entry. Normal author/team
+signature verification remains mandatory. Set min_app_version to the actual
+first published host release supporting this descriptor before publication;
+the repository version alone is not deployment evidence.

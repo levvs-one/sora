@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "介面",
   "customServerWgPeer": "對等端",
   "customServerOptionsInfo": "請使用服務商提供的傳輸與 TLS 設定，或貼上伺服器連結。",
-  "extAvailableOn": "適用平台：{platforms}。"
+  "extAvailableOn": "適用平台：{platforms}。",
+  "winwsScopeWarning": "Zapret 會修改所有 Windows 應用程式透過80和443連接埠傳送的 TCP 流量。它不是 VPN。WinDivert 驅動程式可能會持續載入，直到 Windows 重新啟動。",
+  "winwsRequirements": "需要原生 Windows x64、WLANAPI 和經過驗證的 WinDivert 元件套件。如果 Windows 封鎖驅動程式，此模式將無法使用。"
 }

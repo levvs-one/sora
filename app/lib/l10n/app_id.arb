@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Antarmuka",
   "customServerWgPeer": "Peer",
   "customServerOptionsInfo": "Gunakan pengaturan transportasi dan TLS dari penyedia, atau tempel tautan server.",
-  "extAvailableOn": "Tersedia di: {platforms}."
+  "extAvailableOn": "Tersedia di: {platforms}.",
+  "winwsScopeWarning": "Zapret mengubah trafik TCP pada port 80 dan 443 untuk semua aplikasi Windows. Ini bukan VPN. Driver WinDivert dapat tetap dimuat hingga Windows dimulai ulang.",
+  "winwsRequirements": "Memerlukan Windows x64 native, WLANAPI, dan paket WinDivert terverifikasi. Jika Windows memblokir driver, mode ini tidak tersedia."
 }

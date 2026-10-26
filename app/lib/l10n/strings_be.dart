@@ -2142,4 +2142,12 @@ class SBe extends S {
   String extAvailableOn(String platforms) {
     return 'Даступна на: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret змяняе TCP-трафік на партах 80 і 443 для ўсіх праграм Windows. Гэта не VPN. Драйвер WinDivert можа заставацца загружаным да перазапуску Windows.';
+
+  @override
+  String get winwsRequirements =>
+      'Патрэбныя Windows x64 без эмуляцыі, WLANAPI і правераны камплект WinDivert. Калі Windows блакуе драйвер, гэты рэжым недаступны.';
 }

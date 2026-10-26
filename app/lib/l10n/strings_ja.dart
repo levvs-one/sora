@@ -2085,4 +2085,12 @@ class SJa extends S {
   String extAvailableOn(String platforms) {
     return '対応プラットフォーム: $platforms。';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret は、すべての Windows アプリのポート80と443でTCP 通信を変更します。VPN ではありません。WinDivert ドライバーは Windows の再起動まで読み込まれたままになる場合があります。';
+
+  @override
+  String get winwsRequirements =>
+      'ネイティブの Windows x64、WLANAPI、検証済みの WinDivert パッケージが必要です。Windows がドライバーをブロックする場合、このモードは利用できません。';
 }

@@ -21,6 +21,7 @@ import (
 	"github.com/levvs-one/sora-client/core/engine/olcrtc"
 	"github.com/levvs-one/sora-client/core/engine/singbox"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
+	"github.com/levvs-one/sora-client/core/engine/winws"
 	"github.com/levvs-one/sora-client/core/engine/xray"
 	"github.com/levvs-one/sora-client/core/engine/xraytun"
 	"github.com/levvs-one/sora-client/core/errs"
@@ -58,6 +59,7 @@ type Registry struct {
 	base supervise.Config
 	// bypassBinary is the platform's loopback DPI proxy, never a client path.
 	bypassBinary string
+	winwsBinary  string
 	olcrtc       supervise.Binary
 
 	mu   sync.Mutex
@@ -79,6 +81,7 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 			r.bypassBinary = candidate
 		}
 	}
+	r.winwsBinary = winws.Discover(enginesDir)
 	r.olcrtc, _ = olcrtc.Discover(ctx, enginesDir)
 	for _, kind := range engine.DefaultPreference {
 		b, err := drivers[kind].prober.Discover(ctx, enginesDir)
@@ -128,6 +131,9 @@ func (r *Registry) BypassAvailable() bool {
 	return (runtime.GOOS == "linux" || runtime.GOOS == "windows") && r.bypassBinary != "" && r.Usable()
 }
 
+// WinwsAvailable advertises only the native host-owned bundle, not a proxy.
+func (r *Registry) WinwsAvailable() bool { return r.winwsBinary != "" && r.Usable() }
+
 // LastSelection returns the latest engine choice and rejection reasons for
 // diagnostics.
 func (r *Registry) LastSelection() engine.Selection {
@@ -175,6 +181,16 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		if len(p.Engines) == 0 && p.PrivateControl {
 			order = engine.PrivatePreference
 		}
+		withWinws := winws.Has(p)
+		if withWinws {
+			if err := p.Validate(); err != nil {
+				return nil, err
+			}
+			if r.winwsBinary == "" {
+				return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
+					"registry: the pinned native AMD64 Winws bundle is not available")
+			}
+		}
 		withBypass := bypass.Has(p)
 		// Missing installations use the missing-engine key rather than
 		// an invalid-plan error.
@@ -187,7 +203,7 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		if olcrtc.Has(p) && r.olcrtc.Path == "" {
 			return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing, "registry: olcrtc needs the pinned olcrtc binary and checksum manifest")
 		}
-		selectPlan := olcrtc.Rewrite(bypass.Rewrite(p, nil), nil)
+		selectPlan := winws.Rewrite(olcrtc.Rewrite(bypass.Rewrite(p, nil), nil))
 		sel, bridge, err := r.selectPlan(selectPlan, order)
 		r.mu.Lock()
 		r.last = sel
@@ -215,6 +231,9 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 		}
 		if withBypass {
 			built = bypass.Wrap(built, r.bypassBinary, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs)
+		}
+		if withWinws {
+			built = winws.Wrap(built, r.winwsBinary, filepath.Join(r.base.HomeDir, "winws"), r.base.Logs)
 		}
 		return built, nil
 	}
@@ -388,7 +407,7 @@ func measureThroughController(build func(supervise.Config) (engine.Engine, error
 // BenchmarkEngine uses isolated state and a fresh listener for one temporary
 // measurement. The caller owns home and removes it after closing the engine.
 func (r *Registry) BenchmarkEngine(ctx context.Context, plan *engine.Plan, home string) (engine.Engine, error) {
-	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, bypassBinary: r.bypassBinary, olcrtc: r.olcrtc}
+	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, bypassBinary: r.bypassBinary, winwsBinary: r.winwsBinary, olcrtc: r.olcrtc}
 	isolated.base.HomeDir = home
 	isolated.base.LocalPort = 0
 	return isolated.Factory()(ctx, plan)

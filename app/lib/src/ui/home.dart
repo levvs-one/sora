@@ -215,7 +215,13 @@ class _RestoreBanner extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Pressable(
-                onTap: () => unawaited(sora.restoreCrashedSession()),
+                onTap: () async {
+                  if (!await ensureSystemFilterConsent(context, sora.pendingRestore ?? sora.selected) ||
+                      !context.mounted) {
+                    return;
+                  }
+                  await sora.restoreCrashedSession();
+                },
                 radius: 8,
                 semanticButton: true,
                 child: Padding(

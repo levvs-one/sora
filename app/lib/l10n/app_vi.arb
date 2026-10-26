@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "Giao diện",
   "customServerWgPeer": "Peer",
   "customServerOptionsInfo": "Dùng cài đặt truyền tải và TLS từ nhà cung cấp hoặc dán liên kết máy chủ.",
-  "extAvailableOn": "Có trên: {platforms}."
+  "extAvailableOn": "Có trên: {platforms}.",
+  "winwsScopeWarning": "Zapret thay đổi lưu lượng TCP trên cổng 80 và 443 cho mọi ứng dụng Windows. Đây không phải VPN. Trình điều khiển WinDivert có thể vẫn được nạp đến khi Windows khởi động lại.",
+  "winwsRequirements": "Cần Windows x64 gốc, WLANAPI và gói WinDivert đã xác minh. Nếu Windows chặn trình điều khiển, chế độ này không khả dụng."
 }

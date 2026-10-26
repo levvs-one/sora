@@ -4,7 +4,7 @@
   "name": "Zapret",
   "version": "1.0.0",
   "min_app_version": "1.1.2",
-  "description": "Profiles for the built-in Zapret backend on Linux. Select a profile and connect explicitly. No native binaries are supplied by this extension.",
+  "description": "Profiles for built-in Linux Zapret, or the separately installed native AMD64 Windows WinDivert backend. Windows mode affects system-wide TCP ports 80 and 443 and requires explicit host consent. This extension supplies no native binaries.",
   "author": {
     "name": "Sora",
     "identity": "github:levvs-one",

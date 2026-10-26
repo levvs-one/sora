@@ -2143,4 +2143,12 @@ class SEs extends S {
   String extAvailableOn(String platforms) {
     return 'Disponible en: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret modifica el tráfico TCP en los puertos 80 y 443 de todas las aplicaciones de Windows. No es una VPN. El controlador WinDivert puede permanecer cargado hasta reiniciar Windows.';
+
+  @override
+  String get winwsRequirements =>
+      'Requiere Windows x64 nativo, WLANAPI y el paquete WinDivert verificado. Si Windows bloquea el controlador, este modo no estará disponible.';
 }

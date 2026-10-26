@@ -132,9 +132,7 @@ class Sora extends ChangeNotifier {
       recovered('extension:$id');
     }
     notifyListeners();
-    if (selected.startsWith(extensionBypassPrefix) &&
-        _activeChain == null &&
-        extensions.bypassProfile(selected) == null) {
+    if (selected.startsWith(extensionBypassPrefix) && _activeChain == null && !_canSelectBypass(selected)) {
       if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) unawaited(disconnect());
       return;
     }
@@ -201,6 +199,40 @@ class Sora extends ChangeNotifier {
   }
 
   bool serverlessAvailable = false;
+
+  final _systemFilterConsents = <String>{};
+
+  bool bypassProfileAvailable(ExtensionBypassProfile profile) =>
+      profile.systemWide ? coreCapabilities.contains('serverless-winws') : serverlessAvailable;
+
+  String? systemFilterConsentKey(String choice) {
+    final profile = extensions.bypassProfile(choice);
+    if (profile == null || !profile.systemWide) return null;
+    final inst = extensions.get(profile.extensionId);
+    return inst == null ? null : '${inst.id}@${inst.version}:${inst.authorKey ?? inst.manifest.author.publicKey}';
+  }
+
+  bool needsSystemFilterConsent(String choice) {
+    final key = systemFilterConsentKey(choice);
+    return key != null && !_systemFilterConsents.contains(key);
+  }
+
+  bool approveSystemFilter(String choice, String expectedKey) {
+    final profile = extensions.bypassProfile(choice);
+    if (_disposed ||
+        profile == null ||
+        !bypassProfileAvailable(profile) ||
+        systemFilterConsentKey(choice) != expectedKey) {
+      return false;
+    }
+    _systemFilterConsents.add(expectedKey);
+    return true;
+  }
+
+  bool _canSelectBypass(String choice) {
+    final profile = extensions.bypassProfile(choice);
+    return profile != null && bypassProfileAvailable(profile) && !needsSystemFilterConsent(choice);
+  }
 
   /// Set once the core answers the control channel (the getStatus/getAbout
   /// handshake in [run]); the post-update health signal.
@@ -1444,7 +1476,7 @@ class Sora extends ChangeNotifier {
     if (via == null &&
         _activeChain == null &&
         selected.startsWith(extensionBypassPrefix) &&
-        (!serverlessAvailable || extensions.bypassProfile(selected) == null)) {
+        !_canSelectBypass(selected)) {
       failure = const CoreFailure('app.extension_asset');
       _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
@@ -1660,6 +1692,10 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> select(String server) async {
+    if (extensions.bypassProfile(server)?.systemWide == true && !_canSelectBypass(server)) {
+      reportFailure(const CoreFailure('app.extension_asset'), mode: FailureMode.action, source: 'extension-selection');
+      return;
+    }
     // Persist the canonical outbound id: the plan builder, latency
     // keys and selection checks all speak the core's `custom/<id>` namespace
     // for custom servers, so the plain card id is mapped once, here.
@@ -2522,7 +2558,7 @@ SessionPlan buildPlan({
       OutboundSpec(
         id: Sora.bypassId,
         displayName: extensionBypass ? bypassProfile!.name : 'zapret',
-        protocol: 'bypass',
+        protocol: extensionBypass && bypassProfile!.systemWide ? 'winws' : 'bypass',
         bypass:
             (extensionBypass ? bypassProfile!.strategy : null) ??
             BypassStrategy(

@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-import time
 import zipfile
 
 ARCHIVE_SHA256 = "c493e33a0dc4eba23a8686efdaba55f59755ad6ade3564aebd9d13f4c65e2e0c"
@@ -71,42 +70,28 @@ def main():
       if ($signature.Status -ne 'Valid') { throw "Driver signature status: $($signature.Status)" }
       ConvertTo-Json -Compress @{phase='signature';status=[string]$signature.Status;thumbprint=$signature.SignerCertificate.Thumbprint}
     """, work))
-    # The documented literal false filter diverts no traffic. Do not replace it
-    # with a loopback/port filter: this probe is only about loader compatibility.
+    # The Go fixture uses the production bundle lock, driver trust and runtime
+    # start/stop APIs. Its only live filter is the documented literal false.
     log = work / "winws.log"
-    child = None
     failure = None
     try:
-        with log.open("wb") as output:
-            child = subprocess.Popen(
-                [str(work / "winws.exe"), "--wf-raw=false", "--dpi-desync=multisplit", "--dpi-desync-split-pos=1"],
-                cwd=work, stdout=output, stderr=subprocess.STDOUT,
-                creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-            deadline = time.monotonic() + 15
-            while time.monotonic() < deadline:
-                if child.poll() is not None:
-                    raise RuntimeError(f"winws exited before readiness: {child.returncode}")
-                if log.stat().st_size > 64 * 1024:
-                    raise RuntimeError("winws startup output exceeded the fixture budget")
-                text = log.read_text(encoding="utf-8", errors="replace")
-                if "windivert initialized. capture is started." in text:
-                    print(json.dumps({"phase": "ready", "native_arch": native_arch.value, "filter": "false", "pid": child.pid}))
-                    break
-                time.sleep(0.05)
-            else:
-                raise RuntimeError("No driver readiness marker within 15 seconds")
+        probe = Path(os.environ["SORA_WINWS_NATIVE_TEST"]).resolve(strict=True)
+        result = subprocess.run(
+            [str(probe), "-test.v", "-test.run=^TestNativePinnedWinws$", "-test.timeout=60s"],
+            cwd=work, env={**os.environ, "SORA_WINWS_FIXTURE_DIR": str(work)},
+            capture_output=True, text=True, timeout=70, check=False,
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        )
+        print(result.stdout)
+        print(result.stderr, file=sys.stderr)
+        if result.returncode:
+            raise RuntimeError(f"Production Winws native boundaries failed: {result.returncode}")
+        if "production no-capture startup ready" not in result.stdout:
+            raise RuntimeError("Native fixture did not confirm readiness")
     except Exception as error:
         failure = error
         print(f"Primary winws fixture failure: {error}", file=sys.stderr)
     finally:
-        if child is not None and child.poll() is None:
-            child.terminate()
-            try:
-                child.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                child.kill()
-                child.wait(timeout=5)
         # WinDivert marks its newly created service for deletion. Stop only the
         # service whose binary path is exactly this fixture's pinned driver.
         try:

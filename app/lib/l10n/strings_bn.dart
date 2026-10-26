@@ -2122,4 +2122,12 @@ class SBn extends S {
   String extAvailableOn(String platforms) {
     return 'এগুলিতে উপলব্ধ: $platforms।';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret সব Windows অ্যাপের জন্য পোর্ট 80 ও 443-এ TCP ট্রাফিক বদলায়। এটি VPN নয়। Windows পুনরায় চালু না হওয়া পর্যন্ত WinDivert ড্রাইভার লোড থাকতে পারে।';
+
+  @override
+  String get winwsRequirements =>
+      'নেটিভ Windows x64, WLANAPI এবং যাচাইকৃত WinDivert প্যাকেজ প্রয়োজন। Windows ড্রাইভারটি আটকালে এই মোড উপলভ্য হবে না।';
 }

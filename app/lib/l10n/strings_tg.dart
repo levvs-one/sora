@@ -2120,4 +2120,12 @@ class STg extends S {
   String extAvailableOn(String platforms) {
     return 'Дар ин платформаҳо дастрас аст: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret трафики TCP-ро дар портҳои 80 ва 443 барои ҳамаи барномаҳои Windows тағйир медиҳад. Ин VPN нест. Драйвери WinDivert метавонад то бозоғозии Windows боршуда монад.';
+
+  @override
+  String get winwsRequirements =>
+      'Windows x64 бе эмулятсия, WLANAPI ва маҷмӯи санҷидашудаи WinDivert лозиманд. Агар Windows драйверро бандад, ин ҳолат дастнорас мешавад.';
 }

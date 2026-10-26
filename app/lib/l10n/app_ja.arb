@@ -1034,5 +1034,7 @@
   "customServerWgInterface": "インターフェース",
   "customServerWgPeer": "ピア",
   "customServerOptionsInfo": "プロバイダー指定のトランスポートとTLS設定を入力するか、サーバーリンクを貼り付けてください。",
-  "extAvailableOn": "対応プラットフォーム: {platforms}。"
+  "extAvailableOn": "対応プラットフォーム: {platforms}。",
+  "winwsScopeWarning": "Zapret は、すべての Windows アプリのポート80と443でTCP 通信を変更します。VPN ではありません。WinDivert ドライバーは Windows の再起動まで読み込まれたままになる場合があります。",
+  "winwsRequirements": "ネイティブの Windows x64、WLANAPI、検証済みの WinDivert パッケージが必要です。Windows がドライバーをブロックする場合、このモードは利用できません。"
 }

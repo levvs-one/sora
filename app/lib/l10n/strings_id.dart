@@ -2123,4 +2123,12 @@ class SId extends S {
   String extAvailableOn(String platforms) {
     return 'Tersedia di: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret mengubah trafik TCP pada port 80 dan 443 untuk semua aplikasi Windows. Ini bukan VPN. Driver WinDivert dapat tetap dimuat hingga Windows dimulai ulang.';
+
+  @override
+  String get winwsRequirements =>
+      'Memerlukan Windows x64 native, WLANAPI, dan paket WinDivert terverifikasi. Jika Windows memblokir driver, mode ini tidak tersedia.';
 }

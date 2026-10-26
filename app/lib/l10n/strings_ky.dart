@@ -2123,4 +2123,12 @@ class SKy extends S {
   String extAvailableOn(String platforms) {
     return 'Жеткиликтүү платформалар: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret бардык Windows колдонмолору үчүн 80 жана 443 портторундагы TCP трафигин өзгөртөт. Бул VPN эмес. WinDivert драйвери Windows кайра иштетилгенге чейин жүктөлгөн бойдон калышы мүмкүн.';
+
+  @override
+  String get winwsRequirements =>
+      'Эмуляциясыз Windows x64, WLANAPI жана текшерилген WinDivert топтому керек. Windows драйверди бөгөттөсө, бул режим жеткиликсиз.';
 }

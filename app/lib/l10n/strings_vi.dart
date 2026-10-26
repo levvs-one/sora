@@ -2118,4 +2118,12 @@ class SVi extends S {
   String extAvailableOn(String platforms) {
     return 'Có trên: $platforms.';
   }
+
+  @override
+  String get winwsScopeWarning =>
+      'Zapret thay đổi lưu lượng TCP trên cổng 80 và 443 cho mọi ứng dụng Windows. Đây không phải VPN. Trình điều khiển WinDivert có thể vẫn được nạp đến khi Windows khởi động lại.';
+
+  @override
+  String get winwsRequirements =>
+      'Cần Windows x64 gốc, WLANAPI và gói WinDivert đã xác minh. Nếu Windows chặn trình điều khiển, chế độ này không khả dụng.';
 }

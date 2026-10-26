@@ -80,6 +80,38 @@ if [[ "$arch" == windows-amd64 ]]; then
  echo 'byedpi windows-amd64: verified v0.17.3'
 fi
 
+
+# Keep Winws and its version-coupled DLLs in their own directory. Installing the
+# bundle copies files only; the optional runtime owns loading after user consent.
+if [[ "$arch" == windows-amd64 ]]; then
+ winws_dir="$dest/winws"
+ mkdir -p "$winws_dir/licenses" "$winws_dir/sources"
+ zapret_archive="$work/zapret-v72.13.zip"
+ curl --fail --location --silent --show-error --retry 3 --proto '=https' --proto-redir '=https' --max-filesize 7959200 --output "$zapret_archive" 'https://github.com/bol-van/zapret/releases/download/v72.13/zapret-v72.13.zip'
+ echo "c493e33a0dc4eba23a8686efdaba55f59755ad6ade3564aebd9d13f4c65e2e0c  $zapret_archive" | sha256sum --check --quiet --strict
+ while read -r name digest; do
+  unzip -p "$zapret_archive" "zapret-v72.13/binaries/windows-x86_64/$name" >"$work/$name"
+  echo "$digest  $work/$name" | sha256sum --check --quiet --strict
+  install -m 0644 "$work/$name" "$winws_dir/$name"
+ done <<'WINWS_COMPONENTS'
+winws.exe a14bff1df6234ea555d2e0c61b589f0707c0b12d6c9b7eeccda76012154996e8
+WinDivert.dll c1e060ee19444a259b2162f8af0f3fe8c4428a1c6f694dce20de194ac8d7d9a2
+WinDivert64.sys 8da085332782708d8767bcace5327a6ec7283c17cfb85e40b03cd2323a90ddc2
+cygwin1.dll 103104a52e5293ce418944725df19e2bf81ad9269b9a120d71d39028e821499b
+WINWS_COMPONENTS
+ install -m 0644 "$zapret_archive" "$winws_dir/sources/zapret-v72.13.zip"
+ install -m 0644 "$(dirname "$0")"/winws-licenses/*.txt "$winws_dir/licenses/"
+ while read -r name digest size url; do
+  curl --fail --location --silent --show-error --retry 3 --proto '=https' --proto-redir '=https' --max-filesize "$size" --output "$work/$name" "$url"
+  echo "$digest  $work/$name" | sha256sum --check --quiet --strict
+  install -m 0644 "$work/$name" "$winws_dir/sources/$name"
+ done <<'WINWS_SOURCES'
+WinDivert-v2.2.2-source.tar.gz 300c1b14e08652e0f8647bf06e9b212f924af76cb2459bd0f88da481c9b08336 164606 https://codeload.github.com/basil00/WinDivert/tar.gz/refs/tags/v2.2.2
+cygwin-3.4.10-1-src.tar.xz ac70af0d4e644732f74946f55f7bafe010bab9b9da39a9327c3f0367f1fa43a2 8964220 https://ftp.cvut.cz/mirrors/cygwin.com/x86_64/release/cygwin/cygwin-3.4.10-1-src.tar.xz
+WINWS_SOURCES
+ echo 'winws windows-amd64: verified v72.13, native libraries, licences and complete upstream sources'
+fi
+
 # The archived upstream has no binary releases. Keep its wire implementation
 # unchanged and verify the complete source archive before invoking the Go build.
 if [[ "$arch" != win7-* ]]; then
