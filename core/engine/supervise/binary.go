@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -147,12 +148,16 @@ func (b Binary) VerifyDigest(expected string) error {
 	if expected == "" {
 		return fmt.Errorf("%s: no expected digest", b.Kind)
 	}
-	raw, err := os.ReadFile(b.Path)
+	file, err := os.Open(b.Path)
 	if err != nil {
 		return fmt.Errorf("%s: read binary: %w", b.Kind, err)
 	}
-	sum := sha256.Sum256(raw)
-	got := hex.EncodeToString(sum[:])
+	defer func() { _ = file.Close() }()
+	sum := sha256.New()
+	if _, err := io.Copy(sum, file); err != nil {
+		return fmt.Errorf("%s: read binary: %w", b.Kind, err)
+	}
+	got := hex.EncodeToString(sum.Sum(nil))
 	if subtle.ConstantTimeCompare([]byte(got), []byte(strings.ToLower(strings.TrimSpace(expected)))) != 1 {
 		return fmt.Errorf("%s: digest mismatch: got %s", b.Kind, got)
 	}
