@@ -71,7 +71,7 @@ func Start(ctx context.Context, spec Spec) (*Process, error) {
 	}
 	cmd.Stdout = out
 	cmd.Stderr = out
-	if err := cmd.Start(); err != nil {
+	if err := startRuntimeProcess(cmd); err != nil {
 		return nil, fmt.Errorf("%s: start engine: %w", spec.Name, err)
 	}
 
