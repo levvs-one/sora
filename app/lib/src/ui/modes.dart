@@ -95,31 +95,6 @@ class ModeButton extends StatelessWidget {
   }
 }
 
-class ConnectionChanges extends StatelessWidget {
-  const ConnectionChanges({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
-    if (!sora.needsReconnect) return const SizedBox.shrink();
-    return Column(
-      children: [
-        Text(
-          s.pendingConnectionChanges,
-          textAlign: TextAlign.center,
-          style: Styles.secondary.copyWith(color: palette.ink2),
-        ),
-        TextButton.icon(
-          key: const ValueKey('apply-connection-changes'),
-          onPressed: sora.busy || sora.updateBlocked ? null : () => unawaited(sora.connect()),
-          icon: const Icon(Symbols.refresh_rounded, size: 20, weight: 600),
-          label: Text(s.reconnectNow),
-        ),
-      ],
-    );
-  }
-}
-
 class _Modes extends StatelessWidget {
   const _Modes();
   @override
@@ -293,26 +268,14 @@ class _Modes extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 12),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  TextButton.icon(
-                    key: const ValueKey('modes-info'),
-                    onPressed: () => Navigator.pop(context, true),
-                    icon: Icon(Symbols.info_rounded, size: 20, weight: 600, color: palette.ink),
-                    label: Text(s.modesInfo, style: Styles.secondary.copyWith(color: palette.ink)),
-                  ),
-                  if (sora.needsReconnect)
-                    TextButton.icon(
-                      key: const ValueKey('apply-connection-changes'),
-                      onPressed: sora.busy || sora.updateBlocked ? null : () => unawaited(sora.connect()),
-                      icon: const Icon(Symbols.refresh_rounded, size: 20, weight: 600),
-                      label: Text(s.reconnectNow),
-                    ),
-                ],
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  key: const ValueKey('modes-info'),
+                  onPressed: () => Navigator.pop(context, true),
+                  icon: Icon(Symbols.info_rounded, size: 20, weight: 600, color: palette.ink),
+                  label: Text(s.modesInfo, style: Styles.secondary.copyWith(color: palette.ink)),
+                ),
               ),
             ],
           ),

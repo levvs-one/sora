@@ -64,7 +64,7 @@ class TourTarget extends StatelessWidget {
       tooltipActions: [
         if (step > 0) action(TooltipDefaultActionType.previous, s.tourBack),
         action(TooltipDefaultActionType.next, step == 4 ? s.tourFinish : s.tourNext),
-        action(TooltipDefaultActionType.skip, s.tourSkip),
+        if (step < descriptions.length - 1) action(TooltipDefaultActionType.skip, s.tourSkip),
       ],
       child: child,
     );

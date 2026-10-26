@@ -9,6 +9,8 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:sora/l10n/strings.dart';
 import 'package:sora/src/design/theme.dart';
+import 'package:sora/src/desktop/desktop.dart';
+import 'package:sora/src/ui/home.dart';
 import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
@@ -217,6 +219,34 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(find.byType(AddServerScreen), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('desktop launch help is opt-in and reconnect banner is absent everywhere', (tester) async {
+    sora.needsReconnect = true;
+    await mount(tester, (_) => DesktopScope(desktop: Desktop(sora, navigator), child: const SettingsScreen()));
+    final s = sora.strings;
+    expect(find.text(s.launchAtLoginDetail), findsNothing);
+    expect(find.byKey(const ValueKey('apply-connection-changes')), findsNothing);
+    expect(find.text('Чтобы применить изменения, переподключитесь.'), findsNothing);
+    expect(find.text('Применить и переподключить'), findsNothing);
+    await shot(tester, 'settings-no-reconnect-desktop');
+    await tester.tap(find.byKey(ValueKey('info-${s.launchAtLogin}')));
+    await tester.pumpAndSettle();
+    expect(find.text(s.launchAtLoginDetail), findsOneWidget);
+    expect(tester.widget<Text>(find.text(s.launchAtLoginDetail)).style!.color, Palette.light.ink);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(s.modes));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('mode-panel')), findsOneWidget);
+    expect(find.byKey(const ValueKey('apply-connection-changes')), findsNothing);
+    expect(find.text('Применить и переподключить'), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+    await mount(tester, (_) => const HomeScreen());
+    expect(find.byKey(const ValueKey('apply-connection-changes')), findsNothing);
+    expect(find.text('Чтобы применить изменения, переподключитесь.'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

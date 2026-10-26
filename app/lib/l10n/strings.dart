@@ -1683,18 +1683,6 @@ abstract class S {
   /// **'Показать описание'**
   String get showDescription;
 
-  /// No description provided for @pendingConnectionChanges.
-  ///
-  /// In ru, this message translates to:
-  /// **'Чтобы применить изменения, переподключитесь.'**
-  String get pendingConnectionChanges;
-
-  /// No description provided for @reconnectNow.
-  ///
-  /// In ru, this message translates to:
-  /// **'Применить и переподключить'**
-  String get reconnectNow;
-
   /// No description provided for @errEngineUnsupported.
   ///
   /// In ru, this message translates to:
@@ -1746,7 +1734,7 @@ abstract class S {
   /// No description provided for @probeServers.
   ///
   /// In ru, this message translates to:
-  /// **'Проверить серверы'**
+  /// **'Пинг'**
   String get probeServers;
 
   /// No description provided for @extensions.

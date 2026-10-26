@@ -173,7 +173,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           source: 'log-settings',
           retry: () => unawaited(_readLog(mode: FailureMode.action)),
         ),
-        if (sora.needsReconnect) ...[const ConnectionChanges(), const SizedBox(height: 16)],
         Group(
           children: [
             ChoiceTile<String>(

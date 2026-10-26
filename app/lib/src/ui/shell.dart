@@ -351,20 +351,24 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
             floatingActionButton: compact && _section != 6
-                ? TourTarget(
-                    step: 4,
-                    radius: 12,
-                    child: Material(
-                      color: palette.surface,
-                      elevation: 2,
-                      borderRadius: BorderRadius.circular(12),
-                      child: IconButton(
-                        key: const ValueKey('drawer-button'),
-                        tooltip: S.of(context).sidebarToggle,
-                        icon: Icon(Symbols.left_panel_open_rounded, color: palette.ink, weight: 600),
-                        onPressed: _toggle,
-                      ),
-                    ),
+                ? Builder(
+                    builder: (context) => MediaQuery.sizeOf(context).width >= 720
+                        ? const SizedBox.shrink()
+                        : TourTarget(
+                            step: 4,
+                            radius: 12,
+                            child: Material(
+                              color: palette.surface,
+                              elevation: 2,
+                              borderRadius: BorderRadius.circular(12),
+                              child: IconButton(
+                                key: const ValueKey('drawer-button'),
+                                tooltip: S.of(context).sidebarToggle,
+                                icon: Icon(Symbols.left_panel_open_rounded, color: palette.ink, weight: 600),
+                                onPressed: _toggle,
+                              ),
+                            ),
+                          ),
                   )
                 : null,
           ),

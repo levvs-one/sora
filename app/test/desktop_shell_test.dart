@@ -369,7 +369,14 @@ void main() {
       expect(scrim.rect.left, closeTo(target.left, 1));
       expect(scrim.rect.top, closeTo(target.top.clamp(0, tester.view.physicalSize.height), 1));
       expect(tester.takeException(), isNull);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      expect(find.text('Пропустить'), step == 5 ? findsNothing : findsOneWidget);
+      expect(find.text('Далее'), step == 5 ? findsNothing : findsOneWidget);
+      if (step == 5) {
+        expect(find.text('Готово').hitTestable(), findsOneWidget);
+        await tester.tap(find.text('Готово').hitTestable());
+      } else {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      }
       await tester.pumpAndSettle();
     }
     expect(ShowcaseView.getNamed('sora-tour').isShowcaseRunning, isFalse);
