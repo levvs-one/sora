@@ -2096,4 +2096,26 @@ class SHy extends S {
 
   @override
   String get errCancelled => 'Հարցումը չեղարկվել է։ Անհրաժեշտության դեպքում կրկնեք գործողությունը։';
+
+  @override
+  String get customServerOptions => 'Կապի կարգավորումներ';
+
+  @override
+  String get customServerTransport => 'Փոխադրում';
+
+  @override
+  String get customServerSecurity => 'Անվտանգություն';
+
+  @override
+  String get customServerCipher => 'Գաղտնագիր';
+
+  @override
+  String get customServerWgInterface => 'Միջերես';
+
+  @override
+  String get customServerWgPeer => 'Հասակակից';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Օգտագործեք մատակարարի տրամադրած փոխադրման և TLS կարգավորումները կամ տեղադրեք սերվերի հղումը։';
 }

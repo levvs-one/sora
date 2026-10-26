@@ -2093,4 +2093,26 @@ class STg extends S {
 
   @override
   String get errCancelled => 'Дархост бекор шуд. Агар лозим бошад, амалро такрор кунед.';
+
+  @override
+  String get customServerOptions => 'Танзимоти пайвастшавӣ';
+
+  @override
+  String get customServerTransport => 'Интиқол';
+
+  @override
+  String get customServerSecurity => 'Амният';
+
+  @override
+  String get customServerCipher => 'Рамз';
+
+  @override
+  String get customServerWgInterface => 'Интерфейс';
+
+  @override
+  String get customServerWgPeer => 'Ҳамто';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Танзимоти интиқол ва TLS-и провайдерро ворид кунед ё пайванди серверро гузоред.';
 }

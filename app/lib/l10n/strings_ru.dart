@@ -2111,4 +2111,26 @@ class SRu extends S {
 
   @override
   String get errCancelled => 'Запрос отменён. При необходимости выполните действие снова.';
+
+  @override
+  String get customServerOptions => 'Параметры подключения';
+
+  @override
+  String get customServerTransport => 'Транспорт';
+
+  @override
+  String get customServerSecurity => 'Защита';
+
+  @override
+  String get customServerCipher => 'Шифр';
+
+  @override
+  String get customServerWgInterface => 'Интерфейс';
+
+  @override
+  String get customServerWgPeer => 'Пир';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер.';
 }

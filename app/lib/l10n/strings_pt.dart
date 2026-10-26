@@ -2106,4 +2106,26 @@ class SPt extends S {
 
   @override
   String get errCancelled => 'A solicitação foi cancelada. Repita a ação se necessário.';
+
+  @override
+  String get customServerOptions => 'Configurações de conexão';
+
+  @override
+  String get customServerTransport => 'Transporte';
+
+  @override
+  String get customServerSecurity => 'Segurança';
+
+  @override
+  String get customServerCipher => 'Cifra';
+
+  @override
+  String get customServerWgInterface => 'Interface';
+
+  @override
+  String get customServerWgPeer => 'Par';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Use as configurações de transporte e TLS do provedor ou cole um link do servidor.';
 }

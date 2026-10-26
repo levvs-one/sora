@@ -1002,7 +1002,13 @@
   "errCredentials": "Сохранённые данные доступа потеряны. Импортируйте сервер заново.",
   "subscriptionStale": "Обновлено: {time}",
   "subscriptionNeverUpdated": "Ещё не обновлялась. Повторите.",
-  "@subscriptionStale": {"placeholders": {"time": {"type": "String"}}},
+  "@subscriptionStale": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "errHttpStatus": "{status, plural, =0 {Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.} other {Сервер вернул код HTTP {status}. Проверьте ссылку или обратитесь к провайдеру.}}",
   "errInvalidServer": "Настройки сервера неполные или не поддерживаются. Обновите подписку.",
   "errServerIds": "У двух серверов одинаковый идентификатор. Импортируйте их заново.",
@@ -1035,5 +1041,20 @@
   "errDns": "Некорректные настройки DNS. Проверьте адрес DNS-сервера.",
   "errEndpoint": "Некорректный адрес сервера для проверки. Проверьте имя хоста и порт.",
   "errCancelled": "Запрос отменён. При необходимости выполните действие снова.",
-  "@errHttpStatus": {"description": "Complete HTTP failure message; status 0 means the response code is unknown.", "placeholders": {"status": {"type": "int", "example": "403"}}}
+  "@errHttpStatus": {
+    "description": "Complete HTTP failure message; status 0 means the response code is unknown.",
+    "placeholders": {
+      "status": {
+        "type": "int",
+        "example": "403"
+      }
+    }
+  },
+  "customServerOptions": "Параметры подключения",
+  "customServerTransport": "Транспорт",
+  "customServerSecurity": "Защита",
+  "customServerCipher": "Шифр",
+  "customServerWgInterface": "Интерфейс",
+  "customServerWgPeer": "Пир",
+  "customServerOptionsInfo": "Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер."
 }

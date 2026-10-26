@@ -2096,4 +2096,26 @@ class SId extends S {
 
   @override
   String get errCancelled => 'Permintaan dibatalkan. Ulangi tindakan jika diperlukan.';
+
+  @override
+  String get customServerOptions => 'Pengaturan koneksi';
+
+  @override
+  String get customServerTransport => 'Transportasi';
+
+  @override
+  String get customServerSecurity => 'Keamanan';
+
+  @override
+  String get customServerCipher => 'Sandi';
+
+  @override
+  String get customServerWgInterface => 'Antarmuka';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Gunakan pengaturan transportasi dan TLS dari penyedia, atau tempel tautan server.';
 }

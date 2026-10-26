@@ -2094,4 +2094,26 @@ class SFa extends S {
 
   @override
   String get errCancelled => 'درخواست لغو شد. در صورت نیاز دوباره اقدام کنید.';
+
+  @override
+  String get customServerOptions => 'تنظیمات اتصال';
+
+  @override
+  String get customServerTransport => 'انتقال';
+
+  @override
+  String get customServerSecurity => 'امنیت';
+
+  @override
+  String get customServerCipher => 'رمزنگاری';
+
+  @override
+  String get customServerWgInterface => 'رابط';
+
+  @override
+  String get customServerWgPeer => 'همتا';
+
+  @override
+  String get customServerOptionsInfo =>
+      'تنظیمات انتقال و TLS ارائه‌دهنده را وارد کنید یا پیوند سرور را جای‌گذاری کنید.';
 }

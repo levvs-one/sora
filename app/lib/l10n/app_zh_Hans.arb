@@ -1026,5 +1026,12 @@
   "errRule": "路由规则无效。请检查规则中的域名、IP 地址或应用。",
   "errDns": "DNS 设置无效。请检查 DNS 服务器地址。",
   "errEndpoint": "待检测的服务器地址无效。请检查主机名和端口。",
-  "errCancelled": "请求已取消。如有需要，请重新执行操作。"
+  "errCancelled": "请求已取消。如有需要，请重新执行操作。",
+  "customServerOptions": "连接设置",
+  "customServerTransport": "传输",
+  "customServerSecurity": "安全",
+  "customServerCipher": "加密方式",
+  "customServerWgInterface": "接口",
+  "customServerWgPeer": "对等端",
+  "customServerOptionsInfo": "请使用服务商提供的传输和 TLS 设置，或粘贴服务器链接。"
 }

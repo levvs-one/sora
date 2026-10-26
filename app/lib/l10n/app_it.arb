@@ -1026,5 +1026,12 @@
   "errRule": "Una regola di instradamento non è valida. Controlla il dominio, l’indirizzo IP o l’applicazione nella regola.",
   "errDns": "Le impostazioni DNS non sono valide. Controlla l’indirizzo del server DNS.",
   "errEndpoint": "L’indirizzo del server da verificare non è valido. Controlla il nome host e la porta.",
-  "errCancelled": "La richiesta è stata annullata. Ripeti l’azione se necessario."
+  "errCancelled": "La richiesta è stata annullata. Ripeti l’azione se necessario.",
+  "customServerOptions": "Impostazioni di connessione",
+  "customServerTransport": "Trasporto",
+  "customServerSecurity": "Sicurezza",
+  "customServerCipher": "Cifratura",
+  "customServerWgInterface": "Interfaccia",
+  "customServerWgPeer": "Peer",
+  "customServerOptionsInfo": "Usa le impostazioni di trasporto e TLS del fornitore o incolla un link del server."
 }

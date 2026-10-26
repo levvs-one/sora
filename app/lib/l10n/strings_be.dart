@@ -2115,4 +2115,26 @@ class SBe extends S {
 
   @override
   String get errCancelled => 'Запыт скасаваны. Пры патрэбе выканайце дзеянне зноў.';
+
+  @override
+  String get customServerOptions => 'Параметры падключэння';
+
+  @override
+  String get customServerTransport => 'Транспарт';
+
+  @override
+  String get customServerSecurity => 'Абарона';
+
+  @override
+  String get customServerCipher => 'Шыфр';
+
+  @override
+  String get customServerWgInterface => 'Інтэрфейс';
+
+  @override
+  String get customServerWgPeer => 'Пір';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Укажыце параметры транспарту і TLS з налад правайдара або ўстаўце спасылку на сервер.';
 }

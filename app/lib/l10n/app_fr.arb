@@ -1026,5 +1026,12 @@
   "errRule": "Une règle de routage n’est pas valide. Vérifiez le domaine, l’adresse IP ou l’application dans cette règle.",
   "errDns": "Les paramètres DNS ne sont pas valides. Vérifiez l’adresse du serveur DNS.",
   "errEndpoint": "L’adresse du serveur à tester n’est pas valide. Vérifiez le nom d’hôte et le port.",
-  "errCancelled": "La requête a été annulée. Relancez l’action si nécessaire."
+  "errCancelled": "La requête a été annulée. Relancez l’action si nécessaire.",
+  "customServerOptions": "Paramètres de connexion",
+  "customServerTransport": "Transport",
+  "customServerSecurity": "Sécurité",
+  "customServerCipher": "Chiffrement",
+  "customServerWgInterface": "Interface",
+  "customServerWgPeer": "Pair",
+  "customServerOptionsInfo": "Utilisez les paramètres de transport et TLS de votre fournisseur ou collez un lien de serveur."
 }

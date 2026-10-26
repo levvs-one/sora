@@ -2116,4 +2116,26 @@ class SEs extends S {
 
   @override
   String get errCancelled => 'Se ha cancelado la solicitud. Repite la acción si lo necesitas.';
+
+  @override
+  String get customServerOptions => 'Ajustes de conexión';
+
+  @override
+  String get customServerTransport => 'Transporte';
+
+  @override
+  String get customServerSecurity => 'Seguridad';
+
+  @override
+  String get customServerCipher => 'Cifrado';
+
+  @override
+  String get customServerWgInterface => 'Interfaz';
+
+  @override
+  String get customServerWgPeer => 'Par';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Usa los ajustes de transporte y TLS de tu proveedor o pega un enlace del servidor.';
 }

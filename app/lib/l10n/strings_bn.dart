@@ -2095,4 +2095,26 @@ class SBn extends S {
 
   @override
   String get errCancelled => 'অনুরোধ বাতিল হয়েছে। প্রয়োজন হলে কাজটি আবার করুন।';
+
+  @override
+  String get customServerOptions => 'সংযোগ সেটিংস';
+
+  @override
+  String get customServerTransport => 'ট্রান্সপোর্ট';
+
+  @override
+  String get customServerSecurity => 'নিরাপত্তা';
+
+  @override
+  String get customServerCipher => 'সাইফার';
+
+  @override
+  String get customServerWgInterface => 'ইন্টারফেস';
+
+  @override
+  String get customServerWgPeer => 'পিয়ার';
+
+  @override
+  String get customServerOptionsInfo =>
+      'প্রদানকারীর দেওয়া ট্রান্সপোর্ট ও TLS সেটিংস ব্যবহার করুন অথবা সার্ভারের লিংক পেস্ট করুন।';
 }

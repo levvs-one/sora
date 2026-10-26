@@ -1026,5 +1026,12 @@
   "errRule": "Bir yönlendirme kuralı geçersiz. Kuraldaki alan adını, IP adresini veya uygulamayı kontrol edin.",
   "errDns": "DNS ayarları geçersiz. DNS sunucusunun adresini kontrol edin.",
   "errEndpoint": "Test edilecek sunucunun adresi geçersiz. Ana bilgisayar adını ve bağlantı noktasını kontrol edin.",
-  "errCancelled": "İstek iptal edildi. Gerekirse işlemi tekrarlayın."
+  "errCancelled": "İstek iptal edildi. Gerekirse işlemi tekrarlayın.",
+  "customServerOptions": "Bağlantı ayarları",
+  "customServerTransport": "Taşıma",
+  "customServerSecurity": "Güvenlik",
+  "customServerCipher": "Şifreleme",
+  "customServerWgInterface": "Arayüz",
+  "customServerWgPeer": "Eş",
+  "customServerOptionsInfo": "Sağlayıcınızın taşıma ve TLS ayarlarını kullanın veya sunucu bağlantısını yapıştırın."
 }

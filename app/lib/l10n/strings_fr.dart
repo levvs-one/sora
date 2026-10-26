@@ -2124,4 +2124,26 @@ class SFr extends S {
 
   @override
   String get errCancelled => 'La requête a été annulée. Relancez l’action si nécessaire.';
+
+  @override
+  String get customServerOptions => 'Paramètres de connexion';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Sécurité';
+
+  @override
+  String get customServerCipher => 'Chiffrement';
+
+  @override
+  String get customServerWgInterface => 'Interface';
+
+  @override
+  String get customServerWgPeer => 'Pair';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Utilisez les paramètres de transport et TLS de votre fournisseur ou collez un lien de serveur.';
 }

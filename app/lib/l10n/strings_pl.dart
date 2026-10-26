@@ -2123,4 +2123,25 @@ class SPl extends S {
 
   @override
   String get errCancelled => 'Żądanie zostało anulowane. W razie potrzeby wykonaj czynność ponownie.';
+
+  @override
+  String get customServerOptions => 'Ustawienia połączenia';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Zabezpieczenia';
+
+  @override
+  String get customServerCipher => 'Szyfr';
+
+  @override
+  String get customServerWgInterface => 'Interfejs';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String get customServerOptionsInfo => 'Użyj ustawień transportu i TLS od dostawcy lub wklej link serwera.';
 }

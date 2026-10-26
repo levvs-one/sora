@@ -1026,5 +1026,12 @@
   "errRule": "रूटिंग के किसी नियम में गलती है। नियम में दिया डोमेन, IP पता या ऐप जाँचें।",
   "errDns": "DNS सेटिंग अमान्य हैं। DNS सर्वर का पता जाँचें।",
   "errEndpoint": "जाँच के लिए सर्वर का पता अमान्य है। होस्ट का नाम और पोर्ट जाँचें।",
-  "errCancelled": "अनुरोध रद्द कर दिया गया। ज़रूरत हो तो कार्रवाई दोहराएँ।"
+  "errCancelled": "अनुरोध रद्द कर दिया गया। ज़रूरत हो तो कार्रवाई दोहराएँ।",
+  "customServerOptions": "कनेक्शन सेटिंग",
+  "customServerTransport": "ट्रांसपोर्ट",
+  "customServerSecurity": "सुरक्षा",
+  "customServerCipher": "साइफ़र",
+  "customServerWgInterface": "इंटरफ़ेस",
+  "customServerWgPeer": "पीयर",
+  "customServerOptionsInfo": "प्रदाता की ट्रांसपोर्ट और TLS सेटिंग का उपयोग करें या सर्वर लिंक पेस्ट करें।"
 }

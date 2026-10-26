@@ -2112,4 +2112,25 @@ class SAr extends S {
 
   @override
   String get errCancelled => 'أُلغي الطلب. كرّر الإجراء عند الحاجة.';
+
+  @override
+  String get customServerOptions => 'إعدادات الاتصال';
+
+  @override
+  String get customServerTransport => 'النقل';
+
+  @override
+  String get customServerSecurity => 'الأمان';
+
+  @override
+  String get customServerCipher => 'التشفير';
+
+  @override
+  String get customServerWgInterface => 'الواجهة';
+
+  @override
+  String get customServerWgPeer => 'النظير';
+
+  @override
+  String get customServerOptionsInfo => 'استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم.';
 }

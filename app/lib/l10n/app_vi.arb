@@ -1026,5 +1026,12 @@
   "errRule": "Quy tắc định tuyến không hợp lệ. Hãy kiểm tra tên miền, địa chỉ IP hoặc ứng dụng trong quy tắc.",
   "errDns": "Cài đặt DNS không hợp lệ. Hãy kiểm tra địa chỉ máy chủ DNS.",
   "errEndpoint": "Địa chỉ máy chủ cần kiểm tra không hợp lệ. Hãy kiểm tra tên máy chủ và cổng.",
-  "errCancelled": "Yêu cầu đã bị hủy. Hãy thực hiện lại thao tác nếu cần."
+  "errCancelled": "Yêu cầu đã bị hủy. Hãy thực hiện lại thao tác nếu cần.",
+  "customServerOptions": "Cài đặt kết nối",
+  "customServerTransport": "Truyền tải",
+  "customServerSecurity": "Bảo mật",
+  "customServerCipher": "Mã hóa",
+  "customServerWgInterface": "Giao diện",
+  "customServerWgPeer": "Peer",
+  "customServerOptionsInfo": "Dùng cài đặt truyền tải và TLS từ nhà cung cấp hoặc dán liên kết máy chủ."
 }

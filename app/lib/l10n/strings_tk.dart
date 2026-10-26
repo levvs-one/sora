@@ -2088,4 +2088,26 @@ class STk extends S {
 
   @override
   String get errCancelled => 'Talap ýatyryldy. Zerur bolsa, amaly gaýtalaň.';
+
+  @override
+  String get customServerOptions => 'Birikme sazlamalary';
+
+  @override
+  String get customServerTransport => 'Geçiriş';
+
+  @override
+  String get customServerSecurity => 'Howpsuzlyk';
+
+  @override
+  String get customServerCipher => 'Şifr';
+
+  @override
+  String get customServerWgInterface => 'Interfeýs';
+
+  @override
+  String get customServerWgPeer => 'Deňdeş';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Üpjin edijiniň geçiriş we TLS sazlamalaryny giriziň ýa-da serwer salgysyny goýuň.';
 }

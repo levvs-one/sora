@@ -2076,4 +2076,25 @@ class STh extends S {
 
   @override
   String get errCancelled => 'คำขอถูกยกเลิกแล้ว โปรดทำรายการอีกครั้งหากจำเป็น';
+
+  @override
+  String get customServerOptions => 'การตั้งค่าการเชื่อมต่อ';
+
+  @override
+  String get customServerTransport => 'การรับส่งข้อมูล';
+
+  @override
+  String get customServerSecurity => 'ความปลอดภัย';
+
+  @override
+  String get customServerCipher => 'การเข้ารหัส';
+
+  @override
+  String get customServerWgInterface => 'อินเทอร์เฟซ';
+
+  @override
+  String get customServerWgPeer => 'เพียร์';
+
+  @override
+  String get customServerOptionsInfo => 'ใช้การตั้งค่าการรับส่งข้อมูลและ TLS จากผู้ให้บริการ หรือวางลิงก์เซิร์ฟเวอร์';
 }

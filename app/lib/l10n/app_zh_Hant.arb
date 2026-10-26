@@ -1026,5 +1026,12 @@
   "errRule": "路由規則無效。請檢查規則中的網域、IP 位址或應用程式。",
   "errDns": "DNS 設定無效。請檢查 DNS 伺服器位址。",
   "errEndpoint": "待測試的伺服器位址無效。請檢查主機名稱和連接埠。",
-  "errCancelled": "要求已取消。如有需要，請重新執行操作。"
+  "errCancelled": "要求已取消。如有需要，請重新執行操作。",
+  "customServerOptions": "連線設定",
+  "customServerTransport": "傳輸",
+  "customServerSecurity": "安全性",
+  "customServerCipher": "加密方式",
+  "customServerWgInterface": "介面",
+  "customServerWgPeer": "對等端",
+  "customServerOptionsInfo": "請使用服務商提供的傳輸與 TLS 設定，或貼上伺服器連結。"
 }

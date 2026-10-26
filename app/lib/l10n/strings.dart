@@ -3932,6 +3932,48 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Запрос отменён. При необходимости выполните действие снова.'**
   String get errCancelled;
+
+  /// No description provided for @customServerOptions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Параметры подключения'**
+  String get customServerOptions;
+
+  /// No description provided for @customServerTransport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Транспорт'**
+  String get customServerTransport;
+
+  /// No description provided for @customServerSecurity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защита'**
+  String get customServerSecurity;
+
+  /// No description provided for @customServerCipher.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шифр'**
+  String get customServerCipher;
+
+  /// No description provided for @customServerWgInterface.
+  ///
+  /// In ru, this message translates to:
+  /// **'Интерфейс'**
+  String get customServerWgInterface;
+
+  /// No description provided for @customServerWgPeer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пир'**
+  String get customServerWgPeer;
+
+  /// No description provided for @customServerOptionsInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер.'**
+  String get customServerOptionsInfo;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

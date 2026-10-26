@@ -2121,4 +2121,26 @@ class SIt extends S {
 
   @override
   String get errCancelled => 'La richiesta è stata annullata. Ripeti l’azione se necessario.';
+
+  @override
+  String get customServerOptions => 'Impostazioni di connessione';
+
+  @override
+  String get customServerTransport => 'Trasporto';
+
+  @override
+  String get customServerSecurity => 'Sicurezza';
+
+  @override
+  String get customServerCipher => 'Cifratura';
+
+  @override
+  String get customServerWgInterface => 'Interfaccia';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Usa le impostazioni di trasporto e TLS del fornitore o incolla un link del server.';
 }

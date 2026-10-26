@@ -2096,4 +2096,26 @@ class SKy extends S {
 
   @override
   String get errCancelled => 'Сурам жокко чыгарылды. Керек болсо, аракетти кайталаңыз.';
+
+  @override
+  String get customServerOptions => 'Туташуу параметрлери';
+
+  @override
+  String get customServerTransport => 'Транспорт';
+
+  @override
+  String get customServerSecurity => 'Коопсуздук';
+
+  @override
+  String get customServerCipher => 'Шифр';
+
+  @override
+  String get customServerWgInterface => 'Интерфейс';
+
+  @override
+  String get customServerWgPeer => 'Пир';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Провайдердин транспорт жана TLS параметрлерин киргизиңиз же сервердин шилтемесин чаптаңыз.';
 }

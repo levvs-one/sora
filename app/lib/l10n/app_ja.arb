@@ -1026,5 +1026,12 @@
   "errRule": "ルーティングルールが無効です。ルール内のドメイン、IPアドレス、アプリを確認してください。",
   "errDns": "DNS設定が無効です。DNSサーバーのアドレスを確認してください。",
   "errEndpoint": "テスト対象のサーバーアドレスが無効です。ホスト名とポートを確認してください。",
-  "errCancelled": "リクエストがキャンセルされました。必要に応じて操作をやり直してください。"
+  "errCancelled": "リクエストがキャンセルされました。必要に応じて操作をやり直してください。",
+  "customServerOptions": "接続設定",
+  "customServerTransport": "トランスポート",
+  "customServerSecurity": "セキュリティ",
+  "customServerCipher": "暗号方式",
+  "customServerWgInterface": "インターフェース",
+  "customServerWgPeer": "ピア",
+  "customServerOptionsInfo": "プロバイダー指定のトランスポートとTLS設定を入力するか、サーバーリンクを貼り付けてください。"
 }

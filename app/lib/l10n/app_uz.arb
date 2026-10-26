@@ -1026,5 +1026,12 @@
   "errRule": "Yoʻnaltirish qoidasida xato bor. Qoidada koʻrsatilgan domen, IP manzil yoki ilovani tekshiring.",
   "errDns": "DNS sozlamalari notoʻgʻri. DNS serverining manzilini tekshiring.",
   "errEndpoint": "Tekshiriladigan server manzili notoʻgʻri. Xost nomi va portini tekshiring.",
-  "errCancelled": "Soʻrov bekor qilindi. Kerak boʻlsa, amalni takrorlang."
+  "errCancelled": "Soʻrov bekor qilindi. Kerak boʻlsa, amalni takrorlang.",
+  "customServerOptions": "Ulanish sozlamalari",
+  "customServerTransport": "Transport",
+  "customServerSecurity": "Xavfsizlik",
+  "customServerCipher": "Shifr",
+  "customServerWgInterface": "Interfeys",
+  "customServerWgPeer": "Tengdosh",
+  "customServerOptionsInfo": "Provayder bergan transport va TLS sozlamalarini kiriting yoki server havolasini joylashtiring."
 }

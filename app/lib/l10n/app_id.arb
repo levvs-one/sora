@@ -1026,5 +1026,12 @@
   "errRule": "Aturan perutean tidak valid. Periksa domain, alamat IP, atau aplikasi dalam aturan tersebut.",
   "errDns": "Pengaturan DNS tidak valid. Periksa alamat server DNS.",
   "errEndpoint": "Alamat server yang akan diuji tidak valid. Periksa nama host dan port.",
-  "errCancelled": "Permintaan dibatalkan. Ulangi tindakan jika diperlukan."
+  "errCancelled": "Permintaan dibatalkan. Ulangi tindakan jika diperlukan.",
+  "customServerOptions": "Pengaturan koneksi",
+  "customServerTransport": "Transportasi",
+  "customServerSecurity": "Keamanan",
+  "customServerCipher": "Sandi",
+  "customServerWgInterface": "Antarmuka",
+  "customServerWgPeer": "Peer",
+  "customServerOptionsInfo": "Gunakan pengaturan transportasi dan TLS dari penyedia, atau tempel tautan server."
 }

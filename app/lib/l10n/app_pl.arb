@@ -1026,5 +1026,12 @@
   "errRule": "Reguła routingu jest nieprawidłowa. Sprawdź domenę, adres IP lub aplikację w regule.",
   "errDns": "Ustawienia DNS są nieprawidłowe. Sprawdź adres serwera DNS.",
   "errEndpoint": "Adres sprawdzanego serwera jest nieprawidłowy. Sprawdź nazwę hosta i port.",
-  "errCancelled": "Żądanie zostało anulowane. W razie potrzeby wykonaj czynność ponownie."
+  "errCancelled": "Żądanie zostało anulowane. W razie potrzeby wykonaj czynność ponownie.",
+  "customServerOptions": "Ustawienia połączenia",
+  "customServerTransport": "Transport",
+  "customServerSecurity": "Zabezpieczenia",
+  "customServerCipher": "Szyfr",
+  "customServerWgInterface": "Interfejs",
+  "customServerWgPeer": "Peer",
+  "customServerOptionsInfo": "Użyj ustawień transportu i TLS od dostawcy lub wklej link serwera."
 }

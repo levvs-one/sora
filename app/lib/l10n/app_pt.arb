@@ -1026,5 +1026,12 @@
   "errRule": "Uma regra de roteamento é inválida. Verifique o domínio, o endereço IP ou o aplicativo na regra.",
   "errDns": "As configurações de DNS são inválidas. Verifique o endereço do servidor DNS.",
   "errEndpoint": "O endereço do servidor a ser testado é inválido. Verifique o nome do host e a porta.",
-  "errCancelled": "A solicitação foi cancelada. Repita a ação se necessário."
+  "errCancelled": "A solicitação foi cancelada. Repita a ação se necessário.",
+  "customServerOptions": "Configurações de conexão",
+  "customServerTransport": "Transporte",
+  "customServerSecurity": "Segurança",
+  "customServerCipher": "Cifra",
+  "customServerWgInterface": "Interface",
+  "customServerWgPeer": "Par",
+  "customServerOptionsInfo": "Use as configurações de transporte e TLS do provedor ou cole um link do servidor."
 }

@@ -1026,5 +1026,12 @@
   "errRule": "Ugurlama düzgüninde ýalňyşlyk bar. Düzgündäki domeni, IP salgysyny ýa-da programmany barlaň.",
   "errDns": "DNS sazlamalary nädogry. DNS serweriniň salgysyny barlaň.",
   "errEndpoint": "Barlanjak serweriň salgysy nädogry. Host adyny we porty barlaň.",
-  "errCancelled": "Talap ýatyryldy. Zerur bolsa, amaly gaýtalaň."
+  "errCancelled": "Talap ýatyryldy. Zerur bolsa, amaly gaýtalaň.",
+  "customServerOptions": "Birikme sazlamalary",
+  "customServerTransport": "Geçiriş",
+  "customServerSecurity": "Howpsuzlyk",
+  "customServerCipher": "Şifr",
+  "customServerWgInterface": "Interfeýs",
+  "customServerWgPeer": "Deňdeş",
+  "customServerOptionsInfo": "Üpjin edijiniň geçiriş we TLS sazlamalaryny giriziň ýa-da serwer salgysyny goýuň."
 }

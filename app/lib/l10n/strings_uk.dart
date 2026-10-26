@@ -2116,4 +2116,26 @@ class SUk extends S {
 
   @override
   String get errCancelled => 'Запит скасовано. За потреби виконайте дію знову.';
+
+  @override
+  String get customServerOptions => 'Параметри підключення';
+
+  @override
+  String get customServerTransport => 'Транспорт';
+
+  @override
+  String get customServerSecurity => 'Захист';
+
+  @override
+  String get customServerCipher => 'Шифр';
+
+  @override
+  String get customServerWgInterface => 'Інтерфейс';
+
+  @override
+  String get customServerWgPeer => 'Пір';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Укажіть параметри транспорту й TLS із налаштувань провайдера або вставте посилання на сервер.';
 }

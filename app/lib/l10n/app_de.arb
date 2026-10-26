@@ -1026,5 +1026,12 @@
   "errRule": "Eine Routingregel ist ungültig. Prüfen Sie die Domain, IP-Adresse oder Anwendung in der Regel.",
   "errDns": "Die DNS-Einstellungen sind ungültig. Prüfen Sie die Adresse des DNS-Servers.",
   "errEndpoint": "Die Serveradresse für die Prüfung ist ungültig. Prüfen Sie Hostname und Port.",
-  "errCancelled": "Die Anfrage wurde abgebrochen. Wiederholen Sie die Aktion bei Bedarf."
+  "errCancelled": "Die Anfrage wurde abgebrochen. Wiederholen Sie die Aktion bei Bedarf.",
+  "customServerOptions": "Verbindungseinstellungen",
+  "customServerTransport": "Transport",
+  "customServerSecurity": "Sicherheit",
+  "customServerCipher": "Verschlüsselung",
+  "customServerWgInterface": "Schnittstelle",
+  "customServerWgPeer": "Peer",
+  "customServerOptionsInfo": "Verwende die Transport- und TLS-Einstellungen deines Anbieters oder füge einen Serverlink ein."
 }

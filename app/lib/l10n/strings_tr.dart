@@ -2099,4 +2099,26 @@ class STr extends S {
 
   @override
   String get errCancelled => 'İstek iptal edildi. Gerekirse işlemi tekrarlayın.';
+
+  @override
+  String get customServerOptions => 'Bağlantı ayarları';
+
+  @override
+  String get customServerTransport => 'Taşıma';
+
+  @override
+  String get customServerSecurity => 'Güvenlik';
+
+  @override
+  String get customServerCipher => 'Şifreleme';
+
+  @override
+  String get customServerWgInterface => 'Arayüz';
+
+  @override
+  String get customServerWgPeer => 'Eş';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Sağlayıcınızın taşıma ve TLS ayarlarını kullanın veya sunucu bağlantısını yapıştırın.';
 }

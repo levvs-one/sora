@@ -2098,4 +2098,26 @@ class SAz extends S {
 
   @override
   String get errCancelled => 'Sorğu ləğv edildi. Lazım gələrsə, əməliyyatı təkrarlayın.';
+
+  @override
+  String get customServerOptions => 'Bağlantı parametrləri';
+
+  @override
+  String get customServerTransport => 'Nəqliyyat';
+
+  @override
+  String get customServerSecurity => 'Təhlükəsizlik';
+
+  @override
+  String get customServerCipher => 'Şifr';
+
+  @override
+  String get customServerWgInterface => 'İnterfeys';
+
+  @override
+  String get customServerWgPeer => 'Qarşı tərəf';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Provayderin verdiyi nəqliyyat və TLS parametrlərini daxil edin və ya server keçidini yapışdırın.';
 }

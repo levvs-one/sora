@@ -2102,4 +2102,26 @@ class SUz extends S {
 
   @override
   String get errCancelled => 'Soʻrov bekor qilindi. Kerak boʻlsa, amalni takrorlang.';
+
+  @override
+  String get customServerOptions => 'Ulanish sozlamalari';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Xavfsizlik';
+
+  @override
+  String get customServerCipher => 'Shifr';
+
+  @override
+  String get customServerWgInterface => 'Interfeys';
+
+  @override
+  String get customServerWgPeer => 'Tengdosh';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Provayder bergan transport va TLS sozlamalarini kiriting yoki server havolasini joylashtiring.';
 }

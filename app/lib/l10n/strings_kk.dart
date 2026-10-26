@@ -2094,4 +2094,26 @@ class SKk extends S {
 
   @override
   String get errCancelled => 'Сұрау тоқтатылды. Қажет болса, әрекетті қайталаңыз.';
+
+  @override
+  String get customServerOptions => 'Қосылым параметрлері';
+
+  @override
+  String get customServerTransport => 'Тасымалдау';
+
+  @override
+  String get customServerSecurity => 'Қауіпсіздік';
+
+  @override
+  String get customServerCipher => 'Шифр';
+
+  @override
+  String get customServerWgInterface => 'Интерфейс';
+
+  @override
+  String get customServerWgPeer => 'Пир';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Провайдер берген тасымалдау және TLS параметрлерін енгізіңіз немесе сервер сілтемесін қойыңыз.';
 }

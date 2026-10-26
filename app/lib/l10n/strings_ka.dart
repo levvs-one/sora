@@ -2094,4 +2094,26 @@ class SKa extends S {
 
   @override
   String get errCancelled => 'მოთხოვნა გაუქმდა. საჭიროების შემთხვევაში გაიმეორეთ მოქმედება.';
+
+  @override
+  String get customServerOptions => 'კავშირის პარამეტრები';
+
+  @override
+  String get customServerTransport => 'ტრანსპორტი';
+
+  @override
+  String get customServerSecurity => 'უსაფრთხოება';
+
+  @override
+  String get customServerCipher => 'შიფრი';
+
+  @override
+  String get customServerWgInterface => 'ინტერფეისი';
+
+  @override
+  String get customServerWgPeer => 'პირი';
+
+  @override
+  String get customServerOptionsInfo =>
+      'გამოიყენეთ პროვაიდერის გადაცემისა და TLS პარამეტრები ან ჩასვით სერვერის ბმული.';
 }

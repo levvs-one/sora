@@ -2092,4 +2092,25 @@ class SVi extends S {
 
   @override
   String get errCancelled => 'Yêu cầu đã bị hủy. Hãy thực hiện lại thao tác nếu cần.';
+
+  @override
+  String get customServerOptions => 'Cài đặt kết nối';
+
+  @override
+  String get customServerTransport => 'Truyền tải';
+
+  @override
+  String get customServerSecurity => 'Bảo mật';
+
+  @override
+  String get customServerCipher => 'Mã hóa';
+
+  @override
+  String get customServerWgInterface => 'Giao diện';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String get customServerOptionsInfo => 'Dùng cài đặt truyền tải và TLS từ nhà cung cấp hoặc dán liên kết máy chủ.';
 }

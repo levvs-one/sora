@@ -881,5 +881,12 @@
   "errRule": "A routing rule is invalid. Check the domain, IP address or application in the rule.",
   "errDns": "The DNS settings are invalid. Check the DNS server address.",
   "errEndpoint": "The server address for the check is invalid. Check the hostname and port.",
-  "errCancelled": "The request was cancelled. Repeat the action if needed."
+  "errCancelled": "The request was cancelled. Repeat the action if needed.",
+  "customServerOptions": "Connection settings",
+  "customServerTransport": "Transport",
+  "customServerSecurity": "Security",
+  "customServerCipher": "Cipher",
+  "customServerWgInterface": "Interface",
+  "customServerWgPeer": "Peer",
+  "customServerOptionsInfo": "Use the transport and TLS settings supplied by your provider, or paste a server link."
 }

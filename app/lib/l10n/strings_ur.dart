@@ -2087,4 +2087,26 @@ class SUr extends S {
 
   @override
   String get errCancelled => 'درخواست منسوخ ہو گئی۔ ضرورت ہو تو عمل دوبارہ کریں۔';
+
+  @override
+  String get customServerOptions => 'کنکشن کی ترتیبات';
+
+  @override
+  String get customServerTransport => 'ٹرانسپورٹ';
+
+  @override
+  String get customServerSecurity => 'سیکیورٹی';
+
+  @override
+  String get customServerCipher => 'خفیہ کاری';
+
+  @override
+  String get customServerWgInterface => 'انٹرفیس';
+
+  @override
+  String get customServerWgPeer => 'پیئر';
+
+  @override
+  String get customServerOptionsInfo =>
+      'فراہم کنندہ کی ٹرانسپورٹ اور TLS ترتیبات استعمال کریں یا سرور کا لنک پیسٹ کریں۔';
 }

@@ -1026,5 +1026,12 @@
   "errRule": "Marşrutlaşdırma qaydası yanlışdır. Qaydadakı domeni, IP ünvanını və ya tətbiqi yoxlayın.",
   "errDns": "DNS parametrləri yanlışdır. DNS serverinin ünvanını yoxlayın.",
   "errEndpoint": "Yoxlanacaq serverin ünvanı yanlışdır. Host adını və portu yoxlayın.",
-  "errCancelled": "Sorğu ləğv edildi. Lazım gələrsə, əməliyyatı təkrarlayın."
+  "errCancelled": "Sorğu ləğv edildi. Lazım gələrsə, əməliyyatı təkrarlayın.",
+  "customServerOptions": "Bağlantı parametrləri",
+  "customServerTransport": "Nəqliyyat",
+  "customServerSecurity": "Təhlükəsizlik",
+  "customServerCipher": "Şifr",
+  "customServerWgInterface": "İnterfeys",
+  "customServerWgPeer": "Qarşı tərəf",
+  "customServerOptionsInfo": "Provayderin verdiyi nəqliyyat və TLS parametrlərini daxil edin və ya server keçidini yapışdırın."
 }

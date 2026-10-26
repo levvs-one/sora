@@ -2059,4 +2059,25 @@ class SKo extends S {
 
   @override
   String get errCancelled => '요청이 취소되었습니다. 필요한 경우 작업을 다시 수행하세요.';
+
+  @override
+  String get customServerOptions => '연결 설정';
+
+  @override
+  String get customServerTransport => '전송';
+
+  @override
+  String get customServerSecurity => '보안';
+
+  @override
+  String get customServerCipher => '암호화 방식';
+
+  @override
+  String get customServerWgInterface => '인터페이스';
+
+  @override
+  String get customServerWgPeer => '피어';
+
+  @override
+  String get customServerOptionsInfo => '제공업체의 전송 및 TLS 설정을 사용하거나 서버 링크를 붙여넣으세요.';
 }

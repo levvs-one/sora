@@ -2131,4 +2131,26 @@ class SDe extends S {
 
   @override
   String get errCancelled => 'Die Anfrage wurde abgebrochen. Wiederholen Sie die Aktion bei Bedarf.';
+
+  @override
+  String get customServerOptions => 'Verbindungseinstellungen';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Sicherheit';
+
+  @override
+  String get customServerCipher => 'Verschlüsselung';
+
+  @override
+  String get customServerWgInterface => 'Schnittstelle';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Verwende die Transport- und TLS-Einstellungen deines Anbieters oder füge einen Serverlink ein.';
 }

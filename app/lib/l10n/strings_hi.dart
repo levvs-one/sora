@@ -2087,4 +2087,25 @@ class SHi extends S {
 
   @override
   String get errCancelled => 'अनुरोध रद्द कर दिया गया। ज़रूरत हो तो कार्रवाई दोहराएँ।';
+
+  @override
+  String get customServerOptions => 'कनेक्शन सेटिंग';
+
+  @override
+  String get customServerTransport => 'ट्रांसपोर्ट';
+
+  @override
+  String get customServerSecurity => 'सुरक्षा';
+
+  @override
+  String get customServerCipher => 'साइफ़र';
+
+  @override
+  String get customServerWgInterface => 'इंटरफ़ेस';
+
+  @override
+  String get customServerWgPeer => 'पीयर';
+
+  @override
+  String get customServerOptionsInfo => 'प्रदाता की ट्रांसपोर्ट और TLS सेटिंग का उपयोग करें या सर्वर लिंक पेस्ट करें।';
 }

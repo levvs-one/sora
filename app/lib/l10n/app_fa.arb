@@ -1026,5 +1026,12 @@
   "errRule": "یکی از قوانین مسیریابی نامعتبر است. دامنه، نشانی IP یا برنامه مشخص‌شده در قانون را بررسی کنید.",
   "errDns": "تنظیمات DNS نامعتبر است. نشانی سرور DNS را بررسی کنید.",
   "errEndpoint": "نشانی سرور مورد آزمایش نامعتبر است. نام میزبان و درگاه را بررسی کنید.",
-  "errCancelled": "درخواست لغو شد. در صورت نیاز دوباره اقدام کنید."
+  "errCancelled": "درخواست لغو شد. در صورت نیاز دوباره اقدام کنید.",
+  "customServerOptions": "تنظیمات اتصال",
+  "customServerTransport": "انتقال",
+  "customServerSecurity": "امنیت",
+  "customServerCipher": "رمزنگاری",
+  "customServerWgInterface": "رابط",
+  "customServerWgPeer": "همتا",
+  "customServerOptionsInfo": "تنظیمات انتقال و TLS ارائه‌دهنده را وارد کنید یا پیوند سرور را جای‌گذاری کنید."
 }

@@ -1026,5 +1026,12 @@
   "errRule": "إحدى قواعد التوجيه غير صالحة. تحقق من النطاق أو عنوان IP أو التطبيق المحدد فيها.",
   "errDns": "إعدادات DNS غير صالحة. تحقق من عنوان خادم DNS.",
   "errEndpoint": "عنوان الخادم المراد اختباره غير صالح. تحقق من اسم المضيف والمنفذ.",
-  "errCancelled": "أُلغي الطلب. كرّر الإجراء عند الحاجة."
+  "errCancelled": "أُلغي الطلب. كرّر الإجراء عند الحاجة.",
+  "customServerOptions": "إعدادات الاتصال",
+  "customServerTransport": "النقل",
+  "customServerSecurity": "الأمان",
+  "customServerCipher": "التشفير",
+  "customServerWgInterface": "الواجهة",
+  "customServerWgPeer": "النظير",
+  "customServerOptionsInfo": "استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم."
 }

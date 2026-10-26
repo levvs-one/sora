@@ -1026,5 +1026,12 @@
   "errRule": "روٹنگ کا ایک اصول درست نہیں۔ اصول میں دیا گیا ڈومین، IP پتہ یا ایپ چیک کریں۔",
   "errDns": "DNS کی ترتیبات درست نہیں۔ DNS سرور کا پتہ چیک کریں۔",
   "errEndpoint": "جانچ کے لیے سرور کا پتہ درست نہیں۔ ہوسٹ کا نام اور پورٹ چیک کریں۔",
-  "errCancelled": "درخواست منسوخ ہو گئی۔ ضرورت ہو تو عمل دوبارہ کریں۔"
+  "errCancelled": "درخواست منسوخ ہو گئی۔ ضرورت ہو تو عمل دوبارہ کریں۔",
+  "customServerOptions": "کنکشن کی ترتیبات",
+  "customServerTransport": "ٹرانسپورٹ",
+  "customServerSecurity": "سیکیورٹی",
+  "customServerCipher": "خفیہ کاری",
+  "customServerWgInterface": "انٹرفیس",
+  "customServerWgPeer": "پیئر",
+  "customServerOptionsInfo": "فراہم کنندہ کی ٹرانسپورٹ اور TLS ترتیبات استعمال کریں یا سرور کا لنک پیسٹ کریں۔"
 }

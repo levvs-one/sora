@@ -2055,6 +2055,27 @@ class SZh extends S {
 
   @override
   String get errCancelled => '请求已取消。如有需要，请重新执行操作。';
+
+  @override
+  String get customServerOptions => '连接设置';
+
+  @override
+  String get customServerTransport => '传输';
+
+  @override
+  String get customServerSecurity => '安全';
+
+  @override
+  String get customServerCipher => '加密方式';
+
+  @override
+  String get customServerWgInterface => '接口';
+
+  @override
+  String get customServerWgPeer => '对等端';
+
+  @override
+  String get customServerOptionsInfo => '请使用服务商提供的传输和 TLS 设置，或粘贴服务器链接。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4107,6 +4128,27 @@ class SZhHans extends SZh {
 
   @override
   String get errCancelled => '请求已取消。如有需要，请重新执行操作。';
+
+  @override
+  String get customServerOptions => '连接设置';
+
+  @override
+  String get customServerTransport => '传输';
+
+  @override
+  String get customServerSecurity => '安全';
+
+  @override
+  String get customServerCipher => '加密方式';
+
+  @override
+  String get customServerWgInterface => '接口';
+
+  @override
+  String get customServerWgPeer => '对等端';
+
+  @override
+  String get customServerOptionsInfo => '请使用服务商提供的传输和 TLS 设置，或粘贴服务器链接。';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6160,4 +6202,25 @@ class SZhHant extends SZh {
 
   @override
   String get errCancelled => '要求已取消。如有需要，請重新執行操作。';
+
+  @override
+  String get customServerOptions => '連線設定';
+
+  @override
+  String get customServerTransport => '傳輸';
+
+  @override
+  String get customServerSecurity => '安全性';
+
+  @override
+  String get customServerCipher => '加密方式';
+
+  @override
+  String get customServerWgInterface => '介面';
+
+  @override
+  String get customServerWgPeer => '對等端';
+
+  @override
+  String get customServerOptionsInfo => '請使用服務商提供的傳輸與 TLS 設定，或貼上伺服器連結。';
 }

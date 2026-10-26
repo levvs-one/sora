@@ -1026,5 +1026,12 @@
   "errRule": "Una regla de enrutamiento no es válida. Revisa el dominio, la dirección IP o la aplicación de la regla.",
   "errDns": "La configuración DNS no es válida. Revisa la dirección del servidor DNS.",
   "errEndpoint": "La dirección del servidor que se va a comprobar no es válida. Revisa el nombre del host y el puerto.",
-  "errCancelled": "Se ha cancelado la solicitud. Repite la acción si lo necesitas."
+  "errCancelled": "Se ha cancelado la solicitud. Repite la acción si lo necesitas.",
+  "customServerOptions": "Ajustes de conexión",
+  "customServerTransport": "Transporte",
+  "customServerSecurity": "Seguridad",
+  "customServerCipher": "Cifrado",
+  "customServerWgInterface": "Interfaz",
+  "customServerWgPeer": "Par",
+  "customServerOptionsInfo": "Usa los ajustes de transporte y TLS de tu proveedor o pega un enlace del servidor."
 }

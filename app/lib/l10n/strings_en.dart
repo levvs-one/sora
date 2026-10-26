@@ -2090,4 +2090,26 @@ class SEn extends S {
 
   @override
   String get errCancelled => 'The request was cancelled. Repeat the action if needed.';
+
+  @override
+  String get customServerOptions => 'Connection settings';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Security';
+
+  @override
+  String get customServerCipher => 'Cipher';
+
+  @override
+  String get customServerWgInterface => 'Interface';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String get customServerOptionsInfo =>
+      'Use the transport and TLS settings supplied by your provider, or paste a server link.';
 }

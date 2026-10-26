@@ -2059,4 +2059,25 @@ class SJa extends S {
 
   @override
   String get errCancelled => 'リクエストがキャンセルされました。必要に応じて操作をやり直してください。';
+
+  @override
+  String get customServerOptions => '接続設定';
+
+  @override
+  String get customServerTransport => 'トランスポート';
+
+  @override
+  String get customServerSecurity => 'セキュリティ';
+
+  @override
+  String get customServerCipher => '暗号方式';
+
+  @override
+  String get customServerWgInterface => 'インターフェース';
+
+  @override
+  String get customServerWgPeer => 'ピア';
+
+  @override
+  String get customServerOptionsInfo => 'プロバイダー指定のトランスポートとTLS設定を入力するか、サーバーリンクを貼り付けてください。';
 }
