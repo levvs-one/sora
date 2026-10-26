@@ -60,28 +60,18 @@ func TestEnforcementBackgroundGateIsReal(t *testing.T) {
 	}
 }
 
-// TestEnforcementDangerousAreNotClaimedEnforced is the load-bearing
-// pin: net.hooks has zero enforcement code today, and the matrix
-// must say so. Flipping it to Enforced
-// requires a behavior pin in this test proving a real gate exists -
-// a docs edit must never be able to upgrade the claim on its own.
-func TestEnforcementDangerousAreNotClaimedEnforced(t *testing.T) {
-	for _, id := range []string{"net.hooks"} {
-		row, ok := EnforcementOf(id)
-		if !ok {
-			t.Fatalf("no enforcement row for %q", id)
-		}
-		perm, _ := LookupPermission(id)
-		if perm.Risk != RiskDangerous {
-			t.Fatalf("%q risk = %v in the registry, want RiskDangerous", id, perm.Risk)
-		}
-		if row.Status == EnforcementEnforced || row.Status == EnforcementInstallTime {
-			t.Errorf("%q is claimed %v, but no enforcement point exists; "+
-				"if one landed, add a behavior pin here in the same commit", id, row.Status)
-		}
-		if !strings.Contains(row.Note, "zero enforcement code") {
-			t.Errorf("%q note must stay blunt until a real gate lands: %q", id, row.Note)
-		}
+// Runtime selection, conflicts and disconnect behavior are exercised by
+// app/test/extension_bypass_test.dart over a private authenticated gRPC socket.
+// The Go contract must not imply a core-side extension executable loader.
+func TestEnforcementBypassProfilesScope(t *testing.T) {
+	row, ok := EnforcementOf("net.hooks")
+	perm, _ := LookupPermission("net.hooks")
+	if !ok || row.Status != EnforcementEnforced || perm.Risk != RiskDangerous {
+		t.Fatal("bypass profiles require an enforced dangerous permission")
+	}
+	if !strings.Contains(row.Where, "app/lib/src/ext/store.dart") ||
+		!strings.Contains(row.Note, "profiles") || !strings.Contains(row.Note, "no native paths") {
+		t.Fatal("the claim must stay scoped to the app's declarative profile consumer")
 	}
 }
 

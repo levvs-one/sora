@@ -19,7 +19,7 @@ Future<void> showModes(BuildContext context) async {
 
 Future<void> connectFromHome(BuildContext context) async {
   final sora = SoraScope.read(context);
-  if (sora.phase == Phase.off && !sora.cleanupPending && sora.servers.isEmpty && sora.selected != 'bypass') {
+  if (sora.phase == Phase.off && !sora.cleanupPending && sora.servers.isEmpty && !sora.bypassSelected) {
     final choice = await showDialog<String>(
       context: context,
       builder: (context) {
@@ -68,8 +68,8 @@ class ModeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
-    final label = sora.selected == 'bypass'
-        ? s.serverBypass
+    final label = sora.bypassSelected
+        ? (sora.selected == 'bypass' ? s.serverBypass : sora.displayNameOf(sora.selected))
         : sora.settings.tunnel == 'tun'
         ? 'TUN'
         : s.proxyShort;
@@ -86,7 +86,14 @@ class ModeButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Styles.bodyStrong.copyWith(color: palette.ink),
+            ),
+          ),
           const SizedBox(width: 8),
           Icon(Symbols.expand_more_rounded, size: 20, weight: 600, color: palette.ink),
         ],
@@ -101,7 +108,7 @@ class _Modes extends StatelessWidget {
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
     final settings = sora.settings;
-    final current = sora.selected == 'bypass' ? 'bypass' : settings.tunnel;
+    final current = sora.bypassSelected ? sora.selected : settings.tunnel;
     Widget choice(String key, String title, bool selected, VoidCallback choose) => ListTile(
       key: ValueKey(key),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -116,15 +123,23 @@ class _Modes extends StatelessWidget {
         child: selected ? Icon(Symbols.check_rounded, size: 22, weight: 700, color: palette.ink) : null,
       ),
     );
-    Future<void> mode(String value) => sora.change((x) {
-      if (value == 'bypass') {
-        x.server = 'bypass';
-        x.tunnel = 'tun';
-      } else {
-        if (x.server == 'bypass') x.server = 'auto';
-        x.tunnel = value;
+    Future<void> mode(String value) async {
+      if (sora.extensions.bypassProfile(value) != null) {
+        await sora.change((settings) => settings.tunnel = 'tun', replan: false);
+        await sora.select(value);
+        return;
       }
-    });
+      await sora.change((x) {
+        if (value == 'bypass') {
+          x.server = 'bypass';
+          x.tunnel = 'tun';
+        } else {
+          if (sora.bypassSelected) x.server = 'auto';
+          x.tunnel = value;
+        }
+      });
+    }
+
     final routes = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -136,6 +151,8 @@ class _Modes extends StatelessWidget {
           ('tun', s.tunMode),
           ('proxy', s.tunnelProxy),
           if (sora.serverlessAvailable) ('bypass', s.serverBypass),
+          if (sora.serverlessAvailable)
+            for (final profile in sora.extensions.bypassProfiles) (profile.choiceId, profile.name),
         ])
           choice('mode-$value', title, current == value, () => unawaited(mode(value))),
       ],

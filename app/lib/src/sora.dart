@@ -28,6 +28,7 @@ import 'overrides.dart';
 import 'profiles.dart';
 import 'rules.dart';
 import 'ext/store.dart';
+import 'ext/bypass.dart';
 import 'ext/workers.dart';
 import 'settings.dart';
 import 'notifications.dart';
@@ -131,6 +132,12 @@ class Sora extends ChangeNotifier {
       recovered('extension:$id');
     }
     notifyListeners();
+    if (selected.startsWith(extensionBypassPrefix) &&
+        _activeChain == null &&
+        extensions.bypassProfile(selected) == null) {
+      if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) unawaited(disconnect());
+      return;
+    }
     unawaited(_replan());
     if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
       _pendingSelection = ++_selectionRevision;
@@ -649,7 +656,7 @@ class Sora extends ChangeNotifier {
   /// keys and selection comparisons in one namespace.
   String get selected {
     final chosen = settings.server;
-    if (chosen == 'auto') return chosen;
+    if (chosen == 'auto' || chosen.startsWith(extensionBypassPrefix)) return chosen;
     if (chosen == 'bypass') return serverlessAvailable ? chosen : 'auto';
     if (chosen.startsWith(groupPrefix)) {
       // A group whose members are all hidden no longer exists: fall back to
@@ -667,7 +674,13 @@ class Sora extends ChangeNotifier {
   /// [canonicalCustomId].
   String canonicalServerId(String id) => canonicalCustomId(id, [for (final s in customServers) s.id]);
 
+  bool get bypassSelected => selected == 'bypass' || selected.startsWith(extensionBypassPrefix);
+
   String nameOf(String id) {
+    if (id.startsWith(extensionBypassPrefix)) {
+      final extensionId = id.substring(extensionBypassPrefix.length);
+      return extensions.get(extensionId)?.manifest.name ?? extensionId;
+    }
     if (id.startsWith(groupPrefix)) return entryOf(id, _subscriptions.values)?.name ?? id;
     // Custom servers are keyed by plain id in _customServers but selected by
     // their canonical `custom/<id>` outbound id.
@@ -696,6 +709,7 @@ class Sora extends ChangeNotifier {
       choice: selected,
       settings: settings,
       extensionRules: [for (final r in extensions.routingRules) r.rule],
+      bypassProfile: extensions.bypassProfile(selected),
       latency: latency,
       bandwidth: bandwidth,
       entry: selected.startsWith(groupPrefix)
@@ -1427,7 +1441,16 @@ class Sora extends ChangeNotifier {
       return;
     }
     failure = null;
-    if (selected != 'bypass' && servers.isEmpty) {
+    if (via == null &&
+        _activeChain == null &&
+        selected.startsWith(extensionBypassPrefix) &&
+        (!serverlessAvailable || extensions.bypassProfile(selected) == null)) {
+      failure = const CoreFailure('app.extension_asset');
+      _emit(ConnectionFailed(failure!), mode: mode);
+      notifyListeners();
+      return;
+    }
+    if (!bypassSelected && servers.isEmpty) {
       failure = const CoreFailure('app.no_servers');
       _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
@@ -2426,11 +2449,14 @@ SessionPlan buildPlan({
   List<UserRule> extensionRules = const [],
   List<String> chain = const [],
   bool zapretWithVpn = false,
+  ExtensionBypassProfile? bypassProfile,
   double? Function(String id)? reliabilityOf,
 }) {
+  final extensionBypass = choice.startsWith(extensionBypassPrefix);
+  final bypassMode = chain.isEmpty && (choice == 'bypass' || extensionBypass);
   final plan = SessionPlan(
     tunnelMode: settings.tunnel == 'proxy' ? TunnelMode.TUNNEL_MODE_APPLICATION : TunnelMode.TUNNEL_MODE_SYSTEM,
-    tunStack: settings.tunnel == 'tun' && choice != 'bypass'
+    tunStack: settings.tunnel == 'tun' && !bypassMode
         ? switch (settings.engine) {
             'mihomo' => settings.mihomoTunStack,
             'xray' when Platform.isWindows || settings.xrayTunStack != 'gvisor' => settings.xrayTunStack,
@@ -2464,7 +2490,7 @@ SessionPlan buildPlan({
 
   // Zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
   // the engines directory); never in serverless bypass mode.
-  if (zapretWithVpn && choice != 'bypass') {
+  if (zapretWithVpn && !bypassMode) {
     plan.zapretWithVpn = true;
     // Carry the tuned handshake strategy with it: without it the core falls
     // back to its own defaults and silently ignores the zapret settings
@@ -2490,18 +2516,21 @@ SessionPlan buildPlan({
     return plan;
   }
 
-  if (choice == 'bypass') {
+  if (bypassMode) {
+    if (extensionBypass && bypassProfile?.choiceId != choice) return plan;
     plan.outbounds.add(
       OutboundSpec(
         id: Sora.bypassId,
-        displayName: 'zapret',
+        displayName: extensionBypass ? bypassProfile!.name : 'zapret',
         protocol: 'bypass',
-        bypass: BypassStrategy(
-          splitPos: settings.splitPos,
-          disorder: settings.disorder,
-          tlsRecord: settings.tlsRecord,
-          hostCase: settings.hostCase,
-        ),
+        bypass:
+            (extensionBypass ? bypassProfile!.strategy : null) ??
+            BypassStrategy(
+              splitPos: settings.splitPos,
+              disorder: settings.disorder,
+              tlsRecord: settings.tlsRecord,
+              hostCase: settings.hostCase,
+            ),
       ),
     );
     plan.routing.proxyTarget = Sora.bypassId;

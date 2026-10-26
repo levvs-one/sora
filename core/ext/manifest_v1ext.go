@@ -13,7 +13,7 @@ package ext
 //     "theme.apply"). The app validates color tokens and contrast before use;
 //     this parser enforces the entry path and capability/permission pair.
 //   - "network_hook": DPI-bypass module contract (capability "network-hook",
-//     permission "net.hooks"). The descriptor is not applied at runtime.
+//     permission "net.hooks"). The app consumes version-2 profiles for installed bypass backends.
 //   - "routing": routing-rules contract (capability "routing", permission
 //     "routing.rules"). The app validates and merges the rules into its plan.
 //
@@ -76,7 +76,7 @@ type ThemeExt struct {
 }
 
 // NetworkHookExt points at the DPI-bypass module descriptor (network-hook
-// contract v0, proposed).
+// profile contract version 2).
 type NetworkHookExt struct {
 	// Entry is the hook descriptor inside the package, e.g. "hook.json".
 	Entry string `json:"entry"`

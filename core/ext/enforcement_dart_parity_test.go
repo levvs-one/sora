@@ -4,15 +4,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 	"testing"
 )
 
 // TestEnforcementDartMirrorMatches pins the Dart mirror of the
 // enforcement matrix (app/lib/src/ext/enforcement.dart) to this Go
 // table. The install prompt and the detail screen read the Dart table:
-// if it drifted - above all if it upgraded one of the two RiskDangerous
-// rows the Go side reports as unimplemented - the user would
+// if it drifted - above all if it upgraded a permission beyond the Go-side claim - the user would
 // be told a protection exists that no code performs. The Go test pins
 // the Go claims against the gates; this test pins the mirror against
 // the Go table, row for row, in registry order.
@@ -49,18 +47,6 @@ func TestEnforcementDartMirrorMatches(t *testing.T) {
 		}
 		if want := dartStatus[row.Status]; rows[i][1] != want {
 			t.Errorf("%q: Dart status %v, Go status %v maps to %v", row.ID, rows[i][1], row.Status, want)
-		}
-	}
-	// The net.hooks row must stay unimplemented in the mirror
-	// too - said explicitly, not only via the table walk above, because
-	// this is the claim the whole matrix exists for.
-	for _, id := range []string{"net.hooks"} {
-		re := regexp.MustCompile(`ExtEnforcementRow\(\s*'` + regexp.QuoteMeta(id) + `',\s*ExtEnforcementStatus\.unimplemented`)
-		if !re.MatchString(string(raw)) {
-			t.Errorf("Dart mirror does not pin %q as unimplemented", id)
-		}
-		if !strings.Contains(string(raw), id) {
-			t.Errorf("Dart mirror has no row for %q at all", id)
 		}
 	}
 }

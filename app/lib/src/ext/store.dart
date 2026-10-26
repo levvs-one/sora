@@ -20,6 +20,7 @@ import 'package:http/http.dart' as http;
 
 import 'catalog.dart';
 import 'assets.dart';
+import 'bypass.dart';
 import 'conflicts.dart';
 import 'manifest.dart';
 import 'package.dart';
@@ -152,6 +153,8 @@ class ExtensionStore extends ChangeNotifier {
 
   final _themes = <String, ExtensionTheme>{};
   final _routing = <String, ExtensionRouting>{};
+  final _bypass = <String, ExtensionBypassProfile>{};
+  final _bypassDescriptors = <String, ExtensionBypass>{};
   final _runtimeLogs = <String, List<String>>{};
   final runtimeErrors = <String, String>{};
 
@@ -188,6 +191,22 @@ class ExtensionStore extends ChangeNotifier {
     return [for (final e in sources) ..._routing[e.id]!.rules];
   }
 
+  List<ExtensionBypassProfile> get bypassProfiles {
+    final candidates = installed
+        .where((inst) => inst.enabled && inst.granted.contains('net.hooks') && _bypass.containsKey(inst.id))
+        .toList();
+    final conflict = findConflicts(installed).where((value) => value.kind == ExtConflictKind.netHooks).firstOrNull;
+    if (conflict == null) return [for (final inst in candidates) _bypass[inst.id]!];
+    final winner = _conflictWinners[conflict.key];
+    return [
+      for (final inst in candidates)
+        if (inst.id == winner) _bypass[inst.id]!,
+    ];
+  }
+
+  ExtensionBypassProfile? bypassProfile(String choiceId) =>
+      bypassProfiles.where((profile) => profile.choiceId == choiceId).firstOrNull;
+
   void logRoutingOverlaps(List<String> userDestinations) {
     final before = [...userDestinations];
     for (final r in routingRules) {
@@ -203,11 +222,20 @@ class ExtensionStore extends ChangeNotifier {
   void _validateAssets(ExtManifest m, String Function(String) read) {
     if (m.themeEntry != null) ExtensionTheme.parse(read(m.themeEntry!));
     if (m.routingEntry != null) ExtensionRouting.parse(m.id, read(m.routingEntry!));
+    if (m.networkHookEntry != null) {
+      final descriptor = ExtensionBypass.parse(read(m.networkHookEntry!));
+      if (!descriptor.supports(Platform.operatingSystem)) {
+        throw const FormatException('bypass backend is unavailable on this platform');
+      }
+      descriptor.select(_schemaDefaults(m));
+    }
   }
 
   Future<void> _loadRuntimeAssets() async {
     _themes.clear();
     _routing.clear();
+    final bypass = <String, ExtensionBypassProfile>{};
+    final descriptors = <String, ExtensionBypass>{};
     runtimeErrors.clear();
     for (final inst in installed) {
       try {
@@ -220,11 +248,28 @@ class ExtensionStore extends ChangeNotifier {
 
         if (m.themeEntry != null) _themes[inst.id] = ExtensionTheme.parse(await read(m.themeEntry!));
         if (m.routingEntry != null) _routing[inst.id] = ExtensionRouting.parse(inst.id, await read(m.routingEntry!));
+        if (m.networkHookEntry != null) {
+          final descriptor = ExtensionBypass.parse(await read(m.networkHookEntry!));
+          if (!descriptor.supports(Platform.operatingSystem)) {
+            throw const FormatException('bypass backend is unavailable on this platform');
+          }
+          final settings = await getSettings(inst.id);
+          _validateSettingsValues(m.settingsSchema, settings);
+          final strategy = descriptor.select(settings);
+          descriptors[inst.id] = descriptor;
+          bypass[inst.id] = ExtensionBypassProfile(extensionId: inst.id, name: m.name, strategy: strategy);
+        }
       } catch (e) {
         runtimeErrors[inst.id] = e.toString();
         appendLog(inst.id, 'asset rejected: $e');
       }
     }
+    _bypass
+      ..clear()
+      ..addAll(bypass);
+    _bypassDescriptors
+      ..clear()
+      ..addAll(descriptors);
   }
 
   bool get loaded => _loaded;
@@ -662,6 +707,8 @@ class ExtensionStore extends ChangeNotifier {
     _installed.remove(id);
     _themes.remove(id);
     _routing.remove(id);
+    _bypass.remove(id);
+    _bypassDescriptors.remove(id);
     _runtimeLogs.remove(id);
     runtimeErrors.remove(id);
     await _save();
@@ -757,7 +804,17 @@ class ExtensionStore extends ChangeNotifier {
       }
     }
     merged.addAll(values);
+    if (inst.manifest.networkHookEntry != null) {
+      final descriptor = _bypassDescriptors[id];
+      if (descriptor == null) throw ExtAssetError('bypass descriptor is unavailable');
+      try {
+        descriptor.select({..._schemaDefaults(inst.manifest), ...merged});
+      } on FormatException catch (error) {
+        throw ExtAssetError(error.message);
+      }
+    }
     await f.writeAsString(jsonEncode(merged), flush: true);
+    if (inst.manifest.networkHookEntry != null) await _loadRuntimeAssets();
     notifyListeners();
   }
 

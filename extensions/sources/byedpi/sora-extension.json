@@ -1,0 +1,37 @@
+{
+  "manifest_version": 1,
+  "id": "org.sora.byedpi",
+  "name": "ByeDPI",
+  "version": "1.0.0",
+  "min_app_version": "1.1.2",
+  "description": "Profiles for the built-in ByeDPI backend on Windows. Select a profile and connect explicitly. No native binaries are supplied by this extension.",
+  "author": {
+    "name": "Sora",
+    "identity": "github:levvs-one",
+    "public_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
+  },
+  "permissions": [
+    "net.hooks"
+  ],
+  "capabilities": [
+    "network-hook"
+  ],
+  "network_hook": {
+    "entry": "hook.json"
+  },
+  "settings_schema": {
+    "type": "object",
+    "properties": {
+      "profile": {
+        "type": "string",
+        "title": "DPI",
+        "enum": [
+          "TCP+TLS",
+          "TLS",
+          "HTTP"
+        ],
+        "default": "TCP+TLS"
+      }
+    }
+  }
+}

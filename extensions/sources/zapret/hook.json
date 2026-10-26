@@ -1,0 +1,28 @@
+{
+  "hook_version": 2,
+  "backend": "tpws",
+  "profiles": {
+    "TCP+TLS": {
+      "splitPos": [
+        "1",
+        "midsld"
+      ],
+      "disorder": true,
+      "tlsRecord": "1"
+    },
+    "TLS": {
+      "splitPos": [
+        "1"
+      ],
+      "tlsRecord": "1"
+    },
+    "HTTP": {
+      "splitPos": [
+        "2"
+      ],
+      "hostCase": true,
+      "domainCase": true,
+      "methodEol": true
+    }
+  }
+}

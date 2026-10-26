@@ -19,6 +19,8 @@ import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 import '../../rules.dart';
+import '../../sora.dart';
+import '../../ext/bypass.dart';
 import 'panel_screen.dart';
 import 'permissions_sheet.dart';
 import 'widgets.dart';
@@ -335,6 +337,10 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
             ),
           const SizedBox(height: 12),
         ],
+        if (store.bypassProfile('$extensionBypassPrefix${live.id}') != null) ...[
+          PrimaryButton(label: s.trayConnect, busy: _saving, onTap: _saving ? null : () => _connectBypass(live.id)),
+          const SizedBox(height: 12),
+        ],
         SwitchTile(
           title: s.extEnabled,
           value: live.enabled,
@@ -404,6 +410,27 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
             ..showSnackBar(SnackBar(content: Text(s.extErrGeneric)));
         }
       }
+    }
+  }
+
+  Future<void> _connectBypass(String id) async {
+    final store = ExtScope.of(context);
+    setState(() => _saving = true);
+    try {
+      await store.setSettings(id, _settings ?? await store.getSettings(id));
+      final profile = store.bypassProfile('$extensionBypassPrefix$id');
+      if (profile == null) throw ExtAssetError('bypass profile is unavailable');
+      if (!mounted) return;
+      final sora = SoraScope.read(context);
+      await sora.change((settings) => settings.tunnel = 'tun', replan: false);
+      await sora.select(profile.choiceId);
+      if (sora.phase == Phase.off || sora.phase == Phase.offline) await sora.connect();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).extAssetRejected)));
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 

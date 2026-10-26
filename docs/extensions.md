@@ -472,9 +472,71 @@ no active contributions. Logs show overlaps and runtime failures.
 Source examples with throwaway public keys and local build/sign guides:
 `examples/theme-midnight`, `examples/routing-split`.
 
-### 8.3 Network hooks: not applied
+### 8.3 Selected bypass profiles
 
-`network_hook` still requires capability `network-hook`, permission
-`net.hooks` and a safe descriptor entry. Packages can carry that descriptor,
-but **network hooks are not applied**. Hook loading and DPI bypass remain
-out of scope. No worker or declarative API exposes a traffic hook.
+The app consumes version-2 declarative profiles through the existing
+`network_hook` pointer, `network-hook` capability and dangerous `net.hooks`
+permission. This is not a worker callback on packets.
+
+```json
+{
+  "hook_version": 2,
+  "backend": "tpws",
+  "profiles": {
+    "TCP+TLS": {"splitPos":["1","midsld"],"disorder":true,"tlsRecord":"1"},
+    "HTTP": {"splitPos":["2"],"hostCase":true,"domainCase":true,"methodEol":true}
+  }
+}
+```
+
+Only `tpws` on Linux and `byedpi` on Windows are accepted. These are
+installed host backends: an extension never supplies their executable.
+The descriptor is at most 1 MiB, contains 1..16 profiles with nonblank
+names of at most 64 UTF-8 bytes, and each value is a protobuf-JSON
+`BypassStrategy`. Unknown top-level and strategy fields reject the asset.
+The extension's schema supplies a string setting named `profile` whose
+default names an existing profile. The app rejects unknown selections
+before writing settings. The CLI checks descriptor shape and protobuf
+types; core plan validation checks native strategy semantics before start.
+
+There are no executable paths, scripts, flags, arbitrary engine fragments,
+packet-reading callbacks or new credential APIs. The old proposed version-1
+engine-fragment descriptor is not interpreted as version 2. Windows
+WinDivert/winws is a separate unfinished adapter, not a SOCKS backend and
+not supplied by these profiles.
+
+Installation does not select or connect a profile. Enabled, granted holders
+of net.hooks use the existing exclusive conflict decision, including
+contenders with invalid assets. The user selects the winning profile in
+the mode picker or connects explicitly from its detail screen. Its plan
+contains a copy of that strategy, separate from manual bypass settings.
+Changing an active profile reuses the serialized authenticated core
+Connect flow. A failed replacement retains the old core session. Disabling,
+removing, revoking or losing the selected grant/winner stops that session
+instead of silently substituting another profile. The selection remains
+visible; reconnect fails until it becomes available or the user chooses
+another mode. Cancellation cannot undo a request already accepted by the
+core; an in-flight connection is followed by Disconnect.
+
+The app owns this grant boundary. The core validates an ordinary control
+peer's SessionPlan and does not independently attest the app's extension
+registry or grants. A compromised app/control peer remains outside it.
+
+Sources: `extensions/sources/zapret` (Linux built-in settings) and
+`extensions/sources/byedpi` (Windows driverless backend).
+They are source projects, not published catalog entries. Production
+publication must choose the actual first host release with this consumer
+and set the matching min_app_version before author/team signing.
+The source's minimum version is not deployment evidence.
+
+Catalog bytes and packages are delivered separately from the application.
+Opening/refreshing the catalog fetches and verifies its current team
+signature; compatible additions require no client rebuild. A new native
+backend or API still requires a host that implements it. Catalog visibility
+must not imply installability or claim that old clients have new capabilities.
+The present implementation still needs upfront platform/version presentation
+before these new sources are published.
+
+No profile promises DPI evasion on every network. Loading a Windows driver
+in a disposable test environment proves neither shaping effectiveness nor
+support for every Windows edition, architecture and protection configuration.

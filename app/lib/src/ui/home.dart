@@ -343,7 +343,7 @@ class _ServerCard extends StatelessWidget {
     final s = S.of(context);
     final palette = Palette.of(context);
     final offline = sora.phase == Phase.offline;
-    final empty = sora.servers.isEmpty && sora.selected != 'bypass';
+    final empty = sora.servers.isEmpty && !sora.bypassSelected;
     final selected = sora.selected;
     final name = empty
         ? s.addSubscription

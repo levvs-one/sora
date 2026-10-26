@@ -78,8 +78,8 @@ const List<ExtEnforcementRow> extEnforcementTable = [
   ),
   ExtEnforcementRow(
     'net.hooks',
-    ExtEnforcementStatus.unimplemented,
-    'RiskDangerous with zero enforcement code: no consumer runs extension hooks yet',
+    ExtEnforcementStatus.enforced,
+    'app-selected version-2 profiles for installed tpws/byedpi only; enabled grants and conflict winner; disable disconnects; no native execution or arbitrary engine fragments',
   ),
   ExtEnforcementRow(
     'net.fetch',
