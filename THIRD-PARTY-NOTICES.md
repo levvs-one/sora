@@ -42,6 +42,7 @@ Sora их не изменяет. olcrtc собирается из закрепл
 | go-winio | MIT |
 | tailscale/wf | BSD-3-Clause |
 | gopacket/gopacket 1.7.4 | BSD-3-Clause |
+| go.yaml.in/yaml/v4 4.0.0-rc.6 (импорт подписок) | Apache-2.0, MIT для файлов libyaml |
 
 Тексты лицензий: GPL-3.0 в файле `LICENSE`, Inter в `Inter-LICENSE.txt`, zapret в `zapret-LICENSE.txt` пакета `sora-core`. Лицензии остальных компонентов лежат в их исходном коде по ссылкам выше и на pub.dev.
 
@@ -54,6 +55,54 @@ Linux- и Windows-плагины сохранены в `app/third_party` с пр
 в их `README.md`.
 
 Copyright 2021-2026 [Abandoft](https://github.com/abandoft)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## go-yaml v4
+
+Импорт YAML-подписок использует неизменённый `go.yaml.in/yaml/v4` v4.0.0-rc.6.
+Источник: https://github.com/yaml/go-yaml/tree/v4.0.0-rc.6
+Текст Apache-2.0 приведён в разделе google/pprof.
+
+NOTICE upstream:
+
+The following files were ported to Go from C files of libyaml, and thus are
+still covered by their original MIT license, with the additional copyright
+starting in 2011 when the project was ported over:
+
+- internal/libyaml/api.go
+- internal/libyaml/emitter.go
+- internal/libyaml/parser.go
+- internal/libyaml/reader.go
+- internal/libyaml/scanner.go
+- internal/libyaml/writer.go
+- internal/libyaml/yaml.go
+- internal/libyaml/yamlprivate.go
+
+Copyright 2006-2010 Kirill Simonov
+https://opensource.org/license/mit
+
+All the remaining project files are covered by the Apache license:
+
+Copyright 2011-2019 Canonical Ltd
+Copyright 2025 The go-yaml Project Contributors
+http://www.apache.org/licenses/LICENSE-2.0
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

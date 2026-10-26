@@ -15,6 +15,7 @@ require (
 	github.com/shirou/gopsutil/v4 v4.26.9
 	github.com/tailscale/wf v0.0.0-20240214030419-6fbb0a674ee6
 	github.com/txthinking/socks5 v0.0.0-20260601051520-339b044ab0eb
+	go.yaml.in/yaml/v4 v4.0.0-rc.6
 	golang.org/x/net v0.60.0
 	golang.org/x/sys v0.48.0
 	google.golang.org/grpc v1.83.2

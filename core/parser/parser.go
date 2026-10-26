@@ -19,7 +19,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v4"
+	"go.yaml.in/yaml/v4/plugin/limit"
 
 	"github.com/levvs-one/sora-client/core/engine"
 
@@ -815,7 +816,7 @@ func (p LinkParser) parseYAML(b []byte) (ImportResult, error) {
 	var root struct {
 		Proxies []map[string]any `yaml:"proxies"`
 	}
-	if yaml.Unmarshal(b, &root) != nil {
+	if yaml.Load(b, &root, yaml.WithV3Defaults(), yaml.WithPlugin(limit.New(limit.DepthValue(128)))) != nil {
 		return ImportResult{Format: FormatClash}, ErrInvalid
 	}
 	r := ImportResult{Format: FormatClash}
