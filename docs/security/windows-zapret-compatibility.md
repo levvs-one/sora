@@ -68,3 +68,13 @@ Sources: [Zapret Windows contract](https://github.com/bol-van/zapret/blob/v72.13
 [Cygwin licensing](https://www.cygwin.com/licensing.html),
 [IsWow64Process2](https://learn.microsoft.com/en-us/windows/win32/api/wow64apiset/nf-wow64apiset-iswow64process2),
 [Get-AuthenticodeSignature](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-authenticodesignature).
+
+## First hosted execution
+
+Job 121599815769 (run 40330923486, 0225ff61) passed the pinned-file/architecture
+and WLANAPI checks, but stopped before launching winws: a Windows PowerShell 5.1
+child inherited the PowerShell 7 module environment and could not auto-load
+`Microsoft.PowerShell.Security`. No driver initialization was attempted by that
+run. The fixture now invokes PowerShell 7, matching its CI shell and documented
+API. The valid-signature requirement is retained; this is not a signature or
+kernel-policy bypass. Native loader and cleanup results are still pending.

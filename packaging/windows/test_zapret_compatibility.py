@@ -23,7 +23,7 @@ FILES = {
 
 def powershell(source, work):
     result = subprocess.run(
-        ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", source],
+        ["pwsh.exe", "-NoProfile", "-NonInteractive", "-Command", source],
         env={**os.environ, "SORA_WINWS_FIXTURE_DIR": str(work)},
         capture_output=True, text=True, timeout=20, check=False,
     )
