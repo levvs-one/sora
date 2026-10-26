@@ -321,8 +321,11 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       if (dir.isEmpty) throw StateError('gone');
       _server = LocalPanelServer(dir, entry: _panel.entry, bootstrap: PanelBridge.bootstrapJs);
       _origin = await _server!.start();
-      if (!mounted || generation != _generation) return;
-      final controller = _controller ??= WebViewPlatform.instance is LinuxWebViewPlatform
+      if (!mounted || generation != _generation) {
+        await _server?.stop();
+        return;
+      }
+      final controller = WebViewPlatform.instance is LinuxWebViewPlatform
           ? WebViewController.fromPlatformCreationParams(
               const LinuxWebViewControllerCreationParams(
                 pageCacheEnabled: false,
@@ -376,7 +379,9 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
         },
       );
       if (!mounted || generation != _generation) return;
+      setState(() => _controller = controller);
       await controller.loadRequest(_origin!.resolve(_panel.entry));
+      if (!mounted || generation != _generation) return;
       _watchSora();
     } catch (_) {
       if (mounted && generation == _generation) {
