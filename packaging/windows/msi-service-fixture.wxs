@@ -17,7 +17,8 @@
             <File Id="ProbeExe" Source="$(var.Input)/probe.exe"/>
             <ServiceInstall Id="FixtureService" Name="$(var.Service)" DisplayName="Sora MSI isolated fixture"
                             Type="ownProcess" Start="demand" ErrorControl="normal" Arguments="run $(var.Service)"/>
-            <ServiceControl Id="FixtureControl" Name="$(var.Service)" Start="install" Stop="both" Remove="uninstall" Wait="yes"/>
+            <ServiceControl Id="FixtureStart" Name="$(var.Service)" Start="install" Wait="no"/>
+            <ServiceControl Id="FixtureStop" Name="$(var.Service)" Stop="both" Remove="uninstall" Wait="yes"/>
           </Component>
         </Directory>
       </Directory>

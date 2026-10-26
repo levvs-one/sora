@@ -74,8 +74,10 @@ def build(output, service=False):
                 raise RuntimeError("Fixture requires a demand-start LocalSystem service without a password")
             control = subprocess.check_output(["msiinfo", "export", str(package), "ServiceControl"], text=True)
             rows = list(csv.reader(io.StringIO(control), delimiter="\t"))[3:]
-            if len(rows) != 1 or rows[0][1:5] != [service_name, "163", "", "1"]:
-                raise RuntimeError("Fixture must start, wait, stop and uninstall through native MSI service actions")
+            if len(rows) != 2 or sorted(row[1:5] for row in rows) != sorted([
+                [service_name, "1", "", "0"], [service_name, "162", "", "1"],
+            ]):
+                raise RuntimeError("Fixture must wait for stop/removal, with bounded independent startup readiness")
         custom = subprocess.check_output(["msiinfo", "export", str(package), "CustomAction"], text=True)
         rows = list(csv.reader(io.StringIO(custom), delimiter="\t"))[3:]
         gate = [row for row in rows if row and row[0] == "ProbeReady"]

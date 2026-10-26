@@ -73,7 +73,18 @@ readiness with matching pipe/SCM PID 4160, then timed out at the failed new
 service's `StartServices` operation after 120 seconds. Restoration is not yet
 confirmed. The follow-up makes the mandatory-service bit explicit and retains
 flushed MSI logs, a timeout SCM snapshot and checker output. The timeout and
-old-running/registration assertions remain unchanged; native execution awaits CI.
+old-running/registration assertions remain unchanged. The vital-bit follow-up
+(40247519100/job 121332412620) also timed out. Its snapshot established that
+the fixture really stopped with Win32 exit 1066/service exit 7 and PID 0, while
+MSI remained in `StartServices`; the mandatory-service bit alone did not resolve
+the wait.
+
+Startup now has its own MSI control row with `Wait=0`; a separate stop/removal
+row retains `Wait=1` before file replacement. The checked gate observes SCM
+startup with the existing manager API and a standard-library ticker, rejects
+`Stopped`, and uses one five-second context/deadline for readiness and the pipe
+reply. It does not start services or relax the old-running assertions. Native
+execution of this bounded-start design still awaits CI.
 
 Local construction requires explicit removal sequence 1501: with multiple
 custom actions wixl's relative ordering produced 5903, caught by the existing

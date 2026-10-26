@@ -75,21 +75,37 @@ func checkService(name, expected string) error {
 		return err
 	}
 	defer func() { _ = service.Close() }()
-	before, err := service.Query()
-	if err != nil {
-		return err
-	}
-	if before.State != svc.Running || before.ProcessId == 0 {
-		return errors.New("fixture service is not running")
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	ticker := time.NewTicker(50 * time.Millisecond)
+	defer ticker.Stop()
+	var before svc.Status
+	for {
+		before, err = service.Query()
+		if err != nil {
+			return err
+		}
+		if before.State == svc.Running && before.ProcessId != 0 {
+			break
+		}
+		if before.State == svc.Stopped {
+			return fmt.Errorf("fixture service stopped with exit codes %d/%d", before.Win32ExitCode, before.ServiceSpecificExitCode)
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+		}
+	}
 	connection, err := winio.DialPipeContext(ctx, `\\.\pipe\`+name)
 	if err != nil {
 		return err
 	}
 	defer func() { _ = connection.Close() }()
-	_ = connection.SetDeadline(time.Now().Add(5 * time.Second))
+	deadline, _ := ctx.Deadline()
+	if err := connection.SetDeadline(deadline); err != nil {
+		return err
+	}
 	pipe, ok := connection.(interface{ Fd() uintptr })
 	if !ok {
 		return errors.New("fixture connection has no kernel pipe handle")
