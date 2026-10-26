@@ -224,6 +224,33 @@ jobs:
           path: ${{ runner.temp }}/msi-fixtures
           if-no-files-found: error
 
+  windows-zapret-compatibility:
+    name: Windows Zapret loader compatibility
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download pinned upstream archive
+        shell: pwsh
+        run: |
+          curl.exe --fail --location --proto '=https' --connect-timeout 15 --max-time 120 --max-filesize 7959200 --output "$env:RUNNER_TEMP/zapret-v72.13.zip" https://github.com/bol-van/zapret/releases/download/v72.13/zapret-v72.13.zip
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned Zapret fixture download failed' }
+      - name: Signed driver initializes with a filter that captures nothing
+        shell: pwsh
+        env:
+          SORA_ISOLATED_ZAPRET_TEST: '1'
+        run: |
+          python -B packaging/windows/test_zapret_compatibility.py "$env:RUNNER_TEMP/zapret-v72.13.zip" "$env:RUNNER_TEMP/sora-zapret-loader" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/zapret-loader-evidence.log"
+          if ($LASTEXITCODE -ne 0) { throw 'Native Zapret loader compatibility failed' }
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-zapret-loader-evidence
+          path: |
+            ${{ runner.temp }}/zapret-loader-evidence.log
+            ${{ runner.temp }}/sora-zapret-loader/winws.log
+          if-no-files-found: ignore
+
   windows:
     name: Windows
     needs: [msi-rollback-fixture]
