@@ -53,6 +53,10 @@ def build(output, service=False):
         compiled = subprocess.run(command + [str(source / template)], capture_output=True, text=True, timeout=60)
         if compiled.returncode or compiled.stderr.strip():
             raise RuntimeError("MSI compiler warning/failure: " + compiled.stdout + compiled.stderr)
+        if service:
+            # Wixl 0.106 ignores Vital; its companion tool authors the native mandatory-service bit.
+            subprocess.run(["msibuild", str(package), "-q", "UPDATE ServiceInstall SET ErrorControl = 32769"],
+                           check=True, timeout=10)
         sequence = subprocess.check_output(["msiinfo", "export", str(package), "InstallExecuteSequence"], text=True)
         rows = list(csv.reader(io.StringIO(sequence), delimiter="\t"))[3:]
         actions = {row[0]: int(row[2]) for row in rows if row}
@@ -66,7 +70,7 @@ def build(output, service=False):
                 raise RuntimeError("Readiness must check the running service inside the transaction")
             install = subprocess.check_output(["msiinfo", "export", str(package), "ServiceInstall"], text=True)
             rows = list(csv.reader(io.StringIO(install), delimiter="\t"))[3:]
-            if len(rows) != 1 or rows[0][1] != service_name or rows[0][3:6] != ["16", "3", "1"] or rows[0][8:10] != ["", ""]:
+            if len(rows) != 1 or rows[0][1] != service_name or rows[0][3:6] != ["16", "3", "32769"] or rows[0][8:10] != ["", ""]:
                 raise RuntimeError("Fixture requires a demand-start LocalSystem service without a password")
             control = subprocess.check_output(["msiinfo", "export", str(package), "ServiceControl"], text=True)
             rows = list(csv.reader(io.StringIO(control), delimiter="\t"))[3:]

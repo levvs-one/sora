@@ -68,16 +68,23 @@ fails during `StartPending`, refusal after new service readiness and new file
 observation, successful retry, and removal of files/product/service registrations.
 Both rejected upgrades must restore old bytes, old product registration and a
 running old-version pipe response. A saved JSON record reports each result.
-The native service profile result still awaits CI; local cross-build/table
-inspection is construction evidence only.
+The first service run (40246925410/job 121330587711) confirmed old-version
+readiness with matching pipe/SCM PID 4160, then timed out at the failed new
+service's `StartServices` operation after 120 seconds. Restoration is not yet
+confirmed. The follow-up makes the mandatory-service bit explicit and retains
+flushed MSI logs, a timeout SCM snapshot and checker output. The timeout and
+old-running/registration assertions remain unchanged; native execution awaits CI.
 
 Local construction requires explicit removal sequence 1501: with multiple
 custom actions wixl's relative ordering produced 5903, caught by the existing
 table assertion before execution. The service table is inspected for own-process,
 demand-start, passwordless LocalSystem and wait/start/stop/uninstall flags. The
-compiler does not implement the parsed `Vital` service flag, so no protection
-is attributed to that XML attribute. The separate checked readiness action is
-mandatory. The runner checks removal using the native missing-service error.
+compiler does not implement the parsed `Vital` service flag. Its existing
+companion `msibuild` therefore sets the native `msidbServiceInstallErrorControlVital`
+bit in the single service row; the exported table must contain exactly 32769
+(normal plus vital). No handwritten MSI database writer is introduced. The
+separate checked readiness action remains mandatory. The runner checks removal
+using the native missing-service error.
 
 ## Tool choice
 

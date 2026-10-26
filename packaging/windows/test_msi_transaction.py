@@ -57,13 +57,16 @@ def verify(directory):
                 log = logs / f"{phase}.log"
                 # Msiexec quotes property values, unlike the CRT's whole-argument quoting.
                 command = subprocess.list2cmdline([
-                    "msiexec.exe", "/i", str(directory / f"{name}.msi"), "/qn", "/norestart", "/L*v", str(log),
+                    "msiexec.exe", "/i", str(directory / f"{name}.msi"), "/qn", "/norestart", "/L*v!", str(log),
                 ]) + f' INSTALLFOLDER="{target}" OBSERVATION="{observation}" PROBEFAIL={int(fail)}'
                 (logs / f"{phase}-command.txt").write_text(command + "\n", encoding="utf-8")
-                result = subprocess.run(
-                    command,
-                    capture_output=True, timeout=120,
-                )
+                try:
+                    result = subprocess.run(command, capture_output=True, timeout=120)
+                except subprocess.TimeoutExpired:
+                    if service:
+                        snapshot = subprocess.run(["sc.exe", "queryex", service], capture_output=True, timeout=10)
+                        (logs / f"{phase}-scm.txt").write_bytes(snapshot.stdout + snapshot.stderr)
+                    raise
                 if (result.returncode == 0) == refused:
                     raise RuntimeError(f"{phase}: unexpected installer exit {result.returncode}; see {log}")
                 observed = json.loads(observation.read_text(encoding="utf-8")) if observation.exists() else None
@@ -80,7 +83,9 @@ def verify(directory):
                 health = None
                 if service:
                     ready = subprocess.run([str(target / "service.exe"), "check", service, expected.strip()],
-                                           capture_output=True, text=True, check=True, timeout=15)
+                                           capture_output=True, text=True, timeout=15)
+                    (logs / f"{phase}-health.txt").write_text(ready.stdout + ready.stderr, encoding="utf-8")
+                    ready.check_returncode()
                     health = json.loads(ready.stdout)
                     if health["version"] != expected.strip() or not health["pipe_pid"] or health["pipe_pid"] != health["scm_pid"]:
                         raise RuntimeError("Readiness did not identify the restored/committed service")
@@ -92,7 +97,7 @@ def verify(directory):
             for index, product in enumerate(products):
                 if state(product) in (1, 5):
                     result = subprocess.run(
-                        ["msiexec.exe", "/x", product, "/qn", "/norestart", "/L*v", str(logs / f"cleanup-{index}.log")],
+                        ["msiexec.exe", "/x", product, "/qn", "/norestart", "/L*v!", str(logs / f"cleanup-{index}.log")],
                         capture_output=True, timeout=120,
                     )
                     if result.returncode or state(product) == 5:
