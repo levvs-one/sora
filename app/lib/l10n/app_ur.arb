@@ -1033,5 +1033,6 @@
   "customServerCipher": "خفیہ کاری",
   "customServerWgInterface": "انٹرفیس",
   "customServerWgPeer": "پیئر",
-  "customServerOptionsInfo": "فراہم کنندہ کی ٹرانسپورٹ اور TLS ترتیبات استعمال کریں یا سرور کا لنک پیسٹ کریں۔"
+  "customServerOptionsInfo": "فراہم کنندہ کی ٹرانسپورٹ اور TLS ترتیبات استعمال کریں یا سرور کا لنک پیسٹ کریں۔",
+  "extAvailableOn": "ان پلیٹ فارمز پر دستیاب: {platforms}۔"
 }

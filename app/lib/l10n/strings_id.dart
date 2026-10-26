@@ -2118,4 +2118,9 @@ class SId extends S {
   @override
   String get customServerOptionsInfo =>
       'Gunakan pengaturan transportasi dan TLS dari penyedia, atau tempel tautan server.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Tersedia di: $platforms.';
+  }
 }

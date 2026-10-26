@@ -2133,4 +2133,9 @@ class SRu extends S {
   @override
   String get customServerOptionsInfo =>
       'Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Доступно на: $platforms.';
+  }
 }

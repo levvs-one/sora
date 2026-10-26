@@ -2109,4 +2109,9 @@ class SUr extends S {
   @override
   String get customServerOptionsInfo =>
       'فراہم کنندہ کی ٹرانسپورٹ اور TLS ترتیبات استعمال کریں یا سرور کا لنک پیسٹ کریں۔';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'ان پلیٹ فارمز پر دستیاب: $platforms۔';
+  }
 }

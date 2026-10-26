@@ -2138,4 +2138,9 @@ class SEs extends S {
   @override
   String get customServerOptionsInfo =>
       'Usa los ajustes de transporte y TLS de tu proveedor o pega un enlace del servidor.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Disponible en: $platforms.';
+  }
 }

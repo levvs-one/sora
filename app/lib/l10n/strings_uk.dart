@@ -2138,4 +2138,9 @@ class SUk extends S {
   @override
   String get customServerOptionsInfo =>
       'Укажіть параметри транспорту й TLS із налаштувань провайдера або вставте посилання на сервер.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Доступно на: $platforms.';
+  }
 }

@@ -2080,4 +2080,9 @@ class SJa extends S {
 
   @override
   String get customServerOptionsInfo => 'プロバイダー指定のトランスポートとTLS設定を入力するか、サーバーリンクを貼り付けてください。';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '対応プラットフォーム: $platforms。';
+  }
 }

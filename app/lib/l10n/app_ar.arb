@@ -1033,5 +1033,6 @@
   "customServerCipher": "التشفير",
   "customServerWgInterface": "الواجهة",
   "customServerWgPeer": "النظير",
-  "customServerOptionsInfo": "استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم."
+  "customServerOptionsInfo": "استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم.",
+  "extAvailableOn": "متاح على: {platforms}."
 }

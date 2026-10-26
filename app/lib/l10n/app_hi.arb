@@ -1033,5 +1033,6 @@
   "customServerCipher": "साइफ़र",
   "customServerWgInterface": "इंटरफ़ेस",
   "customServerWgPeer": "पीयर",
-  "customServerOptionsInfo": "प्रदाता की ट्रांसपोर्ट और TLS सेटिंग का उपयोग करें या सर्वर लिंक पेस्ट करें।"
+  "customServerOptionsInfo": "प्रदाता की ट्रांसपोर्ट और TLS सेटिंग का उपयोग करें या सर्वर लिंक पेस्ट करें।",
+  "extAvailableOn": "इन पर उपलब्ध: {platforms}।"
 }

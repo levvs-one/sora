@@ -1033,5 +1033,6 @@
   "customServerCipher": "Şifreleme",
   "customServerWgInterface": "Arayüz",
   "customServerWgPeer": "Eş",
-  "customServerOptionsInfo": "Sağlayıcınızın taşıma ve TLS ayarlarını kullanın veya sunucu bağlantısını yapıştırın."
+  "customServerOptionsInfo": "Sağlayıcınızın taşıma ve TLS ayarlarını kullanın veya sunucu bağlantısını yapıştırın.",
+  "extAvailableOn": "Kullanılabilir platformlar: {platforms}."
 }

@@ -2097,4 +2097,9 @@ class STh extends S {
 
   @override
   String get customServerOptionsInfo => 'ใช้การตั้งค่าการรับส่งข้อมูลและ TLS จากผู้ให้บริการ หรือวางลิงก์เซิร์ฟเวอร์';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'ใช้ได้บน: $platforms';
+  }
 }

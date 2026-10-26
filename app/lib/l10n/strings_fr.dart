@@ -2146,4 +2146,9 @@ class SFr extends S {
   @override
   String get customServerOptionsInfo =>
       'Utilisez les paramètres de transport et TLS de votre fournisseur ou collez un lien de serveur.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Disponible sur : $platforms.';
+  }
 }

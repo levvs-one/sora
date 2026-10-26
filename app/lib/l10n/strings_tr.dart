@@ -2121,4 +2121,9 @@ class STr extends S {
   @override
   String get customServerOptionsInfo =>
       'Sağlayıcınızın taşıma ve TLS ayarlarını kullanın veya sunucu bağlantısını yapıştırın.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Kullanılabilir platformlar: $platforms.';
+  }
 }

@@ -1033,5 +1033,6 @@
   "customServerCipher": "შიფრი",
   "customServerWgInterface": "ინტერფეისი",
   "customServerWgPeer": "პირი",
-  "customServerOptionsInfo": "გამოიყენეთ პროვაიდერის გადაცემისა და TLS პარამეტრები ან ჩასვით სერვერის ბმული."
+  "customServerOptionsInfo": "გამოიყენეთ პროვაიდერის გადაცემისა და TLS პარამეტრები ან ჩასვით სერვერის ბმული.",
+  "extAvailableOn": "ხელმისაწვდომია: {platforms}."
 }

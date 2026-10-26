@@ -3974,6 +3974,12 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер.'**
   String get customServerOptionsInfo;
+
+  /// No description provided for @extAvailableOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступно на: {platforms}.'**
+  String extAvailableOn(String platforms);
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

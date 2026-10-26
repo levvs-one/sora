@@ -2133,4 +2133,9 @@ class SAr extends S {
 
   @override
   String get customServerOptionsInfo => 'استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'متاح على: $platforms.';
+  }
 }

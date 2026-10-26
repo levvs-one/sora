@@ -2118,4 +2118,9 @@ class SHy extends S {
   @override
   String get customServerOptionsInfo =>
       'Օգտագործեք մատակարարի տրամադրած փոխադրման և TLS կարգավորումները կամ տեղադրեք սերվերի հղումը։';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Հասանելի է՝ $platforms։';
+  }
 }

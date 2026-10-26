@@ -2118,4 +2118,9 @@ class SKy extends S {
   @override
   String get customServerOptionsInfo =>
       'Провайдердин транспорт жана TLS параметрлерин киргизиңиз же сервердин шилтемесин чаптаңыз.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Жеткиликтүү платформалар: $platforms.';
+  }
 }

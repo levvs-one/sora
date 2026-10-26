@@ -1033,5 +1033,6 @@
   "customServerCipher": "Chiffrement",
   "customServerWgInterface": "Interface",
   "customServerWgPeer": "Pair",
-  "customServerOptionsInfo": "Utilisez les paramètres de transport et TLS de votre fournisseur ou collez un lien de serveur."
+  "customServerOptionsInfo": "Utilisez les paramètres de transport et TLS de votre fournisseur ou collez un lien de serveur.",
+  "extAvailableOn": "Disponible sur : {platforms}."
 }

@@ -2116,4 +2116,9 @@ class SKk extends S {
   @override
   String get customServerOptionsInfo =>
       'Провайдер берген тасымалдау және TLS параметрлерін енгізіңіз немесе сервер сілтемесін қойыңыз.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Қолжетімді платформалар: $platforms.';
+  }
 }

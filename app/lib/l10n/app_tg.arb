@@ -1033,5 +1033,6 @@
   "customServerCipher": "Рамз",
   "customServerWgInterface": "Интерфейс",
   "customServerWgPeer": "Ҳамто",
-  "customServerOptionsInfo": "Танзимоти интиқол ва TLS-и провайдерро ворид кунед ё пайванди серверро гузоред."
+  "customServerOptionsInfo": "Танзимоти интиқол ва TLS-и провайдерро ворид кунед ё пайванди серверро гузоред.",
+  "extAvailableOn": "Дар ин платформаҳо дастрас аст: {platforms}."
 }

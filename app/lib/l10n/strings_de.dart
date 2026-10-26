@@ -2153,4 +2153,9 @@ class SDe extends S {
   @override
   String get customServerOptionsInfo =>
       'Verwende die Transport- und TLS-Einstellungen deines Anbieters oder füge einen Serverlink ein.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Verfügbar für: $platforms.';
+  }
 }

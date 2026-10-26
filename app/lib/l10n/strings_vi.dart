@@ -2113,4 +2113,9 @@ class SVi extends S {
 
   @override
   String get customServerOptionsInfo => 'Dùng cài đặt truyền tải và TLS từ nhà cung cấp hoặc dán liên kết máy chủ.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Có trên: $platforms.';
+  }
 }

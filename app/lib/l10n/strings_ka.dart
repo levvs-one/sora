@@ -2116,4 +2116,9 @@ class SKa extends S {
   @override
   String get customServerOptionsInfo =>
       'გამოიყენეთ პროვაიდერის გადაცემისა და TLS პარამეტრები ან ჩასვით სერვერის ბმული.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'ხელმისაწვდომია: $platforms.';
+  }
 }

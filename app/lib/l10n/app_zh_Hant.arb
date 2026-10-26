@@ -1033,5 +1033,6 @@
   "customServerCipher": "加密方式",
   "customServerWgInterface": "介面",
   "customServerWgPeer": "對等端",
-  "customServerOptionsInfo": "請使用服務商提供的傳輸與 TLS 設定，或貼上伺服器連結。"
+  "customServerOptionsInfo": "請使用服務商提供的傳輸與 TLS 設定，或貼上伺服器連結。",
+  "extAvailableOn": "適用平台：{platforms}。"
 }

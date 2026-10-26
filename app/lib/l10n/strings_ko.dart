@@ -2080,4 +2080,9 @@ class SKo extends S {
 
   @override
   String get customServerOptionsInfo => '제공업체의 전송 및 TLS 설정을 사용하거나 서버 링크를 붙여넣으세요.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '지원 플랫폼: $platforms.';
+  }
 }

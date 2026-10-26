@@ -1033,5 +1033,6 @@
   "customServerCipher": "Mã hóa",
   "customServerWgInterface": "Giao diện",
   "customServerWgPeer": "Peer",
-  "customServerOptionsInfo": "Dùng cài đặt truyền tải và TLS từ nhà cung cấp hoặc dán liên kết máy chủ."
+  "customServerOptionsInfo": "Dùng cài đặt truyền tải và TLS từ nhà cung cấp hoặc dán liên kết máy chủ.",
+  "extAvailableOn": "Có trên: {platforms}."
 }

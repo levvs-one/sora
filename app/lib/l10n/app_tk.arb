@@ -1033,5 +1033,6 @@
   "customServerCipher": "Şifr",
   "customServerWgInterface": "Interfeýs",
   "customServerWgPeer": "Deňdeş",
-  "customServerOptionsInfo": "Üpjin edijiniň geçiriş we TLS sazlamalaryny giriziň ýa-da serwer salgysyny goýuň."
+  "customServerOptionsInfo": "Üpjin edijiniň geçiriş we TLS sazlamalaryny giriziň ýa-da serwer salgysyny goýuň.",
+  "extAvailableOn": "Elýeterli platformalar: {platforms}."
 }

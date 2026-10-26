@@ -2110,4 +2110,9 @@ class STk extends S {
   @override
   String get customServerOptionsInfo =>
       'Üpjin edijiniň geçiriş we TLS sazlamalaryny giriziň ýa-da serwer salgysyny goýuň.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Elýeterli platformalar: $platforms.';
+  }
 }

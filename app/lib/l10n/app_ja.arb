@@ -1033,5 +1033,6 @@
   "customServerCipher": "暗号方式",
   "customServerWgInterface": "インターフェース",
   "customServerWgPeer": "ピア",
-  "customServerOptionsInfo": "プロバイダー指定のトランスポートとTLS設定を入力するか、サーバーリンクを貼り付けてください。"
+  "customServerOptionsInfo": "プロバイダー指定のトランスポートとTLS設定を入力するか、サーバーリンクを貼り付けてください。",
+  "extAvailableOn": "対応プラットフォーム: {platforms}。"
 }

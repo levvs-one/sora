@@ -1033,5 +1033,6 @@
   "customServerCipher": "Şifr",
   "customServerWgInterface": "İnterfeys",
   "customServerWgPeer": "Qarşı tərəf",
-  "customServerOptionsInfo": "Provayderin verdiyi nəqliyyat və TLS parametrlərini daxil edin və ya server keçidini yapışdırın."
+  "customServerOptionsInfo": "Provayderin verdiyi nəqliyyat və TLS parametrlərini daxil edin və ya server keçidini yapışdırın.",
+  "extAvailableOn": "Bu platformalarda mövcuddur: {platforms}."
 }

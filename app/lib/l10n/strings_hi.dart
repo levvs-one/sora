@@ -2108,4 +2108,9 @@ class SHi extends S {
 
   @override
   String get customServerOptionsInfo => 'प्रदाता की ट्रांसपोर्ट और TLS सेटिंग का उपयोग करें या सर्वर लिंक पेस्ट करें।';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'इन पर उपलब्ध: $platforms।';
+  }
 }

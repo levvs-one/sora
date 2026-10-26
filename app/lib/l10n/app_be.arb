@@ -1033,5 +1033,6 @@
   "customServerCipher": "Шыфр",
   "customServerWgInterface": "Інтэрфейс",
   "customServerWgPeer": "Пір",
-  "customServerOptionsInfo": "Укажыце параметры транспарту і TLS з налад правайдара або ўстаўце спасылку на сервер."
+  "customServerOptionsInfo": "Укажыце параметры транспарту і TLS з налад правайдара або ўстаўце спасылку на сервер.",
+  "extAvailableOn": "Даступна на: {platforms}."
 }

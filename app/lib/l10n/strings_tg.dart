@@ -2115,4 +2115,9 @@ class STg extends S {
   @override
   String get customServerOptionsInfo =>
       'Танзимоти интиқол ва TLS-и провайдерро ворид кунед ё пайванди серверро гузоред.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Дар ин платформаҳо дастрас аст: $platforms.';
+  }
 }

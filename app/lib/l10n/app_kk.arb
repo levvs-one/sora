@@ -1033,5 +1033,6 @@
   "customServerCipher": "Шифр",
   "customServerWgInterface": "Интерфейс",
   "customServerWgPeer": "Пир",
-  "customServerOptionsInfo": "Провайдер берген тасымалдау және TLS параметрлерін енгізіңіз немесе сервер сілтемесін қойыңыз."
+  "customServerOptionsInfo": "Провайдер берген тасымалдау және TLS параметрлерін енгізіңіз немесе сервер сілтемесін қойыңыз.",
+  "extAvailableOn": "Қолжетімді платформалар: {platforms}."
 }

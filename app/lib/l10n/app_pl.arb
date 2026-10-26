@@ -1033,5 +1033,6 @@
   "customServerCipher": "Szyfr",
   "customServerWgInterface": "Interfejs",
   "customServerWgPeer": "Peer",
-  "customServerOptionsInfo": "Użyj ustawień transportu i TLS od dostawcy lub wklej link serwera."
+  "customServerOptionsInfo": "Użyj ustawień transportu i TLS od dostawcy lub wklej link serwera.",
+  "extAvailableOn": "Dostępne na: {platforms}."
 }

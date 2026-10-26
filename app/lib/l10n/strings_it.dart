@@ -2143,4 +2143,9 @@ class SIt extends S {
   @override
   String get customServerOptionsInfo =>
       'Usa le impostazioni di trasporto e TLS del fornitore o incolla un link del server.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Disponibile su: $platforms.';
+  }
 }

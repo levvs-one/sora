@@ -2112,4 +2112,9 @@ class SEn extends S {
   @override
   String get customServerOptionsInfo =>
       'Use the transport and TLS settings supplied by your provider, or paste a server link.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Available on: $platforms.';
+  }
 }

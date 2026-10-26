@@ -888,5 +888,13 @@
   "customServerCipher": "Cipher",
   "customServerWgInterface": "Interface",
   "customServerWgPeer": "Peer",
-  "customServerOptionsInfo": "Use the transport and TLS settings supplied by your provider, or paste a server link."
+  "customServerOptionsInfo": "Use the transport and TLS settings supplied by your provider, or paste a server link.",
+  "extAvailableOn": "Available on: {platforms}.",
+  "@extAvailableOn": {
+    "placeholders": {
+      "platforms": {
+        "type": "String"
+      }
+    }
+  }
 }

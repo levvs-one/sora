@@ -1033,5 +1033,6 @@
   "customServerCipher": "Shifr",
   "customServerWgInterface": "Interfeys",
   "customServerWgPeer": "Tengdosh",
-  "customServerOptionsInfo": "Provayder bergan transport va TLS sozlamalarini kiriting yoki server havolasini joylashtiring."
+  "customServerOptionsInfo": "Provayder bergan transport va TLS sozlamalarini kiriting yoki server havolasini joylashtiring.",
+  "extAvailableOn": "Mavjud platformalar: {platforms}."
 }

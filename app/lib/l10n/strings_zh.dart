@@ -2076,6 +2076,11 @@ class SZh extends S {
 
   @override
   String get customServerOptionsInfo => '请使用服务商提供的传输和 TLS 设置，或粘贴服务器链接。';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '适用平台：$platforms。';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -4149,6 +4154,11 @@ class SZhHans extends SZh {
 
   @override
   String get customServerOptionsInfo => '请使用服务商提供的传输和 TLS 设置，或粘贴服务器链接。';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '适用平台：$platforms。';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -6223,4 +6233,9 @@ class SZhHant extends SZh {
 
   @override
   String get customServerOptionsInfo => '請使用服務商提供的傳輸與 TLS 設定，或貼上伺服器連結。';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '適用平台：$platforms。';
+  }
 }

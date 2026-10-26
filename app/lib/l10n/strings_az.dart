@@ -2120,4 +2120,9 @@ class SAz extends S {
   @override
   String get customServerOptionsInfo =>
       'Provayderin verdiyi nəqliyyat və TLS parametrlərini daxil edin və ya server keçidini yapışdırın.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Bu platformalarda mövcuddur: $platforms.';
+  }
 }

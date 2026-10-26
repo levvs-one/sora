@@ -1033,5 +1033,6 @@
   "customServerCipher": "Գաղտնագիր",
   "customServerWgInterface": "Միջերես",
   "customServerWgPeer": "Հասակակից",
-  "customServerOptionsInfo": "Օգտագործեք մատակարարի տրամադրած փոխադրման և TLS կարգավորումները կամ տեղադրեք սերվերի հղումը։"
+  "customServerOptionsInfo": "Օգտագործեք մատակարարի տրամադրած փոխադրման և TLS կարգավորումները կամ տեղադրեք սերվերի հղումը։",
+  "extAvailableOn": "Հասանելի է՝ {platforms}։"
 }

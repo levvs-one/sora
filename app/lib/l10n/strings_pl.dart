@@ -2144,4 +2144,9 @@ class SPl extends S {
 
   @override
   String get customServerOptionsInfo => 'Użyj ustawień transportu i TLS od dostawcy lub wklej link serwera.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Dostępne na: $platforms.';
+  }
 }

@@ -2137,4 +2137,9 @@ class SBe extends S {
   @override
   String get customServerOptionsInfo =>
       'Укажыце параметры транспарту і TLS з налад правайдара або ўстаўце спасылку на сервер.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Даступна на: $platforms.';
+  }
 }

@@ -1033,5 +1033,6 @@
   "customServerCipher": "การเข้ารหัส",
   "customServerWgInterface": "อินเทอร์เฟซ",
   "customServerWgPeer": "เพียร์",
-  "customServerOptionsInfo": "ใช้การตั้งค่าการรับส่งข้อมูลและ TLS จากผู้ให้บริการ หรือวางลิงก์เซิร์ฟเวอร์"
+  "customServerOptionsInfo": "ใช้การตั้งค่าการรับส่งข้อมูลและ TLS จากผู้ให้บริการ หรือวางลิงก์เซิร์ฟเวอร์",
+  "extAvailableOn": "ใช้ได้บน: {platforms}"
 }

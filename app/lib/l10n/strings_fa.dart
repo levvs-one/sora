@@ -2116,4 +2116,9 @@ class SFa extends S {
   @override
   String get customServerOptionsInfo =>
       'تنظیمات انتقال و TLS ارائه‌دهنده را وارد کنید یا پیوند سرور را جای‌گذاری کنید.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'در دسترس در: $platforms.';
+  }
 }

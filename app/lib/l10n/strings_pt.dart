@@ -2128,4 +2128,9 @@ class SPt extends S {
   @override
   String get customServerOptionsInfo =>
       'Use as configurações de transporte e TLS do provedor ou cole um link do servidor.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Disponível em: $platforms.';
+  }
 }

@@ -1033,5 +1033,6 @@
   "customServerCipher": "رمزنگاری",
   "customServerWgInterface": "رابط",
   "customServerWgPeer": "همتا",
-  "customServerOptionsInfo": "تنظیمات انتقال و TLS ارائه‌دهنده را وارد کنید یا پیوند سرور را جای‌گذاری کنید."
+  "customServerOptionsInfo": "تنظیمات انتقال و TLS ارائه‌دهنده را وارد کنید یا پیوند سرور را جای‌گذاری کنید.",
+  "extAvailableOn": "در دسترس در: {platforms}."
 }

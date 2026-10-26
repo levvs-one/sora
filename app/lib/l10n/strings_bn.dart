@@ -2117,4 +2117,9 @@ class SBn extends S {
   @override
   String get customServerOptionsInfo =>
       'প্রদানকারীর দেওয়া ট্রান্সপোর্ট ও TLS সেটিংস ব্যবহার করুন অথবা সার্ভারের লিংক পেস্ট করুন।';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'এগুলিতে উপলব্ধ: $platforms।';
+  }
 }

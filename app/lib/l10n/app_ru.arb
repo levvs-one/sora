@@ -1056,5 +1056,13 @@
   "customServerCipher": "Шифр",
   "customServerWgInterface": "Интерфейс",
   "customServerWgPeer": "Пир",
-  "customServerOptionsInfo": "Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер."
+  "customServerOptionsInfo": "Укажите параметры транспорта и TLS из настроек провайдера или вставьте ссылку на сервер.",
+  "extAvailableOn": "Доступно на: {platforms}.",
+  "@extAvailableOn": {
+    "placeholders": {
+      "platforms": {
+        "type": "String"
+      }
+    }
+  }
 }

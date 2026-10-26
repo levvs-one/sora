@@ -2124,4 +2124,9 @@ class SUz extends S {
   @override
   String get customServerOptionsInfo =>
       'Provayder bergan transport va TLS sozlamalarini kiriting yoki server havolasini joylashtiring.';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Mavjud platformalar: $platforms.';
+  }
 }
