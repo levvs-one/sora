@@ -12,6 +12,7 @@ import '../core/link.dart';
 import '../design/theme.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../sora.dart';
+import '../notifications.dart';
 import 'kit.dart';
 
 /// A WireGuard key: 32 bytes in standard base64, as `wg genkey` prints.
@@ -150,7 +151,6 @@ class _AddServerScreenState extends State<AddServerScreen> {
   Map<String, String> _material = {};
   late String _protocol;
   String _transport = '', _security = '';
-  String? _pasteError;
   bool _saving = false, _pasting = false, _filling = false;
   bool get _wireGuard => _protocol == 'wireguard';
   bool get _keepStored =>
@@ -232,7 +232,6 @@ class _AddServerScreenState extends State<AddServerScreen> {
     if (_busy) return;
     setState(() {
       _pasting = true;
-      _pasteError = null;
     });
     final sora = SoraScope.read(context);
     sora.recovered('custom-paste');
@@ -275,7 +274,16 @@ class _AddServerScreenState extends State<AddServerScreen> {
       if (!mounted) return;
       final failure = CoreFailure.from(error);
       if (failure.key.startsWith('core.subscription.') || failure.key == 'core.request.invalid') {
-        _pasteError = S.of(context).customServerLinkInvalid;
+        unawaited(
+          sora.recordNotification(
+            AppNotification(
+              time: DateTime.now(),
+              title: S.of(context).customServerOwn,
+              body: S.of(context).customServerLinkInvalid,
+              failureKey: 'form.custom.invalid_link',
+            ),
+          ),
+        );
       } else {
         sora.reportFailure(error, source: 'custom-paste', mode: FailureMode.action);
       }
@@ -324,7 +332,17 @@ class _AddServerScreenState extends State<AddServerScreen> {
   }
 
   Future<void> _save() async {
-    if (_busy || _problems().isNotEmpty) return;
+    if (_busy) return;
+    final errors = _problems();
+    if (errors.isNotEmpty) {
+      setState(() => _touched.addAll(errors.keys));
+      unawaited(
+        SoraScope.read(context).recordNotification(
+          AppNotification(time: DateTime.now(), title: S.of(context).customServerOwn, body: errors.values.first),
+        ),
+      );
+      return;
+    }
     setState(() => _saving = true);
     final draft = CustomServer(
       id: widget.server?.id,
@@ -373,23 +391,17 @@ class _AddServerScreenState extends State<AddServerScreen> {
     final s = S.of(context), palette = Palette.of(context);
     final problems = _problems();
     final protocols = {...SoraScope.of(context).customProtocols, _protocol};
-    final compact = MediaQuery.sizeOf(context).width < 600;
-    final style = Styles.body.copyWith(fontSize: 14, color: palette.ink);
+    final style = Styles.body.copyWith(color: palette.ink);
     return CallbackShortcuts(
       bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => Navigator.of(context).pop()},
       child: Focus(
         autofocus: true,
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              compact ? 0 : 24,
-              16,
-              compact ? 0 : 24,
-              16 + MediaQuery.viewInsetsOf(context).bottom,
-            ),
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(context).bottom),
             child: Center(
               child: SizedBox(
-                width: compact ? double.infinity : 440,
+                width: 520,
                 child: Material(
                   key: const ValueKey('custom-server-sheet'),
                   color: palette.background,
@@ -400,187 +412,142 @@ class _AddServerScreenState extends State<AddServerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+                        padding: const EdgeInsets.fromLTRB(24, 16, 12, 8),
                         child: Row(
                           children: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text(s.cancel, style: style),
-                            ),
                             Expanded(
                               child: Text(
                                 widget.server == null ? s.customServerOwn : s.edit,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Styles.bodyStrong.copyWith(fontSize: 17, color: palette.ink),
+                                style: Styles.heading.copyWith(color: palette.ink),
                               ),
                             ),
-                            TextButton(
-                              key: const ValueKey('custom-save'),
-                              onPressed: _busy || problems.isNotEmpty ? null : _save,
-                              child: _saving
-                                  ? const SizedBox.square(dimension: 16, child: CupertinoActivityIndicator(radius: 8))
-                                  : Text(
-                                      s.save,
-                                      style: style.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        color: _busy || problems.isNotEmpty ? palette.ink3 : palette.ink,
-                                      ),
-                                    ),
+                            RoundButton(
+                              icon: Symbols.close_rounded,
+                              label: s.cancel,
+                              onTap: () => Navigator.of(context).pop(),
                             ),
                           ],
                         ),
                       ),
                       Flexible(
                         child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Group(
-                                  children: [
-                                    TextButton(
-                                      key: const ValueKey('custom-paste'),
-                                      onPressed: _busy ? null : _paste,
-                                      style: TextButton.styleFrom(
-                                        minimumSize: const Size(double.infinity, 44),
-                                        alignment: AlignmentDirectional.centerStart,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(Symbols.content_paste_rounded, size: 18, color: palette.ink),
-                                          const SizedBox(width: 12),
-                                          Expanded(child: Text(s.customServerPaste, style: style)),
-                                          if (_pasting) const CupertinoActivityIndicator(radius: 8),
-                                        ],
-                                      ),
-                                    ),
-                                    if (_pasteError != null)
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                                        child: Text(_pasteError!, style: Styles.dangerCaption(context)),
-                                      ),
-                                  ],
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              TextButton.icon(
+                                key: const ValueKey('custom-paste'),
+                                onPressed: _busy ? null : _paste,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: palette.ink,
+                                  minimumSize: const Size(double.infinity, 48),
+                                  backgroundColor: palette.surface,
+                                  alignment: AlignmentDirectional.centerStart,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
-                                Group(
-                                  children: [
-                                    _field('name', s.customServerName, hint: s.customServerNameHint),
-                                    MenuAnchor(
-                                      menuChildren: [
-                                        for (final p in protocols)
-                                          MenuItemButton(
-                                            onPressed: () => _changeProtocol(p),
-                                            child: Text(p.toUpperCase(), style: style),
-                                          ),
-                                      ],
-                                      builder: (context, controller, _) => TextButton(
-                                        key: const ValueKey('custom-protocol'),
-                                        onPressed: _busy
-                                            ? null
-                                            : () => controller.isOpen ? controller.close() : controller.open(),
-                                        style: TextButton.styleFrom(
-                                          minimumSize: const Size(double.infinity, 44),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Text(s.customServerProtocol, style: style),
-                                            const Spacer(),
-                                            Text(_protocol.toUpperCase(), style: style),
-                                            const SizedBox(width: 4),
-                                            Icon(Symbols.unfold_more_rounded, size: 16, color: palette.ink3),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                icon: _pasting
+                                    ? const CupertinoActivityIndicator(radius: 8)
+                                    : const Icon(Symbols.content_paste_rounded, size: 20),
+                                label: Text(s.customServerPaste, style: style),
+                              ),
+                              const SizedBox(height: 16),
+                              Group(
+                                children: [
+                                  _field('name', s.customServerName),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: _field(
-                                            'address',
-                                            s.customServerAddress,
-                                            hint: s.customServerAddressHint,
-                                            labelWidth: 64,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: _field(
-                                            'port',
-                                            s.customServerPort,
-                                            hint: s.customServerPortHint,
-                                            digits: true,
-                                            labelWidth: 40,
+                                        Text(s.customServerProtocol, style: Styles.row.copyWith(color: palette.ink)),
+                                        const SizedBox(height: 8),
+                                        MenuAnchor(
+                                          menuChildren: [
+                                            for (final p in protocols)
+                                              MenuItemButton(
+                                                onPressed: () => _changeProtocol(p),
+                                                child: Text(p.toUpperCase(), style: style),
+                                              ),
+                                          ],
+                                          builder: (context, controller, _) => OutlinedButton(
+                                            key: const ValueKey('custom-protocol'),
+                                            onPressed: _busy
+                                                ? null
+                                                : () => controller.isOpen ? controller.close() : controller.open(),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: palette.ink,
+                                              minimumSize: const Size(double.infinity, 48),
+                                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                                              side: BorderSide(color: palette.field),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(child: Text(_protocol.toUpperCase(), style: style)),
+                                                Icon(Symbols.unfold_more_rounded, size: 18, color: palette.ink),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                                Group(
-                                  children: [
+                                  ),
+                                  _field('address', s.customServerAddress, info: s.customServerAddressHint),
+                                  _field('port', s.customServerPort, info: s.customServerPortInvalid, digits: true),
+                                ],
+                              ),
+                              Group(
+                                children: [
+                                  _field(
+                                    'credentials',
+                                    _wireGuard
+                                        ? s.customServerWgPrivateKey
+                                        : ['vless', 'vmess', 'tuic'].contains(_protocol)
+                                        ? 'UUID'
+                                        : s.customServerPassword,
+                                    secret: true,
+                                    info: _wireGuard
+                                        ? s.customServerWgKeyInvalid
+                                        : _keepStored
+                                        ? s.customServerOptional
+                                        : null,
+                                  ),
+                                  if (_protocol == 'shadowsocks')
+                                    _field('method', s.probeMethod, info: s.customServerMethodHint),
+                                  if (['socks5', 'http'].contains(_protocol))
+                                    _field('user', s.customServerUser, info: s.customServerOptional),
+                                  if (_protocol == 'tuic') _field('password', s.customServerPassword, secret: true),
+                                  if (_wireGuard) ...[
+                                    _field('addresses', s.customServerWgAddresses, info: s.customServerWgCidrInvalid),
+                                    _field('peerKey', s.customServerWgPeerKey, info: s.customServerWgKeyInvalid),
                                     _field(
-                                      'credentials',
-                                      _wireGuard ? s.customServerWgPrivateKey : s.customServerCredentials,
+                                      'presharedKey',
+                                      s.customServerWgPresharedKey,
                                       secret: true,
-                                      hint: _keepStored ? s.customServerOptional : null,
+                                      info: '${s.customServerOptional}. ${s.customServerWgKeyInvalid}',
                                     ),
-                                    AnimatedSwitcher(
-                                      duration: Motion.of(context, Motion.fast),
-                                      switchInCurve: Motion.curve,
-                                      switchOutCurve: Motion.curve,
-                                      transitionBuilder: (child, animation) => SizeTransition(
-                                        sizeFactor: animation,
-                                        alignment: Alignment.topCenter,
-                                        child: FadeTransition(opacity: animation, child: child),
-                                      ),
-                                      layoutBuilder: (current, previous) =>
-                                          Column(mainAxisSize: MainAxisSize.min, children: [...previous, ?current]),
-                                      child: Column(
-                                        key: ValueKey(_protocol),
-                                        children: [
-                                          if (_protocol == 'shadowsocks')
-                                            _field('method', s.probeMethod, hint: s.customServerMethodHint),
-                                          if (['socks5', 'http'].contains(_protocol))
-                                            _field('user', s.customServerUser, hint: s.customServerOptional),
-                                          if (_protocol == 'tuic')
-                                            _field('password', s.customServerPassword, secret: true),
-                                          if (_wireGuard) ...[
-                                            _field(
-                                              'addresses',
-                                              s.customServerWgAddresses,
-                                              hint: s.customServerWgAddressesHint,
-                                            ),
-                                            _field('peerKey', s.customServerWgPeerKey),
-                                            _field(
-                                              'presharedKey',
-                                              s.customServerWgPresharedKey,
-                                              secret: true,
-                                              hint: s.customServerOptional,
-                                            ),
-                                            _field('allowedIps', s.customServerWgAllowedIps),
-                                            _field(
-                                              'keepalive',
-                                              s.customServerWgKeepalive,
-                                              digits: true,
-                                              hint: s.customServerOptional,
-                                            ),
-                                          ],
-                                        ],
-                                      ),
+                                    _field('allowedIps', s.customServerWgAllowedIps, info: s.customServerWgCidrInvalid),
+                                    _field(
+                                      'keepalive',
+                                      s.customServerWgKeepalive,
+                                      digits: true,
+                                      info: '${s.customServerOptional}. ${s.customServerWgKeepaliveInvalid}',
                                     ),
                                   ],
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: PrimaryButton(
+                          key: const ValueKey('custom-save'),
+                          label: s.save,
+                          busy: _saving,
+                          onTap: _busy || problems.isNotEmpty ? null : _save,
                         ),
                       ),
                     ],
@@ -594,83 +561,83 @@ class _AddServerScreenState extends State<AddServerScreen> {
     );
   }
 
-  Widget _field(
-    String key,
-    String label, {
-    String? hint,
-    bool digits = false,
-    bool secret = false,
-    double labelWidth = 148,
-  }) {
+  Widget _field(String key, String label, {String? info, bool digits = false, bool secret = false}) {
     final s = S.of(context), palette = Palette.of(context);
     final editingWireGuard =
         _wireGuard &&
         ['credentials', 'addresses', 'peerKey', 'presharedKey', 'allowedIps', 'keepalive'].any(_touched.contains);
     final error = _touched.contains(key) || editingWireGuard ? _problems()[key] : null;
-    final style = Styles.body.copyWith(fontSize: 14, color: palette.ink);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 44),
-          child: Row(
+    final last =
+        key ==
+        switch (_protocol) {
+          'wireguard' => 'keepalive',
+          'shadowsocks' => 'method',
+          'socks5' || 'http' => 'user',
+          'tuic' => 'password',
+          _ => 'credentials',
+        };
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: error == null ? palette.field : palette.danger),
+    );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              const SizedBox(width: 12),
-              SizedBox(
-                width: labelWidth,
-                child: Text(label, style: style),
+              Flexible(
+                child: Text(label, style: Styles.row.copyWith(color: palette.ink)),
               ),
-              Expanded(
-                child: Semantics(
-                  label: label,
-                  child: TextField(
-                    key: ValueKey('custom-$key'),
-                    controller: _fields[key],
-                    enabled: !_busy,
-                    obscureText: secret && !_revealed.contains(key),
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    textAlign: TextAlign.end,
-                    keyboardType: digits ? TextInputType.number : TextInputType.text,
-                    inputFormatters: digits ? [FilteringTextInputFormatter.digitsOnly] : null,
-                    textInputAction: TextInputAction.next,
-                    style: style,
-                    decoration: InputDecoration(
-                      hintText: hint,
-                      hintStyle: style.copyWith(color: palette.ink3),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-              ),
-              if (secret)
-                IconButton(
-                  tooltip: _revealed.contains(key) ? s.customServerHideSecret : s.customServerShowSecret,
-                  onPressed: _busy
-                      ? null
-                      : () => setState(() {
-                          if (!_revealed.remove(key)) _revealed.add(key);
-                        }),
-                  style: IconButton.styleFrom(minimumSize: const Size(32, 40), padding: const EdgeInsets.all(8)),
-                  icon: Icon(
-                    _revealed.contains(key) ? Symbols.visibility_off_rounded : Symbols.visibility_rounded,
-                    size: 16,
-                    color: palette.ink3,
-                  ),
-                )
-              else
-                const SizedBox(width: 12),
+              if (info != null) InfoButton(title: label, description: info),
             ],
           ),
-        ),
-        if (error != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-            child: Text(error, style: Styles.dangerCaption(context)),
+          const SizedBox(height: 8),
+          Semantics(
+            label: label,
+            hint: error,
+            child: TextField(
+              key: ValueKey('custom-$key'),
+              controller: _fields[key],
+              enabled: !_busy,
+              obscureText: secret && !_revealed.contains(key),
+              autocorrect: false,
+              enableSuggestions: false,
+              keyboardType: digits ? TextInputType.number : TextInputType.text,
+              inputFormatters: digits ? [FilteringTextInputFormatter.digitsOnly] : null,
+              textInputAction: last ? TextInputAction.done : TextInputAction.next,
+              onSubmitted: last ? (_) => _save() : null,
+              style: Styles.body.copyWith(color: palette.ink),
+              decoration: InputDecoration(
+                border: border,
+                enabledBorder: border,
+                disabledBorder: border,
+                focusedBorder: border.copyWith(
+                  borderSide: BorderSide(color: error == null ? palette.ink : palette.danger, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                isDense: true,
+                suffixIcon: secret
+                    ? IconButton(
+                        tooltip: _revealed.contains(key) ? s.customServerHideSecret : s.customServerShowSecret,
+                        onPressed: _busy
+                            ? null
+                            : () => setState(() {
+                                if (!_revealed.remove(key)) _revealed.add(key);
+                              }),
+                        icon: Icon(
+                          _revealed.contains(key) ? Symbols.visibility_off_rounded : Symbols.visibility_rounded,
+                          size: 20,
+                          color: palette.ink,
+                        ),
+                      )
+                    : null,
+              ),
+            ),
           ),
-      ],
+        ],
+      ),
     );
   }
 }

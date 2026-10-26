@@ -163,13 +163,13 @@ class _WatchBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: palette.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: palette.danger.withValues(alpha: 0.4)),
+          border: Border.all(color: palette.field),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           child: Row(
             children: [
-              Icon(Symbols.link_off_rounded, size: 20, color: palette.danger),
+              Icon(Symbols.link_off_rounded, size: 20, color: palette.ink),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(s.coreWatchUnstable, style: Styles.secondary.copyWith(color: palette.ink)),

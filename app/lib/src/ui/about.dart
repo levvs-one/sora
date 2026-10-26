@@ -14,6 +14,7 @@ import '../design/theme.dart';
 import '../desktop/desktop.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../sora.dart';
+import '../notifications.dart';
 import '../updates.dart';
 import 'kit.dart';
 
@@ -26,11 +27,50 @@ class AboutScreen extends StatefulWidget {
 
 class _AboutScreenState extends State<AboutScreen> {
   About? _about;
+  late final AppUpdater _updates = SoraScope.read(context).updates;
+  UpdateError? _reportedError;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_load()));
+    _updates.addListener(_updateChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _updateChanged();
+      unawaited(_load());
+    });
+  }
+
+  @override
+  void dispose() {
+    _updates.removeListener(_updateChanged);
+    super.dispose();
+  }
+
+  void _updateChanged() {
+    final error = _updates.error;
+    if (!mounted || error == _reportedError) return;
+    _reportedError = error;
+    if (error == null) return;
+    final s = S.of(context);
+    unawaited(
+      SoraScope.read(context).recordNotification(
+        AppNotification(
+          time: DateTime.now(),
+          title: s.updates,
+          body: switch (error) {
+            UpdateError.network => s.updateNetworkError,
+            UpdateError.release => s.updateReleaseError,
+            UpdateError.checksum => s.updateChecksumError,
+            UpdateError.installation => s.updateInstallError,
+            UpdateError.connecting => s.updateWaitConnection,
+            UpdateError.unsupported => s.updateUnsupported,
+            UpdateError.rollback => s.updateRollbackError,
+            UpdateError.rollbackCache => s.updateRollbackCacheError,
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> _load({FailureMode mode = FailureMode.background}) async {
@@ -96,7 +136,7 @@ class _AboutScreenState extends State<AboutScreen> {
             if (updates.versionRevoked)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                child: Text(s.updateVersionRevoked, style: Styles.secondary.copyWith(color: palette.danger)),
+                child: Text(s.updateVersionRevoked, style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -234,20 +274,6 @@ class _AboutScreenState extends State<AboutScreen> {
                   ],
                 ),
               ),
-            if (updates.error case final error?)
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(switch (error) {
-                  UpdateError.network => s.updateNetworkError,
-                  UpdateError.release => s.updateReleaseError,
-                  UpdateError.checksum => s.updateChecksumError,
-                  UpdateError.installation => s.updateInstallError,
-                  UpdateError.connecting => s.updateWaitConnection,
-                  UpdateError.unsupported => s.updateUnsupported,
-                  UpdateError.rollback => s.updateRollbackError,
-                  UpdateError.rollbackCache => s.updateRollbackCacheError,
-                }, style: Styles.dangerSecondary(context)),
-              ),
             // Automatic rollback status. The notice survives the
             // restart the rollback performs (persisted in settings).
             if (updates.rollbackTarget case final target? when updates.rollbackBusy)
@@ -286,9 +312,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   children: [
                     // Honest fail-closed warning (D15): the manifest
                     // signature was not verified, only the file hashes.
-                    Text(s.updateManualSigWarning, style: Styles.dangerSecondary(context)),
-                    const SizedBox(height: 8),
-                    Text(s.updateManual, style: Styles.secondary.copyWith(color: palette.ink2)),
+                    Tile(title: s.updateManual, info: s.updateManualSigWarning),
                     const SizedBox(height: 8),
                     SelectableText(
                       command,

@@ -44,7 +44,7 @@ class _ToastTitle extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             notice.body,
-            style: Styles.secondary.copyWith(color: palette.ink2, height: 16 / 13),
+            style: Styles.secondary.copyWith(color: palette.ink, height: 16 / 13),
           ),
         ],
       ],
@@ -123,7 +123,7 @@ class _NotificationToastsState extends State<NotificationToasts> {
             child: Pressable(
               onTap: close,
               radius: 8,
-              child: SizedBox.square(dimension: 30, child: Icon(Symbols.close_rounded, size: 18, color: palette.ink2)),
+              child: SizedBox.square(dimension: 30, child: Icon(Symbols.close_rounded, size: 18, color: palette.ink)),
             ),
           ),
         ),

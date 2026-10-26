@@ -15,6 +15,7 @@ import 'package:sora/src/generated/sora/custom/v1/custom.pbgrpc.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
 import 'package:sora/src/ui/addserver.dart';
+import 'package:sora/src/ui/kit.dart';
 import 'package:sora/src/ui/servers.dart';
 
 void main() {
@@ -126,7 +127,7 @@ void main() {
   String value(WidgetTester tester, String key) =>
       tester.widget<TextField>(find.byKey(ValueKey('custom-$key'))).controller!.text;
   bool saveEnabled(WidgetTester tester) =>
-      tester.widget<TextButton>(find.byKey(const ValueKey('custom-save'))).onPressed != null;
+      tester.widget<PrimaryButton>(find.byKey(const ValueKey('custom-save'))).onTap != null;
 
   testWidgets('empty own servers have one compact add action and no group', (tester) async {
     await mount(tester);
@@ -135,23 +136,36 @@ void main() {
     expect(find.byKey(const ValueKey('add-own-server')), findsOneWidget);
     expect(find.byTooltip('Add custom server'), findsOneWidget);
     await open(tester);
-    expect(tester.getSize(find.byKey(const ValueKey('custom-server-sheet'))).width, 440);
+    expect(tester.getSize(find.byKey(const ValueKey('custom-server-sheet'))).width, 520);
     expect(saveEnabled(tester), isFalse);
-    await tester.tap(find.text('Cancel'));
+    await tester.tap(find.bySemanticsLabel('Cancel'));
     await tester.pumpAndSettle();
     expect(find.byType(AddServerScreen), findsNothing);
   });
 
-  testWidgets('inline validation blocks saving and Esc closes with field focus', (tester) async {
+  testWidgets('field borders validate without inline errors and Esc closes with field focus', (tester) async {
     await mount(tester, width: 420);
     await open(tester);
-    expect(tester.getSize(find.byKey(const ValueKey('custom-server-sheet'))).width, 420);
+    expect(tester.getSize(find.byKey(const ValueKey('custom-server-sheet'))).width, 388);
     for (final entry in {'name': 'Home', 'address': 'bad address', 'port': '70000', 'credentials': 'secret'}.entries) {
       await tester.enterText(find.byKey(ValueKey('custom-${entry.key}')), entry.value);
     }
     await tester.pumpAndSettle();
-    expect(find.text('Invalid address'), findsOneWidget);
-    expect(find.text('Port must be a number from 1 to 65535'), findsOneWidget);
+    expect(find.text('Invalid address'), findsNothing);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('custom-address')))
+          .decoration!
+          .enabledBorder!
+          .borderSide
+          .color,
+      Palette.light.danger,
+    );
+    expect(find.text('Port must be a number from 1 to 65535'), findsNothing);
+    expect(
+      tester.widget<TextField>(find.byKey(const ValueKey('custom-port'))).decoration!.enabledBorder!.borderSide.color,
+      Palette.light.danger,
+    );
     expect(saveEnabled(tester), isFalse);
     await tester.enterText(find.byKey(const ValueKey('custom-address')), 'vpn.example.com');
     await tester.enterText(find.byKey(const ValueKey('custom-port')), '443');
@@ -159,7 +173,7 @@ void main() {
     expect(saveEnabled(tester), isTrue);
     await tester.enterText(find.byKey(const ValueKey('custom-name')), '');
     await tester.pumpAndSettle();
-    expect(find.text('Enter a name'), findsOneWidget);
+    expect(find.text('Enter a name'), findsNothing);
     expect(saveEnabled(tester), isFalse);
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
@@ -169,6 +183,7 @@ void main() {
   testWidgets('WireGuard and Shadowsocks fields follow protocol with field errors', (tester) async {
     await mount(tester);
     await open(tester);
+    await tester.ensureVisible(find.byKey(const ValueKey('custom-protocol')));
     await tester.tap(find.byKey(const ValueKey('custom-protocol')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('WIREGUARD'));
@@ -176,8 +191,10 @@ void main() {
     expect(find.byKey(const ValueKey('custom-addresses')), findsOneWidget);
     await tester.enterText(find.byKey(const ValueKey('custom-credentials')), 'short');
     await tester.pumpAndSettle();
-    expect(find.text('The key must be 32 bytes of base64, as wg genkey prints.'), findsOneWidget);
+    expect(find.text('The key must be 32 bytes of base64, as wg genkey prints.'), findsNothing);
+    await tester.ensureVisible(find.byKey(const ValueKey('custom-protocol')));
     expect(saveEnabled(tester), isFalse);
+    await tester.ensureVisible(find.byKey(const ValueKey('custom-protocol')));
     await tester.tap(find.byKey(const ValueKey('custom-protocol')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('SHADOWSOCKS'));
@@ -209,6 +226,8 @@ void main() {
       final fixture = fixtures.cast<Map<String, dynamic>>().firstWhere((f) => f['name'] == name);
       await open(tester);
       clipboard = fixture['input'] as String;
+      await tester.ensureVisible(find.byKey(const ValueKey('custom-paste')));
+      await tester.ensureVisible(find.byKey(const ValueKey('custom-paste')));
       await tester.tap(find.byKey(const ValueKey('custom-paste')));
       await settleIo(tester);
       expect(
@@ -247,19 +266,23 @@ void main() {
     final sora = await mount(tester, connect: true);
     await open(tester);
     clipboard = 'vless://123e4567-e89b-12d3-a456-426614174000@example.com:443?security=tls&type=ws&path=%2Fvpn#Home';
+    await tester.ensureVisible(find.byKey(const ValueKey('custom-paste')));
     await tester.tap(find.byKey(const ValueKey('custom-paste')));
     await settleIo(tester);
     final draftName = value(tester, 'name');
     clipboard = 'not a link';
+    await tester.ensureVisible(find.byKey(const ValueKey('custom-paste')));
     await tester.tap(find.byKey(const ValueKey('custom-paste')));
     await settleIo(tester);
     expect(value(tester, 'name'), draftName);
-    expect(find.text('Invalid server link'), findsOneWidget);
+    expect(find.text('Invalid server link'), findsNothing);
+    expect(sora.history.first.body, 'Invalid server link');
     await tester.tap(find.byKey(const ValueKey('custom-save')));
     await settleIo(tester);
     final id = sora.customServers.single.id;
     await open(tester);
     clipboard = 'trojan://second-secret@example.com:8443#Second';
+    await tester.ensureVisible(find.byKey(const ValueKey('custom-paste')));
     await tester.tap(find.byKey(const ValueKey('custom-paste')));
     await settleIo(tester);
     await tester.tap(find.byKey(const ValueKey('custom-save')));

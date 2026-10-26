@@ -320,7 +320,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('update all waits for the failure dialog and keeps the installed version', (tester) async {
+  testWidgets('update all reports a notification and keeps the installed version', (tester) async {
     final store = await _store(tester, installed: true);
     final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
     ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = '1.0.1';
@@ -343,15 +343,15 @@ void main() {
       await tester.tap(updateAll);
       await tester.pump();
       client.chunks.addError(http.ClientException('connection lost'));
-      for (var i = 0; i < 100 && find.text('Install failed').evaluate().isEmpty; i++) {
+      for (var i = 0; i < 100 && find.byType(SnackBar).evaluate().isEmpty; i++) {
         await _io(tester);
       }
       await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text('Install failed'), findsOneWidget);
-      expect(tester.widget<PrimaryButton>(updateAll).busy, isTrue);
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text(sora.strings.extErrNetwork), findsOneWidget);
+      expect(tester.widget<PrimaryButton>(updateAll).busy, isFalse);
       expect(client.closed, isTrue);
       expect(store.get(_entry.id)?.version, _entry.version);
-      await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
     }, () => client);
     expect(tester.widget<PrimaryButton>(updateAll).busy, isFalse);
@@ -385,15 +385,15 @@ void main() {
           var i = 0;
           i < 100 &&
               find.byType(InstallPermissionPrompt).evaluate().isEmpty &&
-              find.text('Install failed').evaluate().isEmpty;
+              find.byType(SnackBar).evaluate().isEmpty;
           i++
         ) {
           await _io(tester);
         }
         if (corrupt) {
-          expect(find.text('Install failed'), findsOneWidget);
+          expect(find.byType(SnackBar), findsOneWidget);
+          expect(find.text(sora.strings.extErrHash), findsOneWidget);
           expect(store.installed, isEmpty);
-          await tester.tap(find.text('OK'));
         } else {
           expect(find.byType(InstallPermissionPrompt), findsOneWidget);
           expect(find.byType(Dialog), findsOneWidget);

@@ -377,46 +377,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   }
 
   Future<void> _showError(BuildContext context, String message) async {
-    final palette = Palette.of(context);
-    final s = S.of(context);
-    final navigator = Navigator.of(context, rootNavigator: true);
-    final route = DialogRoute<void>(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: palette.raised,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Icon(Symbols.error_rounded, color: palette.danger),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(s.extInstallFailed, style: Styles.heading.copyWith(fontSize: 22, color: palette.ink)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(message, style: Styles.body.copyWith(color: palette.ink2)),
-                const SizedBox(height: 16),
-                PrimaryButton(label: s.extOk, onTap: () => Navigator.pop(context)),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-    await navigator.push(route);
-    // A batch must wait for the scrim's exit transition before starting
-    // the next download, otherwise the two dialog routes overlap.
-    await route.completed;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   static String _sha256Hex(Uint8List data) => crypto.sha256.convert(data).toString();
@@ -1091,13 +1054,13 @@ class _ConflictBannerState extends State<_ConflictBanner> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: palette.danger.withValues(alpha: 0.08),
+              color: palette.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: palette.danger.withValues(alpha: 0.4)),
+              border: Border.all(color: palette.field),
             ),
             child: Row(
               children: [
-                Icon(Symbols.warning_rounded, size: 20, color: palette.danger),
+                Icon(Symbols.warning_rounded, size: 20, color: palette.ink),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -1106,7 +1069,7 @@ class _ConflictBannerState extends State<_ConflictBanner> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(s.extConflictsResolve, style: Styles.bodyStrong.copyWith(color: palette.danger)),
+                Text(s.extConflictsResolve, style: Styles.bodyStrong.copyWith(color: palette.ink)),
               ],
             ),
           ),

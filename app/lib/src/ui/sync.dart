@@ -26,7 +26,7 @@ import 'qr.dart';
 ///
 /// Honest states: daemon missing (binary absent) or Android → an
 /// "unavailable" notice, never a fake device list; starting → progress;
-/// start failure → the error text with a retry; pairing session → the real
+/// start failure → a notification and retry; pairing session → the real
 /// QR from the daemon with its TTL; peers → `GET /v1/peers` with the
 /// daemon's `last_sync`.
 class SyncScreen extends StatefulWidget {
@@ -39,7 +39,6 @@ class SyncScreen extends StatefulWidget {
 class _SyncScreenState extends State<SyncScreen> {
   SyncStatusInfo? _status;
   List<SyncPeer>? _peers;
-  String? _opError;
   bool _joining = false;
   bool _refreshing = false;
   final _syncing = <String>{};
@@ -48,6 +47,7 @@ class _SyncScreenState extends State<SyncScreen> {
   /// The daemon can reach `running` after a retry, not just the first boot,
   /// so the load is driven by the state transition, not by `initState`.
   bool _loaded = false;
+  bool _reportedDaemonFailure = false;
 
   SyncDaemon get _daemon => SoraScope.read(context).syncDaemon;
 
@@ -70,6 +70,12 @@ class _SyncScreenState extends State<SyncScreen> {
       _loaded = true;
       unawaited(_load());
     }
+    if (_daemon.state == SyncDaemonState.failed && !_reportedDaemonFailure) {
+      _reportedDaemonFailure = true;
+      _snack(_daemon.errorDetail ?? S.of(context).syncDaemonFailed);
+    } else if (_daemon.state != SyncDaemonState.failed) {
+      _reportedDaemonFailure = false;
+    }
     if (mounted) setState(() {});
   }
 
@@ -91,7 +97,7 @@ class _SyncScreenState extends State<SyncScreen> {
     // Keep Sora's document bridge pointed at the daemon's current client
     // (a retry may have created a new one).
     SoraScope.read(context).ensureSyncBridge();
-    _refreshing = true;
+    setState(() => _refreshing = true);
     try {
       final status = await client.status();
       final peers = await client.peers();
@@ -99,13 +105,12 @@ class _SyncScreenState extends State<SyncScreen> {
       setState(() {
         _status = status;
         _peers = peers;
-        _opError = null;
       });
     } on SyncApiException catch (e) {
       if (!mounted) return;
-      setState(() => _opError = describeSyncError(S.of(context), e));
+      _snack(describeSyncError(S.of(context), e));
     } finally {
-      _refreshing = false;
+      if (mounted) setState(() => _refreshing = false);
     }
   }
 
@@ -193,12 +198,12 @@ class _SyncScreenState extends State<SyncScreen> {
       await _showSyncResult(peer, result);
     } on SyncApiException catch (e) {
       if (!mounted) return;
-      _syncing.remove(peer.id);
-      setState(() => _opError = describeSyncError(S.of(context), e));
+      setState(() => _syncing.remove(peer.id));
+      _snack(describeSyncError(S.of(context), e));
     } on SyncBridgeException catch (e) {
       if (!mounted) return;
-      _syncing.remove(peer.id);
-      setState(() => _opError = '${S.of(context).syncError}: ${e.message}');
+      setState(() => _syncing.remove(peer.id));
+      _snack('${S.of(context).syncError}: ${e.message}');
     }
   }
 
@@ -236,7 +241,7 @@ class _SyncScreenState extends State<SyncScreen> {
       await _refresh();
     } on SyncApiException catch (e) {
       if (!mounted) return;
-      setState(() => _opError = describeSyncError(S.of(context), e));
+      _snack(describeSyncError(S.of(context), e));
     }
   }
 
@@ -311,7 +316,6 @@ class _SyncScreenState extends State<SyncScreen> {
 
   Widget _failed(S s, SyncDaemon daemon) {
     final palette = Palette.of(context);
-    final detail = daemon.errorDetail;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -321,21 +325,13 @@ class _SyncScreenState extends State<SyncScreen> {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.danger),
+                  Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.ink),
                   const SizedBox(height: 12),
                   Text(
-                    s.syncDaemonFailed,
+                    s.sync,
                     textAlign: TextAlign.center,
                     style: Styles.bodyStrong.copyWith(color: palette.ink),
                   ),
-                  if (detail != null && detail.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      detail,
-                      textAlign: TextAlign.center,
-                      style: Styles.caption.copyWith(color: palette.ink2),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -365,13 +361,10 @@ class _SyncScreenState extends State<SyncScreen> {
           ],
         ),
       if (status != null) const SizedBox(height: 16),
-      if (_opError != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(_opError!, style: Styles.secondary.copyWith(color: palette.danger)),
-        ),
       Heading(s.syncDevices),
-      if (peers == null)
+      if (peers == null && !_refreshing)
+        PrimaryButton(label: s.syncRetry, onTap: () => unawaited(_refresh()))
+      else if (peers == null)
         const Group(
           children: [
             Padding(
@@ -459,19 +452,7 @@ class _SyncScreenState extends State<SyncScreen> {
       ],
       const SizedBox(height: 16),
       Group(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(s.syncSecureNote, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
-                const SizedBox(height: 8),
-                Text(s.syncNoLan, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
-              ],
-            ),
-          ),
-        ],
+        children: [Tile(title: s.sync, info: '${s.syncSecureNote}\n\n${s.syncNoLan}')],
       ),
     ];
   }
@@ -666,6 +647,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
         _starting = false;
         _error = describeSyncError(S.of(context), e);
       });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_error!)));
     }
   }
 
@@ -734,10 +716,10 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.danger),
+                    Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.ink),
                     const SizedBox(height: 12),
                     Text(
-                      _error!,
+                      s.syncPairingTitle,
                       textAlign: TextAlign.center,
                       style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5),
                     ),
@@ -825,12 +807,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
           PrimaryButton(label: s.syncStopShowing, busy: _stopping, onTap: _stopping ? null : () => unawaited(_stop())),
           const SizedBox(height: 16),
           Group(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                child: Text(s.syncSecureNote, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
-              ),
-            ],
+            children: [Tile(title: s.syncPairingTitle, info: s.syncSecureNote)],
           ),
         ],
       ],

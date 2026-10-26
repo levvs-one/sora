@@ -10,6 +10,8 @@ import 'package:zxing2/qrcode.dart';
 
 import '../../l10n/strings.dart';
 import '../design/theme.dart';
+import '../sora.dart';
+import '../notifications.dart';
 import '../desktop/links.dart';
 import 'kit.dart';
 import 'subscription_sheet.dart';
@@ -181,7 +183,6 @@ class QrScanScreen extends StatefulWidget {
 
 class _QrScanScreenState extends State<QrScanScreen> {
   bool _busy = false;
-  String? _error;
 
   Future<void> _fromImage() async {
     final file = await openFile(
@@ -192,7 +193,6 @@ class _QrScanScreenState extends State<QrScanScreen> {
     if (file == null || !mounted) return;
     setState(() {
       _busy = true;
-      _error = null;
     });
     String? text;
     try {
@@ -203,7 +203,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
     if (!mounted) return;
     setState(() => _busy = false);
     if (text == null) {
-      setState(() => _error = S.of(context).qrNoCode);
+      unawaited(
+        SoraScope.read(context).recordNotification(
+          AppNotification(time: DateTime.now(), title: S.of(context).qrScanTitle, body: S.of(context).qrNoCode),
+        ),
+      );
       return;
     }
     await _accept(text);
@@ -241,7 +245,13 @@ class _QrScanScreenState extends State<QrScanScreen> {
         await showSubscriptionSheet(navigator.context, link: raw);
         return;
       }
-      if (mounted) setState(() => _error = S.of(context).qrInvalid);
+      if (mounted) {
+        unawaited(
+          SoraScope.read(context).recordNotification(
+            AppNotification(time: DateTime.now(), title: S.of(context).qrScanTitle, body: S.of(context).qrInvalid),
+          ),
+        );
+      }
       return;
     }
     switch (link) {
@@ -262,7 +272,6 @@ class _QrScanScreenState extends State<QrScanScreen> {
   Widget build(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    final error = _error;
     return Screen(
       title: s.qrScanTitle,
       children: [
@@ -272,21 +281,12 @@ class _QrScanScreenState extends State<QrScanScreen> {
         Text(
           s.qrScanHint,
           textAlign: TextAlign.center,
-          style: Styles.body.copyWith(color: palette.ink2),
+          style: Styles.body.copyWith(color: palette.ink),
         ),
         const SizedBox(height: 24),
         PrimaryButton(label: s.qrFromImage, busy: _busy, onTap: _busy ? null : _fromImage),
         const SizedBox(height: 8),
         TextButton(onPressed: _busy ? null : _paste, child: Text(s.qrFromClipboard)),
-        if (error != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(
-              error,
-              textAlign: TextAlign.center,
-              style: Styles.secondary.copyWith(color: palette.ink2),
-            ),
-          ),
       ],
     );
   }
