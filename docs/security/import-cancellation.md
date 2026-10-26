@@ -34,3 +34,29 @@ The background subscription scheduler already has four fetch slots, and one
 subscription has an in-progress flag. Those existing limits do not prove a
 global budget across manual imports, explicit fetches and distinct refreshes.
 Aggregate concurrent parsing and the other S3 resource boundaries remain open.
+
+## Subscription refresh checkpoints
+
+The shared manual/scheduled refresh path also used to accept valid provider
+bytes after its context was cancelled. Three new regressions with the existing
+fake provider and a real private vault reproduced success and replacement of
+the stored record, server list and credentials for an already-cancelled request,
+an expired request, and a valid response released after cancellation.
+
+Refresh now refuses work on an already-finished caller, checks the fetch context
+before parsing/using the result, and checks again immediately before the existing
+atomic vault update. Cancellation clears the in-progress flag and emits the final
+non-updating state while preserving the previous record/list/credential bytes.
+The caller's context is distinguished from the book's own fetch timeout:
+provider deadlines still record normal failure/backoff rather than an immediate
+successful retry. Existing four scheduler slots and per-ID serialization remain.
+
+The regressions verify every retained vault value, release of Updating, and a
+subsequent successful refresh. An additional standard-library synctest case
+advances the real two-minute child deadline and confirms retained servers plus
+failure/backoff while the caller remains alive; it does not wait two wall minutes. They run no real fetch, engine, listener or system
+change. Synchronous parsing is still not preempted, and cancellation after the
+final checkpoint can race an atomic write; there is no transactional undo.
+The initial independent background fetch launched by SaveSubscription retains
+its existing context policy. Aggregate resource limits and lifecycle ownership
+of that background operation remain separate work.

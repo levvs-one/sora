@@ -364,6 +364,9 @@ func (b *subscriptionBook) delete(id string) error {
 // refresh fetches a subscription now. If already running, it returns the
 // current state with updating set.
 func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.SubscriptionState, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	b.mu.Lock()
 	rec, ok := b.records[id]
 	if !ok {
@@ -384,6 +387,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Subscription update started")
 	b.mu.Unlock()
 
+	requestCtx := ctx
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
 	var fetched subscription.Result
@@ -392,6 +396,9 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		fetched.Body = []byte(link)
 	} else {
 		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+	}
+	if err == nil {
+		err = ctx.Err()
 	}
 	answered := err == nil
 	var servers []importedServer
@@ -411,10 +418,21 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		// changed during the fetch.
 		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: subscription %s changed during the update", id)
 	}
+	if err == nil {
+		err = ctx.Err()
+	}
 	next := *current
 	next.LastAttempt = b.now().UTC()
 	if err == nil {
-		err = b.applyUpdateLocked(&next, fetched.Info, servers)
+		err = b.applyUpdateLocked(ctx, &next, fetched.Info, servers)
+	}
+	// Cancellation of the caller/shutdown must release Updating without
+	// replacing credentials or recording the provider as failed. The book's
+	// own fetch timeout still records a normal failure and keeps backoff.
+	if err != nil && requestCtx.Err() != nil {
+		state := b.stateLocked(id)
+		b.notifyLocked(state, logs.LevelInfo, "Subscription update cancelled")
+		return state, requestCtx.Err()
 	}
 	if err != nil {
 		// Failed updates must preserve the last successful server list.
@@ -446,7 +464,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 // applyUpdateLocked atomically stores the record, list, and credentials,
 // removing dropped servers and unused list chunks.
-func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subscription.Info, servers []importedServer) error {
+func (b *subscriptionBook) applyUpdateLocked(ctx context.Context, rec *subscriptionRecord, info subscription.Info, servers []importedServer) error {
 	list := &corev1.FetchSubscriptionResponse{}
 	puts := map[string][]byte{}
 	keep := map[string]bool{}
@@ -480,6 +498,9 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	updated.Info = info
 	updated.LastSuccess, updated.Failures, updated.LastError = updated.LastAttempt, 0, nil
 	updated.FailureSince = time.Time{}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if err := b.persistLocked(&updated, puts, deletes); err != nil {
 		return err
 	}
