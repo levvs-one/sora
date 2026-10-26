@@ -61,3 +61,10 @@ initializing after the screen has closed. A closing-during-initialization
 regression failed before that change and passed afterward. This lifetime fix
 must not be described as the proven cause of the first native test failure;
 the next native run must supply that evidence.
+
+The diagnostic run on 49f9ffd9 (job 121590209716) reached the initial signed page
+and its real `not-connected` response. It then identified the primary failure:
+the test's `runJavaScript` expression returned a Promise, which WebKitGTK rejected
+as `Unsupported result type`. The test now uses `void` for that asynchronous
+expression and still waits for its explicit completion state and all assertions.
+This corrects the test invocation; the full native result remains pending.

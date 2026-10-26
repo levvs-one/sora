@@ -91,7 +91,7 @@ void main() {
         await until("document.getElementById('content')?.textContent.includes('not-connected') === true");
         await controller.runJavaScript("""
           window.nativePanelProof = null;
-          (async () => {
+          void (async () => {
             try {
               const before = await window.soraExt.call('getSettings');
               if (before.refresh_seconds !== ${cycle == 0 ? 5 : 7}) throw new Error('settings read mismatch');
