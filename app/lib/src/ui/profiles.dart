@@ -262,7 +262,6 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final palette = Palette.of(context);
     return Screen(
       title: widget.profile == null ? s.profileAdd : s.profileName,
       actions: [RoundButton(icon: Symbols.check_rounded, label: s.save, onTap: _save)],
@@ -302,12 +301,9 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
             ),
             SwitchTile(
               title: s.profileAutoApply,
+              info: s.profileAutoApplyHint,
               value: _draft.autoApply,
               onChanged: (v) => setState(() => _draft.autoApply = v),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
-              child: Text(s.profileAutoApplyHint, style: Styles.secondary.copyWith(color: palette.ink2)),
             ),
           ],
         ),

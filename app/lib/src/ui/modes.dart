@@ -277,12 +277,9 @@ class _Modes extends StatelessWidget {
                     SwitchTile(
                       key: const ValueKey('strict-kill-switch'),
                       title: s.strictKillSwitch,
+                      info: s.strictKillSwitchWarning,
                       value: settings.strictKillSwitch,
                       onChanged: (v) => unawaited(sora.setStrictKillSwitch(v)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                      child: Text(s.strictKillSwitchWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
                     ),
                   ],
                 ),
@@ -290,12 +287,9 @@ class _Modes extends StatelessWidget {
                 const SizedBox(height: 12),
                 SwitchTile(
                   title: s.zapretWithVpn,
+                  info: s.zapretWithVpnHint,
                   value: settings.zapretWithVpn,
                   onChanged: (v) => unawaited(sora.change((x) => x.zapretWithVpn = v)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child: Text(s.zapretWithVpnHint, style: Styles.secondary.copyWith(color: palette.ink2)),
                 ),
               ],
               const SizedBox(height: 12),

@@ -210,7 +210,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (desktop != null)
               SwitchTile(
                 title: s.launchAtLogin,
-                detail: s.launchAtLoginDetail,
+                info: s.launchAtLoginDetail,
                 value: settings.launchAtLogin,
                 onChanged: (v) async {
                   await sora.change((x) => x.launchAtLogin = v, replan: false);
@@ -397,7 +397,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchTile(
               title: s.autoSwitchOnDegrade,
-              detail: s.autoSwitchOnDegradeDetail,
+              info: s.autoSwitchOnDegradeDetail,
               value: settings.autoSwitchOnDegrade,
               onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
             ),

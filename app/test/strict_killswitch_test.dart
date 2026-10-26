@@ -102,8 +102,14 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('advanced-protection')));
     await tester.pumpAndSettle();
+    expect(find.text(sora.strings.strictKillSwitchWarning), findsNothing);
+    await tester.tap(find.byKey(ValueKey('info-${sora.strings.strictKillSwitch}')));
+    await tester.pumpAndSettle();
     expect(find.text(sora.strings.strictKillSwitchWarning), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('strict-kill-switch')));
+    expect(settings.strictKillSwitch, isFalse);
+    await tester.tap(find.text(sora.strings.close));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(sora.strings.strictKillSwitch));
     await tester.pumpAndSettle();
     expect(settings.strictKillSwitch, isTrue);
     expect(settings.killSwitch, isTrue);
