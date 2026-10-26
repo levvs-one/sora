@@ -57,6 +57,10 @@ def build(output, service=False):
             # Wixl 0.106 ignores Vital; its companion tool authors the native mandatory-service bit.
             subprocess.run(["msibuild", str(package), "-q", "UPDATE ServiceInstall SET ErrorControl = 32769"],
                            check=True, timeout=10)
+        properties = subprocess.check_output(["msiinfo", "export", str(package), "Property"], text=True)
+        rows = list(csv.reader(io.StringIO(properties), delimiter="\t"))[3:]
+        if [row[1] for row in rows if row and row[0] == "MSIRESTARTMANAGERCONTROL"] != ["Disable"]:
+            raise RuntimeError("Every fixture package must disable Restart Manager, including nested old-product removal")
         sequence = subprocess.check_output(["msiinfo", "export", str(package), "InstallExecuteSequence"], text=True)
         rows = list(csv.reader(io.StringIO(sequence), delimiter="\t"))[3:]
         actions = {row[0]: int(row[2]) for row in rows if row}

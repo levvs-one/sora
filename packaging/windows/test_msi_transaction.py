@@ -73,9 +73,6 @@ def verify(directory):
                 ]) + f' INSTALLFOLDER="{target}" OBSERVATION="{observation}" PROBEFAIL={int(fail)}'
                 locked = phase == "locked-new-payload"
                 handle = None
-                if locked:
-                    # Do not let Restart Manager terminate the process holding the test lock.
-                    command += " MSIRESTARTMANAGERCONTROL=Disable"
                 (logs / f"{phase}-command.txt").write_text(command + "\n", encoding="utf-8")
                 try:
                     if locked:
@@ -104,6 +101,8 @@ def verify(directory):
                     logged = log.read_bytes()
                     if b"InstallValidate" not in logged and "InstallValidate".encode("utf-16-le") not in logged:
                         raise RuntimeError("The locked upgrade did not reach native installation validation")
+                    if b"RESTART MANAGER: Session opened" in logged or "RESTART MANAGER: Session opened".encode("utf-16-le") in logged:
+                        raise RuntimeError("A nested fixture installer opened Restart Manager during the lock test")
                 if (result.returncode == 0) == refused:
                     raise RuntimeError(f"{phase}: unexpected installer exit {result.returncode}; see {log}")
                 observed = json.loads(observation.read_text(encoding="utf-8")) if observation.exists() else None

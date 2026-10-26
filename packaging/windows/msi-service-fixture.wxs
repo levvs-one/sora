@@ -5,6 +5,7 @@
     <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
     <Media Id="1" Cabinet="fixture.cab" EmbedCab="yes"/>
     <Property Id="PROBEFAIL" Value="0"/>
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable"/>
     <Upgrade Id="$(var.Upgrade)">
       <UpgradeVersion Minimum="0.0.0" Maximum="$(var.Version)" Property="FIXTURE_PREVIOUS" IncludeMaximum="no"/>
     </Upgrade>
