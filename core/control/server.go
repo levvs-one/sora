@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -940,10 +941,15 @@ func maskText(mask func(string) string, text string) string {
 // ParseImport parses a subscription into a plan with credential references.
 // Credentials go directly to the vault; failed parsing leaves the store
 // unchanged.
-func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) (*corev1.ParseImportResponse, error) {
+func (s *Server) ParseImport(ctx context.Context, req *corev1.ParseImportRequest) (*corev1.ParseImportResponse, error) {
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return nil, transportStatus(err)
+	}
+	ctx, cancel := requestDeadline(ctx, importTimeout)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return nil, status.FromContextError(err).Err()
 	}
 	payload := req.GetPayload()
 	if len(payload) == 0 {
@@ -974,6 +980,9 @@ func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) 
 	for _, server := range servers {
 		puts[server.reference] = server.document
 		plan.Outbounds = append(plan.Outbounds, server.spec)
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, status.FromContextError(err).Err()
 	}
 	if err := s.secrets.Apply(puts, nil); err != nil {
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
