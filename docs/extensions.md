@@ -226,6 +226,13 @@ Additive catalog fields (all optional):
   fraction.
 - `screenshots`: ≤ 8 https image URLs for the detail page.
 - `changelog`: version/date(RFC3339)/notes rows, newest first.
+- `platforms`: optional list of at most 16 distinct lowercase OS identifiers
+  (1..32 ASCII letters/digits/underscore/hyphen, starting with a letter).
+  Examples: `linux`, `windows`, `macos`, `android`, `ios`. Omitted or empty
+  means no catalog OS restriction, preserving earlier entries. Unknown future
+  OS identifiers remain listed and are unavailable on other hosts.
+  This metadata filters installation, not catalog visibility. It does not
+  certify architecture, driver, operating-system edition or backend availability.
 - `capabilities`: subset of the manifest capability registry; the store
   filters on these ("Themes", "Bypasses & network hooks", ...).
 
@@ -534,8 +541,10 @@ Opening/refreshing the catalog fetches and verifies its current team
 signature; compatible additions require no client rebuild. A new native
 backend or API still requires a host that implements it. Catalog visibility
 must not imply installability or claim that old clients have new capabilities.
-The present implementation still needs upfront platform/version presentation
-before these new sources are published.
+The catalog shows OS/version requirements before download and blocks incompatible
+install/update actions without hiding the listing. Signed manifest and runtime
+checks still run afterward. Native architecture/backend checks and the actual
+minimum published host version still need validation before these sources ship.
 
 No profile promises DPI evasion on every network. Loading a Windows driver
 in a disposable test environment proves neither shaping effectiveness nor

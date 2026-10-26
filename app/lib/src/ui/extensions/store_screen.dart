@@ -198,6 +198,11 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
 
   Future<bool> _downloadAndInstall(BuildContext context, Uri url, {required String source, CatalogEntry? entry}) async {
     final s = S.of(context);
+    final compatibility = entry == null ? null : catalogCompatibilityText(s, entry);
+    if (compatibility != null) {
+      await _showError(context, compatibility);
+      return false;
+    }
     final client = http.Client();
     var cancelled = false;
     late final ExtensionInstallDialog window;
@@ -785,6 +790,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     // Staged rollout: the update button appears only for installs inside
     // this version's bucket. The listing itself is never gated: hiding a
     // published version from the catalog would be misleading.
+    final compatibility = catalogCompatibilityText(s, e);
     final needsUpdate =
         installed != null && compareVersions(e.version, installed.version) > 0 && e.rolloutEligible(store.installId);
     return ExtensionCard(
@@ -800,7 +806,9 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
         context,
         ExtensionDetailScreen(entry: e, onInstall: (entry) => _installFromCatalog(context, entry)),
       ),
-      trailing: installed == null
+      trailing: compatibility != null && (installed == null || needsUpdate)
+          ? InfoButton(title: installed == null ? s.extInstall : s.extUpdate, description: compatibility)
+          : installed == null
           ? PillButton(label: s.extInstall, onTap: () => _installFromCatalog(context, e))
           : needsUpdate
           ? PillButton(label: s.extUpdate, onTap: () => _installFromCatalog(context, e))
@@ -882,7 +890,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     }
     final updates = [
       for (final inst in store.installed)
-        if (_needsUpdate(store, inst)) inst,
+        if (_needsUpdate(store, inst) && catalogCompatibilityText(s, _catalog!.find(inst.id)!) == null) inst,
     ];
     return Column(
       children: [
@@ -927,17 +935,27 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 capabilities: inst.manifest.capabilities,
                 permissions: inst.granted,
                 networkHosts: inst.manifest.networkHosts,
-                onTap: () => push<void>(context, ExtensionDetailScreen(installed: inst)),
+                onTap: () => push<void>(
+                  context,
+                  ExtensionDetailScreen(
+                    installed: inst,
+                    entry: _catalog?.find(inst.id),
+                    onInstall: (entry) => _installFromCatalog(context, entry),
+                  ),
+                ),
                 // The switch alone announces only on/off; the label names
                 // the extension it toggles.
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (needsUpdate) ...[
-                      PillButton(
-                        label: s.extUpdate,
-                        onTap: () => _installFromCatalog(context, _catalog!.find(inst.id)!),
-                      ),
+                      if (catalogCompatibilityText(s, _catalog!.find(inst.id)!) case final requirement?)
+                        InfoButton(title: s.extUpdate, description: requirement)
+                      else
+                        PillButton(
+                          label: s.extUpdate,
+                          onTap: () => _installFromCatalog(context, _catalog!.find(inst.id)!),
+                        ),
                       const SizedBox(width: 8),
                     ],
                     Semantics(

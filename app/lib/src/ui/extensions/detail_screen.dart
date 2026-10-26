@@ -310,6 +310,18 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     CatalogEntry? entry,
   ) {
     final s = S.of(context);
+    final compatibility = entry == null ? null : catalogCompatibilityText(s, entry);
+    if (live == null && compatibility != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(s.extInstall, style: Styles.bodyStrong.copyWith(color: Palette.of(context).ink)),
+          ),
+          InfoButton(title: s.extInstall, description: compatibility),
+        ],
+      );
+    }
     if (live == null) {
       // Not installed: install straight from the detail screen.
       return PrimaryButton(label: s.extInstall, onTap: entry == null ? null : () => widget.onInstall?.call(entry));
@@ -321,7 +333,21 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       children: [
         if (needsUpdate) ...[
           const SizedBox(height: 8),
-          PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
+          if (compatibility != null)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    s.extUpdateTo(entry.version),
+                    style: Styles.bodyStrong.copyWith(color: Palette.of(context).ink),
+                  ),
+                ),
+                InfoButton(title: s.extUpdateTo(entry.version), description: compatibility),
+              ],
+            )
+          else
+            PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
         if (live.enabled && m.panels.length == 1) ...[
           if (needsUpdate)

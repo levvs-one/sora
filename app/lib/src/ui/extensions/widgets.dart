@@ -4,6 +4,8 @@
 /// tones and [Palette.danger] for genuine warnings. No decorative colors.
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -12,8 +14,35 @@ import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
 import '../kit.dart';
 import '../../ext/verifier.dart';
+import '../../ext/catalog.dart';
+import '../../updates.dart' show appVersion;
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
+
+/// Signed catalog requirements are an early gate; package verification and
+/// the manifest's own minimum-version check still run after downloading.
+String? catalogCompatibilityText(S s, CatalogEntry entry) {
+  final requirements = <String>[];
+  if (entry.requiresNewerApp(appVersion)) {
+    requirements.add(s.extErrMinApp(entry.minAppVersion));
+  }
+  if (!entry.supportsPlatform(Platform.operatingSystem)) {
+    final names = entry.platforms
+        .map(
+          (os) => switch (os) {
+            'linux' => 'Linux',
+            'windows' => 'Windows',
+            'macos' => 'macOS',
+            'android' => 'Android',
+            'ios' => 'iOS',
+            _ => os,
+          },
+        )
+        .join(', ');
+    requirements.add(s.extAvailableOn(names));
+  }
+  return requirements.isEmpty ? null : requirements.join('\n');
+}
 
 /// 5-star rating display with the numeric value.
 ///

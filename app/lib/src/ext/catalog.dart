@@ -51,6 +51,7 @@ class CatalogEntry {
     required this.rolloutFraction,
     required this.screenshotUrls,
     required this.changelog,
+    this.platforms = const [],
   });
 
   final String id;
@@ -77,6 +78,12 @@ class CatalogEntry {
   final int size;
   final String minAppVersion;
 
+  /// Empty preserves catalog-v1 entries without an OS restriction.
+  final List<String> platforms;
+  bool supportsPlatform(String os) => platforms.isEmpty || platforms.contains(os);
+  bool requiresNewerApp(String runningVersion) =>
+      RegExp(r'^\d+\.\d+\.\d+$').hasMatch(runningVersion) && compareVersions(minAppVersion, runningVersion) > 0;
+
   /// Staged-rollout fraction 0..1; 0 (or absent) means fully rolled out.
   final double rolloutFraction;
 
@@ -87,6 +94,10 @@ class CatalogEntry {
   final List<CatalogChangelogEntry> changelog;
 
   factory CatalogEntry.fromJson(Map<String, dynamic> json) {
+    final platforms = json['platforms'];
+    if (platforms != null && (platforms is! List || platforms.any((value) => value is! String))) {
+      throw CatalogError('platforms must be a list of OS identifiers');
+    }
     return CatalogEntry(
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -107,6 +118,7 @@ class CatalogEntry {
       sha256: (json['sha256'] as String? ?? '').toLowerCase(),
       size: (json['size'] as num? ?? 0).toInt(),
       minAppVersion: json['min_app_version'] as String? ?? '',
+      platforms: List<String>.unmodifiable((platforms as List? ?? []).cast<String>()),
       rolloutFraction: (json['rollout_fraction'] as num? ?? 0).toDouble(),
       screenshotUrls: (json['screenshots'] as List? ?? []).map((e) => e.toString()).toList(),
       changelog: [for (final r in (json['changelog'] as List? ?? [])) CatalogChangelogEntry.fromJson(_changelogRow(r))],
@@ -218,6 +230,11 @@ class ExtensionCatalog {
   }
 
   static void _validateEntry(CatalogEntry e) {
+    if (e.platforms.length > 16 ||
+        e.platforms.toSet().length != e.platforms.length ||
+        e.platforms.any((os) => !RegExp(r'^[a-z][a-z0-9_-]{0,31}$').hasMatch(os))) {
+      throw CatalogError('entry "${e.id}" has invalid platforms');
+    }
     if (e.id.isEmpty || e.name.trim().isEmpty || e.author.trim().isEmpty) {
       throw CatalogError('catalog entry needs id, name and author');
     }

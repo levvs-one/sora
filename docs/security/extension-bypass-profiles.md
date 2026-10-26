@@ -76,8 +76,8 @@ or exploit claim.
 The signed public catalog and published packages are unchanged. Source projects
 must get the actual first supported host version before production author/team
 signing. Catalog refresh already delivers separately signed additions without
-rebuilding a compatible app. Upfront version/platform presentation, the Windows
-WinDivert adapter, its distribution notices/source obligations, production
+rebuilding a compatible app. Catalog preflight now presents version/OS requirements without hiding entries;
+it does not replace native checks. The Windows WinDivert adapter, its distribution notices/source obligations, production
 signing approval and publication remain separate required work.
 
 Local validation: full Flutter suite 547 passed / 71 prerequisite skips,
