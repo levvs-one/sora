@@ -168,7 +168,7 @@ jobs:
           go-version-file: service/sync/go.mod
           cache: false
       - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev bubblewrap shellcheck
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev bubblewrap shellcheck xvfb
       - name: Get packages
         run: flutter pub get
       - name: Check formatting
@@ -181,6 +181,8 @@ jobs:
         run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
         run: flutter build linux --release
+      - name: Native signed extension panel in WebKitGTK
+        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
       - name: Check the Linux update helper
         working-directory: .
         run: |
@@ -316,6 +318,13 @@ jobs:
           flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan, metadata or extension package tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+      - name: Native signed extension panel and bridge
+        working-directory: app
+        run: |
+          flutter test test/panel_bootstrap_js_test.dart test/extension_panel_startup_test.dart
+          if ($LASTEXITCODE -ne 0) { throw 'Panel bootstrap or lifecycle failed' }
+          flutter test integration_test/extension_panel_test.dart -d windows --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
+          if ($LASTEXITCODE -ne 0) { throw 'Signed extension panel or native bridge failed' }
       - name: Build the installer
         shell: pwsh
         run: |

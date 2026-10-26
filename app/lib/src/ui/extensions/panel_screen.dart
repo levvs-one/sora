@@ -4,7 +4,7 @@
 /// ephemeral port) so relative asset paths resolve on every platform and
 /// `file://` quirks are avoided. Navigation is locked to that origin.
 /// The page gets `window.soraExt` (see [PanelBridge.bootstrapJs]); the
-/// `soraExt` JavaScript channel is the panel's only way out.
+/// private JavaScript channel is the panel's only way out.
 library;
 
 import 'dart:async';
@@ -28,7 +28,7 @@ import '../../core/link.dart';
 import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
 
 /// The lockdown policy for extension panels. Panels are embedded WebViews
-/// whose only sanctioned way out is the host API (the soraExt JS channel to
+/// whose only sanctioned way out is the host API (the private JS channel to
 /// core RPCs; net.fetch through the core exists for background workers, not
 /// panels): a panel must never make its own network requests, or a
 /// compromised panel exfiltrates data with a single request.
@@ -55,7 +55,7 @@ const String _panelContentSecurityPolicy =
 ///
 /// Every served response carries [_panelContentSecurityPolicy]: panel
 /// documents must never make their own network requests; the panel's only
-/// sanctioned way out is the soraExt JS channel (net.fetch through the core
+/// sanctioned way out is the private JS channel (net.fetch through the core
 /// exists for background workers, not panels; neither is governed by the
 /// page CSP).
 /// The entry HTML additionally carries the CSP meta tag injected at install
@@ -353,7 +353,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       );
       if (!mounted || generation != _generation) return;
       await controller.addJavaScriptChannel(
-        'soraExt',
+        PanelBridge.channelName,
         onMessageReceived: (message) async {
           if (!mounted || generation != _generation) return;
           String reply;

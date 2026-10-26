@@ -10,6 +10,7 @@ import 'package:webview_platform_interface/webview_platform_interface.dart' as p
 import 'package:sora/l10n/strings.dart';
 import 'package:sora/src/design/theme.dart';
 import 'package:sora/src/ext/package.dart';
+import 'package:sora/src/ext/bridge.dart';
 import 'package:sora/src/ext/catalog.dart';
 import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/settings.dart';
@@ -174,7 +175,7 @@ void main() {
     expect(find.byKey(const ValueKey('native-panel-surface')), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(platformView.controller.mode, JavaScriptMode.unrestricted);
-    expect(platformView.controller.channels.single.name, 'soraExt');
+    expect(platformView.controller.channels.single.name, PanelBridge.channelName);
     final uri = platformView.controller.loaded.single;
     expect(uri.scheme, 'http');
     expect(uri.host, '127.0.0.1');
