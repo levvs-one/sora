@@ -166,6 +166,8 @@ class Sora extends ChangeNotifier {
         time: DateTime.now(),
         title: strings.updateAvailable(release.version),
         body: strings.updateOpenAbout,
+        messageKey: 'notice.update',
+        messageArgs: {'version': release.version},
         action: 'update',
       ),
     ),
@@ -245,6 +247,8 @@ class Sora extends ChangeNotifier {
         action: action,
         argument: argument,
         failureKey: failed.key,
+        messageKey: 'notice.failure',
+        messageArgs: {'failure': failed.key, if (failed.httpStatus != null) 'status': '${failed.httpStatus}'},
       );
       if (repeated) {
         // Retrying still gets feedback, without filling history with one cause.
@@ -349,12 +353,31 @@ class Sora extends ChangeNotifier {
       ServerReturned(:final entry) => (entry, s.noticeMainBack, ''),
       ServerDegraded(:final entry) => (entry, s.noticeDegraded, 'logs'),
     };
+    final (key, args) = switch (notice) {
+      ConnectionLost() => ('notice.connectionLost', <String, String>{}),
+      ConnectionRestored() => (
+        'notice.connectionRestored',
+        {
+          'entry': server,
+          'mode': ['auto', 'bypass'].contains(selected) ? selected : '',
+        },
+      ),
+      ConnectionFailed(:final failure) => (
+        'notice.connectionFailed',
+        {'failure': failure.key, if (failure.httpStatus != null) 'status': '${failure.httpStatus}'},
+      ),
+      ServerSwitched(:final entry, :final backup) => (backup ? 'notice.backup' : 'notice.next', {'entry': entry}),
+      ServerReturned(:final entry) => ('notice.returned', {'entry': entry}),
+      ServerDegraded(:final entry) => ('notice.degraded', {'entry': entry}),
+    };
     return AppNotification(
       time: DateTime.now(),
       title: title,
       body: body,
       action: action,
       failureKey: notice is ConnectionFailed ? notice.failure.key : '',
+      messageKey: key,
+      messageArgs: args,
     );
   }
 
@@ -586,6 +609,7 @@ class Sora extends ChangeNotifier {
   String displayNameOf(String id) => overrides.renames[id] ?? nameOf(id);
   bool probing = false;
   String? probingSubscription;
+  final pendingProbes = <String>{};
   ResponseStream<ProbeResult>? _probeCall;
 
   bool get canProbe =>
@@ -1260,6 +1284,8 @@ class Sora extends ChangeNotifier {
           time: DateTime.now(),
           title: strings.profileApplyAsk(profile.name),
           body: '',
+          messageKey: 'notice.profileAsk',
+          messageArgs: {'name': profile.name},
           action: 'apply-profile',
           argument: profileId,
         ),
@@ -1285,6 +1311,8 @@ class Sora extends ChangeNotifier {
         time: DateTime.now(),
         title: strings.profileApplied(profile.name),
         body: '',
+        messageKey: 'notice.profileApplied',
+        messageArgs: {'name': profile.name},
         action: 'undo-profile',
         argument: before,
       ),
@@ -2023,10 +2051,16 @@ class Sora extends ChangeNotifier {
 
   Future<void> probe({String? subscriptionId}) async {
     final link = _link;
-    final all = subscriptionId == null ? servers : _subscriptions[subscriptionId]?.outbounds.toList() ?? [];
+    final all = subscriptionId == null
+        ? servers
+        : [
+            for (final outbound in _subscriptions[subscriptionId]?.outbounds ?? <OutboundSpec>[])
+              if (!outbound.id.startsWith(customServerPrefix)) outbound,
+          ];
     if (!canProbe || link == null || all.isEmpty) return;
     probing = true;
     probingSubscription = subscriptionId;
+    pendingProbes.addAll(all.map((o) => o.id));
     notifyListeners();
     // The first chunk failure is reported once below; every chunk's results
     // are kept independently, so one bad chunk never sinks the whole probe.
@@ -2054,6 +2088,7 @@ class Sora extends ChangeNotifier {
           );
           await for (final r in call) {
             if (_disposed || link != _link || busy || (phase != Phase.off && phase != Phase.connected)) break;
+            if (!pendingProbes.remove(r.serverId)) continue;
             latency[r.serverId] = r.reachable ? r.latencyMs : null;
             _recordProbe(r.serverId, r.reachable);
             final now = DateTime.now();
@@ -2069,6 +2104,9 @@ class Sora extends ChangeNotifier {
           // A failed chunk leaves its servers unknown; the rest are still
           // measured.
           firstError ??= error;
+        } finally {
+          pendingProbes.removeAll(chunk.map((o) => o.id));
+          notifyListeners();
         }
       }
       if (firstError != null && !_disposed && link == _link) {
@@ -2081,6 +2119,7 @@ class Sora extends ChangeNotifier {
       _probeCall = null;
       probing = false;
       probingSubscription = null;
+      pendingProbes.clear();
       _maybeAutoSwitch();
       notifyListeners();
     }

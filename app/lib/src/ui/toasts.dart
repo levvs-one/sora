@@ -11,6 +11,7 @@ import '../notifications.dart';
 import '../sora.dart';
 import 'kit.dart';
 import 'notifications_screen.dart';
+import 'notification_text.dart';
 
 class ToastVisibility extends InheritedWidget {
   const ToastVisibility({super.key, required this.visible, required super.child});
@@ -31,19 +32,20 @@ class _ToastTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
+    final words = notificationText(S.of(context), notice);
     final body = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          notice.title,
+          words.title,
           key: ObjectKey(notice),
           style: Styles.bodyStrong.copyWith(color: palette.ink, height: 4 / 3),
         ),
-        if (notice.body.isNotEmpty) ...[
+        if (words.body.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
-            notice.body,
+            words.body,
             style: Styles.secondary.copyWith(color: palette.ink, height: 16 / 13),
           ),
         ],
