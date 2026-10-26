@@ -34,6 +34,7 @@ void main() {
       authorKeyPin: catalog.entries.singleWhere((entry) => entry.id == id).authorKey,
     );
     final sora = Sora(await Settings.load(), extensions: store);
+    var bodyFailed = false;
     try {
       for (var cycle = 0; cycle < 2; cycle++) {
         await tester.pumpWidget(
@@ -72,7 +73,17 @@ void main() {
               lastError = error;
             }
           }
-          fail('Native panel did not satisfy $expression; last error: $lastError');
+          Object? document;
+          try {
+            document = await controller
+                .runJavaScriptReturningResult(
+                  "JSON.stringify({url:location.href,state:document.readyState,api:typeof window.soraExt,host:typeof window.SoraExtHost,content:document.getElementById('content')?.textContent,proof:window.nativePanelProof})",
+                )
+                .timeout(const Duration(seconds: 2));
+          } catch (error) {
+            document = '$error';
+          }
+          fail('Native panel did not satisfy $expression; document: $document; last error: $lastError');
         }
 
         // No core is started: the real API must report its not-connected code,
@@ -109,10 +120,19 @@ void main() {
         await tester.pumpWidget(const SizedBox());
         await tester.pump(const Duration(milliseconds: 300));
       }
+    } catch (error, stack) {
+      bodyFailed = true;
+      debugPrintStack(label: 'Native panel primary failure: $error', stackTrace: stack);
+      rethrow;
     } finally {
       await tester.pumpWidget(const SizedBox());
       sora.dispose();
-      await work.delete(recursive: true);
+      try {
+        await work.delete(recursive: true);
+      } catch (error) {
+        debugPrint('Native panel cleanup failure: $error');
+        if (!bodyFailed) rethrow;
+      }
     }
   }, timeout: const Timeout(Duration(minutes: 2)));
 }

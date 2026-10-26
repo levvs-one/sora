@@ -214,6 +214,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(platformView.controller.loaded, isEmpty);
     expect(platformView.controller.channels, isEmpty);
+    expect(
+      platformView.controller.cacheClears,
+      1,
+      reason: 'Closing before readiness must release the late controller.',
+    );
     expect(find.byType(WebViewWidget), findsNothing);
     expect(tester.takeException(), isNull);
   });

@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:webview_all/webview_all.dart';
 import 'package:webview_all_linux/webview_all_linux.dart';
+import 'package:webview_all_windows/webview_all_windows.dart';
 
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
@@ -266,9 +267,23 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     try {
       SoraScope.read(context).removeListener(_onSoraPhase);
     } catch (_) {}
-    _controller?.clearCache();
+    final controller = _controller;
+    _controller = null;
+    if (controller != null) unawaited(_releaseController(controller));
     unawaited(_server?.stop());
     super.dispose();
+  }
+
+  Future<void> _releaseController(WebViewController controller) async {
+    try {
+      await switch (controller.platform) {
+        final LinuxWebViewController native => native.dispose(),
+        final WindowsWebViewController native => native.dispose(),
+        _ => controller.clearCache(),
+      };
+    } catch (error) {
+      debugPrint('Extension panel cleanup failed: $error');
+    }
   }
 
   Future<List<Map<String, dynamic>>> _getConnections() async {
@@ -315,6 +330,8 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     if (_starting || !mounted || _failure != null) return;
     _starting = true;
     final generation = ++_generation;
+    WebViewController? prepared;
+    var retained = false;
     try {
       final store = ExtScope.of(context);
       final dir = store.contentDir(widget.extensionId);
@@ -334,6 +351,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
               ),
             )
           : WebViewController();
+      prepared = controller;
       await controller.setJavaScriptMode(JavaScriptMode.unrestricted);
       if (!mounted || generation != _generation) return;
       await controller.setNavigationDelegate(
@@ -380,6 +398,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       );
       if (!mounted || generation != _generation) return;
       setState(() => _controller = controller);
+      retained = true;
       await controller.loadRequest(_origin!.resolve(_panel.entry));
       if (!mounted || generation != _generation) return;
       _watchSora();
@@ -388,6 +407,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
         setState(() => _failure = 'load');
       }
     } finally {
+      if (!retained && prepared != null) await _releaseController(prepared);
       _starting = false;
     }
   }

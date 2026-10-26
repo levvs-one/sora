@@ -43,3 +43,21 @@ archive or catalog. Its current disconnected-state copy and styling remain in
 that separately signed package. Source/package improvements need their normal
 author and catalog signatures before publication; the host does not bypass that
 trust contract. This is not a general browser-security or native-driver audit.
+
+## Controller lifetime and first native run
+
+The first Linux native job (run 40325604533, job 121581375634) built the app
+successfully but failed: deleting the temporary fixture directory reported
+`Directory not empty`. That exception in the test finalizer hid the initial
+failure, so it does not establish that the browser assertions passed or identify
+the initial cause. The test now records the primary exception and a synthetic
+page-state snapshot before cleanup; cleanup still fails an otherwise successful
+body. No assertions or time bounds were relaxed.
+
+Source review also confirmed that detaching either desktop WebView widget does
+not dispose its controller. The host now uses the native controllers' existing
+`dispose` methods when the panel closes, and releases a controller that finishes
+initializing after the screen has closed. A closing-during-initialization
+regression failed before that change and passed afterward. This lifetime fix
+must not be described as the proven cause of the first native test failure;
+the next native run must supply that evidence.
