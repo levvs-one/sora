@@ -127,16 +127,17 @@ class InstallerSignatureTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertFalse(reached, result.stdout + result.stderr)
 
-    def test_signed_legacy_format_remains_explicitly_supported(self):
+    def test_signed_legacy_format_is_retired_before_installation(self):
         result, reached = self.run_installer("metadata-legacy")
-        self.assertTrue(reached, result.stdout + result.stderr)
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(reached, result.stdout + result.stderr)
 
     @unittest.skipUnless(os.name == "nt", "Windows PowerShell 5.1 compatibility")
     def test_windows_powershell_51_bounds_local_streams(self):
         for variant in ("valid", "metadata-wrong-size", "metadata-legacy", "metadata-oversize"):
             with self.subTest(variant=variant):
                 result, reached = self.run_installer(variant, shell="powershell.exe")
-                self.assertEqual(reached, variant in ("valid", "metadata-legacy"), result.stdout + result.stderr)
+                self.assertEqual(reached, variant == "valid", result.stdout + result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Linux namespace startup control")
     def test_sandbox_setup_failure_is_not_an_installer_rejection(self):

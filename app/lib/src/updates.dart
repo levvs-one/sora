@@ -617,26 +617,19 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
-  List<ReleaseAsset> _boundAssets(List<ReleaseAsset> assets, ReleaseMetadata? metadata) {
+  List<ReleaseAsset> _boundAssets(List<ReleaseAsset> assets, ReleaseMetadata metadata) {
     final bounded = <ReleaseAsset>[];
     for (final asset in assets) {
-      if (metadata == null) {
-        if (asset.size < 1 || asset.size > ReleaseMetadata.maxArtifactBytes) {
-          throw const UpdateFailure(UpdateError.release);
-        }
-        bounded.add(asset);
-      } else {
-        final entry = metadata.artifacts[asset.name];
-        if (entry == null || entry.os != (_windows ? 'windows' : 'linux') || entry.arch != 'amd64') {
-          throw const UpdateFailure(UpdateError.release);
-        }
-        bounded.add(ReleaseAsset(asset.name, asset.url, entry.size));
+      final entry = metadata.artifacts[asset.name];
+      if (entry == null || entry.os != (_windows ? 'windows' : 'linux') || entry.arch != 'amd64') {
+        throw const UpdateFailure(UpdateError.release);
       }
+      bounded.add(ReleaseAsset(asset.name, asset.url, entry.size));
     }
     return bounded;
   }
 
-  Future<({String manifest, ReleaseMetadata? metadata})> _signedManifest(
+  Future<({String manifest, ReleaseMetadata metadata})> _signedManifest(
     SoraRelease release,
     Directory directory,
   ) async {
@@ -661,20 +654,15 @@ class AppUpdater extends ChangeNotifier {
     } on FormatException {
       throw const UpdateFailure(UpdateError.release);
     }
-    ReleaseMetadata? metadata;
-    List<int>? metadataBytes;
-    if (ReleaseMetadata.referenced(manifest)) {
-      final asset = release.asset(ReleaseMetadata.filename);
-      if (asset.size > ReleaseMetadata.maxBytes) throw const UpdateFailure(UpdateError.release);
-      metadataBytes = await _fetch(asset.url, limit: ReleaseMetadata.maxBytes, size: asset.size);
-      metadata = _parseMetadata(metadataBytes, manifest, release.version);
-    }
+    if (!ReleaseMetadata.referenced(manifest)) throw const UpdateFailure(UpdateError.release);
+    final asset = release.asset(ReleaseMetadata.filename);
+    if (asset.size > ReleaseMetadata.maxBytes) throw const UpdateFailure(UpdateError.release);
+    final metadataBytes = await _fetch(asset.url, limit: ReleaseMetadata.maxBytes, size: asset.size);
+    final metadata = _parseMetadata(metadataBytes, manifest, release.version);
     if (_cancelled || _disposed) throw const UpdateFailure(UpdateError.network);
     await File('${directory.path}/SHA256SUMS').writeAsBytes(payload, flush: true);
     await File('${directory.path}/SHA256SUMS.minisig').writeAsBytes(signatureBytes, flush: true);
-    if (metadataBytes != null) {
-      await File('${directory.path}/${ReleaseMetadata.filename}').writeAsBytes(metadataBytes, flush: true);
-    }
+    await File('${directory.path}/${ReleaseMetadata.filename}').writeAsBytes(metadataBytes, flush: true);
     return (manifest: manifest, metadata: metadata);
   }
 
@@ -919,17 +907,16 @@ class AppUpdater extends ChangeNotifier {
       final signature = await _cachedMetadataFile(dir, 'SHA256SUMS.minisig', 8192);
       await verifyPayload(_signingPublicKey, utf8.decode(signature), 'release:v${marker.from}:SHA256SUMS', payload);
       final manifest = utf8.decode(payload);
-      ReleaseMetadata? metadata;
-      if (ReleaseMetadata.referenced(manifest)) {
-        try {
-          metadata = _parseMetadata(
-            await _cachedMetadataFile(dir, ReleaseMetadata.filename, ReleaseMetadata.maxBytes),
-            manifest,
-            marker.from,
-          );
-        } on Object {
-          throw const UpdateFailure(UpdateError.rollback);
-        }
+      if (!ReleaseMetadata.referenced(manifest)) throw const UpdateFailure(UpdateError.rollback);
+      final ReleaseMetadata metadata;
+      try {
+        metadata = _parseMetadata(
+          await _cachedMetadataFile(dir, ReleaseMetadata.filename, ReleaseMetadata.maxBytes),
+          manifest,
+          marker.from,
+        );
+      } on Object {
+        throw const UpdateFailure(UpdateError.rollback);
       }
       final names = installation.filenames(marker.from);
       final paths = <String>[];
@@ -937,11 +924,11 @@ class AppUpdater extends ChangeNotifier {
         final file = File('${dir.path}/$name');
         if (!await file.exists()) throw const UpdateFailure(UpdateError.rollback);
         try {
-          final entry = metadata?.artifacts[name];
-          if (metadata != null && (entry == null || entry.os != 'linux' || entry.arch != 'amd64')) {
+          final entry = metadata.artifacts[name];
+          if (entry == null || entry.os != 'linux' || entry.arch != 'amd64') {
             throw const UpdateFailure(UpdateError.rollback);
           }
-          await verifyUpdateFile(file, manifest, name, size: entry?.size);
+          await verifyUpdateFile(file, manifest, name, size: entry.size);
         } on UpdateFailure {
           debugPrint('[updates] rollback cache hash mismatch for $name; refusing to roll back');
           throw const UpdateFailure(UpdateError.rollback);

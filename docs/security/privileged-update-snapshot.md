@@ -32,7 +32,7 @@ implementation still resolves in-root symlinks. Tests caught that behaviour, so
 the single-component open uses the existing x/sys primitive instead. This is not
 a custom path resolver; nested and parent filenames are refused.
 
-Manifest/signature/optional JSON copies have fixed 1 MiB/8 KiB/1 MiB limits.
+Manifest/signature/required JSON copies have fixed 1 MiB/8 KiB/1 MiB limits.
 Authentication precedes all package opens. Authenticated target/size queries then
 select exactly the two supported packages. Copying reads at most limit+1 bytes,
 checks descriptor size/modification time/link count afterward and verifies signed
@@ -40,9 +40,10 @@ length and hash on the private output. Exclusive creation uses mode 0600.
 Failures remove files created by the command; a preexisting destination is never
 overwritten. The shell retains its private signature/hash/package-manager checks.
 
-Signed legacy manifests retain the existing explicit 2 GiB per-package ceiling
-and authenticated hashes. They have no signed length; retiring that compatibility
-path is a separate S2 transition decision. No unsigned fallback is added. A core
+Signed legacy manifests without authenticated schema 1 metadata are retired;
+the command rejects them and cleans its output before opening any package.
+Every package copy requires a positive authenticated length, bounded by 2 GiB.
+There is no zero-size/API-size/generic-ceiling compatibility fallback. A core
 without the new command refuses preparation, leaving the installed pair untouched;
 ship core/helper changes together through the reviewed signed transition.
 
@@ -73,11 +74,13 @@ without replacing the domain's authenticated size/hash/selection policy. The
 [standard traversal-resistant API](https://go.dev/blog/osroot) plus the existing
 single-component Unix open is sufficient here.
 
-Native tests use real signed producer fixtures for all three formats and an
-ephemeral signed legacy pair. They cover sparse oversized inputs, corruption,
+Native tests use real signed producer fixtures for all three formats and reject
+an ephemeral signed legacy pair, including output cleanup. They cover sparse oversized inputs, corruption,
 missing/empty files, symlinks, hardlinks, FIFO, directories, cancellation, output
 permissions/nonemptiness, mixed CLI modes and a replaced source-directory path.
 The namespace suite also builds the existing temporary-key verifier and exercises
-the actual helper/CLI/signature/copy boundary with a valid pair and tampering.
+the actual helper/CLI/signature/copy boundary with a valid pair, tampering and
+retired signed legacy inputs with absent or unlisted JSON. The legacy cases use
+intact package bytes so tampering cannot produce a false format rejection.
 Only package-manager/system-query operations are intercepted; no host package,
 service, route or firewall operation is performed.

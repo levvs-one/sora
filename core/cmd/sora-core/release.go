@@ -67,22 +67,18 @@ func verifyRelease(directory, version, publicKey string) (*releaseManifest, erro
 		return nil, fmt.Errorf("release: untrusted SHA256SUMS: %w", err)
 	}
 	manifest := &releaseManifest{payload: payload, signature: signature}
-	for _, line := range strings.Split(string(payload), "\n") {
-		line = strings.TrimSuffix(line, "\r")
-		if !strings.HasSuffix(line, " release.json") && !strings.HasSuffix(line, "*release.json") {
-			continue
-		}
-		data, err := readReleaseFile(root, "release.json", 1024*1024)
-		if err != nil {
-			return nil, err
-		}
-		manifest.metadata, err = parseReleaseMetadata(data, payload, version)
-		if err != nil {
-			return nil, err
-		}
-		manifest.metadataBytes = data
-		break
+	if _, err := releaseChecksum(payload, "release.json"); err != nil {
+		return nil, fmt.Errorf("release: schema 1 metadata is required: %w", err)
 	}
+	data, err := readReleaseFile(root, "release.json", 1024*1024)
+	if err != nil {
+		return nil, err
+	}
+	manifest.metadata, err = parseReleaseMetadata(data, payload, version)
+	if err != nil {
+		return nil, err
+	}
+	manifest.metadataBytes = data
 	return manifest, nil
 }
 
@@ -245,8 +241,7 @@ func (manifest *releaseManifest) artifactSize(name, target, version string) (int
 		return 0, err
 	}
 	if manifest.metadata == nil {
-		// Zero means authenticated legacy checksum, with no signed size.
-		return 0, nil
+		return 0, fmt.Errorf("release: artifact sizes require schema 1 metadata")
 	}
 	for _, artifact := range manifest.metadata.Artifacts {
 		if artifact.Name == name {

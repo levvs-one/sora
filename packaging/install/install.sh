@@ -115,16 +115,15 @@ fi
 say "sora: installing $version with $manager"
 fetch SHA256SUMS 1048576
 fetch SHA256SUMS.minisig 8192
-if grep -Eq ' [ *]release[.]json$' "$work/SHA256SUMS"; then fetch release.json 1048576; fi
+grep -Eq ' [ *]release[.]json$' "$work/SHA256SUMS" || die 'schema 1 release metadata is required'
+fetch release.json 1048576
 "$verifier" -verify-release "$work" -release-version "$version" || die 'release signature or metadata rejected; nothing was installed'
 for name in $files; do
 	size=$("$verifier" -verify-release "$work" -release-version "$version" -release-artifact "$name" -release-target "linux/$deb_arch") || die 'artifact metadata rejected'
 	case "$size" in '' | *[!0-9]*) die 'invalid verifier size response' ;; esac
-	if [ "${#size}" -gt 10 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
-	limit=$size
-	if [ "$limit" -eq 0 ]; then limit=2147483648; fi
-	fetch "$name" "$limit"
-	if [ "$size" -gt 0 ] && [ "$(wc -c <"$work/$name")" -ne "$size" ]; then die 'signed package size mismatch'; fi
+	if [ "${#size}" -gt 10 ] || [ "$size" -lt 1 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
+	fetch "$name" "$size"
+	if [ "$(wc -c <"$work/$name")" -ne "$size" ]; then die 'signed package size mismatch'; fi
 done
 
 (

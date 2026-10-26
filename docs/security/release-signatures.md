@@ -64,7 +64,7 @@ one-command trust solution. A signed Windows installer or trusted Linux package
 channel still needs release-owner provisioning before a general release.
 
 The scripts first copy/download bounded manifest and detached signature files,
-and `release.json` when the checksum table declares it. That declaration may
+and require `release.json` in the checksum table. That declaration may
 cause only a bounded metadata fetch before authentication. The trusted verifier
 then checks the requested stable version, signature and declared JSON. A rejection
 stops before package download, UAC or package-manager execution. Packages are
@@ -128,16 +128,17 @@ Using a previously trusted build of sora-core, before using the manifest:
 sora-core -verify-release /path/to/private-release-snapshot -release-version 1.2.3
 ```
 
-The command verifies the manifest signature and any declared metadata, not the
+The command verifies the manifest signature and required schema 1 metadata, not the
 package files. Callers must subsequently check each package's hash,
 expected name, platform and architecture before installation. Signature checking
 does not authorize a downgrade; the caller's version policy remains required.
 
 The native command accepts the two required flags, optionally with both
 `-release-artifact NAME -release-target OS/ARCH`. This query repeats authentication
-and prints only the signed size as a decimal integer. Zero identifies a signed
-legacy manifest without JSON; callers retain a 2 GiB ceiling and verify its
-checksum, never interpret zero as an unlimited download. An unknown artifact,
+and prints only the positive signed size as a decimal integer. Signed manifests
+without authenticated schema 1 JSON are refused; zero is no longer a supported
+size response. The scripts/helper reject zero even from an older verifier,
+without substituting an API size or a generic ceiling. An unknown artifact,
 missing checksum or target mismatch fails. A verifier predating the query refuses
 the flags and cannot silently authorize an installation.
 
@@ -356,9 +357,10 @@ tampering, invalid inputs, stale outputs and a file mutation during hashing.
 
 ### In-app metadata enforcement
 
-After authenticating SHA256SUMS, the app decides whether `release.json` is
-required from that signed payload. Removing the JSON asset from the GitHub API
-cannot select a legacy format. The app fetches at most 1 MiB of JSON, verifies
+After authenticating SHA256SUMS, the app requires its `release.json` entry;
+absence is rejected before any package request. Removing the JSON asset from
+the GitHub API or supplying unlisted JSON cannot select a legacy format.
+The app fetches at most 1 MiB of JSON, verifies
 its listed hash, and validates schema 1, the requested version, current artifact
 names, declared OS/architecture, positive sizes up to 2 GiB, lowercase hashes,
 and a sorted, unique artifact list of at most 128 entries. Re-encoding with the
@@ -375,8 +377,8 @@ to the desktop updater by this change.
 The app saves the exact JSON bytes with the signed manifest in its working
 snapshot and Linux rollback cache. Offline rollback reauthenticates the cached
 manifest and JSON and enforces target and size again before invoking the helper.
-The root-owned Linux helper snapshots any supplied JSON, requires it when the
-signed checksum table declares it, and checks its nonempty, bounded contents
+The root-owned Linux helper requires JSON in its private snapshot and in the
+signed checksum table, and checks its nonempty, bounded contents
 against that table before the package manager runs. An unlisted JSON is rejected.
 The helper now invokes the installed native verifier to parse schema 1 and query
 each package's signed size and expected Linux/amd64 target on that root-owned
@@ -384,13 +386,15 @@ snapshot. It also retains its own checksum, length and package-manager metadata
 checks. Initial-install scripts use the same native query with the detected target,
 including Linux arm64 core packages; Windows selects the existing amd64 build.
 
-Previously signed manifests without a JSON reference remain accepted by the
-existing signature and version policies, including Linux rollback. In the app,
-their size comes from the API with a hard 2 GiB ceiling, not authenticated metadata.
-This is explicit signed-format compatibility, not unsigned fallback. New producer
-output always declares JSON in the signed checksum table. The release transition
-must determine when legacy signed formats can be retired before claiming that
-every supported installation path requires schema 1.
+The draft signed format without JSON is retired on all consumer paths: native
+verification/size queries, both initial scripts, in-app downloads, preparation
+of a rollback cache, offline rollback and privileged Linux snapshots. A valid
+Minisign signature alone does not satisfy the current metadata contract. Stray
+unlisted JSON does not upgrade the format. The 2 GiB per-artifact maximum still
+applies to positive signed sizes; it is not a fallback for missing metadata.
+Existing legacy cache entries cannot be used for a downgrade or suggested as a
+manual-install pair. Update preparation fails before privileged handoff if the
+previous release cannot supply a trusted schema 1 rollback cache.
 
 The metadata fixtures are generated by the production Python producer and signed
 by the Go CLI with a temporary key. Its private part is deleted. Go-to-Dart tests
@@ -422,11 +426,12 @@ files, non-regular inputs and ambiguous command flags. They also check that
 verification does not create core state and that the native trust root agrees
 with the application's team key.
 
-The fifteen committed signature fixtures were generated with `sora-ext sign-file`
-and one temporary test key, whose private part was deleted. They cover the current
-Windows/deb/rpm/Arch test payloads, previous Linux payloads, and signatures for an
-incorrect version or catalog role over otherwise identical bytes. No production
-key signed those fixtures. The updater rejection matrix exercises every supported
+The fifteen older signature fixtures remain as genuine cryptographic negative
+inputs for the retired format. Current lifecycle fixtures are regenerated by the
+production metadata producer and Go signer with a separate ephemeral identity,
+including previous schema 1 packages and incorrect version/catalog roles. Their
+private keys are deleted, never copied or committed. No production key signed
+those fixtures. The updater rejection matrix exercises every supported
 package format and checks that untrusted metadata stops before package download,
 elevation, manual-install suggestions or restart. Cached package-plus-manifest
 tampering, missing signatures and oversized metadata are also rejected.
@@ -434,8 +439,8 @@ tampering, missing signatures and oversized metadata are also rejected.
 The Linux namespace suite checks the private snapshot, installed-verifier
 invocation and installer boundary using stubbed OS queries and a verifier stub.
 It covers verifier rejection/absence, missing/symlinked signatures and ignores a
-downloaded fake verifier. Cryptographic correctness is exercised separately by
-the native tests and Go-to-Dart fixtures; this is not a real package installation
+downloaded fake verifier. An additional namespace case uses the real temporary-key
+native verifier for valid, tampered and retired signed snapshots. This is not a real package installation
 or Windows elevation test.
 
 ## Signed-release transition
@@ -447,19 +452,27 @@ v1.1.0 carried checksum manifests and the expected package matrix. This inventor
 checks asset metadata, not package provenance, embedded Authenticode signatures
 or releases distributed outside GitHub. It provides no evidence of an existing
 production population that requires the draft legacy signed-manifest format.
-Retiring that temporary compatibility path needs an explicit transition policy;
-do not confuse fixture compatibility with deployed-client compatibility.
+The draft compatibility path is now explicitly retired in code. This inventory
+does not prove that no externally distributed client ever used it; assess any
+such population during the release-owner transition. Fixture compatibility is
+not evidence of deployed-client compatibility.
 
 There is no unsigned fallback. Previously published unsigned releases cannot be
 installed by this updater or used as rollback targets. Before shipping it, the
-release owner must independently authenticate and sign both the new manifest and
-the previous Linux rollback release, or establish another reviewed transition.
+release owner must provision an independently authenticated schema 1 baseline
+and a reviewed rollback path. One option is a trusted manual/bootstrap installation
+of a new signed baseline; subsequent updates can cache that baseline. Another
+requires independently authenticating historical payloads, generating complete
+schema 1 metadata and authorizing its signing/publication through a reviewed
+transition. Merely attaching a signature to an old checksum-only release is
+insufficient. This change chooses neither production action nor a bootstrap trust
+channel and does not retrofit provenance to old releases.
 An older installed native verifier that does not understand the command also
 causes the helper to refuse installation. Publishing signatures or re-signing an
 old release is a separate release action; this change performs neither.
 
-Still required by S2: the reviewed transition, a publication gate that keeps the
-private key outside CI, a provisioned consumer bootstrap channel, key rotation/revocation and the
+Still required by S2: the reviewed transition, provisioning/approval of the prepared
+publication gate with its key outside CI, a consumer bootstrap channel, key rotation/revocation and the
 remaining real installation/elevation rejection matrix. Windows does not yet
 implement automatic rollback. Do not publish a release before the signed-release
 transition is ready.

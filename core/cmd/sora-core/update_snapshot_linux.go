@@ -67,12 +67,7 @@ func prepareUpdateSnapshot(ctx context.Context, format, version, source, target,
 			}
 		}
 	}()
-	metadata := []string{"SHA256SUMS", "SHA256SUMS.minisig"}
-	if _, err := input.Lstat("release.json"); err == nil {
-		metadata = append(metadata, "release.json")
-	} else if !errors.Is(err, os.ErrNotExist) {
-		return err
-	}
+	metadata := []string{"SHA256SUMS", "SHA256SUMS.minisig", "release.json"}
 	for _, name := range metadata {
 		limit := int64(1024 * 1024)
 		if name == "SHA256SUMS.minisig" {
@@ -87,29 +82,15 @@ func prepareUpdateSnapshot(ctx context.Context, format, version, source, target,
 	if err != nil {
 		return err
 	}
-	if manifest.metadata == nil && len(metadata) == 3 {
-		return fmt.Errorf("release: snapshot JSON is not authenticated")
-	}
 	for _, name := range names {
 		size, err := manifest.artifactSize(name, "linux/amd64", version)
 		if err != nil {
 			return err
 		}
-		limit := size
-		if limit == 0 {
-			limit = 2 * 1024 * 1024 * 1024
-		}
-		if err := copyUpdateSnapshotFile(ctx, input, output, name, limit); err != nil {
+		if err := copyUpdateSnapshotFile(ctx, input, output, name, size); err != nil {
 			return err
 		}
 		copied = append(copied, name)
-		info, err := output.Stat(name)
-		if err != nil {
-			return err
-		}
-		if size == 0 {
-			size = info.Size()
-		}
 		digest, err := releaseChecksum(manifest.payload, name)
 		if err != nil {
 			return err

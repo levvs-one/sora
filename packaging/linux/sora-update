@@ -82,22 +82,18 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 /usr/bin/sora-core -prepare-update "$format" -release-version "$version" "$source" "$work" || die 'release snapshot verification failed; nothing was installed'
 /usr/bin/sora-core -verify-release "$work" -release-version "$version" || die 'release signature verification failed; nothing was installed'
 cd "$work"
-checked_files=$files
-if grep -Eq ' [ *]release[.]json$' SHA256SUMS; then
-    if [ ! -f release.json ] || [ ! -s release.json ] || [ -L release.json ]; then die 'release metadata is missing or empty'; fi
-    [ "$(wc -c <release.json)" -le 1048576 ] || die 'release metadata is too large'
-    checked_files="$checked_files release.json"
-elif [ -e release.json ]; then
-    die 'release metadata is not authenticated by the checksum manifest'
-fi
+grep -Eq ' [ *]release[.]json$' SHA256SUMS || die 'schema 1 release metadata is required'
+if [ ! -f release.json ] || [ ! -s release.json ] || [ -L release.json ]; then die 'release metadata is missing or empty'; fi
+[ "$(wc -c <release.json)" -le 1048576 ] || die 'release metadata is too large'
+checked_files="$files release.json"
 for name in $checked_files; do
     if [ "$name" != release.json ]; then
         size=$(/usr/bin/sora-core -verify-release "$work" -release-version "$version" -release-artifact "$name" -release-target linux/amd64) || die 'artifact metadata rejected'
         case "$size" in '' | *[!0-9]*) die 'invalid verifier size response' ;; esac
-        if [ "${#size}" -gt 10 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
+        if [ "${#size}" -gt 10 ] || [ "$size" -lt 1 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
         bytes=$(wc -c <"$name")
         if [ "$bytes" -lt 1 ] || [ "$bytes" -gt 2147483648 ]; then die 'invalid package size'; fi
-        if [ "$size" -gt 0 ] && [ "$bytes" -ne "$size" ]; then die 'signed package size mismatch'; fi
+        if [ "$bytes" -ne "$size" ]; then die 'signed package size mismatch'; fi
     fi
     # Match the filename literally, including the dots in release versions.
     awk -v name="$name" 'length($1) == 64 && $1 !~ /[^0-9a-fA-F]/ && (substr($0, 67) == name || substr($0, 67) == "*" name) {print tolower($1) "  " name; count++} END {if (count != 1) exit 1}' SHA256SUMS >>expected || die 'missing or duplicate checksum'

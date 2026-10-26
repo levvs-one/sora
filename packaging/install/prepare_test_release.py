@@ -37,6 +37,8 @@ def prepare(distribution, version, output):
         key = private / "ephemeral"
         subprocess.run([str(signer), "keygen", "-o", str(key)], check=True, stdout=subprocess.DEVNULL)
         public = key.with_suffix(".pub").read_text().splitlines()[-1]
+        # Cross-built native tests reuse only this public root, never the private identity.
+        (output / "fixture-public-key.txt").write_text(public + "\n")
         # Only this temporary source copy trusts the ephemeral fixture identity.
         source = private / "core"
         shutil.copytree(repo / "core", source)

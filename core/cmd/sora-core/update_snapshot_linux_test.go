@@ -47,11 +47,12 @@ func updateSnapshotFixture(t *testing.T) (string, string) {
 	return source, fixture.PublicKey
 }
 
-func TestPrepareUpdateSnapshotFormatsAndLegacy(t *testing.T) {
+func TestPrepareUpdateSnapshotFormatsAndLegacyRetirement(t *testing.T) {
 	for _, format := range []string{"deb", "rpm", "arch", "legacy"} {
 		t.Run(format, func(t *testing.T) {
 			source, key := updateSnapshotFixture(t)
-			if format == "legacy" {
+			legacy := format == "legacy"
+			if legacy {
 				format = "deb"
 				public, private, err := minisign.GenerateKey(rand.Reader)
 				if err != nil {
@@ -78,11 +79,19 @@ func TestPrepareUpdateSnapshotFormatsAndLegacy(t *testing.T) {
 			if err := os.Chmod(target, 0o700); err != nil {
 				t.Fatal(err)
 			}
-			if err := prepareUpdateSnapshot(context.Background(), format, "1.0.5", source, target, key); err != nil {
-				t.Fatal(err)
+			prepareErr := prepareUpdateSnapshot(context.Background(), format, "1.0.5", source, target, key)
+			if legacy {
+				entries, err := os.ReadDir(target)
+				if prepareErr == nil || err != nil || len(entries) != 0 {
+					t.Fatalf("retired legacy snapshot was accepted or left files: %v, %v, %v", prepareErr, entries, err)
+				}
+				return
+			}
+			if prepareErr != nil {
+				t.Fatal(prepareErr)
 			}
 			entries, err := os.ReadDir(target)
-			if err != nil || (len(entries) != 4 && len(entries) != 5) {
+			if err != nil || len(entries) != 5 {
 				t.Fatalf("unexpected selected snapshot: %v, %v", entries, err)
 			}
 			for _, entry := range entries {

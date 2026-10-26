@@ -21,9 +21,9 @@ def generate():
                        cwd=REPO / "tools/sora-ext", env={**os.environ, "CGO_ENABLED": "0"}, check=True)
         key = root / "ephemeral"
         subprocess.run([str(signer), "keygen", "-o", str(key)], check=True, stdout=subprocess.DEVNULL)
-        result = {"public_key": key.with_suffix(".pub").read_text().splitlines()[-1], "releases": {}, "cases": {}}
+        result = {"public_key": key.with_suffix(".pub").read_text().splitlines()[-1], "releases": {}, "cases": {}, "flows": {}}
 
-        def signed(metadata, version, duplicate=False, package_hashes=None):
+        def signed(metadata, version, duplicate=False, package_hashes=None, role=None):
             document = json.loads(metadata)
             hashes = dict(package_hashes) if package_hashes is not None else {
                 entry["name"]: entry["sha256"] for entry in document["artifacts"]}
@@ -34,7 +34,7 @@ def generate():
             payload = root / "SHA256SUMS"
             payload.write_bytes(manifest.encode("ascii"))
             subprocess.run([str(signer), "sign-file", "--key", str(key.with_suffix(".key")),
-                            "--role", f"release:v{version}:SHA256SUMS", str(payload)],
+                            "--role", role or f"release:v{version}:SHA256SUMS", str(payload)],
                            check=True, stdout=subprocess.DEVNULL)
             return {"metadata": metadata, "manifest": manifest, "signature": payload.with_suffix(".minisig").read_text()}
 
@@ -50,6 +50,23 @@ def generate():
                 (distribution / name).write_bytes(b"abc")
             write_release_manifest(distribution, version)
             result["releases"][version] = signed((distribution / "release.json").read_text(), version)
+            result["flows"][version] = {}
+            for package_format in ("deb", "rpm", "arch", "windows"):
+                flow = root / f"flow-{version}-{package_format}"
+                flow.mkdir()
+                names = [f"Sora-Setup-{version}-x64.exe"] if package_format == "windows" else [
+                    f"{package}_{version}_amd64.deb" if package_format == "deb" else
+                    f"{package}-{version}-1.x86_64.rpm" if package_format == "rpm" else
+                    f"{package}-{version}-1-x86_64.pkg.tar.zst" for package in ("sora-core", "sora")]
+                for name in names:
+                    prefix = "Old" if version == "1.0.4" else "Test"
+                    (flow / name).write_bytes(f"{prefix} bytes for {name}".encode("ascii"))
+                write_release_manifest(flow, version)
+                metadata = (flow / "release.json").read_text()
+                record = signed(metadata, version)
+                record["wrong-version-signature"] = signed(metadata, version, role="release:v0.0.0:SHA256SUMS")["signature"]
+                record["catalog-signature"] = signed(metadata, version, role="catalog.json")["signature"]
+                result["flows"][version][package_format] = record
         base = result["releases"]["1.0.5"]["metadata"]
         for case in ("os", "arch", "zero-size", "oversize", "float-size", "wrong-size", "hash-case",
                      "version", "schema", "empty", "order", "unknown", "duplicate-key", "whitespace", "duplicate-checksum"):

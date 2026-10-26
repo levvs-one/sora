@@ -85,18 +85,16 @@ function Receive-ReleaseFile([string]$File, [long]$Limit) {
 try {
     Receive-ReleaseFile 'SHA256SUMS' 1048576
     Receive-ReleaseFile 'SHA256SUMS.minisig' 8192
-    if (Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -cmatch ' [ *]release[.]json$' }) {
-        Receive-ReleaseFile 'release.json' 1048576
-    }
+    if (-not (Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -cmatch ' [ *]release[.]json$' })) { throw 'Schema 1 release metadata is required.' }
+    Receive-ReleaseFile 'release.json' 1048576
     & $verifier -verify-release $work -release-version $version
     if ($LASTEXITCODE -ne 0) { throw 'The release signature or metadata was rejected; nothing was installed.' }
     $sizeText = & $verifier -verify-release $work -release-version $version -release-artifact $name -release-target 'windows/amd64'
     if ($LASTEXITCODE -ne 0 -or $sizeText -notmatch '^(0|[1-9][0-9]{0,9})$') { throw 'Invalid verifier size response.' }
     [long]$signedSize = $sizeText
-    if ($signedSize -gt 2147483648) { throw 'Invalid verifier size response.' }
-    $limit = if ($signedSize -eq 0) { 2147483648 } else { $signedSize }
-    Receive-ReleaseFile $name $limit
-    if ($signedSize -gt 0 -and (Get-Item -LiteralPath (Join-Path $work $name)).Length -ne $signedSize) { throw 'Signed package size mismatch.' }
+    if ($signedSize -lt 1 -or $signedSize -gt 2147483648) { throw 'Invalid verifier size response.' }
+    Receive-ReleaseFile $name $signedSize
+    if ((Get-Item -LiteralPath (Join-Path $work $name)).Length -ne $signedSize) { throw 'Signed package size mismatch.' }
     $pattern = "^([0-9a-f]{64})\s+\*?$([regex]::Escape($name))$"
     $lines = @(Get-Content (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -match $pattern })
     if ($lines.Count -ne 1 -or $lines[0] -notmatch $pattern) { throw "$name needs exactly one entry in SHA256SUMS." }

@@ -35,6 +35,9 @@ class UpdateHelperTest(unittest.TestCase):
             data = ("Package fixture " + name).encode()
             (self.downloads / name).write_bytes(data)
             checksums.append(hashlib.sha256(data).hexdigest() + "  " + name + "\n")
+        metadata = b'{"schema":1}\n'
+        (self.downloads / "release.json").write_bytes(metadata)
+        checksums.append(hashlib.sha256(metadata).hexdigest() + "  release.json\n")
         (self.downloads / "SHA256SUMS").write_text("".join(checksums))
         # Crypto is exercised by the native/Dart signature tests. This suite
         # isolates the helper's snapshot, invocation and installer boundary.
@@ -42,7 +45,7 @@ class UpdateHelperTest(unittest.TestCase):
         return files
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
-                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size="0", old_verifier=False,
+                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size=None, old_verifier=False,
                    native_verifier=False):
         recorder = '[ -f /tmp/test/verification ] && printf "%s\\n" "$@" > /tmp/test/calls'
         # The query fakes also report the installed sora-core version
@@ -63,7 +66,7 @@ class UpdateHelperTest(unittest.TestCase):
                          ' [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]; case "$#" in'
                          ' 4) printf "%s\\n" "$@" > /tmp/test/verification;;'
                          ' 8) [ "$5" = -release-artifact ] && [ "$7" = -release-target ] && [ "$8" = linux/amd64 ];'
-                         ' printf "%s\\n" "$TEST_SIGNED_SIZE";; *) exit 1;; esac',
+                         ' if [ "$TEST_SIGNED_SIZE" = auto ]; then wc -c <"$2/$6"; else printf "%s\\n" "$TEST_SIGNED_SIZE"; fi;; *) exit 1;; esac',
             "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) case "$2" in'
                           " -f='${Version}') echo \"$TEST_INSTALLED\";; *) echo installed;; esac;;"
                           " *) exit 1;; esac",
@@ -92,7 +95,7 @@ class UpdateHelperTest(unittest.TestCase):
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
         ]
         command += ["--setenv", "TEST_INSTALLED", installed]
-        command += ["--setenv", "TEST_SIGNED_SIZE", signed_size]
+        command += ["--setenv", "TEST_SIGNED_SIZE", "auto" if signed_size is None else signed_size]
         for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut", "wc"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
         for name, body in scripts.items():
@@ -207,11 +210,12 @@ class UpdateHelperTest(unittest.TestCase):
                     item.unlink()
                 self.prepare("deb")
                 metadata = self.downloads / "release.json"
-                metadata.write_bytes(b"" if problem == "empty" else b'{"schema":1}\n')
                 sums = self.downloads / "SHA256SUMS"
-                if problem != "unlisted":
-                    sums.write_text(sums.read_text() + hashlib.sha256(metadata.read_bytes()).hexdigest() + "  release.json\n")
-                if problem == "missing":
+                if problem == "unlisted":
+                    sums.write_text("".join(line for line in sums.read_text().splitlines(keepends=True) if not line.endswith("  release.json\n")))
+                elif problem == "empty":
+                    metadata.write_bytes(b"")
+                elif problem == "missing":
                     metadata.unlink()
                 elif problem == "corrupt":
                     metadata.write_bytes(b"changed\n")
@@ -229,7 +233,7 @@ class UpdateHelperTest(unittest.TestCase):
 
     def test_size_query_is_required_and_enforced_before_installation(self):
         self.prepare("deb")
-        for size in ("1", "999", "2147483649", "", "verified", "1;touch /tmp/test/escaped"):
+        for size in ("0", "1", "999", "2147483649", "", "verified", "1;touch /tmp/test/escaped"):
             with self.subTest(size=size):
                 result = self.run_helper("deb", signed_size=size)
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -238,7 +242,7 @@ class UpdateHelperTest(unittest.TestCase):
 
     def test_real_native_snapshot_and_signature_before_package_manager(self):
         self.prepare("deb")
-        for name in ("SHA256SUMS", "SHA256SUMS.minisig"):
+        for name in ("SHA256SUMS", "SHA256SUMS.minisig", "release.json"):
             (self.downloads / name).unlink()
         tools = self.root / "test-tools"
         builder = pathlib.Path(__file__).resolve().parents[1] / "install/prepare_test_release.py"
@@ -250,11 +254,27 @@ class UpdateHelperTest(unittest.TestCase):
         self.assertTrue((self.root / "calls").exists())
         (self.root / "calls").unlink()
         (self.root / "verification").unlink()
-        (self.downloads / "sora_1.0.5_amd64.deb").write_bytes(b"tampered")
+        package = self.downloads / "sora_1.0.5_amd64.deb"
+        original_package = package.read_bytes()
+        package.write_bytes(b"tampered")
         refused = self.run_helper("deb", native_verifier=True)
         self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
         self.assertIn("release snapshot verification failed", refused.stderr)
         self.assertFalse((self.root / "calls").exists())
+        package.write_bytes(original_package)
+        for stray in (False, True):
+            with self.subTest(retired_signed_legacy=True, stray_json=stray):
+                for name in ("SHA256SUMS", "SHA256SUMS.minisig"):
+                    shutil.copyfile(tools / "metadata-legacy" / name, self.downloads / name)
+                metadata = self.downloads / "release.json"
+                if not stray:
+                    metadata.unlink()
+                else:
+                    metadata.write_bytes(b'{"schema":1}\n')
+                refused = self.run_helper("deb", native_verifier=True)
+                self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
+                self.assertIn("release snapshot verification failed", refused.stderr)
+                self.assertFalse((self.root / "calls").exists())
 
 
 if __name__ == "__main__":

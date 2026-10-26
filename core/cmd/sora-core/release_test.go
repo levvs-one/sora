@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,7 +25,14 @@ func TestReleaseSignatureTrustBoundary(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	payload := []byte(strings.Repeat("a", 64) + "  sora_1.2.3_amd64.deb\n")
+	metadata, err := json.Marshal(releaseMetadata{Artifacts: []releaseArtifact{{
+		Arch: "amd64", Name: "sora_1.2.3_amd64.deb", OS: "linux", SHA256: strings.Repeat("a", 64), Size: 1,
+	}}, Schema: 1, Version: "1.2.3"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	metadata = append(metadata, '\n')
+	payload := []byte(fmt.Sprintf("%x  release.json\n%s  sora_1.2.3_amd64.deb\n", sha256.Sum256(metadata), strings.Repeat("a", 64)))
 	for _, test := range []string{"valid", "modified manifest", "wrong key", "untrusted signer", "wrong version", "catalog replay", "missing signature", "oversize manifest", "oversize signature", "empty manifest", "directory", "symlink"} {
 		t.Run(test, func(t *testing.T) {
 			dir := t.TempDir()
@@ -39,6 +49,9 @@ func TestReleaseSignatureTrustBoundary(t *testing.T) {
 				t.Fatal(err)
 			}
 			if err := os.WriteFile(manifest+".minisig", []byte(signature), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(filepath.Join(dir, "release.json"), metadata, 0o600); err != nil {
 				t.Fatal(err)
 			}
 			version, key := "1.2.3", public.String()
@@ -82,14 +95,14 @@ func TestReleaseSignatureTrustBoundary(t *testing.T) {
 			}
 			if test == "valid" {
 				if err := verified.verifyArtifactFiles(context.Background(), dir); err == nil {
-					t.Fatal("legacy manifest passed the full publication profile")
+					t.Fatal("partial manifest passed the full publication profile")
 				}
 				size, err := verified.artifactSize("sora_1.2.3_amd64.deb", "linux/amd64", "1.2.3")
-				if err != nil || size != 0 {
-					t.Fatalf("signed legacy size: %d, %v", size, err)
+				if err != nil || size != 1 {
+					t.Fatalf("signed artifact size: %d, %v", size, err)
 				}
 				if _, err := verified.artifactSize("sora-core_1.2.3_amd64.deb", "linux/amd64", "1.2.3"); err == nil {
-					t.Fatal("missing legacy checksum accepted")
+					t.Fatal("missing artifact checksum accepted")
 				}
 			}
 		})
@@ -137,5 +150,36 @@ func TestReleaseTrustRootMatchesApplication(t *testing.T) {
 	}
 	if !strings.Contains(string(data), "'"+releasePublicKey+"'") {
 		t.Fatal("native release trust root differs from the application's team key")
+	}
+}
+
+func TestReleaseLegacyManifestRejectedBeforeArtifacts(t *testing.T) {
+	public, private, err := minisign.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload := []byte(strings.Repeat("a", 64) + "  sora_1.2.3_amd64.deb\n")
+	signature, err := ext.SignPayload(private, "test", "release:v1.2.3:SHA256SUMS", 1700000000, payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := ext.VerifyPayload(public.String(), signature, "release:v1.2.3:SHA256SUMS", payload); err != nil {
+		t.Fatal(err)
+	}
+	for _, strayJSON := range []bool{false, true} {
+		directory := t.TempDir()
+		for name, data := range map[string][]byte{"SHA256SUMS": payload, "SHA256SUMS.minisig": []byte(signature)} {
+			if err := os.WriteFile(filepath.Join(directory, name), data, 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if strayJSON {
+			if err := os.WriteFile(filepath.Join(directory, "release.json"), []byte("{}\n"), 0o600); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if _, err := verifyRelease(directory, "1.2.3", public.String()); err == nil {
+			t.Fatalf("retired signed legacy format accepted (stray JSON: %v)", strayJSON)
+		}
 	}
 }
