@@ -745,6 +745,77 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq libcap-dev libnetfilter-queue-dev libnfnetlink-dev libmnl-dev zlib1g-dev
           packaging/zapret/build.sh dist/engines
+      - name: Native Zapret core in isolated peer networks
+        timeout-minutes: 5
+        working-directory: core
+        run: |
+          go build -o "$RUNNER_TEMP/sora-zapret-core-probe" ./testdata/coexist
+          for binary in tpws sing-box xray mihomo; do test -x "$PWD/../dist/engines/$binary"; done
+          private=$(sudo mktemp -d /tmp/sora-zapret-ci.XXXXXXXX)
+          trap 'sudo rm -rf -- "$private"' EXIT
+          sudo install -d -m 0700 "$private"/{home,config,cache,data,tmp,engines,coredata}
+          sudo install -m 0755 "$RUNNER_TEMP/sora-zapret-core-probe" "$private/probe"
+          sudo install -m 0755 "$PWD/../dist/sora-core" "$private/sora-core"
+          sudo install -m 0644 "$PWD/../extensions/sources/zapret/hook.json" "$private/hook.json"
+          for binary in tpws sing-box xray mihomo; do
+            sudo install -m 0755 "$PWD/../dist/engines/$binary" "$private/engines/$binary"
+          done
+          for database in geoip.dat geosite.dat; do
+            sudo install -m 0644 "$PWD/../dist/engines/$database" "$private/engines/$database"
+          done
+          original=$(readlink /proc/self/ns/net)
+          sudo unshare --user --map-root-user --net env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SORA_DATA_DIR -u SSH_AUTH_SOCK \
+            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/tmp" TMPDIR="$private/tmp" \
+            SORA_PARENT_NETNS="$original" SORA_BYPASS_ISOLATED=1 sh -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              here=$(readlink /proc/self/ns/net)
+              ip link set lo up
+              unshare -n sleep 180 &
+              peer=$!
+              server=
+              cleanup() {
+                for pid in "$server" "$peer"; do
+                  if [ -n "$pid" ]; then kill "$pid" 2>/dev/null || :; fi
+                done
+                wait 2>/dev/null || :
+              }
+              trap cleanup EXIT
+              for n in $(seq 1 50); do
+                peer_ns=$(readlink "/proc/$peer/ns/net")
+                if [ "$peer_ns" != "$here" ]; then break; fi
+                sleep 0.1
+              done
+              test "$peer_ns" != "$here"
+              ip link add sora-test-a type veth peer name sora-test-b
+              ip link set sora-test-b netns "$peer"
+              ip addr add 198.18.0.1/30 dev sora-test-a
+              ip link set sora-test-a up
+              nsenter -t "$peer" -n ip link set lo up
+              nsenter -t "$peer" -n ip addr add 198.18.0.2/30 dev sora-test-b
+              nsenter -t "$peer" -n ip link set sora-test-b up
+              nsenter -t "$peer" -n "$1/probe" zapret-target "$1/targets.json" > "$1/server.log" 2>&1 &
+              server=$!
+              for n in $(seq 1 100); do
+                [ -s "$1/targets.json" ] && break
+                if ! kill -0 "$server" 2>/dev/null; then cat "$1/server.log"; exit 1; fi
+                sleep 0.1
+              done
+              if [ ! -s "$1/targets.json" ]; then cat "$1/server.log"; exit 1; fi
+              # TPWS can drop privileges normally without changing host groups.
+              unshare --user --map-user=1000 --map-group=1000 sh -e -c '"'"'
+                "$1/sora-core" -socket "$1/core.sock" -data-dir "$1/coredata" -engines-dir "$1/engines" -allow-file-keys > "$1/core.log" 2>&1 &
+                core=$!
+                cleanup_core() { kill -TERM "$core" 2>/dev/null || :; wait "$core" 2>/dev/null || :; }
+                trap cleanup_core EXIT
+                for n in $(seq 1 150); do
+                  [ -S "$1/core.sock" ] && break
+                  if ! kill -0 "$core" 2>/dev/null; then cat "$1/core.log"; exit 1; fi
+                  sleep 0.1
+                done
+                if [ ! -S "$1/core.sock" ]; then cat "$1/core.log"; exit 1; fi
+                "$1/probe" "$1/core.sock" zapret "$1/hook.json" "$1/targets.json" || { cat "$1/core.log"; exit 1; }
+              '"'"' sh "$1"
+            ' sh "$private"
       - uses: subosito/flutter-action@v2
         if: matrix.arch == 'amd64'
         with:

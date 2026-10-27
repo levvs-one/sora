@@ -5,6 +5,8 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,8 +16,10 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"os/signal"
 	"slices"
 	"strconv"
+	"syscall"
 	"time"
 
 	"google.golang.org/grpc"
@@ -28,6 +32,11 @@ import (
 )
 
 func main() {
+	if os.Args[1] == "zapret-target" {
+		requireIsolatedNetwork()
+		serveZapretTargets(os.Args[2])
+		return
+	}
 	if os.Args[1] == "dns-server" {
 		dnsServer()
 		return
@@ -36,12 +45,8 @@ func main() {
 		dnsQuery(os.Args[2], os.Args[3], os.Args[4])
 		return
 	}
-	if os.Args[2] == "byedpi" {
-		current, err := os.Readlink("/proc/self/ns/net")
-		parent := os.Getenv("SORA_PARENT_NETNS")
-		if err != nil || parent == "" || current == parent || os.Getenv("SORA_BYPASS_ISOLATED") != "1" {
-			panic("ByeDPI core test requires a separate network namespace")
-		}
+	if os.Args[2] == "byedpi" || os.Args[2] == "zapret" {
+		requireIsolatedNetwork()
 	}
 	seconds := 0
 	if os.Args[2] == "hold" {
@@ -50,7 +55,7 @@ func main() {
 		must(err)
 	}
 	timeout := time.Duration(seconds)*time.Second + 30*time.Second
-	if os.Args[2] == "byedpi" {
+	if os.Args[2] == "byedpi" || os.Args[2] == "zapret" {
 		timeout = 90 * time.Second
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
@@ -93,6 +98,8 @@ func main() {
 		fmt.Println(r.GetStatus().GetConnection().GetValue())
 	case "byedpi":
 		probeByeDPI(ctx, c, api, auth, os.Args[3])
+	case "zapret":
+		probeZapret(ctx, c, api, auth, os.Args[3], os.Args[4])
 	case "disconnect":
 		r, err := c.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: api, ControlAuthenticator: auth})
 		must(err)
@@ -159,6 +166,63 @@ func main() {
 	}
 }
 
+func requireIsolatedNetwork() {
+	current, err := os.Readlink("/proc/self/ns/net")
+	parent := os.Getenv("SORA_PARENT_NETNS")
+	if err != nil || parent == "" || current == parent || os.Getenv("SORA_BYPASS_ISOLATED") != "1" {
+		panic("bypass core test requires a separate network namespace")
+	}
+}
+
+func linuxBypassProfile(descriptor, name string) *corev1.BypassStrategy {
+	raw, err := os.ReadFile(descriptor) //nolint:gosec // The descriptor is staged inside the isolated fixture.
+	must(err)
+	var root, platforms, variant, profiles map[string]json.RawMessage
+	must(json.Unmarshal(raw, &root))
+	must(json.Unmarshal(root["platforms"], &platforms))
+	must(json.Unmarshal(platforms["linux"], &variant))
+	must(json.Unmarshal(variant["profiles"], &profiles))
+	strategy := new(corev1.BypassStrategy)
+	must(protojson.Unmarshal(profiles[name], strategy))
+	return strategy
+}
+
+type zapretTargets struct {
+	HTTP, HTTPS string
+	Certificate []byte
+}
+
+// serveZapretTargets runs in the fixture's separate peer network namespace.
+func serveZapretTargets(metadata string) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = io.Copy(w, io.LimitReader(r.Body, 4096))
+	})
+	newServer := func(secure bool) *httptest.Server {
+		server := httptest.NewUnstartedServer(handler)
+		must(server.Listener.Close())
+		var listenConfig net.ListenConfig
+		listener, err := listenConfig.Listen(context.Background(), "tcp", "198.18.0.2:0")
+		must(err)
+		server.Listener = listener
+		if secure {
+			server.StartTLS()
+		} else {
+			server.Start()
+		}
+		return server
+	}
+	plain, secure := newServer(false), newServer(true)
+	defer plain.Close()
+	defer secure.Close()
+	data, err := json.Marshal(zapretTargets{HTTP: plain.URL, HTTPS: secure.URL, Certificate: secure.Certificate().Raw})
+	must(err)
+	must(os.WriteFile(metadata+".tmp", data, 0600)) //nolint:gosec // Only the private test directory is used.
+	must(os.Rename(metadata+".tmp", metadata))      //nolint:gosec // Both paths are in the private test directory.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	<-ctx.Done()
+}
+
 // probeByeDPI drives the real core through its authenticated local control socket.
 func probeByeDPI(ctx context.Context, client corev1.CoreControlClient, api *corev1.ApiVersion, auth []byte, descriptor string) {
 	about, err := client.GetAbout(ctx, &corev1.GetAboutRequest{ApiVersion: api})
@@ -167,15 +231,7 @@ func probeByeDPI(ctx context.Context, client corev1.CoreControlClient, api *core
 	if !slices.Contains(about.GetAbout().GetContract().GetCapabilities(), "serverless-bydpi") {
 		panic("ByeDPI capability missing")
 	}
-	raw, err := os.ReadFile(descriptor) //nolint:gosec // This is the staged descriptor in the isolated fixture.
-	must(err)
-	var root, platforms, variant, profiles map[string]json.RawMessage
-	must(json.Unmarshal(raw, &root))
-	must(json.Unmarshal(root["platforms"], &platforms))
-	must(json.Unmarshal(platforms["linux"], &variant))
-	must(json.Unmarshal(variant["profiles"], &profiles))
-	strategy := new(corev1.BypassStrategy)
-	must(protojson.Unmarshal(profiles["TCP+TLS"], strategy))
+	strategy := linuxBypassProfile(descriptor, "TCP+TLS")
 	endpoint := about.GetAbout().GetLocalProxy()
 	proxy, err := url.Parse(fmt.Sprintf("http://%s:%d", endpoint.GetHost(), endpoint.GetPort()))
 	must(err)
@@ -221,6 +277,64 @@ func probeByeDPI(ctx context.Context, client corev1.CoreControlClient, api *core
 		must(err)
 		wire(stopped.GetError())
 		fmt.Println(kind + ": actual core authenticated connect + HTTP/TLS + disconnect PASS")
+	}
+}
+
+// probeZapret connects to targets in the isolated peer namespace through the real core.
+func probeZapret(ctx context.Context, client corev1.CoreControlClient, api *corev1.ApiVersion, auth []byte, descriptor, metadata string) {
+	about, err := client.GetAbout(ctx, &corev1.GetAboutRequest{ApiVersion: api})
+	must(err)
+	wire(about.GetError())
+	if !slices.Contains(about.GetAbout().GetContract().GetCapabilities(), "serverless") {
+		panic("Zapret capability missing")
+	}
+	raw, err := os.ReadFile(metadata) //nolint:gosec // The metadata is generated in the isolated fixture.
+	must(err)
+	var targets zapretTargets
+	must(json.Unmarshal(raw, &targets))
+	certificate, err := x509.ParseCertificate(targets.Certificate)
+	must(err)
+	roots := x509.NewCertPool()
+	roots.AddCert(certificate)
+	endpoint := about.GetAbout().GetLocalProxy()
+	proxy, err := url.Parse(fmt.Sprintf("http://%s:%d", endpoint.GetHost(), endpoint.GetPort()))
+	must(err)
+	for _, kind := range []string{"sing-box", "xray", "mihomo"} {
+		for _, profile := range []string{"TCP+TLS", "TLS", "HTTP"} {
+			strategy := linuxBypassProfile(descriptor, profile)
+			plan := &corev1.SessionPlan{TunnelMode: corev1.TunnelMode_TUNNEL_MODE_APPLICATION,
+				Engines: []string{kind}, NetworkControlAllowed: true,
+				Outbounds: []*corev1.OutboundSpec{{Id: "sora:bypass", DisplayName: "Zapret", Protocol: "bypass", Bypass: strategy}},
+				Routing:   &corev1.RoutingOptions{ProxyTarget: "sora:bypass"}}
+			connected, err := client.Connect(ctx, &corev1.ConnectRequest{ApiVersion: api, ControlAuthenticator: auth, SessionPlan: plan})
+			must(err)
+			wire(connected.GetError())
+			if connected.GetStatus().GetConnection().GetValue() != corev1.ConnectionStateValue_CONNECTION_STATE_VALUE_CONNECTED {
+				panic(kind + "/" + profile + ": core did not reach connected state")
+			}
+			transport := &http.Transport{Proxy: http.ProxyURL(proxy), TLSClientConfig: &tls.Config{
+				RootCAs: roots, ServerName: "example.com", MinVersion: tls.VersionTLS12,
+			}}
+			httpClient := &http.Client{Timeout: 5 * time.Second, Transport: transport}
+			for _, target := range []string{targets.HTTP, targets.HTTPS} {
+				payload := []byte("actual Sora core Zapret fixture")
+				request, err := http.NewRequestWithContext(ctx, http.MethodPost, target, bytes.NewReader(payload))
+				must(err)
+				response, err := httpClient.Do(request)
+				must(err)
+				body, err := io.ReadAll(io.LimitReader(response.Body, 4096))
+				must(err)
+				must(response.Body.Close())
+				if response.StatusCode != http.StatusOK || !bytes.Equal(body, payload) {
+					panic(fmt.Sprintf("%s/%s target=%s status=%d body=%q", kind, profile, target, response.StatusCode, body))
+				}
+			}
+			transport.CloseIdleConnections()
+			stopped, err := client.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: api, ControlAuthenticator: auth})
+			must(err)
+			wire(stopped.GetError())
+			fmt.Printf("%s/%s: actual core Zapret authenticated connect + HTTP/TLS + disconnect PASS\n", kind, profile)
+		}
 	}
 }
 
