@@ -353,7 +353,7 @@ jobs:
         working-directory: app
         run: |
           flutter pub get
-          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart test/winws_profile_test.dart test/extension_bypass_test.dart
+          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart test/winws_profile_test.dart test/extension_bypass_test.dart test/connections_screen_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan, metadata or extension package tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Native signed extension panel and bridge

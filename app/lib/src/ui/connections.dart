@@ -4,6 +4,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:grpc/grpc.dart' show CallOptions, ResponseFuture;
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/strings.dart';
@@ -34,6 +35,11 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   List<Connection> _list = [];
   bool _loaded = false;
   bool _grouped = false;
+  bool _reading = false;
+  CoreFailure? _failure;
+  CoreLink? _sourceLink;
+  String? _sourceSession;
+  ResponseFuture<ListConnectionsResponse>? _request;
   final _collapsedGroups = <String>{};
 
   @override
@@ -43,6 +49,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     // ValueListenableBuilder, so typing rebuilds only the list, not the
     // stats bar, search field and view switch.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       unawaited(_read());
       _timer = Timer.periodic(_every, (_) => unawaited(_read()));
     });
@@ -51,43 +58,60 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    final request = _request;
+    if (request != null) unawaited(request.cancel());
     _search.dispose();
     super.dispose();
   }
 
   Future<void> _read({FailureMode mode = FailureMode.background}) async {
-    if (!mounted) return;
+    if (!mounted || _reading) return;
     final sora = SoraScope.read(context);
-    // Speed counters are polled on demand only while this screen is open;
-    // there is intentionally no global polling (audit M17).
-    unawaited(sora.readStats());
     final link = sora.link, session = sora.sessionId;
-    if (link == null || session == null) {
+    if (link != _sourceLink || session != _sourceSession) {
       setState(() {
+        _sourceLink = link;
+        _sourceSession = session;
         _list = [];
-        _loaded = true;
+        _failure = null;
+        _loaded = false;
       });
+    }
+    if (link == null || session == null) {
+      setState(() => _loaded = true);
       return;
     }
+    unawaited(sora.readStats());
+    setState(() => _reading = true);
     try {
-      final answer = await link.stub.listConnections(
+      final request = link.stub.listConnections(
         ListConnectionsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: session),
+        options: CallOptions(timeout: const Duration(seconds: 5)),
       );
+      _request = request;
+      final answer = await request;
+      if (!mounted || sora.link != link || sora.sessionId != session) return;
       if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
-      if (!mounted) return;
       setState(() {
-        // Show recent connections first to help locate newly opened traffic.
         _list = answer.connections.toList()..sort((a, b) => b.start.seconds.compareTo(a.start.seconds));
-        SoraScope.read(context).recovered('connections');
+        _failure = null;
         _loaded = true;
       });
+      sora.recovered('connections');
     } catch (error) {
-      if (!mounted) return;
-      SoraScope.read(context).reportFailure(error, source: 'connections', mode: mode);
-      // Never leave a permanent blank screen: the error itself is reported
-      // through the notification stream, so surface the empty state here
-      // (e.g. the xray engine cannot list connections at all).
-      setState(() => _loaded = true);
+      if (!mounted || sora.link != link || sora.sessionId != session) return;
+      setState(() {
+        _list = [];
+        _failure = CoreFailure.from(error);
+        _loaded = true;
+      });
+      sora.reportFailure(error, source: 'connections', mode: mode);
+    } finally {
+      _request = null;
+      if (mounted) {
+        setState(() => _reading = false);
+        if (sora.link != link || sora.sessionId != session) unawaited(_read());
+      }
     }
   }
 
@@ -122,64 +146,106 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
-    final palette = Palette.of(context);
+    final s = S.of(context), palette = Palette.of(context);
+    final sora = SoraScope.of(context);
+    final active = sora.link != null && sora.sessionId != null;
+    final current = sora.link == _sourceLink && sora.sessionId == _sourceSession;
+    final usable = active && current && _loaded && _failure == null;
     return Screen(
       title: s.connections,
-      fill: ValueListenableBuilder<TextEditingValue>(
-        valueListenable: _search,
-        builder: (context, value, _) {
-          final query = value.text.trim().toLowerCase();
-          final shown = query.isEmpty
-              ? _list
-              : [
-                  for (final c in _list)
-                    if ('${c.host} ${c.process} ${c.chain.join(' ')}'.toLowerCase().contains(query)) c,
-                ];
-          return !_loaded
-              ? const SizedBox()
-              : shown.isEmpty
-              ? Center(
-                  child: Text(s.connEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
-                )
-              : _grouped
-              ? _groupedList(shown)
-              : ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  itemCount: shown.length,
-                  itemBuilder: (context, i) => _Row(
-                    connection: shown[i],
-                    onClose: () => unawaited(_close(shown[i])),
-                    onCopyHost: () => unawaited(_copyHost(shown[i])),
-                    onAddRule: () => _addRule(shown[i]),
-                  ),
-                );
-        },
-      ),
+      actions: [
+        if (active && _failure == null)
+          SizedBox.square(
+            dimension: 44,
+            child: RoundButton(
+              icon: Symbols.refresh_rounded,
+              label: s.refresh,
+              onTap: _reading ? null : () => unawaited(_read(mode: FailureMode.action)),
+            ),
+          ),
+      ],
+      fill: !active
+          ? Center(
+              child: Text(s.stateOff, style: Styles.body.copyWith(color: palette.ink)),
+            )
+          : !current || !_loaded
+          ? const Center(child: CircularProgressIndicator())
+          : _failure != null
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      describe(s, _failure!),
+                      style: Styles.body.copyWith(color: palette.ink),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: _reading ? null : () => unawaited(_read(mode: FailureMode.action)),
+                      icon: const Icon(Symbols.refresh_rounded),
+                      label: Text(s.refresh),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _search,
+              builder: (context, value, _) {
+                final query = value.text.trim().toLowerCase();
+                final shown = query.isEmpty
+                    ? _list
+                    : [
+                        for (final c in _list)
+                          if ('${c.host} ${c.process} ${c.chain.join(' ')}'.toLowerCase().contains(query)) c,
+                      ];
+                if (shown.isEmpty) {
+                  return Center(
+                    child: Text(
+                      query.isEmpty ? s.connEmpty : s.speedtestEmpty,
+                      style: Styles.secondary.copyWith(color: palette.ink),
+                    ),
+                  );
+                }
+                return _grouped
+                    ? _groupedList(shown)
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        itemCount: shown.length,
+                        itemBuilder: (context, i) => _Row(
+                          connection: shown[i],
+                          onClose: () => unawaited(_close(shown[i])),
+                          onCopyHost: () => unawaited(_copyHost(shown[i])),
+                          onAddRule: () => _addRule(shown[i]),
+                        ),
+                      );
+              },
+            ),
       children: [
-        BackgroundFailureState(
-          source: 'connections',
-          retry: () => unawaited(_read(mode: FailureMode.action)),
-        ),
         const BackgroundFailureState(source: 'stats'),
-        _statsBar(context),
-        CupertinoSearchTextField(
-          controller: _search,
-          placeholder: s.search,
-          style: Styles.body.copyWith(color: palette.ink),
-          placeholderStyle: Styles.body.copyWith(color: palette.ink3),
-          backgroundColor: palette.field,
-          borderRadius: BorderRadius.circular(12),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
-          itemColor: palette.ink3,
-        ),
-        const SizedBox(height: 12),
-        Segments<bool>(
-          value: _grouped,
-          choices: {false: s.connListView, true: s.connGroupByProcess},
-          onChanged: (v) => setState(() => _grouped = v),
-        ),
-        const SizedBox(height: 14),
+        if (active) _statsBar(context),
+        if (usable && _list.isNotEmpty) ...[
+          CupertinoSearchTextField(
+            controller: _search,
+            placeholder: s.search,
+            style: Styles.body.copyWith(color: palette.ink),
+            placeholderStyle: Styles.body.copyWith(color: palette.ink3),
+            backgroundColor: palette.field,
+            borderRadius: BorderRadius.circular(12),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 11),
+            itemColor: palette.ink3,
+          ),
+          const SizedBox(height: 12),
+          Segments<bool>(
+            value: _grouped,
+            choices: {false: s.connListView, true: s.connGroupByProcess},
+            onChanged: (v) => setState(() => _grouped = v),
+          ),
+          const SizedBox(height: 14),
+        ],
       ],
     );
   }
@@ -192,7 +258,9 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
     final palette = Palette.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final up = sora.speedUp, down = sora.speedDown;
-    final active = sora.stats?.activeConnections.toInt();
+    final active = _loaded && _failure == null && sora.link == _sourceLink && sora.sessionId == _sourceSession
+        ? _list.length
+        : null;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
