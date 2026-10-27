@@ -183,25 +183,20 @@ void main() {
       final candidate = await signed(sourceOverride: Directory(path), outputFile: output);
       await candidate.verify(authorKeyLine: publicKey);
       await expectLater(candidate.verify(authorKeyLine: teamKey), throwsA(isA<PackageError>()));
-      await command(tool, ['publish', '--ack-dangerous', output]);
+      final published = await Process.run(tool, ['publish', '--ack-dangerous', output]);
+      expect(published.exitCode, 0, reason: '${published.stderr}');
+      final text = published.stdout as String;
+      final start = text.lastIndexOf('\n  {');
+      expect(start, greaterThanOrEqualTo(0), reason: 'publish must output a catalog entry');
+      final entry = jsonDecode(text.substring(start)) as Map<String, dynamic>;
       final bytes = await File(output).readAsBytes();
       final manifest = candidate.manifest;
-      rows.add({
-        'id': manifest.id,
-        'name': manifest.name,
-        'version': manifest.version,
-        'description': manifest.description,
-        'author': manifest.author.name,
-        'author_identity': manifest.author.identity,
-        'author_key': publicKey,
-        'permissions': manifest.permissions,
-        'capabilities': manifest.capabilities,
-        'min_app_version': manifest.minAppVersion,
-        'platforms': platforms,
-        'download_url': 'https://example.invalid/${manifest.id}.soraext',
-        'sha256': crypto.sha256.convert(bytes).toString(),
-        'size': bytes.length,
-      });
+      expect(entry['capabilities'], manifest.capabilities, reason: manifest.id);
+      expect(entry['permissions'], manifest.permissions, reason: manifest.id);
+      expect(entry['sha256'], crypto.sha256.convert(bytes).toString(), reason: manifest.id);
+      expect(entry['size'], bytes.length, reason: manifest.id);
+      expect(text, contains('platforms'), reason: 'the publisher must review supported platforms');
+      rows.add({...entry, 'platforms': platforms, 'download_url': 'https://example.invalid/${manifest.id}.soraext'});
       if (platforms.contains(Platform.operatingSystem)) {
         await install(candidate);
         expect(store.get(manifest.id), isNotNull);

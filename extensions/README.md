@@ -15,7 +15,10 @@ them with the team key compiled into both (`core/ext/sign.go`,
 1. Build and sign the package with its author key: `sora-ext pack` and
    `sora-ext sign`, then `sora-ext publish` prints the catalog entry.
 2. Copy the package into `packages/`, add the entry to `catalog.json` with
-   `download_url` pointing at it, and set `updated_at`.
+   `download_url` pointing at it, and set `updated_at`. Review the actual host
+   support and set `platforms` explicitly when the extension is restricted to
+   specific operating systems. OS metadata does not certify architecture,
+   backend, driver or API availability.
 3. Sign the catalog with the team key:
    `sora-ext sign-file --key sora-team.key --role catalog.json extensions/catalog.json`
 
