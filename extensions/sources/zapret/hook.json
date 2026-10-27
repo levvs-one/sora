@@ -23,8 +23,7 @@
             "2"
           ],
           "hostCase": true,
-          "domainCase": true,
-          "methodEol": true
+          "domainCase": true
         }
       }
     },
@@ -49,8 +48,7 @@
             "2"
           ],
           "hostCase": true,
-          "domainCase": true,
-          "methodEol": true
+          "domainCase": true
         }
       }
     }

@@ -4,6 +4,10 @@ One signed descriptor selects platform-specific profiles: Linux uses the existin
 host TPWS backend; native Windows x64 uses the host's pinned Winws/WinDivert
 bundle. This extension supplies no executable, DLL, driver, script or native path.
 
+The HTTP profile omits methodEol: its leading line can cause strict HTTP
+servers to reject a request. The remaining shaping options do not guarantee
+compatibility or evasion on every network.
+
 Windows mode shapes TCP traffic on ports 80 and 443 for every application.
 The pinned upstream LAN exclusions are not a complete IANA address classifier.
 It is not a VPN or a per-application filter. Sora requires its advertised native

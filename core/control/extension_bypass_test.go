@@ -50,6 +50,9 @@ func TestExtensionBypassSourceProfilesBuildValidatedPlans(t *testing.T) {
 					if err := protojson.Unmarshal(raw, strategy); err != nil {
 						t.Fatal(err)
 					}
+					if name == "zapret" && label == "HTTP" && strategy.GetMethodEol() {
+						t.Fatal("the default HTTP profile must not add a leading line rejected by strict servers")
+					}
 					protocol := "bypass"
 					if selected.Backend == "winws" {
 						protocol = "winws"
