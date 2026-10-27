@@ -585,7 +585,7 @@ jobs:
           if-no-files-found: error
 
   linux-packages:
-    name: Linux packages
+    name: Linux packages (${{ matrix.arch }}, ${{ matrix.runner }})
     timeout-minutes: 60
     # zapret is C linked against the distribution's netfilter libraries, so
     # each architecture is built natively on its own runner.
@@ -596,8 +596,12 @@ jobs:
         include:
           - arch: amd64
             runner: ubuntu-latest
+            flutter_arch: x64
+            elf_machine: Advanced Micro Devices X86-64
           - arch: arm64
             runner: ubuntu-24.04-arm
+            flutter_arch: arm64
+            elf_machine: AArch64
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v5
@@ -672,26 +676,50 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq libcap-dev libnetfilter-queue-dev libnfnetlink-dev libmnl-dev zlib1g-dev
           packaging/zapret/build.sh dist/engines
-      # Flutter publishes no Linux SDK for arm64 hosts, so the desktop app is
-      # packaged for amd64 only; the core and engines are built for both.
       - uses: subosito/flutter-action@v2
         if: matrix.arch == 'amd64'
         with:
           flutter-version: 3.47.6
           channel: stable
+      # There is no arm64 SDK archive, but the same official Flutter revision
+      # bootstraps its arm64 Dart SDK and engine artifacts on an arm64 host.
+      - name: Set up the pinned Flutter SDK on ARM64
+        if: matrix.arch == 'arm64'
+        run: |
+          test "$(uname -m)" = aarch64
+          git clone --depth 1 --branch 3.47.6 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          test "$(git -C "$RUNNER_TEMP/flutter" rev-parse HEAD)" = 5fc346839b5d0eef006ed8404392afb4dfae428d
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
       - name: Build the app
-        if: matrix.arch == 'amd64'
         working-directory: app
         run: |
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb
           flutter pub get
-          flutter build linux --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+          flutter build linux --release --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+      - name: Check the architecture of every bundled native binary
+        env:
+          SORA_FLUTTER_ARCH: ${{ matrix.flutter_arch }}
+          SORA_ELF_MACHINE: ${{ matrix.elf_machine }}
+        run: |
+          bundle="app/build/linux/$SORA_FLUTTER_ARCH/release/bundle"
+          test -x "$bundle/sora"
+          test -f "$bundle/lib/libapp.so"
+          test -f "$bundle/lib/libflutter_linux_gtk.so"
+          while IFS= read -r -d '' binary; do
+            echo "$binary"
+            readelf -h "$binary" | grep -E "Machine:[[:space:]]+$SORA_ELF_MACHINE$"
+          done < <(find "$bundle" -type f \( -name sora -o -name '*.so' \) -print0)
+      - name: Native signed extension panel on ARM64
+        if: matrix.arch == 'arm64'
+        working-directory: app
+        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
       - name: Package
         env:
           SORA_ARCH: ${{ matrix.arch }}
+          SORA_FLUTTER_ARCH: ${{ matrix.flutter_arch }}
         run: |
-          configs=(packaging/linux/nfpm.yaml)
-          if [ "$SORA_ARCH" = amd64 ]; then configs+=(packaging/linux/nfpm-app.yaml); fi
+          configs=(packaging/linux/nfpm.yaml packaging/linux/nfpm-app.yaml)
           for config in "${configs[@]}"; do
             for packager in deb rpm archlinux; do
               nfpm package --config "$config" --packager "$packager" --target dist/

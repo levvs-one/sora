@@ -21,8 +21,6 @@ def artifact_platform(name, version):
         return ("windows" if name.endswith(".ps1") else "linux"), "any"
     for architecture, rpm_arch in (("amd64", "x86_64"), ("arm64", "aarch64")):
         for package in ("sora-core", "sora"):
-            if package == "sora" and architecture == "arm64":
-                continue
             if name in (f"{package}_{version}_{architecture}.deb",
                         f"{package}-{version}-1.{rpm_arch}.rpm",
                         f"{package}-{version}-1-{rpm_arch}.pkg.tar.zst"):

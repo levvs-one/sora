@@ -27,7 +27,7 @@ class ReleaseManifestTest(unittest.TestCase):
         expected = {"Sora-Setup-1.2.3-x64.exe": ("windows", "amd64"),
                     "install.ps1": ("windows", "any"), "install.sh": ("linux", "any")}
         for arch, machine in (("amd64", "x86_64"), ("arm64", "aarch64")):
-            for package in ("sora-core", "sora") if arch == "amd64" else ("sora-core",):
+            for package in ("sora-core", "sora"):
                 for name in (f"{package}_1.2.3_{arch}.deb", f"{package}-1.2.3-1.{machine}.rpm",
                              f"{package}-1.2.3-1-{machine}.pkg.tar.zst"):
                     expected[name] = ("linux", arch)
@@ -76,7 +76,7 @@ class ReleaseManifestTest(unittest.TestCase):
         self.assertFalse((self.root / "release.json").exists())
 
     def test_unknown_or_wrong_platform_names_are_rejected(self):
-        for name in ("sora_1.2.3_arm64.deb", "Sora-Setup-1.2.4-x64.exe", "Sora-Setup-1.2.3-arm64.exe", "payload.exe"):
+        for name in ("sora_1.2.3_riscv64.deb", "Sora-Setup-1.2.4-x64.exe", "Sora-Setup-1.2.3-arm64.exe", "payload.exe"):
             with self.subTest(name=name):
                 path = self.artifact(name)
                 with self.assertRaises(ValueError):

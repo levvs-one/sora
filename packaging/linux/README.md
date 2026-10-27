@@ -30,10 +30,25 @@ packaging/zapret/build.sh dist/engines
 SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm.yaml --packager deb --target dist/
 
 cd app && flutter build linux --release --dart-define=SORA_VERSION=1.0.6 && cd ..
-SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm-app.yaml --packager deb --target dist/
+SORA_ARCH=amd64 SORA_FLUTTER_ARCH=x64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm-app.yaml --packager deb --target dist/
 ```
 
-`--packager rpm` и `--packager archlinux` собирают остальные форматы. Для arm64 собирается только `sora-core`.
+`--packager rpm` и `--packager archlinux` собирают остальные форматы. Для нативной
+сборки ARM64 используются `SORA_ARCH=arm64`, `SORA_FLUTTER_ARCH=arm64` и
+`flutter build linux --release --target-platform=linux-arm64`. Для amd64
+значение Flutter-архитектуры — `x64`, имя архитектуры пакета — `amd64`.
+
+На ARM64 runner CI получает официальный Flutter 3.47.6 из исходников с проверкой
+revision `5fc346839b5d0eef006ed8404392afb4dfae428d`, поскольку официальный Linux SDK
+archive содержит только x64. Штатный bootstrap этого revision загружает ARM64
+Dart и engine с официального storage. Версия SDK и зависимости приложения не
+меняются. До упаковки проверяется ELF machine каждого бинарника и `.so` в bundle,
+а нативный WebKitGTK-тест открывает подписанный тестовый пакет расширения.
+
+Это сборка и проверка пакетов, а не публикация или подтверждение полного ARM64
+цикла установки/обновления. Установщик ARM64 пока ставит только core, а обновление
+приложения рассчитано на amd64. Этот путь требует отдельного совместимого
+изменения и проверок. `PLANS.md` остаётся открытым до поставки.
 
 CI собирает все форматы в каждом pull request и проверяет установку через `install.sh` на Ubuntu, Fedora и Arch.
 
