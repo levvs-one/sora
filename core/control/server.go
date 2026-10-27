@@ -1220,21 +1220,24 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		}
 	}
 	opts := req.GetOptions()
-	for _, chunk := range chunkServers(endpoints, ProbeChunkSize) {
-		if ctx.Err() != nil {
-			break
-		}
-		note(connect(chunk, nil))
-	}
-	for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
-		if ctx.Err() != nil {
-			break
-		}
-		note(s.measureOutbounds(ctx, opts, chunk, id, results, &wg, connect))
-	}
+	// A chunk owns a backend request slot until its results finish. Start
+	// the next chunk then, while the handler delivers current results.
 	go func() {
-		wg.Wait()
-		close(results)
+		defer close(results)
+		for _, chunk := range chunkServers(endpoints, ProbeChunkSize) {
+			if ctx.Err() != nil {
+				return
+			}
+			note(connect(chunk, nil))
+			wg.Wait()
+		}
+		for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
+			if ctx.Err() != nil {
+				return
+			}
+			note(s.measureOutbounds(ctx, opts, chunk, id, results, &wg, connect))
+			wg.Wait()
+		}
 	}()
 	for result := range results {
 		if err := stream.Send(result); err != nil {
