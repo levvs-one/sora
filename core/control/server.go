@@ -1164,8 +1164,8 @@ func subscriptionInfoToWire(info subscription.Info) *corev1.SubscriptionInfo {
 // thousands of servers degrades into a longer stream instead of dying on a
 // per-request limit. A failing chunk does not abort the others: the first
 // chunk error is remembered, the remaining chunks still run, and the RPC
-// then returns that error (mapped through transportStatus, as before) -
-// partial results, no silent loss.
+// then reports that first failure through a detail-free terminal status.
+// Successfully streamed results remain available to the caller.
 func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.ServerStreamingServer[corev1.ProbeResult]) error {
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return transportStatus(err)
@@ -1245,7 +1245,7 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		}
 	}
 	if firstErr != nil {
-		return transportStatus(firstErr)
+		return rpcStatus(firstErr)
 	}
 	return nil
 }

@@ -109,6 +109,8 @@ void main() {
       const GrpcError.unavailable(): 'app.core_unavailable',
       const GrpcError.unimplemented(): 'core.api.version_mismatch',
       const GrpcError.resourceExhausted(): 'core.request.too_large',
+      const GrpcError.resourceExhausted('resource_exhausted core.probe.too_many'): 'core.probe.too_many',
+      const GrpcError.unavailable('unavailable core.engine.start_failed'): 'core.engine.start_failed',
       const GrpcError.invalidArgument('invalid_argument core.plan.dns_invalid'): 'core.plan.dns_invalid',
     };
     for (final entry in samples.entries) {

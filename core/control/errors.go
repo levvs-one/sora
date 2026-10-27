@@ -36,16 +36,23 @@ var wireCodes = map[errs.Code]corev1.SoraErrorCode{
 	errs.CodeInternal:           corev1.SoraErrorCode_SORA_ERROR_CODE_INTERNAL,
 }
 
-// statusCodes maps connection errors to gRPC status codes. Domain errors stay
-// in responses.
+// statusCodes maps catalog classes for terminal RPC statuses. Unary handlers
+// keep domain failures in their response via transportStatus.
 var statusCodes = map[errs.Code]codes.Code{
-	errs.CodeVersionMismatch:  codes.FailedPrecondition,
-	errs.CodeUnauthenticated:  codes.Unauthenticated,
-	errs.CodePermissionDenied: codes.PermissionDenied,
-	errs.CodeCancelled:        codes.Canceled,
-	errs.CodeDeadlineExceeded: codes.DeadlineExceeded,
-	errs.CodeTimeout:          codes.DeadlineExceeded,
-	errs.CodeInternal:         codes.Internal,
+	errs.CodeVersionMismatch:    codes.FailedPrecondition,
+	errs.CodeUnauthenticated:    codes.Unauthenticated,
+	errs.CodePermissionDenied:   codes.PermissionDenied,
+	errs.CodeCancelled:          codes.Canceled,
+	errs.CodeDeadlineExceeded:   codes.DeadlineExceeded,
+	errs.CodeTimeout:            codes.DeadlineExceeded,
+	errs.CodeInternal:           codes.Internal,
+	errs.CodeInvalidArgument:    codes.InvalidArgument,
+	errs.CodeUnsupported:        codes.Unimplemented,
+	errs.CodeFailedPrecondition: codes.FailedPrecondition,
+	errs.CodeNotFound:           codes.NotFound,
+	errs.CodeResourceExhausted:  codes.ResourceExhausted,
+	errs.CodeUnavailable:        codes.Unavailable,
+	errs.CodeTLS:                codes.Unavailable,
 }
 
 // transportOnly lists errors returned exclusively as gRPC statuses.
@@ -96,12 +103,25 @@ func transportStatus(err error) error {
 	if _, transport := transportOnly[classified.Code()]; !transport {
 		return nil
 	}
+	return rpcStatus(classified)
+}
+
+// rpcStatus includes terminal stream failures that have no response envelope.
+// Details stay out of status text because access logs may not redact them.
+func rpcStatus(err error) error {
+	if err == nil {
+		return nil
+	}
+	classified := errs.From(err)
 	code, ok := statusCodes[classified.Code()]
 	if !ok {
 		code = codes.Unknown
 	}
-	// Status text excludes details because access logs may not redact them.
-	return status.Error(code, string(classified.Code())+" "+string(classified.Key()))
+	key := classified.Key()
+	if key == "" {
+		key = errs.KeyInternal
+	}
+	return status.Error(code, string(classified.Code())+" "+string(key))
 }
 
 // durationOrNil returns a wire delay or nil when unset. Zero would incorrectly
