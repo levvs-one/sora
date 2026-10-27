@@ -75,5 +75,11 @@ The desktop integration branch passed the full local Flutter suite with
 673 tests and 73 prerequisite skips, including the source-script regression;
 the focused host/server/bootstrap/connections suite passed 23 tests and
 analysis reported no issues. New signed-source native assertions exercise
-the same stale-row failures and recovery in each native panel cycle. Those
-new assertions are pending hosted CI; no new native pass is claimed here.
+the same stale-row failures and recovery in each native panel cycle.
+They passed real WebKitGTK (job 122144807077) and WebView2 (job 122146905677,
+run 40490921671) at 61fa17f82dbcbb35d41e82877dec25dfe3529272.
+Both the published package and temporarily signed source completed two cycles,
+including disable/signed permission-reducing update teardown. The full PR123
+rollup finished with 20 successful checks and four conditional skips. The
+source-only error injection tests rendering/recovery; it is not live provider
+traffic or a new permission/authentication proof.

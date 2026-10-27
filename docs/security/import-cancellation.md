@@ -57,9 +57,9 @@ advances the real two-minute child deadline and confirms retained servers plus
 failure/backoff while the caller remains alive; it does not wait two wall minutes. They run no real fetch, engine, listener or system
 change. Synchronous parsing is still not preempted, and cancellation after the
 final checkpoint can race an atomic write; there is no transactional undo.
-The initial independent background fetch launched by SaveSubscription retains
-its existing context policy. Aggregate resource limits and lifecycle ownership
-of that background operation remain separate work.
+The saved-fetch core lifetime is addressed below. Aggregate resource limits
+and physical cancellation of arbitrary provider/parser work remain separate
+boundaries.
 
 ## Shared payload admission
 
@@ -126,9 +126,9 @@ the deadline without timing thresholds or large allocations. No real provider,
 engine, listener, capture or host network is used.
 
 Synchronous parser work after admission is still not preempted, and the existing
-post-parse commit checkpoints do not undo an atomic write. The initial fetch's
-independent lifecycle, total outstanding RPCs/retained inputs, AST width/node
-budgets and the other resource boundaries remain open.
+post-parse commit checkpoints do not undo an atomic write. Total outstanding
+RPCs/retained inputs, AST width/node budgets and the other resource boundaries
+remain open; saved-fetch lifecycle ownership is addressed below.
 
 ## Latest saved subscription link
 
@@ -171,7 +171,51 @@ requests. Existing cancellation, child-timeout/backoff and parser-admission
 regressions remain required.
 
 The pending intent is process-local, not a durable queue or crash-recovery
-guarantee. The existing independent initial-fetch context, two-minute fetch
-timeout, four scheduler slots and shared four-parser admission are retained.
-This does not establish a global fetch budget, shutdown ownership, CPU
-preemption or rollback of an atomic vault write.
+guarantee. The two-minute fetch timeout, four scheduler slots and shared
+four-parser admission are retained. Saved-fetch core cancellation is addressed
+below; global fetch admission, CPU preemption and rollback of an atomic vault
+write remain separate boundaries.
+
+## Saved fetches follow the core lifetime
+
+SaveSubscription intentionally starts a new/changed-link fetch independently
+of its UI request. Previously its context.Background also made it independent
+of the core's Server.Run context. Four private-vault regressions reproduced
+work still marked Updating after that core lifetime ended, accepted late
+provider bytes, and a queued latest-link save launching another fetch.
+
+The book now owns one standard context.WithCancel scope from construction.
+The existing core Run context cancels that scope through context.AfterFunc and
+on Run return. Saved-link fetches use it; the existing pending-intent admission
+does not launch a replacement after it has ended. Creating the scope before
+Run also covers a save admitted before the scheduler starts. The normal App
+Serve path already calls Server.Run with its lifetime context. This does not
+attach saved work to a shorter UI/RPC request.
+
+The implementation reuses the standard context APIs and the existing
+fetchAccepted cancellation checkpoints. It adds no scheduler, retry loop,
+module, environment option or second limiter. Manual-refresh caller context,
+the book's two-minute per-fetch timeout, per-ID serialization, automatic-fetch
+slots and payload admission retain their existing roles.
+
+The regressions observe positive provider entry, core cancellation, Updating
+release for a cooperative provider, unchanged real vault references/record
+bytes, and no queued latest-link fetch after stop. A separate existing fake
+provider deliberately ignores cancellation and returns a valid payload late;
+that payload is discarded without recording a provider failure. The tests
+run before/during Run and use standard synctest, with no live provider,
+engine, listener, capture or system configuration.
+
+Validation: all four old-code scenarios failed; the fixed scenarios passed
+20 race-enabled repetitions. Fresh full control/parser/subscription race suites
+passed in a private user/network namespace; Windows vet/lint and cross-build
+passed. Native Windows ran both groups five times successfully.
+
+This is cooperative scope cancellation and a pre-commit checkpoint, not forced
+preemption of an arbitrary Fetch implementation, physical network-drain proof,
+or an undo of Apply already past its last cancellation check. A provider that
+ignores its context can remain executing until it returns. Run cancellation
+closes this book's saved scope; a new core constructs a new book. Pending intent
+is still process-local, without a durable resume/crash-recovery queue. Unexpected
+Serve-return paths without lifetime cancellation and the remaining aggregate
+resource boundaries are not certified by these handler-level tests.

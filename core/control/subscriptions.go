@@ -118,6 +118,9 @@ type subscriptionBook struct {
 	srv     *Server
 	backoff engine.Backoff
 	now     func() time.Time
+	// Saved-link fetches outlive the UI request, but must end with the core.
+	savedCtx    context.Context
+	cancelSaved context.CancelFunc
 
 	mu      sync.Mutex
 	records map[string]*subscriptionRecord
@@ -139,8 +142,11 @@ type subscriptionBook struct {
 }
 
 func newSubscriptionBook(srv *Server) *subscriptionBook {
+	savedCtx, cancelSaved := context.WithCancel(context.Background())
 	b := &subscriptionBook{
 		srv:          srv,
+		savedCtx:     savedCtx,
+		cancelSaved:  cancelSaved,
 		backoff:      engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
 		now:          time.Now,
 		records:      map[string]*subscriptionRecord{},
@@ -411,7 +417,7 @@ func (b *subscriptionBook) startRefreshLocked(id string) (*subscriptionRecord, e
 // startSavedRefreshLocked consumes a saved-link intent only when its fetch is
 // admitted. Rapid saves coalesce in b.records without creating waiting workers.
 func (b *subscriptionBook) startSavedRefreshLocked(id string) {
-	if !b.pendingFetch[id] {
+	if !b.pendingFetch[id] || b.savedCtx.Err() != nil {
 		return
 	}
 	rec, err := b.startRefreshLocked(id)
@@ -420,7 +426,7 @@ func (b *subscriptionBook) startSavedRefreshLocked(id string) {
 		return
 	}
 	if rec != nil {
-		go func() { _, _ = b.fetchAccepted(context.Background(), rec) }()
+		go func() { _, _ = b.fetchAccepted(b.savedCtx, rec) }()
 	}
 }
 
@@ -583,6 +589,9 @@ func (b *subscriptionBook) nextUpdate(rec *subscriptionRecord) time.Time {
 // run starts due updates and waits for the next deadline, change, or
 // schedulerCheck.
 func (b *subscriptionBook) run(ctx context.Context) {
+	stopSaved := context.AfterFunc(ctx, b.cancelSaved)
+	defer stopSaved()
+	defer b.cancelSaved()
 	slots := make(chan struct{}, parallelUpdates)
 	for {
 		now := b.now()
