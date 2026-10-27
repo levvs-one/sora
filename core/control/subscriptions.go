@@ -403,7 +403,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	answered := err == nil
 	var servers []importedServer
 	if err == nil {
-		servers, err = b.srv.parsePayload(fetched.Body, serverRefFor(id))
+		servers, err = b.srv.parsePayload(ctx, fetched.Body, serverRefFor(id))
 		if isLocalServerLink(link) && len(servers) == 1 {
 			fetched.Info.Title = servers[0].spec.GetDisplayName()
 		}

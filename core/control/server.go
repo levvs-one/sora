@@ -15,6 +15,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/semaphore"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
@@ -152,6 +154,7 @@ type Server struct {
 	extSched    *ext.Scheduler
 	secrets     SecretStore
 	parser      parser.LinkParser
+	parseSlots  *semaphore.Weighted
 	redactors   *redactorCache
 	prober      Prober
 	measurer    Measurer
@@ -253,6 +256,7 @@ func New(cfg Config) (*Server, error) {
 		sessions:    cfg.Sessions,
 		secrets:     cfg.Secrets,
 		parser:      parser.LinkParser{MaxItems: cfg.MaxImportItems},
+		parseSlots:  semaphore.NewWeighted(maxConcurrentParses),
 		redactors:   &redactorCache{byRef: make(map[string]*engine.Redactor)},
 		extSched:    cfg.ExtScheduler,
 		prober:      cfg.Prober,
@@ -970,8 +974,12 @@ func (s *Server) ParseImport(ctx context.Context, req *corev1.ParseImportRequest
 			"control: this core cannot store credentials, so it cannot import")
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
 	}
-	servers, err := s.parsePayload(payload, referenceOf)
+	servers, err := s.parsePayload(ctx, payload, referenceOf)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, status.FromContextError(ctx.Err()).Err()
+		}
+
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
 	}
 	puts := make(map[string][]byte, len(servers))
@@ -1002,10 +1010,18 @@ type importedServer struct {
 	document  []byte
 }
 
+// maxConcurrentParses shares a decoding/preparation budget across manual
+// imports and subscription refreshes, matching the four background workers.
+const maxConcurrentParses = 4
+
 // parsePayload detects the format before parsing, rejecting unknown input
 // instead of returning an empty import. It prepares servers without writing;
 // refFor supplies vault references for one atomic update.
-func (s *Server) parsePayload(payload []byte, refFor func(parser.OutboundSpec) (string, error)) ([]importedServer, error) {
+func (s *Server) parsePayload(ctx context.Context, payload []byte, refFor func(parser.OutboundSpec) (string, error)) ([]importedServer, error) {
+	if err := s.parseSlots.Acquire(ctx, 1); err != nil {
+		return nil, err
+	}
+	defer s.parseSlots.Release(1)
 	if _, err := (parser.ImportDetector{MaxItems: s.parser.MaxItems}).Detect(payload); err != nil {
 		return nil, importError(err)
 	}

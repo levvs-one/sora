@@ -33,7 +33,7 @@ nor this change establishes a hard CPU/memory limit.
 The background subscription scheduler already has four fetch slots, and one
 subscription has an in-progress flag. Those existing limits do not prove a
 global budget across manual imports, explicit fetches and distinct refreshes.
-Aggregate concurrent parsing and the other S3 resource boundaries remain open.
+The shared payload admission below addresses active decoding; aggregate memory and the other S3 resource boundaries remain open.
 
 ## Subscription refresh checkpoints
 
@@ -60,3 +60,72 @@ final checkpoint can race an atomic write; there is no transactional undo.
 The initial independent background fetch launched by SaveSubscription retains
 its existing context policy. Aggregate resource limits and lifecycle ownership
 of that background operation remain separate work.
+
+## Shared payload admission
+
+One control-plane Server now admits at most four calls to its common
+`parsePayload` path at once, before format detection and full decoding. The
+permit remains held through credential-document preparation and is released on
+every return. `ParseImport`, its `FetchSubscription` caller, and the shared
+manual/initial/scheduled subscription refresh path use that admission. Each
+wait uses the existing caller/fetch context; a cancelled or expired waiter does
+not start parsing or write credentials.
+
+Four is an explicit capacity policy matching the existing four automatic-fetch
+workers, not a benchmark-derived throughput or memory threshold. The scheduler's
+fetch slots and per-ID update flag retain their existing roles. HTTP bodies can
+already have arrived before admission. A waiting import keeps its request bytes,
+and results, vault writes and protobuf responses outlive the decoding permit.
+This is not a pre-decode RPC admission limit, a byte budget, a hard heap/CPU
+sandbox, or a cap across separately constructed Server instances. Single-server
+link validation in `normalizedLink` and the custom-server link handler, plus
+engine-config parsers, remain outside this common payload gate.
+
+### Existing-library comparison (27 October 2026)
+
+The project pins Go 1.26.9/toolchain 1.27.3 and already contained both modules.
+The following sizes are complete pinned module ZIPs in the Go cache, not binary
+size deltas; GitHub open counts include pull requests.
+
+| Candidate | Release evidence | GitHub stars / open count | Pinned ZIP | License / runtime |
+| --- | --- | --- | --- | --- |
+| `golang.org/x/sync/semaphore` | pinned and latest v0.24.0, 23 September 2026 | 936 / 9; Go mirror, issues tracked centrally | 26,232 B | BSD-3-Clause; Go >=1.26.0; semaphore imports only the standard library |
+| `google.golang.org/grpc.MaxConcurrentStreams` | pinned v1.83.2, 25 August; latest v1.84.0, 17 September 2026 | 23,094 / 192 | 3,002,440 B for v1.83.2 | Apache-2.0; pinned module Go >=1.25.0 |
+
+Primary evidence: [sync metadata](https://proxy.golang.org/golang.org/x/sync/@latest),
+[gRPC metadata](https://proxy.golang.org/google.golang.org/grpc/@latest),
+[sync repository](https://github.com/golang/sync),
+[gRPC repository](https://github.com/grpc/grpc-go), and the exact installed
+module sources/go.mod files. Both repositories had pushes in October 2026.
+
+The selected [Weighted API](https://pkg.go.dev/golang.org/x/sync@v0.24.0/semaphore)
+already provides cancellable acquisition and release. A direct import promotes
+the same pinned module from indirect to direct; it adds no module/version or
+checksum change. A standard buffered channel was also considered, but would
+duplicate wait/cancel bookkeeping already implemented by this dependency.
+[gRPC's stream limit](https://pkg.go.dev/google.golang.org/grpc@v1.83.2#MaxConcurrentStreams)
+applies per transport and cannot govern the in-process refresh path, so it was
+not selected as the shared parser gate. No transport setting or dependency
+upgrade was introduced.
+
+### Observable checks and limits
+
+The old-code admission regression held four real parses at the existing
+reference-preparation callback: a fifth actual ParseImport still completed and
+persisted a credential. Both cancellation/deadline variants reproduced this
+missing capacity policy. This was an admission test with small synthetic
+subscriptions, not a denial-of-service demonstration or peak-memory benchmark.
+
+The final test also starts the real book refresh with an injected provider,
+while all four permits are occupied. Both waiting paths cancel/expire without
+changing the temporary vault's existing record/list/credential bytes; Updating
+clears, admitted work completes, and a subsequent import succeeds. Malformed
+payload and reference-error paths are exercised before saturation to check
+permit release. Standard `testing/synctest` coordinates blocking and advances
+the deadline without timing thresholds or large allocations. No real provider,
+engine, listener, capture or host network is used.
+
+Synchronous parser work after admission is still not preempted, and the existing
+post-parse commit checkpoints do not undo an atomic write. The initial fetch's
+independent lifecycle, total outstanding RPCs/retained inputs, AST width/node
+budgets and the other resource boundaries remain open.

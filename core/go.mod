@@ -17,6 +17,7 @@ require (
 	github.com/txthinking/socks5 v0.0.0-20260601051520-339b044ab0eb
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 	golang.org/x/net v0.60.0
+	golang.org/x/sync v0.24.0
 	golang.org/x/sys v0.48.0
 	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.11
@@ -41,7 +42,6 @@ require (
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
 	golang.org/x/mod v0.41.0 // indirect
-	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/tools v0.51.0 // indirect
 	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
