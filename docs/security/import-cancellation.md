@@ -216,6 +216,30 @@ preemption of an arbitrary Fetch implementation, physical network-drain proof,
 or an undo of Apply already past its last cancellation check. A provider that
 ignores its context can remain executing until it returns. Run cancellation
 closes this book's saved scope; a new core constructs a new book. Pending intent
-is still process-local, without a durable resume/crash-recovery queue. Unexpected
-Serve-return paths without lifetime cancellation and the remaining aggregate
-resource boundaries are not certified by these handler-level tests.
+is still process-local, without a durable resume/crash-recovery queue. The
+remaining aggregate resource boundaries are not certified by these
+handler-level tests; Serve-return ownership is checked separately below.
+
+
+## Serve return owns its background scope
+
+Run cancellation alone was not sufficient when App.Serve returned while its
+caller remained alive. Both an already-stopped gRPC server and a closed
+listener reproduced the saved fetch surviving that return. Serve now creates
+a standard child context and defers its cancellation, ending its owned Run
+work on every return without cancelling the caller or changing returned errors.
+
+These regressions call the actual Serve method with a constructed control
+plane, a real private vault and the installed gRPC bufconn listener. A fake
+provider first proves the saved fetch is active, then exposes its context.
+The stopped-server result remains nil, a closed-listener failure remains
+non-nil, the caller stays alive, and the fetch context ends as Canceled.
+No App.New, platform recovery, real socket, engine, route or system service is
+started. Direct handler admission uses a temporary authenticator; this is not
+an IPC peer-identity or authorization proof.
+
+Both old-code cases failed. The change passed 20 race-enabled repetitions,
+the fresh complete sora-core command race suite, Windows vet/lint/cross-build,
+and 20 native Windows repetitions of both exit cases. These cooperative
+scope checks do not establish physical network drain, hard process/power
+recovery, parser preemption or rollback of a committed vault write.
