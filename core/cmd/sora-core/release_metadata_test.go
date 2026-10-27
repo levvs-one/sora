@@ -47,14 +47,18 @@ func TestReleaseMetadataCrossLanguageFixtures(t *testing.T) {
 				}
 			}
 			manifest, err := verifyRelease(directory, version, fixtures.PublicKey)
-			valid := name == "1.0.4" || name == "1.0.5" || name == "wrong-size"
+			valid := name == "1.0.4" || name == "1.0.5" || name == "wrong-size" || name == "previous-matrix"
 			if (err == nil) != valid {
 				t.Fatalf("verification: %v", err)
 			}
 			if !valid {
 				return
 			}
-			if manifest.metadata == nil || len(manifest.metadata.Artifacts) != 12 {
+			expectedArtifacts := 15
+			if name == "previous-matrix" {
+				expectedArtifacts = 12
+			}
+			if manifest.metadata == nil || len(manifest.metadata.Artifacts) != expectedArtifacts {
 				t.Fatal("producer metadata was not loaded")
 			}
 			for _, artifact := range manifest.metadata.Artifacts {
@@ -122,13 +126,16 @@ func TestReleaseFullSnapshotGate(t *testing.T) {
 	if err := json.Unmarshal(data, &fixtures); err != nil {
 		t.Fatal(err)
 	}
-	for _, problem := range []string{"valid", "missing", "short", "long", "oversize sparse", "hash", "directory", "symlink", "extra", "many extras", "wrong signed size", "manifest mutation", "signature mutation", "metadata mutation"} {
+	for _, problem := range []string{"valid", "previous matrix", "missing", "short", "long", "oversize sparse", "hash", "directory", "symlink", "extra", "many extras", "wrong signed size", "manifest mutation", "signature mutation", "metadata mutation"} {
 		t.Run(problem, func(t *testing.T) {
 			if problem == "oversize sparse" && runtime.GOOS != "linux" {
 				t.Skip("Linux sparse-file guard; other platforms exercise an oversized byte fixture")
 			}
 			directory := t.TempDir()
 			record := fixtures.Releases["1.0.5"]
+			if problem == "previous matrix" {
+				record = fixtures.Cases["previous-matrix"]
+			}
 			if problem == "wrong signed size" {
 				record = fixtures.Cases["wrong-size"]
 			}

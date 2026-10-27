@@ -43,7 +43,7 @@ def generate():
             distribution.mkdir()
             names = [f"Sora-Setup-{version}-x64.exe", "install.sh", "install.ps1"]
             for arch, machine in (("amd64", "x86_64"), ("arm64", "aarch64")):
-                for package in ("sora-core", "sora") if arch == "amd64" else ("sora-core",):
+                for package in ("sora-core", "sora"):
                     names += [f"{package}_{version}_{arch}.deb", f"{package}-{version}-1.{machine}.rpm",
                               f"{package}-{version}-1-{machine}.pkg.tar.zst"]
             for name in names:
@@ -68,6 +68,11 @@ def generate():
                 record["catalog-signature"] = signed(metadata, version, role="catalog.json")["signature"]
                 result["flows"][version][package_format] = record
         base = result["releases"]["1.0.5"]["metadata"]
+        previous = json.loads(base)
+        previous["artifacts"] = [entry for entry in previous["artifacts"]
+                                 if entry["arch"] != "arm64" or entry["name"].startswith("sora-core")]
+        result["cases"]["previous-matrix"] = signed(
+            json.dumps(previous, ensure_ascii=True, separators=(",", ":"), allow_nan=False) + "\n", "1.0.5")
         for case in ("os", "arch", "zero-size", "oversize", "float-size", "wrong-size", "hash-case",
                      "version", "schema", "empty", "order", "unknown", "duplicate-key", "whitespace", "duplicate-checksum"):
             document = json.loads(base)

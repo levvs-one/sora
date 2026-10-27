@@ -56,7 +56,7 @@ void main() {
     final record = records['1.0.5']!;
     final bytes = utf8.encode(record['metadata']!);
     final metadata = ReleaseMetadata.parse(bytes, '1.0.5');
-    expect(metadata.artifacts.length, 12);
+    expect(metadata.artifacts.length, 15);
     expect(metadata.checksumManifest(sha256.convert(bytes).toString()), record['manifest']);
     expect(ReleaseMetadata.referenced(record['manifest']!), isTrue);
     expect(ReleaseMetadata.referenced('${'a' * 64}  install.sh\n'), isFalse);
@@ -66,7 +66,7 @@ void main() {
   });
 
   for (final name in records.keys.where(
-    (name) => !['1.0.4', '1.0.5', 'wrong-size', 'duplicate-checksum'].contains(name),
+    (name) => !['1.0.4', '1.0.5', 'previous-matrix', 'wrong-size', 'duplicate-checksum'].contains(name),
   )) {
     test('strict metadata parser rejects signed malformed $name', () {
       expect(() => ReleaseMetadata.parse(utf8.encode(records[name]!['metadata']!), '1.0.5'), throwsFormatException);
@@ -193,7 +193,7 @@ void main() {
           restartLinux: () async => restarted = true,
           quit: () async => didQuit = true,
         );
-        final successful = ['success', 'api-small', 'api-large'].contains(scenario);
+        final successful = ['success', 'previous-matrix', 'api-small', 'api-large'].contains(scenario);
         expect(handedOff, successful);
         expect(didQuit, successful);
         if (successful) {

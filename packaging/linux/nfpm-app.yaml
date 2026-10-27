@@ -35,6 +35,7 @@ contents:
   - src: ./app/build/linux/${SORA_FLUTTER_ARCH}/release/bundle/
     dst: /usr/lib/sora/app
     type: tree
+    expand: true
   - src: /usr/lib/sora/app/sora
     dst: /usr/bin/sora
     type: symlink

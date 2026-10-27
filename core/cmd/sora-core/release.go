@@ -86,9 +86,9 @@ func (manifest *releaseManifest) verifyArtifactFiles(ctx context.Context, direct
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	// Schema 1 has twelve distinct allowed names: Windows, two scripts and
-	// nine Linux packages. Publication requires that complete supported matrix.
-	if manifest.metadata == nil || len(manifest.metadata.Artifacts) != 12 {
+	// Schema 1 has fifteen distinct allowed names: Windows, two scripts and
+	// twelve Linux packages. Publication requires that complete supported matrix.
+	if manifest.metadata == nil || len(manifest.metadata.Artifacts) != 15 {
 		return fmt.Errorf("release: full verification requires the complete schema 1 artifact matrix")
 	}
 	root, err := os.OpenRoot(directory)
@@ -263,9 +263,6 @@ func releaseArtifactTarget(name, version string) (string, string) {
 	}
 	for _, pair := range [][2]string{{"amd64", "x86_64"}, {"arm64", "aarch64"}} {
 		for _, pkg := range []string{"sora-core", "sora"} {
-			if pkg == "sora" && pair[0] == "arm64" {
-				continue
-			}
 			if name == pkg+"_"+version+"_"+pair[0]+".deb" || name == pkg+"-"+version+"-1."+pair[1]+".rpm" ||
 				name == pkg+"-"+version+"-1-"+pair[1]+".pkg.tar.zst" {
 				return "linux", pair[0]

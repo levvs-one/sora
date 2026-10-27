@@ -92,7 +92,7 @@ class ReleaseGateTests(unittest.TestCase):
 
     def test_real_signature_and_complete_snapshot(self):
         self.assertEqual(self.invoke(), "verified")
-        self.assertEqual(len(self.downloads), 15)
+        self.assertEqual(len(self.downloads), 18)
         self.assertEqual(self.downloads[:3], list(gate.METADATA.items()))
         self.assertTrue(all(limit == 3 for _, limit in self.downloads[3:]))
         self.assertEqual(self.writes, [])
@@ -210,7 +210,7 @@ class ReleaseGateTests(unittest.TestCase):
 
         with patch.object(self, "api", side_effect=revoked), self.assertRaisesRegex(RuntimeError, "not enabled"):
             self.invoke("publish-prerelease", True)
-        self.assertEqual(len(self.downloads), 15)
+        self.assertEqual(len(self.downloads), 18)
         self.assertEqual(self.writes, [])
 
     def test_changed_tag_after_freeze_never_promotes(self):

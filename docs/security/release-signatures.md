@@ -160,8 +160,8 @@ sora-core -verify-release /path/to/private-release-snapshot \
 ```
 
 This mode requires schema 1 metadata and its complete current matrix: the Windows
-amd64 installer, both installation scripts, six Linux amd64 packages and three
-Linux arm64 core packages. Legacy manifests and an otherwise correctly signed
+amd64 installer, both installation scripts, six Linux amd64 packages and six
+Linux arm64 packages (core and app). Legacy manifests and an otherwise correctly signed
 partial matrix fail this publication preflight. An artifact/target query cannot
 be combined with this mode, and explicitly disabling its boolean flag is rejected.
 
@@ -175,7 +175,7 @@ directory. Keep generated reports outside the private snapshot.
 
 The command reads files and exits before constructing the core; it does not
 download, sign, install or publish anything. Its success message explicitly says
-that all twelve artifact files were verified. General install and rollback paths
+that all fifteen artifact files were verified. General install and rollback paths
 continue to use their existing signature and selected-artifact policies.
 
 This is the file-verification component of a publication gate, not enforcement of
@@ -246,7 +246,7 @@ the independent Minisign signature and native full profile authenticate bytes.
 The Python standard library handles orchestration, JSON and hashing; there is
 no new HTTP, authentication, retry or cryptography implementation/dependency.
 The gate rejects gh output above 2 MiB after the client returns, and projects at
-most sixteen assets to reject an oversized matrix. This is not a transport-level
+most nineteen assets to reject an oversized matrix. This is not a transport-level
 memory bound on gh's own JSON decoder; package streams have the enforced curl
 byte limit described above.
 
@@ -343,11 +343,22 @@ There are no timestamps or absolute paths in the document. `release.json` is
 listed in SHA256SUMS and is not recursively listed in its own artifact array.
 
 The producer recognizes the existing Windows x64 installer, Linux deb/rpm/Arch
-packages for amd64/arm64, and the two installation scripts. ARM64 has only the
-core package. Script architecture is `any`; executable/package architecture is
+packages for amd64/arm64, and the two installation scripts. Both Linux
+architectures include core and app packages. Script architecture is `any`; executable/package architecture is
 derived from the existing build filename contract. This is a declared target,
 not an independent PE/ELF architecture inspection. Unknown names or a mixture of
 versions fail instead of being silently assigned a platform.
+
+The ARM64 build adds three app package names to the existing schema 1 allowlist
+in the Python producer, Go verifier and Dart parser. Complete publication now
+requires fifteen artifacts plus three metadata files; the API projection reads
+at most nineteen assets so an extra asset is refused. Authenticated older
+twelve-artifact metadata remains valid for selected-artifact installation, but
+does not satisfy the new complete publication matrix. Public cross-language
+fixtures include both cases, signed only by a temporary test identity. The
+production root and all signature/role/canonical/size/target checks are retained.
+This metadata compatibility does not by itself implement the ARM64 installer,
+desktop update selection or privileged snapshot/helper path described below.
 
 Inputs must be regular, nonempty files, at most 2 GiB each and 128 files total.
 Symlinks/directories and changes detected during hashing are rejected. Existing

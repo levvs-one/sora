@@ -13,7 +13,7 @@ REPOSITORY = "levvs-one/sora"
 PREFIX = f"repos/{REPOSITORY}"
 ENVIRONMENT = "release"
 METADATA = {"SHA256SUMS": 1048576, "SHA256SUMS.minisig": 8192, "release.json": 1048576}
-RELEASE_FIELDS = "{id,tag_name,draft,prerelease,immutable,assets:[.assets[:16][]|{id,name,size,digest}]}"
+RELEASE_FIELDS = "{id,tag_name,draft,prerelease,immutable,assets:[.assets[:19][]|{id,name,size,digest}]}"
 
 
 def api(path, projection, *, policy=False, update=None):
@@ -94,8 +94,8 @@ def tag_commit(tag):
 
 def asset_map(release):
     assets = release.get("assets")
-    if not isinstance(assets, list) or len(assets) != 15:
-        raise RuntimeError("release must contain exactly twelve artifacts and three metadata files")
+    if not isinstance(assets, list) or len(assets) != 18:
+        raise RuntimeError("release must contain exactly fifteen artifacts and three metadata files")
     result = {}
     for asset in assets:
         name, identifier, size, digest = (asset.get(k) for k in ("name", "id", "size", "digest"))
@@ -105,7 +105,7 @@ def asset_map(release):
                 or not isinstance(digest, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", digest)):
             raise RuntimeError("release asset identity is invalid or ambiguous")
         result[name] = asset
-    if len({a["id"] for a in result.values()}) != 15:
+    if len({a["id"] for a in result.values()}) != 18:
         raise RuntimeError("release asset IDs are not unique")
     return result
 
@@ -178,7 +178,7 @@ def run(tag, commit, verifier, stage="verify", execute=False):
             raise RuntimeError("native release authentication failed")
         metadata = json.loads((snapshot / "release.json").read_bytes())
         artifacts = metadata["artifacts"]
-        if len(artifacts) != 12 or set(assets) != set(METADATA) | {a["name"] for a in artifacts}:
+        if len(artifacts) != 15 or set(assets) != set(METADATA) | {a["name"] for a in artifacts}:
             raise RuntimeError("API asset set differs from the authenticated release matrix")
         for artifact in artifacts:
             download(assets[artifact["name"]], snapshot / artifact["name"], artifact["size"])

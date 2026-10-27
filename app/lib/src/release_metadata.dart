@@ -86,7 +86,6 @@ class ReleaseMetadata {
     if (name == 'install.sh') return ('linux', 'any');
     for (final (arch, machine) in [('amd64', 'x86_64'), ('arm64', 'aarch64')]) {
       for (final package in ['sora-core', 'sora']) {
-        if (package == 'sora' && arch == 'arm64') continue;
         if (name == '${package}_${version}_$arch.deb' ||
             name == '$package-$version-1.$machine.rpm' ||
             name == '$package-$version-1-$machine.pkg.tar.zst') {
