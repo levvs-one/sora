@@ -12,8 +12,11 @@ The helper now calls the installed core with:
   /absolute/untrusted-downloads /var/tmp/private-owned-snapshot
 ```
 
-`rpm` and `arch` select the existing package names for the Linux amd64 desktop
-pair. The command accepts only this mode, version and two absolute directories.
+`rpm` and `arch` select the package names for the native Linux amd64 or arm64
+desktop pair. Selection uses the installed Go binary's `runtime.GOARCH`; callers
+cannot supply an architecture flag or environment override. Other native
+architectures are refused, and missing native packages never select another
+architecture. The command accepts only this mode, version and two absolute directories.
 It exits before core construction, service operations, token reads or networking.
 It installs nothing and grants no additional privilege; pkexec still authorizes
 only the root-owned shell entry point. Other platforms refuse the command.

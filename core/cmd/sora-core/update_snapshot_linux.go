@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"golang.org/x/sys/unix"
@@ -16,15 +17,25 @@ func prepareUpdateSnapshot(ctx context.Context, format, version, source, target,
 	if !releaseVersionPattern.MatchString(version) || len(version) > 64 || !filepath.IsAbs(source) || !filepath.IsAbs(target) {
 		return fmt.Errorf("release: invalid update snapshot version or directories")
 	}
+	architecture := runtime.GOARCH
+	var machine string
+	switch architecture {
+	case "amd64":
+		machine = "x86_64"
+	case "arm64":
+		machine = "aarch64"
+	default:
+		return fmt.Errorf("release: unsupported native update architecture")
+	}
 	var names []string
 	for _, pkg := range []string{"sora-core", "sora"} {
 		switch format {
 		case "deb":
-			names = append(names, pkg+"_"+version+"_amd64.deb")
+			names = append(names, pkg+"_"+version+"_"+architecture+".deb")
 		case "rpm":
-			names = append(names, pkg+"-"+version+"-1.x86_64.rpm")
+			names = append(names, pkg+"-"+version+"-1."+machine+".rpm")
 		case "arch":
-			names = append(names, pkg+"-"+version+"-1-x86_64.pkg.tar.zst")
+			names = append(names, pkg+"-"+version+"-1-"+machine+".pkg.tar.zst")
 		default:
 			return fmt.Errorf("release: unsupported update snapshot format")
 		}
@@ -83,7 +94,7 @@ func prepareUpdateSnapshot(ctx context.Context, format, version, source, target,
 		return err
 	}
 	for _, name := range names {
-		size, err := manifest.artifactSize(name, "linux/amd64", version)
+		size, err := manifest.artifactSize(name, "linux/"+architecture, version)
 		if err != nil {
 			return err
 		}

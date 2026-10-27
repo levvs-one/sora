@@ -379,11 +379,14 @@ producer's canonical rules rejects duplicate or unknown keys, alternative
 encodings and unexpected field order. The reconstructed checksum table must
 equal the entire signed SHA256SUMS, including the metadata entry.
 
-Selected packages must match the local Windows/Linux amd64 target. Their signed
+Selected packages must match Windows amd64 or the native Linux amd64/arm64 target. Their signed
 sizes bound streaming downloads and replace the untrusted API package sizes;
 both truncated and oversized responses fail before installer handoff. Local
-package verification also checks bounded length and SHA-256. ARM64 is not added
-to the desktop updater by this change.
+package verification also checks bounded length and SHA-256. The app uses the
+standard Dart VM ABI to select Linux package filenames and the same signed target
+for current downloads, rollback-cache preparation and offline rollback. Unsupported
+ABIs are refused before package download or installer handoff. Windows still selects the
+existing amd64 installer; no native Windows ARM64 release is authorized by this mapping.
 
 The app saves the exact JSON bytes with the signed manifest in its working
 snapshot and Linux rollback cache. Offline rollback reauthenticates the cached
@@ -392,10 +395,21 @@ The root-owned Linux helper requires JSON in its private snapshot and in the
 signed checksum table, and checks its nonempty, bounded contents
 against that table before the package manager runs. An unlisted JSON is rejected.
 The helper now invokes the installed native verifier to parse schema 1 and query
-each package's signed size and expected Linux/amd64 target on that root-owned
+each package's signed size and expected native Linux target on that root-owned
 snapshot. It also retains its own checksum, length and package-manager metadata
 checks. Initial-install scripts use the same native query with the detected target,
-including Linux arm64 core packages; Windows selects the existing amd64 build.
+including both Linux arm64 packages; Windows selects the existing amd64 build.
+
+The privileged snapshot derives its architecture from the installed Go binary,
+and the helper derives its package names, target query and package-header checks
+from a fixed uname whitelist. There is no user-selectable architecture option.
+Mixed-architecture/emulated setups are not a verified contract; disagreement or
+an absent native package fails rather than downloading an alternative. Existing
+signature, canonical metadata, positive size, hash and private-snapshot checks
+remain required. ARM64 CI runs the Go snapshot, signed Dart metadata/rollback
+matrix and namespace helper contracts. Package managers and OS queries in those
+contract tests are intercepted; this is not a real system upgrade or power-loss
+rollback proof.
 
 The draft signed format without JSON is retired on all consumer paths: native
 verification/size queries, both initial scripts, in-app downloads, preparation

@@ -36,12 +36,16 @@ version_ge() {
 }
 printf '%s\n' "$version" | LC_ALL=C grep -Eq '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$' || die 'invalid version'
 case "$source" in /*) ;; *) die 'download directory must be absolute' ;; esac
-[ "$(uname -m)" = x86_64 ] || die 'the desktop update requires x86_64'
+case "$(uname -m)" in
+x86_64 | amd64) architecture=amd64 machine=x86_64 ;;
+aarch64 | arm64) architecture=arm64 machine=aarch64 ;;
+*) die 'unsupported native desktop update architecture' ;;
+esac
 case "$format" in
 deb)
-    files="sora-core_${version}_amd64.deb sora_${version}_amd64.deb"
+    files="sora-core_${version}_${architecture}.deb sora_${version}_${architecture}.deb"
     case "$(dpkg-query -S /usr/lib/sora/app/sora)" in
-        'sora: /usr/lib/sora/app/sora' | 'sora:amd64: /usr/lib/sora/app/sora') ;;
+        'sora: /usr/lib/sora/app/sora' | "sora:$architecture: /usr/lib/sora/app/sora") ;;
         *) die 'Sora was not installed with dpkg' ;;
     esac
     for package in sora sora-core; do
@@ -49,12 +53,12 @@ deb)
     done
     ;;
 rpm)
-    files="sora-core-${version}-1.x86_64.rpm sora-${version}-1.x86_64.rpm"
+    files="sora-core-${version}-1.${machine}.rpm sora-${version}-1.${machine}.rpm"
     [ "$(rpm -qf --qf '%{NAME}' /usr/lib/sora/app/sora)" = sora ] || die 'Sora was not installed with rpm'
     rpm -q sora sora-core >/dev/null || die 'both packages must be installed'
     ;;
 arch)
-    files="sora-core-${version}-1-x86_64.pkg.tar.zst sora-${version}-1-x86_64.pkg.tar.zst"
+    files="sora-core-${version}-1-${machine}.pkg.tar.zst sora-${version}-1-${machine}.pkg.tar.zst"
     [ "$(pacman -Qoq /usr/lib/sora/app/sora)" = sora ] || die 'Sora was not installed with pacman'
     pacman -Q sora sora-core >/dev/null || die 'both packages must be installed'
     ;;
@@ -88,7 +92,7 @@ if [ ! -f release.json ] || [ ! -s release.json ] || [ -L release.json ]; then d
 checked_files="$files release.json"
 for name in $checked_files; do
     if [ "$name" != release.json ]; then
-        size=$(/usr/bin/sora-core -verify-release "$work" -release-version "$version" -release-artifact "$name" -release-target linux/amd64) || die 'artifact metadata rejected'
+        size=$(/usr/bin/sora-core -verify-release "$work" -release-version "$version" -release-artifact "$name" -release-target "linux/$architecture") || die 'artifact metadata rejected'
         case "$size" in '' | *[!0-9]*) die 'invalid verifier size response' ;; esac
         if [ "${#size}" -gt 10 ] || [ "$size" -lt 1 ] || [ "$size" -gt 2147483648 ]; then die 'invalid verifier size response'; fi
         bytes=$(wc -c <"$name")
@@ -103,17 +107,17 @@ sha256sum -c --quiet expected || die 'checksum mismatch; nothing was installed'
 for package in sora-core sora; do
     case "$format" in
     deb)
-        file="${package}_${version}_amd64.deb"
+        file="${package}_${version}_${architecture}.deb"
         [ "$(dpkg-deb -f "$file" Package)" = "$package" ] || die 'unexpected package name'
         [ "$(dpkg-deb -f "$file" Version)" = "$version" ] || die 'unexpected package version'
-        [ "$(dpkg-deb -f "$file" Architecture)" = amd64 ] || die 'unexpected architecture'
+        [ "$(dpkg-deb -f "$file" Architecture)" = "$architecture" ] || die 'unexpected architecture'
         ;;
     rpm)
-        file="${package}-${version}-1.x86_64.rpm"
-        [ "$(rpm -qp --qf '%{NAME} %{VERSION}-%{RELEASE} %{ARCH}' "$file")" = "$package $version-1 x86_64" ] || die 'unexpected package metadata'
+        file="${package}-${version}-1.${machine}.rpm"
+        [ "$(rpm -qp --qf '%{NAME} %{VERSION}-%{RELEASE} %{ARCH}' "$file")" = "$package $version-1 $machine" ] || die 'unexpected package metadata'
         ;;
     arch)
-        file="${package}-${version}-1-x86_64.pkg.tar.zst"
+        file="${package}-${version}-1-${machine}.pkg.tar.zst"
         [ "$(pacman -Qp "$file")" = "$package $version-1" ] || die 'unexpected package metadata'
         ;;
     esac

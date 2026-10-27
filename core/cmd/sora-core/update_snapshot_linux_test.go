@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -100,6 +101,17 @@ func TestPrepareUpdateSnapshotFormatsAndLegacyRetirement(t *testing.T) {
 					t.Fatalf("snapshot mode: %v, %v", info, err)
 				}
 			}
+			machine := map[string]string{"amd64": "x86_64", "arm64": "aarch64"}[runtime.GOARCH]
+			names := map[string][]string{
+				"deb":  {"sora-core_1.0.5_" + runtime.GOARCH + ".deb", "sora_1.0.5_" + runtime.GOARCH + ".deb"},
+				"rpm":  {"sora-core-1.0.5-1." + machine + ".rpm", "sora-1.0.5-1." + machine + ".rpm"},
+				"arch": {"sora-core-1.0.5-1-" + machine + ".pkg.tar.zst", "sora-1.0.5-1-" + machine + ".pkg.tar.zst"},
+			}[format]
+			for _, name := range names {
+				if data, err := os.ReadFile(filepath.Join(target, name)); err != nil || string(data) != "abc" {
+					t.Fatalf("native package was not snapshotted: %s, %v", name, err)
+				}
+			}
 		})
 	}
 }
@@ -114,7 +126,7 @@ func TestPrepareUpdateSnapshotRejectsAndCleans(t *testing.T) {
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			file := filepath.Join(source, "sora_1.0.5_amd64.deb")
+			file := filepath.Join(source, "sora_1.0.5_"+runtime.GOARCH+".deb")
 			var err error
 			switch problem {
 			case "manifest":
@@ -141,7 +153,7 @@ func TestPrepareUpdateSnapshotRejectsAndCleans(t *testing.T) {
 				}
 				switch problem {
 				case "symlink":
-					err = os.Symlink("sora-core_1.0.5_amd64.deb", file)
+					err = os.Symlink("sora-core_1.0.5_"+runtime.GOARCH+".deb", file)
 				case "fifo":
 					err = unix.Mkfifo(file, 0o600)
 				case "directory":
@@ -227,7 +239,7 @@ func TestPrepareUpdateAuthenticatesBeforeOpeningPackages(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(source, "SHA256SUMS"), []byte("tampered"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Remove(filepath.Join(source, "sora-core_1.0.5_amd64.deb")); err != nil {
+	if err := os.Remove(filepath.Join(source, "sora-core_1.0.5_"+runtime.GOARCH+".deb")); err != nil {
 		t.Fatal(err)
 	}
 	target := t.TempDir()
@@ -237,6 +249,25 @@ func TestPrepareUpdateAuthenticatesBeforeOpeningPackages(t *testing.T) {
 	if err := prepareUpdateSnapshot(context.Background(), "deb", "1.0.5", source, target, key); err == nil ||
 		!strings.Contains(err.Error(), "untrusted SHA256SUMS") {
 		t.Fatalf("package access preceded authentication: %v", err)
+	}
+}
+
+func TestPrepareUpdateSnapshotNeverUsesOtherArchitecture(t *testing.T) {
+	source, key := updateSnapshotFixture(t)
+	for _, name := range []string{"sora-core_1.0.5_", "sora_1.0.5_"} {
+		if err := os.Remove(filepath.Join(source, name+runtime.GOARCH+".deb")); err != nil {
+			t.Fatal(err)
+		}
+	}
+	target := t.TempDir()
+	if err := os.Chmod(target, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := prepareUpdateSnapshot(context.Background(), "deb", "1.0.5", source, target, key); err == nil {
+		t.Fatal("missing native pair was replaced by another architecture")
+	}
+	if entries, err := os.ReadDir(target); err != nil || len(entries) != 0 {
+		t.Fatalf("rejected snapshot was not cleaned: %v, %v", entries, err)
 	}
 }
 

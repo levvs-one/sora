@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi' show Abi;
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -226,17 +227,38 @@ class PendingUpdate {
 
 enum PackageFormat { deb, rpm, arch }
 
+enum ReleaseArchitecture {
+  amd64('x86_64'),
+  arm64('aarch64');
+
+  const ReleaseArchitecture(this.machine);
+  final String machine;
+
+  static ReleaseArchitecture? forAbi(Abi abi) => switch (abi) {
+    Abi.linuxX64 || Abi.windowsX64 => amd64,
+    Abi.linuxArm64 => arm64,
+    _ => null,
+  };
+}
+
 typedef UpdateProcess = Future<ProcessResult> Function(String executable, List<String> arguments);
 
 class LinuxInstallation {
-  const LinuxInstallation(this.format, this.manager);
+  const LinuxInstallation(this.format, this.manager, {this.architecture = ReleaseArchitecture.amd64});
   final PackageFormat format;
   final String manager;
+  final ReleaseArchitecture architecture;
 
   List<String> filenames(String version) => switch (format) {
-    PackageFormat.deb => ['sora-core_${version}_amd64.deb', 'sora_${version}_amd64.deb'],
-    PackageFormat.rpm => ['sora-core-$version-1.x86_64.rpm', 'sora-$version-1.x86_64.rpm'],
-    PackageFormat.arch => ['sora-core-$version-1-x86_64.pkg.tar.zst', 'sora-$version-1-x86_64.pkg.tar.zst'],
+    PackageFormat.deb => ['sora-core_${version}_${architecture.name}.deb', 'sora_${version}_${architecture.name}.deb'],
+    PackageFormat.rpm => [
+      'sora-core-$version-1.${architecture.machine}.rpm',
+      'sora-$version-1.${architecture.machine}.rpm',
+    ],
+    PackageFormat.arch => [
+      'sora-core-$version-1-${architecture.machine}.pkg.tar.zst',
+      'sora-$version-1-${architecture.machine}.pkg.tar.zst',
+    ],
   };
 
   List<String> installArguments(List<String> files) => switch (manager) {
@@ -259,7 +281,13 @@ class LinuxInstallation {
   }
 
   /// Query ownership of this executable, not merely which managers are present.
-  static Future<LinuxInstallation?> detect(UpdateProcess run, String executable) async {
+  static Future<LinuxInstallation?> detect(
+    UpdateProcess run,
+    String executable, {
+    ReleaseArchitecture? architecture,
+  }) async {
+    final arch = architecture ?? ReleaseArchitecture.forAbi(Abi.current());
+    if (arch == null) return null;
     Future<String?> query(String command, List<String> args) async {
       try {
         final result = await run(command, args).timeout(const Duration(seconds: 5));
@@ -270,24 +298,26 @@ class LinuxInstallation {
     }
 
     final debOwner = await query('dpkg-query', ['-S', executable]);
-    if (debOwner == 'sora: $executable' || debOwner == 'sora:amd64: $executable') {
+    if (debOwner == 'sora: $executable' || debOwner == 'sora:${arch.name}: $executable') {
       final status = await query('dpkg-query', ['-W', '-f=\${Package}\t\${db:Status-Status}\n', 'sora', 'sora-core']);
       if (status != null && status.split('\n').toSet().containsAll({'sora\tinstalled', 'sora-core\tinstalled'})) {
-        return const LinuxInstallation(PackageFormat.deb, 'apt-get');
+        return LinuxInstallation(PackageFormat.deb, 'apt-get', architecture: arch);
       }
     }
     if (await query('rpm', ['-qf', '--qf', '%{NAME}\n', executable]) == 'sora') {
       final names = await query('rpm', ['-q', '--qf', '%{NAME}\n', 'sora', 'sora-core']);
       if (names != null && names.split('\n').toSet().containsAll({'sora', 'sora-core'})) {
         for (final manager in ['dnf', 'zypper']) {
-          if (await query(manager, ['--version']) != null) return LinuxInstallation(PackageFormat.rpm, manager);
+          if (await query(manager, ['--version']) != null) {
+            return LinuxInstallation(PackageFormat.rpm, manager, architecture: arch);
+          }
         }
       }
     }
     if (await query('pacman', ['-Qoq', executable]) == 'sora') {
       final packages = await query('pacman', ['-Qq', 'sora', 'sora-core']);
       if (packages != null && packages.split('\n').toSet().containsAll({'sora', 'sora-core'})) {
-        return const LinuxInstallation(PackageFormat.arch, 'pacman');
+        return LinuxInstallation(PackageFormat.arch, 'pacman', architecture: arch);
       }
     }
     return null;
@@ -306,6 +336,7 @@ class AppUpdater extends ChangeNotifier {
     UpdateProcess? run,
     String? executable,
     bool? windows,
+    Abi? abi,
     Future<bool> Function()? canElevate,
     Directory Function(String fromVersion)? rollbackDir,
     this._signingPublicKey = teamPublicKey,
@@ -313,6 +344,7 @@ class AppUpdater extends ChangeNotifier {
        _run = run ?? ((exe, args) => Process.run(exe, args)),
        _executable = executable ?? Platform.resolvedExecutable,
        _windows = windows ?? Platform.isWindows,
+       _architecture = ReleaseArchitecture.forAbi(abi ?? Abi.current()),
        _rollbackDirOverride = rollbackDir,
        _canElevate =
            canElevate ??
@@ -329,6 +361,7 @@ class AppUpdater extends ChangeNotifier {
   final UpdateProcess _run;
   final String _executable;
   final bool _windows;
+  final ReleaseArchitecture? _architecture;
   // Tests use an ephemeral signing identity; production pins the compiled root.
   final String _signingPublicKey;
 
@@ -621,7 +654,7 @@ class AppUpdater extends ChangeNotifier {
     final bounded = <ReleaseAsset>[];
     for (final asset in assets) {
       final entry = metadata.artifacts[asset.name];
-      if (entry == null || entry.os != (_windows ? 'windows' : 'linux') || entry.arch != 'amd64') {
+      if (entry == null || entry.os != (_windows ? 'windows' : 'linux') || entry.arch != _architecture?.name) {
         throw const UpdateFailure(UpdateError.release);
       }
       bounded.add(ReleaseAsset(asset.name, asset.url, entry.size));
@@ -684,8 +717,13 @@ class AppUpdater extends ChangeNotifier {
     bool handedOff = false;
     try {
       _guard();
+      if (_architecture == null || (_windows && _architecture != ReleaseArchitecture.amd64)) {
+        throw const UpdateFailure(UpdateError.unsupported);
+      }
       final release = latest!;
-      final installation = _windows ? null : await LinuxInstallation.detect(_run, _executable);
+      final installation = _windows
+          ? null
+          : await LinuxInstallation.detect(_run, _executable, architecture: _architecture);
       if (!_windows && installation == null) throw const UpdateFailure(UpdateError.unsupported);
       final names = _windows ? ['Sora-Setup-${release.version}-x64.exe'] : installation!.filenames(release.version);
       // Resolve the whole pair before downloading or invoking any installer.
@@ -894,7 +932,8 @@ class AppUpdater extends ChangeNotifier {
     manualCommand = null;
     notifyListeners();
     try {
-      final installation = await LinuxInstallation.detect(_run, _executable);
+      if (_architecture == null) throw const UpdateFailure(UpdateError.unsupported);
+      final installation = await LinuxInstallation.detect(_run, _executable, architecture: _architecture);
       if (installation == null) throw const UpdateFailure(UpdateError.unsupported);
       final dir = _rollbackDir(marker.from);
       if (dir == null || !await dir.exists()) {
@@ -925,7 +964,7 @@ class AppUpdater extends ChangeNotifier {
         if (!await file.exists()) throw const UpdateFailure(UpdateError.rollback);
         try {
           final entry = metadata.artifacts[name];
-          if (entry == null || entry.os != 'linux' || entry.arch != 'amd64') {
+          if (entry == null || entry.os != 'linux' || entry.arch != _architecture.name) {
             throw const UpdateFailure(UpdateError.rollback);
           }
           await verifyUpdateFile(file, manifest, name, size: entry.size);

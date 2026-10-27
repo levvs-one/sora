@@ -694,7 +694,7 @@ jobs:
       - name: Build the app
         working-directory: app
         run: |
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb bubblewrap
           flutter pub get
           flutter build linux --release --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Check the architecture of every bundled native binary
@@ -714,6 +714,21 @@ jobs:
         if: matrix.arch == 'arm64'
         working-directory: app
         run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
+      - name: Native ARM64 update and rollback contracts
+        if: matrix.arch == 'arm64'
+        run: |
+          set -euo pipefail
+          {
+            (cd core && go test -race ./cmd/sora-core -run '^Test(PrepareUpdate|UpdateSnapshot)' -v)
+            (cd app && flutter test test/update_metadata_test.dart)
+            sudo env "PATH=$PATH" "GOCACHE=$(go env GOCACHE)" "GOMODCACHE=$(go env GOMODCACHE)" python3 -B packaging/linux/test_update.py -v
+          } 2>&1 | tee "$RUNNER_TEMP/arm64-update-contract.log"
+      - uses: actions/upload-artifact@v6
+        if: always() && matrix.arch == 'arm64'
+        with:
+          name: arm64-update-contract-evidence
+          path: ${{ runner.temp }}/arm64-update-contract.log
+          if-no-files-found: ignore
       - name: Package
         env:
           SORA_ARCH: ${{ matrix.arch }}

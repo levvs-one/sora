@@ -24,11 +24,12 @@ class UpdateHelperTest(unittest.TestCase):
         target.chmod(0o755)
         return target
 
-    def prepare(self, format):
+    def prepare(self, format, architecture="amd64"):
+        machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
         files = {
-            "deb": ["sora-core_1.0.5_amd64.deb", "sora_1.0.5_amd64.deb"],
-            "rpm": ["sora-core-1.0.5-1.x86_64.rpm", "sora-1.0.5-1.x86_64.rpm"],
-            "arch": ["sora-core-1.0.5-1-x86_64.pkg.tar.zst", "sora-1.0.5-1-x86_64.pkg.tar.zst"],
+            "deb": [f"sora-core_1.0.5_{architecture}.deb", f"sora_1.0.5_{architecture}.deb"],
+            "rpm": [f"sora-core-1.0.5-1.{machine}.rpm", f"sora-1.0.5-1.{machine}.rpm"],
+            "arch": [f"sora-core-1.0.5-1-{machine}.pkg.tar.zst", f"sora-1.0.5-1-{machine}.pkg.tar.zst"],
         }[format]
         checksums = []
         for name in files:
@@ -46,7 +47,7 @@ class UpdateHelperTest(unittest.TestCase):
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
                    installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size=None, old_verifier=False,
-                   native_verifier=False):
+                   native_verifier=False, architecture="amd64", bad_architecture=False):
         recorder = '[ -f /tmp/test/verification ] && printf "%s\\n" "$@" > /tmp/test/calls'
         # The query fakes also report the installed sora-core version
         # (TEST_INSTALLED) for the helper's downgrade protection.
@@ -83,13 +84,23 @@ class UpdateHelperTest(unittest.TestCase):
             "apt-get": recorder,
             "zypper" if zypper else "dnf": recorder,
         }
+        machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
+        if architecture == "arm64":
+            scripts = {name: body.replace("amd64", "arm64").replace("x86_64", "aarch64")
+                       for name, body in scripts.items()}
+        scripts["uname"] = f"printf '%s\\n' '{machine}'"
+        if bad_architecture:
+            other = "amd64" if architecture == "arm64" else "arm64"
+            other_machine = "x86_64" if architecture == "arm64" else "aarch64"
+            scripts["dpkg-deb"] = scripts["dpkg-deb"].replace(f"Architecture) echo {architecture}", f"Architecture) echo {other}")
+            scripts["rpm"] = scripts["rpm"].replace(f"%s %s-1 {machine}", f"%s %s-1 {other_machine}")
         if missing_verifier:
             del scripts["sora-core"]
         if native_verifier:
             scripts["sora-core"] = '/tmp/test/test-tools/sora-verifier "$@"; if [ "$1" = -verify-release ] && [ "$#" = 4 ]; then' \
                                    ' printf "%s\\n" "$@" > /tmp/test/verification; fi'
         command = [
-            "bwrap", "--unshare-all", "--share-net", "--uid", "0", "--gid", "0", "--die-with-parent",
+            "bwrap", "--unshare-all", "--uid", "0", "--gid", "0", "--die-with-parent",
             "--ro-bind", "/", "/", "--tmpfs", "/run", "--tmpfs", "/tmp",
             "--dev", "/dev",
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
@@ -156,6 +167,31 @@ class UpdateHelperTest(unittest.TestCase):
         self.assertFalse((self.root / "calls").exists())
         arguments = (self.root / "dependencies").read_text().splitlines()
         self.assertEqual(arguments, ["-S", "--noconfirm", "--needed", "gst-plugins-good"])
+
+    def test_arm64_package_pair_is_one_transaction(self):
+        for format, zypper in [("deb", False), ("rpm", False), ("rpm", True), ("arch", False)]:
+            with self.subTest(format=format, zypper=zypper):
+                files = self.prepare(format, "arm64")
+                result = self.run_helper(format, architecture="arm64", zypper=zypper)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                arguments = (self.root / "calls").read_text().splitlines()
+                self.assertEqual([pathlib.Path(item).name for item in arguments if item.startswith("/var/tmp/")], files)
+                (self.root / "calls").unlink()
+
+    def test_wrong_arm64_package_headers_never_install(self):
+        for format in ("deb", "rpm"):
+            with self.subTest(format=format):
+                self.prepare(format, "arm64")
+                result = self.run_helper(format, architecture="arm64", bad_architecture=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("unexpected", result.stderr)
+                self.assertFalse((self.root / "calls").exists())
+
+    def test_arm64_never_uses_an_amd64_only_download_pair(self):
+        self.prepare("deb", "amd64")
+        result = self.run_helper("deb", architecture="arm64")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.root / "calls").exists())
 
     def test_reject_corrupt_missing_duplicate_and_symlink_inputs(self):
         for problem in ["corrupt", "missing", "duplicate", "symlink", "missing-signature", "signature-symlink", "metadata", "version", "format"]:
@@ -241,7 +277,8 @@ class UpdateHelperTest(unittest.TestCase):
                 self.assertFalse((self.root / "escaped").exists())
 
     def test_real_native_snapshot_and_signature_before_package_manager(self):
-        self.prepare("deb")
+        architecture = "arm64" if os.uname().machine in ("aarch64", "arm64") else "amd64"
+        self.prepare("deb", architecture)
         for name in ("SHA256SUMS", "SHA256SUMS.minisig", "release.json"):
             (self.downloads / name).unlink()
         tools = self.root / "test-tools"
@@ -249,15 +286,15 @@ class UpdateHelperTest(unittest.TestCase):
         prepared = subprocess.run(["python3", "-B", str(builder), str(self.downloads), "1.0.5", str(tools)],
                                   capture_output=True, text=True, timeout=180, env={**os.environ, "CGO_ENABLED": "0"})
         self.assertEqual(prepared.returncode, 0, prepared.stdout + prepared.stderr)
-        result = self.run_helper("deb", native_verifier=True)
+        result = self.run_helper("deb", native_verifier=True, architecture=architecture)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertTrue((self.root / "calls").exists())
         (self.root / "calls").unlink()
         (self.root / "verification").unlink()
-        package = self.downloads / "sora_1.0.5_amd64.deb"
+        package = self.downloads / f"sora_1.0.5_{architecture}.deb"
         original_package = package.read_bytes()
         package.write_bytes(b"tampered")
-        refused = self.run_helper("deb", native_verifier=True)
+        refused = self.run_helper("deb", native_verifier=True, architecture=architecture)
         self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
         self.assertIn("release snapshot verification failed", refused.stderr)
         self.assertFalse((self.root / "calls").exists())
@@ -271,7 +308,7 @@ class UpdateHelperTest(unittest.TestCase):
                     metadata.unlink()
                 else:
                     metadata.write_bytes(b'{"schema":1}\n')
-                refused = self.run_helper("deb", native_verifier=True)
+                refused = self.run_helper("deb", native_verifier=True, architecture=architecture)
                 self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
                 self.assertIn("release snapshot verification failed", refused.stderr)
                 self.assertFalse((self.root / "calls").exists())
