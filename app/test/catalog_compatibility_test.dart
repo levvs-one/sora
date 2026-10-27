@@ -75,6 +75,22 @@ void main() {
     expect(e.requiresNewerApp('dev'), false);
     expect(e.requiresNewerApp('0.0.0.42'), false);
   });
+  for (final path in [
+    '../extensions/sources/zapret/sora-extension.json',
+    '../extensions/sources/byedpi/sora-extension.json',
+    '../examples/hello-panel/sora-extension.json',
+  ]) {
+    test('release candidate requirement excludes the published client: $path', () {
+      final manifest = jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+      final doc = document();
+      entry(doc)['min_app_version'] = manifest['min_app_version'];
+      final listing = model(doc);
+      // v1.1.2 is the current public release; v1.1.3 is a candidate,
+      // not a claim that a supporting host has already been published.
+      expect(listing.requiresNewerApp('1.1.2'), isTrue);
+      expect(listing.requiresNewerApp('1.1.3'), isFalse);
+    });
+  }
   test('fresh signed catalog adds a listing without replacing the application', () async {
     final dir = await Directory.systemTemp.createTemp('sora-catalog-live-refresh-');
     addTearDown(() => dir.delete(recursive: true));

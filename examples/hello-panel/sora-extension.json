@@ -3,7 +3,7 @@
   "id": "org.sora.hello-panel",
   "name": "Hello Panel",
   "version": "1.0.1",
-  "min_app_version": "1.1.0",
+  "min_app_version": "1.1.3",
   "description": "The official example extension: a panel with live connection statistics.",
   "author": {
     "name": "Sora",

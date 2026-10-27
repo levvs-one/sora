@@ -18,7 +18,7 @@ shared WinDivert service. The driver can remain loaded until a normal Windows
 restart. Native component licences and complete upstream sources accompany the
 host bundle. No profile guarantees evasion in every network.
 
-The sources are not a published package or catalog entry. Normal author/team
-signature verification remains mandatory. Set min_app_version to the actual
-first published host release supporting this descriptor before publication;
-the repository version alone is not deployment evidence.
+The sources target the 1.1.3 release candidate and are not a published package
+or catalog entry. Normal author/team signatures remain mandatory. Publish only
+after an actual 1.1.3-or-later host supporting this descriptor is available;
+the repository version and candidate tests alone are not deployment evidence.

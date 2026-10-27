@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -13,9 +14,11 @@ import 'package:shared_preferences_platform_interface/in_memory_shared_preferenc
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:sora/src/core/link.dart';
 import 'package:sora/src/ext/bypass.dart';
+import 'package:sora/src/ext/catalog.dart';
 import 'package:sora/src/ext/conflicts.dart';
 import 'package:sora/src/ext/package.dart';
 import 'package:sora/src/ext/store.dart';
+import 'package:sora/src/ext/verifier.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/l10n/strings.dart';
@@ -105,10 +108,20 @@ void main() {
     expect(result.exitCode, 0, reason: '${args.first}: ${result.stderr}');
   }
 
-  Future<ExtPackage> signed({String? id, String? version, Map<String, dynamic>? descriptor}) async {
+  Future<ExtPackage> signed({
+    String? id,
+    String? version,
+    Map<String, dynamic>? descriptor,
+    Directory? sourceOverride,
+    String? outputFile,
+  }) async {
     final root = await Directory('${fixture.path}/src-${DateTime.now().microsecondsSinceEpoch}').create();
-    for (final entity in source.listSync().whereType<File>()) {
-      await entity.copy('${root.path}/${entity.uri.pathSegments.last}');
+    final input = sourceOverride ?? source;
+    for (final entity in input.listSync(recursive: true, followLinks: false).whereType<File>()) {
+      final relative = entity.path.substring(input.path.length + 1);
+      final target = File('${root.path}/$relative');
+      await target.parent.create(recursive: true);
+      await entity.copy(target.path);
     }
     final file = File('${root.path}/sora-extension.json');
     final manifest = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
@@ -117,7 +130,7 @@ void main() {
     if (version != null) manifest['version'] = version;
     await file.writeAsString(jsonEncode(manifest));
     if (descriptor != null) await File('${root.path}/hook.json').writeAsString(jsonEncode(descriptor));
-    final output = '${root.path}.soraext';
+    final output = outputFile ?? '${root.path}.soraext';
     await command(tool, ['pack', root.path, '-o', output]);
     await command(tool, ['sign', '--key', '${fixture.path}/temporary-author.key', output]);
     return ExtPackage.open(await File(output).readAsBytes());
@@ -151,6 +164,89 @@ void main() {
   tearDown(() async {
     if (!ownedBySora) store.dispose();
     await dir.delete(recursive: true);
+  });
+
+  test('release candidate packages and signed catalog keep version and platform boundaries', () async {
+    final team = '${fixture.path}/temporary-team';
+    await command(tool, ['keygen', '-o', team]);
+    final teamKey = (await File('$team.pub').readAsLines()).last.trim();
+    final rows = <Map<String, dynamic>>[];
+    final sources = [
+      ('../extensions/sources/zapret', ['linux', 'windows']),
+      ('../extensions/sources/byedpi', ['windows']),
+      ('../examples/hello-panel', ['linux', 'windows']),
+    ];
+    for (var i = 0; i < sources.length; i++) {
+      final (path, platforms) = sources[i];
+      final output = '${fixture.path}/candidate-$i.soraext';
+      final candidate = await signed(sourceOverride: Directory(path), outputFile: output);
+      await candidate.verify(authorKeyLine: publicKey);
+      await expectLater(candidate.verify(authorKeyLine: teamKey), throwsA(isA<PackageError>()));
+      await command(tool, ['publish', '--ack-dangerous', output]);
+      final bytes = await File(output).readAsBytes();
+      final manifest = candidate.manifest;
+      rows.add({
+        'id': manifest.id,
+        'name': manifest.name,
+        'version': manifest.version,
+        'description': manifest.description,
+        'author': manifest.author.name,
+        'author_identity': manifest.author.identity,
+        'author_key': publicKey,
+        'permissions': manifest.permissions,
+        'capabilities': manifest.capabilities,
+        'min_app_version': manifest.minAppVersion,
+        'platforms': platforms,
+        'download_url': 'https://example.invalid/${manifest.id}.soraext',
+        'sha256': crypto.sha256.convert(bytes).toString(),
+        'size': bytes.length,
+      });
+      if (platforms.contains(Platform.operatingSystem)) {
+        await install(candidate);
+        expect(store.get(manifest.id), isNotNull);
+        if (manifest.networkHookEntry != null) {
+          expect(store.bypassProfiles.single.extensionId, manifest.id);
+        }
+        await store.uninstall(manifest.id);
+      } else {
+        await expectLater(install(candidate), throwsA(isA<ExtAssetError>()));
+        expect(store.installed, isEmpty);
+      }
+    }
+    final catalogFile = File('${fixture.path}/candidate-catalog.json');
+    final bytes = Uint8List.fromList(
+      utf8.encode(
+        jsonEncode({
+          'catalog_version': 1,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+          'max_age': 3600,
+          'extensions': rows,
+        }),
+      ),
+    );
+    await catalogFile.writeAsBytes(bytes);
+    await command(tool, ['sign-file', '--key', '$team.key', '--role', 'catalog.json', catalogFile.path]);
+    final sig = await File('${catalogFile.path}.minisig').readAsString();
+    await verifyPayload(teamKey, sig, 'catalog.json', bytes);
+    await expectLater(verifyPayload(teamKey, sig, 'revocations.json', bytes), throwsA(isA<SignatureError>()));
+    final changed = Uint8List.fromList(bytes)..[0] ^= 1;
+    await expectLater(verifyPayload(teamKey, sig, 'catalog.json', changed), throwsA(isA<SignatureError>()));
+    await expectLater(verifyCatalogSignature(sig, bytes), throwsA(isA<SignatureError>()));
+
+    final catalog = ExtensionCatalog.parse(bytes);
+    expect(catalog.entries.map((e) => e.id).toSet(), {'org.sora.zapret', 'org.sora.byedpi', 'org.sora.hello-panel'});
+    for (final entry in catalog.entries) {
+      expect(entry.requiresNewerApp('1.1.2'), isTrue, reason: entry.id);
+      expect(entry.requiresNewerApp('1.1.3'), isFalse, reason: entry.id);
+      expect(entry.supportsPlatform('windows'), isTrue, reason: entry.id);
+      expect(entry.supportsPlatform('linux'), entry.id != 'org.sora.byedpi', reason: entry.id);
+      expect(entry.supportsPlatform('android'), isFalse, reason: entry.id);
+    }
+    await store.catalogCache.store(bytes);
+    expect(
+      (await store.catalogCache.load())!.catalog.entries.map((e) => e.id).toSet(),
+      catalog.entries.map((e) => e.id).toSet(),
+    );
   });
 
   test('declared installed backend only; immutable descriptors and copied strategies', () {
