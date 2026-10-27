@@ -470,6 +470,32 @@ or Windows elevation test.
 
 ## Signed-release transition
 
+### Published v1.1.2 update boundary
+
+The published [v1.1.2 updater](https://github.com/levvs-one/sora/blob/v1.1.2/app/lib/src/updates.dart)
+does not authenticate release signatures. Its Windows install path downloads
+`SHA256SUMS` and the expected installer, compares their hashes and then hands
+the installer to its launcher. When the rollout feed is unreachable it falls
+back to offering the latest release. A signed 1.1.3 candidate does not add
+signature verification to that already installed client.
+
+On 27 October 2026, the existing `windows install: success` test was run from
+an archive of the v1.1.2 tag using mocked HTTP and a fake launch callback: it
+accepted checksum-only test bytes without requesting a signature. Its existing
+rollout test also confirmed the unavailable-feed fallback. Current candidate
+tests separately rejected missing and corrupt signatures before the install
+handoff. These are controlled code-path tests, not real Windows installations
+or proof of a completed migration.
+
+The protected workflow first freezes a prerelease; the old parser rejects
+prerelease records during normal operation. This helps stage a candidate but is
+not an authenticated migration for v1.1.2 users. GitHub permits changing
+prerelease/latest flags even for immutable releases, so immutability alone does
+not give the legacy updater an independent signature check. A release plan must
+cover the legacy clients, an independently authenticated bootstrap channel and
+a reviewed rollback baseline before stable publication. Do not assume that a
+rollout feed or a new package signature protects the old updater.
+
 On 25 October 2026, the authenticated GitHub release API returned eleven visible
 release records. None listed `SHA256SUMS.minisig`, `release.json` or a separate
 `.sig`/`.asc`/`.minisig` asset. The latest stable releases v1.1.2, v1.1.1 and

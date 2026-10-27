@@ -19,6 +19,17 @@ them with the team key compiled into both (`core/ext/sign.go`,
 3. Sign the catalog with the team key:
    `sora-ext sign-file --key sora-team.key --role catalog.json extensions/catalog.json`
 
+Signing adds a signature to the archive and changes its package hash and size.
+Use the values reported by `publish` **after** author signing for the catalog;
+the command validates and prints an entry but does not upload it. Verify the
+signed catalog with the pinned production root before delivering it.
+
+Zapret, ByeDPI and the updated Hello source currently target the 1.1.3 host
+candidate. Publish them only after an actual compatible host is available.
+The existing v1.1.2 updater and the first signed-release transition have
+separate trust requirements described in
+[release signatures](../docs/security/release-signatures.md#published-v112-update-boundary).
+
 `core/ext` test `TestPublishedTeamDocumentsVerify` and the app test
 `ext_revocation_catalog_test.dart` check the signatures and that every
 entry matches its committed package.
