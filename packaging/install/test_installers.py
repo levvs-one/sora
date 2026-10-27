@@ -19,13 +19,14 @@ class InstallerSignatureTest(unittest.TestCase):
         cls.root = Path(cls.temporary.name)
         cls.inputs = cls.root / "inputs"
         cls.inputs.mkdir()
-        for name in ("Sora-Setup-1.2.3-x64.exe", "sora-core_1.2.3_amd64.deb", "sora_1.2.3_amd64.deb"):
+        for name in ("Sora-Setup-1.2.3-x64.exe", "sora-core_1.2.3_amd64.deb", "sora_1.2.3_amd64.deb",
+                     "sora-core_1.2.3_arm64.deb", "sora_1.2.3_arm64.deb"):
             (cls.inputs / name).write_bytes(b"Installer boundary fixture, never executed or installed\n")
         cls.tools = cls.root / "tools"
         prepare(cls.inputs, "1.2.3", cls.tools)
         cls.script = Path(__file__).with_name("install.ps1" if os.name == "nt" else "install.sh").resolve()
 
-    def run_installer(self, variant, shell="pwsh"):
+    def run_installer(self, variant, shell="pwsh", architecture=None, expected_packages=None):
         with tempfile.TemporaryDirectory(prefix="case-", dir=self.root) as directory:
             case = Path(directory)
             distribution = case / "distribution"
@@ -64,6 +65,8 @@ class InstallerSignatureTest(unittest.TestCase):
                 for package in distribution.iterdir():
                     if package.name.endswith((".exe", ".deb", ".rpm", ".pkg.tar.zst")):
                         package.write_bytes(b"x" * package.stat().st_size)
+            elif variant == "missing arm64 app":
+                (distribution / "sora_1.2.3_arm64.deb").unlink()
             elif variant == "missing verifier":
                 verifier = case / "absent-verifier"
             elif variant == "downloaded verifier":
@@ -87,6 +90,12 @@ class InstallerSignatureTest(unittest.TestCase):
                            "--bind", str(self.root), "/tmp/test"]
                 for name in ("sh", "id", "uname", "rm", "grep", "awk", "mktemp", "sha256sum", "readlink", "head", "wc"):
                     command += ["--ro-bind", str(Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
+                if architecture is not None:
+                    machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
+                    uname = case / "uname"
+                    uname.write_text(f"#!/bin/sh\nprintf '%s\\n' '{machine}'\n")
+                    uname.chmod(0o755)
+                    command += ["--ro-bind", str(uname), "/usr/bin/uname"]
                 boundary = case / "apt-get"
                 boundary.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > /tmp/test/' + case.name + '/installation\n')
                 boundary.chmod(0o755)
@@ -101,7 +110,25 @@ class InstallerSignatureTest(unittest.TestCase):
                 result = subprocess.run(command, text=True, capture_output=True, timeout=30)
                 self.assertIn("SORA_INSTALLER_SANDBOX_READY\n", result.stdout, result.stdout + result.stderr)
                 reached = (case / "installation").exists()
+                if expected_packages is not None:
+                    arguments = (case / "installation").read_text().splitlines() if reached else []
+                    packages = [Path(item).name for item in arguments if item.endswith(".deb")]
+                    self.assertEqual(packages, expected_packages, result.stdout + result.stderr)
             return result, reached
+
+    @unittest.skipIf(os.name == "nt", "Linux package architecture selection")
+    def test_linux_installs_both_native_packages(self):
+        for architecture in ("amd64", "arm64"):
+            with self.subTest(architecture=architecture):
+                result, reached = self.run_installer("valid", architecture=architecture,
+                    expected_packages=[f"sora-core_1.2.3_{architecture}.deb", f"sora_1.2.3_{architecture}.deb"])
+                self.assertTrue(reached, result.stdout + result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "Linux package architecture selection")
+    def test_missing_arm64_app_never_becomes_core_only_success(self):
+        result, reached = self.run_installer("missing arm64 app", architecture="arm64")
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(reached, result.stdout + result.stderr)
 
     def test_signed_input_reaches_only_the_isolated_install_boundary(self):
         result, reached = self.run_installer("valid")

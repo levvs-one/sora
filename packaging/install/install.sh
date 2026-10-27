@@ -30,8 +30,8 @@ if [ -n "${SORA_DIST:-}" ]; then
 fi
 
 case "$(uname -m)" in
-x86_64 | amd64) deb_arch=amd64 rpm_arch=x86_64 arch_arch=x86_64 with_app=yes ;;
-aarch64 | arm64) deb_arch=arm64 rpm_arch=aarch64 arch_arch=aarch64 with_app=no ;;
+x86_64 | amd64) deb_arch=amd64 rpm_arch=x86_64 arch_arch=x86_64 ;;
+aarch64 | arm64) deb_arch=arm64 rpm_arch=aarch64 arch_arch=aarch64 ;;
 *) die "no Sora build for $(uname -m)" ;;
 esac
 
@@ -106,11 +106,7 @@ pacman)
 	files="sora-core-${pkgver}-1-${arch_arch}.pkg.tar.zst" app="sora-${pkgver}-1-${arch_arch}.pkg.tar.zst"
 	;;
 esac
-if [ "$with_app" = yes ]; then
-	files="$files $app"
-else
-	say "sora: this processor gets the core only; the app is built for x86_64"
-fi
+files="$files $app"
 
 say "sora: installing $version with $manager"
 fetch SHA256SUMS 1048576
@@ -144,8 +140,7 @@ dnf) $as_root dnf install -y "$@" ;;
 zypper) $as_root zypper --non-interactive install --allow-unsigned-rpm "$@" ;;
 pacman)
 	# Unlike apt/dnf, pacman -U does not fetch missing repository dependencies.
-	deps="nftables iproute2 polkit libnetfilter_queue zlib"
-	if [ "$with_app" = yes ]; then deps="$deps gtk3 webkit2gtk-4.1 gst-plugins-good"; fi
+    deps="nftables iproute2 polkit libnetfilter_queue zlib gtk3 webkit2gtk-4.1 gst-plugins-good"
 	# shellcheck disable=SC2086
 	$as_root pacman -S --noconfirm --needed $deps
 	$as_root pacman -U --noconfirm --needed "$@"
