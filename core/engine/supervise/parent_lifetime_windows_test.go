@@ -40,7 +40,12 @@ func TestEngineJobChildHelper(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer func() { _ = leaf.Process.Kill(); _ = leaf.Wait() }()
-	if err := os.WriteFile(filepath.Join(string(raw), "child.ready"), []byte(strconv.Itoa(os.Getpid())), 0o600); err != nil {
+	ready := filepath.Join(string(raw), "child.ready")
+	// Existence signals readiness, so publish only a fully written, closed PID file.
+	if err := os.WriteFile(ready+".pending", []byte(strconv.Itoa(os.Getpid())), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(ready+".pending", ready); err != nil {
 		t.Fatal(err)
 	}
 	// A finite limit also cleans up a failed reproduction if its caller dies.
@@ -54,7 +59,11 @@ func TestEngineJobGrandchildHelper(t *testing.T) {
 	if err != nil || len(raw) == 0 {
 		t.Fatal("missing private fixture directory")
 	}
-	if err := os.WriteFile(filepath.Join(string(raw), "grandchild.ready"), []byte(strconv.Itoa(os.Getpid())), 0o600); err != nil {
+	ready := filepath.Join(string(raw), "grandchild.ready")
+	if err := os.WriteFile(ready+".pending", []byte(strconv.Itoa(os.Getpid())), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Rename(ready+".pending", ready); err != nil {
 		t.Fatal(err)
 	}
 	time.Sleep(15 * time.Second)
