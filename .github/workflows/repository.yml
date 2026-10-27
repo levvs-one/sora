@@ -801,7 +801,7 @@ jobs:
                 sleep 0.1
               done
               if [ ! -s "$1/targets.json" ]; then cat "$1/server.log"; exit 1; fi
-              # TPWS can drop privileges normally without changing host groups.
+              # Run core and TPWS without root inside the isolated network.
               unshare --user --map-user=1000 --map-group=1000 sh -e -c '"'"'
                 "$1/sora-core" -socket "$1/core.sock" -data-dir "$1/coredata" -engines-dir "$1/engines" -allow-file-keys > "$1/core.log" 2>&1 &
                 core=$!
