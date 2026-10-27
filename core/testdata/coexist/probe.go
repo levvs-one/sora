@@ -3,20 +3,28 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 
-	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 )
 
 func main() {
@@ -28,13 +36,24 @@ func main() {
 		dnsQuery(os.Args[2], os.Args[3], os.Args[4])
 		return
 	}
+	if os.Args[2] == "byedpi" {
+		current, err := os.Readlink("/proc/self/ns/net")
+		parent := os.Getenv("SORA_PARENT_NETNS")
+		if err != nil || parent == "" || current == parent || os.Getenv("SORA_BYPASS_ISOLATED") != "1" {
+			panic("ByeDPI core test requires a separate network namespace")
+		}
+	}
 	seconds := 0
 	if os.Args[2] == "hold" {
 		var err error
 		seconds, err = strconv.Atoi(os.Args[3])
 		must(err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second+30*time.Second)
+	timeout := time.Duration(seconds)*time.Second + 30*time.Second
+	if os.Args[2] == "byedpi" {
+		timeout = 90 * time.Second
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	conn, err := grpc.NewClient("passthrough:///core", grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithContextDialer(func(ctx context.Context, _ string) (net.Conn, error) {
@@ -72,6 +91,8 @@ func main() {
 		must(err)
 		wire(r.GetError())
 		fmt.Println(r.GetStatus().GetConnection().GetValue())
+	case "byedpi":
+		probeByeDPI(ctx, c, api, auth, os.Args[3])
 	case "disconnect":
 		r, err := c.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: api, ControlAuthenticator: auth})
 		must(err)
@@ -135,6 +156,71 @@ func main() {
 		for _, entry := range r.GetEntries() {
 			fmt.Println(entry.GetLevel(), entry.GetSource(), entry.GetMessage())
 		}
+	}
+}
+
+// probeByeDPI drives the real core through its authenticated local control socket.
+func probeByeDPI(ctx context.Context, client corev1.CoreControlClient, api *corev1.ApiVersion, auth []byte, descriptor string) {
+	about, err := client.GetAbout(ctx, &corev1.GetAboutRequest{ApiVersion: api})
+	must(err)
+	wire(about.GetError())
+	if !slices.Contains(about.GetAbout().GetContract().GetCapabilities(), "serverless-bydpi") {
+		panic("ByeDPI capability missing")
+	}
+	raw, err := os.ReadFile(descriptor) //nolint:gosec // This is the staged descriptor in the isolated fixture.
+	must(err)
+	var root, platforms, variant, profiles map[string]json.RawMessage
+	must(json.Unmarshal(raw, &root))
+	must(json.Unmarshal(root["platforms"], &platforms))
+	must(json.Unmarshal(platforms["linux"], &variant))
+	must(json.Unmarshal(variant["profiles"], &profiles))
+	strategy := new(corev1.BypassStrategy)
+	must(protojson.Unmarshal(profiles["TCP+TLS"], strategy))
+	endpoint := about.GetAbout().GetLocalProxy()
+	proxy, err := url.Parse(fmt.Sprintf("http://%s:%d", endpoint.GetHost(), endpoint.GetPort()))
+	must(err)
+	for _, kind := range []string{"sing-box", "xray", "mihomo"} {
+		plan := &corev1.SessionPlan{TunnelMode: corev1.TunnelMode_TUNNEL_MODE_APPLICATION,
+			Engines: []string{kind}, NetworkControlAllowed: true,
+			Outbounds: []*corev1.OutboundSpec{{Id: "sora:bypass", DisplayName: "ByeDPI", Protocol: "byedpi", Bypass: strategy}},
+			Routing:   &corev1.RoutingOptions{ProxyTarget: "sora:bypass"}}
+		connected, err := client.Connect(ctx, &corev1.ConnectRequest{ApiVersion: api, ControlAuthenticator: auth, SessionPlan: plan})
+		must(err)
+		wire(connected.GetError())
+		if connected.GetStatus().GetConnection().GetValue() != corev1.ConnectionStateValue_CONNECTION_STATE_VALUE_CONNECTED {
+			panic(kind + ": core did not reach connected state")
+		}
+		for _, secure := range []bool{false, true} {
+			target := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, _ = io.Copy(w, io.LimitReader(r.Body, 4096))
+			}))
+			if secure {
+				target.StartTLS()
+			} else {
+				target.Start()
+			}
+			httpClient := target.Client()
+			transport := httpClient.Transport.(*http.Transport)
+			transport.Proxy = http.ProxyURL(proxy)
+			httpClient.Timeout = 5 * time.Second
+			payload := []byte("actual Sora core ByeDPI fixture")
+			request, err := http.NewRequestWithContext(ctx, http.MethodPost, target.URL, bytes.NewReader(payload))
+			must(err)
+			response, err := httpClient.Do(request)
+			must(err)
+			body, err := io.ReadAll(io.LimitReader(response.Body, 4096))
+			must(err)
+			must(response.Body.Close())
+			if response.StatusCode != http.StatusOK || !bytes.Equal(body, payload) {
+				panic(kind + ": HTTP/TLS payload mismatch")
+			}
+			transport.CloseIdleConnections()
+			target.Close()
+		}
+		stopped, err := client.Disconnect(ctx, &corev1.DisconnectRequest{ApiVersion: api, ControlAuthenticator: auth})
+		must(err)
+		wire(stopped.GetError())
+		fmt.Println(kind + ": actual core authenticated connect + HTTP/TLS + disconnect PASS")
 	}
 }
 
