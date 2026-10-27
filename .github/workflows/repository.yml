@@ -421,12 +421,17 @@ jobs:
       - name: Check install.ps1
         shell: pwsh
         run: |
-          # The PowerShell Gallery sometimes answers "no match" for a moment;
-          # retry before treating it as a failure of the script under test.
-          for ($i = 1; $i -le 5; $i++) {
-            try { Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -ErrorAction Stop; break }
-            catch { if ($i -eq 5) { throw }; Start-Sleep -Seconds (10 * $i) }
+          # Gallery resolution can fail repeatedly; verify the official release before importing it.
+          $archive = Join-Path $env:RUNNER_TEMP 'PSScriptAnalyzer.1.25.0.nupkg'
+          curl.exe --fail --location --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 180 --max-filesize 14658674 --silent --show-error --output $archive https://github.com/PowerShell/PSScriptAnalyzer/releases/download/1.25.0/PSScriptAnalyzer.1.25.0.nupkg
+          if ($LASTEXITCODE -ne 0) { throw 'PSScriptAnalyzer download failed' }
+          if ((Get-Item -LiteralPath $archive).Length -ne 14658674 -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne '14e634c828eb98efb9f40b2918ba90f139ed5eccdf663a2a747736d996995d60') {
+            throw 'PSScriptAnalyzer archive size or hash mismatch'
           }
+          $module = Join-Path $env:RUNNER_TEMP 'PSScriptAnalyzer-1.25.0'
+          [IO.Compression.ZipFile]::ExtractToDirectory($archive, $module)
+          Import-Module (Join-Path $module 'PSScriptAnalyzer.psd1') -Force -ErrorAction Stop
+          if ((Get-Module PSScriptAnalyzer).Version -ne [version]'1.25.0') { throw 'Unexpected PSScriptAnalyzer version' }
           $found = foreach ($script in @('packaging/install/install.ps1', 'packaging/windows/check-security.ps1')) {
             Invoke-ScriptAnalyzer -Path $script -Severity Warning, Error
           }
