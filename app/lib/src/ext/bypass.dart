@@ -8,9 +8,10 @@ const extensionBypassPrefix = 'sora:extension-bypass:';
 /// A signed descriptor selects profiles for an already installed host backend.
 /// It cannot supply native paths, flags, scripts, or engine config fragments.
 class ExtensionBypass {
-  ExtensionBypass._(this.backend, this.profiles);
+  ExtensionBypass._(this.backend, this.profiles, this._platform);
   final String backend;
   final Map<String, BypassStrategy> profiles;
+  final String? _platform;
 
   static ExtensionBypass parse(String source, {String? operatingSystem}) {
     final doc = jsonDecode(source);
@@ -34,15 +35,18 @@ class ExtensionBypass {
       if (!const {'linux', 'windows'}.contains(entry.key) || entry.value is! Map<String, dynamic>) {
         throw const FormatException('unsupported bypass platform');
       }
-      final variant = _variant(entry.value as Map<String, dynamic>);
-      if (!variant.supports(entry.key)) throw const FormatException('backend does not match its platform');
+      final variant = _variant(entry.value as Map<String, dynamic>, platform: entry.key);
+      if ((entry.key == 'linux' && !const {'tpws', 'byedpi'}.contains(variant.backend)) ||
+          (entry.key == 'windows' && !const {'byedpi', 'winws'}.contains(variant.backend))) {
+        throw const FormatException('backend does not match its platform');
+      }
       variants[entry.key] = variant;
     }
     return variants[operatingSystem ?? Platform.operatingSystem] ??
         (throw const FormatException('bypass backend is unavailable on this platform'));
   }
 
-  static ExtensionBypass _variant(Map<String, dynamic> doc) {
+  static ExtensionBypass _variant(Map<String, dynamic> doc, {String? platform}) {
     if (doc.keys.any((key) => !const {'backend', 'profiles', 'scope'}.contains(key)) ||
         !const {'tpws', 'byedpi', 'winws'}.contains(doc['backend'])) {
       throw const FormatException('unsupported bypass backend');
@@ -66,12 +70,13 @@ class ExtensionBypass {
       strategy.freeze();
       profiles[entry.key] = strategy;
     }
-    return ExtensionBypass._(doc['backend'] as String, Map.unmodifiable(profiles));
+    return ExtensionBypass._(doc['backend'] as String, Map.unmodifiable(profiles), platform);
   }
 
-  bool supports(String operatingSystem) =>
-      (operatingSystem == 'linux' && backend == 'tpws') ||
-      (operatingSystem == 'windows' && const {'byedpi', 'winws'}.contains(backend));
+  bool supports(String operatingSystem) => _platform != null
+      ? operatingSystem == _platform
+      : (operatingSystem == 'linux' && backend == 'tpws') ||
+            (operatingSystem == 'windows' && const {'byedpi', 'winws'}.contains(backend));
 
   BypassStrategy select(Map<String, dynamic> settings) {
     final profile = profiles[settings['profile']];

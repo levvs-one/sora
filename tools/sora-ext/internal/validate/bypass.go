@@ -67,7 +67,7 @@ func validateBypassAsset(raw []byte) error {
 		if err := dec.Decode(&variant); err != nil {
 			return err
 		}
-		if (platform == "linux" && variant.Backend != "tpws") ||
+		if (platform == "linux" && variant.Backend != "tpws" && variant.Backend != "byedpi") ||
 			(platform == "windows" && variant.Backend != "winws" && variant.Backend != "byedpi") ||
 			(platform != "linux" && platform != "windows") {
 			return fmt.Errorf("backend does not match a supported platform")

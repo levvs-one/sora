@@ -59,6 +59,7 @@ type Registry struct {
 	base supervise.Config
 	// bypassBinary is the platform's loopback DPI proxy, never a client path.
 	bypassBinary string
+	byedpiBinary string
 	winwsBinary  string
 	olcrtc       supervise.Binary
 
@@ -79,6 +80,14 @@ func Discover(ctx context.Context, enginesDir string, base supervise.Config) *Re
 		candidate := filepath.Join(enginesDir, name)
 		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && (runtime.GOOS == "windows" || info.Mode().Perm()&0o111 != 0) { //nolint:gosec // the engines directory is set by the service, not by a client
 			r.bypassBinary = candidate
+		}
+	}
+	if runtime.GOOS == "windows" {
+		r.byedpiBinary = r.bypassBinary
+	} else if runtime.GOOS == "linux" && enginesDir != "" {
+		candidate := filepath.Join(enginesDir, "byedpi")
+		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 { //nolint:gosec // the service supplies the engines directory, never a client
+			r.byedpiBinary = candidate
 		}
 	}
 	r.winwsBinary = winws.Discover(enginesDir)
@@ -129,6 +138,11 @@ func (r *Registry) Usable() bool { return len(r.binaries) > 0 }
 // BypassAvailable reports whether the serverless engine can run on this platform.
 func (r *Registry) BypassAvailable() bool {
 	return (runtime.GOOS == "linux" || runtime.GOOS == "windows") && r.bypassBinary != "" && r.Usable()
+}
+
+// ByeDPIAvailable reports only a host-owned, installed proxy.
+func (r *Registry) ByeDPIAvailable() bool {
+	return r.byedpiBinary != "" && r.Usable()
 }
 
 // WinwsAvailable advertises only the native host-owned bundle, not a proxy.
@@ -192,9 +206,16 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 			}
 		}
 		withBypass := bypass.Has(p)
+		protocol, proxyBinary := engine.ProtocolBypass, r.bypassBinary
+		if bypass.HasByeDPI(p) {
+			if err := p.Validate(); err != nil {
+				return nil, err
+			}
+			protocol, proxyBinary = engine.ProtocolByeDPI, r.byedpiBinary
+		}
 		// Missing installations use the missing-engine key rather than
 		// an invalid-plan error.
-		if withBypass && r.bypassBinary == "" {
+		if withBypass && proxyBinary == "" {
 			return nil, errs.Newf(errs.CodeFailedPrecondition, errs.KeyEngineBinaryMissing,
 				"registry: the platform DPI bypass proxy is missing from the engines directory")
 		}
@@ -230,7 +251,7 @@ func (r *Registry) Factory() func(context.Context, *engine.Plan) (engine.Engine,
 			built = olcrtc.Wrap(built, r.olcrtc.Path, filepath.Join(r.base.HomeDir, "olcrtc"), r.base.Logs)
 		}
 		if withBypass {
-			built = bypass.Wrap(built, r.bypassBinary, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs)
+			built = bypass.Wrap(built, proxyBinary, filepath.Join(r.base.HomeDir, "zapret"), r.base.Logs, protocol)
 		}
 		if withWinws {
 			built = winws.Wrap(built, r.winwsBinary, filepath.Join(r.base.HomeDir, "winws"), r.base.Logs)
@@ -407,7 +428,7 @@ func measureThroughController(build func(supervise.Config) (engine.Engine, error
 // BenchmarkEngine uses isolated state and a fresh listener for one temporary
 // measurement. The caller owns home and removes it after closing the engine.
 func (r *Registry) BenchmarkEngine(ctx context.Context, plan *engine.Plan, home string) (engine.Engine, error) {
-	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, bypassBinary: r.bypassBinary, winwsBinary: r.winwsBinary, olcrtc: r.olcrtc}
+	isolated := &Registry{binaries: r.binaries, availability: r.availability, preference: r.preference, base: r.base, bypassBinary: r.bypassBinary, byedpiBinary: r.byedpiBinary, winwsBinary: r.winwsBinary, olcrtc: r.olcrtc}
 	isolated.base.HomeDir = home
 	isolated.base.LocalPort = 0
 	return isolated.Factory()(ctx, plan)

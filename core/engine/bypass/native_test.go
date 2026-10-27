@@ -20,6 +20,24 @@ func TestNativeWindowsProxyCarriesHTTPAndTLS(t *testing.T) {
 	if runtime.GOOS != "windows" || binary == "" {
 		t.Skip("set SORA_BYPASS_BIN to the pinned native Windows ByeDPI build")
 	}
+	nativeProxyCarriesHTTPAndTLS(t, binary, engine.ProtocolBypass)
+}
+
+func TestNativeLinuxByeDPIProxyCarriesHTTPAndTLS(t *testing.T) {
+	binary := os.Getenv("SORA_BYPASS_BIN")
+	if runtime.GOOS != "linux" || binary == "" || os.Getenv("SORA_BYPASS_ISOLATED") != "1" {
+		t.Skip("set SORA_BYPASS_BIN in an isolated Linux network namespace")
+	}
+	current, err := os.Readlink("/proc/self/ns/net")
+	parent := os.Getenv("SORA_PARENT_NETNS")
+	if err != nil || parent == "" || current == parent {
+		t.Fatal("the ByeDPI fixture must not use the parent network namespace")
+	}
+	nativeProxyCarriesHTTPAndTLS(t, binary, engine.ProtocolByeDPI)
+}
+
+func nativeProxyCarriesHTTPAndTLS(t *testing.T, binary string, protocol engine.Protocol) {
+	t.Helper()
 	for _, secure := range []bool{false, true} {
 		t.Run(map[bool]string{false: "HTTP", true: "TLS"}[secure], func(t *testing.T) {
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +57,7 @@ func TestNativeWindowsProxyCarriesHTTPAndTLS(t *testing.T) {
 				server.Start()
 			}
 			t.Cleanup(server.Close)
-			wrapper := Wrap(nil, binary, t.TempDir(), nil)
+			wrapper := Wrap(nil, binary, t.TempDir(), nil, protocol)
 			proxy, err := wrapper.start(engine.BypassStrategy{SplitPos: []string{"1"}, Disorder: true, TLSRecord: "1", HostCase: true})
 			if err != nil {
 				t.Fatal(err)
@@ -69,7 +87,7 @@ func TestNativeWindowsProxyCarriesHTTPAndTLS(t *testing.T) {
 				t.Fatalf("proxy changed the exchange: status=%d bytes=%d err=%v", response.StatusCode, len(data), err)
 			}
 			wrapper.procs[key(engine.BypassStrategy{SplitPos: []string{"1"}})] = proxy
-			bad := &engine.Plan{Outbounds: []engine.Outbound{{ID: "bad", Protocol: engine.ProtocolBypass,
+			bad := &engine.Plan{Outbounds: []engine.Outbound{{ID: "bad", Protocol: protocol,
 				Bypass: &engine.BypassStrategy{SplitPos: []string{"midsld"}}}}}
 			if err := wrapper.Apply(t.Context(), bad); err == nil {
 				t.Fatal("unsupported strategy was accepted")

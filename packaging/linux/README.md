@@ -8,7 +8,7 @@
 | Путь | Пакет | Что это |
 | --- | --- | --- |
 | `/usr/bin/sora-core` | sora-core | служба |
-| `/usr/lib/sora/engines/` | sora-core | sing-box, Xray, mihomo, tpws, nfqws, geoip.dat, geosite.dat |
+| `/usr/lib/sora/engines/` | sora-core | sing-box, Xray, mihomo, ByeDPI, tpws, nfqws, geoip.dat, geosite.dat |
 | `/usr/lib/systemd/system/sora-core.service` | sora-core | unit, см. [service/linux](../../service/linux/README.md) |
 | `/usr/lib/sysusers.d/sora.conf` | sora-core | пользователь и группа `sora` |
 | `/usr/share/polkit-1/actions/io.github.levvs-one.sora.policy` | sora-core | доступ к службе для активной сессии |
@@ -37,6 +37,11 @@ SORA_ARCH=amd64 SORA_FLUTTER_ARCH=x64 SORA_VERSION=1.0.6 nfpm package --config p
 сборки ARM64 используются `SORA_ARCH=arm64`, `SORA_FLUTTER_ARCH=arm64` и
 `flutter build linux --release --target-platform=linux-arm64`. Для amd64
 значение Flutter-архитектуры — `x64`, имя архитектуры пакета — `amd64`.
+
+Для Linux amd64 и ARM64 `fetch.sh` проверяет хеш официального архива ByeDPI
+v0.17.3 и помещает бинарник и MIT-лицензию в пакет core. Это локальный
+SOCKS-бэкенд для TCP, а не системный пакетный фильтр; его стратегии не
+гарантируют обход блокировок в каждой сети.
 
 На ARM64 runner CI получает официальный Flutter 3.47.6 из исходников с проверкой
 revision `5fc346839b5d0eef006ed8404392afb4dfae428d`, поскольку официальный Linux SDK

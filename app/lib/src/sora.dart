@@ -202,8 +202,11 @@ class Sora extends ChangeNotifier {
 
   final _systemFilterConsents = <String>{};
 
-  bool bypassProfileAvailable(ExtensionBypassProfile profile) =>
-      profile.systemWide ? coreCapabilities.contains('serverless-winws') : serverlessAvailable;
+  bool bypassProfileAvailable(ExtensionBypassProfile profile) => profile.systemWide
+      ? coreCapabilities.contains('serverless-winws')
+      : Platform.isLinux && profile.backend == 'byedpi'
+      ? coreCapabilities.contains('serverless-bydpi')
+      : serverlessAvailable;
 
   String? systemFilterConsentKey(String choice) {
     final profile = extensions.bypassProfile(choice);
@@ -2558,7 +2561,11 @@ SessionPlan buildPlan({
       OutboundSpec(
         id: Sora.bypassId,
         displayName: extensionBypass ? bypassProfile!.name : 'zapret',
-        protocol: extensionBypass && bypassProfile!.systemWide ? 'winws' : 'bypass',
+        protocol: extensionBypass && bypassProfile!.systemWide
+            ? 'winws'
+            : extensionBypass && Platform.isLinux && bypassProfile!.backend == 'byedpi'
+            ? 'byedpi'
+            : 'bypass',
         bypass:
             (extensionBypass ? bypassProfile!.strategy : null) ??
             BypassStrategy(

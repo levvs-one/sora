@@ -1,26 +1,55 @@
 {
-  "hook_version": 2,
-  "backend": "byedpi",
-  "profiles": {
-    "TCP+TLS": {
-      "splitPos": [
-        "1"
-      ],
-      "disorder": true,
-      "tlsRecord": "1"
+  "hook_version": 3,
+  "platforms": {
+    "linux": {
+      "backend": "byedpi",
+      "profiles": {
+        "TCP+TLS": {
+          "splitPos": [
+            "1"
+          ],
+          "disorder": true,
+          "tlsRecord": "1"
+        },
+        "TLS": {
+          "splitPos": [
+            "2"
+          ],
+          "tlsRecord": "1"
+        },
+        "HTTP": {
+          "splitPos": [
+            "1"
+          ],
+          "hostCase": true,
+          "domainCase": true
+        }
+      }
     },
-    "TLS": {
-      "splitPos": [
-        "2"
-      ],
-      "tlsRecord": "1"
-    },
-    "HTTP": {
-      "splitPos": [
-        "1"
-      ],
-      "hostCase": true,
-      "domainCase": true
+    "windows": {
+      "backend": "byedpi",
+      "profiles": {
+        "TCP+TLS": {
+          "splitPos": [
+            "1"
+          ],
+          "disorder": true,
+          "tlsRecord": "1"
+        },
+        "TLS": {
+          "splitPos": [
+            "2"
+          ],
+          "tlsRecord": "1"
+        },
+        "HTTP": {
+          "splitPos": [
+            "1"
+          ],
+          "hostCase": true,
+          "domainCase": true
+        }
+      }
     }
   }
 }

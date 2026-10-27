@@ -57,8 +57,9 @@ class _Core extends CoreControlServiceBase {
   Future<HandshakeResponse> handshake(ServiceCall call, HandshakeRequest request) async =>
       HandshakeResponse(negotiatedVersion: apiVersion, controlAuthenticator: List.filled(32, 7));
   @override
-  Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async =>
-      GetAboutResponse(about: About(contract: apiVersion.deepCopy()..capabilities.add('serverless')));
+  Future<GetAboutResponse> getAbout(ServiceCall call, GetAboutRequest request) async => GetAboutResponse(
+    about: About(contract: apiVersion.deepCopy()..capabilities.addAll(['serverless', 'serverless-bydpi'])),
+  );
   @override
   Future<GetStatusResponse> getStatus(ServiceCall call, GetStatusRequest request) async =>
       GetStatusResponse(status: SessionStatus(connection: state));
@@ -173,7 +174,7 @@ void main() {
     final rows = <Map<String, dynamic>>[];
     final sources = [
       ('../extensions/sources/zapret', ['linux', 'windows']),
-      ('../extensions/sources/byedpi', ['windows']),
+      ('../extensions/sources/byedpi', ['linux', 'windows']),
       ('../examples/hello-panel', ['linux', 'windows']),
     ];
     for (var i = 0; i < sources.length; i++) {
@@ -239,7 +240,7 @@ void main() {
       expect(entry.requiresNewerApp('1.1.2'), isTrue, reason: entry.id);
       expect(entry.requiresNewerApp('1.1.3'), isFalse, reason: entry.id);
       expect(entry.supportsPlatform('windows'), isTrue, reason: entry.id);
-      expect(entry.supportsPlatform('linux'), entry.id != 'org.sora.byedpi', reason: entry.id);
+      expect(entry.supportsPlatform('linux'), isTrue, reason: entry.id);
       expect(entry.supportsPlatform('android'), isFalse, reason: entry.id);
     }
     await store.catalogCache.store(bytes);
@@ -665,6 +666,26 @@ void main() {
       await core.close();
       if (await File(socket).exists()) await File(socket).delete();
     });
+    test('signed Linux ByeDPI requires capability before authenticated connect', () async {
+      await store.uninstall(pkg.manifest.id);
+      final byedpi = await signed(sourceOverride: Directory('../extensions/sources/byedpi'));
+      await install(byedpi);
+      expect(sora.coreCapabilities, contains('serverless-bydpi'));
+      final choice = store.bypassProfiles.single.choiceId;
+      await sora.select(choice);
+      sora.coreCapabilities.remove('serverless-bydpi');
+      await sora.connect();
+      expect(core.plans, isEmpty);
+      expect(sora.failure?.key, 'app.extension_asset');
+      sora.coreCapabilities.add('serverless-bydpi');
+      await sora.connect();
+      expect(sora.phase, Phase.connected);
+      expect(core.plans.single.outbounds.single.protocol, 'byedpi');
+      expect(core.plans.single.outbounds.single.bypass.splitPos, ['1']);
+      await store.setEnabled(byedpi.manifest.id, false);
+      await until(() => core.disconnects == 1 && sora.phase == Phase.off, 'ByeDPI disable');
+    });
+
     test('disabling an in-flight profile waits for connection and disconnects without fallback', () async {
       core.gate = Completer<void>();
       await sora.select(store.bypassProfiles.single.choiceId);

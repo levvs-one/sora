@@ -2,7 +2,9 @@
 
 Что Sora ставит вместе с собой. Движки скачиваются с выпусков их авторов и
 сверяются по SHA-256 из [`packaging/engines/engines.lock`](packaging/engines/engines.lock);
-Sora их не изменяет. olcrtc собирается из закреплённого архива исходников, проверенного по SHA-256 в `packaging/engines/fetch.sh`.
+Sora их не изменяет. Архивы ByeDPI отдельно проверяются по SHA-256 в
+`packaging/engines/fetch.sh`. olcrtc собирается из закреплённого архива
+исходников, проверенного тем же скриптом.
 
 ## Движки
 
@@ -12,6 +14,7 @@ Sora их не изменяет. olcrtc собирается из закрепл
 | Xray-core | 26.3.27 | Linux, Windows | MPL-2.0 | https://github.com/XTLS/Xray-core/tree/v26.3.27 |
 | mihomo | 1.19.32 | Linux, Windows (сборка compatible) | GPL-3.0 | https://github.com/MetaCubeX/mihomo/tree/v1.19.32 |
 | olcrtc | f3ad8fb7c0d0fa981423f83269526fa94077c23d | Linux amd64/arm64, Windows amd64 | WTFPL 2 | https://github.com/openlibrecommunity/olcrtc/tree/f3ad8fb7c0d0fa981423f83269526fa94077c23d |
+| ByeDPI | 0.17.3 | Linux amd64/arm64, Windows amd64 | MIT | https://github.com/hufrea/byedpi/tree/v0.17.3 |
 | zapret (tpws, nfqws) | 72.1 | Linux | MIT, © bol-van | [`third_party/zapret`](third_party/zapret) |
 
 ## Приложение
@@ -44,7 +47,7 @@ Sora их не изменяет. olcrtc собирается из закрепл
 | gopacket/gopacket 1.7.4 | BSD-3-Clause |
 | go.yaml.in/yaml/v4 4.0.0-rc.6 (импорт подписок) | Apache-2.0, MIT для файлов libyaml |
 
-Тексты лицензий: GPL-3.0 в файле `LICENSE`, Inter в `Inter-LICENSE.txt`, zapret в `zapret-LICENSE.txt` пакета `sora-core`. Лицензии остальных компонентов лежат в их исходном коде по ссылкам выше и на pub.dev.
+Тексты лицензий: GPL-3.0 в файле `LICENSE`, Inter в `Inter-LICENSE.txt`, zapret в `zapret-LICENSE.txt` пакета `sora-core`. Лицензия ByeDPI включена в пакет как `byedpi.LICENSE`. Лицензии остальных компонентов лежат в их исходном коде по ссылкам выше и на pub.dev.
 
 ## WebView All
 

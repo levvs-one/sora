@@ -9,8 +9,8 @@ import (
 	"github.com/levvs-one/sora-client/core/engine"
 )
 
-func proxyArgs(strategy engine.BypassStrategy, port int) ([]string, error) {
-	if runtime.GOOS == "windows" {
+func proxyArgs(strategy engine.BypassStrategy, port int, protocol engine.Protocol) ([]string, error) {
+	if protocol == engine.ProtocolByeDPI || runtime.GOOS == "windows" {
 		return WindowsArgs(strategy, port)
 	}
 	return Args(strategy, port), nil
@@ -23,7 +23,7 @@ func WindowsArgs(strategy engine.BypassStrategy, port int) ([]string, error) {
 		return nil, err
 	}
 	if strategy.MethodEOL {
-		return nil, fmt.Errorf("bypass: Windows ByeDPI does not support HTTP method EOL shaping")
+		return nil, fmt.Errorf("bypass: ByeDPI does not support HTTP method EOL shaping")
 	}
 	args := []string{"--ip=127.0.0.1", "--port=" + strconv.Itoa(port), "--no-udp"}
 	mode := "--split="
@@ -36,13 +36,13 @@ func WindowsArgs(strategy engine.BypassStrategy, port int) ([]string, error) {
 	}
 	for _, position := range strategy.SplitPos {
 		if _, err := strconv.Atoi(position); err != nil {
-			return nil, fmt.Errorf("bypass: Windows ByeDPI needs numeric split positions, not %q", position)
+			return nil, fmt.Errorf("bypass: ByeDPI needs numeric split positions, not %q", position)
 		}
 		args = append(args, mode+position)
 	}
 	if strategy.TLSRecord != "" {
 		if _, err := strconv.Atoi(strategy.TLSRecord); err != nil {
-			return nil, fmt.Errorf("bypass: Windows ByeDPI needs a numeric TLS record position, not %q", strategy.TLSRecord)
+			return nil, fmt.Errorf("bypass: ByeDPI needs a numeric TLS record position, not %q", strategy.TLSRecord)
 		}
 		args = append(args, "--tlsrec="+strategy.TLSRecord)
 	}

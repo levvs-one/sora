@@ -650,6 +650,19 @@ jobs:
         run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ../../dist/sora-sync ./cmd/sora-sync
       - name: Fetch and verify the engines
         run: packaging/engines/fetch.sh ${{ matrix.arch }} dist/engines
+      - name: Native ByeDPI proxy in an isolated network
+        working-directory: core
+        run: |
+          go test -race -c -o "$RUNNER_TEMP/sora-bydpi-tests" ./engine/bypass
+          go test -race -c -o "$RUNNER_TEMP/sora-bydpi-engine-tests" ./engine/interop
+          for binary in byedpi sing-box xray mihomo; do test -x "$PWD/../dist/engines/$binary"; done
+          private="$RUNNER_TEMP/sora-bydpi-private"
+          mkdir -p "$private"/{home,config,cache,data,tmp}
+          original=$(readlink /proc/self/ns/net)
+          sudo unshare --user --map-root-user --net env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY \
+            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" TMPDIR="$private/tmp" \
+            SORA_PARENT_NETNS="$original" SORA_BYPASS_ISOLATED=1 SORA_BYPASS_BIN="$PWD/../dist/engines/byedpi" SORA_ENGINES_DIR="$PWD/../dist/engines" \
+            sh -e -c 'ip link set lo up; "$1" -test.v -test.run "^TestNativeLinuxByeDPIProxyCarriesHTTPAndTLS$" -test.timeout 30s; exec "$2" -test.v -test.run "^TestIsolatedNativeByeDPIEngineTraffic$" -test.timeout 2m' sh "$RUNNER_TEMP/sora-bydpi-tests" "$RUNNER_TEMP/sora-bydpi-engine-tests"
       - name: Xray profile geodata in an isolated filesystem
         if: matrix.arch == 'amd64'
         working-directory: core
@@ -794,6 +807,9 @@ jobs:
             done
             test -x /usr/bin/sora
             readelf -h /usr/bin/sora | grep -E 'Machine:[[:space:]]+${{ matrix.elf_machine }}$'
+            test -x /usr/lib/sora/engines/byedpi
+            readelf -h /usr/lib/sora/engines/byedpi | grep -E 'Machine:[[:space:]]+${{ matrix.elf_machine }}$'
+            cmp /usr/share/licenses/sora-core/byedpi.LICENSE packaging/engines/byedpi.LICENSE
             /usr/bin/sora-core -version
             probe="/tmp/sora-installed-core-probe-$GITHUB_RUN_ID"
             (cd core && CGO_ENABLED=0 go build -o "$probe" ./testdata/coexist)

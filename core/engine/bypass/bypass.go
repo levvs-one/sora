@@ -24,7 +24,16 @@ const Source = "zapret"
 
 // Has reports whether a plan carries a bypass outbound.
 func Has(p *engine.Plan) bool {
-	return p != nil && slices.ContainsFunc(p.Outbounds, func(o engine.Outbound) bool { return o.Protocol == engine.ProtocolBypass })
+	return p != nil && slices.ContainsFunc(p.Outbounds, isProxy)
+}
+
+// HasByeDPI identifies a plan that requires the explicit host-owned proxy.
+func HasByeDPI(p *engine.Plan) bool {
+	return p != nil && slices.ContainsFunc(p.Outbounds, func(o engine.Outbound) bool { return o.Protocol == engine.ProtocolByeDPI })
+}
+
+func isProxy(o engine.Outbound) bool {
+	return o.Protocol == engine.ProtocolBypass || o.Protocol == engine.ProtocolByeDPI
 }
 
 // Args returns listener and strategy arguments for tpws. Plans cannot set file,
@@ -64,7 +73,7 @@ func Rewrite(p *engine.Plan, ports map[string]int) *engine.Plan {
 	out := *p
 	out.Outbounds = slices.Clone(p.Outbounds)
 	for i, o := range out.Outbounds {
-		if o.Protocol != engine.ProtocolBypass {
+		if !isProxy(o) {
 			continue
 		}
 		port := ports[key(*o.Bypass)]
@@ -80,9 +89,10 @@ func Rewrite(p *engine.Plan, ports map[string]int) *engine.Plan {
 // Engine runs an engine with the local DPI proxies its plan needs.
 type Engine struct {
 	engine.Engine
-	binary string
-	home   string
-	logs   *logs.Center
+	binary   string
+	home     string
+	logs     *logs.Center
+	protocol engine.Protocol
 
 	mu    sync.Mutex
 	procs map[string]*proxy
@@ -95,15 +105,21 @@ type proxy struct {
 }
 
 // Wrap adds bypass outbounds using the installed platform proxy.
-func Wrap(inner engine.Engine, binary, home string, center *logs.Center) *Engine {
-	return &Engine{Engine: inner, binary: binary, home: home, logs: center, procs: map[string]*proxy{}}
+func Wrap(inner engine.Engine, binary, home string, center *logs.Center, protocol engine.Protocol) *Engine {
+	return &Engine{Engine: inner, binary: binary, home: home, logs: center, protocol: protocol, procs: map[string]*proxy{}}
 }
 
 // Validate checks the plan the engine will run.
 func (e *Engine) Validate(ctx context.Context, p *engine.Plan) error {
 	for _, o := range p.Outbounds {
-		if o.Protocol == engine.ProtocolBypass && o.Bypass != nil {
-			if _, err := proxyArgs(*o.Bypass, 0); err != nil {
+		if isProxy(o) {
+			if o.Protocol != e.protocol {
+				return errors.New("bypass: plan needs a different proxy backend")
+			}
+			if o.Bypass == nil {
+				return errors.New("bypass: missing proxy strategy")
+			}
+			if _, err := proxyArgs(*o.Bypass, 0, e.protocol); err != nil {
 				return err
 			}
 		}
@@ -116,8 +132,14 @@ func (e *Engine) Validate(ctx context.Context, p *engine.Plan) error {
 func (e *Engine) Apply(ctx context.Context, p *engine.Plan) error {
 	needed := map[string]engine.BypassStrategy{}
 	for _, o := range p.Outbounds {
-		if o.Protocol == engine.ProtocolBypass && o.Bypass != nil {
-			if _, err := proxyArgs(*o.Bypass, 0); err != nil {
+		if isProxy(o) {
+			if o.Protocol != e.protocol {
+				return errors.New("bypass: plan needs a different proxy backend")
+			}
+			if o.Bypass == nil {
+				return errors.New("bypass: missing proxy strategy")
+			}
+			if _, err := proxyArgs(*o.Bypass, 0, e.protocol); err != nil {
 				return err
 			}
 			needed[key(*o.Bypass)] = *o.Bypass
@@ -158,7 +180,7 @@ func (e *Engine) start(strategy engine.BypassStrategy) (*proxy, error) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	px := &proxy{port: port, cancel: cancel}
-	args, err := proxyArgs(strategy, port)
+	args, err := proxyArgs(strategy, port, e.protocol)
 	if err != nil {
 		cancel()
 		return nil, err

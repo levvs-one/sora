@@ -103,3 +103,10 @@ func TestPlatformBypassScopeAndBackendPairing(t *testing.T) {
 		}
 	}
 }
+
+func TestLinuxByeDPIRequiresExplicitPlatformVariant(t *testing.T) {
+	valid := []byte(`{"hook_version":3,"platforms":{"linux":{"backend":"byedpi","profiles":{"TCP":{"splitPos":["1"]}}},"windows":{"backend":"byedpi","profiles":{"TCP":{"splitPos":["1"]}}}}}`)
+	if err := validateBypassAsset(valid); err != nil {
+		t.Fatalf("Linux ByeDPI variant rejected: %v", err)
+	}
+}

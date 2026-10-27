@@ -326,6 +326,9 @@ func (s *Server) apiVersion() *corev1.ApiVersion {
 	if provider, ok := s.measurer.(interface{ WinwsAvailable() bool }); ok && provider.WinwsAvailable() {
 		capabilities = append(capabilities, "serverless-winws")
 	}
+	if provider, ok := s.measurer.(interface{ ByeDPIAvailable() bool }); ok && provider.ByeDPIAvailable() {
+		capabilities = append(capabilities, "serverless-bydpi")
+	}
 	if len(chainEngines(s.measurer)) > 0 {
 		capabilities = append(capabilities, "chains")
 	}

@@ -68,6 +68,31 @@ if [[ "$found" -ne 3 ]]; then
 	exit 1
 fi
 
+# ByeDPI is a host-owned SOCKS backend, pinned separately for each Linux ABI.
+if [[ "$arch" == amd64 || "$arch" == arm64 ]]; then
+ case "$arch" in
+  amd64)
+   byedpi_name=byedpi-17.3-x86_64.tar.gz
+   byedpi_member=ciadpi-x86_64
+   byedpi_digest=98f73c32eacb571ebd88d790f6376ed9e70f02d44c1fe862472ecea75cd7117d
+   byedpi_size=81074
+   ;;
+  arm64)
+   byedpi_name=byedpi-17.3-aarch64.tar.gz
+   byedpi_member=ciadpi-aarch64
+   byedpi_digest=d5806504e159e8119ede5af1164a609251b0520cd4483a7db611b6d238b9404b
+   byedpi_size=82351
+   ;;
+ esac
+ byedpi_file="$work/$byedpi_name"
+ curl --fail --location --silent --show-error --retry 3 --proto '=https' --proto-redir '=https' --max-filesize "$byedpi_size" --output "$byedpi_file" "https://github.com/hufrea/byedpi/releases/download/v0.17.3/$byedpi_name"
+ echo "$byedpi_digest  $byedpi_file" | sha256sum --check --quiet --strict
+ tar -xOzf "$byedpi_file" "$byedpi_member" >"$work/byedpi"
+ install -m 0755 "$work/byedpi" "$dest/byedpi"
+ install -m 0644 "$(dirname "$0")/byedpi.LICENSE" "$dest/byedpi.LICENSE"
+ echo "byedpi $arch: verified v0.17.3"
+fi
+
 # Windows uses a native, driver-free SOCKS reshaper; packet interception is
 # deliberately not part of this backend. Its upstream release is MIT licensed.
 if [[ "$arch" == windows-amd64 ]]; then

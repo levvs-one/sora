@@ -89,4 +89,83 @@ void main() {
     expect(settings.splitPos, ['3']);
     expect(settings.tlsRecord, '2');
   });
+
+  test('ByeDPI descriptor must name each supported platform explicitly', () {
+    final variant = {
+      'backend': 'byedpi',
+      'profiles': {
+        'TCP': {
+          'splitPos': ['1'],
+        },
+      },
+    };
+    final raw = jsonEncode({
+      'hook_version': 3,
+      'platforms': {'linux': variant, 'windows': variant},
+    });
+    final linux = ExtensionBypass.parse(raw, operatingSystem: 'linux');
+    final windows = ExtensionBypass.parse(raw, operatingSystem: 'windows');
+    expect(linux.backend, 'byedpi');
+    expect(linux.supports('linux'), isTrue);
+    expect(linux.supports('windows'), isFalse);
+    expect(windows.supports('windows'), isTrue);
+    expect(windows.supports('linux'), isFalse);
+    final legacy = ExtensionBypass.parse(jsonEncode({'hook_version': 2, ...variant}));
+    expect(legacy.supports('windows'), isTrue);
+    expect(legacy.supports('linux'), isFalse);
+  });
+
+  test('Linux ByeDPI plans cannot silently select the TPWS backend', () async {
+    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    final settings = await Settings.load();
+    final descriptor = ExtensionBypass.parse(
+      jsonEncode({
+        'hook_version': 2,
+        'backend': 'byedpi',
+        'profiles': {
+          'TCP': {
+            'splitPos': ['1'],
+          },
+        },
+      }),
+    );
+    final profile = ExtensionBypassProfile(
+      extensionId: 'org.sora.byedpi',
+      name: 'ByeDPI',
+      backend: 'byedpi',
+      strategy: descriptor.select({'profile': 'TCP'}),
+    );
+    final plan = buildPlan(servers: [], choice: profile.choiceId, settings: settings, bypassProfile: profile);
+    expect(plan.outbounds.single.protocol, Platform.isLinux ? 'byedpi' : 'bypass');
+  });
+
+  test('Linux ByeDPI requires its own advertised core capability', () async {
+    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    final settings = await Settings.load();
+    final descriptor = ExtensionBypass.parse(
+      jsonEncode({
+        'hook_version': 2,
+        'backend': 'byedpi',
+        'profiles': {
+          'TCP': {
+            'splitPos': ['1'],
+          },
+        },
+      }),
+    );
+    final profile = ExtensionBypassProfile(
+      extensionId: 'org.sora.byedpi',
+      name: 'ByeDPI',
+      backend: 'byedpi',
+      strategy: descriptor.select({'profile': 'TCP'}),
+    );
+    final sora = Sora(settings);
+    addTearDown(sora.dispose);
+    sora.serverlessAvailable = true;
+    expect(sora.bypassProfileAvailable(profile), !Platform.isLinux);
+    sora.coreCapabilities = {'serverless-bydpi'};
+    expect(sora.bypassProfileAvailable(profile), isTrue);
+    sora.serverlessAvailable = false;
+    expect(sora.bypassProfileAvailable(profile), Platform.isLinux);
+  });
 }
