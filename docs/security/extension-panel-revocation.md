@@ -33,12 +33,47 @@ navigation, disabling during initialization, and a reply deliberately held
 until after disable. The existing bridge/server/startup suite remains required.
 The native integration additionally disables the published package at the end
 of its two cycles and installs a temporary-author-signed permission-reducing
-source update while its panel is open. Those new native teardown cases are
-pending hosted WebKitGTK/WebView2 execution; mock-platform checks are not
-their substitute. Production catalog/package signatures and roots are untouched.
+source update while its panel is open. Those new native teardown cases
+passed hosted WebKitGTK (job 121937941578) and WebView2 (job 121938746476,
+run 40427833762) on the original PR111 head. They are now included in the
+desktop integration branch. That historical pass does not prove a newer
+combined head; its native CI must pass separately. Production catalog/package
+signatures and roots are untouched.
 
 The full local Flutter suite passed 560 tests with 73 prerequisite skips;
 the focused host/bootstrap/server tests and the existing runtime suite also
 passed. The delayed-host-work fixture adds the notification while authorized
 and holds only its reply, so it checks response suppression rather than
 pretending that revocation can undo an already performed action.
+
+## Bounded initialization and honest connection failures
+
+The host now gives its asynchronous startup 15 seconds, then detaches that
+generation, stops its private local server and requests disposal of its
+preparing/attached controller through the existing platform APIs. The retry
+creates a new generation only after rechecking the current installed package
+and grants. A late initializer cannot attach to that retry or close its newer
+server. Teardown also removes the cached Sora listener.
+
+The deadline bounds host initialization and loadRequest completion; it does
+not certify page JavaScript readiness, forcibly terminate a stuck native
+plugin or guarantee real-time cleanup by the OS. Widget regressions reproduce
+a never-completing initializer, retry and late completion with a fake native
+platform. The earlier implementation failed both deadline cases.
+
+The panel connection query now has a five-second gRPC deadline and rejects a
+wire SoraError through the documented bridge error contract. A private
+loopback gRPC regression first returns a real positive row, then a wire error:
+the earlier host incorrectly resolved that error as an empty successful list.
+The Hello source also replaces stale rows with a permission/unavailable state
+and re-enables Refresh; automatic refresh remains quiet. A Node VM regression
+executes its actual page script with a minimal DOM fixture and verifies
+positive escaped rows, both error states, recovery and interactive-only
+notices. It is JavaScript logic coverage, not a browser preview.
+
+The desktop integration branch passed the full local Flutter suite with
+673 tests and 73 prerequisite skips, including the source-script regression;
+the focused host/server/bootstrap/connections suite passed 23 tests and
+analysis reported no issues. New signed-source native assertions exercise
+the same stale-row failures and recovery in each native panel cycle. Those
+new assertions are pending hosted CI; no new native pass is claimed here.

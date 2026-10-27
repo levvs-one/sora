@@ -111,9 +111,12 @@
       content.innerHTML = html + '</tbody></table>';
     } catch (error) {
       const code = error && error.code;
-      if (code === 'not-connected') {
-        content.innerHTML = '<p class="empty">Connect Sora to see active connections.</p>';
-      }
+      const message = code === 'not-connected'
+        ? 'Connect Sora to see active connections.'
+        : code === 'permission-denied'
+          ? 'Allow connection access in the extension permissions.'
+          : 'Connections are unavailable. Try Refresh.';
+      content.innerHTML = '<p class="empty">' + message + '</p>';
       if (interactive) {
         await notice(code === 'permission-denied'
           ? 'Allow connection access in the extension permissions to refresh this panel.'

@@ -119,7 +119,7 @@ void main() {
               try {
                 document = await controller
                     .runJavaScriptReturningResult(
-                      "JSON.stringify({url:location.href,state:document.readyState,api:typeof window.soraExt,host:typeof window.SoraExtHost,content:document.getElementById('content')?.textContent,aboutOpen:document.getElementById('about')?.open,focus:document.activeElement?.id,proof:window.nativePanelProof})",
+                      "JSON.stringify({url:location.href,state:document.readyState,api:typeof window.soraExt,host:typeof window.SoraExtHost,content:document.getElementById('content')?.textContent,aboutOpen:document.getElementById('about')?.open,focus:document.activeElement?.id,proof:window.nativePanelProof,sourceFailure:window.sourceFailureProof})",
                     )
                     .timeout(const Duration(seconds: 2));
               } catch (error) {
@@ -136,6 +136,41 @@ void main() {
                   : "document.getElementById('content')?.textContent.includes('not-connected') === true",
             );
             if (useSource) {
+              final noticesBeforeFailure = sora.history.length;
+              await controller.runJavaScript("""
+                window.sourceFailureProof = null;
+                void (async () => {
+                  const call = window.soraExt.call;
+                  let proof = true;
+                  try {
+                    window.soraExt.call = (method, args) => method === 'getConnections'
+                      ? Promise.resolve([{host: 'fixture.example', process: 'fixture', down_bytes: 1, up_bytes: 0}])
+                      : call(method, args);
+                    await load();
+                    if (!content.textContent.includes('fixture.example')) throw new Error('positive rows missing');
+                    for (const code of ['internal', 'permission-denied']) {
+                      window.soraExt.call = (method, args) => method === 'getConnections'
+                        ? Promise.reject(Object.assign(new Error('synthetic fixture'), {code}))
+                        : call(method, args);
+                      await load();
+                      const text = content.textContent;
+                      if (text.includes('fixture.example') || text.includes('No active connections')) {
+                        throw new Error('failure retained rows or became empty');
+                      }
+                      if (!text.includes(code === 'internal' ? 'unavailable' : 'Allow connection access')) {
+                        throw new Error('failure state missing');
+                      }
+                      if (refresh.disabled || refresh.getAttribute('aria-busy') !== 'false') {
+                        throw new Error('refresh remained busy');
+                      }
+                    }
+                  } catch (error) { proof = String(error); }
+                  finally { window.soraExt.call = call; await load(); }
+                  window.sourceFailureProof = proof;
+                })();
+              """);
+              await until('window.sourceFailureProof === true');
+              expect(sora.history, hasLength(noticesBeforeFailure));
               await until('document.fonts.status === "loaded" && document.fonts.check(\'15px "Inter"\')');
               await controller.runJavaScript("document.getElementById('info').click();");
               await until("document.getElementById('about').open === true");

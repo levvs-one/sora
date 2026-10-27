@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:grpc/grpc.dart' as grpc;
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:webview_all/webview_all.dart';
@@ -14,6 +15,8 @@ import 'package:sora/src/ext/bridge.dart';
 import 'package:sora/src/ext/catalog.dart';
 import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/settings.dart';
+import 'package:sora/src/core/link.dart';
+import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'package:sora/src/notifications.dart';
 import 'package:sora/src/sora.dart';
 import 'package:sora/src/ui/extensions/panel_screen.dart';
@@ -21,11 +24,39 @@ import 'package:sora/src/ui/extensions/panel_screen.dart';
 class _DelayedSora extends Sora {
   _DelayedSora(super.settings, ExtensionStore extensions) : super(extensions: extensions);
   Completer<void>? replyGate;
+  CoreLink? connection;
+  @override
+  CoreLink? get link => connection ?? super.link;
   @override
   Future<void> recordNotification(AppNotification notice) async {
     await super.recordNotification(notice);
     await replyGate?.future;
   }
+}
+
+class _ConnectionCore extends CoreControlServiceBase {
+  bool fail = false;
+  @override
+  Future<HandshakeResponse> handshake(grpc.ServiceCall call, HandshakeRequest request) async =>
+      HandshakeResponse(negotiatedVersion: apiVersion, controlAuthenticator: List.filled(32, 1));
+  @override
+  Future<ListConnectionsResponse> listConnections(grpc.ServiceCall call, ListConnectionsRequest request) async => fail
+      ? ListConnectionsResponse(error: SoraError(userMessageKey: 'core.connections.unavailable'))
+      : ListConnectionsResponse(
+          connections: [Connection(id: 'fixture', host: 'fixture.example')],
+        );
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw StateError('Unexpected panel fixture RPC');
+}
+
+class _ConnectionLink implements CoreLink {
+  _ConnectionLink(this.stub);
+  @override
+  final CoreControlClient stub;
+  @override
+  final List<int> token = List.filled(32, 1);
+  @override
+  dynamic noSuchMethod(Invocation invocation) => throw StateError('Unexpected panel fixture link operation');
 }
 
 class _Platform extends WebViewPlatform {
@@ -326,5 +357,107 @@ void main() {
     );
     expect(find.byType(WebViewWidget), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+  testWidgets('a native initializer that never finishes cannot leave a permanent spinner', (tester) async {
+    await mount(tester);
+    final old = platformView.controller;
+    try {
+      await tester.pump(const Duration(seconds: 30));
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text(lookupS(const Locale('en')).extPanelUnavailable), findsOneWidget);
+      expect(old.loaded, isEmpty);
+      expect(old.cacheClears, 1);
+      platformView.initialization.complete();
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pumpAndSettle();
+      expect(old.loaded, isEmpty);
+      expect(old.channels, isEmpty);
+      expect(old.cacheClears, 1);
+    } finally {
+      await tester.pumpWidget(const SizedBox());
+      if (!platformView.initialization.isCompleted) platformView.initialization.complete();
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('retry after the native startup deadline owns only the new controller', (tester) async {
+    await mount(tester);
+    final old = platformView.controller;
+    try {
+      await tester.pump(const Duration(seconds: 30));
+      expect(find.text(lookupS(const Locale('en')).extPanelUnavailable), findsOneWidget);
+      await tester.tap(find.text(lookupS(const Locale('en')).refresh));
+      for (var i = 0; i < 40 && identical(old, platformView.controller); i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.pump();
+      }
+      expect(identical(old, platformView.controller), isFalse);
+      platformView.initialization.complete();
+      await ready(tester);
+      expect(old.loaded, isEmpty);
+      expect(old.cacheClears, 1);
+      expect(find.byType(WebViewWidget), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    } finally {
+      await tester.pumpWidget(const SizedBox());
+      if (!platformView.initialization.isCompleted) platformView.initialization.complete();
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pumpAndSettle();
+    }
+  });
+  testWidgets('a core connection-list failure rejects the bridge promise instead of reporting zero rows', (
+    tester,
+  ) async {
+    final core = _ConnectionCore();
+    late grpc.Server server;
+    late grpc.ClientChannel channel;
+    await tester.runAsync(() async {
+      server = grpc.Server.create(services: [core]);
+      await server.serve(address: InternetAddress.loopbackIPv4, port: 0);
+      channel = grpc.ClientChannel(
+        '127.0.0.1',
+        port: server.port!,
+        options: const grpc.ChannelOptions(credentials: grpc.ChannelCredentials.insecure()),
+      );
+      final stub = CoreControlClient(channel);
+      await stub.handshake(HandshakeRequest(clientVersion: apiVersion));
+      sora.connection = _ConnectionLink(stub);
+      sora.sessionId = 'fixture-session';
+    });
+    try {
+      await mount(tester);
+      platformView.initialization.complete();
+      await ready(tester);
+      final controller = platformView.controller;
+      final native = controller.channels.single;
+      await tester.runAsync(() async {
+        native.onMessageReceived(
+          const platform.JavaScriptMessage(message: '{"id":201,"method":"getConnections","args":{}}'),
+        );
+        for (var i = 0; i < 100 && !controller.scripts.any((s) => s.contains('_resolve(201,')); i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+        }
+      });
+      expect(controller.scripts.any((s) => s.contains('_resolve(201, true') && s.contains('fixture.example')), isTrue);
+      core.fail = true;
+      await tester.runAsync(() async {
+        native.onMessageReceived(
+          const platform.JavaScriptMessage(message: '{"id":202,"method":"getConnections","args":{}}'),
+        );
+        for (var i = 0; i < 100 && !controller.scripts.any((s) => s.contains('_resolve(202,')); i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+        }
+      });
+      expect(controller.scripts.any((s) => s.contains('_resolve(202, false')), isTrue);
+      expect(controller.scripts.any((s) => s.contains('_resolve(202, true')), isFalse);
+    } finally {
+      await tester.pumpWidget(const SizedBox());
+      await tester.runAsync(() async {
+        await channel.terminate();
+        await server.shutdown();
+      });
+      sora.connection = null;
+    }
   });
 }
