@@ -130,6 +130,9 @@ type subscriptionBook struct {
 	// lookup. A failed parse yields a nil list, exactly as the eager
 	// load did, so deferring it changes no observable behaviour.
 	pendingLists map[string]bool
+	// pendingFetch retains only explicit new/changed-link saves while an older
+	// fetch owns the per-subscription slot. It is not an automatic retry.
+	pendingFetch map[string]bool
 	updating     map[string]bool
 	watchers     map[chan *corev1.SubscriptionState]struct{}
 	wake         chan struct{}
@@ -142,6 +145,7 @@ func newSubscriptionBook(srv *Server) *subscriptionBook {
 		now:          time.Now,
 		records:      map[string]*subscriptionRecord{},
 		lists:        map[string][]*corev1.OutboundSpec{},
+		pendingFetch: map[string]bool{},
 		pendingLists: map[string]bool{},
 		updating:     map[string]bool{},
 		watchers:     map[chan *corev1.SubscriptionState]struct{}{},
@@ -320,10 +324,11 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	state := b.stateLocked(rec.ID)
 	b.notifyLocked(state, logs.LevelInfo, "Subscription saved")
 	if fetchNow {
-		go func() { _, _ = b.refresh(context.Background(), rec.ID) }()
+		b.pendingFetch[rec.ID] = true
+		b.startSavedRefreshLocked(rec.ID)
 	}
 	b.poke()
-	return state, nil
+	return b.stateLocked(rec.ID), nil
 }
 
 // persistLocked writes the subscription record and update's vault changes
@@ -357,6 +362,7 @@ func (b *subscriptionBook) delete(id string) error {
 	delete(b.records, id)
 	delete(b.lists, id)
 	delete(b.pendingLists, id)
+	delete(b.pendingFetch, id)
 	b.notifyLocked(&corev1.SubscriptionState{Settings: &corev1.SubscriptionSettings{Id: id}, Deleted: true}, logs.LevelInfo, "Subscription removed")
 	return nil
 }
@@ -368,25 +374,58 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		return nil, err
 	}
 	b.mu.Lock()
-	rec, ok := b.records[id]
-	if !ok {
+	rec, err := b.startRefreshLocked(id)
+	if err != nil {
 		b.mu.Unlock()
-		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: no subscription %s", id)
+		return nil, err
 	}
-	if b.updating[id] {
+	if rec == nil {
 		state := b.stateLocked(id)
 		b.mu.Unlock()
 		return state, nil
 	}
+	b.mu.Unlock()
+	return b.fetchAccepted(ctx, rec)
+}
+
+// startRefreshLocked reserves the existing per-ID slot and snapshots the saved
+// request. The caller must hold b.mu; nil means another fetch owns the slot.
+func (b *subscriptionBook) startRefreshLocked(id string) (*subscriptionRecord, error) {
+	rec, ok := b.records[id]
+	if !ok {
+		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: no subscription %s", id)
+	}
+	if b.updating[id] {
+		return nil, nil
+	}
 	if b.srv.fetcher == nil && !isLocalServerLink(rec.URL) {
-		b.mu.Unlock()
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionFetch, "control: this core cannot fetch subscriptions")
 	}
 	b.updating[id] = true
-	link, agent := rec.URL, rec.UserAgent
+	delete(b.pendingFetch, id)
 	b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Subscription update started")
-	b.mu.Unlock()
+	snapshot := *rec
+	return &snapshot, nil
+}
 
+// startSavedRefreshLocked consumes a saved-link intent only when its fetch is
+// admitted. Rapid saves coalesce in b.records without creating waiting workers.
+func (b *subscriptionBook) startSavedRefreshLocked(id string) {
+	if !b.pendingFetch[id] {
+		return
+	}
+	rec, err := b.startRefreshLocked(id)
+	if err != nil {
+		delete(b.pendingFetch, id)
+		return
+	}
+	if rec != nil {
+		go func() { _, _ = b.fetchAccepted(context.Background(), rec) }()
+	}
+}
+
+func (b *subscriptionBook) fetchAccepted(ctx context.Context, rec *subscriptionRecord) (*corev1.SubscriptionState, error) {
+	id, link, agent := rec.ID, rec.URL, rec.UserAgent
 	requestCtx := ctx
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
@@ -411,6 +450,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	defer b.startSavedRefreshLocked(id)
 	delete(b.updating, id)
 	current, ok := b.records[id]
 	if !ok || current.URL != link {

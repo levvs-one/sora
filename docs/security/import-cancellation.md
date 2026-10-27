@@ -129,3 +129,49 @@ Synchronous parser work after admission is still not preempted, and the existing
 post-parse commit checkpoints do not undo an atomic write. The initial fetch's
 independent lifecycle, total outstanding RPCs/retained inputs, AST width/node
 budgets and the other resource boundaries remain open.
+
+## Latest saved subscription link
+
+Saving a new URL while an older refresh owned the subscription's in-progress
+slot previously dropped the new fetch. Three regressions reproduced this with
+automatic updates disabled: an old successful fetch, an old failed fetch, and
+cancellation of an older manual refresh. The latest saved URL remained empty or
+kept the previous server list. These tests use an injected provider and a real
+temporary vault, without provider requests or a running core.
+
+The existing book mutex now protects one pending saved-link intent per ID.
+Admission snapshots the current URL and user agent and consumes that intent
+only when the existing per-ID slot is reserved. Finishing an older request
+admits the latest saved link before releasing the mutex. Rapid intervening URL
+edits coalesce; they do not create waiting workers. Deletion removes the intent.
+A failure without a further saved URL does not enqueue another attempt.
+Manual refresh cancellation does not cancel an independently saved new link.
+
+This reuses the existing admission and vault-update paths. Two installed
+alternatives were checked against their pinned documentation on 27 October:
+
+| Candidate | Pinned release | Repository stars / open count | Module ZIP | License / Go floor |
+| --- | --- | --- | --- | --- |
+| [singleflight](https://pkg.go.dev/golang.org/x/sync@v0.24.0/singleflight) | v0.24.0, 23 September 2026 | 936 / 9 | 26,232 B | BSD-3-Clause / 1.26.0 |
+| [errgroup](https://pkg.go.dev/golang.org/x/sync@v0.24.0/errgroup) | v0.24.0, 23 September 2026 | 936 / 9 | 26,232 B | BSD-3-Clause / 1.26.0 |
+
+Both belong to the same already-installed module; counts include pull requests,
+and its mirror was pushed on 15 October. Neither is deprecated in its package
+documentation. Both fit the project's Go 1.26.9/toolchain 1.27.3 floor and use
+standard-library imports. Singleflight shares the currently running result;
+Forget permits overlapping work. Errgroup limits concurrent tasks but does not
+retain the latest changed URL. Neither replaces the book's saved-intent/atomic
+admission boundary, so no dependency, version or second limiter was added.
+
+The six scenarios assert exact fetch order, no overlap while the old request is
+blocked, final latest server/credential retention, coalescing of intermediate
+links, deletion without resurrection, a single failed latest attempt, and a
+metadata-only save without an extra fetch. Standard synctest coordinates the
+requests. Existing cancellation, child-timeout/backoff and parser-admission
+regressions remain required.
+
+The pending intent is process-local, not a durable queue or crash-recovery
+guarantee. The existing independent initial-fetch context, two-minute fetch
+timeout, four scheduler slots and shared four-parser admission are retained.
+This does not establish a global fetch budget, shutdown ownership, CPU
+preemption or rollback of an atomic vault write.
