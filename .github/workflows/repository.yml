@@ -694,7 +694,7 @@ jobs:
       - name: Build the app
         working-directory: app
         run: |
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb bubblewrap
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb bubblewrap shellcheck
           flutter pub get
           flutter build linux --release --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Check the architecture of every bundled native binary
@@ -740,22 +740,47 @@ jobs:
               nfpm package --config "$config" --packager "$packager" --target dist/
             done
           done
-      - name: Install with install.sh on Ubuntu, Fedora and Arch
+      - name: Install the native core and app on Ubuntu
+        timeout-minutes: 20
+        # The same script people run, on an expendable native runner.
+        run: |
+          set -euo pipefail
+          {
+            shellcheck packaging/install/install.sh
+            # The hosted runner restricts unprivileged namespace setup.
+            sudo env "PATH=$PATH" python3 -B packaging/install/test_installers.py
+            mkdir -p install-test
+            cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
+            python3 packaging/install/prepare_test_release.py install-test "$SORA_VERSION" test-tools
+            SORA_DIST=install-test SORA_VERIFIER="$PWD/test-tools/sora-verifier" sh packaging/install/install.sh
+            for _ in $(seq 1 30); do systemctl is-active --quiet sora-core && break; sleep 1; done
+            systemctl is-active sora-core
+            for package in sora-core sora; do
+              test "$(dpkg-query -W -f='${Architecture}' "$package")" = '${{ matrix.arch }}'
+              test "$(dpkg-query -W -f='${Version}' "$package")" = "$SORA_VERSION"
+            done
+            test -x /usr/bin/sora
+            readelf -h /usr/bin/sora | grep -E 'Machine:[[:space:]]+${{ matrix.elf_machine }}$'
+            /usr/bin/sora-core -version
+            probe="/tmp/sora-installed-core-probe-$GITHUB_RUN_ID"
+            (cd core && CGO_ENABLED=0 go build -o "$probe" ./testdata/coexist)
+            # This account is admitted by the service's existing peer-UID rule.
+            sudo -u sora "$probe" /run/sora/core.sock logs
+            echo 'Installed native packages and authenticated core IPC passed.'
+          } 2>&1 | tee "$RUNNER_TEMP/linux-install.log"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: linux-install-${{ matrix.arch }}-evidence
+          path: ${{ runner.temp }}/linux-install.log
+          if-no-files-found: ignore
+      - name: Installed service diagnostics
+        if: failure()
+        run: sudo journalctl -u sora-core --no-pager -n 60
+      - name: Install with install.sh on Fedora and Arch
         if: matrix.arch == 'amd64'
         timeout-minutes: 20
-        # The same script people run, on the packages this job built.
         run: |
-          shellcheck packaging/install/install.sh
-          # The hosted runner restricts loopback setup in unprivileged namespaces.
-          sudo env "PATH=$PATH" python3 -B packaging/install/test_installers.py
-          mkdir -p install-test
-          cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
-          python3 packaging/install/prepare_test_release.py install-test "$SORA_VERSION" test-tools
-          SORA_DIST=install-test SORA_VERIFIER="$PWD/test-tools/sora-verifier" sh packaging/install/install.sh
-          for _ in $(seq 1 30); do systemctl is-active --quiet sora-core && break; sleep 1; done
-          systemctl is-active sora-core
-          test -x /usr/bin/sora
-          /usr/bin/sora-core -version
           # Distribution mirrors drop a download now and then. A package that
           # does not install fails all three runs.
           retry() { for _ in 1 2; do "$@" && return; sleep 15; done; "$@"; }
