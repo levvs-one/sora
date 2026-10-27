@@ -656,13 +656,23 @@ jobs:
           go test -race -c -o "$RUNNER_TEMP/sora-bydpi-tests" ./engine/bypass
           go test -race -c -o "$RUNNER_TEMP/sora-bydpi-engine-tests" ./engine/interop
           for binary in byedpi sing-box xray mihomo; do test -x "$PWD/../dist/engines/$binary"; done
-          private="$RUNNER_TEMP/sora-bydpi-private"
-          mkdir -p "$private"/{home,config,cache,data,tmp}
+          # Root mapped inside the user namespace cannot traverse the runner's home.
+          private=$(sudo mktemp -d /tmp/sora-bydpi-ci.XXXXXXXX)
+          trap 'sudo rm -rf -- "$private"' EXIT
+          sudo install -d -m 0700 "$private"/{home,config,cache,data,tmp,engines}
+          sudo install -m 0755 "$RUNNER_TEMP/sora-bydpi-tests" "$private/proxy-tests"
+          sudo install -m 0755 "$RUNNER_TEMP/sora-bydpi-engine-tests" "$private/engine-tests"
+          for binary in byedpi sing-box xray mihomo; do
+            sudo install -m 0755 "$PWD/../dist/engines/$binary" "$private/engines/$binary"
+          done
+          for database in geoip.dat geosite.dat; do
+            sudo install -m 0644 "$PWD/../dist/engines/$database" "$private/engines/$database"
+          done
           original=$(readlink /proc/self/ns/net)
           sudo unshare --user --map-root-user --net env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY \
             HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" TMPDIR="$private/tmp" \
-            SORA_PARENT_NETNS="$original" SORA_BYPASS_ISOLATED=1 SORA_BYPASS_BIN="$PWD/../dist/engines/byedpi" SORA_ENGINES_DIR="$PWD/../dist/engines" \
-            sh -e -c 'ip link set lo up; "$1" -test.v -test.run "^TestNativeLinuxByeDPIProxyCarriesHTTPAndTLS$" -test.timeout 30s; exec "$2" -test.v -test.run "^TestIsolatedNativeByeDPIEngineTraffic$" -test.timeout 2m' sh "$RUNNER_TEMP/sora-bydpi-tests" "$RUNNER_TEMP/sora-bydpi-engine-tests"
+            SORA_PARENT_NETNS="$original" SORA_BYPASS_ISOLATED=1 SORA_BYPASS_BIN="$private/engines/byedpi" SORA_ENGINES_DIR="$private/engines" \
+            sh -e -c 'ip link set lo up; "$1" -test.v -test.run "^TestNativeLinuxByeDPIProxyCarriesHTTPAndTLS$" -test.timeout 30s; exec "$2" -test.v -test.run "^TestIsolatedNativeByeDPIEngineTraffic$" -test.timeout 2m' sh "$private/proxy-tests" "$private/engine-tests"
       - name: Xray profile geodata in an isolated filesystem
         if: matrix.arch == 'amd64'
         working-directory: core
