@@ -184,6 +184,41 @@ void main() {
             debugPrint(
               'Native signed panel source=$useSource cycle $cycle: initial rejection, settings, permission gate and notification passed',
             );
+            if (cycle == 1) {
+              if (useSource) {
+                final project = Directory('${work.path}/source');
+                final manifestFile = File('${project.path}/sora-extension.json');
+                final manifest = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
+                manifest['version'] = '1.0.2';
+                (manifest['permissions'] as List).remove('notifications');
+                await manifestFile.writeAsString(jsonEncode(manifest));
+                final tool = '${work.path}/sora-ext${Platform.isWindows ? '.exe' : ''}';
+                final output = '${work.path}/upgrade.soraext';
+                for (final args in [
+                  ['pack', project.path, '-o', output],
+                  ['sign', '--key', '${work.path}/temporary-author.key', output],
+                ]) {
+                  final result = await Process.run(tool, args);
+                  expect(result.exitCode, 0, reason: '${result.stderr}');
+                }
+                final upgrade = ExtPackage.open(await File(output).readAsBytes());
+                await store.install(
+                  upgrade,
+                  source: 'catalog',
+                  granted: upgrade.manifest.permissions,
+                  authorKeyPin: authorPin,
+                );
+                expect(store.get(id)!.version, '1.0.2');
+              } else {
+                await store.setEnabled(id, false);
+              }
+              await tester.pump(const Duration(milliseconds: 300));
+              expect(find.byType(WebViewWidget), findsNothing);
+              expect(find.byType(CircularProgressIndicator), findsNothing);
+              debugPrint(
+                'Native panel source=$useSource: disable or signed permission-reducing update removed the surface',
+              );
+            }
             await tester.pumpWidget(const SizedBox());
             await tester.pump(const Duration(milliseconds: 300));
           }

@@ -219,7 +219,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     final store = ExtScope.of(context);
     _storeRef = store;
     final inst = store.get(widget.extensionId);
-    if (inst == null || !inst.enabled || inst.manifest.panels.isEmpty) {
+    if (inst == null || !inst.enabled || !inst.granted.contains('ui.panel') || inst.manifest.panels.isEmpty) {
       setState(() => _failure = 'gone');
       return;
     }
@@ -255,7 +255,23 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   void _onStoreChanged() {
     if (!mounted) return;
     final inst = ExtScope.of(context).get(widget.extensionId);
-    if (inst == null || !inst.enabled) {
+    if (inst == null ||
+        !inst.enabled ||
+        !inst.granted.contains('ui.panel') ||
+        inst.manifest.version != _manifest.version ||
+        inst.manifest.author.publicKey != _manifest.author.publicKey ||
+        inst.granted.length != _bridge.granted.length ||
+        !inst.granted.toSet().containsAll(_bridge.granted)) {
+      // Navigation can be refused (a root route), or disposal can wait for
+      // another frame. Revoke native callbacks before that asynchronous pop.
+      _generation++;
+      final controller = _controller;
+      final server = _server;
+      _controller = null;
+      _server = null;
+      if (controller != null) unawaited(_releaseController(controller));
+      unawaited(server?.stop());
+      setState(() => _failure = 'gone');
       Navigator.of(context).maybePop();
     }
   }
@@ -357,6 +373,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       await controller.setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (request) {
+            if (!mounted || generation != _generation) return NavigationDecision.prevent;
             final uri = Uri.tryParse(request.url);
             final ok = uri != null && uri.scheme == 'http' && uri.host == '127.0.0.1' && uri.port == _origin!.port;
             return ok ? NavigationDecision.navigate : NavigationDecision.prevent;
@@ -380,6 +397,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
           } catch (_) {
             reply = '{"ok":false,"error":"internal"}';
           }
+          if (!mounted || generation != _generation) return;
           Map<String, dynamic> decoded;
           try {
             decoded = jsonDecode(reply) as Map<String, dynamic>;
