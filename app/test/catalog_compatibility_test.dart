@@ -75,11 +75,12 @@ void main() {
     expect(e.requiresNewerApp('dev'), false);
     expect(e.requiresNewerApp('0.0.0.42'), false);
   });
-  for (final path in [
+  const candidateSources = [
     '../extensions/sources/zapret/sora-extension.json',
     '../extensions/sources/byedpi/sora-extension.json',
     '../examples/hello-panel/sora-extension.json',
-  ]) {
+  ];
+  for (final path in candidateSources) {
     test('release candidate requirement excludes the published client: $path', () {
       final manifest = jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
       final doc = document();
@@ -91,6 +92,19 @@ void main() {
       expect(listing.requiresNewerApp('1.1.3'), isFalse);
     });
   }
+  test('release host version enables candidate sources and rejects a future requirement', () {
+    expect(appVersion, matches(RegExp(r'^\d+\.\d+\.\d+$')));
+    for (final path in candidateSources) {
+      final manifest = jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+      final doc = document();
+      entry(doc)['min_app_version'] = manifest['min_app_version'];
+      expect(model(doc).requiresNewerApp(appVersion), isFalse, reason: path);
+    }
+    final next = document();
+    final major = int.parse(appVersion.split('.').first);
+    entry(next)['min_app_version'] = '${major + 1}.0.0';
+    expect(model(next).requiresNewerApp(appVersion), isTrue);
+  }, skip: const bool.fromEnvironment('SORA_RELEASE_CHECK') ? false : 'requires a release version define');
   test('fresh signed catalog adds a listing without replacing the application', () async {
     final dir = await Directory.systemTemp.createTemp('sora-catalog-live-refresh-');
     addTearDown(() => dir.delete(recursive: true));
