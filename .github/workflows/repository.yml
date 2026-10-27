@@ -180,13 +180,15 @@ jobs:
       - name: Check release-version catalog compatibility
         run: |
           version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
+          echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
       - name: Connection and export races over an isolated RPC socket
         run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
         run: flutter build linux --release
       - name: Native signed extension panel in WebKitGTK
-        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
+        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
       - name: Check the Linux update helper
         working-directory: .
         run: |
@@ -370,6 +372,8 @@ jobs:
           $roots = @($dependencies.packages | Where-Object { $_.kind -eq 'root' })
           if ($roots.Count -ne 1 -or $roots[0].name -ne 'sora') { throw 'Unexpected app package root' }
           $version = ($roots[0].version -split '\+')[0]
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$version") { throw 'Tag and app version differ' }
+          "SORA_COMPAT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Release-version catalog compatibility failed' }
       - name: Native signed extension panel and bridge
@@ -377,7 +381,7 @@ jobs:
         run: |
           flutter test test/panel_bootstrap_js_test.dart test/extension_panel_startup_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Panel bootstrap or lifecycle failed' }
-          flutter test integration_test/extension_panel_test.dart -d windows --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
+          flutter test integration_test/extension_panel_test.dart -d windows --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
           if ($LASTEXITCODE -ne 0) { throw 'Signed extension panel or native bridge failed' }
       - name: Build the installer
         shell: pwsh
@@ -726,16 +730,18 @@ jobs:
             echo "$binary"
             readelf -h "$binary" | grep -E "Machine:[[:space:]]+$SORA_ELF_MACHINE$"
           done < <(find "$bundle" -type f \( -name sora -o -name '*.so' \) -print0)
-      - name: Native signed extension panel on ARM64
-        if: matrix.arch == 'arm64'
-        working-directory: app
-        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}"
       - name: Check release-version catalog compatibility on ARM64
         if: matrix.arch == 'arm64'
         working-directory: app
         run: |
           version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
+          echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+      - name: Native signed extension panel on ARM64
+        if: matrix.arch == 'arm64'
+        working-directory: app
+        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
       - name: Native ARM64 update and rollback contracts
         if: matrix.arch == 'arm64'
         run: |

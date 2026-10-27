@@ -9,10 +9,12 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 import 'package:sora/l10n/strings.dart';
 import 'package:sora/src/design/theme.dart';
 import 'package:sora/src/ext/catalog.dart';
+import 'package:sora/src/ext/manifest.dart' show compareVersions;
 import 'package:sora/src/ext/package.dart';
 import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
+import 'package:sora/src/updates.dart' show appVersion;
 import 'package:sora/src/ui/extensions/panel_screen.dart';
 import 'package:webview_all/webview_all.dart';
 
@@ -73,6 +75,10 @@ void main() {
           package = ExtPackage.open(await File('$root/extensions/packages/hello-panel-1.0.0.soraext').readAsBytes());
           final catalog = ExtensionCatalog.parse(await File('$root/extensions/catalog.json').readAsBytes());
           authorPin = catalog.entries.singleWhere((entry) => entry.id == id).authorKey;
+        }
+        if (const bool.fromEnvironment('SORA_PANEL_CHECK_VERSION')) {
+          expect(appVersion, matches(RegExp(r'^\d+\.\d+\.\d+$')));
+          expect(compareVersions(package.manifest.minAppVersion, appVersion), lessThanOrEqualTo(0));
         }
         await store.install(package, source: 'catalog', granted: package.manifest.permissions, authorKeyPin: authorPin);
         final sora = Sora(await Settings.load(), extensions: store);
