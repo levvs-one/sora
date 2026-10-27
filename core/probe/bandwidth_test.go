@@ -58,9 +58,20 @@ func (f *fakeEngine) Running() (supervise.Runtime, error) {
 // target for benchmark downloads.
 func proxyStub(t *testing.T, payload []byte) (*httptest.Server, int) {
 	t.Helper()
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Length", "1048576")
-		// Stream the payload in a loop; the client stops at duration end.
+		// A finite loopback response can finish inside one Windows clock tick.
+		// Keep this positive fixture measurable; production still rejects zero.
+		start := time.Now()
+		clock := time.NewTicker(time.Millisecond)
+		defer clock.Stop()
+		for time.Since(start) <= 0 {
+			select {
+			case <-r.Context().Done():
+				return
+			case <-clock.C:
+			}
+		}
 		for {
 			if _, err := w.Write(payload); err != nil {
 				return
@@ -341,5 +352,18 @@ func TestBenchmarkIsolatesAndRemovesEngineHomes(t *testing.T) {
 		if _, err := os.Stat(home); !os.IsNotExist(err) {
 			t.Errorf("temporary home survived shutdown: %v", err)
 		}
+	}
+}
+
+func TestDownloadGoodputRejectsEmptyResponse(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Length", "0")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+	bps, err := downloadGoodput(context.Background(), server.Listener.Addr().String(),
+		server.URL, time.Second, 1, func(uint32) {})
+	if err == nil || bps != 0 {
+		t.Fatalf("empty response goodput = %d, %v; want failure", bps, err)
 	}
 }
