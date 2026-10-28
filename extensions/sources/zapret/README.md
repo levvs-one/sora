@@ -22,7 +22,5 @@ shared WinDivert service. The driver can remain loaded until a normal Windows
 restart. Native component licences and complete upstream sources accompany the
 host bundle. No profile guarantees evasion in every network.
 
-The sources target the 1.1.3 release candidate and are not a published package
-or catalog entry. Normal author/team signatures remain mandatory. Publish only
-after an actual 1.1.3-or-later host supporting this descriptor is available;
-the repository version and candidate tests alone are not deployment evidence.
+Version 1.0.0 is published in `extensions/catalog-1.1.3.json` with author and
+team signatures and requires Sora 1.1.3 or later.

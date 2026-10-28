@@ -5,8 +5,8 @@ the compiled team key (`core/ext/sign.go`, `app/lib/src/ext/verifier.dart`):
 
 - `catalog.json` and `catalog.json.minisig`: the legacy store catalog used by
   the published v1.1.2 client;
-- `catalog-1.1.3.json` and `catalog-1.1.3.json.minisig`: the catalog for the
-  compatible host candidate;
+- `catalog-1.1.3.json` and `catalog-1.1.3.json.minisig`: the catalog for
+  Sora 1.1.3 and later;
 - `revocations.json` and `revocations.json.minisig`: versions the app must
   disable and refuse;
 - `packages/`: the signed `.soraext` files the catalog points at.
@@ -32,18 +32,15 @@ version, minimum app version and permissions must also match. When an entry
 declares capabilities, they must match the manifest; older entries may omit
 them. Verify the signed catalog with the pinned production root before delivering it.
 
-Zapret, ByeDPI and the updated Hello source currently target the 1.1.3 host
-candidate. The published v1.1.2 client uses the legacy URL and offers an
-install action before it checks a package's minimum host version. Keep entries
-that require the new host out of its catalog.
+Zapret 1.0.0, ByeDPI 1.0.0 and Hello Panel 1.0.1 require Sora 1.1.3 and are
+listed only in `catalog-1.1.3.json`. The v1.1.2 client uses the legacy URL and
+offers an install action before it checks a package's minimum host version, so
+entries that require a newer host stay out of `catalog.json`.
 
-The versioned catalog is initially an exact copy of the existing public signed
-catalog and signature; it does not publish the candidates. Both catalogs use
-the same team key and `catalog.json` signature role, so the file name does not
-provide a separate cryptographic scope or rollback protection. Before shipping
-a host that points at the versioned URL, the catalog and signature must be
-available and verify at that URL. Publish the candidates only after an actual
-compatible host is available. The existing v1.1.2 updater and the first
+Both catalogs use the same team key and `catalog.json` signature role, so the
+file name does not provide a separate cryptographic scope or rollback
+protection. A host that points at a new versioned URL ships only after that
+catalog and its signature are available and verify there. The existing v1.1.2 updater and the first
 signed-release transition have separate trust requirements described in
 [release signatures](../docs/security/release-signatures.md#published-v112-update-boundary).
 
