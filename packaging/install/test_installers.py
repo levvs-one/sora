@@ -86,9 +86,9 @@ class InstallerSignatureTest(unittest.TestCase):
                 env = {**os.environ, "SORA_VERSION": version, "SORA_DIST": str(distribution), "SORA_VERIFIER": str(verifier)}
                 if bootstrap or installed_verifier:
                     env.pop("SORA_VERIFIER", None)
-                    env["ProgramFiles"] = str(case / "no-installed-client")
+                    env["PROGRAMFILES"] = str(case / "no-installed-client")
                     if installed_verifier:
-                        installed = Path(env["ProgramFiles"]) / "Sora/core/sora-core.exe"
+                        installed = Path(env["PROGRAMFILES"]) / "Sora/core/sora-core.exe"
                         installed.parent.mkdir(parents=True)
                         shutil.copyfile(verifier, installed)
                 if bootstrap:
