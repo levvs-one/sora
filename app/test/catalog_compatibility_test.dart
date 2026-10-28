@@ -39,8 +39,83 @@ void main() {
   final published = File('../extensions/catalog.json').readAsBytesSync();
   final signature = File('../extensions/catalog.json.minisig').readAsBytesSync();
   Map<String, dynamic> document() => jsonDecode(utf8.decode(published)) as Map<String, dynamic>;
-  Map<String, dynamic> entry(Map<String, dynamic> doc) => (doc['extensions'] as List).single as Map<String, dynamic>;
-  CatalogEntry model(Map<String, dynamic> doc) => ExtensionCatalog.parse(utf8.encode(jsonEncode(doc))).entries.single;
+  Map<String, dynamic> entry(Map<String, dynamic> doc) => (doc['extensions'] as List)
+      .cast<Map<String, dynamic>>()
+      .firstWhere((item) => item['id'] == 'org.sora.hello-panel');
+  CatalogEntry model(Map<String, dynamic> doc) =>
+      ExtensionCatalog.parse(utf8.encode(jsonEncode(doc))).find('org.sora.hello-panel')!;
+
+  test('Hello remains addressable when the catalog has multiple entries', () {
+    final doc = document();
+    final hello = entry(doc);
+    doc['extensions'] = [
+      {...hello, 'id': 'org.fixture.before'},
+      ...doc['extensions'] as List,
+      {...hello, 'id': 'org.fixture.after'},
+    ];
+    expect(model(doc).id, 'org.sora.hello-panel');
+    entry(doc)['platforms'] = ['linux'];
+    expect(model(doc).supportsPlatform('windows'), false);
+  });
+
+  testWidgets('catalog displays and filters multiple entries independently', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 900);
+    addTearDown(tester.view.reset);
+    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    final doc = document();
+    final hello = entry(doc);
+    // This local cache is a UI fixture, not a signed publication.
+    doc['extensions'] = [
+      {...hello, 'id': 'org.fixture.before', 'name': 'Fixture before'},
+      hello,
+      {...hello, 'id': 'org.fixture.after', 'name': 'Fixture after'},
+    ];
+    late Directory dir;
+    late Sora sora;
+    await tester.runAsync(() async {
+      dir = await Directory.systemTemp.createTemp('sora-catalog-multiple-ui-');
+      final store = ExtensionStore(dir: dir.path);
+      await store.load();
+      await store.catalogCache.store(utf8.encode(jsonEncode(doc)));
+      sora = Sora(await Settings.load(), extensions: store);
+    });
+    addTearDown(() async {
+      sora.dispose();
+      await dir.delete(recursive: true);
+    });
+    final client = MockClient((request) async => http.Response('', 503));
+    addTearDown(client.close);
+    await http.runWithClient(() async {
+      await tester.pumpWidget(
+        SoraScope(
+          sora: sora,
+          child: ExtScope(
+            store: sora.extensions,
+            child: MaterialApp(
+              theme: buildTheme(Brightness.light),
+              locale: const Locale('en'),
+              localizationsDelegates: S.localizationsDelegates,
+              supportedLocales: S.supportedLocales,
+              home: const ExtensionsScreen(),
+            ),
+          ),
+        ),
+      );
+      for (var i = 0; i < 80 && find.byType(ExtensionCard).evaluate().length < 3; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.pump(const Duration(milliseconds: 20));
+      }
+      expect(find.byType(ExtensionCard), findsNWidgets(3));
+      await tester.enterText(find.byType(EditableText), 'fixture after');
+      await tester.pump();
+      expect(find.byKey(const ValueKey('org.fixture.after')), findsOneWidget);
+      expect(find.byKey(const ValueKey('org.fixture.before')), findsNothing);
+      expect(find.byKey(const ValueKey('org.sora.hello-panel')), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => client);
+  });
 
   test('platform metadata is optional, typed and immutable; future OS entries stay visible', () {
     expect(model(document()).supportsPlatform('windows'), true);
@@ -122,9 +197,10 @@ void main() {
     addTearDown(client.close);
     final refreshed = await cache.refresh(client: client);
     expect(refreshed.fromCache, false);
-    expect(refreshed.catalog.entries.single.id, model(document()).id);
+    final ids = ExtensionCatalog.parse(published).entries.map((entry) => entry.id).toList();
+    expect(refreshed.catalog.entries.map((entry) => entry.id).toList(), ids);
     expect(requests, [defaultCatalogUrl, '$defaultCatalogUrl.minisig']);
-    expect((await cache.load())!.catalog.entries.single.id, refreshed.catalog.entries.single.id);
+    expect((await cache.load())!.catalog.entries.map((entry) => entry.id).toList(), ids);
     final tampered = MockClient(
       (request) async =>
           http.Response.bytes(request.url.path.endsWith('.minisig') ? signature : utf8.encode('{}'), 200),
@@ -132,7 +208,7 @@ void main() {
     addTearDown(tampered.close);
     final fallback = await cache.refresh(client: tampered);
     expect(fallback.fromCache, true);
-    expect(fallback.catalog.entries.single.id, refreshed.catalog.entries.single.id);
+    expect(fallback.catalog.entries.map((entry) => entry.id).toList(), ids);
   });
   for (final checkVersion in [false, true]) {
     for (final installed in [false, true]) {
@@ -148,6 +224,9 @@ void main() {
         late ExtensionStore store;
         late Sora sora;
         final doc = document();
+        doc['extensions'] = [entry(doc)];
+        final currentVersion = (entry(doc)['version'] as String).split('.');
+        final nextVersion = '${currentVersion[0]}.${currentVersion[1]}.${int.parse(currentVersion[2]) + 1}';
         final os = Platform.isWindows ? 'linux' : 'windows';
         if (checkVersion) {
           entry(doc)['min_app_version'] = '999.0.0';
@@ -155,7 +234,7 @@ void main() {
           entry(doc)['platforms'] = [os];
         }
         final expected = entry(doc)['name'] as String;
-        if (installed) entry(doc)['version'] = '1.0.1';
+        if (installed) entry(doc)['version'] = nextVersion;
         final action = installed ? 'Update' : 'Install';
         await tester.runAsync(() async {
           dir = await Directory.systemTemp.createTemp('sora-catalog-compat-ui-');
@@ -255,7 +334,7 @@ void main() {
           expect(find.byType(SnackBar), findsOneWidget);
           expect(downloads.any((url) => url.endsWith('.soraext')), false);
           expect(store.installed.length, installed ? 1 : 0);
-          if (installed) expect(store.installed.single.version, '1.0.0');
+          if (installed) expect(store.installed.single.version, currentVersion.join('.'));
           expect(tester.takeException(), isNull);
           await tester.pumpWidget(const SizedBox());
         }, () => client);

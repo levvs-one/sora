@@ -33,9 +33,9 @@ The existing v1.1.2 updater and the first signed-release transition have
 separate trust requirements described in
 [release signatures](../docs/security/release-signatures.md#published-v112-update-boundary).
 
-`core/ext` test `TestPublishedTeamDocumentsVerify` and the app test
-`ext_revocation_catalog_test.dart` check the signatures and that every
-entry matches its committed package.
+The app test `ext_revocation_catalog_test.dart` checks the published catalog
+and revocation signatures, then verifies and installs every committed package
+against its catalog entry.
 
 ## Revoking
 
@@ -47,5 +47,4 @@ Add an entry (`id`, `versions` as `*`, `=x.y.z`, `<x.y.z` or `<=x.y.z`,
 The revocation list carries `expires_at`; once it passes, the app refuses
 new installs until it gets a fresh list, because a stale list may miss a
 revocation. Re-sign before it expires: bump `updated_at` and `expires_at`
-and run the `--role revocations.json` command above. The core test fails
-two weeks before expiry as a reminder.
+and run the `--role revocations.json` command above.

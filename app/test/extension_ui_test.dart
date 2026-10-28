@@ -32,9 +32,20 @@ import 'package:sora/src/ui/shell.dart';
 
 import 'ext_runtimes_test.dart' show seed;
 
-final _catalogBytes = File('../extensions/catalog.json').readAsBytesSync();
+// These interaction tests target the published Hello entry independently of
+// how many other extensions the locally seeded catalog contains.
+final _catalogBytes = () {
+  final doc = jsonDecode(File('../extensions/catalog.json').readAsStringSync()) as Map<String, dynamic>;
+  final hello = (doc['extensions'] as List).cast<Map<String, dynamic>>().firstWhere(
+    (entry) => entry['id'] == 'org.sora.hello-panel',
+  );
+  doc['extensions'] = [hello];
+  return Uint8List.fromList(utf8.encode(jsonEncode(doc)));
+}();
 final _entry = ExtensionCatalog.parse(_catalogBytes).entries.single;
 final _packageBytes = File('../extensions/packages/${_entry.downloadUrl.split('/').last}').readAsBytesSync();
+final _versionParts = _entry.version.split('.');
+final _nextVersion = '${_versionParts[0]}.${_versionParts[1]}.${int.parse(_versionParts[2]) + 1}';
 
 class _Routes extends NavigatorObserver {
   final dialogs = <Route<dynamic>>{};
@@ -223,7 +234,7 @@ void main() {
       await _io(tester);
       await tester.pumpAndSettle();
       expect(find.byType(ExtensionName), findsOneWidget);
-      expect(find.text('Sora, 1.0.0'), findsOneWidget);
+      expect(find.text('${_entry.author}, ${_entry.version}'), findsOneWidget);
       expect(find.text('Author'), findsNothing);
       expect(find.text('Version'), findsNothing);
       expect(find.text('Changelog'), findsNothing);
@@ -242,11 +253,11 @@ void main() {
     final json =
         ((jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>)['extensions'] as List).single
             as Map<String, dynamic>;
-    final update = CatalogEntry.fromJson({...json, 'version': '1.0.1'});
+    final update = CatalogEntry.fromJson({...json, 'version': _nextVersion});
     await tester.pumpWidget(_app(ExtensionDetailScreen(entry: update), store: store));
     await _io(tester);
     await tester.pumpAndSettle();
-    expect(find.text('Update to 1.0.1'), findsOneWidget);
+    expect(find.text('Update to $_nextVersion'), findsOneWidget);
     expect(find.text('Open'), findsOneWidget);
     expect(find.byType(VerifiedBadge), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -323,7 +334,7 @@ void main() {
   testWidgets('update all reports a notification and keeps the installed version', (tester) async {
     final store = await _store(tester, installed: true);
     final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
-    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = '1.0.1';
+    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = _nextVersion;
     await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
     final sora = Sora(await Settings.load(), extensions: store);
     addTearDown(sora.dispose);

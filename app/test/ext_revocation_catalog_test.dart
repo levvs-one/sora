@@ -33,24 +33,36 @@ void main() {
 
   Future<ExtPackage> revokedPackage() async => ExtPackage.open(await fixture('revoked.soraext').readAsBytes());
 
-  test('the published catalog verifies and its package installs from the catalog', () async {
+  test('the published catalog verifies and every package matches and installs', () async {
     final client = serving({
       defaultCatalogUrl: published('catalog.json'),
       '$defaultCatalogUrl.minisig': published('catalog.json.minisig'),
     });
+    addTearDown(client.close);
     final catalog = await fetchCatalog(client: client);
-    final entry = catalog.entries.single;
-    final bytes = await published('packages/${entry.downloadUrl.split('/').last}').readAsBytes();
-    expect(bytes.length, entry.size);
+    expect(catalog.entries, isNotEmpty);
     final store = ExtensionStore(dir: dir.path);
+    addTearDown(store.dispose);
     await store.load();
-    await store.install(
-      ExtPackage.open(bytes),
-      source: 'catalog',
-      granted: entry.permissions,
-      authorKeyPin: entry.authorKey,
-    );
-    expect(store.isEnabled(entry.id), isTrue);
+    for (final entry in catalog.entries) {
+      final bytes = await published('packages/${entry.downloadUrl.split('/').last}').readAsBytes();
+      final manifest = ExtPackage.open(bytes).manifest;
+      expect(bytes.length, entry.size, reason: entry.id);
+      expect(manifest.id, entry.id);
+      expect(manifest.version, entry.version, reason: entry.id);
+      expect(manifest.minAppVersion, entry.minAppVersion, reason: entry.id);
+      expect(manifest.permissions, unorderedEquals(entry.permissions), reason: entry.id);
+      expect(manifest.capabilities, unorderedEquals(entry.capabilities), reason: entry.id);
+      await store.installBytes(
+        bytes,
+        source: 'catalog',
+        granted: entry.permissions,
+        expectedSha256: entry.sha256,
+        authorKeyPin: entry.authorKey,
+      );
+      expect(store.isEnabled(entry.id), isTrue, reason: entry.id);
+    }
+    expect(store.installed.map((value) => value.id).toSet(), catalog.entries.map((entry) => entry.id).toSet());
   });
 
   test('the published revocation list verifies and revokes nothing installed', () async {

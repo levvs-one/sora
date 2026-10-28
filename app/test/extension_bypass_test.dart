@@ -172,6 +172,7 @@ void main() {
     await command(tool, ['keygen', '-o', team]);
     final teamKey = (await File('$team.pub').readAsLines()).last.trim();
     final rows = <Map<String, dynamic>>[];
+    final packages = <String, Uint8List>{};
     final sources = [
       ('../extensions/sources/zapret', ['linux', 'windows']),
       ('../extensions/sources/byedpi', ['linux', 'windows']),
@@ -197,6 +198,7 @@ void main() {
       expect(entry['size'], bytes.length, reason: manifest.id);
       expect(text, contains('platforms'), reason: 'the publisher must review supported platforms');
       rows.add({...entry, 'platforms': platforms, 'download_url': 'https://example.invalid/${manifest.id}.soraext'});
+      packages[manifest.id] = bytes;
       if (platforms.contains(Platform.operatingSystem)) {
         await install(candidate);
         expect(store.get(manifest.id), isNotNull);
@@ -237,7 +239,57 @@ void main() {
       expect(entry.supportsPlatform('windows'), isTrue, reason: entry.id);
       expect(entry.supportsPlatform('linux'), isTrue, reason: entry.id);
       expect(entry.supportsPlatform('android'), isFalse, reason: entry.id);
+      final data = packages[entry.id]!;
+      final manifest = ExtPackage.open(data).manifest;
+      expect(manifest.id, entry.id);
+      expect(manifest.version, entry.version, reason: entry.id);
+      expect(manifest.minAppVersion, entry.minAppVersion, reason: entry.id);
+      expect(manifest.permissions, unorderedEquals(entry.permissions), reason: entry.id);
+      expect(manifest.capabilities, unorderedEquals(entry.capabilities), reason: entry.id);
+      final damaged = Uint8List.fromList(data)..[0] ^= 1;
+      await expectLater(
+        store.installBytes(
+          damaged,
+          source: 'catalog',
+          granted: entry.permissions,
+          expectedSha256: entry.sha256,
+          authorKeyPin: entry.authorKey,
+        ),
+        throwsA(isA<ExtStoreError>()),
+      );
+      await expectLater(
+        store.installBytes(
+          data,
+          source: 'catalog',
+          granted: entry.permissions,
+          expectedSha256: entry.sha256,
+          authorKeyPin: teamKey,
+        ),
+        throwsA(isA<ExtStoreError>()),
+      );
+      await store.installBytes(
+        data,
+        source: 'catalog',
+        granted: entry.permissions,
+        expectedSha256: entry.sha256,
+        authorKeyPin: entry.authorKey,
+      );
+      expect(store.isEnabled(entry.id), isTrue, reason: entry.id);
     }
+    expect(store.installed.map((entry) => entry.id).toSet(), packages.keys.toSet());
+    final conflict = findConflicts(store.installed).single;
+    expect(conflict.kind, ExtConflictKind.netHooks);
+    expect(conflict.extensionIds, ['org.sora.byedpi', 'org.sora.zapret']);
+    expect(store.bypassProfiles, isEmpty);
+    await store.setConflictWinner(conflict.key, 'org.sora.byedpi');
+    expect(store.bypassProfiles.single.extensionId, 'org.sora.byedpi');
+    final reloaded = ExtensionStore(dir: dir.path);
+    addTearDown(reloaded.dispose);
+    await reloaded.load();
+    expect(reloaded.installed.map((entry) => entry.id).toSet(), packages.keys.toSet());
+    expect(reloaded.bypassProfiles.single.extensionId, 'org.sora.byedpi');
+    await reloaded.setEnabled('org.sora.byedpi', false);
+    expect(reloaded.bypassProfiles.single.extensionId, 'org.sora.zapret');
     await store.catalogCache.store(bytes);
     expect(
       (await store.catalogCache.load())!.catalog.entries.map((e) => e.id).toSet(),
