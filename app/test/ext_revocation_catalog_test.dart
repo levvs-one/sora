@@ -101,6 +101,10 @@ void main() {
     expect(refreshed.catalog.entries, isNotEmpty);
   });
 
+  test('release catalog is available with a trusted signature', () async {
+    await fetchCatalog();
+  }, skip: const bool.fromEnvironment('SORA_VERIFY_LIVE_CATALOG') ? false : 'tagged release check only');
+
   test('the published revocation list verifies and revokes nothing installed', () async {
     final store = ExtensionStore(dir: dir.path);
     await store.load();
