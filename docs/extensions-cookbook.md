@@ -157,4 +157,4 @@ Build and sign `examples/theme-midnight` or `examples/routing-split`, then
 install from file. The app applies validated theme colors and merges enabled
 routing contributions into the session plan. Theme stylesheets are ignored.
 See `docs/extensions.md` for token mappings, contrast checks and rule order.
-Network hooks are not applied.
+Signed declarative bypass profiles use the installed native backend after an explicit selection; arbitrary packet callbacks are not exposed. See the selected-profile contract in `docs/extensions.md`.

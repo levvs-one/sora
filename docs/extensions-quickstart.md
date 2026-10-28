@@ -118,5 +118,5 @@ Background workers, themes and routing rules also run in the app now. Start
 from `sora-ext scaffold --template background`, `examples/theme-midnight` or
 `examples/routing-split`. Workers use `window.soraExt.call` and `console.log`;
 they run on the core scheduler while the app is open. Theme stylesheets are
-ignored; network hooks are not applied. See the normative runtime contracts
+ignored. Signed declarative bypass profiles require an explicit selection and a compatible native backend; arbitrary packet callbacks are not exposed. See the normative runtime contracts
 in [extensions.md](extensions.md).

@@ -471,8 +471,9 @@ extension's log, including overlaps with user rules. Rules are never removed
 because of an overlap: an overlap may be partial.
 
 Enable, disable, update, rollback and uninstall recompute the session plan.
-A live session reconnects through the app's serialized selection mechanism
-when its resulting plan changes. The extension detail screen lists enabled
+An explicit user edit reconnects a live session once through the app's debounced,
+serialized replacement path when its resulting plan changes. Background refreshes
+only update the mirror and do not authorize reconnects. The extension detail screen lists enabled
 contributions with their match, action and comment; disabled extensions have
 no active contributions. Logs show overlaps and runtime failures.
 
@@ -496,8 +497,12 @@ permission. This is not a worker callback on packets.
 }
 ```
 
-Only `tpws` on Linux and `byedpi` on Windows are accepted. These are
-installed host backends: an extension never supplies their executable.
+Version 2 supports `tpws` on Linux and `byedpi` on Windows. Linux ByeDPI
+profiles additionally require the core's `serverless-bydpi` capability. Version 3
+selects explicit platform/backend variants and adds Windows `winws` with the
+literal `system-tcp-80-443` scope and fresh host consent. See the
+[Windows adapter contract](security/extension-bypass-profiles.md#windows-winws-adapter).
+These are installed host backends: an extension never supplies their executable.
 The descriptor is at most 1 MiB, contains 1..16 profiles with nonblank
 names of at most 64 UTF-8 bytes, and each value is a protobuf-JSON
 `BypassStrategy`. Unknown top-level and strategy fields reject the asset.
@@ -508,9 +513,9 @@ types; core plan validation checks native strategy semantics before start.
 
 There are no executable paths, scripts, flags, arbitrary engine fragments,
 packet-reading callbacks or new credential APIs. The old proposed version-1
-engine-fragment descriptor is not interpreted as version 2. Windows
-WinDivert/winws is a separate unfinished adapter, not a SOCKS backend and
-not supplied by these profiles.
+engine-fragment descriptor is not interpreted as version 2. Windows WinDivert/winws is the separate version-3 packet-filter adapter,
+not a SOCKS backend. It is available only when the core confirms its verified
+bundle and the user accepts the host-owned system-filter warning.
 
 Installation does not select or connect a profile. Enabled, granted holders
 of net.hooks use the existing exclusive conflict decision, including

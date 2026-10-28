@@ -208,7 +208,8 @@ update replaces it.
 - **Manual install on openSUSE (zypper):** when the privileged helper is not
   available, the app prints a manual fallback command built from the same
   arguments the helper uses, plain `zypper --non-interactive install` with
-  GPG signature verification intact, matching the helper. The app
+  GPG signature verification intact. The privileged helper separately accepts
+  the RPM after authenticating its Minisign metadata and package header. The app
   does not silently weaken verification on the fallback path, so the RPMs
   must be GPG-signed; the release-signing key ceremony is still pending
   (owner blocker). Until it is done, installing on openSUSE requires either
