@@ -569,5 +569,5 @@ publication gate with its key outside CI, key rotation/revocation and the
 remaining real installation/elevation rejection matrix. Windows does not yet
 implement automatic rollback. For 1.1.3, install the new signed baseline through the bootstrap script;
 subsequent updates can cache 1.1.3 for verified Linux rollback. Do not promise
-rollback to unsigned 1.1.2. The Windows tag build also requires Authenticode
-provisioning independently of Minisign; without it the release cannot build.
+rollback to unsigned 1.1.2. The Windows workflow enforces Authenticode only when `WINDOWS_SIGNING_CERTIFICATE` is configured; otherwise it records unsigned EXEs in the job summary and permits the release.
+Release metadata remains signed with the independent team Minisign key.

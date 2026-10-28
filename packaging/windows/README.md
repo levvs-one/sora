@@ -21,7 +21,7 @@ cd app; flutter build windows --release --dart-define=SORA_VERSION=1.0.6; cd ..
 iscc /DAppVersion=1.0.6 packaging\windows\sora.iss
 ```
 
-Опубликованный v1.1.2 не подписан Authenticode; SmartScreen может показывать предупреждение. Новый tag CI требует действительных подписей установщика, GUI, core и sync. Само подписание доверенным сертификатом ещё нужно подключить до выпуска. MSI не собирается; тихая установка EXE работает с ключами `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
+Опубликованный v1.1.2 не подписан Authenticode; SmartScreen может показывать предупреждение. Tag CI требует действительных подписей установщика, GUI, core и sync, только когда в workflow настроен сертификат `WINDOWS_SIGNING_CERTIFICATE`; без него записывает неподписанные EXE в job summary и пропускает выпуск. MSI не собирается; тихая установка EXE работает с ключами `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
 
 Тихая установка всегда открывает Sora после регистрации и запуска службы, с исходными правами пользователя. В приложении установщик запускается через ShellExecuteEx с действием `open`, чтобы загрузчик Inno сам запросил UAC и сохранил исходную учётную запись для `[Run]`. Контрольная сумма проверяется до запуска. `install.ps1` ждёт завершения установщика через `WaitForExit()`: `Start-Process -Wait` ждёт ещё и открытую Sora. CI проверяет появление процесса Sora после `install.ps1`.
 

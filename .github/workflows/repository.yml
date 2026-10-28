@@ -398,6 +398,8 @@ jobs:
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ env.SORA_VERSION }} packaging\windows\sora.iss
       - name: Inspect Windows release security
         shell: pwsh
+        env:
+          SORA_AUTHENTICODE_CONFIGURED: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE != '' }}
         run: |
           & .\packaging\windows\check-security.ps1 -Path @('dist', 'app/build/windows/x64/runner/Release') -ReportPath "$env:RUNNER_TEMP/windows-security.json"
       - uses: actions/upload-artifact@v6

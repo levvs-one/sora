@@ -5,6 +5,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$requireAuthenticode = $env:SORA_AUTHENTICODE_CONFIGURED -eq 'true'
 $targets = @(Get-Item -LiteralPath $Path)
 $files = @()
 foreach ($target in $targets) {
@@ -98,6 +99,7 @@ $report = [ordered]@{
     CompleteReleaseSet = $completeRelease
     BundleErrors = $bundleErrors
     AuthenticodeReady = $completeRelease -and $unsignedOwned.Count -eq 0
+    AuthenticodeRequired = $requireAuthenticode
     Scope = 'Local Defender scan and Authenticode status; not a guarantee for other products or SmartScreen reputation'
 }
 $reportFile = [IO.Path]::GetFullPath($ReportPath)
@@ -105,6 +107,17 @@ New-Item -ItemType Directory -Force -Path ([IO.Path]::GetDirectoryName($reportFi
 $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $reportFile -Encoding utf8
 Write-Output "Windows security evidence: $reportFile"
 if ($scanFailure) { throw $scanFailure }
-if ($env:GITHUB_REF_TYPE -eq 'tag' -and -not $report.AuthenticodeReady) {
-    throw 'A release requires the complete Sora executable set with valid Authenticode signatures'
+if ($env:GITHUB_STEP_SUMMARY) {
+    $summary = @('## Windows Authenticode', "Certificate configured: $requireAuthenticode")
+    foreach ($entry in @($inventory | Where-Object { $_.SoraOwned })) {
+        $summary += "- $([IO.Path]::GetFileName($entry.Path)): $($entry.Authenticode)"
+    }
+    if (-not $requireAuthenticode) { $summary += 'No signing certificate is configured; unsigned EXEs are permitted for this release.' }
+    $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+}
+if ($env:GITHUB_REF_TYPE -eq 'tag') {
+    if (-not $completeRelease) { throw 'A release requires the complete Sora executable set' }
+    if ($requireAuthenticode -and -not $report.AuthenticodeReady) {
+        throw 'A configured signing certificate requires valid Authenticode signatures on all Sora executables'
+    }
 }
