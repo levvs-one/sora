@@ -865,11 +865,18 @@ jobs:
           sudo cp -a "$sdk_root" "$private/flutter"
           sudo cp -a "$pub_cache" "$private/pub-cache"
           sudo chown -R root:root "$private/source" "$private/flutter" "$private/pub-cache"
+          # Flutter may initialize its own tool before honoring pub's offline
+          # flag, so prepare this private copy before isolating the test.
+          sudo env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
+            setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all \
+            bash -e -c 'cd "$1/flutter/packages/flutter_tools"; "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile; cd "$1/source/app"; flutter pub get --offline --enforce-lockfile' bash "$private"
           parent_net=$(readlink /proc/self/ns/net)
           parent_user=$(readlink /proc/self/ns/user)
           sudo unshare --user --map-root-user --net \
             env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
-            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
             PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
             SORA_LIVE_BYPASS=1 SORA_BYPASS_ISOLATED=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
             bash -e -c '
@@ -911,10 +918,6 @@ jobs:
               done
               test -s "$1/targets.json"
               cd "$1/source/app"
-              # The copied SDK still points at the inaccessible runner package cache.
-              # Resolve its tool first: the Flutter cache refresh ignores --offline here.
-              (cd "$1/flutter/packages/flutter_tools" && setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile)
-              setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter pub get --offline
               setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$2" test/extension_bypass_test.dart --plain-name "signed Zapret profile connects the app to a real isolated core"
             ' bash "$private" "$version"
       - name: Check the architecture of every bundled native binary
@@ -960,11 +963,18 @@ jobs:
           sudo cp -a "$sdk_root" "$private/flutter"
           sudo cp -a "$pub_cache" "$private/pub-cache"
           sudo chown -R root:root "$private/source" "$private/flutter" "$private/pub-cache"
+          # Flutter may initialize its own tool before honoring pub's offline
+          # flag, so prepare this private copy before isolating the test.
+          sudo env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
+            setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all \
+            bash -e -c 'cd "$1/flutter/packages/flutter_tools"; "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile; cd "$1/source/app"; flutter pub get --offline --enforce-lockfile' bash "$private"
           parent_net=$(readlink /proc/self/ns/net)
           parent_user=$(readlink /proc/self/ns/user)
           sudo unshare --user --map-root-user --net \
             env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
-            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
             PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
             SORA_LIVE_BYPASS=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
             bash -e -c '
@@ -972,9 +982,6 @@ jobs:
               test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
               ip link set lo up
               cd "$1/source/app"
-              # Rebind the SDK package config before Flutter can refresh it online.
-              (cd "$1/flutter/packages/flutter_tools" && setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile)
-              setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter pub get --offline
               exec setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$2" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
             ' bash "$private" "$version"
       - name: Native signed extension panel on ARM64

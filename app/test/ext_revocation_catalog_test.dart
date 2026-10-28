@@ -7,9 +7,8 @@ import 'package:sora/src/ext/catalog.dart';
 import 'package:sora/src/ext/package.dart';
 import 'package:sora/src/ext/store.dart';
 
-/// The team catalog and revocation list the app downloads are the signed
-/// files in extensions/ of the repository; these tests serve exactly those
-/// bytes. The revocation fixtures revoke only a test id.
+/// Serve the signed catalog files committed in extensions/ and the
+/// published revocation list. The revocation fixtures revoke only a test id.
 void main() {
   final repo = Directory('..').absolute.path;
   File published(String name) => File('$repo/extensions/$name');
@@ -33,36 +32,73 @@ void main() {
 
   Future<ExtPackage> revokedPackage() async => ExtPackage.open(await fixture('revoked.soraext').readAsBytes());
 
-  test('the published catalog verifies and every package matches and installs', () async {
-    final client = serving({
-      defaultCatalogUrl: published('catalog.json'),
-      '$defaultCatalogUrl.minisig': published('catalog.json.minisig'),
+  const legacyUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog.json';
+  test('the compatible host uses its own catalog URL', () {
+    expect(defaultCatalogUrl, 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog-1.1.3.json');
+    expect(defaultCatalogUrl, isNot(legacyUrl));
+  });
+
+  for (final (label, url, file) in [
+    ('legacy published catalog', legacyUrl, 'catalog.json'),
+    ('compatible-host repository catalog', defaultCatalogUrl, 'catalog-1.1.3.json'),
+  ]) {
+    test('$label verifies and every package matches and installs', () async {
+      final client = serving({url: published(file), '$url.minisig': published('$file.minisig')});
+      addTearDown(client.close);
+      final catalog = await fetchCatalog(client: client, url: url);
+      expect(catalog.entries, isNotEmpty);
+      final store = ExtensionStore(dir: dir.path);
+      addTearDown(store.dispose);
+      await store.load();
+      for (final entry in catalog.entries) {
+        final bytes = await published('packages/${entry.downloadUrl.split('/').last}').readAsBytes();
+        final manifest = ExtPackage.open(bytes).manifest;
+        expect(bytes.length, entry.size, reason: entry.id);
+        expect(manifest.id, entry.id);
+        expect(manifest.version, entry.version, reason: entry.id);
+        expect(manifest.minAppVersion, entry.minAppVersion, reason: entry.id);
+        expect(manifest.permissions, unorderedEquals(entry.permissions), reason: entry.id);
+        expect(manifest.capabilities, unorderedEquals(entry.capabilities), reason: entry.id);
+        await store.installBytes(
+          bytes,
+          source: 'catalog',
+          granted: entry.permissions,
+          expectedSha256: entry.sha256,
+          authorKeyPin: entry.authorKey,
+        );
+        expect(store.isEnabled(entry.id), isTrue, reason: entry.id);
+      }
+      expect(store.installed.map((value) => value.id).toSet(), catalog.entries.map((entry) => entry.id).toSet());
     });
-    addTearDown(client.close);
-    final catalog = await fetchCatalog(client: client);
-    expect(catalog.entries, isNotEmpty);
-    final store = ExtensionStore(dir: dir.path);
-    addTearDown(store.dispose);
-    await store.load();
-    for (final entry in catalog.entries) {
-      final bytes = await published('packages/${entry.downloadUrl.split('/').last}').readAsBytes();
-      final manifest = ExtPackage.open(bytes).manifest;
-      expect(bytes.length, entry.size, reason: entry.id);
-      expect(manifest.id, entry.id);
-      expect(manifest.version, entry.version, reason: entry.id);
-      expect(manifest.minAppVersion, entry.minAppVersion, reason: entry.id);
-      expect(manifest.permissions, unorderedEquals(entry.permissions), reason: entry.id);
-      expect(manifest.capabilities, unorderedEquals(entry.capabilities), reason: entry.id);
-      await store.installBytes(
-        bytes,
-        source: 'catalog',
-        granted: entry.permissions,
-        expectedSha256: entry.sha256,
-        authorKeyPin: entry.authorKey,
-      );
-      expect(store.isEnabled(entry.id), isTrue, reason: entry.id);
-    }
-    expect(store.installed.map((value) => value.id).toSet(), catalog.entries.map((entry) => entry.id).toSet());
+  }
+
+  test('a verified legacy cache survives an offline catalog transition', () async {
+    final cache = CatalogCache(dir.path);
+    final legacy = serving({
+      legacyUrl: published('catalog.json'),
+      '$legacyUrl.minisig': published('catalog.json.minisig'),
+    });
+    final offline = serving({});
+    final compatible = serving({
+      defaultCatalogUrl: published('catalog-1.1.3.json'),
+      '$defaultCatalogUrl.minisig': published('catalog-1.1.3.json.minisig'),
+    });
+    addTearDown(legacy.close);
+    addTearDown(offline.close);
+    addTearDown(compatible.close);
+
+    final original = await cache.refresh(client: legacy, url: legacyUrl);
+    expect(original.fromCache, isFalse);
+    final fallback = await cache.refresh(client: offline);
+    expect(fallback.fromCache, isTrue);
+    expect(
+      fallback.catalog.entries.map((entry) => entry.id),
+      orderedEquals(original.catalog.entries.map((entry) => entry.id)),
+    );
+    await expectLater(CatalogCache('${dir.path}/new').refresh(client: offline), throwsA(isA<CatalogError>()));
+    final refreshed = await cache.refresh(client: compatible);
+    expect(refreshed.fromCache, isFalse);
+    expect(refreshed.catalog.entries, isNotEmpty);
   });
 
   test('the published revocation list verifies and revokes nothing installed', () async {

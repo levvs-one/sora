@@ -168,8 +168,15 @@ no network access in v1.
 
 ## 5. Catalog
 
-The team catalog is `catalog.json` plus `catalog.json.minisig` (minisign,
-team key; trusted comment `timestamp:..\tfile:catalog.json\tsha256:..`).
+The published v1.1.2 app uses `catalog.json` and `catalog.json.minisig`.
+The compatible host candidate uses `catalog-1.1.3.json` and its `.minisig`.
+Both use the team key and the same catalog signature role, with trusted
+comment `timestamp:..\tfile:catalog.json\tsha256:..`. The versioned path
+separates listings but does not add a cryptographic scope or rollback
+protection. The repository seed is a copy of the existing signed catalog;
+it does not establish that a new host or extension has been published.
+The versioned files must be available and verify at the configured URL before
+shipping a host that uses it. See [catalog publishing](../extensions/README.md).
 Shape:
 
 ```json
