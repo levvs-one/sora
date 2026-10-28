@@ -4,8 +4,7 @@
 ///
 /// The choice is persisted per conflict key ([ExtConflict.key]) so it
 /// survives reinstalls of the same contender set. The theme runtime applies
-/// the winner at once; network hooks are not run, which the install prompt
-/// and the note below say.
+/// the winner at once; supported network profiles require an explicit choice.
 library;
 
 import 'package:flutter/material.dart';
@@ -150,14 +149,13 @@ class _ConflictBlock extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(_kindLabel(context, conflict.kind), style: Styles.bodyStrong.copyWith(color: palette.ink)),
-        if (conflict.kind == ExtConflictKind.netHooks)
-          Text(S.of(context).extPermNotYetActive, style: Styles.secondary.copyWith(color: palette.ink2)),
         const SizedBox(height: 8),
         for (final id in conflict.extensionIds)
           _ContenderRow(
             name: store.get(id)?.manifest.name ?? id,
             detail: _detail(context, id),
             verified: store.get(id) != null && isTeamExtension(store.get(id)!),
+            notYetActive: conflict.kind == ExtConflictKind.netHooks && store.get(id)?.manifest.networkHookEntry == null,
             selected: winner == id,
             onTap: () => onPick(id),
           ),
@@ -177,12 +175,14 @@ class _ContenderRow extends StatelessWidget {
     required this.name,
     required this.verified,
     required this.detail,
+    required this.notYetActive,
     required this.selected,
     required this.onTap,
   });
   final String name;
   final bool verified;
   final String detail;
+  final bool notYetActive;
   final bool selected;
   final VoidCallback onTap;
 
@@ -192,7 +192,7 @@ class _ContenderRow extends StatelessWidget {
     return Semantics(
       button: true,
       checked: selected,
-      label: s.extConflictWinner(name),
+      label: notYetActive ? '${s.extConflictWinner(name)}. ${s.extPermNotYetActive}' : s.extConflictWinner(name),
       excludeSemantics: true,
       onTap: onTap,
       child: Pressable(
@@ -218,6 +218,7 @@ class _ContenderRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (notYetActive) Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink2)),
                   ],
                 ),
               ),

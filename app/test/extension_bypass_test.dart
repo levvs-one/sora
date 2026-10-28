@@ -441,6 +441,75 @@ void main() {
       expect(conflict.kind, ExtConflictKind.netHooks);
       expect(conflict.extensionIds, ['org.sora.byedpi', 'org.sora.zapret']);
       expect(store.bypassProfiles, isEmpty);
+      await tester.tap(find.text('Installed'));
+      await tester.pumpAndSettle();
+      final conflictBanner = find.text('1 conflicts need your decision');
+      for (var i = 0; i < 1000 && conflictBanner.evaluate().isEmpty; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.pump(const Duration(milliseconds: 20));
+      }
+      expect(conflictBanner, findsOneWidget);
+      await tester.tap(conflictBanner);
+      await tester.pumpAndSettle();
+      final conflictDialog = find.byType(Dialog);
+      expect(conflictDialog, findsOneWidget);
+      expect(find.text('This permission does nothing in this version of Sora yet.'), findsNothing);
+      final confirm = find.descendant(of: conflictDialog, matching: find.byType(PrimaryButton));
+      expect(tester.widget<PrimaryButton>(confirm).onTap, isNull);
+      await tester.tap(find.descendant(of: conflictDialog, matching: find.text('ByeDPI')));
+      await tester.pump();
+      expect(tester.widget<PrimaryButton>(confirm).onTap, isNotNull);
+      await tester.tap(find.descendant(of: conflictDialog, matching: find.text('Confirm')));
+      for (
+        var i = 0;
+        i < 1000 &&
+            (store.bypassProfiles.isEmpty ||
+                conflictDialog.evaluate().isNotEmpty ||
+                conflictBanner.evaluate().isNotEmpty);
+        i++
+      ) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.pump(const Duration(milliseconds: 20));
+      }
+      expect(store.bypassProfiles.single.extensionId, 'org.sora.byedpi');
+      expect(conflictDialog, findsNothing);
+      await tester.pumpAndSettle();
+      expect(find.text('1 conflicts need your decision'), findsNothing);
+
+      await tester.runAsync(() async {
+        final genericSource = await Directory('${fixture.path}/generic-hook').create();
+        final manifest = jsonDecode(
+          await File('../extensions/sources/zapret/sora-extension.json').readAsString(),
+        ) as Map<String, dynamic>;
+        manifest['id'] = 'org.sora.dormant';
+        manifest['name'] = 'Dormant network';
+        manifest['capabilities'] = <String>[];
+        manifest.remove('network_hook');
+        manifest.remove('settings_schema');
+        await File('${genericSource.path}/sora-extension.json').writeAsString(jsonEncode(manifest));
+        await install(await signed(sourceOverride: genericSource));
+      });
+      for (var i = 0; i < 1000 && conflictBanner.evaluate().isEmpty; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.pump(const Duration(milliseconds: 20));
+      }
+      expect(conflictBanner, findsOneWidget);
+      await tester.tap(conflictBanner);
+      await tester.pumpAndSettle();
+      final dormant = find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics &&
+            widget.properties.label ==
+                'Dormant network wins. This permission does nothing in this version of Sora yet.',
+      );
+      final active = find.byWidgetPredicate(
+        (widget) => widget is Semantics && widget.properties.label == 'Zapret wins',
+      );
+      final inactiveNotice = find.text('This permission does nothing in this version of Sora yet.');
+      expect(find.descendant(of: dormant, matching: inactiveNotice), findsOneWidget);
+      expect(find.descendant(of: active, matching: inactiveNotice), findsNothing);
+      await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('Cancel')));
+      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
     }, () => client);
