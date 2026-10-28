@@ -36,9 +36,9 @@ void main() {
       'packages/material_symbols_icons/MaterialSymbolsRounded',
     )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
   });
-  final published = File('../extensions/catalog.json').readAsBytesSync();
-  final signature = File('../extensions/catalog.json.minisig').readAsBytesSync();
-  Map<String, dynamic> document() => jsonDecode(utf8.decode(published)) as Map<String, dynamic>;
+  final catalogBytes = File('../extensions/catalog-1.1.3.json').readAsBytesSync();
+  final signature = File('../extensions/catalog-1.1.3.json.minisig').readAsBytesSync();
+  Map<String, dynamic> document() => jsonDecode(utf8.decode(catalogBytes)) as Map<String, dynamic>;
   Map<String, dynamic> entry(Map<String, dynamic> doc) => (doc['extensions'] as List)
       .cast<Map<String, dynamic>>()
       .firstWhere((item) => item['id'] == 'org.sora.hello-panel');
@@ -185,19 +185,19 @@ void main() {
     addTearDown(() => dir.delete(recursive: true));
     final cache = CatalogCache(dir.path);
     // Only the old local cache is synthetic; fetched bytes and signature are
-    // the actual team-signed published document, verified by production code.
+    // the repository team-signed catalog, verified by production code.
     final old = document()..['extensions'] = <Object>[];
     await cache.store(utf8.encode(jsonEncode(old)));
     expect((await cache.load())!.catalog.entries, isEmpty);
     final requests = <String>[];
     final client = MockClient((request) async {
       requests.add(request.url.toString());
-      return http.Response.bytes(request.url.path.endsWith('.minisig') ? signature : published, 200);
+      return http.Response.bytes(request.url.path.endsWith('.minisig') ? signature : catalogBytes, 200);
     });
     addTearDown(client.close);
     final refreshed = await cache.refresh(client: client);
     expect(refreshed.fromCache, false);
-    final ids = ExtensionCatalog.parse(published).entries.map((entry) => entry.id).toList();
+    final ids = ExtensionCatalog.parse(catalogBytes).entries.map((entry) => entry.id).toList();
     expect(refreshed.catalog.entries.map((entry) => entry.id).toList(), ids);
     expect(requests, [defaultCatalogUrl, '$defaultCatalogUrl.minisig']);
     expect((await cache.load())!.catalog.entries.map((entry) => entry.id).toList(), ids);
