@@ -863,7 +863,7 @@ void main() {
     expect(restarted.needsSystemFilterConsent(choice), true);
   }, skip: !Platform.isWindows ? 'requires native Windows app platform; no driver is loaded' : false);
 
-  testWidgets('Windows scope info and Escape do not consent; explicit selection does', (tester) async {
+  testWidgets('Windows filter has one consent prompt and Escape does not consent', (tester) async {
     late Sora sora;
     late String choice;
     await tester.runAsync(() async {
@@ -903,15 +903,12 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('mode-button')));
     await tester.pumpAndSettle();
     final name = store.get('org.sora.winws-fixture')!.manifest.name;
-    await tester.tap(find.byKey(ValueKey('info-$name')));
-    await tester.pumpAndSettle();
-    expect(find.text(sora.strings.winwsScopeWarning), findsOneWidget);
+    expect(find.byKey(ValueKey('info-$name')), findsNothing);
     expect(sora.needsSystemFilterConsent(choice), true);
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pumpAndSettle();
     await tester.tap(find.text(name));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('system-filter-consent')), findsOneWidget);
+    expect(find.text(sora.strings.winwsScopeWarning), findsOneWidget);
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(sora.selected, isNot(choice));
