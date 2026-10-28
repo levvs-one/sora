@@ -72,6 +72,35 @@ void main() {
     });
   }
 
+  test('a verified legacy cache survives an offline catalog transition', () async {
+    final cache = CatalogCache(dir.path);
+    final legacy = serving({
+      legacyUrl: published('catalog.json'),
+      '$legacyUrl.minisig': published('catalog.json.minisig'),
+    });
+    final offline = serving({});
+    final compatible = serving({
+      defaultCatalogUrl: published('catalog-1.1.3.json'),
+      '$defaultCatalogUrl.minisig': published('catalog-1.1.3.json.minisig'),
+    });
+    addTearDown(legacy.close);
+    addTearDown(offline.close);
+    addTearDown(compatible.close);
+
+    final original = await cache.refresh(client: legacy, url: legacyUrl);
+    expect(original.fromCache, isFalse);
+    final fallback = await cache.refresh(client: offline);
+    expect(fallback.fromCache, isTrue);
+    expect(
+      fallback.catalog.entries.map((entry) => entry.id),
+      orderedEquals(original.catalog.entries.map((entry) => entry.id)),
+    );
+    await expectLater(CatalogCache('${dir.path}/new').refresh(client: offline), throwsA(isA<CatalogError>()));
+    final refreshed = await cache.refresh(client: compatible);
+    expect(refreshed.fromCache, isFalse);
+    expect(refreshed.catalog.entries, isNotEmpty);
+  });
+
   test('the published revocation list verifies and revokes nothing installed', () async {
     final store = ExtensionStore(dir: dir.path);
     await store.load();
