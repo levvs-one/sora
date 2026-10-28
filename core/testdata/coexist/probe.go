@@ -19,6 +19,7 @@ import (
 	"os/signal"
 	"slices"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -195,6 +196,7 @@ type zapretTargets struct {
 // serveZapretTargets runs in the fixture's separate peer network namespace.
 func serveZapretTargets(metadata string) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Fixture-Host", r.Host)
 		_, _ = io.Copy(w, io.LimitReader(r.Body, 4096))
 	})
 	newServer := func(secure bool) *httptest.Server {
@@ -320,6 +322,10 @@ func probeZapret(ctx context.Context, client corev1.CoreControlClient, api *core
 				payload := []byte("actual Sora core Zapret fixture")
 				request, err := http.NewRequestWithContext(ctx, http.MethodPost, target, bytes.NewReader(payload))
 				must(err)
+				targetURL, err := url.Parse(target)
+				must(err)
+				expectedHost := net.JoinHostPort("example.com", targetURL.Port())
+				request.Host = expectedHost
 				response, err := httpClient.Do(request)
 				must(err)
 				body, err := io.ReadAll(io.LimitReader(response.Body, 4096))
@@ -327,6 +333,10 @@ func probeZapret(ctx context.Context, client corev1.CoreControlClient, api *core
 				must(response.Body.Close())
 				if response.StatusCode != http.StatusOK || !bytes.Equal(body, payload) {
 					panic(fmt.Sprintf("%s/%s target=%s status=%d body=%q", kind, profile, target, response.StatusCode, body))
+				}
+				host := response.Header.Get("X-Fixture-Host")
+				if !strings.EqualFold(host, expectedHost) || (profile == "HTTP" && target == targets.HTTP && host == expectedHost) {
+					panic(fmt.Sprintf("%s/%s target=%s unexpected Host %q", kind, profile, target, host))
 				}
 			}
 			transport.CloseIdleConnections()

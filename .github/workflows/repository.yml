@@ -764,10 +764,14 @@ jobs:
             sudo install -m 0644 "$PWD/../dist/engines/$database" "$private/engines/$database"
           done
           original=$(readlink /proc/self/ns/net)
-          sudo unshare --user --map-root-user --net env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SORA_DATA_DIR -u SSH_AUTH_SOCK \
+          original_mount=$(readlink /proc/self/ns/mnt)
+          sudo unshare --user --map-root-user --net --mount --propagation private env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SORA_DATA_DIR -u SSH_AUTH_SOCK \
             HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/tmp" TMPDIR="$private/tmp" \
-            SORA_PARENT_NETNS="$original" SORA_BYPASS_ISOLATED=1 sh -e -c '
+            SORA_PARENT_NETNS="$original" SORA_PARENT_MNTNS="$original_mount" SORA_BYPASS_ISOLATED=1 sh -e -c '
               test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              test "$(readlink /proc/self/ns/mnt)" != "$SORA_PARENT_MNTNS"
+              printf "%s\\n" "198.18.0.2 example.com" > "$1/hosts"
+              mount --bind "$1/hosts" /etc/hosts
               here=$(readlink /proc/self/ns/net)
               ip link set lo up
               unshare -n sleep 180 &
