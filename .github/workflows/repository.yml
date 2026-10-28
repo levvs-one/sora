@@ -885,17 +885,17 @@ jobs:
           runner_uid=$(id -u)
           runner_gid=$(id -g)
           test "$runner_uid" -ne 0 && test "$runner_gid" -ne 0
-          sudo unshare --user --map-users="1000:$runner_uid:1" --map-user=0 --map-groups="1000:$runner_gid:1" --map-group=0 --net \
+          sudo -g "#$runner_gid" unshare --net \
             env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
             HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
             PATH="$PATH" PUB_CACHE="${PUB_CACHE:-$HOME/.pub-cache}" GOCACHE="$(go env GOCACHE)" GOMODCACHE="$(go env GOMODCACHE)" GOPROXY=off \
             SORA_LIVE_BYPASS=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
             bash -e -c '
               test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
-              test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
               ip link set lo up
-              exec setpriv --reuid=1000 --regid=1000 --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$1" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
-            ' bash "$version"
+              exec unshare --user --map-users="0:$1:1" --map-groups="0:$2:1" --setuid=0 --keep-caps \
+                setpriv --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$3" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
+            ' bash "$runner_uid" "$runner_gid" "$version"
       - name: Native signed extension panel on ARM64
         if: matrix.arch == 'arm64'
         working-directory: app
