@@ -12,7 +12,7 @@ class Announcement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    final style = Styles.caption.copyWith(color: palette.ink2);
+    final style = Styles.caption.copyWith(color: palette.ink);
     final markdown = IntrinsicWidth(
       child: MarkdownBody(
         data: text,

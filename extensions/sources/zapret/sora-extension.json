@@ -1,0 +1,37 @@
+{
+  "manifest_version": 1,
+  "id": "org.sora.zapret",
+  "name": "Zapret",
+  "version": "1.0.0",
+  "min_app_version": "1.1.3",
+  "description": "Profiles for built-in Linux Zapret, or the separately installed native AMD64 Windows WinDivert backend. Windows mode affects system-wide TCP ports 80 and 443 and requires explicit host consent. This extension supplies no native binaries. Requires Sora 1.1.3 or later.",
+  "author": {
+    "name": "Sora",
+    "identity": "github:levvs-one",
+    "public_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+"
+  },
+  "permissions": [
+    "net.hooks"
+  ],
+  "capabilities": [
+    "network-hook"
+  ],
+  "network_hook": {
+    "entry": "hook.json"
+  },
+  "settings_schema": {
+    "type": "object",
+    "properties": {
+      "profile": {
+        "type": "string",
+        "title": "DPI",
+        "enum": [
+          "TCP+TLS",
+          "TLS",
+          "HTTP"
+        ],
+        "default": "TCP+TLS"
+      }
+    }
+  }
+}

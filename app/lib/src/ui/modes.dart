@@ -17,9 +17,55 @@ Future<void> showModes(BuildContext context) async {
   if (info == true && navigator.mounted) await push<void>(navigator.context, const ModesGuideScreen());
 }
 
+/// Consent belongs to the host UI and this app launch, not extension settings.
+Future<bool> ensureSystemFilterConsent(BuildContext context, String choice) async {
+  final sora = SoraScope.read(context);
+  final profile = sora.extensions.bypassProfile(choice);
+  if (profile == null || !profile.systemWide) return true;
+  final available = sora.bypassProfileAvailable(profile);
+  if (available && !sora.needsSystemFilterConsent(choice)) return true;
+  final key = sora.systemFilterConsentKey(choice);
+  final s = S.of(context), palette = Palette.of(context);
+  final accepted = await showDialog<bool>(
+    context: context,
+    barrierColor: palette.scrim,
+    animationStyle: AnimationStyle(
+      duration: Motion.of(context, Motion.medium),
+      reverseDuration: Motion.of(context, Motion.medium),
+    ),
+    builder: (context) => AlertDialog(
+      key: const ValueKey('system-filter-consent'),
+      scrollable: true,
+      backgroundColor: palette.raised,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      constraints: const BoxConstraints(maxWidth: 420),
+      insetPadding: const EdgeInsets.all(24),
+      title: Text(profile.name, style: Styles.heading.copyWith(color: palette.ink)),
+      content: Text(
+        available ? s.winwsScopeWarning : s.winwsRequirements,
+        style: Styles.body.copyWith(color: palette.ink, height: 1.5),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(available ? s.cancel : s.close, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+        ),
+        if (available)
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(s.chooseEngine(profile.name), style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          ),
+      ],
+    ),
+  );
+  return accepted == true && context.mounted && key != null && sora.approveSystemFilter(choice, key);
+}
+
 Future<void> connectFromHome(BuildContext context) async {
   final sora = SoraScope.read(context);
-  if (sora.phase == Phase.off && !sora.cleanupPending && sora.servers.isEmpty && sora.selected != 'bypass') {
+  if (sora.phase == Phase.off && !sora.cleanupPending && sora.servers.isEmpty && !sora.bypassSelected) {
     final choice = await showDialog<String>(
       context: context,
       builder: (context) {
@@ -60,6 +106,7 @@ Future<void> connectFromHome(BuildContext context) async {
     }
     return;
   }
+  if (sora.phase == Phase.off && !await ensureSystemFilterConsent(context, sora.selected)) return;
   await sora.toggle();
 }
 
@@ -68,8 +115,8 @@ class ModeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
-    final label = sora.selected == 'bypass'
-        ? s.serverBypass
+    final label = sora.bypassSelected
+        ? (sora.selected == 'bypass' ? s.serverBypass : sora.displayNameOf(sora.selected))
         : sora.settings.tunnel == 'tun'
         ? 'TUN'
         : s.proxyShort;
@@ -86,36 +133,18 @@ class ModeButton extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Styles.bodyStrong.copyWith(color: palette.ink),
+            ),
+          ),
           const SizedBox(width: 8),
           Icon(Symbols.expand_more_rounded, size: 20, weight: 600, color: palette.ink),
         ],
       ),
-    );
-  }
-}
-
-class ConnectionChanges extends StatelessWidget {
-  const ConnectionChanges({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
-    if (!sora.needsReconnect) return const SizedBox.shrink();
-    return Column(
-      children: [
-        Text(
-          s.pendingConnectionChanges,
-          textAlign: TextAlign.center,
-          style: Styles.secondary.copyWith(color: palette.ink2),
-        ),
-        TextButton.icon(
-          key: const ValueKey('apply-connection-changes'),
-          onPressed: sora.busy || sora.updateBlocked ? null : () => unawaited(sora.connect()),
-          icon: const Icon(Symbols.refresh_rounded, size: 20, weight: 600),
-          label: Text(s.reconnectNow),
-        ),
-      ],
     );
   }
 }
@@ -126,7 +155,7 @@ class _Modes extends StatelessWidget {
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
     final settings = sora.settings;
-    final current = sora.selected == 'bypass' ? 'bypass' : settings.tunnel;
+    final current = sora.bypassSelected ? sora.selected : settings.tunnel;
     Widget choice(String key, String title, bool selected, VoidCallback choose) => ListTile(
       key: ValueKey(key),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -134,22 +163,37 @@ class _Modes extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       selected: selected,
       selectedTileColor: palette.field,
-      title: Text(title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+      title: Row(
+        children: [
+          Flexible(
+            child: Text(title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+          ),
+        ],
+      ),
       onTap: choose,
       trailing: SizedBox(
         width: 24,
         child: selected ? Icon(Symbols.check_rounded, size: 22, weight: 700, color: palette.ink) : null,
       ),
     );
-    Future<void> mode(String value) => sora.change((x) {
-      if (value == 'bypass') {
-        x.server = 'bypass';
-        x.tunnel = 'tun';
-      } else {
-        if (x.server == 'bypass') x.server = 'auto';
-        x.tunnel = value;
+    Future<void> mode(String value) async {
+      if (sora.extensions.bypassProfile(value) != null) {
+        if (!await ensureSystemFilterConsent(context, value) || !context.mounted) return;
+        await sora.change((settings) => settings.tunnel = 'tun', replan: false);
+        await sora.select(value);
+        return;
       }
-    });
+      await sora.change((x) {
+        if (value == 'bypass') {
+          x.server = 'bypass';
+          x.tunnel = 'tun';
+        } else {
+          if (sora.bypassSelected) x.server = 'auto';
+          x.tunnel = value;
+        }
+      });
+    }
+
     final routes = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -161,6 +205,7 @@ class _Modes extends StatelessWidget {
           ('tun', s.tunMode),
           ('proxy', s.tunnelProxy),
           if (sora.serverlessAvailable) ('bypass', s.serverBypass),
+          for (final profile in sora.extensions.bypassProfiles) (profile.choiceId, profile.name),
         ])
           choice('mode-$value', title, current == value, () => unawaited(mode(value))),
       ],
@@ -179,17 +224,6 @@ class _Modes extends StatelessWidget {
           ('mihomo', 'mihomo'),
         ])
           choice('engine-$value', title, settings.engine == value, () async {
-            if (value == 'sing-box' && !settings.controlPort) {
-              if (!await confirm(
-                context,
-                question: s.controlPortQuestion('sing-box'),
-                action: s.chooseEngine('sing-box'),
-                destructive: false,
-              )) {
-                return;
-              }
-              if (!context.mounted) return;
-            }
             await sora.change(
               (x) => x
                 ..engine = value
@@ -278,11 +312,18 @@ class _Modes extends StatelessWidget {
                       key: const ValueKey('strict-kill-switch'),
                       title: s.strictKillSwitch,
                       value: settings.strictKillSwitch,
-                      onChanged: (v) => unawaited(sora.setStrictKillSwitch(v)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                      child: Text(s.strictKillSwitchWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
+                      onChanged: (v) async {
+                        if (v &&
+                            !await confirm(
+                              context,
+                              question: s.strictKillSwitchWarning,
+                              action: s.strictKillSwitch,
+                              destructive: false,
+                            )) {
+                          return;
+                        }
+                        await sora.setStrictKillSwitch(v);
+                      },
                     ),
                   ],
                 ),
@@ -293,32 +334,16 @@ class _Modes extends StatelessWidget {
                   value: settings.zapretWithVpn,
                   onChanged: (v) => unawaited(sora.change((x) => x.zapretWithVpn = v)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-                  child: Text(s.zapretWithVpnHint, style: Styles.secondary.copyWith(color: palette.ink2)),
-                ),
               ],
               const SizedBox(height: 12),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  TextButton.icon(
-                    key: const ValueKey('modes-info'),
-                    onPressed: () => Navigator.pop(context, true),
-                    icon: Icon(Symbols.info_rounded, size: 20, weight: 600, color: palette.ink),
-                    label: Text(s.modesInfo, style: Styles.secondary.copyWith(color: palette.ink)),
-                  ),
-                  if (sora.needsReconnect)
-                    TextButton.icon(
-                      key: const ValueKey('apply-connection-changes'),
-                      onPressed: sora.busy || sora.updateBlocked ? null : () => unawaited(sora.connect()),
-                      icon: const Icon(Symbols.refresh_rounded, size: 20, weight: 600),
-                      label: Text(s.reconnectNow),
-                    ),
-                ],
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: TextButton.icon(
+                  key: const ValueKey('modes-info'),
+                  onPressed: () => Navigator.pop(context, true),
+                  icon: Icon(Symbols.info_rounded, size: 20, weight: 600, color: palette.ink),
+                  label: Text(s.modesInfo, style: Styles.secondary.copyWith(color: palette.ink)),
+                ),
               ),
             ],
           ),

@@ -205,71 +205,58 @@ class SDe extends S {
   String get errGeneric => 'Etwas ist schief gelaufen';
 
   @override
-  String get errCore => 'Der Sora-Dienst antwortet nicht. Warten Sie kurz und versuchen Sie es erneut.';
+  String get errCore => 'Der Sora-Dienst antwortet nicht';
 
   @override
-  String get errAuth =>
-      'Der Zugriff auf den Sora-Dienst wurde verweigert. Starten Sie die App neu und versuchen Sie es erneut.';
+  String get errAuth => 'Der Zugriff auf den Sora-Dienst wurde verweigert';
 
   @override
-  String get errVersion => 'Die Sora-App und der Dienst haben unterschiedliche Versionen. Aktualisieren Sie Sora.';
+  String get errVersion => 'Die Sora-App und der Dienst haben unterschiedliche Versionen';
 
   @override
-  String get errBusy => 'Der vorherige Befehl wird noch ausgeführt. Warten Sie, bis er abgeschlossen ist.';
+  String get errBusy => 'Der vorherige Befehl wird noch ausgeführt';
 
   @override
-  String get errEngineMissing => 'Die Engine für diesen Server fehlt. Suchen Sie nach Updates für Sora.';
+  String get errEngineMissing => 'Die Engine für diesen Server fehlt';
 
   @override
-  String get errEngineStart => 'Die Engine konnte nicht starten. Prüfen Sie die Ursache im Verbindungsprotokoll.';
+  String get errEngineStart => 'Die Engine konnte nicht starten';
 
   @override
-  String get errEngineStopped => 'Die Engine wurde beendet. Versuchen Sie erneut, eine Verbindung herzustellen.';
+  String get errEngineStopped => 'Die Engine wurde beendet';
 
   @override
-  String get errTunnel =>
-      'Dieser VPN-Modus ist nicht verfügbar. Wählen Sie einen anderen Modus oder prüfen Sie die Dienstberechtigungen.';
+  String get errTunnel => 'Dieser VPN-Modus ist nicht verfügbar';
 
   @override
-  String get errNetwork => 'Der Server kann nicht erreicht werden';
+  String get errTimeout => 'Der Server hat nicht rechtzeitig geantwortet';
 
   @override
-  String get errTimeout => 'Der Server hat nicht rechtzeitig geantwortet. Versuchen Sie es in einer Minute erneut.';
+  String get errFirewall => 'Der Internetzugriff außerhalb des VPN konnte nicht gesperrt werden';
 
   @override
-  String get errFirewall =>
-      'Der Internetzugriff außerhalb des VPN konnte nicht gesperrt werden. Prüfen Sie die Ursache im Verbindungsprotokoll.';
+  String get errSubFetch => 'Das Abonnement konnte nicht geladen werden';
 
   @override
-  String get errSubFetch =>
-      'Das Abonnement konnte nicht geladen werden. Prüfen Sie Ihre Internetverbindung und versuchen Sie es in einer Minute erneut.';
+  String get errSubFormat => 'Das Abonnementformat wurde nicht erkannt';
 
   @override
-  String get errSubFormat =>
-      'Das Abonnementformat wurde nicht erkannt. Bitten Sie Ihren Anbieter um einen kompatiblen Abonnementlink.';
+  String get errSubEmpty => 'Das Abonnement enthält keine Server';
 
   @override
-  String get errSubEmpty => 'Das Abonnement enthält keine Server. Wenden Sie sich an Ihren Abonnementanbieter.';
+  String get errSubDuplicate => 'Dieses Abonnement wurde bereits hinzugefügt';
 
   @override
-  String get errSubDuplicate =>
-      'Dieses Abonnement wurde bereits hinzugefügt. Aktualisieren Sie es, um die neuesten Server zu laden.';
+  String get errSubLimit => 'Die Höchstzahl an Abonnements ist erreicht';
 
   @override
-  String get errSubLimit =>
-      'Die Höchstzahl an Abonnements ist erreicht. Entfernen Sie ein ungenutztes Abonnement, bevor Sie ein neues hinzufügen.';
+  String get errSubScheme => 'Nicht unterstütztes Abonnement-Link-Schema';
 
   @override
-  String get errSubScheme =>
-      'Abonnementlinks müssen mit https:// beginnen. Bitten Sie Ihren Anbieter um einen sicheren Link.';
+  String get errSecretStore => 'Der Sora-Speicher ist beschädigt oder nicht zugänglich';
 
   @override
-  String get errSecretStore =>
-      'Der Sora-Speicher ist beschädigt oder nicht zugänglich. Prüfen Sie die Zugriffsrechte und die Details im Protokoll.';
-
-  @override
-  String get errNoServers =>
-      'Es sind keine Server zum Verbinden vorhanden. Fügen Sie ein Abonnement oder einen eigenen Server hinzu.';
+  String get errNoServers => 'Es sind keine Server zum Verbinden vorhanden';
 
   @override
   String get connections => 'Verbindungen';
@@ -323,9 +310,6 @@ class SDe extends S {
   String get dnsAuto => 'Auto';
 
   @override
-  String get dnsHint => 'Adressen, durch Kommas getrennt';
-
-  @override
   String get fragment => 'TLS-Fragmentierung';
 
   @override
@@ -341,13 +325,7 @@ class SDe extends S {
   String get byDefault => 'Standard';
 
   @override
-  String get rangeHint => 'Zum Beispiel 100-200';
-
-  @override
   String get splitPos => 'Geteilte Positionen';
-
-  @override
-  String get splitPosHint => 'Beispiel: 1, Mittelsld';
 
   @override
   String get disorder => 'Teile neu anordnen';
@@ -456,11 +434,6 @@ class SDe extends S {
   String get support => 'Unterstützung';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine wird über einen Port an diesem Computer gesteuert. Andere Programme können erkennen, dass ein VPN aktiviert ist.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'Wählen Sie $engine';
   }
@@ -536,9 +509,6 @@ class SDe extends S {
   String get launchAtLogin => 'Beginnen Sie mit dem System';
 
   @override
-  String get launchAtLoginDetail => 'Sora wird beim Anmelden automatisch gestartet und bleibt im Infobereich.';
-
-  @override
   String get closeToTray => 'Im geschlossenen Zustand im Fach aufbewahren';
 
   @override
@@ -573,9 +543,6 @@ class SDe extends S {
   String get noticeInTray => 'Sora befindet sich noch im Fach';
 
   @override
-  String get noticeInTrayBody => 'Beenden Sie das Menü mit seinem Symbol';
-
-  @override
   String get noticeLost => 'Verbindung verloren';
 
   @override
@@ -603,11 +570,7 @@ class SDe extends S {
   String get importTitle => 'Dieses Abonnement hinzufügen?';
 
   @override
-  String get importSealed =>
-      'Dieser Link ist für Happ verschlüsselt und kann nur von Happ gelesen werden. Fragen Sie Ihren Anbieter nach dem einfachen Abonnement-Link.';
-
-  @override
-  String get understood => 'OK';
+  String get importSealed => 'Dieser Link ist für Happ verschlüsselt und kann nur von Happ gelesen werden';
 
   @override
   String get noAnswer => 'keine Antwort';
@@ -646,39 +609,10 @@ class SDe extends S {
   String get openLogs => 'Protokolle öffnen';
 
   @override
-  String get tourReplay => 'Guide erneut anzeigen';
-
-  @override
-  String tourStep(int step) {
-    return 'Schritt $step von 5';
-  }
-
-  @override
   String get tourBack => 'Zurück';
 
   @override
   String get tourNext => 'Nächste';
-
-  @override
-  String get tourSkip => 'Überspringen';
-
-  @override
-  String get tourFinish => 'Erledigt';
-
-  @override
-  String get tourAdd => 'Fügen Sie den Abonnementlink Ihres Anbieters hinzu.';
-
-  @override
-  String get tourServer => 'Wählen Sie einen Server. „Am schnellsten“ wählt eines für Sie aus.';
-
-  @override
-  String get tourConnect => 'Klicken Sie hier, um eine Verbindung herzustellen oder zu trennen.';
-
-  @override
-  String get tourMode => 'Wählen Sie einen Modus. Der Kill-Switch blockiert das Internet, wenn das VPN ausfällt.';
-
-  @override
-  String get tourSettings => 'Einstellungen öffnen. Sie können diesen Leitfaden dort noch einmal ansehen.';
 
   @override
   String get chooseProgram => 'Wählen Sie ein Programm';
@@ -690,7 +624,7 @@ class SDe extends S {
   String get runningProcesses => 'Laufende Prozesse';
 
   @override
-  String get programsEmpty => 'Keine Anwendungen gefunden. Versuchen Sie es mit einem anderen Namen.';
+  String get programsEmpty => 'Keine Anwendungen gefunden';
 
   @override
   String get selectExe => 'Wählen Sie eine .exe-Datei';
@@ -702,7 +636,7 @@ class SDe extends S {
   String get speedtestSearch => 'Finden Sie einen Dienst';
 
   @override
-  String get speedtestEmpty => 'Keine Übereinstimmungen. Ändern Sie die Suche.';
+  String get speedtestEmpty => 'Keine Übereinstimmungen';
 
   @override
   String get speedtestBackToList => 'Zurück zu den Dienstleistungen';
@@ -711,15 +645,13 @@ class SDe extends S {
   String get speedtestOpenBrowser => 'Im Browser öffnen';
 
   @override
-  String get speedtestUnavailable =>
-      'Der eingebettete Browser konnte nicht gestartet werden. Öffnen Sie den Dienst in Ihrem Systembrowser.';
+  String get speedtestUnavailable => 'Der eingebettete Browser konnte nicht gestartet werden';
 
   @override
-  String get speedtestPageFailed =>
-      'Die Seite konnte nicht geladen werden. Laden Sie es neu oder öffnen Sie den Dienst in Ihrem Systembrowser.';
+  String get speedtestPageFailed => 'Die Seite konnte nicht geladen werden';
 
   @override
-  String get speedtestExternalFailed => 'Der Systembrowser konnte nicht geöffnet werden. Versuchen Sie es erneut.';
+  String get speedtestExternalFailed => 'Der Systembrowser konnte nicht geöffnet werden';
 
   @override
   String get modes => 'Modi';
@@ -759,54 +691,28 @@ class SDe extends S {
   String get updateNoNotes => 'Die Veröffentlichung enthält keine Notizen.';
 
   @override
-  String get updateDropWarning =>
-      'Die VPN-Verbindung wird für einige Sekunden unterbrochen, während Sora und sein Kernupdate durchgeführt werden. Weitermachen?';
+  String get updateDropWarning => 'Verbindung für das Update trennen?';
 
   @override
-  String get updateWaitConnection => 'Warten Sie, bis die VPN-Verbindung und der Kern bereit sind.';
+  String get updateWaitConnection => 'Verbindung ist nicht bereit';
 
   @override
-  String get updateDownloading => 'Dateien werden heruntergeladen und überprüft...';
-
-  @override
-  String get updateInstalling => 'Das Update wird vorbereitet oder auf die Administratorauthentifizierung gewartet ...';
-
-  @override
-  String get updateNetworkError => 'Das Update konnte nicht heruntergeladen werden. Versuchen Sie es erneut.';
+  String get updateNetworkError => 'Das Update konnte nicht heruntergeladen werden';
 
   @override
   String get updateReleaseError => 'Die Release-Daten oder erforderlichen Dateien fehlen oder sind ungültig.';
 
   @override
-  String get updateChecksumError => 'Der Download stimmt nicht mit SHA256SUMS überein. Es wurde nichts installiert.';
+  String get updateChecksumError => 'Der Download stimmt nicht mit SHA256SUMS überein';
 
   @override
-  String get updateInstallError =>
-      'Das Update wurde nicht abgeschlossen. Möglicherweise wurde die Authentifizierung abgebrochen.';
+  String get updateInstallError => 'Das Update wurde nicht abgeschlossen';
 
   @override
-  String get updateUnsupported =>
-      'Diese ausführbare Datei gehört keinem unterstützten Sora-Paketpaar. Verwenden Sie die Installationsanweisungen für das Release.';
+  String get updateUnsupported => 'Diese ausführbare Datei gehört keinem unterstützten Sora-Paketpaar';
 
   @override
-  String get updateManual =>
-      'Führen Sie diesen Befehl in einem Terminal aus, um beide verifizierten Pakete zu installieren, und öffnen Sie dann Sora erneut. Die Dateien bleiben im Download-Verzeichnis. Die VPN-Verbindung wird unterbrochen.';
-
-  @override
-  String get updateSignaturePending =>
-      'Update-Dateien werden mit den Prüfsummen abgeglichen, die mit dem Release veröffentlicht werden.';
-
-  @override
-  String get updateManualSigWarning =>
-      'Die Dateien unten passen zu den Prüfsummen des Releases. Führe den Befehl aus, wenn du sie aus dem offiziellen Release geladen hast.';
-
-  @override
-  String get updateVersionRevoked =>
-      'Der Entwickler hat diese Version zurückgezogen. Bitte warten Sie auf eine korrigierte Veröffentlichung.';
-
-  @override
-  String get updateRolloutPending =>
-      'Eine neuere Version wird nach und nach eingeführt und Ihnen automatisch angeboten.';
+  String get updateVersionRevoked => 'Der Entwickler hat diese Version zurückgezogen';
 
   @override
   String updateRollbacking(String version) {
@@ -819,8 +725,7 @@ class SDe extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatisches Rollback fehlgeschlagen. Wenn die neue Version nicht funktioniert, installieren Sie die vorherige Version manuell neu.';
+  String get updateRollbackError => 'Automatisches Rollback fehlgeschlagen';
 
   @override
   String get updateRollbackCacheError =>
@@ -830,10 +735,7 @@ class SDe extends S {
   String get updateCopyCommand => 'Befehl kopieren';
 
   @override
-  String get updateChecksDisabled => 'Automatische Prüfungen sind in den Einstellungen deaktiviert.';
-
-  @override
-  String get updateInstalled => 'Update installiert. Öffnen Sie Sora erneut.';
+  String get updateInstalled => 'Update installiert';
 
   @override
   String get projectLinks => 'Projekt';
@@ -863,21 +765,13 @@ class SDe extends S {
   String get showDescription => 'Beschreibung anzeigen';
 
   @override
-  String get pendingConnectionChanges => 'Stellen Sie die Verbindung erneut her, um diese Änderungen zu übernehmen.';
+  String get errEngineUnsupported => 'Die ausgewählte Engine unterstützt dieses Profil oder diese Einstellungen nicht';
 
   @override
-  String get reconnectNow => 'Anwenden und erneut verbinden';
+  String get errRestore => 'Die Verbindungsbereinigung war unvollständig';
 
   @override
-  String get errEngineUnsupported =>
-      'Die ausgewählte Engine unterstützt dieses Profil oder diese Einstellungen nicht. Wählen Sie „Auto“ oder eine kompatible Engine.';
-
-  @override
-  String get errRestore =>
-      'Die Verbindungsbereinigung war unvollständig. Versuchen Sie erneut, die Verbindung zu trennen. Einzelheiten finden Sie im Protokoll.';
-
-  @override
-  String get errSessionEnded => 'Diese Sitzung ist bereits beendet. Aktualisieren Sie den Verbindungsstatus.';
+  String get errSessionEnded => 'Diese Sitzung ist bereits beendet';
 
   @override
   String get retryDisconnect => 'Versuchen Sie erneut, die Verbindung zu trennen';
@@ -893,10 +787,10 @@ class SDe extends S {
 
   @override
   String get modesGuide =>
-      'Wählen Sie „Auto“, wenn Sie nicht sicher sind, welche Engine Ihr Server benötigt. Sora überprüft das Profil und die Einstellungen vor der Verbindung. Eine Engine kann die Bandbreite Ihres Plans nicht erhöhen: Die Leistung hängt vom Server, der Route, dem Protokoll und dem Netzwerk ab.\n\n## Modi\n\n### Gesamter Datenverkehr (TUN)\n\nSora erstellt eine virtuelle Netzwerkschnittstelle und leitet den Anwendungsverkehr darüber weiter, einschließlich TCP und UDP. Verwenden Sie diesen Modus für Telegram, Spiele und Discord-Sprache. Regeln können bestimmte Websites oder Programme direkt senden oder blockieren. Der Netzwerkdienst benötigt eine Erlaubnis und einen Server, der das erforderliche Protokoll unterstützt.\n\n### System-Proxy\n\nSora konfiguriert einen lokalen HTTP/SOCKS-Proxy. Es wird von Anwendungen verwendet, die die Proxy-Einstellungen des Systems berücksichtigen. Anwendungen mit eigenem Netzwerk-Stack können sich direkt verbinden; UDP und Sprachanrufe benötigen im Allgemeinen TUN. Dieser Modus eignet sich für Browser und Anwendungen mit Proxy-Unterstützung.\n\n### Kein Server\n\nAuf Linux verwendet Sora [zapret](https://github.com/bol-van/zapret), um HTTP/TLS-Anfragen aufzuteilen und umzuformen und einige DPI-Prüfungen zu umgehen. Ihre IP bleibt gleich und Verbindungen gehen direkt zur Website. Die Ergebnisse hängen von Ihrem Anbieter und der Blockierungsmethode ab.\n\nDie aktuelle Integration verwendet tpws für HTTP und TLS über TCP. Es umgeht weder die IP-Blockierung noch leitet es UDP weiter und kann die MTProto-Verbindungen von Telegram nicht garantieren. Verwenden Sie einen VPN-Server mit TUN für Discord-Sprache, Telegram-Anrufe und solche Einschränkungen.\n\n## Motoren\n\n### Automatisch\n\nSora wählt eine installierte Engine aus, die den gesamten Verbindungsplan unterstützt: Serverprotokolle, Transporte, Gruppen, Fragmentierung und Modus. Eine inkompatible manuelle Auswahl wird abgelehnt, bevor die aktuelle Verbindung beendet wird. Wählen Sie „Auto“ oder eine andere Engine und wenden Sie die Einstellungen erneut an.\n\n### sing-box\n\nZu den neuen Sora-Paketen gehören [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), ein Zweig von [sing-box](https://github.com/SagerNet/sing-box), der clientseitige XHTTP und VLESS Encryption hinzufügt. Sora erkennt den Build und seine Fähigkeiten. Ein Upstream-Build ohne XHTTP erhält diese Fähigkeit nicht allein durch seinen Namen.\n\nZu den unterstützten Protokollen gehören VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard und die AmneziaWG 1.x/2.x-Parameter, die Sora importieren kann. Für vollständige Xray-JSON-Profile ist Xray erforderlich. Neue AWG 3.x-Felder können noch nicht importiert werden. sing-box verwendet einen passwortgeschützten lokalen Steuerungsport, den andere Anwendungen auf dem Computer erkennen können.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) unterstützt VLESS, REALITY, XHTTP, VLESS Encryption und TLS-Fragmentierung. Es führt auch vollständige Provider-Profile Xray aus und behält dabei deren Routing und Gruppen bei. Solche Profile können nicht automatisch in eine andere Engine konvertiert werden, ohne ihr Verhalten zu ändern.\n\nIm Paket Xray wurde die Einstellung entfernt, die die TLS-Zertifikatsüberprüfung deaktiviert („allowInsecure“). Bei normalen Servern, die diese Einstellung erfordern, wird automatisch sing-box oder mihomo ausgewählt. Wenn Sie Xray manuell auswählen, wird die Inkompatibilität gemeldet, bevor die aktuelle Verbindung beendet wird. Ältere vollständige JSON-Profile benötigen ein aktualisiertes Anbieterprofil mit einem überprüfbaren Zertifikat oder einer Zertifikats-PIN.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) unterstützt geordnete Fallback- und Lastausgleichsgruppen, XHTTP und AmneziaWG. Wählen Sie diese Option, wenn ein automatisches Failover auf einen Backup-Server wichtig ist. Die TLS-Fragmentierungseinstellung von Sora ist mit dieser Engine nicht verfügbar.\n\n## Kompatibilität in Sora\n\n| Funktion | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN und TCP/UDP | Ja | Ja | Ja |\n| XHTTP | Ja | Ja | Ja |\n| VLESS Encryption | Ja | Ja | Ja |\n| Vollständiges Xray-Profil | Nein | Ja | Nein |\n| TUIC / AnyTLS | Beide | Nein | TUIC |\n| mieru | Nein | Nein | Ja |\n| NaiveProxy | Ja | Nein | Nein |\n| TLS-Fragmentierung | Ja | Ja | Nein |\n| AmneziaWG 1.x/2.x | Ja¹ | Nein | Ja |\n| Geordnete Fallback-Gruppe | Nein | Nein² | Ja |\n\n¹ Profile mit J1/J2/J3/Itime verwenden mihomo; Diese Felder dürfen niemals stillschweigend verworfen werden. ² Für eine Gruppe vollständiger Xray-Profile wählt die App ein Backup-Profil aus. Die Unterstützung hängt vom installierten Build ab. Überprüfen Sie die Version unter „Info“.\n\n## TUN-Stapel\n\nDer Stack verarbeitet TCP und UDP innerhalb der virtuellen Schnittstelle. Im Modi-Panel bieten Xray und mihomo gVisor, System, Mixed und MIPS an. Jede Engine speichert ihre eigene Präferenz. System-Proxy- und serverlose Modi verwenden diese Einstellung nicht.\n\n- **Mixed** – TCP verwendet den System-Stack, während gVisor UDP verarbeitet. Dies ist die Standardeinstellung für mihomo unter Linux. Unter Windows verwenden Xray und mihomo standardmäßig MIPS.\n- **System** – verwendet den System-Stack. Versuchen Sie eine andere Option, wenn bei Netzwerkanwendungen Probleme auftreten.\n- **gVisor** – verarbeitet den Datenverkehr im Userspace.\n- **MIPS** – mihomos eigener IP-Stack, verfügbar in der gebündelten Version 1.19.32.\n\nAuf Linux verwendet Xray standardmäßig seinen integrierten gVisor. System, Mixed und MIPS auf Linux verwenden mihomo als TUN-Engine und leiten TCP und UDP über eine authentifizierte lokale SOCKS-Verbindung an Xray weiter. Xray behält das Protokoll, das Anbieterprofil und das Routing bei. Für diese drei Optionen ist ein installierter mihomo erforderlich. Auf Windows verwendet Xray für alle vier TUN-Stacks mihomo 1.19.32 oder neuer. Protokolle und Routing bleiben in Xray. Anwendungsregeln unterstützen in dieser Kombination nur direkte Verbindungen und Blockieren; unter Linux benötigen diese Regeln den integrierten gVisor von Xray.\n\nDie Brücke führt einen zweiten Prozess aus. Bei drei Leerlaufmessungen auf dem Linux verbrauchte er etwa 32–36 MiB mehr physischen Speicher als der native Xray TUN. Dies misst nicht die Download-Last: CPU- und Speicherkosten hängen von den Verbindungen ab. sing-box hat keinen Stack-Selektor. Kein Stack garantiert eine bessere Leistung in jedem Netzwerk. Wählen Sie einen Stack aus und wählen Sie „Anwenden und erneut verbinden“, um ihn in Ihrem Netzwerk auszuprobieren.\n\n## Einstellungen übernehmen\n\nWenn Sie einen Server auswählen, wird die Verbindung automatisch wiederhergestellt. Modus-, Engine-, DNS- und Regeleinstellungen werden sofort gespeichert; Klicken Sie während einer aktiven Verbindung auf „Übernehmen“ und stellen Sie die Verbindung erneut her, um sie zu verwenden. Der Neustart einer Engine kann Downloads und Anrufe unterbrechen. Wiederholte Klicks starten keine Parallelverbindungen; Durch das Trennen wird der Übergang beendet und die Verbindung freigegeben.\n\nDas Internet nur über VPN blockiert den direkten Datenverkehr, wenn ein Tunnel unterbrochen wird. Es betrifft die gesamte Maschine. Durch eine explizite Trennung werden die Regeln von Sora entfernt. Wenn die Bereinigung nicht abgeschlossen ist, versuchen Sie erneut, die Verbindung zu trennen, und öffnen Sie das Protokoll.\n\n## Projektdokumentation\n\n- [sing-box-lx: Konfiguration und Support](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box-Dokumentation](https://sing-box.sagernet.org/)\n- [Xray-Dokumentation](https://xtls.github.io/)\n- [mihomo-Dokumentation](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: Betrieb und Einschränkungen](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC überträgt TCP über einen Videoanruf in Jitsi, Yandex Telemost oder WB Stream. Importieren Sie einen olcrtc://-Link oder QR-Code. Das Protokoll funktioniert mit sing-box, Xray und mihomo im Proxy- und TUN-Modus; UDP wird nicht unterstützt. Beide Endpunkte benötigen kompatible OLC2-Versionen. Das ursprüngliche Projekt ist archiviert.\n';
+      'Wählen Sie „Auto“, wenn Sie nicht sicher sind, welche Engine Ihr Server benötigt. Sora überprüft das Profil und die Einstellungen vor der Verbindung. Eine Engine kann die Bandbreite Ihres Plans nicht erhöhen: Die Leistung hängt vom Server, der Route, dem Protokoll und dem Netzwerk ab.\n\n## Modi\n\n### Gesamter Datenverkehr (TUN)\n\nSora erstellt eine virtuelle Netzwerkschnittstelle und leitet den Anwendungsverkehr darüber weiter, einschließlich TCP und UDP. Verwenden Sie diesen Modus für Telegram, Spiele und Discord-Sprache. Regeln können bestimmte Websites oder Programme direkt senden oder blockieren. Der Netzwerkdienst benötigt eine Erlaubnis und einen Server, der das erforderliche Protokoll unterstützt.\n\n### System-Proxy\n\nSora konfiguriert einen lokalen HTTP/SOCKS-Proxy. Es wird von Anwendungen verwendet, die die Proxy-Einstellungen des Systems berücksichtigen. Anwendungen mit eigenem Netzwerk-Stack können sich direkt verbinden; UDP und Sprachanrufe benötigen im Allgemeinen TUN. Dieser Modus eignet sich für Browser und Anwendungen mit Proxy-Unterstützung.\n\n### Kein Server\n\nAuf Linux verwendet Sora [zapret](https://github.com/bol-van/zapret), um HTTP/TLS-Anfragen aufzuteilen und umzuformen und einige DPI-Prüfungen zu umgehen. Ihre IP bleibt gleich und Verbindungen gehen direkt zur Website. Die Ergebnisse hängen von Ihrem Anbieter und der Blockierungsmethode ab.\n\nDie aktuelle Integration verwendet tpws für HTTP und TLS über TCP. Es umgeht weder die IP-Blockierung noch leitet es UDP weiter und kann die MTProto-Verbindungen von Telegram nicht garantieren. Verwenden Sie einen VPN-Server mit TUN für Discord-Sprache, Telegram-Anrufe und solche Einschränkungen.\n\n## Motoren\n\n### Automatisch\n\nSora wählt eine installierte Engine aus, die den gesamten Verbindungsplan unterstützt: Serverprotokolle, Transporte, Gruppen, Fragmentierung und Modus. Eine inkompatible manuelle Auswahl wird abgelehnt, bevor die aktuelle Verbindung beendet wird. Wählen Sie „Auto“ oder eine andere Engine und wenden Sie die Einstellungen erneut an.\n\n### sing-box\n\nZu den neuen Sora-Paketen gehören [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), ein Zweig von [sing-box](https://github.com/SagerNet/sing-box), der clientseitige XHTTP und VLESS Encryption hinzufügt. Sora erkennt den Build und seine Fähigkeiten. Ein Upstream-Build ohne XHTTP erhält diese Fähigkeit nicht allein durch seinen Namen.\n\nZu den unterstützten Protokollen gehören VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard und die AmneziaWG 1.x/2.x-Parameter, die Sora importieren kann. Für vollständige Xray-JSON-Profile ist Xray erforderlich. Neue AWG 3.x-Felder können noch nicht importiert werden. sing-box verwendet einen passwortgeschützten lokalen Steuerungsport, den andere Anwendungen auf dem Computer erkennen können.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) unterstützt VLESS, REALITY, XHTTP, VLESS Encryption und TLS-Fragmentierung. Es führt auch vollständige Provider-Profile Xray aus und behält dabei deren Routing und Gruppen bei. Solche Profile können nicht automatisch in eine andere Engine konvertiert werden, ohne ihr Verhalten zu ändern.\n\nIm Paket Xray wurde die Einstellung entfernt, die die TLS-Zertifikatsüberprüfung deaktiviert („allowInsecure“). Bei normalen Servern, die diese Einstellung erfordern, wird automatisch sing-box oder mihomo ausgewählt. Wenn Sie Xray manuell auswählen, wird die Inkompatibilität gemeldet, bevor die aktuelle Verbindung beendet wird. Ältere vollständige JSON-Profile benötigen ein aktualisiertes Anbieterprofil mit einem überprüfbaren Zertifikat oder einer Zertifikats-PIN.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) unterstützt geordnete Fallback- und Lastausgleichsgruppen, XHTTP und AmneziaWG. Wählen Sie diese Option, wenn ein automatisches Failover auf einen Backup-Server wichtig ist. Die TLS-Fragmentierungseinstellung von Sora ist mit dieser Engine nicht verfügbar.\n\n## Kompatibilität in Sora\n\n| Funktion | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN und TCP/UDP | Ja | Ja | Ja |\n| XHTTP | Ja | Ja | Ja |\n| VLESS Encryption | Ja | Ja | Ja |\n| Vollständiges Xray-Profil | Nein | Ja | Nein |\n| TUIC / AnyTLS | Beide | Nein | TUIC |\n| mieru | Nein | Nein | Ja |\n| NaiveProxy | Ja | Nein | Nein |\n| TLS-Fragmentierung | Ja | Ja | Nein |\n| AmneziaWG 1.x/2.x | Ja¹ | Nein | Ja |\n| Geordnete Fallback-Gruppe | Nein | Nein² | Ja |\n\n¹ Profile mit J1/J2/J3/Itime verwenden mihomo; Diese Felder dürfen niemals stillschweigend verworfen werden. ² Für eine Gruppe vollständiger Xray-Profile wählt die App ein Backup-Profil aus. Die Unterstützung hängt vom installierten Build ab. Überprüfen Sie die Version unter „Info“.\n\n## TUN-Stapel\n\nDer Stack verarbeitet TCP und UDP innerhalb der virtuellen Schnittstelle. Im Modi-Panel bieten Xray und mihomo gVisor, System, Mixed und MIPS an. Jede Engine speichert ihre eigene Präferenz. System-Proxy- und serverlose Modi verwenden diese Einstellung nicht.\n\n- **Mixed** – TCP verwendet den System-Stack, während gVisor UDP verarbeitet. Dies ist die Standardeinstellung für mihomo unter Linux. Unter Windows verwenden Xray und mihomo standardmäßig MIPS.\n- **System** – verwendet den System-Stack. Versuchen Sie eine andere Option, wenn bei Netzwerkanwendungen Probleme auftreten.\n- **gVisor** – verarbeitet den Datenverkehr im Userspace.\n- **MIPS** – mihomos eigener IP-Stack, verfügbar in der gebündelten Version 1.19.32.\n\nAuf Linux verwendet Xray standardmäßig seinen integrierten gVisor. System, Mixed und MIPS auf Linux verwenden mihomo als TUN-Engine und leiten TCP und UDP über eine authentifizierte lokale SOCKS-Verbindung an Xray weiter. Xray behält das Protokoll, das Anbieterprofil und das Routing bei. Für diese drei Optionen ist ein installierter mihomo erforderlich. Auf Windows verwendet Xray für alle vier TUN-Stacks mihomo 1.19.32 oder neuer. Protokolle und Routing bleiben in Xray. Anwendungsregeln unterstützen in dieser Kombination nur direkte Verbindungen und Blockieren; unter Linux benötigen diese Regeln den integrierten gVisor von Xray.\n\nDie Brücke führt einen zweiten Prozess aus. Bei drei Leerlaufmessungen auf dem Linux verbrauchte er etwa 32–36 MiB mehr physischen Speicher als der native Xray TUN. Dies misst nicht die Download-Last: CPU- und Speicherkosten hängen von den Verbindungen ab. sing-box hat keinen Stack-Selektor. Kein Stack garantiert eine bessere Leistung in jedem Netzwerk.\n\n## Einstellungen übernehmen\n\nBei der Auswahl eines Servers wird die Verbindung automatisch neu aufgebaut. Ihre Änderungen an Modus, Engine, DNS oder Regeln werden nach einer kurzen Pause einmalig mit automatischem Neuverbinden angewendet; Hintergrundaktualisierungen verbinden nicht neu. Ein Neustart der Engine kann Downloads und Anrufe unterbrechen.\n\nDas Internet nur über VPN blockiert den direkten Datenverkehr, wenn ein Tunnel unterbrochen wird. Es betrifft die gesamte Maschine. Durch eine explizite Trennung werden die Regeln von Sora entfernt. Wenn die Bereinigung nicht abgeschlossen ist, versuchen Sie erneut, die Verbindung zu trennen, und öffnen Sie das Protokoll.\n\n## Projektdokumentation\n\n- [sing-box-lx: Konfiguration und Support](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box-Dokumentation](https://sing-box.sagernet.org/)\n- [Xray-Dokumentation](https://xtls.github.io/)\n- [mihomo-Dokumentation](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: Betrieb und Einschränkungen](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC überträgt TCP über einen Videoanruf in Jitsi, Yandex Telemost oder WB Stream. Importieren Sie einen olcrtc://-Link oder QR-Code. Das Protokoll funktioniert mit sing-box, Xray und mihomo im Proxy- und TUN-Modus; UDP wird nicht unterstützt. Beide Endpunkte benötigen kompatible OLC2-Versionen. Das ursprüngliche Projekt ist archiviert.\n';
 
   @override
-  String get probeServers => 'Überprüfen Sie die Server';
+  String get probeServers => 'Klingeln';
 
   @override
   String get extensions => 'Erweiterungen';
@@ -920,13 +814,10 @@ class SDe extends S {
   String get extInstallOne => '1 Installation';
 
   @override
-  String get extSideloadWarning => 'Nur installieren, wenn Sie dem selbst signierten Schlüssel des Autors vertrauen.';
+  String get extSideloadWarning => 'Selbst signierter Schlüssel';
 
   @override
   String get extPermissionsWidened => 'Das Update fordert neue Berechtigungen:';
-
-  @override
-  String get extDangerousAck => 'Ich verstehe, dass diese Berechtigungen ernst sind';
 
   @override
   String get extInstall => 'Installieren';
@@ -939,9 +830,6 @@ class SDe extends S {
 
   @override
   String get extConfirm => 'Bestätigen';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Katalog';
@@ -992,17 +880,13 @@ class SDe extends S {
   String get extEmptySearch => 'Nichts gefunden';
 
   @override
-  String get extEmptyInstalled =>
-      'Noch keine Erweiterungen installiert.\nWählen Sie eine aus dem Katalog oder installieren Sie sie aus einer Datei.';
+  String get extEmptyInstalled => 'Noch keine Erweiterungen installiert';
 
   @override
   String get extInstallFromFile => 'Aus Datei installieren';
 
   @override
   String get extInstallFromUrl => 'Installation von URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Herunterladen';
@@ -1017,21 +901,16 @@ class SDe extends S {
   String get extInstalling => 'Installieren…';
 
   @override
-  String get extInstallFailed => 'Installation fehlgeschlagen';
-
-  @override
-  String get extErrSignature =>
-      'Die Signaturprüfung ist fehlgeschlagen. Die Datei ist möglicherweise beschädigt oder manipuliert.';
+  String get extErrSignature => 'Die Signaturprüfung ist fehlgeschlagen';
 
   @override
   String get extErrManifest => 'Das Erweiterungsmanifest ist ungültig.';
 
   @override
-  String get extErrNetwork => 'Netzwerkfehler. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.';
+  String get extErrNetwork => 'Netzwerkfehler';
 
   @override
-  String get extErrHash =>
-      'Die heruntergeladene Datei stimmt nicht mit dem Katalog überein. Sie wurde möglicherweise manipuliert.';
+  String get extErrHash => 'Die heruntergeladene Datei stimmt nicht mit dem Katalog überein';
 
   @override
   String extErrMinApp(String version) {
@@ -1042,11 +921,11 @@ class SDe extends S {
   String get extErrHttpsOnly => 'Es sind nur https://-Links zulässig';
 
   @override
-  String get extErrGeneric => 'Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.';
+  String get extErrGeneric => 'Etwas ist schief gelaufen';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Dieses Update ist mit einem anderen Autorenschlüssel als die installierte Version signiert und wurde daher blockiert. Wenn Sie dem neuen Schlüssel vertrauen, deinstallieren Sie die Erweiterung und installieren Sie sie explizit erneut.';
+      'Dieses Update ist mit einem anderen Autorenschlüssel als die installierte Version signiert und wurde daher blockiert';
 
   @override
   String get extDisabled => 'Deaktiviert';
@@ -1103,7 +982,7 @@ class SDe extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count Konflikte erfordern Ihre Entscheidung';
+    return 'Erweiterungskonflikte: $count';
   }
 
   @override
@@ -1180,10 +1059,10 @@ class SDe extends S {
   String get extPermThemeApply => 'Themen anwenden';
 
   @override
-  String get extPermRoutingRules => 'Routing-Regeln hinzufügen (beeinflusst, wohin der Netzwerkverkehr geht)';
+  String get extPermRoutingRules => 'Routing-Regeln hinzufügen';
 
   @override
-  String get extPermNetHooks => 'In den Netzwerkpfad integrieren (DPI Bypass-Module)';
+  String get extPermNetHooks => 'In den Netzwerkpfad integrieren';
 
   @override
   String get extPermNetFetch => 'Fordern Sie URL aus der Zulassungsliste an';
@@ -1192,7 +1071,7 @@ class SDe extends S {
   String get extPermBackground => 'Hintergrundaufgaben ausführen';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Deaktiviert';
 
   @override
   String get extCapBackground => 'Läuft im Hintergrund';
@@ -1230,9 +1109,6 @@ class SDe extends S {
   String get extSortRelevance => 'Relevanz';
 
   @override
-  String get extPermNetworkDetail => 'VPN-Anfragen sind nur an die folgenden Hosts erlaubt.';
-
-  @override
   String get extBgTitle => 'Hintergrundaufgabe';
 
   @override
@@ -1254,9 +1130,6 @@ class SDe extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Aktivieren Sie die Erweiterung, um ihre Hintergrundaufgabe zu verwalten.';
-
-  @override
   String get extCapNetwork => 'Netzwerkzugriff';
 
   @override
@@ -1273,8 +1146,7 @@ class SDe extends S {
   String get diagnosticHttp => 'HTTP-Diagnose';
 
   @override
-  String get diagnosticNoData =>
-      'Noch keine erfassten Anfragen. Öffnen Sie zunächst eine Website für Geschwindigkeitstests.';
+  String get diagnosticNoData => 'Noch keine erfassten Anfragen';
 
   @override
   String get qrShareTitle => 'Teilen Sie den QR-Code';
@@ -1284,12 +1156,6 @@ class SDe extends S {
 
   @override
   String get qrCopyLink => 'Link kopieren';
-
-  @override
-  String get qrWarning => 'Teile den Code nur mit Personen, denen du vertraust.';
-
-  @override
-  String get qrScanHint => 'Wähle einen Screenshot oder ein Foto mit QR-Code oder füge einen Link ein';
 
   @override
   String get qrFromClipboard => 'Aus der Zwischenablage einfügen';
@@ -1375,31 +1241,10 @@ class SDe extends S {
   String get dnsLeakCheckKillSwitchDns => 'DNS-Schutz durch Netzwerksperre';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Konfigurieren Sie DNS für den Tunnel in den DNS-Einstellungen oben.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Prüfen Sie, welche Resolver Ihr System außerhalb des Tunnels verwenden würde.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Aktivieren Sie die Netzwerksperre, damit DNS-Verkehr im Tunnel bleibt.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Verschlüsseltes DNS des Betriebssystems';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Gefälschte DNS-Antworten';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Überprüfen Sie, welche verschlüsselten DNS-Endpunkte Ihr System außerhalb des Tunnels verwendet.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Verwenden Sie verschlüsseltes DNS (DoT oder DoH) für den Tunnel, damit Resolver keine Antworten fälschen können.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Verbinden Sie sich zuerst mit dem VPN und prüfen Sie dann auf Lecks.';
 
   @override
   String get dnsExpected => 'Erwartet';
@@ -1426,8 +1271,7 @@ class SDe extends S {
   String get autoSelectSmart => 'Intelligente Wahl';
 
   @override
-  String get coreWatchUnstable =>
-      'Die Verbindung zum Core ist instabil. Warten Sie kurz und versuchen Sie erneut, sich zu verbinden.';
+  String get coreWatchUnstable => 'Die Verbindung zum Core ist instabil';
 
   @override
   String get watchReconnect => 'Erneut verbinden';
@@ -1466,8 +1310,7 @@ class SDe extends S {
   String get overrideCustomRules => 'Eigene Regeln';
 
   @override
-  String get errBenchmarkUnsupported =>
-      'Die Geschwindigkeitsmessung erfordert einen neueren Core. Aktualisieren Sie Sora.';
+  String get errBenchmarkUnsupported => 'Die Geschwindigkeitsmessung erfordert einen neueren Core';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1478,8 +1321,7 @@ class SDe extends S {
   String get profiles => 'Netzwerkprofile';
 
   @override
-  String get profilesEmpty =>
-      'Noch keine Profile. Erstellen Sie eines, um Einstellungen automatisch auf bekannte Netzwerke anzuwenden.';
+  String get profilesEmpty => 'Noch keine Profile';
 
   @override
   String get profileAdd => 'Profil hinzufügen';
@@ -1491,9 +1333,6 @@ class SDe extends S {
   String get profileSsids => 'Wi-Fi Netzwerke (SSID)';
 
   @override
-  String get profileSsidsHint => 'Privat, Büro durch Kommas getrennt';
-
-  @override
   String get profileGateways => 'Netzwerk-Gateways';
 
   @override
@@ -1501,9 +1340,6 @@ class SDe extends S {
 
   @override
   String get profileAutoApply => 'Automatisch anwenden';
-
-  @override
-  String get profileAutoApplyHint => 'Wenn deaktiviert, vor dem Anwenden des Profils nachfragen.';
 
   @override
   String get profileSnapshot => 'Aktuelle Einstellungen merken';
@@ -1547,14 +1383,13 @@ class SDe extends S {
   String get networkUnknown => 'Netzwerkinformationen nicht verfügbar';
 
   @override
-  String get profileNoTriggers => 'Fügen Sie mindestens einen Trigger hinzu: SSID, Gateway oder ASN';
+  String get profileNoTriggers => 'Keine Profilbedingungen';
 
   @override
   String get chains => 'Proxy-Ketten';
 
   @override
-  String get chainsEmpty =>
-      'Noch keine Ketten. Verknüpfen Sie zwei bis drei Server, sodass der Datenverkehr über jeden von ihnen läuft.';
+  String get chainsEmpty => 'Noch keine Ketten';
 
   @override
   String get chainAdd => 'Neue Kette';
@@ -1563,16 +1398,10 @@ class SDe extends S {
   String get chainName => 'Kettenname';
 
   @override
-  String get chainPickServers => 'Wählen Sie 2–3 Server aus';
+  String get chainTooFew => 'Eine Kette benötigt mindestens zwei Server';
 
   @override
-  String get chainOrderHint => 'Zum Neuordnen ziehen: Der Verkehr tritt oben ein und verlässt ihn unten.';
-
-  @override
-  String get chainTooFew => 'Eine Kette benötigt mindestens zwei Server. Fügen Sie einen weiteren Server hinzu.';
-
-  @override
-  String get chainTooMany => 'Eine Kette kann höchstens drei Server enthalten. Entfernen Sie die überzähligen Server.';
+  String get chainTooMany => 'Eine Kette kann höchstens drei Server enthalten';
 
   @override
   String get chainEstimate => 'Geschätzte Latenz';
@@ -1589,12 +1418,10 @@ class SDe extends S {
   }
 
   @override
-  String get chainUnsupported =>
-      'Die gewählte Engine unterstützt keine Serverketten. Wählen Sie eine kompatible Engine.';
+  String get chainUnsupported => 'Die gewählte Engine unterstützt keine Serverketten';
 
   @override
-  String get chainHopMissing =>
-      'Ein Server in der Kette ist nicht mehr verfügbar. Wählen Sie für diesen Schritt einen anderen Server.';
+  String get chainHopMissing => 'Ein Server in der Kette ist nicht mehr verfügbar';
 
   @override
   String chainHop(Object n) {
@@ -1614,7 +1441,7 @@ class SDe extends S {
   String get syncDevices => 'Meine Geräte';
 
   @override
-  String get syncEmpty => 'Keine gekoppelten Geräte. Koppeln Sie ein anderes Gerät über das lokale Netzwerk.';
+  String get syncEmpty => 'Keine gekoppelten Geräte';
 
   @override
   String get syncPair => 'Gerät koppeln';
@@ -1642,9 +1469,6 @@ class SDe extends S {
   String get syncNever => 'Niemals';
 
   @override
-  String get syncNoLan => 'Geräte müssen sich im selben lokalen Netzwerk befinden';
-
-  @override
   String get syncPaired => 'Gerät gekoppelt';
 
   @override
@@ -1654,18 +1478,10 @@ class SDe extends S {
   String get syncWaiting => 'Warten auf das andere Gerät…';
 
   @override
-  String get syncSecureNote => 'Ende-zu-Ende-verschlüsselter Kanal. Keine Konten, keine Cloud-Server.';
-
-  @override
   String get zapretWithVpn => 'DPI-Filterung für direkten Netzwerkverkehr umgehen';
 
   @override
-  String get zapretWithVpnHint =>
-      'Führt zapret neben dem VPN-Tunnel aus: Tunnelverkehr nutzt das VPN, direkter Verkehr die Umgehung.';
-
-  @override
-  String get chainDuplicate =>
-      'Ein Server kommt mehrfach in der Kette vor. Wählen Sie für jeden Schritt einen anderen Server.';
+  String get chainDuplicate => 'Ein Server kommt mehrfach in der Kette vor';
 
   @override
   String get edit => 'Bearbeiten';
@@ -1675,10 +1491,6 @@ class SDe extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Automatische Umschaltung bei Verschlechterung';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Wenn der gewählte Server deutlich langsamer wird oder nicht mehr antwortet, wechselt Sora zum besten gemessenen Server, höchstens einmal alle 10 Minuten.';
 
   @override
   String get tunStackMixed => 'Gemischt';
@@ -1696,19 +1508,13 @@ class SDe extends S {
   String get customServerName => 'Name';
 
   @override
-  String get customServerNameHint => 'Zum Beispiel: mein VPS';
-
-  @override
-  String get customServerNameRequired => 'Geben Sie den Namen ein';
+  String get customServerNameRequired => 'Name fehlt';
 
   @override
   String get customServerAddress => 'Adresse';
 
   @override
-  String get customServerAddressHint => 'example.com oder 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Geben Sie die Serveradresse ein';
+  String get customServerAddressRequired => 'Adresse fehlt';
 
   @override
   String get customServerAddressInvalid => 'Ungültige Adresse';
@@ -1717,19 +1523,13 @@ class SDe extends S {
   String get customServerPort => 'Port';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Port muss eine Zahl zwischen 1 und 65535 sein';
+  String get customServerPortInvalid => 'Ungültiger Port';
 
   @override
   String get customServerProtocol => 'Protokoll';
 
   @override
   String get customServerCredentials => 'Anmeldeinformationen';
-
-  @override
-  String get customServerOptional => 'Optional';
 
   @override
   String get customServerShowSecret => 'Geheimnis anzeigen';
@@ -1743,23 +1543,13 @@ class SDe extends S {
   }
 
   @override
-  String get customServerTest => 'Test';
-
-  @override
   String get leakTestTitle => 'Test auf Datenlecks';
-
-  @override
-  String get leakTestIntro =>
-      'Prüft, ob Datenverkehr das Gerät am Tunnel vorbei verlassen kann: direkte DNS- und ICMP-Anfragen, IPv6-Ausgang und Systemresolver. Führen Sie den Test bei aktiver Verbindung aus.';
 
   @override
   String get leakTestRun => 'Prüfen';
 
   @override
   String get leakTestCancel => 'Abbrechen';
-
-  @override
-  String get leakTestNeedsConnection => 'Stellen Sie eine Verbindung zum VPN her, um auf Datenlecks zu testen.';
 
   @override
   String leakTestProgress(int count) {
@@ -1785,9 +1575,6 @@ class SDe extends S {
 
   @override
   String get leakTestFix => 'Beheben';
-
-  @override
-  String get leakTestFixedNote => 'Die Netzwerksperre ist aktiv. Führen Sie den Test erneut durch.';
 
   @override
   String get leakTestCheckDirectDns => 'Direkt DNS';
@@ -1820,15 +1607,13 @@ class SDe extends S {
   String get syncDaemonFailed => 'Der Synchronisierungsdienst konnte nicht gestartet werden';
 
   @override
-  String get syncDaemonMissing =>
-      'Die Komponente sora-sync wurde nicht gefunden. Installieren Sie die App neu, um die Gerätesynchronisierung zu aktivieren.';
+  String get syncDaemonMissing => 'Die Komponente sora-sync wurde nicht gefunden';
 
   @override
   String get syncDaemonStarting => 'Synchronisierungsdienst wird gestartet…';
 
   @override
-  String get syncErrAuth =>
-      'Der Synchronisierungsdienst hat das Zugriffstoken abgelehnt. Starten Sie die App neu und versuchen Sie es erneut.';
+  String get syncErrAuth => 'Der Synchronisierungsdienst hat das Zugriffstoken abgelehnt';
 
   @override
   String get syncErrNotFound => 'Das Gerät ist nicht mehr gekoppelt';
@@ -1837,8 +1622,7 @@ class SDe extends S {
   String get syncErrPairingActive => 'Eine Pairing-Sitzung ist bereits geöffnet';
 
   @override
-  String get syncErrUnreachable =>
-      'Das andere Gerät hat nicht geantwortet. Stellen Sie sicher, dass es sich im selben Netzwerk befindet und seinen Code anzeigt.';
+  String get syncErrUnreachable => 'Das andere Gerät hat nicht geantwortet';
 
   @override
   String get syncError => 'Synchronisierungsfehler';
@@ -1850,10 +1634,6 @@ class SDe extends S {
 
   @override
   String get syncJoining => 'Kopplung mit dem Gerät...';
-
-  @override
-  String get syncLegacyCleared =>
-      'Die alte Geräteliste wurde nie wirklich gekoppelt und daher gelöscht. Koppeln Sie Ihre Geräte erneut, diesmal wirklich.';
 
   @override
   String get syncNewCode => 'Neuer Code';
@@ -1913,8 +1693,7 @@ class SDe extends S {
   String get syncThisDevice => 'Dieses Gerät';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Synchronisierung auf Android nicht verfügbar';
 
   @override
   String get diagnosticPackets => 'Paketerfassung';
@@ -1962,28 +1741,25 @@ class SDe extends S {
   String get customServerWgKeepalive => 'Keepalive, Sekunden';
 
   @override
-  String get customServerWgKeyInvalid => 'Der Schlüssel muss 32 Byte in Base64 sein, wie wg genkey ihn ausgibt.';
+  String get customServerWgKeyInvalid => 'Ungültiger WireGuard-Schlüssel';
 
   @override
-  String get customServerWgCidrInvalid => 'Präfixe kommagetrennt eingeben, etwa 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Ungültiges CIDR-Präfix';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'Eine Sekundenzahl von 0 bis 65535 eingeben.';
+  String get customServerWgKeepaliveInvalid => 'Ungültiges Keepalive-Intervall';
 
   @override
   String get strictKillSwitch => 'Strikte Netzwerksperre';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Blockiert nach dem Verbinden Datenverkehr außerhalb des VPN auch bei Absturz, Neustart oder Beenden der App. Nur Trennen oder Ausschalten dieser Option gibt den Zugriff frei. Nach einem Systemneustart greift die Sperre nur bei aktivierter Verbindung beim Start.';
+  String get strictKillSwitchWarning => 'Datenverkehr außerhalb des VPN nach dem Beenden blockieren?';
 
   @override
-  String get extWorkerFailed =>
-      'Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen. Prüfe das Erweiterungsprotokoll.';
+  String get extWorkerFailed => 'Die Hintergrundaufgabe der Erweiterung ist fehlgeschlagen';
 
   @override
-  String get extAssetRejected =>
-      'Die Erweiterungsdatei enthält unleserliche Farben oder ungültige Regeln. Bitten Sie den Autor der Erweiterung, die Datei zu korrigieren.';
+  String get extAssetRejected => 'Die Erweiterungsdatei enthält unleserliche Farben oder ungültige Regeln';
 
   @override
   String get extVerifiedSora => 'Von Sora verifiziert';
@@ -2009,31 +1785,25 @@ class SDe extends S {
   String get customServerPassword => 'Passwort';
 
   @override
-  String get customServerSecretRequired => 'Wert eingeben';
+  String get customServerSecretRequired => 'Wert fehlt';
 
   @override
   String get customServerLinkInvalid => 'Ungültiger Serverlink';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Interner Sora-Fehler';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Serverzertifikat abgelehnt';
 
   @override
-  String get errInternal => 'Interner Sora-Fehler. Speichern Sie das Protokoll und melden Sie den Fehler.';
+  String get errFileAccess => 'Kein Dateizugriff';
 
   @override
-  String get errTls => 'Serverzertifikat abgelehnt. Prüfen Sie die Uhrzeit oder kontaktieren Sie den Anbieter.';
+  String get errDataLimit => 'Zu viele Daten';
 
   @override
-  String get errFileAccess => 'Kein Dateizugriff. Prüfen Sie Berechtigungen und freien Speicher.';
-
-  @override
-  String get errDataLimit => 'Zu viele Daten. Wählen Sie weniger Einträge und versuchen Sie es erneut.';
-
-  @override
-  String get errCredentials => 'Gespeicherte Zugangsdaten fehlen. Importieren Sie den Server erneut.';
+  String get errCredentials => 'Gespeicherte Zugangsdaten fehlen';
 
   @override
   String subscriptionStale(String time) {
@@ -2041,62 +1811,54 @@ class SDe extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Noch nicht aktualisiert. Erneut versuchen.';
+  String get subscriptionNeverUpdated => 'Noch nicht aktualisiert';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Der Server hat HTTP $status zurückgegeben. Prüfen Sie den Link oder wenden Sie sich an Ihren Anbieter.',
-      zero: 'Der Server hat die Anfrage abgelehnt. Prüfen Sie den Link oder wenden Sie sich an Ihren Anbieter.',
+      other: 'Der Server hat HTTP $status zurückgegeben',
+      zero: 'Der Server hat die Anfrage abgelehnt',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer =>
-      'Servereinstellungen sind unvollständig oder nicht unterstützt. Aktualisieren Sie das Abonnement.';
+  String get errInvalidServer => 'Servereinstellungen sind unvollständig oder nicht unterstützt';
 
   @override
-  String get errServerIds => 'Zwei Server haben dieselbe Kennung. Importieren Sie sie erneut.';
+  String get errServerIds => 'Zwei Server haben dieselbe Kennung';
 
   @override
-  String get errRoutingGroup =>
-      'Die Route verweist auf fehlende Server oder eine defekte Gruppe. Aktualisieren Sie das Abonnement.';
+  String get errRoutingGroup => 'Die Route verweist auf fehlende Server oder eine defekte Gruppe';
 
   @override
-  String get errConnections =>
-      'Verbindungen sind nicht verfügbar. Verbinden Sie sich oder wählen Sie eine andere Engine.';
+  String get errConnections => 'Verbindungen sind nicht verfügbar';
 
   @override
-  String get errLogs => 'Dieser Dienst führt kein Protokoll. Aktualisieren Sie Sora.';
+  String get errLogs => 'Dieser Dienst führt kein Protokoll';
 
   @override
-  String get errDiagnostics =>
-      'Diagnose konnte nicht erfasst werden. Versuchen Sie es erneut oder speichern Sie das Protokoll.';
+  String get errDiagnostics => 'Diagnose konnte nicht erfasst werden';
 
   @override
-  String get errMissingItem => 'Das angeforderte Element existiert nicht mehr. Aktualisieren Sie die Liste.';
+  String get errMissingItem => 'Das angeforderte Element existiert nicht mehr';
 
   @override
-  String get errInvalidRequest =>
-      'Die Anfrage enthält ungültige Werte. Prüfen Sie die Eingabe und versuchen Sie es erneut.';
+  String get errInvalidRequest => 'Die Anfrage enthält ungültige Werte';
 
   @override
-  String get errProxyLogin =>
-      'Der Systemproxy unterstützt diese Anmeldung nicht. Entfernen Sie Benutzername und Passwort des lokalen Proxys.';
+  String get errProxyLogin => 'Der Systemproxy unterstützt diese Anmeldung nicht';
 
   @override
-  String get errLogFilter => 'Ungültiger Protokollfilter. Leeren Sie die Suche und versuchen Sie es erneut.';
+  String get errLogFilter => 'Ungültiger Protokollfilter';
 
   @override
-  String get errSubRedirect =>
-      'Der Server hat an eine unsichere Adresse umgeleitet. Fordern Sie beim Anbieter einen neuen Link an.';
+  String get errSubRedirect => 'Der Server hat an eine unsichere Adresse umgeleitet';
 
   @override
-  String get errProxySetup =>
-      'Systemproxy konnte nicht eingerichtet werden. Verbinden Sie sich erneut oder öffnen Sie das Protokoll.';
+  String get errProxySetup => 'Systemproxy konnte nicht eingerichtet werden';
 
   @override
   String get notificationsToday => 'Heute';
@@ -2122,19 +1884,46 @@ class SDe extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'Das Aktualisierungsintervall des Abonnements ist ungültig. Wählen Sie das vom Anbieter empfohlene Intervall.';
+  String get errSubInterval => 'Das Aktualisierungsintervall des Abonnements ist ungültig';
 
   @override
-  String get errRule =>
-      'Eine Routingregel ist ungültig. Prüfen Sie die Domain, IP-Adresse oder Anwendung in der Regel.';
+  String get errRule => 'Eine Routingregel ist ungültig';
 
   @override
-  String get errDns => 'Die DNS-Einstellungen sind ungültig. Prüfen Sie die Adresse des DNS-Servers.';
+  String get errDns => 'Die DNS-Einstellungen sind ungültig';
 
   @override
-  String get errEndpoint => 'Die Serveradresse für die Prüfung ist ungültig. Prüfen Sie Hostname und Port.';
+  String get errEndpoint => 'Die Serveradresse für die Prüfung ist ungültig';
 
   @override
-  String get errCancelled => 'Die Anfrage wurde abgebrochen. Wiederholen Sie die Aktion bei Bedarf.';
+  String get errCancelled => 'Die Anfrage wurde abgebrochen';
+
+  @override
+  String get customServerOptions => 'Verbindungseinstellungen';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Sicherheit';
+
+  @override
+  String get customServerCipher => 'Verschlüsselung';
+
+  @override
+  String get customServerWgInterface => 'Schnittstelle';
+
+  @override
+  String get customServerWgPeer => 'Peer';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Verfügbar für: $platforms.';
+  }
+
+  @override
+  String get winwsScopeWarning => 'TCP-Datenverkehr aller Apps ändern?';
+
+  @override
+  String get winwsRequirements => 'Dieser VPN-Modus ist nicht verfügbar';
 }

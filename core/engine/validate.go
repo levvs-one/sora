@@ -116,7 +116,7 @@ var validProtocols = map[Protocol]bool{
 	ProtocolVLESS: true, ProtocolVMess: true, ProtocolTrojan: true,
 	ProtocolShadowsocks: true, ProtocolHysteria2: true, ProtocolTUIC: true,
 	ProtocolWireGuard: true, ProtocolSOCKS5: true, ProtocolHTTP: true,
-	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolXrayProfile: true,
+	ProtocolAnyTLS: true, ProtocolBypass: true, ProtocolByeDPI: true, ProtocolWinws: true, ProtocolXrayProfile: true,
 	ProtocolDirect: true, ProtocolOLCRTC: true, ProtocolMieru: true, ProtocolNaive: true,
 }
 
@@ -145,7 +145,7 @@ func (o Outbound) Validate() error {
 	if !validTransports[o.Transport.Type] {
 		errs = append(errs, fmt.Errorf("outbound %s: unknown transport %q", o.ID, o.Transport.Type))
 	}
-	serverless := o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass
+	serverless := o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass || o.Protocol == ProtocolByeDPI || o.Protocol == ProtocolWinws
 	if !serverless && o.Port == 0 {
 		errs = append(errs, fmt.Errorf("outbound %s: port must be between 1 and 65535", o.ID))
 	}
@@ -158,7 +158,7 @@ func (o Outbound) Validate() error {
 	if o.Protocol == ProtocolMieru || o.Protocol == ProtocolNaive {
 		errs = append(errs, o.validateCommunity())
 	}
-	if o.Protocol == ProtocolBypass {
+	if o.Protocol == ProtocolBypass || o.Protocol == ProtocolByeDPI || o.Protocol == ProtocolWinws {
 		errs = append(errs, o.Bypass.validate(o.ID))
 	}
 	if o.Protocol == ProtocolXrayProfile {
@@ -219,6 +219,17 @@ func (p *Plan) Validate() error {
 	if slices.ContainsFunc(p.Outbounds, func(o Outbound) bool { return o.Protocol == ProtocolXrayProfile }) &&
 		(len(p.Outbounds) > 1 || len(p.Groups) > 0) {
 		errs = append(errs, errors.New("plan: an Xray profile runs alone, without other outbounds or groups"))
+	}
+
+	if slices.ContainsFunc(p.Outbounds, func(o Outbound) bool { return o.Protocol == ProtocolByeDPI }) &&
+		(len(p.Outbounds) != 1 || len(p.Groups) != 0 || p.ExtensionProxy != nil) {
+		errs = append(errs, errors.New("plan: ByeDPI runs alone without VPNs, groups or extension proxies"))
+	}
+
+	// A machine-wide packet filter cannot preserve per-outbound ownership.
+	if slices.ContainsFunc(p.Outbounds, func(o Outbound) bool { return o.Protocol == ProtocolWinws }) &&
+		(len(p.Outbounds) != 1 || len(p.Groups) != 0 || p.ExtensionProxy != nil) {
+		errs = append(errs, errors.New("plan: system-wide Winws runs alone without VPNs, groups or extension proxies"))
 	}
 
 	// Collect all group names before validating members to allow nested and
@@ -335,7 +346,7 @@ func validateChains(outbounds []Outbound, ids map[string]struct{}) error {
 		if o.Via == "" {
 			continue
 		}
-		if o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass {
+		if o.Protocol == ProtocolDirect || o.Protocol == ProtocolBypass || o.Protocol == ProtocolByeDPI || o.Protocol == ProtocolWinws {
 			return fmt.Errorf("outbound %s: a %s outbound cannot dial through another", o.ID, o.Protocol)
 		}
 		if o.Via == o.ID {

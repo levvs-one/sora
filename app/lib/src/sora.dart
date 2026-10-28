@@ -28,6 +28,7 @@ import 'overrides.dart';
 import 'profiles.dart';
 import 'rules.dart';
 import 'ext/store.dart';
+import 'ext/bypass.dart';
 import 'ext/workers.dart';
 import 'settings.dart';
 import 'notifications.dart';
@@ -131,11 +132,11 @@ class Sora extends ChangeNotifier {
       recovered('extension:$id');
     }
     notifyListeners();
-    unawaited(_replan());
-    if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
-      _pendingSelection = ++_selectionRevision;
-      unawaited(_applySelection());
+    if (selected.startsWith(extensionBypassPrefix) && _activeChain == null && !_canSelectBypass(selected)) {
+      if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) unawaited(disconnect());
+      return;
     }
+    unawaited(_replan());
   }
 
   final browserDiagnostics = BrowserDiagnostics();
@@ -165,7 +166,9 @@ class Sora extends ChangeNotifier {
       AppNotification(
         time: DateTime.now(),
         title: strings.updateAvailable(release.version),
-        body: strings.updateOpenAbout,
+        body: '',
+        messageKey: 'notice.update',
+        messageArgs: {'version': release.version},
         action: 'update',
       ),
     ),
@@ -192,6 +195,43 @@ class Sora extends ChangeNotifier {
   }
 
   bool serverlessAvailable = false;
+
+  final _systemFilterConsents = <String>{};
+
+  bool bypassProfileAvailable(ExtensionBypassProfile profile) => profile.systemWide
+      ? coreCapabilities.contains('serverless-winws')
+      : Platform.isLinux && profile.backend == 'byedpi'
+      ? coreCapabilities.contains('serverless-bydpi')
+      : serverlessAvailable;
+
+  String? systemFilterConsentKey(String choice) {
+    final profile = extensions.bypassProfile(choice);
+    if (profile == null || !profile.systemWide) return null;
+    final inst = extensions.get(profile.extensionId);
+    return inst == null ? null : '${inst.id}@${inst.version}:${inst.authorKey ?? inst.manifest.author.publicKey}';
+  }
+
+  bool needsSystemFilterConsent(String choice) {
+    final key = systemFilterConsentKey(choice);
+    return key != null && !_systemFilterConsents.contains(key);
+  }
+
+  bool approveSystemFilter(String choice, String expectedKey) {
+    final profile = extensions.bypassProfile(choice);
+    if (_disposed ||
+        profile == null ||
+        !bypassProfileAvailable(profile) ||
+        systemFilterConsentKey(choice) != expectedKey) {
+      return false;
+    }
+    _systemFilterConsents.add(expectedKey);
+    return true;
+  }
+
+  bool _canSelectBypass(String choice) {
+    final profile = extensions.bypassProfile(choice);
+    return profile != null && bypassProfileAvailable(profile) && !needsSystemFilterConsent(choice);
+  }
 
   /// Set once the core answers the control channel (the getStatus/getAbout
   /// handshake in [run]); the post-update health signal.
@@ -245,6 +285,8 @@ class Sora extends ChangeNotifier {
         action: action,
         argument: argument,
         failureKey: failed.key,
+        messageKey: 'notice.failure',
+        messageArgs: {'failure': failed.key, if (failed.httpStatus != null) 'status': '${failed.httpStatus}'},
       );
       if (repeated) {
         // Retrying still gets feedback, without filling history with one cause.
@@ -349,12 +391,31 @@ class Sora extends ChangeNotifier {
       ServerReturned(:final entry) => (entry, s.noticeMainBack, ''),
       ServerDegraded(:final entry) => (entry, s.noticeDegraded, 'logs'),
     };
+    final (key, args) = switch (notice) {
+      ConnectionLost() => ('notice.connectionLost', <String, String>{}),
+      ConnectionRestored() => (
+        'notice.connectionRestored',
+        {
+          'entry': server,
+          'mode': ['auto', 'bypass'].contains(selected) ? selected : '',
+        },
+      ),
+      ConnectionFailed(:final failure) => (
+        'notice.connectionFailed',
+        {'failure': failure.key, if (failure.httpStatus != null) 'status': '${failure.httpStatus}'},
+      ),
+      ServerSwitched(:final entry, :final backup) => (backup ? 'notice.backup' : 'notice.next', {'entry': entry}),
+      ServerReturned(:final entry) => ('notice.returned', {'entry': entry}),
+      ServerDegraded(:final entry) => ('notice.degraded', {'entry': entry}),
+    };
     return AppNotification(
       time: DateTime.now(),
       title: title,
       body: body,
       action: action,
       failureKey: notice is ConnectionFailed ? notice.failure.key : '',
+      messageKey: key,
+      messageArgs: args,
     );
   }
 
@@ -402,6 +463,7 @@ class Sora extends ChangeNotifier {
   int _selectionRevision = 0;
   int? _pendingSelection;
   bool needsReconnect = false;
+  Timer? _settingsReconnect;
   bool cleanupPending = false;
   bool strictBlocked = false;
 
@@ -586,6 +648,7 @@ class Sora extends ChangeNotifier {
   String displayNameOf(String id) => overrides.renames[id] ?? nameOf(id);
   bool probing = false;
   String? probingSubscription;
+  final pendingProbes = <String>{};
   ResponseStream<ProbeResult>? _probeCall;
 
   bool get canProbe =>
@@ -625,7 +688,7 @@ class Sora extends ChangeNotifier {
   /// keys and selection comparisons in one namespace.
   String get selected {
     final chosen = settings.server;
-    if (chosen == 'auto') return chosen;
+    if (chosen == 'auto' || chosen.startsWith(extensionBypassPrefix)) return chosen;
     if (chosen == 'bypass') return serverlessAvailable ? chosen : 'auto';
     if (chosen.startsWith(groupPrefix)) {
       // A group whose members are all hidden no longer exists: fall back to
@@ -643,7 +706,13 @@ class Sora extends ChangeNotifier {
   /// [canonicalCustomId].
   String canonicalServerId(String id) => canonicalCustomId(id, [for (final s in customServers) s.id]);
 
+  bool get bypassSelected => selected == 'bypass' || selected.startsWith(extensionBypassPrefix);
+
   String nameOf(String id) {
+    if (id.startsWith(extensionBypassPrefix)) {
+      final extensionId = id.substring(extensionBypassPrefix.length);
+      return extensions.get(extensionId)?.manifest.name ?? extensionId;
+    }
     if (id.startsWith(groupPrefix)) return entryOf(id, _subscriptions.values)?.name ?? id;
     // Custom servers are keyed by plain id in _customServers but selected by
     // their canonical `custom/<id>` outbound id.
@@ -672,6 +741,7 @@ class Sora extends ChangeNotifier {
       choice: selected,
       settings: settings,
       extensionRules: [for (final r in extensions.routingRules) r.rule],
+      bypassProfile: extensions.bypassProfile(selected),
       latency: latency,
       bandwidth: bandwidth,
       entry: selected.startsWith(groupPrefix)
@@ -1230,7 +1300,7 @@ class Sora extends ChangeNotifier {
 
   /// Applies a network profile's settings snapshot. Only snapshot
   /// fields the profile captured are touched; the rest stays as-is.
-  Future<void> applyProfile(NetworkProfile profile) async {
+  Future<void> applyProfile(NetworkProfile profile, {bool userInitiated = true}) async {
     await change((x) {
       if (profile.tunnel != null) x.tunnel = profile.tunnel!;
       if (profile.preset != null) x.preset = profile.preset!;
@@ -1238,11 +1308,7 @@ class Sora extends ChangeNotifier {
       if (profile.dnsPreset != null) x.dnsPreset = profile.dnsPreset!;
       if (profile.engine != null) x.engine = profile.engine!;
       if (profile.serverId != null) x.server = profile.serverId!;
-    });
-    if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
-      _pendingSelection = ++_selectionRevision;
-      await _applySelection();
-    }
+    }, userInitiated: userInitiated);
   }
 
   /// Handles a core ProfileMatched event: marks the profile active and
@@ -1253,13 +1319,15 @@ class Sora extends ChangeNotifier {
     if (profile == null) return;
     profiles.activeId = profileId;
     if (profile.autoApply) {
-      await applyProfileWithUndo(profile);
+      await applyProfileWithUndo(profile, userInitiated: false);
     } else {
       await recordNotification(
         AppNotification(
           time: DateTime.now(),
           title: strings.profileApplyAsk(profile.name),
           body: '',
+          messageKey: 'notice.profileAsk',
+          messageArgs: {'name': profile.name},
           action: 'apply-profile',
           argument: profileId,
         ),
@@ -1270,7 +1338,7 @@ class Sora extends ChangeNotifier {
 
   /// Applies a profile and posts an undo snapshot so the previous settings
   /// are one tap away.
-  Future<void> applyProfileWithUndo(NetworkProfile profile) async {
+  Future<void> applyProfileWithUndo(NetworkProfile profile, {bool userInitiated = true}) async {
     final before = jsonEncode({
       'tunnel': settings.tunnel,
       'preset': settings.preset,
@@ -1279,12 +1347,14 @@ class Sora extends ChangeNotifier {
       'server': settings.server,
       'engine': settings.engine,
     });
-    await applyProfile(profile);
+    await applyProfile(profile, userInitiated: userInitiated);
     await recordNotification(
       AppNotification(
         time: DateTime.now(),
         title: strings.profileApplied(profile.name),
         body: '',
+        messageKey: 'notice.profileApplied',
+        messageArgs: {'name': profile.name},
         action: 'undo-profile',
         argument: before,
       ),
@@ -1309,10 +1379,6 @@ class Sora extends ChangeNotifier {
         final engine = before['engine'];
         if (engine is String) x.engine = engine;
       });
-      if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
-        _pendingSelection = ++_selectionRevision;
-        await _applySelection();
-      }
     } catch (_) {
       // A corrupt snapshot must not break the UI; there is nothing sane to
       // restore, so the current settings simply stay.
@@ -1385,6 +1451,7 @@ class Sora extends ChangeNotifier {
   /// remaining attempt count during profile-group failover.
   Future<void> connect({bool retry = false, ProxyChain? via, FailureMode mode = FailureMode.action}) async {
     if (_disposed || updateBlocked || busy || _stopping) return;
+    _settingsReconnect?.cancel();
     if (cleanupPending && !strictBlocked) {
       await disconnect();
       if (cleanupPending || _disposed) return;
@@ -1399,7 +1466,16 @@ class Sora extends ChangeNotifier {
       return;
     }
     failure = null;
-    if (selected != 'bypass' && servers.isEmpty) {
+    if (via == null &&
+        _activeChain == null &&
+        selected.startsWith(extensionBypassPrefix) &&
+        !_canSelectBypass(selected)) {
+      failure = const CoreFailure('app.extension_asset');
+      _emit(ConnectionFailed(failure!), mode: mode);
+      notifyListeners();
+      return;
+    }
+    if (!bypassSelected && servers.isEmpty) {
       failure = const CoreFailure('app.no_servers');
       _emit(ConnectionFailed(failure!), mode: mode);
       notifyListeners();
@@ -1545,6 +1621,7 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> disconnect() async {
+    _settingsReconnect?.cancel();
     _selectionRevision++;
     _pendingSelection = null;
     final link = _link;
@@ -1599,7 +1676,7 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Defers connection changes until the user explicitly reconnects.
+  /// Background refreshes update the mirror without authorizing a reconnect.
   Future<void> _replan() async {
     extensions.logRoutingOverlaps(settings.rules.map(UserRule.parse).nonNulls.map((r) => r.destination).toList());
     if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
@@ -1609,11 +1686,16 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> select(String server) async {
+    if (extensions.bypassProfile(server)?.systemWide == true && !_canSelectBypass(server)) {
+      reportFailure(const CoreFailure('app.extension_asset'), mode: FailureMode.action, source: 'extension-selection');
+      return;
+    }
     // Persist the canonical outbound id: the plan builder, latency
     // keys and selection checks all speak the core's `custom/<id>` namespace
     // for custom servers, so the plain card id is mapped once, here.
     final canonical = canonicalServerId(server);
     if (settings.server == canonical) return;
+    _settingsReconnect?.cancel();
     settings.server = canonical;
     if (_activeChain != null) {
       // A manual server pick ends the chain session: the next plan is
@@ -1656,14 +1738,32 @@ class Sora extends ChangeNotifier {
     });
   }
 
-  /// Applies settings and stages connection changes. Disable [replan] for
+  /// Applies user settings in one debounced replacement. Disable [replan] for
   /// appearance-only changes.
-  Future<void> change(void Function(Settings) apply, {bool replan = true}) async {
+  Future<void> change(void Function(Settings) apply, {bool replan = true, bool userInitiated = true}) async {
+    final beforePlan = replan ? currentPlan : null;
     final checks = settings.checkUpdates;
     apply(settings);
     if (checks != settings.checkUpdates) await updates.setChecking(settings.checkUpdates);
     notifyListeners();
-    if (replan) await _replan();
+    if (replan) {
+      await _replan();
+      if (userInitiated && currentPlan != beforePlan) applyConnectionChanges();
+    }
+  }
+
+  /// Only an explicit user edit authorizes replacing the active connection.
+  void applyConnectionChanges() {
+    _settingsReconnect?.cancel();
+    if (_disposed ||
+        _stopping ||
+        (phase != Phase.connected && phase != Phase.reconnecting && _connectionWork == null)) {
+      return;
+    }
+    _settingsReconnect = Timer(const Duration(milliseconds: 350), () {
+      _pendingSelection = ++_selectionRevision;
+      unawaited(_applySelection());
+    });
   }
 
   /// Resets settings to defaults and reapplies the active connection plan.
@@ -1672,6 +1772,7 @@ class Sora extends ChangeNotifier {
     await updates.setChecking(settings.checkUpdates);
     notifyListeners();
     await _replan();
+    applyConnectionChanges();
   }
 
   Future<void> setKillSwitch(bool value) {
@@ -2023,10 +2124,16 @@ class Sora extends ChangeNotifier {
 
   Future<void> probe({String? subscriptionId}) async {
     final link = _link;
-    final all = subscriptionId == null ? servers : _subscriptions[subscriptionId]?.outbounds.toList() ?? [];
+    final all = subscriptionId == null
+        ? servers
+        : [
+            for (final outbound in _subscriptions[subscriptionId]?.outbounds ?? <OutboundSpec>[])
+              if (!outbound.id.startsWith(customServerPrefix)) outbound,
+          ];
     if (!canProbe || link == null || all.isEmpty) return;
     probing = true;
     probingSubscription = subscriptionId;
+    pendingProbes.addAll(all.map((o) => o.id));
     notifyListeners();
     // The first chunk failure is reported once below; every chunk's results
     // are kept independently, so one bad chunk never sinks the whole probe.
@@ -2054,6 +2161,7 @@ class Sora extends ChangeNotifier {
           );
           await for (final r in call) {
             if (_disposed || link != _link || busy || (phase != Phase.off && phase != Phase.connected)) break;
+            if (!pendingProbes.remove(r.serverId)) continue;
             latency[r.serverId] = r.reachable ? r.latencyMs : null;
             _recordProbe(r.serverId, r.reachable);
             final now = DateTime.now();
@@ -2069,6 +2177,9 @@ class Sora extends ChangeNotifier {
           // A failed chunk leaves its servers unknown; the rest are still
           // measured.
           firstError ??= error;
+        } finally {
+          pendingProbes.removeAll(chunk.map((o) => o.id));
+          notifyListeners();
         }
       }
       if (firstError != null && !_disposed && link == _link) {
@@ -2081,6 +2192,7 @@ class Sora extends ChangeNotifier {
       _probeCall = null;
       probing = false;
       probingSubscription = null;
+      pendingProbes.clear();
       _maybeAutoSwitch();
       notifyListeners();
     }
@@ -2351,6 +2463,7 @@ class Sora extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _settingsReconnect?.cancel();
     for (final timer in _failureTimers.values) {
       timer.cancel();
     }
@@ -2387,11 +2500,14 @@ SessionPlan buildPlan({
   List<UserRule> extensionRules = const [],
   List<String> chain = const [],
   bool zapretWithVpn = false,
+  ExtensionBypassProfile? bypassProfile,
   double? Function(String id)? reliabilityOf,
 }) {
+  final extensionBypass = choice.startsWith(extensionBypassPrefix);
+  final bypassMode = chain.isEmpty && (choice == 'bypass' || extensionBypass);
   final plan = SessionPlan(
     tunnelMode: settings.tunnel == 'proxy' ? TunnelMode.TUNNEL_MODE_APPLICATION : TunnelMode.TUNNEL_MODE_SYSTEM,
-    tunStack: settings.tunnel == 'tun' && choice != 'bypass'
+    tunStack: settings.tunnel == 'tun' && !bypassMode
         ? switch (settings.engine) {
             'mihomo' => settings.mihomoTunStack,
             'xray' when Platform.isWindows || settings.xrayTunStack != 'gvisor' => settings.xrayTunStack,
@@ -2425,7 +2541,7 @@ SessionPlan buildPlan({
 
   // Zapret's tpws alongside the VPN tunnel (Linux only, needs tpws in
   // the engines directory); never in serverless bypass mode.
-  if (zapretWithVpn && choice != 'bypass') {
+  if (zapretWithVpn && !bypassMode) {
     plan.zapretWithVpn = true;
     // Carry the tuned handshake strategy with it: without it the core falls
     // back to its own defaults and silently ignores the zapret settings
@@ -2451,18 +2567,25 @@ SessionPlan buildPlan({
     return plan;
   }
 
-  if (choice == 'bypass') {
+  if (bypassMode) {
+    if (extensionBypass && bypassProfile?.choiceId != choice) return plan;
     plan.outbounds.add(
       OutboundSpec(
         id: Sora.bypassId,
-        displayName: 'zapret',
-        protocol: 'bypass',
-        bypass: BypassStrategy(
-          splitPos: settings.splitPos,
-          disorder: settings.disorder,
-          tlsRecord: settings.tlsRecord,
-          hostCase: settings.hostCase,
-        ),
+        displayName: extensionBypass ? bypassProfile!.name : 'zapret',
+        protocol: extensionBypass && bypassProfile!.systemWide
+            ? 'winws'
+            : extensionBypass && Platform.isLinux && bypassProfile!.backend == 'byedpi'
+            ? 'byedpi'
+            : 'bypass',
+        bypass:
+            (extensionBypass ? bypassProfile!.strategy : null) ??
+            BypassStrategy(
+              splitPos: settings.splitPos,
+              disorder: settings.disorder,
+              tlsRecord: settings.tlsRecord,
+              hostCase: settings.hostCase,
+            ),
       ),
     );
     plan.routing.proxyTarget = Sora.bypassId;

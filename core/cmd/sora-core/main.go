@@ -416,6 +416,8 @@ func (s *source) EngineLines() []string {
 
 // Serve runs the control plane until the context ends.
 func (a *App) Serve(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	stop := context.AfterFunc(ctx, func() { _ = a.listener.Close() })
 	defer stop()
 	a.log.Info("core listening", "endpoint", a.address, "tunnel", a.local)

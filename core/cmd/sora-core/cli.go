@@ -21,19 +21,26 @@ import (
 
 // flags holds operator settings with defaults for a standard installation.
 type flags struct {
-	dataDir     string
-	enginesDir  string
-	engine      string
-	localPort   int
-	bypass      string
-	socket      string
-	logLevel    string
-	check       bool
-	fileKeys    bool
-	showVersion bool
-	install     bool
-	uninstall   bool
-	showToken   bool
+	dataDir         string
+	enginesDir      string
+	engine          string
+	localPort       int
+	bypass          string
+	socket          string
+	logLevel        string
+	check           bool
+	fileKeys        bool
+	showVersion     bool
+	install         bool
+	uninstall       bool
+	stopService     bool
+	showToken       bool
+	verifyRelease   string
+	releaseVersion  string
+	releaseArtifact string
+	releaseTarget   string
+	releaseFiles    bool
+	prepareUpdate   string
 }
 
 func main() {
@@ -81,9 +88,84 @@ func run(ctx context.Context, arguments []string) error {
 	set.BoolVar(&f.showVersion, "version", false, "print the contract and build version and exit")
 	set.BoolVar(&f.install, "install-service", false, "Windows: register this executable as the SoraCore service with the other flags, start it and exit")
 	set.BoolVar(&f.uninstall, "uninstall-service", false, "Windows: stop and remove the SoraCore service and exit")
+	set.BoolVar(&f.stopService, "stop-service", false, "Windows: stop SoraCore and wait before an installer replaces its files; do not remove the service")
 	set.BoolVar(&f.showToken, "print-token", false, "print the control plane token and exit")
+	set.StringVar(&f.verifyRelease, "verify-release", "", "verify the signed SHA256SUMS in a release directory and exit")
+	set.StringVar(&f.releaseVersion, "release-version", "", "expected stable release version for -verify-release (e.g. 1.2.3)")
+	set.StringVar(&f.releaseArtifact, "release-artifact", "", "with -release-target, print this authenticated artifact's byte size (0 for signed legacy manifests)")
+	set.StringVar(&f.releaseTarget, "release-target", "", "expected artifact OS/architecture, e.g. linux/amd64")
+	set.BoolVar(&f.releaseFiles, "verify-release-files", false, "with release verification, require the complete schema 1 snapshot and verify every artifact file")
+	set.StringVar(&f.prepareUpdate, "prepare-update", "", "Linux: copy and authenticate an update pair (deb/rpm/arch); requires -release-version and source/destination directories")
 	if err := set.Parse(arguments); err != nil {
 		return errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyUnauthenticated)
+	}
+	stopping := false
+	set.Visit(func(option *flag.Flag) { stopping = stopping || option.Name == "stop-service" })
+	if stopping {
+		if !f.stopService || set.NFlag() != 1 || set.NArg() != 0 {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyUnauthenticated,
+				"service stopping requires -stop-service alone; other flags and arguments are forbidden")
+		}
+		return stopInstalledService()
+	}
+	preparation := false
+	set.Visit(func(option *flag.Flag) { preparation = preparation || option.Name == "prepare-update" })
+	if preparation {
+		invalid := set.NArg() != 2 || f.prepareUpdate == "" || f.releaseVersion == ""
+		set.Visit(func(option *flag.Flag) {
+			if option.Name != "prepare-update" && option.Name != "release-version" {
+				invalid = true
+			}
+		})
+		if invalid {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyUnauthenticated,
+				"update preparation requires -prepare-update FORMAT -release-version VERSION SOURCE DESTINATION; other flags are forbidden")
+		}
+		return prepareUpdateSnapshot(ctx, f.prepareUpdate, f.releaseVersion, set.Arg(0), set.Arg(1), releasePublicKey)
+	}
+	verification, artifactQuery, invalid := false, false, set.NArg() != 0
+	set.Visit(func(option *flag.Flag) {
+		switch option.Name {
+		case "verify-release", "release-version":
+			verification = true
+		case "release-artifact", "release-target":
+			verification, artifactQuery = true, true
+		case "verify-release-files":
+			verification = true
+			if !f.releaseFiles {
+				invalid = true
+			}
+		default:
+			invalid = true
+		}
+	})
+	if verification {
+		if invalid || f.verifyRelease == "" || f.releaseVersion == "" ||
+			(artifactQuery && (f.releaseArtifact == "" || f.releaseTarget == "" || f.releaseFiles)) {
+			return errs.Newf(errs.CodeInvalidArgument, errs.KeyUnauthenticated,
+				"release verification requires -verify-release and -release-version, optionally an artifact/target pair or -verify-release-files; other flags are forbidden")
+		}
+		manifest, err := verifyRelease(f.verifyRelease, f.releaseVersion, releasePublicKey)
+		if err != nil {
+			return err
+		}
+		if f.releaseFiles {
+			if err := manifest.verifyArtifactFiles(ctx, f.verifyRelease); err != nil {
+				return err
+			}
+			fmt.Printf("verified release %s signature, metadata and all %d artifact files\n", f.releaseVersion, len(manifest.metadata.Artifacts))
+			return nil
+		}
+		if artifactQuery {
+			size, err := manifest.artifactSize(f.releaseArtifact, f.releaseTarget, f.releaseVersion)
+			if err != nil {
+				return err
+			}
+			fmt.Println(size)
+			return nil
+		}
+		fmt.Printf("verified release %s SHA256SUMS signature\n", f.releaseVersion)
+		return nil
 	}
 	if f.uninstall {
 		return uninstallService()

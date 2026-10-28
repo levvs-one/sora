@@ -152,10 +152,6 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
         Group(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: Text(s.leakTestIntro, style: Styles.secondary.copyWith(color: Palette.of(context).ink2)),
-            ),
-            Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
               child: PrimaryButton(
                 label: _running ? s.leakTestCancel : s.leakTestRun,
@@ -165,7 +161,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
           ],
         ),
         if (_running) _progress(context),
-        if (_needsConnection) _note(context, Symbols.info_rounded, s.leakTestNeedsConnection),
+        if (_needsConnection) _note(context, Symbols.info_rounded, s.stateOff),
         if (_failure != null) _note(context, Symbols.info_rounded, describe(s, _failure!)),
         if (_results.isNotEmpty) _report(context),
       ],
@@ -209,7 +205,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
               Icon(icon, size: 18, color: palette.ink2),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(text, style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             ],
           ),
@@ -300,7 +296,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                   Icon(Symbols.info_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(s.leakTestSkipped, style: Styles.caption.copyWith(color: palette.ink2)),
+                    child: Text(s.leakTestSkipped, style: Styles.caption.copyWith(color: palette.ink)),
                   ),
                 ],
               ),
@@ -319,7 +315,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                   Icon(Symbols.check_circle_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(s.leakTestFixedNote, style: Styles.caption.copyWith(color: palette.ink2)),
+                    child: Text(s.killSwitch, style: Styles.caption.copyWith(color: palette.ink)),
                   ),
                 ],
               ),

@@ -13,3 +13,5 @@ var errNotWindows = errors.New("a service is registered on Windows only; on Linu
 func installService([]string) error { return errNotWindows }
 
 func uninstallService() error { return errNotWindows }
+
+func stopInstalledService() error { return errNotWindows }

@@ -75,7 +75,7 @@ void main() {
       store = ExtensionStore(dir: dir.path);
       await store.load();
       settings = await Settings.load();
-      await settings.completeTour();
+
       settings.animations = false;
     });
     final sora = Sora(settings, extensions: store);
@@ -223,7 +223,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('example.org'), findsOneWidget);
-    expect(find.text('Use the currently selected proxy; no server ID is embedded'), findsOneWidget);
+    expect(find.text('Use the currently selected proxy; no server ID is embedded'), findsNothing);
     await tester.runAsync(() => store.setEnabled(inst.id, false));
     await tester.pumpAndSettle();
     expect(find.text('example.org'), findsNothing);

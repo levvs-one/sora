@@ -20,7 +20,6 @@ import '../groups.dart';
 import '../notifications.dart';
 import '../sora.dart';
 import '../updates.dart';
-import '../ui/kit.dart';
 import '../ui/servers.dart';
 import '../ui/subscription_sheet.dart';
 import 'links.dart';
@@ -79,7 +78,7 @@ class Desktop with WindowListener {
   /// because an existing core session may still be active.
   bool _coreSeen = false;
 
-  /// Last notification text for each subscription, used to suppress duplicates.
+  /// Last warning meaning for each subscription, independent of display language.
   final Map<String, String> _warned = {};
 
   /// Initializes desktop integration. [hidden] keeps a login launch in the tray
@@ -137,7 +136,12 @@ class Desktop with WindowListener {
     _visible = false;
     if (!sora.settings.trayHintShown) {
       sora.settings.trayHintShown = true;
-      unawaited(_tell(_s.noticeInTray, _s.noticeInTrayBody, always: true));
+      unawaited(
+        _tell(
+          AppNotification(time: DateTime.now(), title: _s.noticeInTray, body: '', messageKey: 'notice.tray'),
+          always: true,
+        ),
+      );
     }
   }
 
@@ -477,41 +481,28 @@ class Desktop with WindowListener {
 
   // Focused windows already display events, so notices are suppressed.
 
-  Future<void> _tell(
-    String title,
-    String body, {
-    bool always = false,
-    bool record = true,
-    String action = '',
-    String argument = '',
-  }) async {
-    if (record) {
-      await sora.recordNotification(
-        AppNotification(time: DateTime.now(), title: title, body: body, action: action, argument: argument),
-      );
-    }
-    // Suppress duplicate notifications when the focused window already shows
-    // the event.
+  Future<void> _tell(AppNotification notice, {bool always = false, bool record = true}) async {
+    if (record) await sora.recordNotification(notice);
+    // Suppress duplicate notifications when the focused window already shows the event.
     if (!sora.settings.notifications || (!always && _visible && _focused)) return;
     try {
       await _notifications.show(
-        id: title.hashCode & 0x7fffffff,
-        title: title,
-        body: body,
+        id: notice.title.hashCode & 0x7fffffff,
+        title: notice.title,
+        body: notice.body,
         notificationDetails: const NotificationDetails(
           linux: LinuxNotificationDetails(),
           windows: WindowsNotificationDetails(),
         ),
       );
     } catch (_) {
-      // A failing notification backend (e.g. D-Bus) must not surface as an
-      // unhandled async error (audit L27).
+      // Desktop notification availability must not break the app.
     }
   }
 
   void _notice(Notice notice) {
     final entry = sora.notificationFor(notice);
-    unawaited(_tell(entry.title, entry.body, record: false));
+    unawaited(_tell(entry, record: false));
   }
 
   void _warnAboutSubscriptions() {
@@ -522,9 +513,11 @@ class Desktop with WindowListener {
       final id = sub.settings.id;
       if (warning == null) {
         _warned.remove(id);
-      } else if (_warned[id] != warning) {
-        _warned[id] = warning;
-        unawaited(_tell(s.noticeSubscription, warning, action: 'subscription', argument: id));
+      } else {
+        final identity = jsonEncode([warning.messageKey, warning.messageArgs]);
+        if (_warned[id] == identity) continue;
+        _warned[id] = identity;
+        unawaited(_tell(warning));
       }
     }
   }
@@ -597,7 +590,7 @@ class Desktop with WindowListener {
         await showSubscriptionSheet(context, link: url.toString(), name: name);
       case SealedForHapp():
         final s = S.of(context);
-        await confirm(context, question: s.importSealed, action: s.understood, destructive: false, cancellable: false);
+        await sora.recordNotification(AppNotification(time: DateTime.now(), title: s.importSealed, body: ''));
     }
   }
 }

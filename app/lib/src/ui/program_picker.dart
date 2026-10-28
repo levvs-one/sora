@@ -150,7 +150,7 @@ class _ProgramPickerState extends State<_ProgramPicker> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(describe(s, _failure!), style: Styles.secondary.copyWith(color: palette.ink2)),
+                                Text(describe(s, _failure!), style: Styles.secondary.copyWith(color: palette.ink)),
                                 const SizedBox(height: 8),
                                 TextButton(
                                   onPressed: () => _load(mode: FailureMode.action),
@@ -163,7 +163,7 @@ class _ProgramPickerState extends State<_ProgramPicker> {
                         ? const Center(child: CircularProgressIndicator())
                         : shown.isEmpty
                         ? Center(
-                            child: Text(s.programsEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
+                            child: Text(s.programsEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
                           )
                         : ListView.builder(
                             itemCount: shown.length,

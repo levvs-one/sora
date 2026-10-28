@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,7 +19,7 @@ import 'qr.dart';
 /// End-to-end encrypted device sync without cloud.
 ///
 /// Wired (2026-10-20): the screen drives the sora-sync daemon
-/// (`service/sync`) — spawning it on demand, health-checking its localhost
+/// (`service/sync`) - spawning it on demand, health-checking its localhost
 /// HTTP API, and running pairing, peers and sync through it. The daemon is
 /// the source of truth for peers; the app keeps no device registry, and
 /// "paired" is shown only for peers the daemon reports after a successful
@@ -26,7 +27,7 @@ import 'qr.dart';
 ///
 /// Honest states: daemon missing (binary absent) or Android → an
 /// "unavailable" notice, never a fake device list; starting → progress;
-/// start failure → the error text with a retry; pairing session → the real
+/// start failure → a notification and retry; pairing session → the real
 /// QR from the daemon with its TTL; peers → `GET /v1/peers` with the
 /// daemon's `last_sync`.
 class SyncScreen extends StatefulWidget {
@@ -39,7 +40,6 @@ class SyncScreen extends StatefulWidget {
 class _SyncScreenState extends State<SyncScreen> {
   SyncStatusInfo? _status;
   List<SyncPeer>? _peers;
-  String? _opError;
   bool _joining = false;
   bool _refreshing = false;
   final _syncing = <String>{};
@@ -48,8 +48,9 @@ class _SyncScreenState extends State<SyncScreen> {
   /// The daemon can reach `running` after a retry, not just the first boot,
   /// so the load is driven by the state transition, not by `initState`.
   bool _loaded = false;
+  bool _reportedDaemonFailure = false;
 
-  SyncDaemon get _daemon => SoraScope.read(context).syncDaemon;
+  late final SyncDaemon _daemon = SoraScope.read(context).syncDaemon;
 
   @override
   void initState() {
@@ -69,6 +70,12 @@ class _SyncScreenState extends State<SyncScreen> {
     if (_daemon.state == SyncDaemonState.running && !_loaded) {
       _loaded = true;
       unawaited(_load());
+    }
+    if (_daemon.state == SyncDaemonState.failed && !_reportedDaemonFailure) {
+      _reportedDaemonFailure = true;
+      _snack(_daemon.errorDetail ?? S.of(context).syncDaemonFailed);
+    } else if (_daemon.state != SyncDaemonState.failed) {
+      _reportedDaemonFailure = false;
     }
     if (mounted) setState(() {});
   }
@@ -91,7 +98,7 @@ class _SyncScreenState extends State<SyncScreen> {
     // Keep Sora's document bridge pointed at the daemon's current client
     // (a retry may have created a new one).
     SoraScope.read(context).ensureSyncBridge();
-    _refreshing = true;
+    setState(() => _refreshing = true);
     try {
       final status = await client.status();
       final peers = await client.peers();
@@ -99,13 +106,12 @@ class _SyncScreenState extends State<SyncScreen> {
       setState(() {
         _status = status;
         _peers = peers;
-        _opError = null;
       });
     } on SyncApiException catch (e) {
       if (!mounted) return;
-      setState(() => _opError = describeSyncError(S.of(context), e));
+      _snack(describeSyncError(S.of(context), e));
     } finally {
-      _refreshing = false;
+      if (mounted) setState(() => _refreshing = false);
     }
   }
 
@@ -193,12 +199,12 @@ class _SyncScreenState extends State<SyncScreen> {
       await _showSyncResult(peer, result);
     } on SyncApiException catch (e) {
       if (!mounted) return;
-      _syncing.remove(peer.id);
-      setState(() => _opError = describeSyncError(S.of(context), e));
+      setState(() => _syncing.remove(peer.id));
+      _snack(describeSyncError(S.of(context), e));
     } on SyncBridgeException catch (e) {
       if (!mounted) return;
-      _syncing.remove(peer.id);
-      setState(() => _opError = '${S.of(context).syncError}: ${e.message}');
+      setState(() => _syncing.remove(peer.id));
+      _snack('${S.of(context).syncError}: ${e.message}');
     }
   }
 
@@ -236,7 +242,7 @@ class _SyncScreenState extends State<SyncScreen> {
       await _refresh();
     } on SyncApiException catch (e) {
       if (!mounted) return;
-      setState(() => _opError = describeSyncError(S.of(context), e));
+      _snack(describeSyncError(S.of(context), e));
     }
   }
 
@@ -274,7 +280,7 @@ class _SyncScreenState extends State<SyncScreen> {
               const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(s.syncDaemonStarting, style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(s.syncDaemonStarting, style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             ],
           ),
@@ -300,7 +306,7 @@ class _SyncScreenState extends State<SyncScreen> {
               Text(
                 detail,
                 textAlign: TextAlign.center,
-                style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5),
+                style: Styles.secondary.copyWith(color: palette.ink, height: 1.5),
               ),
             ],
           ),
@@ -311,7 +317,6 @@ class _SyncScreenState extends State<SyncScreen> {
 
   Widget _failed(S s, SyncDaemon daemon) {
     final palette = Palette.of(context);
-    final detail = daemon.errorDetail;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -321,21 +326,13 @@ class _SyncScreenState extends State<SyncScreen> {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.danger),
+                  Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.ink),
                   const SizedBox(height: 12),
                   Text(
-                    s.syncDaemonFailed,
+                    s.sync,
                     textAlign: TextAlign.center,
                     style: Styles.bodyStrong.copyWith(color: palette.ink),
                   ),
-                  if (detail != null && detail.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      detail,
-                      textAlign: TextAlign.center,
-                      style: Styles.caption.copyWith(color: palette.ink2),
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -359,19 +356,16 @@ class _SyncScreenState extends State<SyncScreen> {
           children: [
             Tile(
               title: s.syncThisDevice,
-              detail: status.deviceName.isEmpty ? status.deviceId : '${status.deviceName} · ${status.deviceId}',
+              detail: status.deviceName.trim().isEmpty ? Platform.localHostname : status.deviceName,
               detailColor: palette.ink2,
             ),
           ],
         ),
       if (status != null) const SizedBox(height: 16),
-      if (_opError != null)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Text(_opError!, style: Styles.secondary.copyWith(color: palette.danger)),
-        ),
       Heading(s.syncDevices),
-      if (peers == null)
+      if (peers == null && !_refreshing)
+        PrimaryButton(label: s.syncRetry, onTap: () => unawaited(_refresh()))
+      else if (peers == null)
         const Group(
           children: [
             Padding(
@@ -392,7 +386,7 @@ class _SyncScreenState extends State<SyncScreen> {
                   Text(
                     s.syncEmpty,
                     textAlign: TextAlign.center,
-                    style: Styles.secondary.copyWith(color: palette.ink2),
+                    style: Styles.secondary.copyWith(color: palette.ink),
                   ),
                 ],
               ),
@@ -449,7 +443,7 @@ class _SyncScreenState extends State<SyncScreen> {
                   const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(s.syncJoining, style: Styles.secondary.copyWith(color: palette.ink2)),
+                    child: Text(s.syncJoining, style: Styles.secondary.copyWith(color: palette.ink)),
                   ),
                 ],
               ),
@@ -457,28 +451,12 @@ class _SyncScreenState extends State<SyncScreen> {
           ],
         ),
       ],
-      const SizedBox(height: 16),
-      Group(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(s.syncSecureNote, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
-                const SizedBox(height: 8),
-                Text(s.syncNoLan, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
-              ],
-            ),
-          ),
-        ],
-      ),
     ];
   }
 }
 
 /// Result of one peer sync: every moved document with its kind label,
-/// name, origin device and update time — the honest view of what arrived
+/// name, origin device and update time - the honest view of what arrived
 /// and what left, instead of bare counters.
 class _SyncResultCard extends StatelessWidget {
   const _SyncResultCard({required this.peer, required this.result});
@@ -496,7 +474,7 @@ class _SyncResultCard extends StatelessWidget {
 
     Widget docRow(SyncDocMeta meta, String fromLabel) => Tile(
       title: syncDocKindLabel(s, meta.kind),
-      detail: '${meta.name} · ${s.syncFrom(fromLabel)} · ${when(meta.updatedAt)}',
+      detail: '${meta.name}, ${s.syncFrom(fromLabel)}, ${when(meta.updatedAt)}',
       detailColor: palette.ink2,
     );
 
@@ -530,7 +508,7 @@ class _SyncResultCard extends StatelessWidget {
                             child: Text(
                               s.syncNoChanges,
                               textAlign: TextAlign.center,
-                              style: Styles.secondary.copyWith(color: palette.ink2),
+                              style: Styles.secondary.copyWith(color: palette.ink),
                             ),
                           )
                         else ...[
@@ -569,7 +547,7 @@ class _SyncResultCard extends StatelessWidget {
 
 /// Shows this device's pairing code, generated by the daemon.
 ///
-/// The QR payload comes from `POST /v1/pairing/start` and is shown as-is —
+/// The QR payload comes from `POST /v1/pairing/start` and is shown as-is -
 /// the app never invents key material. While the session is open the screen
 /// polls the daemon: a fresh peer means the other side paired (the screen
 /// pops with success); a closed session without a new peer means the code
@@ -666,11 +644,12 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
         _starting = false;
         _error = describeSyncError(S.of(context), e);
       });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_error!)));
     }
   }
 
   /// Watches for the pairing outcome: a fresh peer means the other side
-  /// completed the Noise_XX handshake — success is shown immediately, not
+  /// completed the Noise_XX handshake - success is shown immediately, not
   /// after the TTL; a closed session without one means the code expired.
   Future<void> _poll() async {
     final client = _client;
@@ -724,7 +703,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
           const Center(child: SizedBox.square(dimension: 28, child: CircularProgressIndicator(strokeWidth: 2))),
           const SizedBox(height: 16),
           Center(
-            child: Text(s.syncDaemonStarting, style: Styles.secondary.copyWith(color: palette.ink2)),
+            child: Text(s.syncDaemonStarting, style: Styles.secondary.copyWith(color: palette.ink)),
           ),
         ] else if (_error != null) ...[
           const SizedBox(height: 32),
@@ -734,12 +713,12 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.danger),
+                    Icon(Symbols.warning_rounded, size: 40, weight: 400, color: palette.ink),
                     const SizedBox(height: 12),
                     Text(
-                      _error!,
+                      s.syncPairingTitle,
                       textAlign: TextAlign.center,
-                      style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5),
+                      style: Styles.secondary.copyWith(color: palette.ink, height: 1.5),
                     ),
                   ],
                 ),
@@ -802,7 +781,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
           ),
           const SizedBox(height: 16),
           Center(
-            child: Text(_countdown(s), style: Styles.secondary.copyWith(color: palette.ink2)),
+            child: Text(_countdown(s), style: Styles.secondary.copyWith(color: palette.ink)),
           ),
           const SizedBox(height: 8),
           Group(
@@ -814,7 +793,7 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
                     const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 2)),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: Text(s.syncWaiting, style: Styles.secondary.copyWith(color: palette.ink2)),
+                      child: Text(s.syncWaiting, style: Styles.secondary.copyWith(color: palette.ink)),
                     ),
                   ],
                 ),
@@ -823,15 +802,6 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
           ),
           const SizedBox(height: 16),
           PrimaryButton(label: s.syncStopShowing, busy: _stopping, onTap: _stopping ? null : () => unawaited(_stop())),
-          const SizedBox(height: 16),
-          Group(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                child: Text(s.syncSecureNote, style: Styles.secondary.copyWith(color: palette.ink2, height: 1.5)),
-              ),
-            ],
-          ),
         ],
       ],
     );

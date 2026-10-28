@@ -139,17 +139,21 @@ v2rayNG, sing-box `experimental/libbox` (+ SFA), NekoBox.
       `Stop()`, `StatusJSON()`, колбэк `PlatformBridge { Protect(fd int32), GetSystemDNS() string, ... }`.
       Прецеденты: v2rayNG (`AndroidLibV2rayLite` + Xray в процессе), sing-box libbox
       (`BoxService` + `PlatformInterface`: `OpenTun`, `FindConnectionOwner`...), SFA.
-- **Что уже готово в core:** нет cgo; `os/exec` изолирован в `supervise`/`tunroute`/
-      `guard(nftables)`/`fingerprint`, все с build-тегами платформ, в mobile-сборку
-      не попадут; dbus только в `ipc/polkit_linux.go`; `core/guard.NoopFirewall` и
-      `core/session` guard уже предусматривают «system-owned tunnels such as Android
-      VpnService»; `core/doc.go` заявляет Android как целевую платформу.
+- **Что уже готово в core:** существующий `engine.Engine` задаёт границу жизненного
+      цикла; `core/guard.NoopFirewall` предусматривает system-owned tunnel.
+      Cross-build пакета `control` для Android arm64 без cgo проходит, но это не
+      запуск на Android и не готовая AAR. **Desktop-код не исключается автоматически:**
+      Go считает тег `linux` истинным и при `GOOS=android`. В текущем графе остаются
+      polkit, Linux packet capture, systemd DNS и внешние процессы. Перед mobile
+      runtime эти зависимости требуется явно отделить; см. проверку в §2.4.
 - **Что нужно доработать (P0 инженерный):**
   1. Движки сейчас, внешние процессы (`engine/supervise`: «run -c stdin»).
      Нужен **in-process driver**: sing-box, `experimental/libbox` (официальный),
      Xray, in-process через Xray-core API (как libv2ray у v2rayNG),
-     mihomo, in-process (как у ClashMeta Android). Граница: интерфейс
-     `engine.Driver` с двумя реализациями `external` (текущая) / `embedded` (Android).
+     mihomo, in-process (как у ClashMeta Android). Повторно использовать
+     существующую границу `engine.Engine`. Нынешний `supervise.Driver` задаёт
+     командные строки и handshake дочернего процесса; сам по себе он не является
+     embedded API. Новый дублирующий lifecycle-интерфейс заранее не требуется.
      Это самая крупная работа темы.
   2. TUN: Kotlin делает `Builder.establish()`, fd (`dup()`, см. грабли libbox)
      передаётся в Go; движок поднимает TUN поверх fd. Сокеты движка, через
@@ -194,12 +198,50 @@ v2rayNG, sing-box `experimental/libbox` (+ SFA), NekoBox.
 
 | Компонент core | Android |
 |---|---|
-| `parser`, `profiles`, `subscription`, `secret`, `session`, `control` (gRPC-контракт) | как есть |
+| `parser`, `profiles`, `subscription`, `secret`, `session`, `control` (gRPC-контракт) | логика переиспользуется; Android runtime и транзитивные desktop-зависимости ещё не проверены |
 | `diagnostics/dnsleak.go` (canary, killswitch-dns) | как есть, кроме `SystemResolvers()` |
 | `engine/*` (рендер конфигов sing-box/xray/mihomo) | как есть; меняется только способ запуска (embedded driver) |
-| `engine/supervise`, `guard/nftables`, `tunroute`, `ipc` (polkit/peercred) | не используется на Android |
+| `engine/supervise`, `guard/nftables`, `tunroute`, `ipc` (polkit/peercred) | требуется исключить или заменить в mobile runtime; текущие Linux build tags этого не обеспечивают |
 | `probe` (bandwidth) | как есть, сокеты через Protect-бридж |
 | `service/sync` (E2E) | как есть |
+
+### 2.4. Проверка текущего исходника, 27.10.2026
+
+На Go 1.27.3 из корня `core/` выполнены команды без запуска ядра:
+
+```sh
+GOOS=android GOARCH=arm64 CGO_ENABLED=0 go build ./control
+GOOS=android GOARCH=arm64 CGO_ENABLED=0 go list -e -json ./engine/singbox ./diagnostics ./ipc ./control
+```
+
+Cross-build завершился успешно. Выбор файлов показал
+`diagnostics/packets_linux.go`, `systemdns_encrypted_linux.go`,
+`systemdns_resolvconf.go` и `ipc/polkit_linux.go`.
+Это соответствует [правилу Go для Android/Linux build constraints](https://pkg.go.dev/cmd/go#hdr-Build_constraints).
+Загрузка Linux-модуля на Android не доказывает наличие systemd, polkit, права
+захвата пакетов, корректного DNS, VpnService или разрешения запуска child executable.
+В `app/` Android runner и Kotlin bridge по-прежнему отсутствуют.
+
+Кандидаты исследованы по официальным исходникам и API GitHub; ничего не добавлено
+в зависимости и ни один APK/AAR не скачан или запущен:
+
+| Кандидат | Последний stable release | Stars / открытые issues | Размер опубликованного ARM64 APK или AAR | Runtime / лицензия |
+|---|---|---|---|---|
+| [sing-box/libbox](https://github.com/SagerNet/sing-box/tree/v1.14.4/experimental/libbox) | v1.14.4, 24.10.2026 | 39292 / 342 | SFA ARM64 APK 36665679 B | Go 1.25.5; [GPLv3-or-later с дополнительным условием имени/ассоциации](https://github.com/SagerNet/sing-box/blob/v1.14.4/LICENSE), API GitHub возвращает NOASSERTION |
+| [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite/tree/v26.10.21) | v26.10.21, 22.10.2026 | 483 / 0 | libv2ray.aar 59954240 B | Go 1.27; LGPL-3.0; отдельная зависимость Xray |
+| [ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid/tree/v2.11.36) | v2.11.36, 21.10.2026 | 48418 / 0 | ARM64 APK 47623688 B | AGP 8.8.0, Kotlin 2.1.0; GPL-3.0; целое приложение |
+
+Issues посчитаны с `is:issue is:open`, без pull requests. Размеры APK и AAR
+не сравнивают чистый размер движка и не предсказывают размер Sora. Метрики
+не являются аудитом или доказательством происхождения кода. GPL/LGPL и
+дополнительное условие sing-box требуют проверки условий интеграции и поставки;
+наличие GPL в Sora само по себе не завершает эту проверку.
+
+Выбор модуля ещё не сделан. До добавления зависимости нужно прочитать API
+закреплённого stable revision, проверить его на реальном Android bridge и
+существующем renderer, затем воспроизводимо собрать AAR с нужными ABI.
+Изученный `PlatformInterface` из ветки testing не заменяет такой проверки.
+Не добавлять пустой embedded driver, не выдавать cross-build за VPN-клиент.
 
 ---
 
@@ -207,5 +249,5 @@ v2rayNG, sing-box `experimental/libbox` (+ SFA), NekoBox.
 
 - Тема 18/20 (эта): сеть/VpnService. Контракт безопасности Kotlin-слоя, тема
   `sora-legacy/docs/android-security-requirements.md` (H6/H7/H8/M12/M13).
-- При старте разработки: сначала `engine.Driver` embedded для sing-box (P0 инж.),
+- При старте разработки: сначала embedded-реализация существующего `engine.Engine` (P0 инж.),
   затем Kotlin-каркас VpnService по чек-листу §1, затем P1.

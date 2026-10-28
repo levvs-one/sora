@@ -100,7 +100,7 @@ class _BenchmarkScreenState extends State<BenchmarkScreen> {
             child: Text(
               s.errNoServers,
               textAlign: TextAlign.center,
-              style: Styles.secondary.copyWith(color: palette.ink2),
+              style: Styles.secondary.copyWith(color: palette.ink),
             ),
           )
         else
@@ -173,11 +173,11 @@ class _BenchmarkRow extends StatelessWidget {
             Text(s.speedMbps(mbpsOf(bps)), style: Styles.figures(Styles.secondary).copyWith(color: palette.ink))
           else if (stale != null)
             Text(
-              '${s.speedMbps(mbpsOf(stale))} · ${s.benchmarkStale}',
+              '${s.speedMbps(mbpsOf(stale))}, ${s.benchmarkStale}',
               style: Styles.figures(Styles.caption).copyWith(color: palette.ink3),
             )
           else
-            Text('—', style: Styles.figures(Styles.secondary).copyWith(color: palette.ink3)),
+            Text('-', style: Styles.figures(Styles.secondary).copyWith(color: palette.ink3)),
         ],
       ),
     );

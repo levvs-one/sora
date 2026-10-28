@@ -4,7 +4,7 @@
 /// ephemeral port) so relative asset paths resolve on every platform and
 /// `file://` quirks are avoided. Navigation is locked to that origin.
 /// The page gets `window.soraExt` (see [PanelBridge.bootstrapJs]); the
-/// `soraExt` JavaScript channel is the panel's only way out.
+/// private JavaScript channel is the panel's only way out.
 library;
 
 import 'dart:async';
@@ -12,9 +12,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart' show CallOptions;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:webview_all/webview_all.dart';
 import 'package:webview_all_linux/webview_all_linux.dart';
+import 'package:webview_all_windows/webview_all_windows.dart';
 
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
@@ -28,7 +30,7 @@ import '../../core/link.dart';
 import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
 
 /// The lockdown policy for extension panels. Panels are embedded WebViews
-/// whose only sanctioned way out is the host API (the soraExt JS channel to
+/// whose only sanctioned way out is the host API (the private JS channel to
 /// core RPCs; net.fetch through the core exists for background workers, not
 /// panels): a panel must never make its own network requests, or a
 /// compromised panel exfiltrates data with a single request.
@@ -55,7 +57,7 @@ const String _panelContentSecurityPolicy =
 ///
 /// Every served response carries [_panelContentSecurityPolicy]: panel
 /// documents must never make their own network requests; the panel's only
-/// sanctioned way out is the soraExt JS channel (net.fetch through the core
+/// sanctioned way out is the private JS channel (net.fetch through the core
 /// exists for background workers, not panels; neither is governed by the
 /// page CSP).
 /// The entry HTML additionally carries the CSP meta tag injected at install
@@ -177,7 +179,11 @@ class LocalPanelServer {
     return script + html;
   }
 
-  Future<void> stop() async => await _server?.close(force: true);
+  Future<void> stop() async {
+    final server = _server;
+    _server = null;
+    await server?.close(force: true);
+  }
 }
 
 class ExtensionPanelScreen extends StatefulWidget {
@@ -190,7 +196,12 @@ class ExtensionPanelScreen extends StatefulWidget {
 }
 
 class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
+  static const _startupTimeout = Duration(seconds: 15);
+
   WebViewController? _controller;
+  WebViewController? _preparingController;
+  Timer? _startupTimer;
+  Sora? _soraRef;
   LocalPanelServer? _server;
   Uri? _origin;
   late final PanelBridge _bridge;
@@ -218,7 +229,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     final store = ExtScope.of(context);
     _storeRef = store;
     final inst = store.get(widget.extensionId);
-    if (inst == null || !inst.enabled || inst.manifest.panels.isEmpty) {
+    if (inst == null || !inst.enabled || !inst.granted.contains('ui.panel') || inst.manifest.panels.isEmpty) {
       setState(() => _failure = 'gone');
       return;
     }
@@ -254,7 +265,17 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   void _onStoreChanged() {
     if (!mounted) return;
     final inst = ExtScope.of(context).get(widget.extensionId);
-    if (inst == null || !inst.enabled) {
+    if (inst == null ||
+        !inst.enabled ||
+        !inst.granted.contains('ui.panel') ||
+        inst.manifest.version != _manifest.version ||
+        inst.manifest.author.publicKey != _manifest.author.publicKey ||
+        inst.granted.length != _bridge.granted.length ||
+        !inst.granted.toSet().containsAll(_bridge.granted)) {
+      // Navigation can be refused (a root route), or disposal can wait for
+      // another frame. Revoke native callbacks before that asynchronous pop.
+      _stopRuntime();
+      setState(() => _failure = 'gone');
       Navigator.of(context).maybePop();
     }
   }
@@ -262,13 +283,38 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   @override
   void dispose() {
     _storeRef?.removeListener(_onStoreChanged);
-    _generation++;
-    try {
-      SoraScope.read(context).removeListener(_onSoraPhase);
-    } catch (_) {}
-    _controller?.clearCache();
-    unawaited(_server?.stop());
+    _stopRuntime();
     super.dispose();
+  }
+
+  void _stopRuntime() {
+    _generation++;
+    _startupTimer?.cancel();
+    _startupTimer = null;
+    _starting = false;
+    _soraRef?.removeListener(_onSoraPhase);
+    _soraRef = null;
+    final controller = _controller, preparing = _preparingController;
+    final server = _server;
+    _controller = null;
+    _preparingController = null;
+    _server = null;
+    _origin = null;
+    if (controller != null) unawaited(_releaseController(controller));
+    if (preparing != null) unawaited(_releaseController(preparing));
+    unawaited(server?.stop());
+  }
+
+  Future<void> _releaseController(WebViewController controller) async {
+    try {
+      await switch (controller.platform) {
+        final LinuxWebViewController native => native.dispose(),
+        final WindowsWebViewController native => native.dispose(),
+        _ => controller.clearCache(),
+      };
+    } catch (error) {
+      debugPrint('Extension panel cleanup failed: $error');
+    }
   }
 
   Future<List<Map<String, dynamic>>> _getConnections() async {
@@ -277,7 +323,9 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     if (link == null || session == null) throw BridgeError('not-connected', 'no session');
     final answer = await link.stub.listConnections(
       ListConnectionsRequest(apiVersion: apiVersion, controlAuthenticator: link.token, sessionId: session),
+      options: CallOptions(timeout: const Duration(seconds: 5)),
     );
+    if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
     return [
       for (final c in answer.connections)
         {
@@ -315,14 +363,25 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
     if (_starting || !mounted || _failure != null) return;
     _starting = true;
     final generation = ++_generation;
+    WebViewController? prepared;
+    _startupTimer = Timer(_startupTimeout, () {
+      if (!mounted || generation != _generation) return;
+      _stopRuntime();
+      setState(() => _failure = 'load');
+    });
     try {
       final store = ExtScope.of(context);
       final dir = store.contentDir(widget.extensionId);
       if (dir.isEmpty) throw StateError('gone');
-      _server = LocalPanelServer(dir, entry: _panel.entry, bootstrap: PanelBridge.bootstrapJs);
-      _origin = await _server!.start();
-      if (!mounted || generation != _generation) return;
-      final controller = _controller ??= WebViewPlatform.instance is LinuxWebViewPlatform
+      final server = LocalPanelServer(dir, entry: _panel.entry, bootstrap: PanelBridge.bootstrapJs);
+      _server = server;
+      final origin = await server.start();
+      if (!mounted || generation != _generation) {
+        await server.stop();
+        return;
+      }
+      _origin = origin;
+      final controller = WebViewPlatform.instance is LinuxWebViewPlatform
           ? WebViewController.fromPlatformCreationParams(
               const LinuxWebViewControllerCreationParams(
                 pageCacheEnabled: false,
@@ -331,11 +390,14 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
               ),
             )
           : WebViewController();
+      prepared = controller;
+      _preparingController = controller;
       await controller.setJavaScriptMode(JavaScriptMode.unrestricted);
       if (!mounted || generation != _generation) return;
       await controller.setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (request) {
+            if (!mounted || generation != _generation) return NavigationDecision.prevent;
             final uri = Uri.tryParse(request.url);
             final ok = uri != null && uri.scheme == 'http' && uri.host == '127.0.0.1' && uri.port == _origin!.port;
             return ok ? NavigationDecision.navigate : NavigationDecision.prevent;
@@ -350,7 +412,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       );
       if (!mounted || generation != _generation) return;
       await controller.addJavaScriptChannel(
-        'soraExt',
+        PanelBridge.channelName,
         onMessageReceived: (message) async {
           if (!mounted || generation != _generation) return;
           String reply;
@@ -359,6 +421,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
           } catch (_) {
             reply = '{"ok":false,"error":"internal"}';
           }
+          if (!mounted || generation != _generation) return;
           Map<String, dynamic> decoded;
           try {
             decoded = jsonDecode(reply) as Map<String, dynamic>;
@@ -376,20 +439,35 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
         },
       );
       if (!mounted || generation != _generation) return;
+      setState(() {
+        _preparingController = null;
+        _controller = controller;
+      });
       await controller.loadRequest(_origin!.resolve(_panel.entry));
+      if (!mounted || generation != _generation) return;
       _watchSora();
     } catch (_) {
       if (mounted && generation == _generation) {
+        _stopRuntime();
         setState(() => _failure = 'load');
       }
     } finally {
-      _starting = false;
+      if (prepared != null && identical(_preparingController, prepared)) {
+        _preparingController = null;
+        await _releaseController(prepared);
+      }
+      if (generation == _generation) {
+        _startupTimer?.cancel();
+        _startupTimer = null;
+        _starting = false;
+      }
     }
   }
 
   void _watchSora() {
     final sora = SoraScope.read(context);
     _lastPhase = sora.phase;
+    _soraRef = sora;
     sora.addListener(_onSoraPhase);
   }
 
@@ -428,9 +506,25 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
                   const SizedBox(height: 12),
                   Text(
                     s.extPanelUnavailable,
-                    style: Styles.body.copyWith(color: palette.ink2),
+                    style: Styles.body.copyWith(color: palette.ink),
                     textAlign: TextAlign.center,
                   ),
+                  if (_failure == 'load') ...[
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: _starting
+                          ? null
+                          : () {
+                              if (_failure != 'load') return;
+                              _onStoreChanged();
+                              if (_failure != 'load') return;
+                              setState(() => _failure = null);
+                              unawaited(_start());
+                            },
+                      icon: const Icon(Symbols.refresh_rounded),
+                      label: Text(s.refresh),
+                    ),
+                  ],
                 ],
               ),
             )

@@ -3,7 +3,9 @@ package xray
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
@@ -23,7 +25,7 @@ var profileOwned = []string{"inbounds", "log", "api", "stats", "metrics", "polic
 
 // Drop reverse bridges to prevent provider access to local networks. Remove
 // file keys recursively to prevent reads or writes with service privileges.
-var profileFileKeys = map[string]bool{"masterKeyLog": true, "certificateFile": true, "keyFile": true}
+var profileFileKeys = []string{"masterKeyLog", "certificateFile", "keyFile"}
 
 // stripFiles removes the keys of profileFileKeys from a decoded JSON value.
 func stripFiles(v any) {
@@ -32,7 +34,7 @@ func stripFiles(v any) {
 		stripFiles(map[string]any(t))
 	case map[string]any:
 		for key, child := range t {
-			if profileFileKeys[key] {
+			if slices.ContainsFunc(profileFileKeys, func(name string) bool { return strings.EqualFold(key, name) }) {
 				delete(t, key)
 				continue
 			}
@@ -53,8 +55,11 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	if err := json.Unmarshal(profile.Profile, &cfg); err != nil {
 		return nil, fmt.Errorf("xray: profile %s: %w", profile.ID, err)
 	}
-	for _, key := range profileOwned {
-		delete(cfg, key)
+	// Match the engine's JSON field folding, including Unicode equivalents.
+	for key := range cfg {
+		if slices.ContainsFunc(profileOwned, func(name string) bool { return strings.EqualFold(key, name) }) {
+			delete(cfg, key)
+		}
 	}
 	stripFiles(cfg)
 	outbounds, _ := cfg["outbounds"].([]any)
@@ -105,7 +110,14 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	}
 	cfg["inbounds"] = sessionInbounds(p, rt)
 	frame(cfg, p, rt)
-	return json.Marshal(cfg)
+	raw, err := json.Marshal(cfg)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateProfileAssets(raw); err != nil {
+		return nil, err
+	}
+	return raw, nil
 }
 
 // probeProfile prefixes tags and references so profiles share one probe

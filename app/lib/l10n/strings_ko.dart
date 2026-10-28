@@ -205,61 +205,58 @@ class SKo extends S {
   String get errGeneric => '문제가 발생했습니다.';
 
   @override
-  String get errCore => 'Sora 서비스가 응답하지 않습니다. 잠시 기다린 후 다시 시도하세요.';
+  String get errCore => 'Sora 서비스가 응답하지 않습니다';
 
   @override
-  String get errAuth => 'Sora 서비스에 대한 접근이 거부되었습니다. 앱을 다시 시작한 후 재시도하세요.';
+  String get errAuth => 'Sora 서비스에 대한 접근이 거부되었습니다';
 
   @override
-  String get errVersion => 'Sora 앱과 서비스의 버전이 다릅니다. Sora를 업데이트하세요.';
+  String get errVersion => 'Sora 앱과 서비스의 버전이 다릅니다';
 
   @override
-  String get errBusy => '이전 명령이 아직 실행 중입니다. 완료될 때까지 기다리세요.';
+  String get errBusy => '이전 명령이 아직 실행 중입니다';
 
   @override
-  String get errEngineMissing => '이 서버에 필요한 엔진을 찾을 수 없습니다. Sora 업데이트를 확인하세요.';
+  String get errEngineMissing => '이 서버에 필요한 엔진을 찾을 수 없습니다';
 
   @override
-  String get errEngineStart => '엔진을 시작하지 못했습니다. 연결 로그에서 원인을 확인하세요.';
+  String get errEngineStart => '엔진을 시작하지 못했습니다';
 
   @override
-  String get errEngineStopped => '엔진이 중지되었습니다. 다시 연결해 보세요.';
+  String get errEngineStopped => '엔진이 중지되었습니다';
 
   @override
-  String get errTunnel => '이 VPN 모드는 사용할 수 없습니다. 다른 모드를 선택하거나 서비스 권한을 확인하세요.';
+  String get errTunnel => '이 VPN 모드는 사용할 수 없습니다';
 
   @override
-  String get errNetwork => '서버에 연결할 수 없습니다';
+  String get errTimeout => '서버가 제시간에 응답하지 않았습니다';
 
   @override
-  String get errTimeout => '서버가 제시간에 응답하지 않았습니다. 1분 후에 다시 시도하세요.';
+  String get errFirewall => 'VPN 외부의 인터넷 접근을 차단하지 못했습니다';
 
   @override
-  String get errFirewall => 'VPN 외부의 인터넷 접근을 차단하지 못했습니다. 연결 로그에서 원인을 확인하세요.';
+  String get errSubFetch => '구독을 다운로드하지 못했습니다';
 
   @override
-  String get errSubFetch => '구독을 다운로드하지 못했습니다. 인터넷 연결을 확인하고 1분 후에 다시 시도하세요.';
+  String get errSubFormat => '구독 형식을 인식하지 못했습니다';
 
   @override
-  String get errSubFormat => '구독 형식을 인식하지 못했습니다. 제공업체에 호환되는 구독 링크를 요청하세요.';
+  String get errSubEmpty => '구독에 서버가 없습니다';
 
   @override
-  String get errSubEmpty => '구독에 서버가 없습니다. 구독 제공업체에 문의하세요.';
+  String get errSubDuplicate => '이미 추가된 구독입니다';
 
   @override
-  String get errSubDuplicate => '이미 추가된 구독입니다. 최신 서버 목록을 받으려면 구독을 업데이트하세요.';
+  String get errSubLimit => '구독 수가 한도에 도달했습니다';
 
   @override
-  String get errSubLimit => '구독 수가 한도에 도달했습니다. 새 구독을 추가하기 전에 사용하지 않는 구독을 삭제하세요.';
+  String get errSubScheme => '지원되지 않는 구독 링크 방식';
 
   @override
-  String get errSubScheme => '구독 링크는 https://로 시작해야 합니다. 제공업체에 보안 링크를 요청하세요.';
+  String get errSecretStore => 'Sora 저장소가 손상되었거나 접근할 수 없습니다';
 
   @override
-  String get errSecretStore => 'Sora 저장소가 손상되었거나 접근할 수 없습니다. 접근 권한과 로그의 세부 내용을 확인하세요.';
-
-  @override
-  String get errNoServers => '연결할 서버가 없습니다. 구독이나 개인 서버를 추가하세요.';
+  String get errNoServers => '연결할 서버가 없습니다';
 
   @override
   String get connections => '사이';
@@ -313,9 +310,6 @@ class SKo extends S {
   String get dnsAuto => '자동';
 
   @override
-  String get dnsHint => '주소, 쉼표로 구분';
-
-  @override
   String get fragment => 'TLS 조각화';
 
   @override
@@ -331,13 +325,7 @@ class SKo extends S {
   String get byDefault => '기본';
 
   @override
-  String get rangeHint => '예를 들어 100-200';
-
-  @override
   String get splitPos => '위치 분할';
-
-  @override
-  String get splitPosHint => '예: 1, midsld';
 
   @override
   String get disorder => '조각 재정렬';
@@ -446,11 +434,6 @@ class SKo extends S {
   String get support => '지원하다';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine는 이 컴퓨터의 포트를 통해 제어됩니다. 다른 프로그램에서는 VPN이 켜져 있음을 알 수 있습니다.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine를 선택하세요';
   }
@@ -521,9 +504,6 @@ class SKo extends S {
   String get launchAtLogin => '시스템으로 시작하세요';
 
   @override
-  String get launchAtLoginDetail => '로그인 시 Sora가 자동으로 시작되어 트레이에 상주합니다.';
-
-  @override
   String get closeToTray => '닫은 후에는 트레이에 보관하세요.';
 
   @override
@@ -558,9 +538,6 @@ class SKo extends S {
   String get noticeInTray => 'Sora가 아직 트레이에 있습니다.';
 
   @override
-  String get noticeInTrayBody => '아이콘 메뉴에서 종료';
-
-  @override
   String get noticeLost => '연결 끊김';
 
   @override
@@ -588,10 +565,7 @@ class SKo extends S {
   String get importTitle => '이 구독을 추가하시겠습니까?';
 
   @override
-  String get importSealed => '이 링크는 Happ에 대해 암호화되어 있으며 Happ만 읽을 수 있습니다. 일반 구독 링크는 공급자에게 문의하세요.';
-
-  @override
-  String get understood => '좋아요';
+  String get importSealed => '이 링크는 Happ에 대해 암호화되어 있으며 Happ만 읽을 수 있습니다';
 
   @override
   String get noAnswer => '대답이 없다';
@@ -630,39 +604,10 @@ class SKo extends S {
   String get openLogs => '로그 열기';
 
   @override
-  String get tourReplay => '가이드 다시 표시';
-
-  @override
-  String tourStep(int step) {
-    return '5단계 $step';
-  }
-
-  @override
   String get tourBack => '뒤쪽에';
 
   @override
   String get tourNext => '다음';
-
-  @override
-  String get tourSkip => '건너뛰다';
-
-  @override
-  String get tourFinish => '완료';
-
-  @override
-  String get tourAdd => '제공업체의 구독 링크를 추가하세요.';
-
-  @override
-  String get tourServer => '서버를 선택하세요. \"가장 빠름\"이 하나를 선택합니다.';
-
-  @override
-  String get tourConnect => '연결하거나 연결을 끊으려면 여기를 클릭하세요.';
-
-  @override
-  String get tourMode => '모드를 선택하세요. VPN이 끊어지면 킬 스위치가 인터넷을 차단합니다.';
-
-  @override
-  String get tourSettings => '설정을 엽니다. 여기서 이 가이드를 다시 재생할 수 있습니다.';
 
   @override
   String get chooseProgram => '프로그램을 선택하세요';
@@ -674,7 +619,7 @@ class SKo extends S {
   String get runningProcesses => '실행 중인 프로세스';
 
   @override
-  String get programsEmpty => '애플리케이션을 찾을 수 없습니다. 다른 이름을 사용해 보세요.';
+  String get programsEmpty => '애플리케이션을 찾을 수 없습니다';
 
   @override
   String get selectExe => '.exe 파일을 선택하세요';
@@ -686,7 +631,7 @@ class SKo extends S {
   String get speedtestSearch => '서비스 찾기';
 
   @override
-  String get speedtestEmpty => '일치하는 항목이 없습니다. 검색을 변경하세요.';
+  String get speedtestEmpty => '일치하는 항목이 없습니다';
 
   @override
   String get speedtestBackToList => '서비스로 돌아가기';
@@ -695,13 +640,13 @@ class SKo extends S {
   String get speedtestOpenBrowser => '브라우저에서 열기';
 
   @override
-  String get speedtestUnavailable => '내장된 브라우저를 시작할 수 없습니다. 시스템 브라우저에서 서비스를 엽니다.';
+  String get speedtestUnavailable => '내장된 브라우저를 시작할 수 없습니다';
 
   @override
-  String get speedtestPageFailed => '페이지를 로드할 수 없습니다. 다시 로드하거나 시스템 브라우저에서 서비스를 엽니다.';
+  String get speedtestPageFailed => '페이지를 로드할 수 없습니다';
 
   @override
-  String get speedtestExternalFailed => '시스템 브라우저를 열 수 없습니다. 다시 시도해 보세요.';
+  String get speedtestExternalFailed => '시스템 브라우저를 열 수 없습니다';
 
   @override
   String get modes => '모드';
@@ -741,46 +686,28 @@ class SKo extends S {
   String get updateNoNotes => '릴리스에는 메모가 없습니다.';
 
   @override
-  String get updateDropWarning => 'Sora 및 핵심 업데이트가 진행되는 동안 VPN 연결이 몇 초 동안 끊어집니다. 계속하다?';
+  String get updateDropWarning => '업데이트를 위해 연결을 끊을까요?';
 
   @override
-  String get updateWaitConnection => 'VPN 연결과 코어가 준비될 때까지 기다립니다.';
+  String get updateWaitConnection => '연결이 준비되지 않았습니다';
 
   @override
-  String get updateDownloading => '파일 다운로드 및 확인 중...';
-
-  @override
-  String get updateInstalling => '업데이트를 준비 중이거나 관리자 인증을 기다리는 중...';
-
-  @override
-  String get updateNetworkError => '업데이트를 다운로드할 수 없습니다. 다시 시도해 보세요.';
+  String get updateNetworkError => '업데이트를 다운로드할 수 없습니다';
 
   @override
   String get updateReleaseError => '릴리스 데이터 또는 필수 파일이 누락되었거나 잘못되었습니다.';
 
   @override
-  String get updateChecksumError => '다운로드가 SHA256SUMS와 일치하지 않습니다. 아무것도 설치되지 않았습니다.';
+  String get updateChecksumError => '다운로드가 SHA256SUMS와 일치하지 않습니다';
 
   @override
-  String get updateInstallError => '업데이트가 완료되지 않았습니다. 인증이 취소되었을 수 있습니다.';
+  String get updateInstallError => '업데이트가 완료되지 않았습니다';
 
   @override
-  String get updateUnsupported => '이 실행 파일은 지원되는 Sora 패키지 쌍의 소유가 아닙니다. 릴리스 설치 지침을 사용하십시오.';
+  String get updateUnsupported => '이 실행 파일은 지원되는 Sora 패키지 쌍의 소유가 아닙니다';
 
   @override
-  String get updateManual => '터미널에서 이 명령을 실행하여 확인된 두 패키지를 모두 설치한 다음 Sora를 다시 엽니다. 파일은 다운로드 디렉터리에 유지됩니다. VPN 연결이 끊어집니다.';
-
-  @override
-  String get updateSignaturePending => '업데이트 파일은 릴리스와 함께 게시된 체크섬과 대조합니다.';
-
-  @override
-  String get updateManualSigWarning => '아래 파일은 릴리스 체크섬과 일치합니다. 공식 릴리스에서 내려받았다면 명령을 실행하세요.';
-
-  @override
-  String get updateVersionRevoked => '개발자가 이 버전을 철회했습니다. 수정된 릴리스를 기다려 주십시오.';
-
-  @override
-  String get updateRolloutPending => '최신 버전이 점진적으로 출시되고 자동으로 제공됩니다.';
+  String get updateVersionRevoked => '개발자가 이 버전을 철회했습니다';
 
   @override
   String updateRollbacking(String version) {
@@ -793,7 +720,7 @@ class SKo extends S {
   }
 
   @override
-  String get updateRollbackError => '자동 롤백에 실패했습니다. 새 버전이 작동하지 않으면 이전 릴리스를 수동으로 다시 설치하십시오.';
+  String get updateRollbackError => '자동 롤백에 실패했습니다';
 
   @override
   String get updateRollbackCacheError => '현재 버전의 확인된 롤백 복사본을 준비할 수 없어 업데이트가 설치되지 않았습니다.';
@@ -802,10 +729,7 @@ class SKo extends S {
   String get updateCopyCommand => '복사 명령';
 
   @override
-  String get updateChecksDisabled => '설정에서 자동 검사가 비활성화되어 있습니다.';
-
-  @override
-  String get updateInstalled => '업데이트가 설치되었습니다. Sora를 다시 엽니다.';
+  String get updateInstalled => '업데이트가 설치되었습니다';
 
   @override
   String get projectLinks => '프로젝트';
@@ -835,19 +759,13 @@ class SKo extends S {
   String get showDescription => '설명 표시';
 
   @override
-  String get pendingConnectionChanges => '변경사항을 적용하려면 다시 연결하세요.';
+  String get errEngineUnsupported => '선택한 엔진은 이 프로필이나 설정을 지원하지 않습니다';
 
   @override
-  String get reconnectNow => '적용하고 다시 연결하세요';
+  String get errRestore => '연결 정리가 완료되지 않았습니다';
 
   @override
-  String get errEngineUnsupported => '선택한 엔진은 이 프로필이나 설정을 지원하지 않습니다. 자동 또는 호환 엔진을 선택하세요.';
-
-  @override
-  String get errRestore => '연결 정리가 완료되지 않았습니다. 연결 해제를 다시 시도하세요. 자세한 내용은 로그를 참조하세요.';
-
-  @override
-  String get errSessionEnded => '이 세션은 이미 종료되었습니다. 연결 상태를 새로 고칩니다.';
+  String get errSessionEnded => '이 세션은 이미 종료되었습니다';
 
   @override
   String get retryDisconnect => '연결 해제를 다시 시도하세요.';
@@ -863,10 +781,10 @@ class SKo extends S {
 
   @override
   String get modesGuide =>
-      '서버에 어떤 엔진이 필요한지 확실하지 않은 경우 자동을 선택하십시오. Sora는 연결하기 전에 프로필과 설정을 확인합니다. 엔진은 계획의 대역폭을 늘릴 수 없습니다. 성능은 서버, 경로, 프로토콜 및 네트워크에 따라 다릅니다.\n\n## 모드\n\n### 모든 트래픽(TUN)\n\nSora는 가상 네트워크 인터페이스를 생성하고 이를 통해 TCP 및 UDP를 포함한 애플리케이션 트래픽을 라우팅합니다. Telegram, 게임 및 Discord 음성에 이 모드를 사용하십시오. 규칙은 특정 사이트나 프로그램을 직접 보내거나 차단할 수 있습니다. 네트워크 서비스에는 권한이 필요하며 필요한 프로토콜을 지원하는 서버가 필요합니다.\n\n### System 프록시\n\nSora는 로컬 HTTP/SOCKS 프록시를 구성합니다. 시스템 프록시 설정을 존중하는 응용 프로그램이 이를 사용합니다. 자체 네트워크 스택이 있는 애플리케이션은 직접 연결할 수 있습니다. UDP 및 음성 통화에는 일반적으로 TUN이 필요합니다. 이 모드는 프록시를 지원하는 브라우저 및 애플리케이션에 적합합니다.\n\n### 서버 없음\n\nLinux에서 Sora는 [zapret](https://github.com/bol-van/zapret)를 사용하여 HTTP/TLS 요청을 분할 및 재구성하고 일부 DPI 검사를 우회합니다. 귀하의 IP는 동일하게 유지되며 연결은 웹사이트로 직접 연결됩니다. 결과는 공급자와 차단 방법에 따라 다릅니다.\n\n현재 통합에서는 HTTP 및 TCP를 통한 TLS에 tpws를 사용합니다. IP 차단이나 UDP 중계를 우회하지 않으며 Telegram의 MTProto 연결을 보장할 수 없습니다. Discord 음성, Telegram 통화 및 이러한 종류의 제한 사항에는 TUN이 포함된 VPN 서버를 사용하세요.\n\n## 엔진\n\n### 자동\n\nSora는 서버 프로토콜, 전송, 그룹, 조각화 및 모드 등 전체 연결 계획을 지원하는 설치된 엔진을 선택합니다. 현재 연결을 중단하기 전에 호환되지 않는 수동 선택이 거부됩니다. 자동 또는 다른 엔진을 선택하고 설정을 다시 적용하십시오.\n\n### sing-box\n\n새로운 Sora 패키지에는 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box)의 포크가 포함되어 있으며 클라이언트 측 XHTTP 및 VLESS Encryption가 추가되었습니다. Sora는 ​​빌드와 해당 기능을 인식합니다. XHTTP가 없는 업스트림 빌드는 이름만으로는 이 기능을 얻을 수 없습니다.\n\n지원되는 프로토콜에는 VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard 및 AmneziaWG 1.x/2.x 매개변수가 포함됩니다. Sora는 가져올 수 있습니다. 전체 Xray JSON 프로필에는 Xray가 필요합니다. 새로운 AWG 3.x 필드는 아직 가져올 수 없습니다. sing-box는 컴퓨터의 다른 응용 프로그램이 감지할 수 있는 비밀번호로 보호된 로컬 제어 포트를 사용합니다.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core)는 VLESS, REALITY, XHTTP, VLESS Encryption 및 TLS 조각화를 지원합니다. 또한 라우팅과 그룹을 유지하면서 완전한 공급자 Xray 프로필을 실행합니다. 이러한 프로필은 동작을 변경하지 않고는 자동으로 다른 엔진으로 변환될 수 없습니다.\n\n번들로 제공되는 Xray는 TLS 인증서 확인을 비활성화하는 설정(`allowInsecure`)을 제거했습니다. 이 설정이 필요한 일반 서버에 대해서는 sing-box 또는 mihomo를 자동으로 선택합니다. Xray를 선택하면 현재 연결을 중단하기 전에 비호환성을 수동으로 보고합니다. 이전 전체 JSON 프로필에는 확인 가능한 인증서 또는 인증서 핀이 포함된 업데이트된 공급자 프로필이 필요합니다.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo)는 순서가 지정된 대체 및 로드 밸런싱 그룹인 XHTTP 및 AmneziaWG를 지원합니다. 백업 서버로의 자동 장애 조치가 중요한 경우 선택하세요. 이 엔진에서는 Sora의 TLS 조각화 설정을 사용할 수 없습니다.\n\n## Sora의 호환성\n\n| 기능 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 및 TCP/UDP | 예 | 예 | 예 |\n| XHTTP | 예 | 예 | 예 |\n| VLESS Encryption | 예 | 예 | 예 |\n| 전체 Xray 프로필 | 아니요 | 예 | 아니요 |\n| TUIC / AnyTLS | 둘 다 | 아니요 | TUIC |\n| mieru | 아니요 | 아니요 | 예 |\n| NaiveProxy | 예 | 아니요 | 아니요 |\n| TLS 조각화 | 예 | 예 | 아니요 |\n| AmneziaWG 1.x/2.x | 예1 | 아니요 | 예 |\n| 정렬된 대체 그룹 | 아니요 | 노² | 예 |\n\n¹ J1/J2/J3/Itime가 포함된 프로필은 mihomo를 사용합니다. 이러한 필드는 자동으로 삭제되어서는 안 됩니다. ² 완전한 Xray 프로필 그룹의 경우 앱은 백업 프로필을 선택합니다. 지원은 설치된 빌드에 따라 다릅니다. 정보에서 버전을 확인하세요.\n\n## TUN 스택\n\n스택은 가상 인터페이스 내부에서 TCP 및 UDP를 처리합니다. 모드 패널에서 Xray 및 mihomo는 ​​gVisor, System, Mixed 및 MIPS를 제공합니다. 각 엔진은 고유한 기본 설정을 저장합니다. System 프록시 및 서버리스 모드에서는 이 기본 설정을 사용하지 않습니다.\n\n- **Mixed**: TCP는 시스템 스택을 사용하고 gVisor는 UDP를 처리합니다. Linux에서 mihomo의 기본값입니다. Windows에서는 Xray와 mihomo가 기본적으로 MIPS를 사용합니다.\n- **System**: 시스템 스택을 사용합니다. 네트워크 응용 프로그램에 문제가 발생하면 다른 옵션을 시도해 보십시오.\n- **gVisor**: 사용자 공간의 트래픽을 처리합니다.\n- **MIPS**: mihomo의 자체 IP 스택은 번들 버전 1.19.32에서 사용할 수 있습니다.\n\nLinux에서 Xray는 기본적으로 내장된 gVisor를 사용합니다. Linux의 System, Mixed 및 MIPS는 mihomo를 TUN 엔진으로 사용하여 인증된 로컬 SOCKS 링크를 통해 TCP 및 UDP를 Xray로 전달합니다. Xray는 프로토콜, 공급자 프로필 및 라우팅을 유지합니다. 이 세 가지 옵션에는 mihomo가 설치되어 있어야 합니다. Windows에서 Xray는 네 가지 TUN 스택 모두에 mihomo 1.19.32 이상을 사용합니다. 프로토콜과 라우팅은 Xray가 처리합니다. 이 구성의 앱 규칙은 직접 연결과 차단만 지원합니다. Linux에서는 이러한 규칙에 Xray 내장 gVisor가 필요합니다.\n\n브리지는 두 번째 프로세스를 실행합니다. Linux에 대한 세 가지 유휴 측정에서 기본 Xray TUN보다 약 32~36MiB 더 많은 물리적 메모리를 사용했습니다. 이는 다운로드 로드를 측정하지 않습니다. CPU 및 메모리 비용은 연결에 따라 달라집니다. sing-box에는 스택 선택기가 없습니다. 어떤 스택도 모든 네트워크에서 더 나은 성능을 보장하지 않습니다. 스택을 선택하고 적용 및 다시 연결을 선택하여 네트워크에서 사용해 보세요.\n\n## 설정 적용 중\n\n서버를 선택하면 자동으로 다시 연결됩니다. 모드, 엔진, DNS 및 규칙 설정은 즉시 저장됩니다. 활성 연결 중에 적용을 클릭하고 다시 연결하여 사용하세요. 엔진을 다시 시작하면 다운로드 및 호출이 중단될 수 있습니다. 반복해서 클릭해도 병렬 연결이 시작되지 않습니다. 연결을 끊으면 전환이 종료되고 연결이 해제됩니다.\n\nVPN을 통한 인터넷만 터널이 끊어지면 직접 트래픽을 차단합니다. 이는 전체 기계에 영향을 미칩니다. 명시적인 연결 해제는 Sora의 규칙을 제거합니다. 정리가 완료되지 않으면 연결을 끊고 로그를 다시 열어보세요.\n\n## 프로젝트 문서\n\n- [sing-box-lx: 구성 및 지원](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 문서](https://sing-box.sagernet.org/)\n- [Xray 문서](https://xtls.github.io/)\n- [mihomo 문서](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: 동작 및 제한사항](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC는 Jitsi, Yandex Telemost 또는 WB Stream의 영상 통화를 통해 TCP를 전송합니다. olcrtc:// 링크나 QR 코드를 가져오세요. 프록시 및 TUN 모드에서 sing-box, Xray, mihomo와 함께 작동하며 UDP는 지원하지 않습니다. 양쪽에 호환되는 OLC2 빌드가 필요합니다. 원본 프로젝트는 보관 처리되었습니다.\n';
+      '서버에 어떤 엔진이 필요한지 확실하지 않은 경우 자동을 선택하십시오. Sora는 연결하기 전에 프로필과 설정을 확인합니다. 엔진은 계획의 대역폭을 늘릴 수 없습니다. 성능은 서버, 경로, 프로토콜 및 네트워크에 따라 다릅니다.\n\n## 모드\n\n### 모든 트래픽(TUN)\n\nSora는 가상 네트워크 인터페이스를 생성하고 이를 통해 TCP 및 UDP를 포함한 애플리케이션 트래픽을 라우팅합니다. Telegram, 게임 및 Discord 음성에 이 모드를 사용하십시오. 규칙은 특정 사이트나 프로그램을 직접 보내거나 차단할 수 있습니다. 네트워크 서비스에는 권한이 필요하며 필요한 프로토콜을 지원하는 서버가 필요합니다.\n\n### System 프록시\n\nSora는 로컬 HTTP/SOCKS 프록시를 구성합니다. 시스템 프록시 설정을 존중하는 응용 프로그램이 이를 사용합니다. 자체 네트워크 스택이 있는 애플리케이션은 직접 연결할 수 있습니다. UDP 및 음성 통화에는 일반적으로 TUN이 필요합니다. 이 모드는 프록시를 지원하는 브라우저 및 애플리케이션에 적합합니다.\n\n### 서버 없음\n\nLinux에서 Sora는 [zapret](https://github.com/bol-van/zapret)를 사용하여 HTTP/TLS 요청을 분할 및 재구성하고 일부 DPI 검사를 우회합니다. 귀하의 IP는 동일하게 유지되며 연결은 웹사이트로 직접 연결됩니다. 결과는 공급자와 차단 방법에 따라 다릅니다.\n\n현재 통합에서는 HTTP 및 TCP를 통한 TLS에 tpws를 사용합니다. IP 차단이나 UDP 중계를 우회하지 않으며 Telegram의 MTProto 연결을 보장할 수 없습니다. Discord 음성, Telegram 통화 및 이러한 종류의 제한 사항에는 TUN이 포함된 VPN 서버를 사용하세요.\n\n## 엔진\n\n### 자동\n\nSora는 서버 프로토콜, 전송, 그룹, 조각화 및 모드 등 전체 연결 계획을 지원하는 설치된 엔진을 선택합니다. 현재 연결을 중단하기 전에 호환되지 않는 수동 선택이 거부됩니다. 자동 또는 다른 엔진을 선택하고 설정을 다시 적용하십시오.\n\n### sing-box\n\n새로운 Sora 패키지에는 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box)의 포크가 포함되어 있으며 클라이언트 측 XHTTP 및 VLESS Encryption가 추가되었습니다. Sora는 ​​빌드와 해당 기능을 인식합니다. XHTTP가 없는 업스트림 빌드는 이름만으로는 이 기능을 얻을 수 없습니다.\n\n지원되는 프로토콜에는 VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard 및 AmneziaWG 1.x/2.x 매개변수가 포함됩니다. Sora는 가져올 수 있습니다. 전체 Xray JSON 프로필에는 Xray가 필요합니다. 새로운 AWG 3.x 필드는 아직 가져올 수 없습니다. sing-box는 컴퓨터의 다른 응용 프로그램이 감지할 수 있는 비밀번호로 보호된 로컬 제어 포트를 사용합니다.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core)는 VLESS, REALITY, XHTTP, VLESS Encryption 및 TLS 조각화를 지원합니다. 또한 라우팅과 그룹을 유지하면서 완전한 공급자 Xray 프로필을 실행합니다. 이러한 프로필은 동작을 변경하지 않고는 자동으로 다른 엔진으로 변환될 수 없습니다.\n\n번들로 제공되는 Xray는 TLS 인증서 확인을 비활성화하는 설정(`allowInsecure`)을 제거했습니다. 이 설정이 필요한 일반 서버에 대해서는 sing-box 또는 mihomo를 자동으로 선택합니다. Xray를 선택하면 현재 연결을 중단하기 전에 비호환성을 수동으로 보고합니다. 이전 전체 JSON 프로필에는 확인 가능한 인증서 또는 인증서 핀이 포함된 업데이트된 공급자 프로필이 필요합니다.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo)는 순서가 지정된 대체 및 로드 밸런싱 그룹인 XHTTP 및 AmneziaWG를 지원합니다. 백업 서버로의 자동 장애 조치가 중요한 경우 선택하세요. 이 엔진에서는 Sora의 TLS 조각화 설정을 사용할 수 없습니다.\n\n## Sora의 호환성\n\n| 기능 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 및 TCP/UDP | 예 | 예 | 예 |\n| XHTTP | 예 | 예 | 예 |\n| VLESS Encryption | 예 | 예 | 예 |\n| 전체 Xray 프로필 | 아니요 | 예 | 아니요 |\n| TUIC / AnyTLS | 둘 다 | 아니요 | TUIC |\n| mieru | 아니요 | 아니요 | 예 |\n| NaiveProxy | 예 | 아니요 | 아니요 |\n| TLS 조각화 | 예 | 예 | 아니요 |\n| AmneziaWG 1.x/2.x | 예1 | 아니요 | 예 |\n| 정렬된 대체 그룹 | 아니요 | 노² | 예 |\n\n¹ J1/J2/J3/Itime가 포함된 프로필은 mihomo를 사용합니다. 이러한 필드는 자동으로 삭제되어서는 안 됩니다. ² 완전한 Xray 프로필 그룹의 경우 앱은 백업 프로필을 선택합니다. 지원은 설치된 빌드에 따라 다릅니다. 정보에서 버전을 확인하세요.\n\n## TUN 스택\n\n스택은 가상 인터페이스 내부에서 TCP 및 UDP를 처리합니다. 모드 패널에서 Xray 및 mihomo는 ​​gVisor, System, Mixed 및 MIPS를 제공합니다. 각 엔진은 고유한 기본 설정을 저장합니다. System 프록시 및 서버리스 모드에서는 이 기본 설정을 사용하지 않습니다.\n\n- **Mixed**: TCP는 시스템 스택을 사용하고 gVisor는 UDP를 처리합니다. Linux에서 mihomo의 기본값입니다. Windows에서는 Xray와 mihomo가 기본적으로 MIPS를 사용합니다.\n- **System**: 시스템 스택을 사용합니다. 네트워크 응용 프로그램에 문제가 발생하면 다른 옵션을 시도해 보십시오.\n- **gVisor**: 사용자 공간의 트래픽을 처리합니다.\n- **MIPS**: mihomo의 자체 IP 스택은 번들 버전 1.19.32에서 사용할 수 있습니다.\n\nLinux에서 Xray는 기본적으로 내장된 gVisor를 사용합니다. Linux의 System, Mixed 및 MIPS는 mihomo를 TUN 엔진으로 사용하여 인증된 로컬 SOCKS 링크를 통해 TCP 및 UDP를 Xray로 전달합니다. Xray는 프로토콜, 공급자 프로필 및 라우팅을 유지합니다. 이 세 가지 옵션에는 mihomo가 설치되어 있어야 합니다. Windows에서 Xray는 네 가지 TUN 스택 모두에 mihomo 1.19.32 이상을 사용합니다. 프로토콜과 라우팅은 Xray가 처리합니다. 이 구성의 앱 규칙은 직접 연결과 차단만 지원합니다. Linux에서는 이러한 규칙에 Xray 내장 gVisor가 필요합니다.\n\n브리지는 두 번째 프로세스를 실행합니다. Linux에 대한 세 가지 유휴 측정에서 기본 Xray TUN보다 약 32~36MiB 더 많은 물리적 메모리를 사용했습니다. 이는 다운로드 로드를 측정하지 않습니다. CPU 및 메모리 비용은 연결에 따라 달라집니다. sing-box에는 스택 선택기가 없습니다. 어떤 스택도 모든 네트워크에서 더 나은 성능을 보장하지 않습니다.\n\n## 설정 적용 중\n\n서버를 선택하면 자동으로 다시 연결됩니다. 직접 변경한 모드, 엔진, DNS 또는 규칙은 잠시 후 자동 재연결하여 한 번만 적용되며, 백그라운드 새로고침은 VPN을 다시 연결하지 않습니다. 엔진을 다시 시작하면 다운로드와 통화가 중단될 수 있습니다.\n\nVPN을 통한 인터넷만 터널이 끊어지면 직접 트래픽을 차단합니다. 이는 전체 기계에 영향을 미칩니다. 명시적인 연결 해제는 Sora의 규칙을 제거합니다. 정리가 완료되지 않으면 연결을 끊고 로그를 다시 열어보세요.\n\n## 프로젝트 문서\n\n- [sing-box-lx: 구성 및 지원](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 문서](https://sing-box.sagernet.org/)\n- [Xray 문서](https://xtls.github.io/)\n- [mihomo 문서](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: 동작 및 제한사항](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC는 Jitsi, Yandex Telemost 또는 WB Stream의 영상 통화를 통해 TCP를 전송합니다. olcrtc:// 링크나 QR 코드를 가져오세요. 프록시 및 TUN 모드에서 sing-box, Xray, mihomo와 함께 작동하며 UDP는 지원하지 않습니다. 양쪽에 호환되는 OLC2 빌드가 필요합니다. 원본 프로젝트는 보관 처리되었습니다.\n';
 
   @override
-  String get probeServers => '서버 확인';
+  String get probeServers => '핑';
 
   @override
   String get extensions => '확장';
@@ -890,13 +808,10 @@ class SKo extends S {
   String get extInstallOne => '설치 1회';
 
   @override
-  String get extSideloadWarning => '작성자의 자체 서명 키를 신뢰하는 경우에만 설치하세요.';
+  String get extSideloadWarning => '자체 서명 키';
 
   @override
   String get extPermissionsWidened => '업데이트에서 새 권한을 요청합니다.';
-
-  @override
-  String get extDangerousAck => '나는 이러한 권한이 심각한 것임을 이해합니다';
 
   @override
   String get extInstall => '설치';
@@ -909,9 +824,6 @@ class SKo extends S {
 
   @override
   String get extConfirm => '확인';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => '카탈로그';
@@ -962,16 +874,13 @@ class SKo extends S {
   String get extEmptySearch => '아무것도 발견되지 않았습니다';
 
   @override
-  String get extEmptyInstalled => '아직 확장 프로그램이 설치되지 않았습니다.\n카탈로그에서 찾거나 파일에서 설치하세요.';
+  String get extEmptyInstalled => '아직 확장 프로그램이 설치되지 않았습니다';
 
   @override
   String get extInstallFromFile => '파일에서 설치';
 
   @override
   String get extInstallFromUrl => 'URL에서 설치';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => '다운로드';
@@ -986,19 +895,16 @@ class SKo extends S {
   String get extInstalling => '설치 중…';
 
   @override
-  String get extInstallFailed => '설치 실패';
-
-  @override
-  String get extErrSignature => '서명 확인에 실패했습니다. 파일이 손상되었거나 변조되었을 수 있습니다.';
+  String get extErrSignature => '서명 확인에 실패했습니다';
 
   @override
   String get extErrManifest => '확장 매니페스트가 잘못되었습니다.';
 
   @override
-  String get extErrNetwork => '네트워크 오류입니다. 연결을 확인하고 다시 시도하세요.';
+  String get extErrNetwork => '네트워크 오류입니다';
 
   @override
-  String get extErrHash => '다운로드가 카탈로그와 일치하지 않습니다. 조작되었을 수도 있습니다.';
+  String get extErrHash => '다운로드가 카탈로그와 일치하지 않습니다';
 
   @override
   String extErrMinApp(String version) {
@@ -1009,11 +915,10 @@ class SKo extends S {
   String get extErrHttpsOnly => 'https:// 링크만 허용됩니다.';
 
   @override
-  String get extErrGeneric => '문제가 발생했습니다. 다시 시도해 주세요.';
+  String get extErrGeneric => '문제가 발생했습니다';
 
   @override
-  String get extErrAuthorKeyChanged =>
-      '이 업데이트는 설치된 버전과 다른 작성자 키로 서명되었으므로 차단되었습니다. 새 키를 신뢰하는 경우 확장 프로그램을 제거하고 명시적으로 다시 설치하세요.';
+  String get extErrAuthorKeyChanged => '이 업데이트는 설치된 버전과 다른 작성자 키로 서명되었으므로 차단되었습니다';
 
   @override
   String get extDisabled => '비활성화됨';
@@ -1070,7 +975,7 @@ class SKo extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count 충돌에는 귀하의 결정이 필요합니다';
+    return '확장 프로그램 충돌: $count';
   }
 
   @override
@@ -1147,10 +1052,10 @@ class SKo extends S {
   String get extPermThemeApply => '테마 적용';
 
   @override
-  String get extPermRoutingRules => '라우팅 규칙 추가(네트워크 트래픽이 이동하는 위치에 영향을 줌)';
+  String get extPermRoutingRules => '라우팅 규칙 추가';
 
   @override
-  String get extPermNetHooks => '네트워크 경로에 통합(DPI 우회 모듈)';
+  String get extPermNetHooks => '네트워크 경로에 통합';
 
   @override
   String get extPermNetFetch => '허용 목록에서 URL 요청';
@@ -1159,7 +1064,7 @@ class SKo extends S {
   String get extPermBackground => '백그라운드 작업 실행';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => '비활성화됨';
 
   @override
   String get extCapBackground => '백그라운드에서 실행됩니다.';
@@ -1197,9 +1102,6 @@ class SKo extends S {
   String get extSortRelevance => '관련성';
 
   @override
-  String get extPermNetworkDetail => 'VPN 요청은 아래 호스트에만 접근할 수 있습니다.';
-
-  @override
   String get extBgTitle => '백그라운드 작업';
 
   @override
@@ -1221,9 +1123,6 @@ class SKo extends S {
   }
 
   @override
-  String get extBgDisabledNote => '백그라운드 작업을 관리하려면 확장 프로그램을 활성화하세요.';
-
-  @override
   String get extCapNetwork => '네트워크 액세스';
 
   @override
@@ -1240,7 +1139,7 @@ class SKo extends S {
   String get diagnosticHttp => 'HTTP 진단';
 
   @override
-  String get diagnosticNoData => '아직 기록된 요청이 없습니다. 먼저 속도 테스트 웹사이트를 열어보세요.';
+  String get diagnosticNoData => '아직 기록된 요청이 없습니다';
 
   @override
   String get qrShareTitle => 'QR로 공유';
@@ -1250,12 +1149,6 @@ class SKo extends S {
 
   @override
   String get qrCopyLink => '링크 복사';
-
-  @override
-  String get qrWarning => '신뢰하는 사람에게만 코드를 공유하세요.';
-
-  @override
-  String get qrScanHint => 'QR 코드가 있는 스크린샷이나 사진을 선택하거나 링크를 붙여 넣으세요';
 
   @override
   String get qrFromClipboard => '클립보드에서 붙여넣기';
@@ -1336,28 +1229,10 @@ class SKo extends S {
   String get dnsLeakCheckKillSwitchDns => '네트워크 차단을 통한 DNS 보호';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => '위의 DNS 설정에서 터널에 대해 DNS을 구성합니다.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => '시스템이 터널 외부에서 사용할 확인 프로그램을 확인하세요.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS 트래픽이 터널 안에 머물도록 네트워크 차단을 켜세요.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => '운영 체제의 암호화 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => '위조된 DNS 응답';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => '시스템이 터널 외부에서 사용하는 암호화된 DNS 엔드포인트를 확인하세요.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns => '리졸버가 응답을 위조할 수 없도록 터널에 암호화 DNS(DoT 또는 DoH)를 사용하세요.';
-
-  @override
-  String get dnsCheckNeedsConnection => '먼저 VPN에 연결한 후 누출이 있는지 확인하세요.';
 
   @override
   String get dnsExpected => '예상됨';
@@ -1384,7 +1259,7 @@ class SKo extends S {
   String get autoSelectSmart => '현명한 선택';
 
   @override
-  String get coreWatchUnstable => '코어와의 연결이 불안정합니다. 잠시 기다린 후 다시 연결해 보세요.';
+  String get coreWatchUnstable => '코어와의 연결이 불안정합니다';
 
   @override
   String get watchReconnect => '다시 연결';
@@ -1423,7 +1298,7 @@ class SKo extends S {
   String get overrideCustomRules => '자체 규칙';
 
   @override
-  String get errBenchmarkUnsupported => '속도를 측정하려면 더 최신 버전의 코어가 필요합니다. Sora를 업데이트하세요.';
+  String get errBenchmarkUnsupported => '속도를 측정하려면 더 최신 버전의 코어가 필요합니다';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1434,7 +1309,7 @@ class SKo extends S {
   String get profiles => '네트워크 프로필';
 
   @override
-  String get profilesEmpty => '아직 프로필이 없습니다. 알려진 네트워크에 자동으로 설정을 적용하려면 네트워크를 만드세요.';
+  String get profilesEmpty => '아직 프로필이 없습니다';
 
   @override
   String get profileAdd => '프로필 추가';
@@ -1446,9 +1321,6 @@ class SKo extends S {
   String get profileSsids => 'Wi-Fi 네트워크(SSID)';
 
   @override
-  String get profileSsidsHint => '집, 사무실은 쉼표로 구분됩니다.';
-
-  @override
   String get profileGateways => '네트워크 게이트웨이';
 
   @override
@@ -1456,9 +1328,6 @@ class SKo extends S {
 
   @override
   String get profileAutoApply => '자동 적용';
-
-  @override
-  String get profileAutoApplyHint => '끄면 프로필을 적용하기 전에 확인합니다.';
 
   @override
   String get profileSnapshot => '현재 설정 기억';
@@ -1502,13 +1371,13 @@ class SKo extends S {
   String get networkUnknown => '네트워크 정보를 사용할 수 없습니다.';
 
   @override
-  String get profileNoTriggers => '하나 이상의 트리거 추가: SSID, 게이트웨이 또는 ASN';
+  String get profileNoTriggers => '프로필 조건이 없습니다';
 
   @override
   String get chains => '프록시 체인';
 
   @override
-  String get chainsEmpty => '아직 체인이 없습니다. 2~3개의 서버를 연결하여 트래픽이 각 서버를 통과하도록 합니다.';
+  String get chainsEmpty => '아직 체인이 없습니다';
 
   @override
   String get chainAdd => '새 체인';
@@ -1517,16 +1386,10 @@ class SKo extends S {
   String get chainName => '체인 이름';
 
   @override
-  String get chainPickServers => '2~3개의 서버 선택';
+  String get chainTooFew => '체인에는 최소 두 개의 서버가 필요합니다';
 
   @override
-  String get chainOrderHint => '드래그하여 재정렬: 트래픽이 위쪽으로 들어오고 아래쪽으로 나갑니다.';
-
-  @override
-  String get chainTooFew => '체인에는 최소 두 개의 서버가 필요합니다. 서버를 하나 더 추가하세요.';
-
-  @override
-  String get chainTooMany => '체인에는 최대 세 개의 서버만 사용할 수 있습니다. 초과한 서버를 삭제하세요.';
+  String get chainTooMany => '체인에는 최대 세 개의 서버만 사용할 수 있습니다';
 
   @override
   String get chainEstimate => '예상 대기 시간';
@@ -1543,10 +1406,10 @@ class SKo extends S {
   }
 
   @override
-  String get chainUnsupported => '선택한 엔진은 체인을 지원하지 않습니다. 호환되는 엔진을 선택하세요.';
+  String get chainUnsupported => '선택한 엔진은 체인을 지원하지 않습니다';
 
   @override
-  String get chainHopMissing => '체인의 서버 중 하나를 더 이상 사용할 수 없습니다. 해당 구간에 다른 서버를 선택하세요.';
+  String get chainHopMissing => '체인의 서버 중 하나를 더 이상 사용할 수 없습니다';
 
   @override
   String chainHop(Object n) {
@@ -1566,7 +1429,7 @@ class SKo extends S {
   String get syncDevices => '내 장치';
 
   @override
-  String get syncEmpty => '페어링된 장치가 없습니다. 로컬 네트워크를 통해 다른 장치를 페어링합니다.';
+  String get syncEmpty => '페어링된 장치가 없습니다';
 
   @override
   String get syncPair => '장치 페어링';
@@ -1594,9 +1457,6 @@ class SKo extends S {
   String get syncNever => '절대 안함';
 
   @override
-  String get syncNoLan => '장치는 동일한 로컬 네트워크에 있어야 합니다.';
-
-  @override
   String get syncPaired => '장치가 페어링되었습니다';
 
   @override
@@ -1606,16 +1466,10 @@ class SKo extends S {
   String get syncWaiting => '다른 장치를 기다리는 중…';
 
   @override
-  String get syncSecureNote => '종단 간 암호화된 채널입니다. 계정도 없고 클라우드 서버도 없습니다.';
-
-  @override
   String get zapretWithVpn => '우회 DPI 직접 네트워크 트래픽 필터링';
 
   @override
-  String get zapretWithVpnHint => 'VPN 터널과 함께 zapret을 실행합니다. 터널 트래픽은 VPN을 사용하고 직접 트래픽은 우회 기능을 사용합니다.';
-
-  @override
-  String get chainDuplicate => '체인에 같은 서버가 두 번 이상 사용되었습니다. 구간마다 다른 서버를 선택하세요.';
+  String get chainDuplicate => '체인에 같은 서버가 두 번 이상 사용되었습니다';
 
   @override
   String get edit => '편집';
@@ -1625,10 +1479,6 @@ class SKo extends S {
 
   @override
   String get autoSwitchOnDegrade => '성능 저하 시 자동 전환';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      '선택한 서버가 크게 느려지거나 응답하지 않으면 Sora가 측정 결과가 가장 좋은 서버로 전환합니다. 전환은 10분에 한 번으로 제한됩니다.';
 
   @override
   String get tunStackMixed => '혼합';
@@ -1646,19 +1496,13 @@ class SKo extends S {
   String get customServerName => '이름';
 
   @override
-  String get customServerNameHint => '예: 내 VPS';
-
-  @override
-  String get customServerNameRequired => '이름을 입력하세요';
+  String get customServerNameRequired => '이름이 없습니다';
 
   @override
   String get customServerAddress => '주소';
 
   @override
-  String get customServerAddressHint => 'example.com 또는 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => '서버 주소를 입력하세요';
+  String get customServerAddressRequired => '주소가 없습니다';
 
   @override
   String get customServerAddressInvalid => '잘못된 주소';
@@ -1667,19 +1511,13 @@ class SKo extends S {
   String get customServerPort => '포트';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => '포트는 1~65535 사이의 숫자여야 합니다.';
+  String get customServerPortInvalid => '잘못된 포트';
 
   @override
   String get customServerProtocol => '프로토콜';
 
   @override
   String get customServerCredentials => '로그인 정보';
-
-  @override
-  String get customServerOptional => '선택사항';
 
   @override
   String get customServerShowSecret => '비밀 표시';
@@ -1693,23 +1531,13 @@ class SKo extends S {
   }
 
   @override
-  String get customServerTest => '테스트';
-
-  @override
   String get leakTestTitle => '데이터 유출 테스트';
-
-  @override
-  String get leakTestIntro =>
-      '트래픽이 터널 밖으로 기기를 빠져나갈 수 있는지 확인합니다. 직접 DNS 및 ICMP 요청, IPv6 외부 통신, 시스템 리졸버를 검사합니다. 연결된 상태에서 실행하세요.';
 
   @override
   String get leakTestRun => '확인';
 
   @override
   String get leakTestCancel => '취소';
-
-  @override
-  String get leakTestNeedsConnection => 'VPN에 연결하여 데이터 유출을 테스트합니다.';
 
   @override
   String leakTestProgress(int count) {
@@ -1730,9 +1558,6 @@ class SKo extends S {
 
   @override
   String get leakTestFix => '수정';
-
-  @override
-  String get leakTestFixedNote => '네트워크 차단이 켜져 있습니다. 테스트를 다시 실행해 확인하세요.';
 
   @override
   String get leakTestCheckDirectDns => '직접 DNS';
@@ -1765,13 +1590,13 @@ class SKo extends S {
   String get syncDaemonFailed => '동기화 서비스를 시작할 수 없습니다.';
 
   @override
-  String get syncDaemonMissing => 'sora-sync 구성 요소를 찾을 수 없습니다. 기기 동기화를 활성화하려면 앱을 다시 설치하세요.';
+  String get syncDaemonMissing => 'sora-sync 구성 요소를 찾을 수 없습니다';
 
   @override
   String get syncDaemonStarting => '동기화 서비스를 시작하는 중…';
 
   @override
-  String get syncErrAuth => '동기화 서비스가 액세스 토큰을 거부했습니다. 앱을 다시 시작한 후 다시 시도해 보세요.';
+  String get syncErrAuth => '동기화 서비스가 액세스 토큰을 거부했습니다';
 
   @override
   String get syncErrNotFound => '장치가 더 이상 페어링되지 않습니다.';
@@ -1780,7 +1605,7 @@ class SKo extends S {
   String get syncErrPairingActive => '페어링 세션이 이미 열려 있습니다.';
 
   @override
-  String get syncErrUnreachable => '다른 장치가 응답하지 않았습니다. 동일한 네트워크에 있고 해당 코드가 표시되는지 확인하세요.';
+  String get syncErrUnreachable => '다른 장치가 응답하지 않았습니다';
 
   @override
   String get syncError => '동기화 오류';
@@ -1792,9 +1617,6 @@ class SKo extends S {
 
   @override
   String get syncJoining => '기기와 페어링 중…';
-
-  @override
-  String get syncLegacyCleared => '이전 장치 목록은 실제로 페어링된 적이 없으므로 삭제되었습니다. 이번에는 실제로 장치를 다시 페어링하십시오.';
 
   @override
   String get syncNewCode => '새 코드';
@@ -1854,8 +1676,7 @@ class SKo extends S {
   String get syncThisDevice => '이 장치';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android에서는 동기화를 사용할 수 없습니다';
 
   @override
   String get diagnosticPackets => '패킷 캡처';
@@ -1902,26 +1723,25 @@ class SKo extends S {
   String get customServerWgKeepalive => 'Keepalive(초)';
 
   @override
-  String get customServerWgKeyInvalid => '키는 wg genkey 출력처럼 base64 32바이트여야 합니다.';
+  String get customServerWgKeyInvalid => '잘못된 WireGuard 키';
 
   @override
-  String get customServerWgCidrInvalid => '10.0.0.2/32 같은 접두사를 쉼표로 구분해 입력하세요.';
+  String get customServerWgCidrInvalid => '잘못된 CIDR 접두사';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0에서 65535 사이의 초를 입력하세요.';
+  String get customServerWgKeepaliveInvalid => '잘못된 keepalive 간격';
 
   @override
   String get strictKillSwitch => '엄격한 네트워크 차단';
 
   @override
-  String get strictKillSwitchWarning =>
-      '연결 후에는 충돌, 재시작 또는 앱 종료 후에도 VPN 외부 트래픽을 차단합니다. 연결을 끊거나 이 옵션을 꺼야 접근이 복원됩니다. 기기를 재부팅한 뒤에는 시작 시 연결이 활성화된 경우에만 차단을 재개합니다.';
+  String get strictKillSwitchWarning => '종료 후에도 VPN 외부 트래픽을 차단할까요?';
 
   @override
-  String get extWorkerFailed => '확장 기능의 백그라운드 작업이 실패했습니다. 확장 기능 로그를 확인하세요.';
+  String get extWorkerFailed => '확장 기능의 백그라운드 작업이 실패했습니다';
 
   @override
-  String get extAssetRejected => '확장 프로그램 파일에 읽기 어려운 색상이나 잘못된 규칙이 있습니다. 확장 프로그램 제작자에게 파일 수정을 요청하세요.';
+  String get extAssetRejected => '확장 프로그램 파일에 읽기 어려운 색상이나 잘못된 규칙이 있습니다';
 
   @override
   String get extVerifiedSora => 'Sora 인증됨';
@@ -1947,31 +1767,25 @@ class SKo extends S {
   String get customServerPassword => '비밀번호';
 
   @override
-  String get customServerSecretRequired => '값을 입력하세요';
+  String get customServerSecretRequired => '값이 없습니다';
 
   @override
   String get customServerLinkInvalid => '잘못된 서버 링크입니다';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora 내부 오류입니다';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => '서버 인증서가 거부되었습니다';
 
   @override
-  String get errInternal => 'Sora 내부 오류입니다. 로그를 저장하고 문제를 신고하세요.';
+  String get errFileAccess => '파일에 접근할 수 없습니다';
 
   @override
-  String get errTls => '서버 인증서가 거부되었습니다. 시계를 확인하거나 제공업체에 문의하세요.';
+  String get errDataLimit => '데이터가 너무 많습니다';
 
   @override
-  String get errFileAccess => '파일에 접근할 수 없습니다. 권한과 여유 공간을 확인하세요.';
-
-  @override
-  String get errDataLimit => '데이터가 너무 많습니다. 항목을 줄이고 다시 시도하세요.';
-
-  @override
-  String get errCredentials => '저장된 인증 정보가 없습니다. 서버를 다시 가져오세요.';
+  String get errCredentials => '저장된 인증 정보가 없습니다';
 
   @override
   String subscriptionStale(String time) {
@@ -1979,54 +1793,54 @@ class SKo extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => '아직 업데이트되지 않았습니다. 다시 시도하세요.';
+  String get subscriptionNeverUpdated => '아직 업데이트되지 않았습니다';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: '서버가 HTTP $status 코드를 반환했습니다. 링크를 확인하거나 제공업체에 문의하세요.',
-      zero: '서버가 요청을 거부했습니다. 링크를 확인하거나 제공업체에 문의하세요.',
+      other: '서버가 HTTP $status 코드를 반환했습니다',
+      zero: '서버가 요청을 거부했습니다',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => '서버 설정이 불완전하거나 지원되지 않습니다. 구독을 업데이트하세요.';
+  String get errInvalidServer => '서버 설정이 불완전하거나 지원되지 않습니다';
 
   @override
-  String get errServerIds => '두 서버의 식별자가 같습니다. 다시 가져오세요.';
+  String get errServerIds => '두 서버의 식별자가 같습니다';
 
   @override
-  String get errRoutingGroup => '경로가 없는 서버나 손상된 그룹을 참조합니다. 구독을 업데이트하세요.';
+  String get errRoutingGroup => '경로가 없는 서버나 손상된 그룹을 참조합니다';
 
   @override
-  String get errConnections => '연결 목록을 볼 수 없습니다. 연결하거나 다른 엔진을 선택하세요.';
+  String get errConnections => '연결 목록을 볼 수 없습니다';
 
   @override
-  String get errLogs => '이 서비스는 로그를 보관하지 않습니다. Sora를 업데이트하세요.';
+  String get errLogs => '이 서비스는 로그를 보관하지 않습니다';
 
   @override
-  String get errDiagnostics => '진단을 수집하지 못했습니다. 다시 시도하거나 로그를 저장하세요.';
+  String get errDiagnostics => '진단을 수집하지 못했습니다';
 
   @override
-  String get errMissingItem => '요청한 항목이 더 이상 없습니다. 목록을 새로고침하세요.';
+  String get errMissingItem => '요청한 항목이 더 이상 없습니다';
 
   @override
-  String get errInvalidRequest => '요청에 잘못된 값이 있습니다. 입력을 확인하고 다시 시도하세요.';
+  String get errInvalidRequest => '요청에 잘못된 값이 있습니다';
 
   @override
-  String get errProxyLogin => '시스템 프록시는 이 로그인을 지원하지 않습니다. 로컬 프록시의 사용자 이름과 암호를 제거하세요.';
+  String get errProxyLogin => '시스템 프록시는 이 로그인을 지원하지 않습니다';
 
   @override
-  String get errLogFilter => '로그 필터가 잘못되었습니다. 검색을 지우고 다시 시도하세요.';
+  String get errLogFilter => '로그 필터가 잘못되었습니다';
 
   @override
-  String get errSubRedirect => '서버가 안전하지 않은 주소로 이동시켰습니다. 제공업체에 새 링크를 요청하세요.';
+  String get errSubRedirect => '서버가 안전하지 않은 주소로 이동시켰습니다';
 
   @override
-  String get errProxySetup => '시스템 프록시를 설정하지 못했습니다. 다시 연결하거나 로그를 여세요.';
+  String get errProxySetup => '시스템 프록시를 설정하지 못했습니다';
 
   @override
   String get notificationsToday => '오늘';
@@ -2052,17 +1866,46 @@ class SKo extends S {
   }
 
   @override
-  String get errSubInterval => '구독 업데이트 간격이 올바르지 않습니다. 제공업체에서 권장하는 간격을 선택하세요.';
+  String get errSubInterval => '구독 업데이트 간격이 올바르지 않습니다';
 
   @override
-  String get errRule => '라우팅 규칙이 올바르지 않습니다. 규칙의 도메인, IP 주소 또는 앱을 확인하세요.';
+  String get errRule => '라우팅 규칙이 올바르지 않습니다';
 
   @override
-  String get errDns => 'DNS 설정이 올바르지 않습니다. DNS 서버 주소를 확인하세요.';
+  String get errDns => 'DNS 설정이 올바르지 않습니다';
 
   @override
-  String get errEndpoint => '테스트할 서버 주소가 올바르지 않습니다. 호스트 이름과 포트를 확인하세요.';
+  String get errEndpoint => '테스트할 서버 주소가 올바르지 않습니다';
 
   @override
-  String get errCancelled => '요청이 취소되었습니다. 필요한 경우 작업을 다시 수행하세요.';
+  String get errCancelled => '요청이 취소되었습니다';
+
+  @override
+  String get customServerOptions => '연결 설정';
+
+  @override
+  String get customServerTransport => '전송';
+
+  @override
+  String get customServerSecurity => '보안';
+
+  @override
+  String get customServerCipher => '암호화 방식';
+
+  @override
+  String get customServerWgInterface => '인터페이스';
+
+  @override
+  String get customServerWgPeer => '피어';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '지원 플랫폼: $platforms.';
+  }
+
+  @override
+  String get winwsScopeWarning => '모든 앱의 TCP 트래픽을 변경할까요?';
+
+  @override
+  String get winwsRequirements => '이 VPN 모드는 사용할 수 없습니다';
 }

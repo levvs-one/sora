@@ -33,6 +33,7 @@ class _Core extends CoreControlServiceBase {
   final probeRequests = <ProbeServersRequest>[];
   final probeCalls = <ServiceCall>[];
   Completer<void>? probeGate;
+  final probeResultGates = <String, Completer<void>>{};
   final subscriptions = [
     SubscriptionState(
       settings: SubscriptionSettings(id: 'first'),
@@ -123,6 +124,7 @@ class _Core extends CoreControlServiceBase {
     probeCalls.add(call);
     await probeGate?.future;
     for (final outbound in request.outbounds) {
+      await probeResultGates[outbound.id]?.future;
       yield ProbeResult(serverId: outbound.id, reachable: true, latencyMs: 42);
     }
   }
@@ -222,6 +224,9 @@ void main() {
     if (core.probeGate case final gate? when !gate.isCompleted) gate.complete();
     if (core.diagnosticGate case final gate? when !gate.isCompleted) gate.complete();
     if (core.exportGate case final gate? when !gate.isCompleted) gate.complete();
+    for (final gate in core.probeResultGates.values) {
+      if (!gate.isCompleted) gate.complete();
+    }
     if (!disposed) sora.dispose();
     try {
       await running.timeout(const Duration(seconds: 10));
@@ -236,7 +241,6 @@ void main() {
     testWidgets('exports carry the selected category, search and format; old cores cannot mislabel data', (
       tester,
     ) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       final saves = <String>[];
       const chooser = MethodChannel('plugins.flutter.io/file_selector');
@@ -340,7 +344,6 @@ void main() {
     });
 
     testWidgets('packet capture requires TUN; cancel and leaving logs suppress late replies', (tester) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       core.diagnosticGate = Completer<void>();
       Future<void> packetMenu() async {
@@ -408,7 +411,6 @@ void main() {
       testWidgets(
         'connect orb remains clickable after reset while ${initiallyConnected ? "connected" : "disconnected"}',
         (tester) async {
-          await sora.settings.completeTour();
           sora.settings.animations = false;
           if (initiallyConnected) await tester.runAsync(sora.connect);
           try {
@@ -425,7 +427,7 @@ void main() {
             }
             await tester.pump(const Duration(milliseconds: 250));
             expect(sora.phase, initiallyConnected ? Phase.off : Phase.connected);
-            expect(sora.settings.tourDone, isTrue);
+
             if (initiallyConnected) {
               await tester.runAsync(() => tester.tap(connect));
               for (var i = 0; i < 50 && sora.phase != Phase.connected; i++) {
@@ -447,7 +449,6 @@ void main() {
     }
 
     testWidgets('log sections combine with severity and search in both history and stream', (tester) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
@@ -504,7 +505,6 @@ void main() {
     });
 
     testWidgets('manual log retry does not turn later tail failures into action errors', (tester) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       Future<void> waitForTail() async {
         for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
@@ -546,7 +546,7 @@ void main() {
 
     testWidgets('logs opened before the service link arrives load and continue streaming', (tester) async {
       final waiting = Sora(sora.settings);
-      await waiting.settings.completeTour();
+
       waiting.settings.animations = false;
       Future<void>? waitingWork;
       try {
@@ -584,7 +584,7 @@ void main() {
 
     testWidgets('new log entries preserve the visible text until the reader returns to the top', (tester) async {
       core.logPage = List.generate(80, (i) => LogEntry(sequence: Int64(80 - i), source: 'core', message: 'History $i'));
-      await sora.settings.completeTour();
+
       sora.settings.animations = false;
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
@@ -649,7 +649,7 @@ void main() {
         700,
         (i) => LogEntry(sequence: Int64(700 - i), source: 'core', message: 'History $i'),
       );
-      await sora.settings.completeTour();
+
       sora.settings.animations = false;
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
@@ -701,6 +701,7 @@ void main() {
       await until(() => core.probeRequests.length == 1);
       expect(core.probeRequests.single.outbounds.map((o) => o.id), ['a', 'b']);
       expect(sora.probingSubscription, 'first');
+      expect(sora.pendingProbes, {'a', 'b'});
       await sora.probe(subscriptionId: 'second');
       expect(core.probeRequests, hasLength(1));
       core.probeGate!.complete();
@@ -708,11 +709,100 @@ void main() {
       expect(sora.latency, {'a': 42, 'b': 42});
       expect(sora.probing, isFalse);
       expect(sora.probingSubscription, isNull);
+      expect(sora.pendingProbes, isEmpty);
       await sora.probe(subscriptionId: 'missing');
       expect(core.probeRequests, hasLength(1));
       await sora.probe(subscriptionId: 'second');
       expect(core.probeRequests.last.outbounds.single.id, 'c');
       expect(sora.latency['c'], 42);
+    });
+
+    test('subscription ping excludes merged own servers while global ping includes them once', () async {
+      core.subscriptionChanges.add(core.subscriptions.first.deepCopy()..outbounds.add(OutboundSpec(id: 'custom/own')));
+      await until(() => sora.servers.length == 4);
+      await sora.probe(subscriptionId: 'first');
+      expect(core.probeRequests.single.outbounds.map((o) => o.id), ['a', 'b']);
+      await sora.probe();
+      expect(core.probeRequests.last.outbounds.map((o) => o.id).toSet(), {'a', 'b', 'c', 'custom/own'});
+      expect(sora.pendingProbes, isEmpty);
+    });
+
+    test('ping indicators clear by result while later chunks remain pending', () async {
+      final rows = List.generate(260, (i) => OutboundSpec(id: 'row-$i'));
+      core.subscriptionChanges.add(
+        SubscriptionState(
+          settings: SubscriptionSettings(id: 'first'),
+          outbounds: rows,
+        ),
+      );
+      await until(() => sora.servers.length == 261);
+      core.probeResultGates['row-1'] = Completer<void>();
+      final task = sora.probe(subscriptionId: 'first');
+      await until(() => sora.latency.containsKey('row-0'));
+      expect(sora.pendingProbes, hasLength(259));
+      expect(sora.pendingProbes, contains('row-259'));
+      expect(sora.pendingProbes, isNot(contains('row-0')));
+      core.probeResultGates['row-1']!.complete();
+      await task;
+      expect(core.probeRequests.map((r) => r.outbounds.length), [128, 128, 4]);
+      expect(sora.pendingProbes, isEmpty);
+      expect(sora.latency, hasLength(260));
+    });
+
+    testWidgets('subscription ping spins only its rows and choosing a location applies without a reconnect action', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1440, 1000);
+      addTearDown(tester.view.reset);
+
+      sora.settings.animations = false;
+      sora.settings.language = 'ru';
+      await tester.runAsync(() async {
+        await sora.select('a');
+        await sora.connect();
+      });
+      core.subscriptionChanges.add(
+        core.subscriptions.first.deepCopy()
+          ..displayName = 'Travel'
+          ..outbounds[0].displayName = 'Amsterdam'
+          ..outbounds[1].displayName = 'Tokyo',
+      );
+      await tester.runAsync(() => until(() => sora.subscriptions.first.displayName == 'Travel'));
+      core.probeGate = Completer<void>();
+      try {
+        await tester.pumpWidget(SoraApp(sora: sora));
+        await tester.pump();
+        late Future<void> task;
+        await tester.runAsync(() async {
+          task = sora.probe(subscriptionId: 'first');
+          await until(() => core.probeRequests.isNotEmpty);
+        });
+        await tester.pump();
+        expect(find.byKey(const ValueKey('ping-row-a')), findsOneWidget);
+        expect(find.byKey(const ValueKey('ping-row-b')), findsOneWidget);
+        expect(find.byKey(const ValueKey('ping-row-c')), findsNothing);
+        expect(find.text('Применить и переподключить'), findsNothing);
+        await tester.runAsync(() async {
+          core.probeGate!.complete();
+          await task;
+        });
+        await tester.pump();
+        expect(find.byKey(const ValueKey('ping-row-a')), findsNothing);
+        expect(sora.strings.probeServers, 'Пинг');
+        await tester.runAsync(() => sora.select('b'));
+        await tester.pump();
+        expect(core.connects, 2);
+        expect(core.disconnects, 0);
+        expect(core.plan!.groups.single.members.first, 'b');
+        expect(sora.phase, Phase.connected);
+        expect(sora.needsReconnect, isFalse);
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        sora.dispose();
+        disposed = true;
+        await tester.runAsync(() => running.timeout(const Duration(seconds: 10)));
+      }
     });
 
     test('probing does not start while connection routes are changing', () async {
@@ -739,6 +829,7 @@ void main() {
         await measurement;
         expect(sora.probing, isFalse);
         expect(sora.probingSubscription, isNull);
+        expect(sora.pendingProbes, isEmpty);
         core.probeGate!.complete();
         await Future<void>.delayed(const Duration(milliseconds: 50));
         expect(sora.latency, {'a': 17});
@@ -761,7 +852,7 @@ void main() {
       expect(sora.history, isEmpty);
     });
 
-    test('settings during startup remain pending until explicit application', () async {
+    test('settings during startup apply once after the connection finishes', () async {
       core.gate = Completer<void>();
       final start = sora.connect();
       await until(() => core.connects == 1);
@@ -771,9 +862,41 @@ void main() {
       expect(sora.needsReconnect, isTrue);
       expect(core.connects, 1);
       core.gate = null;
-      await sora.connect();
+      await until(() => core.connects == 2 && !sora.busy);
       expect(core.plan!.engines, ['xray']);
       expect(sora.needsReconnect, isFalse);
+    });
+
+    test('user connection edits debounce once and background changes never reconnect', () async {
+      await sora.connect();
+      for (var i = 0; i < 50; i++) {
+        await sora.change((s) => s.engine = i.isEven ? 'xray' : 'mihomo');
+      }
+      expect(core.connects, 1);
+      await until(() => core.connects == 2 && !sora.busy);
+      expect(core.plan!.engines, ['mihomo']);
+      await sora.change((s) => s.engine = 'xray', userInitiated: false);
+      await sora.change((s) => s.theme = 'dark');
+      await sora.probe();
+      core.subscriptionChanges.add(core.subscriptions.first.deepCopy()..outbounds[0].displayName = 'Renamed');
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(core.connects, 2);
+      await sora.change((s) => s.engine = 'sing-box');
+      await sora.disconnect();
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(core.connects, 2);
+      expect(sora.phase, Phase.off);
+    });
+
+    test('an automatically rejected replacement is reported once without retrying', () async {
+      await sora.connect();
+      core.reject = true;
+      await sora.change((s) => s.engine = 'sing-box');
+      await until(() => core.connects == 2 && !sora.busy);
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(core.connects, 2);
+      expect(sora.history, hasLength(1));
+      expect(sora.phase, Phase.connected);
     });
 
     test('location clicks coalesce to the last choice while a replacement is starting', () async {
@@ -875,7 +998,7 @@ void main() {
     });
 
     for (final selectedEngine in ['mihomo', 'xray']) {
-      test('$selectedEngine TUN stack click bursts are staged until one explicit reconnect', () async {
+      test('$selectedEngine TUN stack click bursts coalesce and disconnect cancels pending changes', () async {
         await sora.change(
           (s) => s
             ..server = 'a'

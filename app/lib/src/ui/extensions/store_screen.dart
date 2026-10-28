@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/cupertino.dart' show CupertinoSearchTextField, CupertinoSwitch;
+import 'package:flutter/foundation.dart' show setEquals;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart' as crypto;
@@ -117,10 +118,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                           ? const _ExtensionsBody()
                           : _failed
                           ? Center(
-                              child: Text(
-                                s.extErrGeneric,
-                                style: Styles.body.copyWith(color: Palette.of(context).ink2),
-                              ),
+                              child: Text(s.extErrGeneric, style: Styles.body.copyWith(color: Palette.of(context).ink)),
                             )
                           : const Center(child: CircularProgressIndicator()),
                     ),
@@ -168,7 +166,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                   TextField(
                     controller: controller,
                     keyboardType: TextInputType.url,
-                    decoration: InputDecoration(hintText: s.extUrlHint),
+                    decoration: InputDecoration(labelText: s.extInstallFromUrl),
                     onSubmitted: (_) => Navigator.pop(context, controller.text.trim()),
                   ),
                   const SizedBox(height: 16),
@@ -198,6 +196,11 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
 
   Future<bool> _downloadAndInstall(BuildContext context, Uri url, {required String source, CatalogEntry? entry}) async {
     final s = S.of(context);
+    final compatibility = entry == null ? null : catalogCompatibilityText(s, entry);
+    if (compatibility != null) {
+      await _showError(context, compatibility);
+      return false;
+    }
     final client = http.Client();
     var cancelled = false;
     late final ExtensionInstallDialog window;
@@ -237,6 +240,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         source: source,
         expectedSha256: entry?.sha256,
         authorKeyPin: entry?.authorKey,
+        catalogEntry: entry,
         changelog: changelog,
         window: window,
         verified: entry?.badges.contains('staff') ?? false,
@@ -270,6 +274,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       body.add(chunk);
       onProgress(body.length, total);
     }
+    if (expectedSize != null && body.length != expectedSize) {
+      throw Exception('download size does not match the catalog entry');
+    }
     return body.takeBytes();
   }
 
@@ -286,13 +293,14 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     required String? expectedSha256,
     List<CatalogChangelogEntry>? changelog,
     String? authorKeyPin,
+    CatalogEntry? catalogEntry,
     ExtensionInstallDialog? window,
     bool verified = false,
   }) async {
     final s = S.of(context);
     if (!context.mounted) return false;
     final progress = window ?? ExtensionInstallDialog(context, const InstallProgressWindow(stage: InstallStage.verify));
-    var isUpdate = false;
+    var isUpdate = catalogEntry != null && _store.get(catalogEntry.id) != null;
     Future<void> showFailure(String message) async {
       await progress.close();
       if (context.mounted) {
@@ -310,6 +318,17 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       // Catalog installs verify against the catalog-pinned author key,
       // never against the manifest's self-attested one.
       await pkg.verify(authorKeyLine: authorKeyPin);
+      // Catalog v1 permits entries without capability metadata.
+      if (source == 'catalog' &&
+          (catalogEntry == null ||
+              pkg.manifest.id != catalogEntry.id ||
+              pkg.manifest.version != catalogEntry.version ||
+              pkg.manifest.minAppVersion != catalogEntry.minAppVersion ||
+              !setEquals(pkg.manifest.permissions.toSet(), catalogEntry.permissions.toSet()) ||
+              (catalogEntry.capabilities.isNotEmpty &&
+                  !setEquals(pkg.manifest.capabilities.toSet(), catalogEntry.capabilities.toSet())))) {
+        throw PackageError('manifest does not match the catalog entry');
+      }
       // min_app_version gate against the running app.
       if (_appVersion.isNotEmpty && compareVersions(pkg.manifest.minAppVersion, _appVersion) > 0) {
         throw PackageError('needs app ${pkg.manifest.minAppVersion}');
@@ -342,7 +361,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       final granted = await decision.future;
       if (granted == null || !context.mounted) return false;
       progress.show(const InstallProgressWindow(stage: InstallStage.install));
+      final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
       await _store.install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
+      sora?.applyConnectionChanges();
       return true;
     } on ExtAssetError {
       await progress.close();
@@ -377,46 +398,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
   }
 
   Future<void> _showError(BuildContext context, String message) async {
-    final palette = Palette.of(context);
-    final s = S.of(context);
-    final navigator = Navigator.of(context, rootNavigator: true);
-    final route = DialogRoute<void>(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: palette.raised,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Icon(Symbols.error_rounded, color: palette.danger),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(s.extInstallFailed, style: Styles.heading.copyWith(fontSize: 22, color: palette.ink)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(message, style: Styles.body.copyWith(color: palette.ink2)),
-                const SizedBox(height: 16),
-                PrimaryButton(label: s.extOk, onTap: () => Navigator.pop(context)),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-    await navigator.push(route);
-    // A batch must wait for the scrim's exit transition before starting
-    // the next download, otherwise the two dialog routes overlap.
-    await route.completed;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   static String _sha256Hex(Uint8List data) => crypto.sha256.convert(data).toString();
@@ -555,7 +539,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
           children: [
             Icon(Symbols.cloud_off_rounded, size: 40, color: palette.ink3),
             const SizedBox(height: 12),
-            Text(s.extCatalogError, style: Styles.body.copyWith(color: palette.ink2)),
+            Text(s.extCatalogError, style: Styles.body.copyWith(color: palette.ink)),
             const SizedBox(height: 12),
             PrimaryButton(label: s.extRetry, onTap: _refreshCatalog),
           ],
@@ -587,7 +571,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 ),
                 TextButton(
                   onPressed: _refreshCatalog,
-                  child: Text(s.extRetry, style: TextStyle(color: palette.ink2)),
+                  child: Text(s.extRetry, style: TextStyle(color: palette.ink)),
                 ),
               ],
             ),
@@ -659,7 +643,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               final entries = _filtered(value.text.trim().toLowerCase());
               return entries.isEmpty
                   ? Center(
-                      child: Text(s.extEmptySearch, style: Styles.body.copyWith(color: palette.ink2)),
+                      child: Text(s.extEmptySearch, style: Styles.body.copyWith(color: palette.ink)),
                     )
                   : RefreshIndicator(
                       onRefresh: _refreshCatalog,
@@ -822,6 +806,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     // Staged rollout: the update button appears only for installs inside
     // this version's bucket. The listing itself is never gated: hiding a
     // published version from the catalog would be misleading.
+    final compatibility = catalogCompatibilityText(s, e);
     final needsUpdate =
         installed != null && compareVersions(e.version, installed.version) > 0 && e.rolloutEligible(store.installId);
     return ExtensionCard(
@@ -831,13 +816,14 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       rating: e.rating,
       installs: e.installs,
       verified: e.badges.contains('staff'),
-      subtitle: e.description,
       permissions: e.permissions,
       onTap: () => push<void>(
         context,
         ExtensionDetailScreen(entry: e, onInstall: (entry) => _installFromCatalog(context, entry)),
       ),
-      trailing: installed == null
+      trailing: compatibility != null && (installed == null || needsUpdate)
+          ? InfoButton(title: installed == null ? s.extInstall : s.extUpdate, description: compatibility)
+          : installed == null
           ? PillButton(label: s.extInstall, onTap: () => _installFromCatalog(context, e))
           : needsUpdate
           ? PillButton(label: s.extUpdate, onTap: () => _installFromCatalog(context, e))
@@ -910,7 +896,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             const SizedBox(height: 12),
             Text(
               q.isEmpty ? s.extEmptyInstalled : s.extEmptySearch,
-              style: Styles.body.copyWith(color: palette.ink2),
+              style: Styles.body.copyWith(color: palette.ink),
               textAlign: TextAlign.center,
             ),
           ],
@@ -919,7 +905,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
     }
     final updates = [
       for (final inst in store.installed)
-        if (_needsUpdate(store, inst)) inst,
+        if (_needsUpdate(store, inst) && catalogCompatibilityText(s, _catalog!.find(inst.id)!) == null) inst,
     ];
     return Column(
       children: [
@@ -964,17 +950,27 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 capabilities: inst.manifest.capabilities,
                 permissions: inst.granted,
                 networkHosts: inst.manifest.networkHosts,
-                onTap: () => push<void>(context, ExtensionDetailScreen(installed: inst)),
+                onTap: () => push<void>(
+                  context,
+                  ExtensionDetailScreen(
+                    installed: inst,
+                    entry: _catalog?.find(inst.id),
+                    onInstall: (entry) => _installFromCatalog(context, entry),
+                  ),
+                ),
                 // The switch alone announces only on/off; the label names
                 // the extension it toggles.
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (needsUpdate) ...[
-                      PillButton(
-                        label: s.extUpdate,
-                        onTap: () => _installFromCatalog(context, _catalog!.find(inst.id)!),
-                      ),
+                      if (catalogCompatibilityText(s, _catalog!.find(inst.id)!) case final requirement?)
+                        InfoButton(title: s.extUpdate, description: requirement)
+                      else
+                        PillButton(
+                          label: s.extUpdate,
+                          onTap: () => _installFromCatalog(context, _catalog!.find(inst.id)!),
+                        ),
                       const SizedBox(width: 8),
                     ],
                     Semantics(
@@ -1091,13 +1087,13 @@ class _ConflictBannerState extends State<_ConflictBanner> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: palette.danger.withValues(alpha: 0.08),
+              color: palette.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: palette.danger.withValues(alpha: 0.4)),
+              border: Border.all(color: palette.field),
             ),
             child: Row(
               children: [
-                Icon(Symbols.warning_rounded, size: 20, color: palette.danger),
+                Icon(Symbols.warning_rounded, size: 20, color: palette.ink),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -1106,7 +1102,7 @@ class _ConflictBannerState extends State<_ConflictBanner> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(s.extConflictsResolve, style: Styles.bodyStrong.copyWith(color: palette.danger)),
+                Text(s.extConflictsResolve, style: Styles.bodyStrong.copyWith(color: palette.ink)),
               ],
             ),
           ),
@@ -1169,7 +1165,7 @@ class _FilterPill extends StatelessWidget {
               color: selected ? palette.ink : palette.field,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Text(label, style: Styles.secondary.copyWith(color: selected ? palette.surface : palette.ink2)),
+            child: Text(label, style: Styles.secondary.copyWith(color: selected ? palette.surface : palette.ink)),
           ),
         ),
       ),

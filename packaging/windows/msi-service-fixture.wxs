@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="$(var.Product)" UpgradeCode="$(var.Upgrade)" Name="Sora MSI service transaction fixture"
+           Version="$(var.Version)" Manufacturer="Sora tests" Language="1033">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
+    <Media Id="1" Cabinet="fixture.cab" EmbedCab="yes"/>
+    <Property Id="PROBEFAIL" Value="0"/>
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable"/>
+    <Upgrade Id="$(var.Upgrade)">
+      <UpgradeVersion Minimum="0.0.0" Maximum="$(var.Version)" Property="FIXTURE_PREVIOUS" IncludeMaximum="no"/>
+    </Upgrade>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="SoraMSIServiceFixture">
+          <Component Id="PayloadComponent" Guid="$(var.Component)" Win64="yes">
+            <File Id="ServiceExe" Source="$(var.Input)/service.exe" KeyPath="yes"/>
+            <File Id="Payload" Source="$(var.Input)/payload.txt"/>
+            <File Id="ProbeExe" Source="$(var.Input)/probe.exe"/>
+            <ServiceInstall Id="FixtureService" Name="$(var.Service)" DisplayName="Sora MSI isolated fixture"
+                            Type="ownProcess" Start="demand" ErrorControl="normal" Arguments="run $(var.Service)"/>
+            <ServiceControl Id="FixtureStart" Name="$(var.Service)" Start="install" Wait="no"/>
+            <ServiceControl Id="FixtureStop" Name="$(var.Service)" Stop="both" Remove="uninstall" Wait="yes"/>
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id="Fixture" Level="1"><ComponentRef Id="PayloadComponent"/></Feature>
+    <CustomAction Id="VerifyService" FileKey="ServiceExe" Execute="deferred" Impersonate="no" Return="check"
+                  ExeCommand="check $(var.Service) $(var.Expected)"/>
+    <CustomAction Id="ProbeReady" FileKey="ProbeExe" Execute="deferred" Impersonate="no" Return="check"
+                  ExeCommand="&quot;[#Payload]&quot; &quot;[OBSERVATION]&quot; $(var.Expected) [PROBEFAIL]"/>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts Sequence="1501"/>
+      <Custom Action="VerifyService" After="StartServices">NOT REMOVE~="ALL"</Custom>
+      <Custom Action="ProbeReady" After="VerifyService">NOT REMOVE~="ALL"</Custom>
+    </InstallExecuteSequence>
+  </Product>
+</Wix>

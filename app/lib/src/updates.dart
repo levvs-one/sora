@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi' show Abi;
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +11,8 @@ import 'package:http/io_client.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 import 'settings.dart';
+import 'ext/verifier.dart';
+import 'release_metadata.dart';
 
 const appVersion = String.fromEnvironment('SORA_VERSION', defaultValue: 'dev');
 const releaseRepository = 'https://github.com/levvs-one/sora';
@@ -28,9 +32,6 @@ enum UpdateConnection { idle, connected, changing, unknown }
 enum UpdateError { network, release, checksum, installation, connecting, unsupported, rollback, rollbackCache }
 
 /// Visible phase of an in-flight update flow.
-/// There is deliberately no "verifying" stage: file hashes are checked
-/// against the manifest, but releases are not signed yet, so the UI must
-/// not claim verification.
 enum UpdateStage { idle, checking, downloading, installing }
 
 class UpdateFailure implements Exception {
@@ -142,6 +143,7 @@ class SoraRelease {
       // Published Sora packages use a three-part stable version in filenames.
       if (json['draft'] != false ||
           json['prerelease'] != false ||
+          version.length > 64 ||
           !RegExp(r'^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$').hasMatch(version)) {
         throw const UpdateFailure(UpdateError.release);
       }
@@ -178,10 +180,16 @@ String expectedHash(String manifest, String name) {
   return hashes.single;
 }
 
-Future<void> verifyUpdateFile(File file, String manifest, String name) async {
+Future<void> verifyUpdateFile(File file, String manifest, String name, {int? size}) async {
   final expected = expectedHash(manifest, name);
-  final actual = await sha256.bind(file.openRead()).first;
-  if (actual.toString() != expected) throw const UpdateFailure(UpdateError.checksum);
+  final length = await file.length();
+  if (length < 1 || length > ReleaseMetadata.maxArtifactBytes || (size != null && length != size)) {
+    throw const UpdateFailure(UpdateError.checksum);
+  }
+  final actual = await sha256.bind(file.openRead(0, length + 1)).first;
+  if (actual.toString() != expected || await file.length() != length) {
+    throw const UpdateFailure(UpdateError.checksum);
+  }
 }
 
 /// Marker written to settings after a Linux update's privileged helper
@@ -219,17 +227,38 @@ class PendingUpdate {
 
 enum PackageFormat { deb, rpm, arch }
 
+enum ReleaseArchitecture {
+  amd64('x86_64'),
+  arm64('aarch64');
+
+  const ReleaseArchitecture(this.machine);
+  final String machine;
+
+  static ReleaseArchitecture? forAbi(Abi abi) => switch (abi) {
+    Abi.linuxX64 || Abi.windowsX64 => amd64,
+    Abi.linuxArm64 => arm64,
+    _ => null,
+  };
+}
+
 typedef UpdateProcess = Future<ProcessResult> Function(String executable, List<String> arguments);
 
 class LinuxInstallation {
-  const LinuxInstallation(this.format, this.manager);
+  const LinuxInstallation(this.format, this.manager, {this.architecture = ReleaseArchitecture.amd64});
   final PackageFormat format;
   final String manager;
+  final ReleaseArchitecture architecture;
 
   List<String> filenames(String version) => switch (format) {
-    PackageFormat.deb => ['sora-core_${version}_amd64.deb', 'sora_${version}_amd64.deb'],
-    PackageFormat.rpm => ['sora-core-$version-1.x86_64.rpm', 'sora-$version-1.x86_64.rpm'],
-    PackageFormat.arch => ['sora-core-$version-1-x86_64.pkg.tar.zst', 'sora-$version-1-x86_64.pkg.tar.zst'],
+    PackageFormat.deb => ['sora-core_${version}_${architecture.name}.deb', 'sora_${version}_${architecture.name}.deb'],
+    PackageFormat.rpm => [
+      'sora-core-$version-1.${architecture.machine}.rpm',
+      'sora-$version-1.${architecture.machine}.rpm',
+    ],
+    PackageFormat.arch => [
+      'sora-core-$version-1-${architecture.machine}.pkg.tar.zst',
+      'sora-$version-1-${architecture.machine}.pkg.tar.zst',
+    ],
   };
 
   List<String> installArguments(List<String> files) => switch (manager) {
@@ -252,7 +281,13 @@ class LinuxInstallation {
   }
 
   /// Query ownership of this executable, not merely which managers are present.
-  static Future<LinuxInstallation?> detect(UpdateProcess run, String executable) async {
+  static Future<LinuxInstallation?> detect(
+    UpdateProcess run,
+    String executable, {
+    ReleaseArchitecture? architecture,
+  }) async {
+    final arch = architecture ?? ReleaseArchitecture.forAbi(Abi.current());
+    if (arch == null) return null;
     Future<String?> query(String command, List<String> args) async {
       try {
         final result = await run(command, args).timeout(const Duration(seconds: 5));
@@ -263,24 +298,26 @@ class LinuxInstallation {
     }
 
     final debOwner = await query('dpkg-query', ['-S', executable]);
-    if (debOwner == 'sora: $executable' || debOwner == 'sora:amd64: $executable') {
+    if (debOwner == 'sora: $executable' || debOwner == 'sora:${arch.name}: $executable') {
       final status = await query('dpkg-query', ['-W', '-f=\${Package}\t\${db:Status-Status}\n', 'sora', 'sora-core']);
       if (status != null && status.split('\n').toSet().containsAll({'sora\tinstalled', 'sora-core\tinstalled'})) {
-        return const LinuxInstallation(PackageFormat.deb, 'apt-get');
+        return LinuxInstallation(PackageFormat.deb, 'apt-get', architecture: arch);
       }
     }
     if (await query('rpm', ['-qf', '--qf', '%{NAME}\n', executable]) == 'sora') {
       final names = await query('rpm', ['-q', '--qf', '%{NAME}\n', 'sora', 'sora-core']);
       if (names != null && names.split('\n').toSet().containsAll({'sora', 'sora-core'})) {
         for (final manager in ['dnf', 'zypper']) {
-          if (await query(manager, ['--version']) != null) return LinuxInstallation(PackageFormat.rpm, manager);
+          if (await query(manager, ['--version']) != null) {
+            return LinuxInstallation(PackageFormat.rpm, manager, architecture: arch);
+          }
         }
       }
     }
     if (await query('pacman', ['-Qoq', executable]) == 'sora') {
       final packages = await query('pacman', ['-Qq', 'sora', 'sora-core']);
       if (packages != null && packages.split('\n').toSet().containsAll({'sora', 'sora-core'})) {
-        return const LinuxInstallation(PackageFormat.arch, 'pacman');
+        return LinuxInstallation(PackageFormat.arch, 'pacman', architecture: arch);
       }
     }
     return null;
@@ -299,12 +336,15 @@ class AppUpdater extends ChangeNotifier {
     UpdateProcess? run,
     String? executable,
     bool? windows,
+    Abi? abi,
     Future<bool> Function()? canElevate,
     Directory Function(String fromVersion)? rollbackDir,
+    this._signingPublicKey = teamPublicKey,
   }) : _client = client ?? (() => IOClient(HttpClient()..findProxy = HttpClient.findProxyFromEnvironment)),
        _run = run ?? ((exe, args) => Process.run(exe, args)),
        _executable = executable ?? Platform.resolvedExecutable,
        _windows = windows ?? Platform.isWindows,
+       _architecture = ReleaseArchitecture.forAbi(abi ?? Abi.current()),
        _rollbackDirOverride = rollbackDir,
        _canElevate =
            canElevate ??
@@ -321,6 +361,9 @@ class AppUpdater extends ChangeNotifier {
   final UpdateProcess _run;
   final String _executable;
   final bool _windows;
+  final ReleaseArchitecture? _architecture;
+  // Tests use an ephemeral signing identity; production pins the compiled root.
+  final String _signingPublicKey;
 
   /// Test seam for the rollback cache location: production uses the
   /// XDG cache dir, tests point it at a temp directory.
@@ -593,6 +636,69 @@ class AppUpdater extends ChangeNotifier {
     }
   }
 
+  ReleaseMetadata _parseMetadata(List<int> bytes, String manifest, String version) {
+    final digest = sha256.convert(bytes).toString();
+    if (digest != expectedHash(manifest, ReleaseMetadata.filename)) {
+      throw const UpdateFailure(UpdateError.checksum);
+    }
+    try {
+      final metadata = ReleaseMetadata.parse(bytes, version);
+      if (metadata.checksumManifest(digest) != manifest) throw const FormatException('Inconsistent checksum manifest');
+      return metadata;
+    } on FormatException {
+      throw const UpdateFailure(UpdateError.release);
+    }
+  }
+
+  List<ReleaseAsset> _boundAssets(List<ReleaseAsset> assets, ReleaseMetadata metadata) {
+    final bounded = <ReleaseAsset>[];
+    for (final asset in assets) {
+      final entry = metadata.artifacts[asset.name];
+      if (entry == null || entry.os != (_windows ? 'windows' : 'linux') || entry.arch != _architecture?.name) {
+        throw const UpdateFailure(UpdateError.release);
+      }
+      bounded.add(ReleaseAsset(asset.name, asset.url, entry.size));
+    }
+    return bounded;
+  }
+
+  Future<({String manifest, ReleaseMetadata metadata})> _signedManifest(
+    SoraRelease release,
+    Directory directory,
+  ) async {
+    final sums = release.asset('SHA256SUMS');
+    final signature = release.asset('SHA256SUMS.minisig');
+    if (sums.size < 1 || sums.size > 1024 * 1024 || signature.size < 1 || signature.size > 8192) {
+      throw const UpdateFailure(UpdateError.release);
+    }
+    final payload = Uint8List.fromList(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+    final signatureBytes = await _fetch(signature.url, limit: 8192, size: signature.size);
+    final String manifest;
+    try {
+      await verifyPayload(
+        _signingPublicKey,
+        utf8.decode(signatureBytes),
+        'release:v${release.version}:SHA256SUMS',
+        payload,
+      );
+      manifest = utf8.decode(payload);
+    } on SignatureError {
+      throw const UpdateFailure(UpdateError.release);
+    } on FormatException {
+      throw const UpdateFailure(UpdateError.release);
+    }
+    if (!ReleaseMetadata.referenced(manifest)) throw const UpdateFailure(UpdateError.release);
+    final asset = release.asset(ReleaseMetadata.filename);
+    if (asset.size > ReleaseMetadata.maxBytes) throw const UpdateFailure(UpdateError.release);
+    final metadataBytes = await _fetch(asset.url, limit: ReleaseMetadata.maxBytes, size: asset.size);
+    final metadata = _parseMetadata(metadataBytes, manifest, release.version);
+    if (_cancelled || _disposed) throw const UpdateFailure(UpdateError.network);
+    await File('${directory.path}/SHA256SUMS').writeAsBytes(payload, flush: true);
+    await File('${directory.path}/SHA256SUMS.minisig').writeAsBytes(signatureBytes, flush: true);
+    await File('${directory.path}/${ReleaseMetadata.filename}').writeAsBytes(metadataBytes, flush: true);
+    return (manifest: manifest, metadata: metadata);
+  }
+
   /// The caller provides desktop launch/quit operations so tests never elevate.
   Future<void> install({
     required Future<bool> Function() confirmDrop,
@@ -611,20 +717,26 @@ class AppUpdater extends ChangeNotifier {
     bool handedOff = false;
     try {
       _guard();
+      if (_architecture == null || (_windows && _architecture != ReleaseArchitecture.amd64)) {
+        throw const UpdateFailure(UpdateError.unsupported);
+      }
       final release = latest!;
-      final installation = _windows ? null : await LinuxInstallation.detect(_run, _executable);
+      final installation = _windows
+          ? null
+          : await LinuxInstallation.detect(_run, _executable, architecture: _architecture);
       if (!_windows && installation == null) throw const UpdateFailure(UpdateError.unsupported);
       final names = _windows ? ['Sora-Setup-${release.version}-x64.exe'] : installation!.filenames(release.version);
       // Resolve the whole pair before downloading or invoking any installer.
-      final assets = [for (final name in names) release.asset(name)];
-      final sums = release.asset('SHA256SUMS');
+      var assets = [for (final name in names) release.asset(name)];
+      release.asset('SHA256SUMS.minisig');
       if (_work != null) await _work!.delete(recursive: true);
       final work = _work = await Directory.systemTemp.createTemp('sora-update-');
-      final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+      final verified = await _signedManifest(release, work);
+      final manifest = verified.manifest;
+      assets = _boundAssets(assets, verified.metadata);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
-      await File('${work.path}/SHA256SUMS').writeAsString(manifest, flush: true);
       // Progress spans the whole download phase, so the bar fills once across
       // all package files instead of restarting at zero for every file.
       final totalSize = assets.fold<int>(0, (sum, asset) => sum + asset.size);
@@ -642,11 +754,9 @@ class AppUpdater extends ChangeNotifier {
           progressTotal: totalSize,
         );
         downloaded += asset.size;
-        // Integrity check only: the file hash must match the manifest, which
-        // the TLS transport to GitHub authenticates. Releases are not signed
-        // yet, so the UI must not present this step as signature
-        // verification.
-        await verifyUpdateFile(file, manifest, asset.name);
+        // The signature authenticates the manifest; this binds each package
+        // to its signed hash before any installer handoff.
+        await verifyUpdateFile(file, manifest, asset.name, size: asset.size);
       }
       _guard();
       if (connection() == UpdateConnection.connected && !await confirmDrop()) return;
@@ -737,8 +847,8 @@ class AppUpdater extends ChangeNotifier {
   ///   mismatch → no rollback, error + manual command instead).
   /// A marker naming any other build, or a corrupt one, is cleared
   /// silently: its premise is void and it must never trigger a downgrade.
-  /// No-op on Windows: the in-app path is blocked fail-closed there (A2),
-  /// so a marker can never exist.
+  /// This health-check marker belongs to the Linux update path.
+  /// Windows does not yet implement automatic rollback.
   Future<void> checkPendingUpdate({
     required bool Function() coreHealthy,
     required Future<void> Function() restart,
@@ -788,6 +898,16 @@ class AppUpdater extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
+  Future<Uint8List> _cachedMetadataFile(Directory dir, String name, int limit) async {
+    final bytes = BytesBuilder(copy: false);
+    await for (final chunk in File('${dir.path}/$name').openRead(0, limit + 1).timeout(const Duration(seconds: 5))) {
+      bytes.add(chunk);
+      if (bytes.length > limit) throw const UpdateFailure(UpdateError.rollback);
+    }
+    if (bytes.isEmpty) throw const UpdateFailure(UpdateError.rollback);
+    return bytes.takeBytes();
+  }
+
   /// Rolls back to [marker.from] using the verified rollback cache.
   /// Fail-closed at every step: missing cache, hash mismatch, no elevation
   /// or a failed helper run → no downgrade happens; the error and a manual
@@ -812,27 +932,42 @@ class AppUpdater extends ChangeNotifier {
     manualCommand = null;
     notifyListeners();
     try {
-      final installation = await LinuxInstallation.detect(_run, _executable);
+      if (_architecture == null) throw const UpdateFailure(UpdateError.unsupported);
+      final installation = await LinuxInstallation.detect(_run, _executable, architecture: _architecture);
       if (installation == null) throw const UpdateFailure(UpdateError.unsupported);
       final dir = _rollbackDir(marker.from);
       if (dir == null || !await dir.exists()) {
         debugPrint('[updates] no rollback cache for ${marker.from}; cannot roll back');
         throw const UpdateFailure(UpdateError.rollback);
       }
-      // Re-verify against the cached manifest: the cache was hash-verified
-      // at download time, but it lived on user-writable disk since.
-      final manifestFile = File('${dir.path}/SHA256SUMS');
-      if (!await manifestFile.exists()) {
+      // Both manifest and packages lived on user-writable disk since download.
+      // Bound reads independently of mutable file lengths before verification.
+      final payload = await _cachedMetadataFile(dir, 'SHA256SUMS', 1024 * 1024);
+      final signature = await _cachedMetadataFile(dir, 'SHA256SUMS.minisig', 8192);
+      await verifyPayload(_signingPublicKey, utf8.decode(signature), 'release:v${marker.from}:SHA256SUMS', payload);
+      final manifest = utf8.decode(payload);
+      if (!ReleaseMetadata.referenced(manifest)) throw const UpdateFailure(UpdateError.rollback);
+      final ReleaseMetadata metadata;
+      try {
+        metadata = _parseMetadata(
+          await _cachedMetadataFile(dir, ReleaseMetadata.filename, ReleaseMetadata.maxBytes),
+          manifest,
+          marker.from,
+        );
+      } on Object {
         throw const UpdateFailure(UpdateError.rollback);
       }
-      final manifest = await manifestFile.readAsString();
       final names = installation.filenames(marker.from);
       final paths = <String>[];
       for (final name in names) {
         final file = File('${dir.path}/$name');
         if (!await file.exists()) throw const UpdateFailure(UpdateError.rollback);
         try {
-          await verifyUpdateFile(file, manifest, name);
+          final entry = metadata.artifacts[name];
+          if (entry == null || entry.os != 'linux' || entry.arch != _architecture.name) {
+            throw const UpdateFailure(UpdateError.rollback);
+          }
+          await verifyUpdateFile(file, manifest, name, size: entry.size);
         } on UpdateFailure {
           debugPrint('[updates] rollback cache hash mismatch for $name; refusing to roll back');
           throw const UpdateFailure(UpdateError.rollback);
@@ -886,7 +1021,7 @@ class AppUpdater extends ChangeNotifier {
     return Directory('$base/sora/rollback/$fromVersion');
   }
 
-  /// Downloads and hash-verifies the currently installed release's packages
+  /// Authenticates the manifest and hash-verifies the installed release's packages
   /// into the rollback cache, so a broken update can be reverted offline.
   /// Any failure (network, missing release assets, hash mismatch) aborts the
   /// whole update (fail-closed): installing without a rollback path is not
@@ -907,18 +1042,18 @@ class AppUpdater extends ChangeNotifier {
       final previous = SoraRelease.parse(utf8.decode(bytes));
       if (previous.version != from) throw const UpdateFailure(UpdateError.release);
       final names = installation.filenames(previous.version);
-      final assets = [for (final name in names) previous.asset(name)];
-      final sums = previous.asset('SHA256SUMS');
+      var assets = [for (final name in names) previous.asset(name)];
       await dir.create(recursive: true);
-      final manifest = utf8.decode(await _fetch(sums.url, limit: 1024 * 1024, size: sums.size));
+      final verified = await _signedManifest(previous, dir);
+      final manifest = verified.manifest;
+      assets = _boundAssets(assets, verified.metadata);
       for (final asset in assets) {
         expectedHash(manifest, asset.name);
       }
-      await File('${dir.path}/SHA256SUMS').writeAsString(manifest, flush: true);
       for (final asset in assets) {
         final file = File('${dir.path}/${asset.name}');
         await _fetch(asset.url, limit: asset.size, target: file, size: asset.size);
-        await verifyUpdateFile(file, manifest, asset.name);
+        await verifyUpdateFile(file, manifest, asset.name, size: asset.size);
       }
       debugPrint('[updates] rollback cache ready for $from (${assets.length} packages, hashes verified)');
     } on UpdateFailure catch (e) {

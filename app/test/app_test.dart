@@ -274,7 +274,7 @@ void main() {
     tester.platformDispatcher.localesTestValue = const [Locale('ru')];
     late Sora sora;
     await tester.runAsync(() async => sora = Sora(await Settings.load()));
-    await sora.settings.completeTour();
+
     sora.failure = CoreFailure.unavailable;
     await tester.pumpWidget(SoraApp(sora: sora));
     await tester.pumpAndSettle();

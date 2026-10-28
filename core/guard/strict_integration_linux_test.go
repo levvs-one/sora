@@ -3,6 +3,7 @@ package guard
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -147,6 +148,70 @@ func TestStrictNftIntegration(t *testing.T) {
 	run("nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "ip", "link", "set", "peer0", "up")
 	// DAD must complete before IPv6 reachability is tested.
 	run("nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "ip", "link", "set", "lo", "up")
+	receiver := exec.CommandContext(t.Context(), "nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "nft", "-f", "-")
+	receiver.Stdin = strings.NewReader(`table inet sora_test_receiver {
+		counter v4tcp { }
+		counter v4udp { }
+		counter v6tcp { }
+		counter v6udp { }
+		chain input {
+			type filter hook input priority 0; policy accept;
+			ip daddr 192.168.50.2 tcp dport 8080 counter name v4tcp
+			ip daddr 192.168.50.2 udp dport 8080 counter name v4udp
+			ip6 daddr fd00::2 tcp dport 8080 counter name v6tcp
+			ip6 daddr fd00::2 udp dport 8080 counter name v6udp
+		}
+	}`)
+	if output, err := receiver.CombinedOutput(); err != nil {
+		t.Fatalf("install receiver counters: %v %s", err, output)
+	}
+	checkPackets := func(phase string, reachable bool) {
+		t.Helper()
+		output, err := exec.CommandContext(t.Context(), "nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "nft", "-j", "list", "counters", "table", "inet", "sora_test_receiver").Output()
+		if err != nil {
+			t.Fatal(err)
+		}
+		var snapshot struct {
+			Nftables []struct {
+				Counter *struct {
+					Name    string
+					Packets *uint64
+				}
+			}
+		}
+		if err := json.Unmarshal(output, &snapshot); err != nil {
+			t.Fatal(err)
+		}
+		counts := make(map[string]uint64)
+		for _, object := range snapshot.Nftables {
+			if counter := object.Counter; counter != nil {
+				if counter.Packets == nil {
+					t.Fatal("receiver omitted its packet count")
+				}
+				if _, duplicate := counts[counter.Name]; duplicate {
+					t.Fatal("receiver repeated a counter")
+				}
+				counts[counter.Name] = *counter.Packets
+			}
+		}
+		if len(counts) != 4 {
+			t.Fatalf("receiver counters missing: %v", counts)
+		}
+		for _, name := range []string{"v4tcp", "v4udp", "v6tcp", "v6udp"} {
+			count, found := counts[name]
+			if !found || (count > 0) != reachable {
+				t.Fatalf("%s receiver %s packets=%d, expected traffic=%v", phase, name, count, reachable)
+			}
+		}
+		encoded, err := json.Marshal(struct {
+			Phase   string            `json:"phase"`
+			Packets map[string]uint64 `json:"packets"`
+		}{Phase: phase, Packets: counts})
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(string(encoded))
+	}
 	client := &http.Client{Timeout: 500 * time.Millisecond, Transport: &http.Transport{DisableKeepAlives: true}}
 	reaches := func(host string) bool { return strictHTTPReachable(t.Context(), host) }
 	deadline := time.Now().Add(5 * time.Second)
@@ -158,6 +223,8 @@ func TestStrictNftIntegration(t *testing.T) {
 			t.Fatalf("baseline unreachable: %s", host)
 		}
 	}
+	checkPackets("baseline", true)
+	run("nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "nft", "reset", "counters", "table", "inet", "sora_test_receiver")
 	checkOtherUID := func(stage string) {
 		t.Helper()
 		t.Run(stage, func(t *testing.T) {
@@ -195,31 +262,61 @@ func TestStrictNftIntegration(t *testing.T) {
 			t.Fatalf("loopback blocked: %v", err)
 		}
 		_ = response.Body.Close()
-		if !reaches("203.0.113.2") || !strictUDPReachable(t.Context(), "2001:db8::2") {
-			t.Fatal("engine VPN endpoint blocked")
+		tcp, udp := reaches("203.0.113.2"), strictUDPReachable(t.Context(), "2001:db8::2")
+		if !tcp || !udp {
+			for _, args := range [][]string{{"ip", "-j", "address"}, {"nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "ip", "-j", "address"}} {
+				output, err := exec.CommandContext(t.Context(), args[0], args[1:]...).CombinedOutput()
+				t.Logf("endpoint failure addresses: %s (%v)", output, err)
+			}
+			t.Fatalf("engine VPN endpoint blocked: TCP4=%v UDP6=%v", tcp, udp)
 		}
 		if strictUDPReachable(t.Context(), "203.0.113.2") || reaches("2001:db8::2") {
 			t.Fatal("endpoint allowed the wrong transport")
 		}
 		checkOtherUID("other-user")
 		for _, host := range []string{"192.168.50.2", "fd00::2"} {
-			if reaches(host) {
+			if reaches(host) || strictUDPReachable(t.Context(), host) {
 				t.Fatalf("leak: %s", host)
 			}
 		}
 	}
 	verify()
+	checkPackets("armed", false)
 	if err := holder.Process.Kill(); err != nil {
 		t.Fatal(err)
 	}
 	verify()
+	checkPackets("after-sigkill", false)
+	run("ip", "link", "set", "test0", "down")
+	run("ip", "link", "set", "test0", "up")
+	// Linux can remove global IPv6 addresses on an administrative down. Restore
+	// fixture addressing as the network manager would before testing reachability.
+	for _, address := range []string{"2001:db8::1/64", "fd00::1/64"} {
+		run("ip", "-6", "address", "replace", address, "dev", "test0")
+	}
+	deadline = time.Now().Add(5 * time.Second)
+	for !strictUDPReachable(t.Context(), "2001:db8::2") && time.Now().Before(deadline) {
+		time.Sleep(50 * time.Millisecond)
+	}
+	verify()
+	checkPackets("after-link-recovery", false)
 	run("nft", "delete", "table", "inet", "sora")
+	for _, host := range []string{"192.168.50.2", "fd00::2"} {
+		if !reaches(host) || !strictUDPReachable(t.Context(), host) {
+			t.Fatalf("removed-firewall control unreachable: %s", host)
+		}
+	}
+	checkPackets("firewall-removed-control", true)
 	firewall, _ := NewNftables(0, nil)
 	g, _ := New(Options{DataDir: dir, EnginePorts: []uint16{7890}}, firewall)
 	if err := g.Recover(t.Context()); err != nil {
 		t.Fatal(err)
 	}
+	// Count only the restored protection, excluding the deliberate unprotected
+	// interval above, where the receiver must have detected traffic.
+	run("nsenter", "-t", fmt.Sprint(peer.Process.Pid), "-n", "nft", "reset", "counters", "table", "inet", "sora_test_receiver")
 	verify()
+	checkPackets("after-guard-recovery", false)
 	// Explicit LAN policy is live and retains the outside block.
 	policy := g.Current()
 	policy.AllowLAN = true

@@ -39,6 +39,11 @@ const (
 	// ProtocolBypass reshapes direct TLS and HTTP handshakes with zapret to
 	// evade DPI. It requires no server.
 	ProtocolBypass Protocol = "bypass"
+	// ProtocolByeDPI selects the host-owned ByeDPI proxy explicitly; older cores reject it.
+	ProtocolByeDPI Protocol = "byedpi"
+	// ProtocolWinws selects a system-wide Windows filter, not a proxy. Older
+	// cores reject this name instead of silently routing its traffic direct.
+	ProtocolWinws Protocol = "winws"
 	// ProtocolXrayProfile runs a provider's full Xray configuration within
 	// the session, preserving outbounds, balancers, and routing. Only Xray
 	// supports it.

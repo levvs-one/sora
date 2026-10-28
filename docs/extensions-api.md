@@ -127,7 +127,7 @@ See [runtime budgets and lifecycle](extensions.md#71-background_task).
 | `theme.json` | applied by the app, validated palette and contrast, one conflict winner |
 | `rules.json` | merged into the session plan after user rules, deterministic first-match order |
 | `worker.js` | scheduled, permission checked, isolated, CPU/memory/wall budgets |
-| `network_hook` / `net.hooks` | not applied |
+| `network_hook` / `net.hooks` | signed declarative bypass profiles, explicit selection and native capability checks; no arbitrary packet callbacks |
 | `tray` / widgets | reserved |
 
 The exact theme tokens, routing match syntax, priorities and reset behavior

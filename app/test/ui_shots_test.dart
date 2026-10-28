@@ -55,7 +55,7 @@ void main() {
       for (final theme in ['light', 'dark']) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-        await settings.completeTour();
+
         settings
           ..language = language
           ..theme = theme
@@ -193,7 +193,7 @@ void main() {
       for (final theme in ['light', 'dark']) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-        await settings.completeTour();
+
         settings
           ..language = language
           ..theme = theme
@@ -387,10 +387,11 @@ void main() {
         await tester.pumpAndSettle();
         unawaited(chooseProgram(navigator.context));
         await tester.pump();
-        for (var i = 0; i < 8; i++) {
-          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
+        for (var i = 0; i < 100 && find.byType(CircularProgressIndicator).evaluate().isNotEmpty; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
           await tester.pump();
         }
+        expect(find.byType(CircularProgressIndicator), findsNothing);
         await save('program-picker');
         navigator.pop();
         await tester.pumpAndSettle();
@@ -462,7 +463,7 @@ void main() {
         for (final (width, height) in [(1440.0, 900.0), (1000.0, 720.0), (420.0, 800.0)]) {
           SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
           final settings = await Settings.load();
-          await settings.completeTour();
+
           settings
             ..language = Platform.environment['SORA_SHOTS_LANG'] ?? 'ru'
             ..theme = theme
@@ -606,13 +607,6 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          for (var step = 1; step <= 5; step++) {
-            expect(find.text('Шаг $step из 5'), findsOneWidget);
-            expect(tester.takeException(), isNull);
-            await save('$output/tour-$step-${width.toInt()}x${height.toInt()}-$theme.png');
-            await tester.tap(find.text(step == 5 ? 'Готово' : 'Далее'));
-            await tester.pumpAndSettle();
-          }
           sora.phase = Phase.off;
           sora.serverlessAvailable = true;
           sora.notifyListeners();
@@ -711,7 +705,7 @@ void main() {
       unawaited(core.stderr.drain<void>());
       SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
       final settings = await Settings.load();
-      await settings.completeTour();
+
       settings
         ..animations = false
         ..probeMethod = 'connect';
@@ -799,7 +793,8 @@ void main() {
                     as String;
             await tester.tap(find.byKey(const ValueKey('custom-paste')));
             await settleLive();
-            expect(find.byKey(const ValueKey('custom-peerKey')), findsOneWidget);
+            expect(find.byKey(const ValueKey('custom-peerKey')), findsNothing);
+            expect(tester.widget<PrimaryButton>(find.byKey(const ValueKey('custom-save'))).label, s.save);
             await save('ownserver-form-wireguard', language, theme);
             await tester.tap(find.byKey(const ValueKey('custom-save')));
             await settleLive();

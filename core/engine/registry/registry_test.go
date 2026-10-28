@@ -160,9 +160,9 @@ func TestBypassAvailabilityRequiresPlatformReshaperAndEngine(t *testing.T) {
 		engines bool
 		want    bool
 	}{
-		{"", false, false}, {"/tpws", false, false}, {"", true, false}, {"/tpws", true, runtime.GOOS == "linux"},
+		{"", false, false}, {"/tpws", false, false}, {"", true, false}, {"/tpws", true, runtime.GOOS == "linux" || runtime.GOOS == "windows"},
 	} {
-		r := &Registry{tpws: tc.tpws, binaries: map[engine.Kind]supervise.Binary{}}
+		r := &Registry{bypassBinary: tc.tpws, binaries: map[engine.Kind]supervise.Binary{}}
 		if tc.engines {
 			r.binaries[engine.KindXray] = supervise.Binary{}
 		}

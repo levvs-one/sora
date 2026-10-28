@@ -205,64 +205,58 @@ class SUk extends S {
   String get errGeneric => 'Щось пішло не так';
 
   @override
-  String get errCore => 'Служба Sora не відповідає. Трохи зачекайте й спробуйте знову.';
+  String get errCore => 'Служба Sora не відповідає';
 
   @override
-  String get errAuth => 'Немає доступу до служби Sora. Перезапустіть застосунок і спробуйте знову.';
+  String get errAuth => 'Немає доступу до служби Sora';
 
   @override
-  String get errVersion => 'Застосунок і служба Sora мають різні версії. Оновіть Sora.';
+  String get errVersion => 'Застосунок і служба Sora мають різні версії';
 
   @override
-  String get errBusy => 'Попередня команда ще виконується. Дочекайтеся її завершення.';
+  String get errBusy => 'Попередня команда ще виконується';
 
   @override
-  String get errEngineMissing => 'Не знайдено ядро для цього сервера. Перевірте наявність оновлень Sora.';
+  String get errEngineMissing => 'Не знайдено ядро для цього сервера';
 
   @override
-  String get errEngineStart => 'Ядро не запустилося. Перегляньте причину в журналі підключення.';
+  String get errEngineStart => 'Ядро не запустилося';
 
   @override
-  String get errEngineStopped => 'Ядро зупинилося. Спробуйте підключитися знову.';
+  String get errEngineStopped => 'Ядро зупинилося';
 
   @override
-  String get errTunnel => 'Цей режим VPN недоступний. Виберіть інший режим або перевірте права служби.';
+  String get errTunnel => 'Цей режим VPN недоступний';
 
   @override
-  String get errNetwork => 'Не вдається підключитися до сервера';
+  String get errTimeout => 'Сервер не відповів вчасно';
 
   @override
-  String get errTimeout => 'Сервер не відповів вчасно. Спробуйте ще раз за хвилину.';
+  String get errFirewall => 'Не вдалося заблокувати доступ до інтернету поза VPN';
 
   @override
-  String get errFirewall =>
-      'Не вдалося заблокувати доступ до інтернету поза VPN. Перегляньте причину в журналі підключення.';
+  String get errSubFetch => 'Не вдалося завантажити підписку';
 
   @override
-  String get errSubFetch => 'Не вдалося завантажити підписку. Перевірте інтернет і спробуйте ще раз за хвилину.';
+  String get errSubFormat => 'Формат підписки не розпізнано';
 
   @override
-  String get errSubFormat => 'Формат підписки не розпізнано. Попросіть сумісне посилання в постачальника підписки.';
+  String get errSubEmpty => 'У підписці немає серверів';
 
   @override
-  String get errSubEmpty => 'У підписці немає серверів. Зверніться до постачальника підписки.';
+  String get errSubDuplicate => 'Цю підписку вже додано';
 
   @override
-  String get errSubDuplicate => 'Цю підписку вже додано. Оновіть її, щоб отримати актуальні сервери.';
+  String get errSubLimit => 'Досягнуто обмеження кількості підписок';
 
   @override
-  String get errSubLimit =>
-      'Досягнуто обмеження кількості підписок. Видаліть непотрібну підписку, перш ніж додавати нову.';
+  String get errSubScheme => 'Непідтримувана схема посилання підписки';
 
   @override
-  String get errSubScheme =>
-      'Посилання на підписку має починатися з https://. Попросіть захищене посилання в постачальника.';
+  String get errSecretStore => 'Сховище Sora пошкоджене або недоступне';
 
   @override
-  String get errSecretStore => 'Сховище Sora пошкоджене або недоступне. Перевірте права доступу й подробиці в журналі.';
-
-  @override
-  String get errNoServers => 'Немає серверів для підключення. Додайте підписку або власний сервер.';
+  String get errNoServers => 'Немає серверів для підключення';
 
   @override
   String get connections => 'Зв\'язки';
@@ -316,9 +310,6 @@ class SUk extends S {
   String get dnsAuto => 'Авто';
 
   @override
-  String get dnsHint => 'Адреси, розділені комами';
-
-  @override
   String get fragment => 'TLS фрагментація';
 
   @override
@@ -334,13 +325,7 @@ class SUk extends S {
   String get byDefault => 'За замовчуванням';
 
   @override
-  String get rangeHint => 'Наприклад, 100-200';
-
-  @override
   String get splitPos => 'Розділ позицій';
-
-  @override
-  String get splitPosHint => 'Наприклад, 1, midsld';
 
   @override
   String get disorder => 'Змініть порядок частин';
@@ -449,11 +434,6 @@ class SUk extends S {
   String get support => 'Підтримка';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine керується через порт на цьому комп’ютері. Інші програми зможуть визначити, що VPN увімкнено.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'Виберіть $engine';
   }
@@ -529,9 +509,6 @@ class SUk extends S {
   String get launchAtLogin => 'Почніть із системи';
 
   @override
-  String get launchAtLoginDetail => 'Sora автоматично запускатиметься під час входу в систему й залишатиметься в треї.';
-
-  @override
   String get closeToTray => 'Зберігати в закритому лотку';
 
   @override
@@ -566,9 +543,6 @@ class SUk extends S {
   String get noticeInTray => 'Sora все ще в треї';
 
   @override
-  String get noticeInTrayBody => 'Вийдіть із меню його значка';
-
-  @override
   String get noticeLost => 'З\'єднання втрачено';
 
   @override
@@ -596,11 +570,7 @@ class SUk extends S {
   String get importTitle => 'Додати цю підписку?';
 
   @override
-  String get importSealed =>
-      'Це посилання зашифровано для Happ, і лише Happ може його прочитати. Попросіть свого провайдера надати просте посилання для підписки.';
-
-  @override
-  String get understood => 'добре';
+  String get importSealed => 'Це посилання зашифровано для Happ, і лише Happ може його прочитати';
 
   @override
   String get noAnswer => 'немає відповіді';
@@ -639,39 +609,10 @@ class SUk extends S {
   String get openLogs => 'Відкриті журнали';
 
   @override
-  String get tourReplay => 'Знову показати посібник';
-
-  @override
-  String tourStep(int step) {
-    return 'Крок $step із 5';
-  }
-
-  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далі';
-
-  @override
-  String get tourSkip => 'Пропустити';
-
-  @override
-  String get tourFinish => 'Готово';
-
-  @override
-  String get tourAdd => 'Додайте посилання на підписку вашого постачальника.';
-
-  @override
-  String get tourServer => 'Виберіть сервер. «Найшвидший» вибере для вас один.';
-
-  @override
-  String get tourConnect => 'Натисніть тут, щоб підключитися або відключитися.';
-
-  @override
-  String get tourMode => 'Виберіть режим. Kill Switch блокує Інтернет, якщо VPN переривається.';
-
-  @override
-  String get tourSettings => 'Відкрийте налаштування. Ви можете відтворити цей посібник там.';
 
   @override
   String get chooseProgram => 'Виберіть програму';
@@ -683,7 +624,7 @@ class SUk extends S {
   String get runningProcesses => 'Запущені процеси';
 
   @override
-  String get programsEmpty => 'Додатків не знайдено. Спробуйте інше ім\'я.';
+  String get programsEmpty => 'Додатків не знайдено';
 
   @override
   String get selectExe => 'Виберіть файл .exe';
@@ -695,7 +636,7 @@ class SUk extends S {
   String get speedtestSearch => 'Знайдіть послугу';
 
   @override
-  String get speedtestEmpty => 'Немає збігів. Змінити пошук.';
+  String get speedtestEmpty => 'Немає збігів';
 
   @override
   String get speedtestBackToList => 'Назад до послуг';
@@ -704,14 +645,13 @@ class SUk extends S {
   String get speedtestOpenBrowser => 'Відкрити в браузері';
 
   @override
-  String get speedtestUnavailable => 'Не вдалося запустити вбудований браузер. Відкрийте службу в системному браузері.';
+  String get speedtestUnavailable => 'Не вдалося запустити вбудований браузер';
 
   @override
-  String get speedtestPageFailed =>
-      'Не вдалося завантажити сторінку. Перезавантажте його або відкрийте службу в системному браузері.';
+  String get speedtestPageFailed => 'Не вдалося завантажити сторінку';
 
   @override
-  String get speedtestExternalFailed => 'Не вдалося відкрити системний браузер. Спробуйте знову.';
+  String get speedtestExternalFailed => 'Не вдалося відкрити системний браузер';
 
   @override
   String get modes => 'Режими';
@@ -751,51 +691,28 @@ class SUk extends S {
   String get updateNoNotes => 'Реліз не має приміток.';
 
   @override
-  String get updateDropWarning =>
-      'Під час оновлення Sora та його основного з’єднання VPN-з’єднання припиниться на кілька секунд. Продовжити?';
+  String get updateDropWarning => 'Перервати з’єднання для оновлення?';
 
   @override
-  String get updateWaitConnection => 'Зачекайте, поки VPN-з’єднання та ядро ​​будуть готові.';
+  String get updateWaitConnection => 'З’єднання ще не готове';
 
   @override
-  String get updateDownloading => 'Завантаження та перевірка файлів...';
-
-  @override
-  String get updateInstalling => 'Підготовка оновлення або очікування автентифікації адміністратора...';
-
-  @override
-  String get updateNetworkError => 'Не вдалося завантажити оновлення. Спробуйте знову.';
+  String get updateNetworkError => 'Не вдалося завантажити оновлення';
 
   @override
   String get updateReleaseError => 'Дані випуску або необхідні файли відсутні або недійсні.';
 
   @override
-  String get updateChecksumError => 'Завантаження не відповідає SHA256SUMS. Нічого не встановлено.';
+  String get updateChecksumError => 'Завантаження не відповідає SHA256SUMS';
 
   @override
-  String get updateInstallError => 'Оновлення не завершено. Можливо, автентифікацію скасовано.';
+  String get updateInstallError => 'Оновлення не завершено';
 
   @override
-  String get updateUnsupported =>
-      'Цей виконуваний файл не належить підтримуваній парі пакетів Sora. Використовуйте інструкції з встановлення випуску.';
+  String get updateUnsupported => 'Цей виконуваний файл не належить підтримуваній парі пакетів Sora';
 
   @override
-  String get updateManual =>
-      'Виконайте цю команду в терміналі, щоб інсталювати обидва перевірені пакети, а потім повторно відкрийте Sora. Файли залишаються в каталозі завантаження. З’єднання VPN припиниться.';
-
-  @override
-  String get updateSignaturePending =>
-      'Файли оновлення звіряються з контрольними сумами, опублікованими разом із релізом.';
-
-  @override
-  String get updateManualSigWarning =>
-      'Файли нижче збігаються з контрольними сумами релізу. Виконайте команду, якщо завантажили їх з офіційного релізу.';
-
-  @override
-  String get updateVersionRevoked => 'Розробник відкликав цю версію. Зачекайте на виправлений випуск.';
-
-  @override
-  String get updateRolloutPending => 'Поступово розгортається новіша версія, яка буде запропонована вам автоматично.';
+  String get updateVersionRevoked => 'Розробник відкликав цю версію';
 
   @override
   String updateRollbacking(String version) {
@@ -808,8 +725,7 @@ class SUk extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Помилка автоматичного відкоту. Якщо нова версія не працює, перевстановіть попередню версію вручну.';
+  String get updateRollbackError => 'Помилка автоматичного відкоту';
 
   @override
   String get updateRollbackCacheError =>
@@ -819,10 +735,7 @@ class SUk extends S {
   String get updateCopyCommand => 'Копіювати команду';
 
   @override
-  String get updateChecksDisabled => 'Автоматичні перевірки вимкнено в налаштуваннях.';
-
-  @override
-  String get updateInstalled => 'Оновлення встановлено. Повторно відкрийте Sora.';
+  String get updateInstalled => 'Оновлення встановлено';
 
   @override
   String get projectLinks => 'Демонструвати';
@@ -852,20 +765,13 @@ class SUk extends S {
   String get showDescription => 'Показати опис';
 
   @override
-  String get pendingConnectionChanges => 'Повторно підключіться, щоб застосувати ці зміни.';
+  String get errEngineUnsupported => 'Вибраний механізм не підтримує цей профіль або налаштування';
 
   @override
-  String get reconnectNow => 'Застосуйте та повторно підключіться';
+  String get errRestore => 'Очищення підключення не завершено';
 
   @override
-  String get errEngineUnsupported =>
-      'Вибраний механізм не підтримує цей профіль або налаштування. Виберіть Авто або сумісний двигун.';
-
-  @override
-  String get errRestore => 'Очищення підключення не завершено. Повторити відключення; подробиці дивіться в журналі.';
-
-  @override
-  String get errSessionEnded => 'Ця сесія вже закінчилася. Оновіть стан підключення.';
+  String get errSessionEnded => 'Ця сесія вже закінчилася';
 
   @override
   String get retryDisconnect => 'Повторіть спробу відключення';
@@ -881,10 +787,10 @@ class SUk extends S {
 
   @override
   String get modesGuide =>
-      'Виберіть «Авто», якщо ви не впевнені, яка система потрібна вашому серверу. Sora перевіряє профіль і налаштування перед підключенням. Механізм не може збільшити пропускну здатність вашого плану: продуктивність залежить від сервера, маршруту, протоколу та мережі.\n\n## Режими\n\n### Весь трафік (TUN)\n\nSora створює віртуальний мережевий інтерфейс і направляє через нього трафік додатків, включаючи TCP і UDP. Використовуйте цей режим для Telegram, ігор і голосу Discord. Правила можуть безпосередньо надсилати певні сайти чи програми або блокувати їх. Службі мережі потрібен дозвіл і сервер, який підтримує необхідний протокол.\n\n### System проксі\n\nSora налаштовує локальний проксі HTTP/SOCKS. Програми, які поважають системні налаштування проксі-сервера, використовують його. Програми з власним мережевим стеком можуть підключатися безпосередньо; Для UDP і голосових викликів зазвичай потрібен TUN. Цей режим підходить для браузерів і програм з підтримкою проксі.\n\n### Немає сервера\n\nНа Linux Sora використовує [zapret](https://github.com/bol-van/zapret) для розділення та зміни форми запитів HTTP/TLS та обходу деяких перевірок DPI. Ваша IP-адреса залишається незмінною, а з’єднання йдуть безпосередньо на веб-сайт. Результати залежать від вашого провайдера та методу блокування.\n\nПоточна інтеграція використовує tpws для HTTP та TLS через TCP. Він не обходить IP-блокування та не ретранслює UDP і не може гарантувати з’єднання MTProto Telegram. Використовуйте сервер VPN із TUN для голосу Discord, дзвінків Telegram і подібних обмежень.\n\n## Двигуни\n\n### Авто\n\nSora вибирає встановлений механізм, який підтримує весь план підключення: протоколи сервера, транспорти, групи, фрагментацію та режим. Несумісний вибір вручну відхиляється перед припиненням поточного підключення. Виберіть «Авто» або інший механізм і знову застосуйте налаштування.\n\n### sing-box\n\nНові пакети Sora включають [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), розгалуження [sing-box](https://github.com/SagerNet/sing-box), додавання XHTTP і VLESS Encryption на стороні клієнта. Sora розпізнає конструкцію та її можливості. Вихідна збірка без XHTTP не отримує цю можливість лише через назву.\n\nПідтримувані протоколи включають VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметри AmneziaWG 1.x/2.x Sora може імпортувати. Повні профілі Xray JSON потребують Xray. Нові поля AWG 3.x ще не можна імпортувати. sing-box використовує локальний порт керування, захищений паролем, який можуть виявити інші програми на комп’ютері.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) підтримує фрагментацію VLESS, REALITY, XHTTP, VLESS Encryption і TLS. Він також запускає повні профілі постачальника Xray, зберігаючи їх маршрутизацію та групи. Такі профілі не можна автоматично конвертувати в інший механізм без зміни їхньої поведінки.\n\nУ комплекті Xray видалено параметр, який вимикає перевірку сертифіката TLS (`allowInsecure`). Автоматично вибирає sing-box або mihomo для звичайних серверів, які потребують цього параметра. Вибір Xray вручну повідомляє про несумісність перед припиненням поточного з’єднання. Старіші повні профілі JSON потребують оновленого профілю постачальника з сертифікатом, який можна перевірити, або PIN-кодом сертифіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) підтримує впорядковані резервні групи та групи балансування навантаження, XHTTP і AmneziaWG. Виберіть його, коли автоматичне перемикання після відмови на резервний сервер має значення. Налаштування фрагментації TLS Sora недоступне з цим механізмом.\n\n## Сумісність у Sora\n\n| Особливість | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Повний профіль Xray | Ні | Так | Ні |\n| TUIC / AnyTLS | Обидва | Ні | TUIC |\n| mieru | Ні | Ні | Так |\n| NaiveProxy | Так | Ні | Ні |\n| Фрагментація TLS | Так | Так | Ні |\n| AmneziaWG 1.x/2.x | Так¹ | Ні | Так |\n| Замовлена ​​резервна група | Ні | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime використовують mihomo; ці поля ніколи не можна мовчки відкидати. ² Для групи повних профілів Xray програма вибирає резервний профіль. Підтримка залежить від встановленої збірки; перевірте його версію в Про програму.\n\n## Стек TUN\n\nСтек обробляє TCP і UDP у віртуальному інтерфейсі. На панелі режимів Xray і mihomo пропонують gVisor, System, Mixed і MIPS. Кожен двигун зберігає власні переваги. Режими проксі System і режим без сервера не використовують цей параметр.\n\n- **Mixed**: TCP використовує системний стек, тоді як gVisor обробляє UDP. Це типовий варіант для mihomo в Linux. У Windows Xray і mihomo типово використовують MIPS.\n- **System**: використовує системний стек. Спробуйте інший варіант, якщо мережеві програми стикаються з проблемами.\n- **gVisor**: обробляє трафік у просторі користувача.\n- **MIPS**: власний IP-стек mihomo, доступний у пакетній версії 1.19.32.\n\nНа Linux Xray використовує свій вбудований gVisor за замовчуванням. System, Mixed і MIPS на Linux використовують mihomo як механізм TUN, пересилаючи TCP і UDP на Xray через автентифіковане локальне посилання SOCKS. Xray зберігає протокол, профіль провайдера та маршрутизацію. Для цих трьох опцій потрібен встановлений mihomo. На Windows Xray використовує mihomo 1.19.32 або новіший для всіх чотирьох стеків TUN. Протоколи й маршрутизація залишаються в Xray. Правила застосунків у цій зв’язці підтримують лише пряме з’єднання та блокування; на Linux вони потребують вбудованого gVisor Xray.\n\nМіст запускає другий процес. У трьох вимірюваннях бездіяльності на Linux він використовував приблизно на 32–36 МБ більше фізичної пам’яті, ніж рідний Xray TUN. Це не вимірює навантаження на завантаження: вартість процесора та пам’яті залежить від з’єднань. sing-box не має селектора стека. Жоден стек не гарантує кращої продуктивності в кожній мережі. Виберіть стек, виберіть «Застосувати» та повторно підключіться, щоб спробувати його у своїй мережі.\n\n## Застосування налаштувань\n\nВибір сервера повторює підключення автоматично. Налаштування режиму, механізму, DNS і правил зберігаються негайно; під час активного підключення натисніть «Застосувати» та підключіться повторно, щоб використовувати їх. Перезапуск двигуна може перервати завантаження та дзвінки. Повторні клацання не запускають паралельні підключення; від\'єднання завершує перехід і розриває з\'єднання.\n\nІнтернет лише через VPN блокує прямий трафік у разі обриву тунелю. Це впливає на всю машину. Явне відключення видаляє правила Sora. Якщо очищення не завершується, повторіть спробу від’єднання та відкрийте журнал.\n\n## Проектна документація\n\n- [sing-box-lx: налаштування та підтримка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Документація sing-box](https://sing-box.sagernet.org/)\n- [Документація Xray](https://xtls.github.io/)\n- [Документація mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: робота та обмеження] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC передає TCP через відеодзвінок у Jitsi, Яндекс Телемості або WB Stream. Імпортуйте посилання olcrtc:// або QR-код. Протокол працює з sing-box, Xray і mihomo в режимах проксі й TUN; UDP не підтримується. Обом сторонам потрібні сумісні збірки OLC2. Вихідний проєкт архівовано.\n';
+      'Виберіть «Авто», якщо ви не впевнені, яка система потрібна вашому серверу. Sora перевіряє профіль і налаштування перед підключенням. Механізм не може збільшити пропускну здатність вашого плану: продуктивність залежить від сервера, маршруту, протоколу та мережі.\n\n## Режими\n\n### Весь трафік (TUN)\n\nSora створює віртуальний мережевий інтерфейс і направляє через нього трафік додатків, включаючи TCP і UDP. Використовуйте цей режим для Telegram, ігор і голосу Discord. Правила можуть безпосередньо надсилати певні сайти чи програми або блокувати їх. Службі мережі потрібен дозвіл і сервер, який підтримує необхідний протокол.\n\n### System проксі\n\nSora налаштовує локальний проксі HTTP/SOCKS. Програми, які поважають системні налаштування проксі-сервера, використовують його. Програми з власним мережевим стеком можуть підключатися безпосередньо; Для UDP і голосових викликів зазвичай потрібен TUN. Цей режим підходить для браузерів і програм з підтримкою проксі.\n\n### Немає сервера\n\nНа Linux Sora використовує [zapret](https://github.com/bol-van/zapret) для розділення та зміни форми запитів HTTP/TLS та обходу деяких перевірок DPI. Ваша IP-адреса залишається незмінною, а з’єднання йдуть безпосередньо на веб-сайт. Результати залежать від вашого провайдера та методу блокування.\n\nПоточна інтеграція використовує tpws для HTTP та TLS через TCP. Він не обходить IP-блокування та не ретранслює UDP і не може гарантувати з’єднання MTProto Telegram. Використовуйте сервер VPN із TUN для голосу Discord, дзвінків Telegram і подібних обмежень.\n\n## Двигуни\n\n### Авто\n\nSora вибирає встановлений механізм, який підтримує весь план підключення: протоколи сервера, транспорти, групи, фрагментацію та режим. Несумісний вибір вручну відхиляється перед припиненням поточного підключення. Виберіть «Авто» або інший механізм і знову застосуйте налаштування.\n\n### sing-box\n\nНові пакети Sora включають [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), розгалуження [sing-box](https://github.com/SagerNet/sing-box), додавання XHTTP і VLESS Encryption на стороні клієнта. Sora розпізнає конструкцію та її можливості. Вихідна збірка без XHTTP не отримує цю можливість лише через назву.\n\nПідтримувані протоколи включають VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard і параметри AmneziaWG 1.x/2.x Sora може імпортувати. Повні профілі Xray JSON потребують Xray. Нові поля AWG 3.x ще не можна імпортувати. sing-box використовує локальний порт керування, захищений паролем, який можуть виявити інші програми на комп’ютері.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) підтримує фрагментацію VLESS, REALITY, XHTTP, VLESS Encryption і TLS. Він також запускає повні профілі постачальника Xray, зберігаючи їх маршрутизацію та групи. Такі профілі не можна автоматично конвертувати в інший механізм без зміни їхньої поведінки.\n\nУ комплекті Xray видалено параметр, який вимикає перевірку сертифіката TLS (`allowInsecure`). Автоматично вибирає sing-box або mihomo для звичайних серверів, які потребують цього параметра. Вибір Xray вручну повідомляє про несумісність перед припиненням поточного з’єднання. Старіші повні профілі JSON потребують оновленого профілю постачальника з сертифікатом, який можна перевірити, або PIN-кодом сертифіката.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) підтримує впорядковані резервні групи та групи балансування навантаження, XHTTP і AmneziaWG. Виберіть його, коли автоматичне перемикання після відмови на резервний сервер має значення. Налаштування фрагментації TLS Sora недоступне з цим механізмом.\n\n## Сумісність у Sora\n\n| Особливість | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN і TCP/UDP | Так | Так | Так |\n| XHTTP | Так | Так | Так |\n| VLESS Encryption | Так | Так | Так |\n| Повний профіль Xray | Ні | Так | Ні |\n| TUIC / AnyTLS | Обидва | Ні | TUIC |\n| mieru | Ні | Ні | Так |\n| NaiveProxy | Так | Ні | Ні |\n| Фрагментація TLS | Так | Так | Ні |\n| AmneziaWG 1.x/2.x | Так¹ | Ні | Так |\n| Замовлена ​​резервна група | Ні | №² | Так |\n\n¹ Профілі з J1/J2/J3/Itime використовують mihomo; ці поля ніколи не можна мовчки відкидати. ² Для групи повних профілів Xray програма вибирає резервний профіль. Підтримка залежить від встановленої збірки; перевірте його версію в Про програму.\n\n## Стек TUN\n\nСтек обробляє TCP і UDP у віртуальному інтерфейсі. На панелі режимів Xray і mihomo пропонують gVisor, System, Mixed і MIPS. Кожен двигун зберігає власні переваги. Режими проксі System і режим без сервера не використовують цей параметр.\n\n- **Mixed**: TCP використовує системний стек, тоді як gVisor обробляє UDP. Це типовий варіант для mihomo в Linux. У Windows Xray і mihomo типово використовують MIPS.\n- **System**: використовує системний стек. Спробуйте інший варіант, якщо мережеві програми стикаються з проблемами.\n- **gVisor**: обробляє трафік у просторі користувача.\n- **MIPS**: власний IP-стек mihomo, доступний у пакетній версії 1.19.32.\n\nНа Linux Xray використовує свій вбудований gVisor за замовчуванням. System, Mixed і MIPS на Linux використовують mihomo як механізм TUN, пересилаючи TCP і UDP на Xray через автентифіковане локальне посилання SOCKS. Xray зберігає протокол, профіль провайдера та маршрутизацію. Для цих трьох опцій потрібен встановлений mihomo. На Windows Xray використовує mihomo 1.19.32 або новіший для всіх чотирьох стеків TUN. Протоколи й маршрутизація залишаються в Xray. Правила застосунків у цій зв’язці підтримують лише пряме з’єднання та блокування; на Linux вони потребують вбудованого gVisor Xray.\n\nМіст запускає другий процес. У трьох вимірюваннях бездіяльності на Linux він використовував приблизно на 32–36 МБ більше фізичної пам’яті, ніж рідний Xray TUN. Це не вимірює навантаження на завантаження: вартість процесора та пам’яті залежить від з’єднань. sing-box не має селектора стека. Жоден стек не гарантує кращої продуктивності в кожній мережі.\n\n## Застосування налаштувань\n\nВибір сервера автоматично перепідключає з’єднання. Ваші зміни режиму, ядра, DNS або правил застосовуються один раз після короткої паузи з автоматичним перепідключенням; фонові оновлення не перепідключають VPN. Перезапуск ядра може перервати завантаження й дзвінки.\n\nІнтернет лише через VPN блокує прямий трафік у разі обриву тунелю. Це впливає на всю машину. Явне відключення видаляє правила Sora. Якщо очищення не завершується, повторіть спробу від’єднання та відкрийте журнал.\n\n## Проектна документація\n\n- [sing-box-lx: налаштування та підтримка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [Документація sing-box](https://sing-box.sagernet.org/)\n- [Документація Xray](https://xtls.github.io/)\n- [Документація mihomo](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: робота та обмеження] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC передає TCP через відеодзвінок у Jitsi, Яндекс Телемості або WB Stream. Імпортуйте посилання olcrtc:// або QR-код. Протокол працює з sing-box, Xray і mihomo в режимах проксі й TUN; UDP не підтримується. Обом сторонам потрібні сумісні збірки OLC2. Вихідний проєкт архівовано.\n';
 
   @override
-  String get probeServers => 'Перевірити сервери';
+  String get probeServers => 'Пінг';
 
   @override
   String get extensions => 'Розширення';
@@ -908,13 +814,10 @@ class SUk extends S {
   String get extInstallOne => '1 встановлення';
 
   @override
-  String get extSideloadWarning => 'Установлюйте, лише якщо довіряєте самопідписаному ключу автора.';
+  String get extSideloadWarning => 'Самопідписаний ключ';
 
   @override
   String get extPermissionsWidened => 'Оновлення запитує нові дозволи:';
-
-  @override
-  String get extDangerousAck => 'Я розумію, що ці дозволи серйозні';
 
   @override
   String get extInstall => 'Встановити';
@@ -927,9 +830,6 @@ class SUk extends S {
 
   @override
   String get extConfirm => 'Підтвердити';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Каталог';
@@ -980,16 +880,13 @@ class SUk extends S {
   String get extEmptySearch => 'Нічого не знайдено';
 
   @override
-  String get extEmptyInstalled => 'Розширень ще не встановлено.\nЗнайдіть його в каталозі або встановіть із файлу.';
+  String get extEmptyInstalled => 'Розширень ще не встановлено';
 
   @override
   String get extInstallFromFile => 'Встановити з файлу';
 
   @override
   String get extInstallFromUrl => 'Встановити з URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Завантажити';
@@ -1004,19 +901,16 @@ class SUk extends S {
   String get extInstalling => 'Встановлення…';
 
   @override
-  String get extInstallFailed => 'Помилка встановлення';
-
-  @override
-  String get extErrSignature => 'Не вдалося перевірити підпис. Файл може бути пошкоджено або підроблено.';
+  String get extErrSignature => 'Не вдалося перевірити підпис';
 
   @override
   String get extErrManifest => 'Маніфест розширення недійсний.';
 
   @override
-  String get extErrNetwork => 'Помилка мережі. Перевірте підключення та повторіть спробу.';
+  String get extErrNetwork => 'Помилка мережі';
 
   @override
-  String get extErrHash => 'Завантаження не відповідає каталогу. Можливо, це було підроблено.';
+  String get extErrHash => 'Завантаження не відповідає каталогу';
 
   @override
   String extErrMinApp(String version) {
@@ -1027,11 +921,11 @@ class SUk extends S {
   String get extErrHttpsOnly => 'Дозволено лише посилання https://';
 
   @override
-  String get extErrGeneric => 'Щось пішло не так. Спробуйте ще раз.';
+  String get extErrGeneric => 'Щось пішло не так';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Це оновлення підписано іншим ключем автора, ніж встановлена ​​версія, тому його було заблоковано. Якщо ви довіряєте новому ключу, видаліть розширення та встановіть його знову явно.';
+      'Це оновлення підписано іншим ключем автора, ніж встановлена ​​версія, тому його було заблоковано';
 
   @override
   String get extDisabled => 'Вимкнено';
@@ -1088,7 +982,7 @@ class SUk extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count конфлікти потребують вашого рішення';
+    return 'Конфлікти розширень: $count';
   }
 
   @override
@@ -1165,10 +1059,10 @@ class SUk extends S {
   String get extPermThemeApply => 'Застосовувати теми оформлення';
 
   @override
-  String get extPermRoutingRules => 'Додати правила маршрутизації (впливає на те, куди йде мережевий трафік)';
+  String get extPermRoutingRules => 'Додати правила маршрутизації';
 
   @override
-  String get extPermNetHooks => 'Інтеграція в мережевий шлях (модулі обходу DPI)';
+  String get extPermNetHooks => 'Інтеграція в мережевий шлях';
 
   @override
   String get extPermNetFetch => 'Запитувати URL із дозволеного списку';
@@ -1177,7 +1071,7 @@ class SUk extends S {
   String get extPermBackground => 'Запуск фонових завдань';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Вимкнено';
 
   @override
   String get extCapBackground => 'Працює у фоновому режимі';
@@ -1215,9 +1109,6 @@ class SUk extends S {
   String get extSortRelevance => 'Релевантність';
 
   @override
-  String get extPermNetworkDetail => 'Запити через VPN дозволені лише до цих хостів.';
-
-  @override
   String get extBgTitle => 'Фонове завдання';
 
   @override
@@ -1253,9 +1144,6 @@ class SUk extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Увімкніть розширення для керування його фоновим завданням.';
-
-  @override
   String get extCapNetwork => 'Доступ до мережі';
 
   @override
@@ -1272,7 +1160,7 @@ class SUk extends S {
   String get diagnosticHttp => 'HTTP діагностика';
 
   @override
-  String get diagnosticNoData => 'Ще немає записаних запитів. Спочатку відкрийте сайт тесту швидкості.';
+  String get diagnosticNoData => 'Ще немає записаних запитів';
 
   @override
   String get qrShareTitle => 'Поділитися QR-кодом';
@@ -1282,12 +1170,6 @@ class SUk extends S {
 
   @override
   String get qrCopyLink => 'Копіювати посилання';
-
-  @override
-  String get qrWarning => 'Показуйте код лише тим, кому довіряєте.';
-
-  @override
-  String get qrScanHint => 'Виберіть знімок екрана або фото з QR-кодом чи вставте посилання';
 
   @override
   String get qrFromClipboard => 'Вставити з буфера обміну';
@@ -1375,30 +1257,10 @@ class SUk extends S {
   String get dnsLeakCheckKillSwitchDns => 'Захист DNS через kill switch';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Налаштуйте DNS для тунелю в налаштуваннях DNS вище.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'Перевірте, які резолвери ваша система використовуватиме поза тунелем.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Увімкніть kill switch, щоб трафік DNS залишався в тунелі.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Зашифрований DNS системи';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Підроблені відповіді DNS';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Перевірте, які зашифровані кінцеві точки DNS використовує ваша система поза тунелем.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Використовуйте зашифрований DNS (DoT або DoH) для тунелю, щоб резолвери не могли підробити відповіді.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Спочатку підключіться до VPN, а потім перевірте наявність витоків.';
 
   @override
   String get dnsExpected => 'Очікується';
@@ -1425,7 +1287,7 @@ class SUk extends S {
   String get autoSelectSmart => 'Розумний вибір';
 
   @override
-  String get coreWatchUnstable => 'Зв’язок із ядром нестабільний. Трохи зачекайте й спробуйте підключитися знову.';
+  String get coreWatchUnstable => 'Зв’язок із ядром нестабільний';
 
   @override
   String get watchReconnect => 'Перепідключити';
@@ -1464,7 +1326,7 @@ class SUk extends S {
   String get overrideCustomRules => 'Свої правила';
 
   @override
-  String get errBenchmarkUnsupported => 'Для вимірювання швидкості потрібна новіша версія ядра. Оновіть Sora.';
+  String get errBenchmarkUnsupported => 'Для вимірювання швидкості потрібна новіша версія ядра';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1475,8 +1337,7 @@ class SUk extends S {
   String get profiles => 'Профілі мережі';
 
   @override
-  String get profilesEmpty =>
-      'Ще немає профілів. Створіть його, щоб автоматично застосувати налаштування до відомих мереж.';
+  String get profilesEmpty => 'Ще немає профілів';
 
   @override
   String get profileAdd => 'Додати профіль';
@@ -1488,9 +1349,6 @@ class SUk extends S {
   String get profileSsids => 'Wi-Fi мережі (SSID)';
 
   @override
-  String get profileSsidsHint => 'Будинок, Офіс через кому';
-
-  @override
   String get profileGateways => 'Мережеві шлюзи';
 
   @override
@@ -1498,9 +1356,6 @@ class SUk extends S {
 
   @override
   String get profileAutoApply => 'Застосовувати автоматично';
-
-  @override
-  String get profileAutoApplyHint => 'Якщо вимкнено, запитувати перед застосуванням профілю.';
 
   @override
   String get profileSnapshot => 'Запам\'ятати поточні налаштування';
@@ -1544,13 +1399,13 @@ class SUk extends S {
   String get networkUnknown => 'Інформація про мережу недоступна';
 
   @override
-  String get profileNoTriggers => 'Додайте принаймні один тригер: SSID, шлюз або ASN';
+  String get profileNoTriggers => 'Немає умов профілю';
 
   @override
   String get chains => 'Ланцюжки проксі';
 
   @override
-  String get chainsEmpty => 'Ланцюгів ще немає. Зв’яжіть 2–3 сервери, щоб трафік проходив через кожен із них.';
+  String get chainsEmpty => 'Ланцюгів ще немає';
 
   @override
   String get chainAdd => 'Новий ланцюг';
@@ -1559,16 +1414,10 @@ class SUk extends S {
   String get chainName => 'Назва ланцюга';
 
   @override
-  String get chainPickServers => 'Виберіть 2–3 сервери';
+  String get chainTooFew => 'Для ланцюжка потрібні принаймні два сервери';
 
   @override
-  String get chainOrderHint => 'Перетягніть, щоб змінити порядок: рух в’їжджає вгорі, а виходить – унизу.';
-
-  @override
-  String get chainTooFew => 'Для ланцюжка потрібні принаймні два сервери. Додайте ще один сервер.';
-
-  @override
-  String get chainTooMany => 'У ланцюжку може бути щонайбільше три сервери. Приберіть зайві сервери.';
+  String get chainTooMany => 'У ланцюжку може бути щонайбільше три сервери';
 
   @override
   String get chainEstimate => 'Розрахункова затримка';
@@ -1585,10 +1434,10 @@ class SUk extends S {
   }
 
   @override
-  String get chainUnsupported => 'Вибране ядро не підтримує ланцюжки. Виберіть сумісне ядро.';
+  String get chainUnsupported => 'Вибране ядро не підтримує ланцюжки';
 
   @override
-  String get chainHopMissing => 'Один із серверів ланцюжка більше недоступний. Виберіть інший сервер для цієї ланки.';
+  String get chainHopMissing => 'Один із серверів ланцюжка більше недоступний';
 
   @override
   String chainHop(Object n) {
@@ -1608,7 +1457,7 @@ class SUk extends S {
   String get syncDevices => 'Мої пристрої';
 
   @override
-  String get syncEmpty => 'Немає сполучених пристроїв. Підключіть інший пристрій через локальну мережу.';
+  String get syncEmpty => 'Немає сполучених пристроїв';
 
   @override
   String get syncPair => 'Спарити пристрій';
@@ -1636,9 +1485,6 @@ class SUk extends S {
   String get syncNever => 'Ніколи';
 
   @override
-  String get syncNoLan => 'Пристрої мають бути в одній локальній мережі';
-
-  @override
   String get syncPaired => 'Пристрій спарений';
 
   @override
@@ -1648,17 +1494,10 @@ class SUk extends S {
   String get syncWaiting => 'Очікування іншого пристрою…';
 
   @override
-  String get syncSecureNote => 'Канал із наскрізним шифруванням. Ні облікових записів, ні хмарних серверів.';
-
-  @override
   String get zapretWithVpn => 'Обхід фільтрації DPI для прямого мережевого трафіку';
 
   @override
-  String get zapretWithVpnHint =>
-      'Запускає zapret разом із VPN-тунелем: трафік тунелю йде через VPN, а прямий трафік через засіб обходу блокувань.';
-
-  @override
-  String get chainDuplicate => 'У ланцюжку повторюється сервер. Виберіть різні сервери для кожної ланки.';
+  String get chainDuplicate => 'У ланцюжку повторюється сервер';
 
   @override
   String get edit => 'Редагувати';
@@ -1668,10 +1507,6 @@ class SUk extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Автоматичне перемикання при деградації';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Якщо вибраний сервер сильно сповільниться або перестане відповідати, Sora перемкнеться на найкращий за вимірюваннями, але не частіше ніж раз на 10 хвилин.';
 
   @override
   String get tunStackMixed => 'Змішаний';
@@ -1689,19 +1524,13 @@ class SUk extends S {
   String get customServerName => 'Назва';
 
   @override
-  String get customServerNameHint => 'Наприклад: мій VPS';
-
-  @override
-  String get customServerNameRequired => 'Введіть назву';
+  String get customServerNameRequired => 'Назву не вказано';
 
   @override
   String get customServerAddress => 'Адреса';
 
   @override
-  String get customServerAddressHint => 'example.com або 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Введіть адресу сервера';
+  String get customServerAddressRequired => 'Адресу не вказано';
 
   @override
   String get customServerAddressInvalid => 'Недійсна адреса';
@@ -1710,19 +1539,13 @@ class SUk extends S {
   String get customServerPort => 'Порт';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Порт має бути числом від 1 до 65535';
+  String get customServerPortInvalid => 'Неправильний порт';
 
   @override
   String get customServerProtocol => 'Протокол';
 
   @override
   String get customServerCredentials => 'Дані для входу';
-
-  @override
-  String get customServerOptional => 'Необов\'язково';
 
   @override
   String get customServerShowSecret => 'Показати секрет';
@@ -1736,23 +1559,13 @@ class SUk extends S {
   }
 
   @override
-  String get customServerTest => 'Тест';
-
-  @override
   String get leakTestTitle => 'Перевірка на витік даних';
-
-  @override
-  String get leakTestIntro =>
-      'Перевіряє, чи може трафік залишити пристрій поза тунелем: прямі запити DNS та ICMP, вихід IPv6 і системні резолвери. Запускайте під час активного підключення.';
 
   @override
   String get leakTestRun => 'Перевірити';
 
   @override
   String get leakTestCancel => 'Скасувати';
-
-  @override
-  String get leakTestNeedsConnection => 'Підключіться до VPN, щоб перевірити наявність витоку даних.';
 
   @override
   String leakTestProgress(int count) {
@@ -1780,9 +1593,6 @@ class SUk extends S {
 
   @override
   String get leakTestFix => 'Виправити';
-
-  @override
-  String get leakTestFixedNote => 'Kill switch увімкнено. Повторіть перевірку.';
 
   @override
   String get leakTestCheckDirectDns => 'Прямий DNS';
@@ -1816,15 +1626,13 @@ class SUk extends S {
   String get syncDaemonFailed => 'Не вдалося запустити службу синхронізації';
 
   @override
-  String get syncDaemonMissing =>
-      'Компонент sora-sync не знайдено. Перевстановіть програму, щоб увімкнути синхронізацію пристрою.';
+  String get syncDaemonMissing => 'Компонент sora-sync не знайдено';
 
   @override
   String get syncDaemonStarting => 'Запуск служби синхронізації…';
 
   @override
-  String get syncErrAuth =>
-      'Служба синхронізації відхилила маркер доступу. Перезапустіть програму та повторіть спробу.';
+  String get syncErrAuth => 'Служба синхронізації відхилила маркер доступу';
 
   @override
   String get syncErrNotFound => 'Пристрій більше не підключено';
@@ -1833,8 +1641,7 @@ class SUk extends S {
   String get syncErrPairingActive => 'Сеанс створення пари вже відкрито';
 
   @override
-  String get syncErrUnreachable =>
-      'Інший пристрій не відповідає. Переконайтеся, що він у тій самій мережі та відображає його код.';
+  String get syncErrUnreachable => 'Інший пристрій не відповідає';
 
   @override
   String get syncError => 'Помилка синхронізації';
@@ -1846,10 +1653,6 @@ class SUk extends S {
 
   @override
   String get syncJoining => 'Сполучення з пристроєм…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Старий список пристроїв насправді ніколи не сполучався, тому його було очищено. З’єднайте свої пристрої знову, цього разу по-справжньому.';
 
   @override
   String get syncNewCode => 'Новий код';
@@ -1909,8 +1712,7 @@ class SUk extends S {
   String get syncThisDevice => 'Цей пристрій';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Синхронізація недоступна на Android';
 
   @override
   String get diagnosticPackets => 'Перехоплення пакетів';
@@ -1957,27 +1759,25 @@ class SUk extends S {
   String get customServerWgKeepalive => 'Keepalive, секунд';
 
   @override
-  String get customServerWgKeyInvalid => 'Ключ має бути 32 байтами в base64, як виводить wg genkey.';
+  String get customServerWgKeyInvalid => 'Неправильний ключ WireGuard';
 
   @override
-  String get customServerWgCidrInvalid => 'Вкажіть адреси через кому у вигляді 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Неправильний префікс CIDR';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'Вкажіть кількість секунд від 0 до 65535.';
+  String get customServerWgKeepaliveInvalid => 'Неправильний інтервал keepalive';
 
   @override
   String get strictKillSwitch => 'Суворий kill switch';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Після підключення блокує трафік поза VPN навіть після збою, перезапуску чи виходу з програми. Доступ відновиться лише після відключення VPN або цієї опції. Після перезавантаження блокування відновлюється лише з увімкненим підключенням під час запуску.';
+  String get strictKillSwitchWarning => 'Блокувати трафік поза VPN після виходу?';
 
   @override
-  String get extWorkerFailed => 'Фонове завдання розширення завершилося з помилкою. Перевірте журнал розширення.';
+  String get extWorkerFailed => 'Фонове завдання розширення завершилося з помилкою';
 
   @override
-  String get extAssetRejected =>
-      'Файл розширення містить нечитабельні кольори або некоректні правила. Попросіть автора розширення виправити файл.';
+  String get extAssetRejected => 'Файл розширення містить нечитабельні кольори або некоректні правила';
 
   @override
   String get extVerifiedSora => 'Перевірено Sora';
@@ -2003,31 +1803,25 @@ class SUk extends S {
   String get customServerPassword => 'Пароль';
 
   @override
-  String get customServerSecretRequired => 'Введіть значення';
+  String get customServerSecretRequired => 'Значення не вказано';
 
   @override
   String get customServerLinkInvalid => 'Неправильне посилання на сервер';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Внутрішня помилка Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Сертифікат сервера відхилено';
 
   @override
-  String get errInternal => 'Внутрішня помилка Sora. Збережіть журнал і повідомте про збій.';
+  String get errFileAccess => 'Немає доступу до файлу';
 
   @override
-  String get errTls => 'Сертифікат сервера відхилено. Перевірте годинник або зверніться до провайдера.';
+  String get errDataLimit => 'Забагато даних';
 
   @override
-  String get errFileAccess => 'Немає доступу до файлу. Перевірте права та вільне місце.';
-
-  @override
-  String get errDataLimit => 'Забагато даних. Виберіть менше елементів і повторіть.';
-
-  @override
-  String get errCredentials => 'Збережені дані доступу втрачено. Імпортуйте сервер знову.';
+  String get errCredentials => 'Збережені дані доступу втрачено';
 
   @override
   String subscriptionStale(String time) {
@@ -2035,54 +1829,54 @@ class SUk extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Ще не оновлювалася. Повторіть.';
+  String get subscriptionNeverUpdated => 'Ще не оновлювалася';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Сервер повернув код HTTP $status. Перевірте посилання або зверніться до постачальника.',
-      zero: 'Сервер відхилив запит. Перевірте посилання або зверніться до постачальника.',
+      other: 'Сервер повернув код HTTP $status',
+      zero: 'Сервер відхилив запит',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Налаштування сервера неповні або не підтримуються. Оновіть підписку.';
+  String get errInvalidServer => 'Налаштування сервера неповні або не підтримуються';
 
   @override
-  String get errServerIds => 'Два сервери мають однаковий ідентифікатор. Імпортуйте їх знову.';
+  String get errServerIds => 'Два сервери мають однаковий ідентифікатор';
 
   @override
-  String get errRoutingGroup => 'Маршрут посилається на видалені сервери або пошкоджену групу. Оновіть підписку.';
+  String get errRoutingGroup => 'Маршрут посилається на видалені сервери або пошкоджену групу';
 
   @override
-  String get errConnections => 'Список підключень недоступний. Підключіться або виберіть інше ядро.';
+  String get errConnections => 'Список підключень недоступний';
 
   @override
-  String get errLogs => 'Ця служба не веде журнал. Оновіть Sora.';
+  String get errLogs => 'Ця служба не веде журнал';
 
   @override
-  String get errDiagnostics => 'Не вдалося зібрати діагностику. Повторіть або збережіть журнал.';
+  String get errDiagnostics => 'Не вдалося зібрати діагностику';
 
   @override
-  String get errMissingItem => 'Запитаний елемент більше не існує. Оновіть список.';
+  String get errMissingItem => 'Запитаний елемент більше не існує';
 
   @override
-  String get errInvalidRequest => 'У запиті неправильні значення. Перевірте введені дані та повторіть.';
+  String get errInvalidRequest => 'У запиті неправильні значення';
 
   @override
-  String get errProxyLogin => 'Системний проксі не підтримує цей вхід. Видаліть логін і пароль локального проксі.';
+  String get errProxyLogin => 'Системний проксі не підтримує цей вхід';
 
   @override
-  String get errLogFilter => 'Неправильний фільтр журналу. Очистьте пошук і повторіть.';
+  String get errLogFilter => 'Неправильний фільтр журналу';
 
   @override
-  String get errSubRedirect => 'Сервер перенаправив на небезпечну адресу. Запитайте нове посилання у провайдера.';
+  String get errSubRedirect => 'Сервер перенаправив на небезпечну адресу';
 
   @override
-  String get errProxySetup => 'Не вдалося налаштувати системний проксі. Перепідключіться або відкрийте журнал.';
+  String get errProxySetup => 'Не вдалося налаштувати системний проксі';
 
   @override
   String get notificationsToday => 'Сьогодні';
@@ -2108,18 +1902,46 @@ class SUk extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'Недопустимий інтервал оновлення підписки. Виберіть інтервал, рекомендований постачальником.';
+  String get errSubInterval => 'Недопустимий інтервал оновлення підписки';
 
   @override
-  String get errRule => 'У правилі маршрутизації є помилка. Перевірте вказаний домен, IP-адресу або програму.';
+  String get errRule => 'У правилі маршрутизації є помилка';
 
   @override
-  String get errDns => 'Некоректні налаштування DNS. Перевірте адресу DNS-сервера.';
+  String get errDns => 'Некоректні налаштування DNS';
 
   @override
-  String get errEndpoint => 'Некоректна адреса сервера для перевірки. Перевірте ім’я хоста й порт.';
+  String get errEndpoint => 'Некоректна адреса сервера для перевірки';
 
   @override
-  String get errCancelled => 'Запит скасовано. За потреби виконайте дію знову.';
+  String get errCancelled => 'Запит скасовано';
+
+  @override
+  String get customServerOptions => 'Параметри підключення';
+
+  @override
+  String get customServerTransport => 'Транспорт';
+
+  @override
+  String get customServerSecurity => 'Захист';
+
+  @override
+  String get customServerCipher => 'Шифр';
+
+  @override
+  String get customServerWgInterface => 'Інтерфейс';
+
+  @override
+  String get customServerWgPeer => 'Пір';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Доступно на: $platforms.';
+  }
+
+  @override
+  String get winwsScopeWarning => 'Змінити TCP-трафік усіх програм?';
+
+  @override
+  String get winwsRequirements => 'Цей режим VPN недоступний';
 }

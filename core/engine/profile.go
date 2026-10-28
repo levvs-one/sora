@@ -1,11 +1,15 @@
 package engine
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"slices"
+	"strings"
+)
 
 // profileKeys are the fields of an Xray configuration that carry credentials.
-var profileKeys = map[string]bool{
-	"id": true, "password": true, "pass": true, "user": true, "publicKey": true, "privateKey": true,
-	"shortId": true, "preSharedKey": true, "secretKey": true, "spiderX": true, "seed": true,
+var profileKeys = []string{
+	"id", "password", "pass", "user", "publicKey", "privateKey",
+	"shortId", "preSharedKey", "secretKey", "spiderX", "seed",
 }
 
 // profileSecrets extracts profile credentials for redacting engine output.
@@ -23,7 +27,7 @@ func profileSecrets(raw json.RawMessage) []string {
 		switch x := v.(type) {
 		case map[string]any:
 			for k, value := range x {
-				if s, ok := value.(string); ok && profileKeys[k] {
+				if s, ok := value.(string); ok && slices.ContainsFunc(profileKeys, func(name string) bool { return strings.EqualFold(k, name) }) {
 					out = append(out, s)
 					continue
 				}

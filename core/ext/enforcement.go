@@ -19,7 +19,7 @@ package ext
 //     path beyond that gate to check.
 //   - Inert: no API exposes the asset at all; granting changes nothing.
 //   - Unimplemented: the runtime consumer is not built yet; granting
-//     changes nothing. Network hooks remain here.
+//     changes nothing.
 
 // EnforcementStatus classifies one permission's real enforcement.
 type EnforcementStatus int
@@ -106,8 +106,9 @@ var enforcementTable = []EnforcementRow{
 	},
 	{
 		ID:     "net.hooks",
-		Status: EnforcementUnimplemented,
-		Note:   "RiskDangerous with zero enforcement code: no hook consumer runs extension code on the traffic path yet. Enforcement and consent must land together before this row moves",
+		Status: EnforcementEnforced,
+		Where:  "app/lib/src/ext/store.dart bypassProfiles + bypass.dart + sora.dart connect/buildPlan",
+		Note:   "app-selected version-2 profiles for installed tpws/byedpi only; enabled grant and conflict winner required; disable disconnects; no native paths, scripts, arbitrary engine fragments or WinDivert adapter",
 	},
 	{
 		ID:     "net.fetch",

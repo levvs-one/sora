@@ -8,7 +8,7 @@
 ///
 /// Resolution (which extension wins) is persisted by [ExtensionStore]; themes use the stored winner.
 /// Routing rules are not contested: they merge in a fixed order after the user's rules.
-/// Network hooks are not run by the app.
+/// Bypass profiles also require the stored network-hook conflict winner.
 library;
 
 import 'store.dart';

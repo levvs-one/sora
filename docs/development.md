@@ -121,7 +121,7 @@ Linux, после сборки службы, ядер, zapret и приложе�
 
 ```sh
 SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm.yaml --packager deb --target dist/
-SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm-app.yaml --packager deb --target dist/
+SORA_ARCH=amd64 SORA_FLUTTER_ARCH=x64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm-app.yaml --packager deb --target dist/
 ```
 
 `--packager rpm` и `--packager archlinux` дают остальные форматы.

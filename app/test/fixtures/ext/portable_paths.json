@@ -1,0 +1,27 @@
+{
+  "unsafe": [
+    "entry.js.", "entry.js ", "assets./entry.js", "assets /entry.js",
+    "NUL", "nul.txt", "CON", "AUX.json", "PRN.txt", "COM1.js", "LPT9.css",
+    "COM¹.txt", "LPT².txt", "COM³", "COM1 .txt", "CONIN$", "CONOUT$",
+    "NUL/entry.js", "LONGFI~1.JS", "assets/ABCDEF~2", "~1.js",
+    "what?.js", "star*.js", "less<.js", "more>.js", "pipe|.js", "quote\".js",
+    "zero\u0000.js", "line\n.js", "control\u001f.js"
+  ],
+  "conflicts": [
+    ["entry.js", "ENTRY.JS"],
+    ["Assets/a.js", "assets/b.js"],
+    ["a/B/one.js", "a/b/two.js"],
+    ["assets", "assets/entry.js"],
+    ["assets/a.js", "ASSETS"],
+    ["assets", "assets.js", "assets/entry.js"],
+    ["Assets/a.js", "assets.foo", "assets/b.js"],
+    ["ресурсы/a.js", "РЕСУРСЫ/b.js"],
+    ["σ.js", "ς.js"],
+    ["I.js", "ı.js"]
+  ],
+  "valid": [
+    "entry.js", "assets/a.js", "assets/deep/b.css", ".meta/data.json",
+    "ресурсы/панель.html", "images/图标.svg", "vendors~app.js", "name~12.longextension",
+    "COM10.js", "NULdata.txt", "Straße.js", "STRASSE.js", "..hidden/data.json"
+  ]
+}

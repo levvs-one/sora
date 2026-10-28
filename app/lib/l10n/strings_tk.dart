@@ -205,62 +205,58 @@ class STk extends S {
   String get errGeneric => 'Bir zat nädogry boldy';
 
   @override
-  String get errCore => 'Sora hyzmaty jogap bermeýär. Biraz garaşyp, täzeden synanyşyň.';
+  String get errCore => 'Sora hyzmaty jogap bermeýär';
 
   @override
-  String get errAuth => 'Sora hyzmatyna giriş ret edildi. Programmany täzeden açyp, ýene synanyşyň.';
+  String get errAuth => 'Sora hyzmatyna giriş ret edildi';
 
   @override
-  String get errVersion => 'Sora programmasynyň we hyzmatynyň wersiýalary tapawutly. Sora-ny täzeläň.';
+  String get errVersion => 'Sora programmasynyň we hyzmatynyň wersiýalary tapawutly';
 
   @override
-  String get errBusy => 'Öňki buýruk henizem ýerine ýetirilýär. Onuň tamamlanmagyna garaşyň.';
+  String get errBusy => 'Öňki buýruk henizem ýerine ýetirilýär';
 
   @override
-  String get errEngineMissing => 'Bu serwer üçin zerur hereketlendiriji tapylmady. Sora täzelenmelerini barlaň.';
+  String get errEngineMissing => 'Bu serwer üçin zerur hereketlendiriji tapylmady';
 
   @override
-  String get errEngineStart => 'Hereketlendiriji işe başlamady. Sebäbini birikme žurnalyndan görüň.';
+  String get errEngineStart => 'Hereketlendiriji işe başlamady';
 
   @override
-  String get errEngineStopped => 'Hereketlendiriji togtady. Täzeden birikmäge synanyşyň.';
+  String get errEngineStopped => 'Hereketlendiriji togtady';
 
   @override
-  String get errTunnel => 'Bu VPN tertibi elýeterli däl. Başga tertip saýlaň ýa-da hyzmatyň rugsatlaryny barlaň.';
+  String get errTunnel => 'Bu VPN tertibi elýeterli däl';
 
   @override
-  String get errNetwork => 'Serwere baryp bolmaýar';
+  String get errTimeout => 'Serwer wagtynda jogap bermedi';
 
   @override
-  String get errTimeout => 'Serwer wagtynda jogap bermedi. Bir minutdan täzeden synanyşyň.';
+  String get errFirewall => 'VPN-den daşarda internete girişi petikläp bolmady';
 
   @override
-  String get errFirewall => 'VPN-den daşarda internete girişi petikläp bolmady. Sebäbini birikme žurnalyndan görüň.';
+  String get errSubFetch => 'Abunalygy ýükläp bolmady';
 
   @override
-  String get errSubFetch => 'Abunalygy ýükläp bolmady. Internet birikmesini barlap, bir minutdan täzeden synanyşyň.';
+  String get errSubFormat => 'Abunalygyň formaty tanalmady';
 
   @override
-  String get errSubFormat => 'Abunalygyň formaty tanalmady. Üpjün edijiden gabat gelýän abunalyk salgysyny soraň.';
+  String get errSubEmpty => 'Abunalykda serwer ýok';
 
   @override
-  String get errSubEmpty => 'Abunalykda serwer ýok. Abunalyk üpjün edijisine ýüz tutuň.';
+  String get errSubDuplicate => 'Bu abunalyk eýýäm goşulan';
 
   @override
-  String get errSubDuplicate => 'Bu abunalyk eýýäm goşulan. Iň soňky serwerleri almak üçin ony täzeläň.';
+  String get errSubLimit => 'Abunalyklaryň sany çägine ýetdi';
 
   @override
-  String get errSubLimit => 'Abunalyklaryň sany çägine ýetdi. Täzesini goşmazdan öň ulanmaýan abunalygyňyzy aýyryň.';
+  String get errSubScheme => 'Abuna baglanyşygynyň shemasy goldanylmaýar';
 
   @override
-  String get errSubScheme => 'Abunalyk salgysy https:// bilen başlamaly. Üpjün edijiden howpsuz salgy soraň.';
+  String get errSecretStore => 'Sora ammary zaýalanan ýa-da elýeterli däl';
 
   @override
-  String get errSecretStore =>
-      'Sora ammary zaýalanan ýa-da elýeterli däl. Giriş rugsatlaryny we žurnaldaky maglumatlary barlaň.';
-
-  @override
-  String get errNoServers => 'Birikmek üçin serwer ýok. Abunalyk ýa-da öz serweriňizi goşuň.';
+  String get errNoServers => 'Birikmek üçin serwer ýok';
 
   @override
   String get connections => 'Baglanyşyklar';
@@ -314,9 +310,6 @@ class STk extends S {
   String get dnsAuto => 'Awto';
 
   @override
-  String get dnsHint => 'Salgylar, vergul aýry';
-
-  @override
   String get fragment => 'TLS bölekleri';
 
   @override
@@ -332,13 +325,7 @@ class STk extends S {
   String get byDefault => 'Bellenen';
 
   @override
-  String get rangeHint => 'Mysal üçin, 100-200';
-
-  @override
   String get splitPos => 'Positionerleşýän ýerleri';
-
-  @override
-  String get splitPosHint => 'Mysal üçin, 1, orta';
 
   @override
   String get disorder => 'Bölekleri tertipläň';
@@ -447,11 +434,6 @@ class STk extends S {
   String get support => 'Goldaw';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine bu kompýuterdäki port arkaly dolandyrylýar. Beýleki programmalar bir VPN-iň açykdygyny aýdyp bilerler.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine saýlaň';
   }
@@ -527,9 +509,6 @@ class STk extends S {
   String get launchAtLogin => 'Ulgamdan başlaň';
 
   @override
-  String get launchAtLoginDetail => 'Ulgama gireniňizde Sora awtomatiki işe girizer we lotoqda galar.';
-
-  @override
   String get closeToTray => 'Closedapylanda tarelde saklaň';
 
   @override
@@ -564,9 +543,6 @@ class STk extends S {
   String get noticeInTray => 'Sora henizem lagada';
 
   @override
-  String get noticeInTrayBody => 'Nyşanasynyň menýusyndan çykyň';
-
-  @override
   String get noticeLost => 'Baglanyşyk ýitdi';
 
   @override
@@ -594,11 +570,7 @@ class STk extends S {
   String get importTitle => 'Bu abuna ýazyňmy?';
 
   @override
-  String get importSealed =>
-      'Bu baglanyşyk Happ üçin kodlanýar we ony diňe Happ okap biler. Adaty abuna baglanyşygy üçin üpjün edijiňizden soraň.';
-
-  @override
-  String get understood => 'Bolýar';
+  String get importSealed => 'Bu baglanyşyk Happ üçin kodlanýar we ony diňe Happ okap biler';
 
   @override
   String get noAnswer => 'Jogap ýok';
@@ -637,39 +609,10 @@ class STk extends S {
   String get openLogs => 'Surnallary açyň';
 
   @override
-  String get tourReplay => 'Guideene-de gollanma görkez';
-
-  @override
-  String tourStep(int step) {
-    return '5-nji ädim $step';
-  }
-
-  @override
   String get tourBack => 'Yzyna';
 
   @override
   String get tourNext => 'Indiki';
-
-  @override
-  String get tourSkip => 'Geçmek';
-
-  @override
-  String get tourFinish => 'Boldy';
-
-  @override
-  String get tourAdd => 'Üpjün edijiňiziň abuna baglanyşygyny goşuň.';
-
-  @override
-  String get tourServer => 'Serwer saýlaň. “Iň çalt” siziň üçin birini saýlaýar.';
-
-  @override
-  String get tourConnect => 'Birikdirmek ýa-da aýyrmak üçin şu ýere basyň.';
-
-  @override
-  String get tourMode => 'Re modeimi saýlaň. VPN düşse, wyklýuçatel interneti bloklaýar.';
-
-  @override
-  String get tourSettings => 'Sazlamalary açyň. Bu gollanmany şol ýerde gaýtadan ulanyp bilersiňiz.';
 
   @override
   String get chooseProgram => 'Programma saýlaň';
@@ -681,7 +624,7 @@ class STk extends S {
   String get runningProcesses => 'Işleýiş amallary';
 
   @override
-  String get programsEmpty => 'Programmalar tapylmady Başga bir at synap görüň.';
+  String get programsEmpty => 'Programmalar tapylmady Başga bir at synap görüň';
 
   @override
   String get selectExe => '.Exe faýly saýlaň';
@@ -693,7 +636,7 @@ class STk extends S {
   String get speedtestSearch => 'Hyzmat tapyň';
 
   @override
-  String get speedtestEmpty => 'Gabat gelenok. Gözlegi üýtgediň.';
+  String get speedtestEmpty => 'Gabat gelenok';
 
   @override
   String get speedtestBackToList => 'Hyzmatlara dolan';
@@ -702,13 +645,13 @@ class STk extends S {
   String get speedtestOpenBrowser => 'Brauzerde açyň';
 
   @override
-  String get speedtestUnavailable => 'Içerki brauzer başlap bilmedi. Hyzmaty ulgam brauzeriňizde açyň.';
+  String get speedtestUnavailable => 'Içerki brauzer başlap bilmedi';
 
   @override
-  String get speedtestPageFailed => 'Sahypa ýükläp bilmedi. Ony täzeden ýükläň ýa-da ulgam brauzeriňizde hyzmaty açyň.';
+  String get speedtestPageFailed => 'Sahypa ýükläp bilmedi';
 
   @override
-  String get speedtestExternalFailed => 'Ulgam brauzeri açyp bilmedi. Gaýtadan synanyşyň.';
+  String get speedtestExternalFailed => 'Ulgam brauzeri açyp bilmedi';
 
   @override
   String get modes => 'Reesimler';
@@ -748,52 +691,28 @@ class STk extends S {
   String get updateNoNotes => 'Neşirde hiç hili bellik ýok.';
 
   @override
-  String get updateDropWarning =>
-      'Sora we esasy täzelenmesi bilen VPN birikmesi birnäçe sekuntlap ​​pese gaçar. Dowam et?';
+  String get updateDropWarning => 'Täzelemek üçin birikmäni kesmelimi?';
 
   @override
-  String get updateWaitConnection => 'VPN birikmesiniň we ýadrosynyň taýýar bolmagyna garaşyň.';
+  String get updateWaitConnection => 'Birikme taýýar däl';
 
   @override
-  String get updateDownloading => 'Faýllary göçürip almak we barlamak ...';
-
-  @override
-  String get updateInstalling => 'Täzelenmäni taýýarlamak ýa-da administratoryň tassyklanmagyna garaşmak ...';
-
-  @override
-  String get updateNetworkError => 'Täzelenmäni göçürip alyp bolmady Gaýtadan synanyşyň.';
+  String get updateNetworkError => 'Täzelenmäni göçürip alyp bolmady Gaýtadan synanyşyň';
 
   @override
   String get updateReleaseError => 'Goýberilýän maglumatlar ýa-da zerur faýllar ýok ýa-da nädogry.';
 
   @override
-  String get updateChecksumError => 'Göçürip almak SHA256SUMS bilen gabat gelenok. Hiç zat gurulmady';
+  String get updateChecksumError => 'Göçürip almak SHA256SUMS bilen gabat gelenok';
 
   @override
-  String get updateInstallError => 'Täzelenme gutarmady. Hakyky tanamaklyk ýatyrylan bolmagy mümkin.';
+  String get updateInstallError => 'Täzelenme gutarmady';
 
   @override
-  String get updateUnsupported =>
-      'Bu ýerine ýetirip boljak, goldanýan Sora paket jübütine degişli däl. Goýberiş gurnama görkezmelerini ulanyň.';
+  String get updateUnsupported => 'Bu ýerine ýetirip boljak, goldanýan Sora paket jübütine degişli däl';
 
   @override
-  String get updateManual =>
-      'Barlanylan paketleri gurmak üçin bu buýrugy terminalda işlediň, soňra Sora açyň. Faýllar göçürip almak katalogynda galýarlar. VPN birikmesi peseler.';
-
-  @override
-  String get updateSignaturePending =>
-      'Täzelenme faýllary goýberiliş bilen çap edilen barlag jemleri bilen deňeşdirilýär.';
-
-  @override
-  String get updateManualSigWarning =>
-      'Aşakdaky faýllar goýberilişiň barlag jemlerine laýyk gelýär. Olary resmi goýberilişden ýükläp alan bolsaňyz, buýrugy ýerine ýetiriň.';
-
-  @override
-  String get updateVersionRevoked =>
-      'Dörediji bu wersiýany yzyna aldy. Düzedilen goýberilişine garaşmagyňyzy haýyş edýäris.';
-
-  @override
-  String get updateRolloutPending => 'Täze wersiýa kem-kemden çykýar we size awtomatiki usulda hödürlener.';
+  String get updateVersionRevoked => 'Dörediji bu wersiýany yzyna aldy';
 
   @override
   String updateRollbacking(String version) {
@@ -806,8 +725,7 @@ class STk extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Awtomatiki yza gaýtmak şowsuz. Täze wersiýa işlemese, öňki goýberilişi el bilen täzeden guruň.';
+  String get updateRollbackError => 'Awtomatiki yza gaýtmak şowsuz';
 
   @override
   String get updateRollbackCacheError =>
@@ -817,10 +735,7 @@ class STk extends S {
   String get updateCopyCommand => 'Buýrugy göçüriň';
 
   @override
-  String get updateChecksDisabled => 'Sazlamalarda awtomatiki barlaglar ýapylýar.';
-
-  @override
-  String get updateInstalled => 'Täzelenme guruldy Sora açyň.';
+  String get updateInstalled => 'Täzelenme guruldy Sora açyň';
 
   @override
   String get projectLinks => 'Taslama';
@@ -850,21 +765,13 @@ class STk extends S {
   String get showDescription => 'Düşündiriş görkez';
 
   @override
-  String get pendingConnectionChanges => 'Bu üýtgeşmeleri ulanmak üçin gaýtadan birikdiriň.';
+  String get errEngineUnsupported => 'Saýlanan hereketlendiriji bu profili ýa-da sazlamalary goldamaýar';
 
   @override
-  String get reconnectNow => 'Goşuň we gaýtadan birikdiriň';
+  String get errRestore => 'Baglanyşygy arassalamak doly däldi';
 
   @override
-  String get errEngineUnsupported =>
-      'Saýlanan hereketlendiriji bu profili ýa-da sazlamalary goldamaýar. Awto ýa-da gabat gelýän dwigateli saýlaň.';
-
-  @override
-  String get errRestore =>
-      'Baglanyşygy arassalamak doly däldi. Aýyrmak üçin gaýtadan synanyşyň; jikme-jiklikler üçin gündelige serediň.';
-
-  @override
-  String get errSessionEnded => 'Bu sessiýa eýýäm tamamlandy. Baglanyş ýagdaýyny täzeläň.';
+  String get errSessionEnded => 'Bu sessiýa eýýäm tamamlandy';
 
   @override
   String get retryDisconnect => 'Aýyrmagy gaýtadan synanyşyň';
@@ -880,10 +787,10 @@ class STk extends S {
 
   @override
   String get modesGuide =>
-      'Serweriňiziň haýsy motora mätäçdigini bilmeýän bolsaňyz, Awto saýlaň. Sora birikmezden ozal profil we sazlamalary barlaýar. Dwigatel meýilnamaňyzyň geçiriş giňligini artdyryp bilmez: öndürijilik serwere, ugra, protokola we tora baglydyr.\n\n## Reesimler\n\n### traffichli traffik (TUN)\n\nSora wirtual tor interfeýsini döredýär we TCP we UDP ýaly programma trafigini ugrukdyrýar. Bu re modeimi Telegram, oýunlar we Discord sesi üçin ulanyň. Düzgünler belli bir saýtlary ýa-da programmalary gönüden-göni iberip ýa-da blokirläp biler. Tor hyzmaty, zerur protokoly goldaýan serwere we serwere mätäç.\n\n### System proksi\n\nSora ýerli HTTP / SOCKS proksi düzýär. Ulgam proksi sazlamalaryna hormat goýýan programmalar ony ulanýarlar. Öz torlary bilen goýmalar gönüden-göni birigip biler; UDP we sesli jaňlar adatça TUN gerek. Bu re modeim proksi goldawy bilen brauzerlere we programmalara laýyk gelýär.\n\n### Serwer ýok\n\nLinux-de, Sora HTTP / TLS haýyşlaryny bölmek we üýtgetmek we käbir DPI barlaglaryndan aýlanyp geçmek üçin [zapret] (https://github.com/bol-van/zapret) ulanýar. IP-iňiz şol bir ýagdaýda galýar we birikmeler göni web sahypasyna gidýär. Netijeler üpjün edijiňize we blokirleme usulyna baglydyr.\n\nHäzirki integrasiýa, TCP-den HTTP we TLS üçin tpws ulanýar. IP blokirlemesinden ýa-da UDP-den geçmeýär we Telegram-iň MTProto birikmelerini kepillendirip bilmeýär. Discord sesi, Telegram jaňlary we bu hili çäklendirmeler üçin TUN bilen VPN serwerini ulanyň.\n\n## Dwigateller\n\n### Awto\n\nSora ähli birikme meýilnamasyny goldaýan gurnalan hereketlendirijini saýlaýar: serwer protokollary, transportlar, toparlar, böleklere bölüniş we re modeim. Gabat gelmeýän el bilen saýlamak, häzirki baglanyşygy togtatmazdan ozal ret edilýär. Awto ýa-da başga dwigateli saýlaň we sazlamalary täzeden ulanyň.\n\n### sing-box\n\nTäze Sora paketleri [sing-box-lx] (https://github.com/Leadaxe/sing-box-lx), [sing-box] (https://github.com/SagerNet/sing-box), müşderi tarapyna XHTTP we VLESS Encryption goşýar. Sora gurluşy we mümkinçiliklerini ykrar edýär. XHTTP bolmazdan ýokary akym gurmak, diňe öz adyndan bu mümkinçiligi gazanyp bilmez.\n\nGoldaw berlen protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard we WireGuard we AmneziaWG AmneziaWG Doly Xray JSON profilleri Xray talap edýär. Täze AWG 3.x meýdanlaryny entek import edip bolmaýar. sing-box kompýuterdäki beýleki programmalaryň tapyp bilýän parol bilen goralýan ýerli dolandyryş portuny ulanýar.\n\n### Xray\n\n[Xray-core] (https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption we TLS böleklerini goldaýar. Şeýle hem, marşrutlaryny we toparlaryny gorap saklamak bilen doly üpjün ediji Xray profilini işleýär. Şeýle profilleri özlerini alyp barşyny üýtgetmän awtomatiki usulda başga motora öwrüp bolmaz.\n\nBaglanan Xray TLS şahadatnamasyny tassyklamagy (\"allowInsecure\") ýapýan sazlamany aýyrdy. Awto bu sazlamany talap edýän adaty serwerler üçin sing-box ýa-da mihomo saýlaýar. Xray saýlamak, häzirki birikmäni togtatmazdan ozal gabat gelmeýändigini habar berýär. Has köne JSON profillerinde barlanylýan şahadatnama ýa-da şahadatnama pin bilen täzelenen üpjün ediji profiline mätäç.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ätiýaçlyk serwere yzygiderli geçiş toparlaryny, ýük paýlaşmagy, XHTTP we AmneziaWG goldaýar. Ätiýaçlyk serwere awtomatik geçmek möhüm bolsa, ony saýlaň. Sora-nyň TLS bölekleme sazlamasy bu ýadro bilen elýeterli däl.\n\n## Sora-de laýyklyk\n\n| Aýratynlyk | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN we TCP / UDP | Hawa | Hawa | Hawa |\n| XHTTP | Hawa | Hawa | Hawa |\n| VLESS Encryption | Hawa | Hawa | Hawa |\n| Doly Xray tertibi | | Ok | Hawa | | Ok |\n| TUIC / AnyTLS | Ikisi | | Ok | TUIC |\n| mieru | Ýok | Ýok | Hawa |\n| NaiveProxy | Hawa | Ýok | Ýok |\n| TLS bölekleri | Hawa | Hawa | | Ok |\n| AmneziaWG 1.x / 2.x | Hawa | | Ok | Hawa |\n| Yza gaýdyp gelen topar | | Ok | ²ok | Hawa |\n\nZ J1/J2/J3/Itime bolan profiller mihomo ulanýar; bu meýdanlar hiç haçan sessiz-üýnsüz taşlanmaly däldir. Complete Doly Xray profilleriniň topary üçin programma ätiýaçlyk profilini saýlaýar. Goldaw gurlan gurna baglydyr; hakda wersiýasyny barlaň.\n\n## TUN ýygyndysy\n\nStack wirtual interfeýsiň içinde TCP we UDP işleýär. Reesimler panelinde Xray we mihomo gVisor, System, Mixed we MIPS hödürleýär. Her hereketlendiriji öz islegini tygşytlaýar. System proksi we Serwersiz reesimler bu ileri tutmany ulanmaýarlar.\n\n- ** Mixed ** - TCP ulgam stakasyny ulanýar, gVisor bolsa UDP işleýär. Bu Linux-da mihomo üçin başlangyç görnüşdir. Windows-da Xray we mihomo başlangyç görnüş hökmünde MIPS ulanýar.\n- ** System ** - ulgam toplumyny ulanýar. Tor programmalarynda kynçylyklar ýüze çyksa, başga bir warianty synap görüň.\n- ** gVisor ** - ulanyjy giňişliginde traffigi dolandyrýar.\n- ** MIPS ** - mihomo-iň öz IP ýygyndysy, birleşdirilen 1.19.32 wersiýasynda bar.\n\nLinux-de, Xray gurnalan gVisor deslapky görnüşde ulanýar. Linux-de System, Mixed we MIPS mihomo-ni TUN hereketlendirijisi hökmünde ulanyp, TCP we UDP-ni tassyklanan ýerli SOCKS baglanyşygy arkaly Xray-e ugradýar. Xray protokoly, üpjün edijiniň profilini we marşrutyny saklaýar. Bu üç wariant gurnalan mihomo talap edýär. Windows-de Xray dört TUN stekiniň hemmesi üçin mihomo 1.19.32 ýa-da has täze wersiýany ulanýar. Protokollar we ugur kesgitlemek Xray-da galýar. Bu birleşmede programma düzgünleri diňe göni birikmäni we bloklamagy goldaýar; Linux-de bu düzgünler Xray-yň içindäki gVisor stekini talap edýär.\n\nKöprü ikinji gezek işleýär. Linux-de üç sany boş ölçegde, ýerli Xray TUN-dan has takmynan 32–36 MiB fiziki ýat ulanyldy. Bu göçürip almak ýüküni ölçemeýär: CPU we ýat çykdajylary birikmelere baglydyr. sing-box-de hiç hili saýlaýjy ýok. Hiç bir stak her ulgamda has gowy işlemegi kepillendirmeýär. Ackygyndy saýlaň we toruňyzda synap görmek üçin “Apply” -y täzeden birikdiriň.\n\n## Sazlamalary ulanmak\n\nSerwer saýlamak awtomatiki birikdirilýär. Reodeim, hereketlendiriji, DNS we düzgün sazlamalary derrew saklanýar; işjeň birikme wagtynda, \"Goý\" düwmesine basyň we olary ulanmak üçin gaýtadan birikdiriň. Dwigateli täzeden açmak ýüklemeleri we jaňlary kesip biler. Gaýtalanyp basmak parallel baglanyşyklara başlamaz; aýyrmak birikmäni tamamlaýar we baglanyşygy boşadýar.\n\nInternet diňe VPN arkaly tunel gaçanda göni traffigi bloklaýar. Tutuş maşyna täsir edýär. Açyk aýyrmak Sora düzgünlerini aýyrýar. Arassalamak gutarmasa, birikmäni täzeden synap görüň we gündeligi açyň.\n\n## Taslama resminamalary\n\n- [sing-box-lx: konfigurasiýa we goldaw] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box resminamalary] (https://sing-box.sagernet.org/)\n- [Xray resminamalary] (https://xtls.github.io/)\n- [mihomo resminamalary] (https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: iş we çäklendirmeler] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP trafikini Jitsi, Yandex Telemost ýa-da WB Stream wideo jaňynyň üsti bilen geçirýär. olcrtc:// baglanyşygyny ýa-da QR koduny import ediň. Proksi we TUN režimlerinde sing-box, Xray we mihomo bilen işleýär; UDP goldanylmaýar. Iki tarapa-da gabat gelýän OLC2 ýygyndylary gerek. Başlangyç taslama arhiwlenen.\n';
+      'Serweriňiziň haýsy motora mätäçdigini bilmeýän bolsaňyz, Awto saýlaň. Sora birikmezden ozal profil we sazlamalary barlaýar. Dwigatel meýilnamaňyzyň geçiriş giňligini artdyryp bilmez: öndürijilik serwere, ugra, protokola we tora baglydyr.\n\n## Reesimler\n\n### traffichli traffik (TUN)\n\nSora wirtual tor interfeýsini döredýär we TCP we UDP ýaly programma trafigini ugrukdyrýar. Bu re modeimi Telegram, oýunlar we Discord sesi üçin ulanyň. Düzgünler belli bir saýtlary ýa-da programmalary gönüden-göni iberip ýa-da blokirläp biler. Tor hyzmaty, zerur protokoly goldaýan serwere we serwere mätäç.\n\n### System proksi\n\nSora ýerli HTTP / SOCKS proksi düzýär. Ulgam proksi sazlamalaryna hormat goýýan programmalar ony ulanýarlar. Öz torlary bilen goýmalar gönüden-göni birigip biler; UDP we sesli jaňlar adatça TUN gerek. Bu re modeim proksi goldawy bilen brauzerlere we programmalara laýyk gelýär.\n\n### Serwer ýok\n\nLinux-de, Sora HTTP / TLS haýyşlaryny bölmek we üýtgetmek we käbir DPI barlaglaryndan aýlanyp geçmek üçin [zapret] (https://github.com/bol-van/zapret) ulanýar. IP-iňiz şol bir ýagdaýda galýar we birikmeler göni web sahypasyna gidýär. Netijeler üpjün edijiňize we blokirleme usulyna baglydyr.\n\nHäzirki integrasiýa, TCP-den HTTP we TLS üçin tpws ulanýar. IP blokirlemesinden ýa-da UDP-den geçmeýär we Telegram-iň MTProto birikmelerini kepillendirip bilmeýär. Discord sesi, Telegram jaňlary we bu hili çäklendirmeler üçin TUN bilen VPN serwerini ulanyň.\n\n## Dwigateller\n\n### Awto\n\nSora ähli birikme meýilnamasyny goldaýan gurnalan hereketlendirijini saýlaýar: serwer protokollary, transportlar, toparlar, böleklere bölüniş we re modeim. Gabat gelmeýän el bilen saýlamak, häzirki baglanyşygy togtatmazdan ozal ret edilýär. Awto ýa-da başga dwigateli saýlaň we sazlamalary täzeden ulanyň.\n\n### sing-box\n\nTäze Sora paketleri [sing-box-lx] (https://github.com/Leadaxe/sing-box-lx), [sing-box] (https://github.com/SagerNet/sing-box), müşderi tarapyna XHTTP we VLESS Encryption goşýar. Sora gurluşy we mümkinçiliklerini ykrar edýär. XHTTP bolmazdan ýokary akym gurmak, diňe öz adyndan bu mümkinçiligi gazanyp bilmez.\n\nGoldaw berlen protokollara VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard we WireGuard we AmneziaWG AmneziaWG Doly Xray JSON profilleri Xray talap edýär. Täze AWG 3.x meýdanlaryny entek import edip bolmaýar. sing-box kompýuterdäki beýleki programmalaryň tapyp bilýän parol bilen goralýan ýerli dolandyryş portuny ulanýar.\n\n### Xray\n\n[Xray-core] (https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption we TLS böleklerini goldaýar. Şeýle hem, marşrutlaryny we toparlaryny gorap saklamak bilen doly üpjün ediji Xray profilini işleýär. Şeýle profilleri özlerini alyp barşyny üýtgetmän awtomatiki usulda başga motora öwrüp bolmaz.\n\nBaglanan Xray TLS şahadatnamasyny tassyklamagy (\"allowInsecure\") ýapýan sazlamany aýyrdy. Awto bu sazlamany talap edýän adaty serwerler üçin sing-box ýa-da mihomo saýlaýar. Xray saýlamak, häzirki birikmäni togtatmazdan ozal gabat gelmeýändigini habar berýär. Has köne JSON profillerinde barlanylýan şahadatnama ýa-da şahadatnama pin bilen täzelenen üpjün ediji profiline mätäç.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) ätiýaçlyk serwere yzygiderli geçiş toparlaryny, ýük paýlaşmagy, XHTTP we AmneziaWG goldaýar. Ätiýaçlyk serwere awtomatik geçmek möhüm bolsa, ony saýlaň. Sora-nyň TLS bölekleme sazlamasy bu ýadro bilen elýeterli däl.\n\n## Sora-de laýyklyk\n\n| Aýratynlyk | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN we TCP / UDP | Hawa | Hawa | Hawa |\n| XHTTP | Hawa | Hawa | Hawa |\n| VLESS Encryption | Hawa | Hawa | Hawa |\n| Doly Xray tertibi | | Ok | Hawa | | Ok |\n| TUIC / AnyTLS | Ikisi | | Ok | TUIC |\n| mieru | Ýok | Ýok | Hawa |\n| NaiveProxy | Hawa | Ýok | Ýok |\n| TLS bölekleri | Hawa | Hawa | | Ok |\n| AmneziaWG 1.x / 2.x | Hawa | | Ok | Hawa |\n| Yza gaýdyp gelen topar | | Ok | ²ok | Hawa |\n\nZ J1/J2/J3/Itime bolan profiller mihomo ulanýar; bu meýdanlar hiç haçan sessiz-üýnsüz taşlanmaly däldir. Complete Doly Xray profilleriniň topary üçin programma ätiýaçlyk profilini saýlaýar. Goldaw gurlan gurna baglydyr; hakda wersiýasyny barlaň.\n\n## TUN ýygyndysy\n\nStack wirtual interfeýsiň içinde TCP we UDP işleýär. Reesimler panelinde Xray we mihomo gVisor, System, Mixed we MIPS hödürleýär. Her hereketlendiriji öz islegini tygşytlaýar. System proksi we Serwersiz reesimler bu ileri tutmany ulanmaýarlar.\n\n- ** Mixed ** - TCP ulgam stakasyny ulanýar, gVisor bolsa UDP işleýär. Bu Linux-da mihomo üçin başlangyç görnüşdir. Windows-da Xray we mihomo başlangyç görnüş hökmünde MIPS ulanýar.\n- ** System ** - ulgam toplumyny ulanýar. Tor programmalarynda kynçylyklar ýüze çyksa, başga bir warianty synap görüň.\n- ** gVisor ** - ulanyjy giňişliginde traffigi dolandyrýar.\n- ** MIPS ** - mihomo-iň öz IP ýygyndysy, birleşdirilen 1.19.32 wersiýasynda bar.\n\nLinux-de, Xray gurnalan gVisor deslapky görnüşde ulanýar. Linux-de System, Mixed we MIPS mihomo-ni TUN hereketlendirijisi hökmünde ulanyp, TCP we UDP-ni tassyklanan ýerli SOCKS baglanyşygy arkaly Xray-e ugradýar. Xray protokoly, üpjün edijiniň profilini we marşrutyny saklaýar. Bu üç wariant gurnalan mihomo talap edýär. Windows-de Xray dört TUN stekiniň hemmesi üçin mihomo 1.19.32 ýa-da has täze wersiýany ulanýar. Protokollar we ugur kesgitlemek Xray-da galýar. Bu birleşmede programma düzgünleri diňe göni birikmäni we bloklamagy goldaýar; Linux-de bu düzgünler Xray-yň içindäki gVisor stekini talap edýär.\n\nKöprü ikinji gezek işleýär. Linux-de üç sany boş ölçegde, ýerli Xray TUN-dan has takmynan 32–36 MiB fiziki ýat ulanyldy. Bu göçürip almak ýüküni ölçemeýär: CPU we ýat çykdajylary birikmelere baglydyr. sing-box-de hiç hili saýlaýjy ýok. Hiç bir stak her ulgamda has gowy işlemegi kepillendirmeýär.\n\n## Sazlamalary ulanmak\n\nSerwer saýlananda birikme awtomatik täzeden gurulýar. Režime, ýadroga, DNS-e ýa-da düzgünlere girizen üýtgeşmeleriňiz gysga arakesmeden soň awtomatik gaýtadan birikmek bilen bir gezek ulanylýar; fondaky täzelenmeler VPN-i gaýtadan birikdirmeýär. Ýadrony täzeden başlatmak ýüklemeleri we jaňlary kesip biler.\n\nInternet diňe VPN arkaly tunel gaçanda göni traffigi bloklaýar. Tutuş maşyna täsir edýär. Açyk aýyrmak Sora düzgünlerini aýyrýar. Arassalamak gutarmasa, birikmäni täzeden synap görüň we gündeligi açyň.\n\n## Taslama resminamalary\n\n- [sing-box-lx: konfigurasiýa we goldaw] (https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box resminamalary] (https://sing-box.sagernet.org/)\n- [Xray resminamalary] (https://xtls.github.io/)\n- [mihomo resminamalary] (https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: iş we çäklendirmeler] (https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP trafikini Jitsi, Yandex Telemost ýa-da WB Stream wideo jaňynyň üsti bilen geçirýär. olcrtc:// baglanyşygyny ýa-da QR koduny import ediň. Proksi we TUN režimlerinde sing-box, Xray we mihomo bilen işleýär; UDP goldanylmaýar. Iki tarapa-da gabat gelýän OLC2 ýygyndylary gerek. Başlangyç taslama arhiwlenen.\n';
 
   @override
-  String get probeServers => 'Serwerleri barlaň';
+  String get probeServers => 'Ping';
 
   @override
   String get extensions => 'Giňeldişler';
@@ -907,13 +814,10 @@ class STk extends S {
   String get extInstallOne => '1 gurmak';
 
   @override
-  String get extSideloadWarning => 'Diňe awtoryň öz gol çeken açaryna ynanýan bolsaňyz guruň.';
+  String get extSideloadWarning => 'Özi gol çeken açar';
 
   @override
   String get extPermissionsWidened => 'Täzelenme täze rugsatlar soraýar:';
-
-  @override
-  String get extDangerousAck => 'Bu rugsatlaryň çynlakaýdygyna düşünýärin';
 
   @override
   String get extInstall => 'Gurna';
@@ -926,9 +830,6 @@ class STk extends S {
 
   @override
   String get extConfirm => 'Tassykla';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Katalog';
@@ -979,16 +880,13 @@ class STk extends S {
   String get extEmptySearch => 'Hiç zat tapylmady';
 
   @override
-  String get extEmptyInstalled => 'Entek giňeltmeler ýok.\nKatalogdan birini tapyň ýa-da bir faýldan guruň.';
+  String get extEmptyInstalled => 'Entek giňeltmeler ýok';
 
   @override
   String get extInstallFromFile => 'Faýldan guruň';
 
   @override
   String get extInstallFromUrl => 'URL-dan guruň';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Göçürip al';
@@ -1003,19 +901,16 @@ class STk extends S {
   String get extInstalling => 'Gurnalýar…';
 
   @override
-  String get extInstallFailed => 'Gurmak şowsuz';
-
-  @override
-  String get extErrSignature => 'Gol barlagy şowsuz boldy. Faýl zaýalanan ýa-da üýtgedilen bolup biler.';
+  String get extErrSignature => 'Gol barlagy şowsuz boldy';
 
   @override
   String get extErrManifest => 'Giňeldiş manifesti nädogry.';
 
   @override
-  String get extErrNetwork => 'Tor ýalňyşlygy. Baglanyşygyňyzy barlaň we gaýtadan synanyşyň.';
+  String get extErrNetwork => 'Tor ýalňyşlygy';
 
   @override
-  String get extErrHash => 'Göçürilen faýl katalogdakysyna gabat gelmeýär. Ol üýtgedilen bolup biler.';
+  String get extErrHash => 'Göçürilen faýl katalogdakysyna gabat gelmeýär';
 
   @override
   String extErrMinApp(String version) {
@@ -1026,11 +921,11 @@ class STk extends S {
   String get extErrHttpsOnly => 'Diňe https:// baglanyşyklara rugsat berilýär';
 
   @override
-  String get extErrGeneric => 'Bir zat nädogry boldy. Gaýtadan synanyşmagyňyzy haýyş edýäris.';
+  String get extErrGeneric => 'Bir zat nädogry boldy';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Bu täzelenme, gurnalan wersiýadan başga awtor açary bilen gol çekildi, şonuň üçin ol petiklendi. Täze açara ynanýan bolsaňyz, giňeltmäni aýyryň we aç-açan guruň.';
+      'Bu täzelenme, gurnalan wersiýadan başga awtor açary bilen gol çekildi, şonuň üçin ol petiklendi';
 
   @override
   String get extDisabled => 'Öçürilen';
@@ -1087,7 +982,7 @@ class STk extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count dawalary siziň kararyňyza mätäç';
+    return 'Giňeldiş gapma-garşylyklary: $count';
   }
 
   @override
@@ -1164,10 +1059,10 @@ class STk extends S {
   String get extPermThemeApply => 'Mowzuklary ulanyň';
 
   @override
-  String get extPermRoutingRules => 'Ugurlandyryş düzgünlerini goşmak (tor trafiginiň ugruna täsir edýär)';
+  String get extPermRoutingRules => 'Ugurlandyryş düzgünlerini goşmak';
 
   @override
-  String get extPermNetHooks => 'Tor ýoluna goşulyň (DPI aýlaw modullary)';
+  String get extPermNetHooks => 'Tor ýoluna goşulyň';
 
   @override
   String get extPermNetFetch => 'Rugsat berlen sanawdan URL haýyş';
@@ -1176,7 +1071,7 @@ class STk extends S {
   String get extPermBackground => 'Fon meselelerini işlediň';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Öçürilen';
 
   @override
   String get extCapBackground => 'Fonda işleýär';
@@ -1214,9 +1109,6 @@ class STk extends S {
   String get extSortRelevance => 'Degişlilik';
 
   @override
-  String get extPermNetworkDetail => 'VPN haýyşlaryna diňe aşakdaky hostlara rugsat berilýär.';
-
-  @override
   String get extBgTitle => 'Fon işi';
 
   @override
@@ -1238,9 +1130,6 @@ class STk extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Fon işini dolandyrmak üçin giňeldişi işjeňleşdiriň.';
-
-  @override
   String get extCapNetwork => 'Tora giriş';
 
   @override
@@ -1257,7 +1146,7 @@ class STk extends S {
   String get diagnosticHttp => 'HTTP anyklaýyş';
 
   @override
-  String get diagnosticNoData => 'Entek ýazylan haýyş ýok. Ilki bilen tizlik synag web sahypasyny açyň.';
+  String get diagnosticNoData => 'Entek ýazylan haýyş ýok';
 
   @override
   String get qrShareTitle => 'QR kody paýlaşyň';
@@ -1267,12 +1156,6 @@ class STk extends S {
 
   @override
   String get qrCopyLink => 'Baglanyşygy göçüriň';
-
-  @override
-  String get qrWarning => 'Kody diňe ynanýan adamlaryňyz bilen paýlaşyň.';
-
-  @override
-  String get qrScanHint => 'QR kodly ekran suratyny ýa-da suraty saýlaň, ýa-da salgyny goýuň';
 
   @override
   String get qrFromClipboard => 'Buferden goýuň';
@@ -1353,29 +1236,10 @@ class STk extends S {
   String get dnsLeakCheckKillSwitchDns => 'Tor gulpynyň DNS goragy';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Ýokardaky DNS sazlamalarynda tuneliň DNS-ini belläň.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'Ulgamyňyzyň tunelden daşarda haýsy çözgütleri ulanjakdygyny barlaň.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS trafiginiň tunelde galmagy üçin tor gulpyny açyň.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Ulgamyň şifrlenen DNS-i';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Galp DNS jogaplar';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => 'Ulgamyň tuneliň daşynda ulanýan haýsy kodlanan DNS nokatlaryny barlaň.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'At çözüjiler jogaplary galplaşdyryp bilmez ýaly, tunelde şifrlenen DNS (DoT ýa-da DoH) ulanyň.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Ilki VPN birikdiriň, soňra syzyşlary barlaň.';
 
   @override
   String get dnsExpected => 'Garaşylýar';
@@ -1402,7 +1266,7 @@ class STk extends S {
   String get autoSelectSmart => 'Akylly saýlaw';
 
   @override
-  String get coreWatchUnstable => 'Ýadro bilen aragatnaşyk durnuksyz. Biraz garaşyp, täzeden birikmäge synanyşyň.';
+  String get coreWatchUnstable => 'Ýadro bilen aragatnaşyk durnuksyz';
 
   @override
   String get watchReconnect => 'Täzeden birik';
@@ -1441,7 +1305,7 @@ class STk extends S {
   String get overrideCustomRules => 'Öz düzgünleriňiz';
 
   @override
-  String get errBenchmarkUnsupported => 'Tizligi ölçemek üçin ýadronyň has täze wersiýasy gerek. Sora-ny täzeläň.';
+  String get errBenchmarkUnsupported => 'Tizligi ölçemek üçin ýadronyň has täze wersiýasy gerek';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1452,7 +1316,7 @@ class STk extends S {
   String get profiles => 'Tor profilleri';
 
   @override
-  String get profilesEmpty => 'Entek profil ýok. Belli ulgamlarda sazlamalary awtomatiki ulanmak üçin birini dörediň.';
+  String get profilesEmpty => 'Entek profil ýok';
 
   @override
   String get profileAdd => 'Profil goşuň';
@@ -1464,9 +1328,6 @@ class STk extends S {
   String get profileSsids => 'Wi-Fi torlary (SSID)';
 
   @override
-  String get profileSsidsHint => 'Öý, ofis vergul bilen bölünýär';
-
-  @override
   String get profileGateways => 'Tor şlýuzalary';
 
   @override
@@ -1474,9 +1335,6 @@ class STk extends S {
 
   @override
   String get profileAutoApply => 'Awtomatiki ulanmak';
-
-  @override
-  String get profileAutoApplyHint => 'Öçürilen bolsa, profili ulanmazdan öň tassyklama soralýar.';
 
   @override
   String get profileSnapshot => 'Häzirki sazlamalary ýadyňyzda saklaň';
@@ -1520,13 +1378,13 @@ class STk extends S {
   String get networkUnknown => 'Ulgam maglumatlary elýeterli däl';
 
   @override
-  String get profileNoTriggers => 'Iň azyndan bir trigger goşuň: SSID, şlýuz ýa-da ASN';
+  String get profileNoTriggers => 'Profil şertleri ýok';
 
   @override
   String get chains => 'Proksi zynjyrlary';
 
   @override
-  String get chainsEmpty => 'Entek zynjyr ýok. 2-3 serweri baglanyşdyryň, şonuň üçin olaryň hersinden trafik çykýar.';
+  String get chainsEmpty => 'Entek zynjyr ýok';
 
   @override
   String get chainAdd => 'Täze zynjyr';
@@ -1535,16 +1393,10 @@ class STk extends S {
   String get chainName => 'Zynjyryň ady';
 
   @override
-  String get chainPickServers => '2-3 serwer saýlaň';
+  String get chainTooFew => 'Zynjyr üçin azyndan iki serwer gerek';
 
   @override
-  String get chainOrderHint => 'Tertibe salmak üçin süýräň: traffik ýokarsyna girýär we aşagyndan çykýar.';
-
-  @override
-  String get chainTooFew => 'Zynjyr üçin azyndan iki serwer gerek. Ýene bir serwer goşuň.';
-
-  @override
-  String get chainTooMany => 'Zynjyrda iň köp üç serwer bolup biler. Artykmaç serwerleri aýyryň.';
+  String get chainTooMany => 'Zynjyrda iň köp üç serwer bolup biler';
 
   @override
   String get chainEstimate => 'Takmynan gijä galmak';
@@ -1561,12 +1413,10 @@ class STk extends S {
   }
 
   @override
-  String get chainUnsupported =>
-      'Saýlanan hereketlendiriji zynjyrlary goldamaýar. Gabat gelýän hereketlendirijini saýlaň.';
+  String get chainUnsupported => 'Saýlanan hereketlendiriji zynjyrlary goldamaýar';
 
   @override
-  String get chainHopMissing =>
-      'Zynjyrdaky serwerleriň biri indi elýeterli däl. Şol basgançak üçin başga serwer saýlaň.';
+  String get chainHopMissing => 'Zynjyrdaky serwerleriň biri indi elýeterli däl';
 
   @override
   String chainHop(Object n) {
@@ -1586,7 +1436,7 @@ class STk extends S {
   String get syncDevices => 'Enjamlarym';
 
   @override
-  String get syncEmpty => 'Jübütlenen enjam ýok. Ýerli tor arkaly başga enjamy jübütläň.';
+  String get syncEmpty => 'Jübütlenen enjam ýok';
 
   @override
   String get syncPair => 'Enjamy jübütle';
@@ -1614,9 +1464,6 @@ class STk extends S {
   String get syncNever => 'Hiç haçan';
 
   @override
-  String get syncNoLan => 'Enjamlar şol bir ýerli ulgamda bolmaly';
-
-  @override
   String get syncPaired => 'Enjam jübütlendi';
 
   @override
@@ -1626,17 +1473,10 @@ class STk extends S {
   String get syncWaiting => 'Beýleki enjama garaşmak…';
 
   @override
-  String get syncSecureNote => 'Kanal uçdan-uja şifrlenen. Hasap we bulut serwerleri gerek däl.';
-
-  @override
   String get zapretWithVpn => 'Göni tor trafigi üçin süzgüçden DPI aýlaň';
 
   @override
-  String get zapretWithVpnHint =>
-      'zapret VPN tuneli bilen bir wagtda işleýär: tuneliň trafigi VPN arkaly, göni trafik bolsa böwetden aýlanyp geçiş serişdesi arkaly geçýär.';
-
-  @override
-  String get chainDuplicate => 'Zynjyrda şol bir serwer gaýtalanýar. Her basgançak üçin başga serwer saýlaň.';
+  String get chainDuplicate => 'Zynjyrda şol bir serwer gaýtalanýar';
 
   @override
   String get edit => 'Redaktirläň';
@@ -1646,10 +1486,6 @@ class STk extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Hil pese düşende awtomatiki geçmek';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Saýlanan serwer ep-esli haýallasa ýa-da jogap bermese, Sora ölçeg boýunça iň gowy serwere geçýär, ýöne her 10 minutda bir gezekden köp däl.';
 
   @override
   String get tunStackMixed => 'Garyşyk';
@@ -1667,19 +1503,13 @@ class STk extends S {
   String get customServerName => 'Ady';
 
   @override
-  String get customServerNameHint => 'Mysal üçin: meniň VPS';
-
-  @override
-  String get customServerNameRequired => 'Adyny giriziň';
+  String get customServerNameRequired => 'At görkezilmedi';
 
   @override
   String get customServerAddress => 'Salgysy';
 
   @override
-  String get customServerAddressHint => 'example.com ýa-da 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Serweriň salgysyny giriziň';
+  String get customServerAddressRequired => 'Salgy görkezilmedi';
 
   @override
   String get customServerAddressInvalid => 'Nädogry salgy';
@@ -1688,19 +1518,13 @@ class STk extends S {
   String get customServerPort => 'Port';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Port 1-den 65535-e çenli san bolmaly';
+  String get customServerPortInvalid => 'Port nädogry';
 
   @override
   String get customServerProtocol => 'Protokol';
 
   @override
   String get customServerCredentials => 'Giriş maglumatlary';
-
-  @override
-  String get customServerOptional => 'Hökmany däl';
 
   @override
   String get customServerShowSecret => 'Gizlin maglumaty görkez';
@@ -1714,23 +1538,13 @@ class STk extends S {
   }
 
   @override
-  String get customServerTest => 'Synag';
-
-  @override
   String get leakTestTitle => 'Maglumatlaryň syzmagy üçin synag';
-
-  @override
-  String get leakTestIntro =>
-      'Trafigiň enjamdan tuneliň daşyndan çykyp bilýändigini barlaýar: göni DNS we ICMP talaplary, IPv6 çykyşy we ulgamyň at çözüjileri. Birikme işjeň wagty işlediň.';
 
   @override
   String get leakTestRun => 'Barlaň';
 
   @override
   String get leakTestCancel => 'Ýatyr';
-
-  @override
-  String get leakTestNeedsConnection => 'Maglumatlaryň syzmagyny barlamak üçin VPN birikdiriň.';
 
   @override
   String leakTestProgress(int count) {
@@ -1756,9 +1570,6 @@ class STk extends S {
 
   @override
   String get leakTestFix => 'düzediň';
-
-  @override
-  String get leakTestFixedNote => 'Tor gulpy açyk. Barlamak üçin synagy gaýtadan işlediň.';
 
   @override
   String get leakTestCheckDirectDns => 'Göni DNS';
@@ -1791,14 +1602,13 @@ class STk extends S {
   String get syncDaemonFailed => 'Sinhronlamak hyzmatyny başlap bolmady';
 
   @override
-  String get syncDaemonMissing => 'sora-sync komponenti tapylmady. Enjamy sinhronlamak üçin programmany täzeden guruň.';
+  String get syncDaemonMissing => 'sora-sync komponenti tapylmady';
 
   @override
   String get syncDaemonStarting => 'Sinhronlamak hyzmatyna başlamak…';
 
   @override
-  String get syncErrAuth =>
-      'Sinhronlamak hyzmaty giriş belligini ret etdi. Programmany täzeden açyň we gaýtadan synanyşyň.';
+  String get syncErrAuth => 'Sinhronlamak hyzmaty giriş belligini ret etdi';
 
   @override
   String get syncErrNotFound => 'Enjam indi jübütlenenok';
@@ -1807,7 +1617,7 @@ class STk extends S {
   String get syncErrPairingActive => 'Jübütlemek sessiýasy eýýäm açyk';
 
   @override
-  String get syncErrUnreachable => 'Beýleki enjam jogap bermedi. Şol bir torda we koduny görkezýändigine göz ýetiriň.';
+  String get syncErrUnreachable => 'Beýleki enjam jogap bermedi';
 
   @override
   String get syncError => 'Sinhronizasiýa säwligi';
@@ -1819,10 +1629,6 @@ class STk extends S {
 
   @override
   String get syncJoining => 'Enjam bilen jübütlemek…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Köne enjamlaryň sanawy aslynda jübütlenmedi, şonuň üçin arassalandy. Enjamlaryňyzy täzeden jübütläň, bu gezek hakyky.';
 
   @override
   String get syncNewCode => 'Täze kod';
@@ -1882,8 +1688,7 @@ class STk extends S {
   String get syncThisDevice => 'Bu enjam';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android-de sinhronizasiýa elýeterli däl';
 
   @override
   String get diagnosticPackets => 'Paket almak';
@@ -1930,27 +1735,25 @@ class STk extends S {
   String get customServerWgKeepalive => 'Keepalive, sekunt';
 
   @override
-  String get customServerWgKeyInvalid => 'Açar wg genkey çykarşy ýaly base64-de 32 baýt bolmaly.';
+  String get customServerWgKeyInvalid => 'WireGuard açary nädogry';
 
   @override
-  String get customServerWgCidrInvalid => 'Otur bilen bölünen prefiksleri giriziň, meselem 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'CIDR prefiksi nädogry';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0-dan 65535-e çenli sekunt sanyny giriziň.';
+  String get customServerWgKeepaliveInvalid => 'Keepalive aralygy nädogry';
 
   @override
   String get strictKillSwitch => 'Berk tor gulpy';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Birikdirilenden soň näsazlyk, gaýtadan başlatmak ýa-da programmadan çykmak wagtynda hem VPN-den daşarky traffigi petikleýär. Giriş diňe baglanyşyk kesilende ýa-da bu sazlama öçürilende dikeldilýär. Enjam gaýtadan açylanda petikleme diňe başlangyçda birikmek işjeň bolsa dowam edýär.';
+  String get strictKillSwitchWarning => 'Çykandan soň VPN daşyndaky traffigi blokirlemelimi?';
 
   @override
-  String get extWorkerFailed => 'Giňeltmäniň fon işi şowsuz boldy. Giňeltmäniň ýazgylaryny barlaň.';
+  String get extWorkerFailed => 'Giňeltmäniň fon işi şowsuz boldy';
 
   @override
-  String get extAssetRejected =>
-      'Giňeltme faýlynda okamagy kynlaşdyrýan reňkler ýa-da nädogry düzgünler bar. Giňeltmäniň awtoryndan faýly düzetmegini soraň.';
+  String get extAssetRejected => 'Giňeltme faýlynda okamagy kynlaşdyrýan reňkler ýa-da nädogry düzgünler bar';
 
   @override
   String get extVerifiedSora => 'Sora tarapyndan barlanan';
@@ -1976,31 +1779,25 @@ class STk extends S {
   String get customServerPassword => 'Açar sözi';
 
   @override
-  String get customServerSecretRequired => 'Baha giriziň';
+  String get customServerSecretRequired => 'Baha görkezilmedi';
 
   @override
   String get customServerLinkInvalid => 'Serwer salgysy nädogry';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora içki ýalňyşlygy';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Serweriň sertifikaty ret edildi';
 
   @override
-  String get errInternal => 'Sora içki ýalňyşlygy. Žurnaly ýazdyryň we näsazlygy habar beriň.';
+  String get errFileAccess => 'Faýla girip bolmaýar';
 
   @override
-  String get errTls => 'Serweriň sertifikaty ret edildi. Sagady barlaň ýa-da üpjün edijä ýüz tutuň.';
+  String get errDataLimit => 'Maglumat aşa köp';
 
   @override
-  String get errFileAccess => 'Faýla girip bolmaýar. Rugsatlary we boş ýeri barlaň.';
-
-  @override
-  String get errDataLimit => 'Maglumat aşa köp. Azrak element saýlap, gaýtadan synanyşyň.';
-
-  @override
-  String get errCredentials => 'Ýatda saklanan giriş maglumatlary ýok. Serweri gaýtadan import ediň.';
+  String get errCredentials => 'Ýatda saklanan giriş maglumatlary ýok';
 
   @override
   String subscriptionStale(String time) {
@@ -2008,54 +1805,54 @@ class STk extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Entek täzelenmedi. Gaýtadan synanyşyň.';
+  String get subscriptionNeverUpdated => 'Entek täzelenmedi';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Serwer HTTP $status koduny gaýtardy. Salgyny barlaň ýa-da üpjün edijä ýüz tutuň.',
-      zero: 'Serwer talaby ret etdi. Salgyny barlaň ýa-da üpjün edijä ýüz tutuň.',
+      other: 'Serwer HTTP $status koduny gaýtardy',
+      zero: 'Serwer talaby ret etdi',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Serwer sazlamalary doly däl ýa-da goldanylmaýar. Abunalygy täzeläň.';
+  String get errInvalidServer => 'Serwer sazlamalary doly däl ýa-da goldanylmaýar';
 
   @override
-  String get errServerIds => 'Iki serweriň kesgitleýjisi birmeňzeş. Olary gaýtadan import ediň.';
+  String get errServerIds => 'Iki serweriň kesgitleýjisi birmeňzeş';
 
   @override
-  String get errRoutingGroup => 'Marşrut ýok serwerlere ýa-da bozulan topara salgylanýar. Abunalygy täzeläň.';
+  String get errRoutingGroup => 'Marşrut ýok serwerlere ýa-da bozulan topara salgylanýar';
 
   @override
-  String get errConnections => 'Birikmeleriň sanawy elýeterli däl. Birigiň ýa-da başga hereketlendiriji saýlaň.';
+  String get errConnections => 'Birikmeleriň sanawy elýeterli däl';
 
   @override
-  String get errLogs => 'Bu hyzmat žurnal ýöretmeýär. Sora-ny täzeläň.';
+  String get errLogs => 'Bu hyzmat žurnal ýöretmeýär';
 
   @override
-  String get errDiagnostics => 'Diagnostikany ýygnap bolmady. Gaýtadan synanyşyň ýa-da žurnaly ýazdyryň.';
+  String get errDiagnostics => 'Diagnostikany ýygnap bolmady';
 
   @override
-  String get errMissingItem => 'Soralan element indi ýok. Sanawy täzeläň.';
+  String get errMissingItem => 'Soralan element indi ýok';
 
   @override
-  String get errInvalidRequest => 'Haýyşda nädogry bahalar bar. Girizen maglumatlaryňyzy barlap, gaýtadan synanyşyň.';
+  String get errInvalidRequest => 'Haýyşda nädogry bahalar bar';
 
   @override
-  String get errProxyLogin => 'Ulgam proksisi bu girişi goldamaýar. Ýerli proksiniň ulanyjy adyny we parolyny aýryň.';
+  String get errProxyLogin => 'Ulgam proksisi bu girişi goldamaýar';
 
   @override
-  String get errLogFilter => 'Žurnal süzgüji nädogry. Gözlegi arassalap, gaýtadan synanyşyň.';
+  String get errLogFilter => 'Žurnal süzgüji nädogry';
 
   @override
-  String get errSubRedirect => 'Serwer howply salga gönükdirdi. Üpjin edijiden täze salgy soraň.';
+  String get errSubRedirect => 'Serwer howply salga gönükdirdi';
 
   @override
-  String get errProxySetup => 'Ulgam proksisini sazlap bolmady. Gaýtadan birigiň ýa-da žurnaly açyň.';
+  String get errProxySetup => 'Ulgam proksisini sazlap bolmady';
 
   @override
   String get notificationsToday => 'Şu gün';
@@ -2081,17 +1878,46 @@ class STk extends S {
   }
 
   @override
-  String get errSubInterval => 'Abunalygyň täzelenme aralygy nädogry. Üpjün edijiniň maslahat berýän aralygyny saýlaň.';
+  String get errSubInterval => 'Abunalygyň täzelenme aralygy nädogry';
 
   @override
-  String get errRule => 'Ugurlama düzgüninde ýalňyşlyk bar. Düzgündäki domeni, IP salgysyny ýa-da programmany barlaň.';
+  String get errRule => 'Ugurlama düzgüninde ýalňyşlyk bar';
 
   @override
-  String get errDns => 'DNS sazlamalary nädogry. DNS serweriniň salgysyny barlaň.';
+  String get errDns => 'DNS sazlamalary nädogry';
 
   @override
-  String get errEndpoint => 'Barlanjak serweriň salgysy nädogry. Host adyny we porty barlaň.';
+  String get errEndpoint => 'Barlanjak serweriň salgysy nädogry';
 
   @override
-  String get errCancelled => 'Talap ýatyryldy. Zerur bolsa, amaly gaýtalaň.';
+  String get errCancelled => 'Talap ýatyryldy';
+
+  @override
+  String get customServerOptions => 'Birikme sazlamalary';
+
+  @override
+  String get customServerTransport => 'Geçiriş';
+
+  @override
+  String get customServerSecurity => 'Howpsuzlyk';
+
+  @override
+  String get customServerCipher => 'Şifr';
+
+  @override
+  String get customServerWgInterface => 'Interfeýs';
+
+  @override
+  String get customServerWgPeer => 'Deňdeş';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Elýeterli platformalar: $platforms.';
+  }
+
+  @override
+  String get winwsScopeWarning => 'Ähli programmalaryň TCP traffigini üýtgetmelimi?';
+
+  @override
+  String get winwsRequirements => 'Bu VPN tertibi elýeterli däl';
 }

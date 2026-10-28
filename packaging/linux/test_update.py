@@ -1,6 +1,7 @@
 """Exercise the privileged helper in a mount/user namespace with no host writes."""
 
 import hashlib
+import os
 import pathlib
 import shutil
 import subprocess
@@ -23,26 +24,50 @@ class UpdateHelperTest(unittest.TestCase):
         target.chmod(0o755)
         return target
 
-    def prepare(self, format):
+    def prepare(self, format, architecture="amd64"):
+        machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
         files = {
-            "deb": ["sora-core_1.0.5_amd64.deb", "sora_1.0.5_amd64.deb"],
-            "rpm": ["sora-core-1.0.5-1.x86_64.rpm", "sora-1.0.5-1.x86_64.rpm"],
-            "arch": ["sora-core-1.0.5-1-x86_64.pkg.tar.zst", "sora-1.0.5-1-x86_64.pkg.tar.zst"],
+            "deb": [f"sora-core_1.0.5_{architecture}.deb", f"sora_1.0.5_{architecture}.deb"],
+            "rpm": [f"sora-core-1.0.5-1.{machine}.rpm", f"sora-1.0.5-1.{machine}.rpm"],
+            "arch": [f"sora-core-1.0.5-1-{machine}.pkg.tar.zst", f"sora-1.0.5-1-{machine}.pkg.tar.zst"],
         }[format]
         checksums = []
         for name in files:
             data = ("Package fixture " + name).encode()
             (self.downloads / name).write_bytes(data)
             checksums.append(hashlib.sha256(data).hexdigest() + "  " + name + "\n")
+        metadata = b'{"schema":1}\n'
+        (self.downloads / "release.json").write_bytes(metadata)
+        checksums.append(hashlib.sha256(metadata).hexdigest() + "  release.json\n")
         (self.downloads / "SHA256SUMS").write_text("".join(checksums))
+        # Crypto is exercised by the native/Dart signature tests. This suite
+        # isolates the helper's snapshot, invocation and installer boundary.
+        (self.downloads / "SHA256SUMS.minisig").write_text("verifier contract fixture\n")
         return files
 
     def run_helper(self, format, version="1.0.5", bad_metadata=False, zypper=False, dependency_failure=False,
-                   installed="1.0.4", extra=()):
-        recorder = 'printf "%s\\n" "$@" > /tmp/test/calls'
+                   installed="1.0.4", extra=(), signature_failure=False, missing_verifier=False, signed_size=None, old_verifier=False,
+                   native_verifier=False, architecture="amd64", bad_architecture=False):
+        recorder = '[ -f /tmp/test/verification ] && printf "%s\\n" "$@" > /tmp/test/calls'
         # The query fakes also report the installed sora-core version
         # (TEST_INSTALLED) for the helper's downgrade protection.
         scripts = {
+            "sora-core": 'if [ "$1" = -prepare-update ]; then [ "${TEST_OLD_VERIFIER:-0}" = 0 ];'
+                         ' [ "$3" = -release-version ] && [ "$4" = 1.0.5 ];'
+                         ' [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]; case "$6" in /var/tmp/sora-update.*) ;; *) exit 1;; esac;'
+                         ' case "$2" in deb) files="sora-core_1.0.5_amd64.deb sora_1.0.5_amd64.deb";;'
+                         ' rpm) files="sora-core-1.0.5-1.x86_64.rpm sora-1.0.5-1.x86_64.rpm";;'
+                         ' arch) files="sora-core-1.0.5-1-x86_64.pkg.tar.zst sora-1.0.5-1-x86_64.pkg.tar.zst";; *) exit 1;; esac;'
+                         ' if [ -e "$5/release.json" ] || [ -L "$5/release.json" ]; then files="$files release.json"; fi;'
+                         ' for name in SHA256SUMS SHA256SUMS.minisig $files; do'
+                         ' [ -f "$5/$name" ] && [ ! -L "$5/$name" ]; cp -P -- "$5/$name" "$6/$name"; done; exit 0; fi;'
+                         ' [ "$1" = -verify-release ] && [ "$3" = -release-version ] &&'
+                         ' [ "$4" = 1.0.5 ]; case "$2" in /var/tmp/sora-update.*) ;; *) exit 1;; esac;'
+                         ' [ -f "$2/SHA256SUMS" ] && [ -f "$2/SHA256SUMS.minisig" ];'
+                         ' [ "${TEST_SIGNATURE_FAILURE:-0}" = 0 ]; case "$#" in'
+                         ' 4) printf "%s\\n" "$@" > /tmp/test/verification;;'
+                         ' 8) [ "$5" = -release-artifact ] && [ "$7" = -release-target ] && [ "$8" = linux/amd64 ];'
+                         ' if [ "$TEST_SIGNED_SIZE" = auto ]; then wc -c <"$2/$6"; else printf "%s\\n" "$TEST_SIGNED_SIZE"; fi;; *) exit 1;; esac',
             "dpkg-query": 'case "$1" in -S) echo "sora: /usr/lib/sora/app/sora";; -W) case "$2" in'
                           " -f='${Version}') echo \"$TEST_INSTALLED\";; *) echo installed;; esac;;"
                           " *) exit 1;; esac",
@@ -59,14 +84,30 @@ class UpdateHelperTest(unittest.TestCase):
             "apt-get": recorder,
             "zypper" if zypper else "dnf": recorder,
         }
+        machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
+        if architecture == "arm64":
+            scripts = {name: body.replace("amd64", "arm64").replace("x86_64", "aarch64")
+                       for name, body in scripts.items()}
+        scripts["uname"] = f"printf '%s\\n' '{machine}'"
+        if bad_architecture:
+            other = "amd64" if architecture == "arm64" else "arm64"
+            other_machine = "x86_64" if architecture == "arm64" else "aarch64"
+            scripts["dpkg-deb"] = scripts["dpkg-deb"].replace(f"Architecture) echo {architecture}", f"Architecture) echo {other}")
+            scripts["rpm"] = scripts["rpm"].replace(f"%s %s-1 {machine}", f"%s %s-1 {other_machine}")
+        if missing_verifier:
+            del scripts["sora-core"]
+        if native_verifier:
+            scripts["sora-core"] = '/tmp/test/test-tools/sora-verifier "$@"; if [ "$1" = -verify-release ] && [ "$#" = 4 ]; then' \
+                                   ' printf "%s\\n" "$@" > /tmp/test/verification; fi'
         command = [
-            "bwrap", "--unshare-all", "--share-net", "--uid", "0", "--gid", "0", "--die-with-parent",
+            "bwrap", "--unshare-all", "--uid", "0", "--gid", "0", "--die-with-parent",
             "--ro-bind", "/", "/", "--tmpfs", "/run", "--tmpfs", "/tmp",
             "--dev", "/dev",
             "--tmpfs", "/var/tmp", "--tmpfs", "/usr/bin", "--bind", str(self.root), "/tmp/test",
         ]
         command += ["--setenv", "TEST_INSTALLED", installed]
-        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut"]:
+        command += ["--setenv", "TEST_SIGNED_SIZE", "auto" if signed_size is None else signed_size]
+        for name in ["sh", "id", "uname", "cp", "rm", "grep", "awk", "mktemp", "sha256sum", "sed", "cut", "wc"]:
             command += ["--ro-bind", str(pathlib.Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
         for name, body in scripts.items():
             command += ["--ro-bind", str(self.script(name, body)), "/usr/bin/" + name]
@@ -74,6 +115,10 @@ class UpdateHelperTest(unittest.TestCase):
             command += ["--setenv", "TEST_VERSION", "1.0.4"]
         if dependency_failure:
             command += ["--setenv", "TEST_DEPENDENCY_FAILURE", "1"]
+        if signature_failure:
+            command += ["--setenv", "TEST_SIGNATURE_FAILURE", "1"]
+        if old_verifier:
+            command += ["--setenv", "TEST_OLD_VERIFIER", "1"]
         command += ["--", "/bin/sh", "/tmp/test/sora-update", format, version, "/tmp/test/downloads", *extra]
         return subprocess.run(command, capture_output=True, text=True, timeout=10)
 
@@ -109,6 +154,10 @@ class UpdateHelperTest(unittest.TestCase):
                 packages = [item for item in arguments if item.startswith("/var/tmp/")]
                 self.assertEqual([pathlib.Path(item).name for item in packages], files)
                 self.assertEqual(len(packages), 2)
+                verification = (self.root / "verification").read_text().splitlines()
+                self.assertEqual(verification[0], "-verify-release")
+                self.assertTrue(verification[1].startswith("/var/tmp/sora-update."))
+                self.assertEqual(verification[2:], ["-release-version", "1.0.5"])
                 (self.root / "calls").unlink()
 
     def test_arch_dependency_failure_leaves_the_installed_pair_untouched(self):
@@ -119,8 +168,33 @@ class UpdateHelperTest(unittest.TestCase):
         arguments = (self.root / "dependencies").read_text().splitlines()
         self.assertEqual(arguments, ["-S", "--noconfirm", "--needed", "gst-plugins-good"])
 
+    def test_arm64_package_pair_is_one_transaction(self):
+        for format, zypper in [("deb", False), ("rpm", False), ("rpm", True), ("arch", False)]:
+            with self.subTest(format=format, zypper=zypper):
+                files = self.prepare(format, "arm64")
+                result = self.run_helper(format, architecture="arm64", zypper=zypper)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                arguments = (self.root / "calls").read_text().splitlines()
+                self.assertEqual([pathlib.Path(item).name for item in arguments if item.startswith("/var/tmp/")], files)
+                (self.root / "calls").unlink()
+
+    def test_wrong_arm64_package_headers_never_install(self):
+        for format in ("deb", "rpm"):
+            with self.subTest(format=format):
+                self.prepare(format, "arm64")
+                result = self.run_helper(format, architecture="arm64", bad_architecture=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("unexpected", result.stderr)
+                self.assertFalse((self.root / "calls").exists())
+
+    def test_arm64_never_uses_an_amd64_only_download_pair(self):
+        self.prepare("deb", "amd64")
+        result = self.run_helper("deb", architecture="arm64")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.root / "calls").exists())
+
     def test_reject_corrupt_missing_duplicate_and_symlink_inputs(self):
-        for problem in ["corrupt", "missing", "duplicate", "symlink", "metadata", "version", "format"]:
+        for problem in ["corrupt", "missing", "duplicate", "symlink", "missing-signature", "signature-symlink", "metadata", "version", "format"]:
             with self.subTest(problem=problem):
                 for item in self.downloads.iterdir():
                     item.unlink()
@@ -136,6 +210,12 @@ class UpdateHelperTest(unittest.TestCase):
                     target = self.downloads / files[0]
                     target.unlink()
                     target.symlink_to(files[1])
+                elif problem == "missing-signature":
+                    (self.downloads / "SHA256SUMS.minisig").unlink()
+                elif problem == "signature-symlink":
+                    target = self.downloads / "SHA256SUMS.minisig"
+                    target.unlink()
+                    target.symlink_to("SHA256SUMS")
                 result = self.run_helper(
                     "unknown" if problem == "format" else "deb",
                     version="1.0.5;touch /tmp/test/escaped" if problem == "version" else "1.0.5",
@@ -145,6 +225,93 @@ class UpdateHelperTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout)
                 self.assertFalse((self.root / "calls").exists())
                 self.assertFalse((self.root / "escaped").exists())
+
+    def test_untrusted_release_or_missing_installed_verifier_never_installs(self):
+        self.prepare("deb")
+        downloaded = self.downloads / "sora-core"
+        downloaded.write_text("#!/bin/sh\nprintf used > /tmp/test/escaped\nexit 0\n")
+        downloaded.chmod(0o755)
+        for arguments in ({"signature_failure": True}, {"missing_verifier": True}, {"old_verifier": True}):
+            with self.subTest(arguments=arguments):
+                result = self.run_helper("deb", **arguments)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("release snapshot verification failed", result.stderr)
+                self.assertFalse((self.root / "calls").exists())
+                self.assertFalse((self.root / "escaped").exists())
+
+    def test_declared_release_metadata_is_snapshotted_and_hash_checked(self):
+        for problem in ("valid", "empty", "missing", "corrupt", "symlink", "oversize", "unlisted"):
+            with self.subTest(problem=problem):
+                for item in self.downloads.iterdir():
+                    item.unlink()
+                self.prepare("deb")
+                metadata = self.downloads / "release.json"
+                sums = self.downloads / "SHA256SUMS"
+                if problem == "unlisted":
+                    sums.write_text("".join(line for line in sums.read_text().splitlines(keepends=True) if not line.endswith("  release.json\n")))
+                elif problem == "empty":
+                    metadata.write_bytes(b"")
+                elif problem == "missing":
+                    metadata.unlink()
+                elif problem == "corrupt":
+                    metadata.write_bytes(b"changed\n")
+                elif problem == "symlink":
+                    metadata.unlink()
+                    metadata.symlink_to("SHA256SUMS")
+                elif problem == "oversize":
+                    metadata.write_bytes(b"x" * (1048576 + 1))
+                result = self.run_helper("deb")
+                self.assertNotIn("bwrap:", result.stderr)
+                self.assertEqual(result.returncode == 0, problem == "valid", result.stdout + result.stderr)
+                self.assertEqual((self.root / "calls").exists(), problem == "valid")
+                if (self.root / "calls").exists():
+                    (self.root / "calls").unlink()
+
+    def test_size_query_is_required_and_enforced_before_installation(self):
+        self.prepare("deb")
+        for size in ("0", "1", "999", "2147483649", "", "verified", "1;touch /tmp/test/escaped"):
+            with self.subTest(size=size):
+                result = self.run_helper("deb", signed_size=size)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertFalse((self.root / "calls").exists())
+                self.assertFalse((self.root / "escaped").exists())
+
+    def test_real_native_snapshot_and_signature_before_package_manager(self):
+        architecture = "arm64" if os.uname().machine in ("aarch64", "arm64") else "amd64"
+        self.prepare("deb", architecture)
+        for name in ("SHA256SUMS", "SHA256SUMS.minisig", "release.json"):
+            (self.downloads / name).unlink()
+        tools = self.root / "test-tools"
+        builder = pathlib.Path(__file__).resolve().parents[1] / "install/prepare_test_release.py"
+        prepared = subprocess.run(["python3", "-B", str(builder), str(self.downloads), "1.0.5", str(tools)],
+                                  capture_output=True, text=True, timeout=180, env={**os.environ, "CGO_ENABLED": "0"})
+        self.assertEqual(prepared.returncode, 0, prepared.stdout + prepared.stderr)
+        result = self.run_helper("deb", native_verifier=True, architecture=architecture)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.root / "calls").exists())
+        (self.root / "calls").unlink()
+        (self.root / "verification").unlink()
+        package = self.downloads / f"sora_1.0.5_{architecture}.deb"
+        original_package = package.read_bytes()
+        package.write_bytes(b"tampered")
+        refused = self.run_helper("deb", native_verifier=True, architecture=architecture)
+        self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
+        self.assertIn("release snapshot verification failed", refused.stderr)
+        self.assertFalse((self.root / "calls").exists())
+        package.write_bytes(original_package)
+        for stray in (False, True):
+            with self.subTest(retired_signed_legacy=True, stray_json=stray):
+                for name in ("SHA256SUMS", "SHA256SUMS.minisig"):
+                    shutil.copyfile(tools / "metadata-legacy" / name, self.downloads / name)
+                metadata = self.downloads / "release.json"
+                if not stray:
+                    metadata.unlink()
+                else:
+                    metadata.write_bytes(b'{"schema":1}\n')
+                refused = self.run_helper("deb", native_verifier=True, architecture=architecture)
+                self.assertNotEqual(refused.returncode, 0, refused.stdout + refused.stderr)
+                self.assertIn("release snapshot verification failed", refused.stderr)
+                self.assertFalse((self.root / "calls").exists())
 
 
 if __name__ == "__main__":

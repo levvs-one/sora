@@ -498,115 +498,109 @@ abstract class S {
   /// No description provided for @errCore.
   ///
   /// In ru, this message translates to:
-  /// **'Служба Sora не отвечает. Подождите немного и попробуйте снова.'**
+  /// **'Служба Sora не отвечает'**
   String get errCore;
 
   /// No description provided for @errAuth.
   ///
   /// In ru, this message translates to:
-  /// **'Нет доступа к службе Sora. Перезапустите приложение и попробуйте снова.'**
+  /// **'Нет доступа к службе Sora'**
   String get errAuth;
 
   /// No description provided for @errVersion.
   ///
   /// In ru, this message translates to:
-  /// **'Приложение и служба Sora разных версий. Обновите Sora.'**
+  /// **'Приложение и служба Sora разных версий'**
   String get errVersion;
 
   /// No description provided for @errBusy.
   ///
   /// In ru, this message translates to:
-  /// **'Предыдущая команда ещё выполняется. Дождитесь её завершения.'**
+  /// **'Предыдущая команда ещё выполняется'**
   String get errBusy;
 
   /// No description provided for @errEngineMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Не найдено ядро для этого сервера. Проверьте наличие обновлений Sora.'**
+  /// **'Не найдено ядро для этого сервера'**
   String get errEngineMissing;
 
   /// No description provided for @errEngineStart.
   ///
   /// In ru, this message translates to:
-  /// **'Ядро не запустилось. Посмотрите причину в журнале подключения.'**
+  /// **'Ядро не запустилось'**
   String get errEngineStart;
 
   /// No description provided for @errEngineStopped.
   ///
   /// In ru, this message translates to:
-  /// **'Ядро остановилось. Попробуйте подключиться снова.'**
+  /// **'Ядро остановилось'**
   String get errEngineStopped;
 
   /// No description provided for @errTunnel.
   ///
   /// In ru, this message translates to:
-  /// **'Этот режим VPN недоступен. Выберите другой режим или проверьте права службы.'**
+  /// **'Этот режим VPN недоступен'**
   String get errTunnel;
-
-  /// No description provided for @errNetwork.
-  ///
-  /// In ru, this message translates to:
-  /// **'Нет связи с сервером'**
-  String get errNetwork;
 
   /// No description provided for @errTimeout.
   ///
   /// In ru, this message translates to:
-  /// **'Сервер не ответил вовремя. Попробуйте ещё раз через минуту.'**
+  /// **'Сервер не ответил вовремя'**
   String get errTimeout;
 
   /// No description provided for @errFirewall.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось включить блокировку интернета без VPN. Посмотрите причину в журнале подключения.'**
+  /// **'Не удалось включить блокировку интернета без VPN'**
   String get errFirewall;
 
   /// No description provided for @errSubFetch.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось загрузить подписку. Проверьте интернет и попробуйте ещё раз через минуту.'**
+  /// **'Не удалось загрузить подписку'**
   String get errSubFetch;
 
   /// No description provided for @errSubFormat.
   ///
   /// In ru, this message translates to:
-  /// **'Формат подписки не распознан. Запросите совместимую ссылку у провайдера подписки.'**
+  /// **'Формат подписки не распознан'**
   String get errSubFormat;
 
   /// No description provided for @errSubEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'В подписке нет серверов. Обратитесь к провайдеру подписки.'**
+  /// **'В подписке нет серверов'**
   String get errSubEmpty;
 
   /// No description provided for @errSubDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'Эта подписка уже добавлена. Обновите её, чтобы получить актуальные серверы.'**
+  /// **'Эта подписка уже добавлена'**
   String get errSubDuplicate;
 
   /// No description provided for @errSubLimit.
   ///
   /// In ru, this message translates to:
-  /// **'Достигнут предел числа подписок. Удалите ненужную подписку перед добавлением новой.'**
+  /// **'Достигнут предел числа подписок'**
   String get errSubLimit;
 
   /// No description provided for @errSubScheme.
   ///
   /// In ru, this message translates to:
-  /// **'Ссылка на подписку должна начинаться с https://. Запросите защищённую ссылку у провайдера.'**
+  /// **'Неподдерживаемая схема ссылки подписки'**
   String get errSubScheme;
 
   /// No description provided for @errSecretStore.
   ///
   /// In ru, this message translates to:
-  /// **'Хранилище Sora повреждено или недоступно. Проверьте права доступа и подробности в журнале.'**
+  /// **'Хранилище Sora повреждено или недоступно'**
   String get errSecretStore;
 
   /// No description provided for @errNoServers.
   ///
   /// In ru, this message translates to:
-  /// **'Нет серверов для подключения. Добавьте подписку или свой сервер.'**
+  /// **'Нет серверов для подключения'**
   String get errNoServers;
 
   /// No description provided for @connections.
@@ -711,12 +705,6 @@ abstract class S {
   /// **'Авто'**
   String get dnsAuto;
 
-  /// No description provided for @dnsHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Адреса через запятую'**
-  String get dnsHint;
-
   /// No description provided for @fragment.
   ///
   /// In ru, this message translates to:
@@ -747,23 +735,11 @@ abstract class S {
   /// **'По умолчанию'**
   String get byDefault;
 
-  /// No description provided for @rangeHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Например, 100-200'**
-  String get rangeHint;
-
   /// No description provided for @splitPos.
   ///
   /// In ru, this message translates to:
   /// **'Места разбиения'**
   String get splitPos;
-
-  /// No description provided for @splitPosHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Например, 1, midsld'**
-  String get splitPosHint;
 
   /// No description provided for @disorder.
   ///
@@ -969,12 +945,6 @@ abstract class S {
   /// **'Поддержка'**
   String get support;
 
-  /// No description provided for @controlPortQuestion.
-  ///
-  /// In ru, this message translates to:
-  /// **'{engine} управляется через порт на этом компьютере. Другие программы смогут заметить, что VPN включён.'**
-  String controlPortQuestion(String engine);
-
   /// No description provided for @chooseEngine.
   ///
   /// In ru, this message translates to:
@@ -1083,12 +1053,6 @@ abstract class S {
   /// **'Запускать вместе с системой'**
   String get launchAtLogin;
 
-  /// No description provided for @launchAtLoginDetail.
-  ///
-  /// In ru, this message translates to:
-  /// **'Sora будет автоматически запускаться при входе в систему и оставаться в трее.'**
-  String get launchAtLoginDetail;
-
   /// No description provided for @closeToTray.
   ///
   /// In ru, this message translates to:
@@ -1149,12 +1113,6 @@ abstract class S {
   /// **'Sora осталась в трее'**
   String get noticeInTray;
 
-  /// No description provided for @noticeInTrayBody.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выйти можно из меню значка'**
-  String get noticeInTrayBody;
-
   /// No description provided for @noticeLost.
   ///
   /// In ru, this message translates to:
@@ -1212,14 +1170,8 @@ abstract class S {
   /// No description provided for @importSealed.
   ///
   /// In ru, this message translates to:
-  /// **'Эта ссылка зашифрована для Happ, прочитать её может только Happ. Попросите у провайдера обычную ссылку на подписку.'**
+  /// **'Эта ссылка зашифрована для Happ, прочитать её может только Happ'**
   String get importSealed;
-
-  /// No description provided for @understood.
-  ///
-  /// In ru, this message translates to:
-  /// **'Понятно'**
-  String get understood;
 
   /// No description provided for @noAnswer.
   ///
@@ -1293,18 +1245,6 @@ abstract class S {
   /// **'Открыть логи'**
   String get openLogs;
 
-  /// No description provided for @tourReplay.
-  ///
-  /// In ru, this message translates to:
-  /// **'Показать гайд снова'**
-  String get tourReplay;
-
-  /// No description provided for @tourStep.
-  ///
-  /// In ru, this message translates to:
-  /// **'Шаг {step} из 5'**
-  String tourStep(int step);
-
   /// No description provided for @tourBack.
   ///
   /// In ru, this message translates to:
@@ -1316,48 +1256,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Далее'**
   String get tourNext;
-
-  /// No description provided for @tourSkip.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пропустить'**
-  String get tourSkip;
-
-  /// No description provided for @tourFinish.
-  ///
-  /// In ru, this message translates to:
-  /// **'Готово'**
-  String get tourFinish;
-
-  /// No description provided for @tourAdd.
-  ///
-  /// In ru, this message translates to:
-  /// **'Добавьте ссылку на подписку от провайдера.'**
-  String get tourAdd;
-
-  /// No description provided for @tourServer.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выберите сервер. «Самый быстрый» подберёт его за вас.'**
-  String get tourServer;
-
-  /// No description provided for @tourConnect.
-  ///
-  /// In ru, this message translates to:
-  /// **'Нажмите здесь, чтобы подключиться или отключиться.'**
-  String get tourConnect;
-
-  /// No description provided for @tourMode.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выберите режим. Kill switch блокирует интернет при обрыве VPN.'**
-  String get tourMode;
-
-  /// No description provided for @tourSettings.
-  ///
-  /// In ru, this message translates to:
-  /// **'Откройте настройки. Здесь можно показать гайд снова.'**
-  String get tourSettings;
 
   /// No description provided for @chooseProgram.
   ///
@@ -1380,7 +1278,7 @@ abstract class S {
   /// No description provided for @programsEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Программы не найдены. Попробуйте другое имя.'**
+  /// **'Программы не найдены'**
   String get programsEmpty;
 
   /// No description provided for @selectExe.
@@ -1404,7 +1302,7 @@ abstract class S {
   /// No description provided for @speedtestEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Ничего не найдено. Измените запрос.'**
+  /// **'Ничего не найдено'**
   String get speedtestEmpty;
 
   /// No description provided for @speedtestBackToList.
@@ -1422,19 +1320,19 @@ abstract class S {
   /// No description provided for @speedtestUnavailable.
   ///
   /// In ru, this message translates to:
-  /// **'Встроенный браузер не запустился. Откройте сервис в системном браузере.'**
+  /// **'Встроенный браузер не запустился'**
   String get speedtestUnavailable;
 
   /// No description provided for @speedtestPageFailed.
   ///
   /// In ru, this message translates to:
-  /// **'Страница не загрузилась. Обновите её или откройте сервис в системном браузере.'**
+  /// **'Страница не загрузилась'**
   String get speedtestPageFailed;
 
   /// No description provided for @speedtestExternalFailed.
   ///
   /// In ru, this message translates to:
-  /// **'Системный браузер не открылся. Попробуйте ещё раз.'**
+  /// **'Системный браузер не открылся'**
   String get speedtestExternalFailed;
 
   /// No description provided for @modes.
@@ -1506,31 +1404,19 @@ abstract class S {
   /// No description provided for @updateDropWarning.
   ///
   /// In ru, this message translates to:
-  /// **'При обновлении Sora и ядра VPN-соединение прервётся на несколько секунд. Продолжить?'**
+  /// **'Прервать соединение для обновления?'**
   String get updateDropWarning;
 
   /// No description provided for @updateWaitConnection.
   ///
   /// In ru, this message translates to:
-  /// **'Дождитесь завершения подключения и готовности службы Sora.'**
+  /// **'Подключение ещё не готово'**
   String get updateWaitConnection;
-
-  /// No description provided for @updateDownloading.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скачиваем и проверяем файлы...'**
-  String get updateDownloading;
-
-  /// No description provided for @updateInstalling.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подготовка обновления или ожидание пароля администратора...'**
-  String get updateInstalling;
 
   /// No description provided for @updateNetworkError.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось скачать обновление. Попробуйте ещё раз.'**
+  /// **'Не удалось скачать обновление'**
   String get updateNetworkError;
 
   /// No description provided for @updateReleaseError.
@@ -1542,50 +1428,26 @@ abstract class S {
   /// No description provided for @updateChecksumError.
   ///
   /// In ru, this message translates to:
-  /// **'Файл не совпадает с SHA256SUMS. Установка не запускалась.'**
+  /// **'Файл не совпадает с SHA256SUMS'**
   String get updateChecksumError;
 
   /// No description provided for @updateInstallError.
   ///
   /// In ru, this message translates to:
-  /// **'Обновление не завершилось. Возможно, запрос прав был отменён.'**
+  /// **'Обновление не завершилось'**
   String get updateInstallError;
 
   /// No description provided for @updateUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Этот файл приложения не принадлежит поддерживаемой паре пакетов Sora. Используйте инструкцию установки из описания релиза.'**
+  /// **'Этот файл приложения не принадлежит поддерживаемой паре пакетов Sora'**
   String get updateUnsupported;
-
-  /// No description provided for @updateManual.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.'**
-  String get updateManual;
-
-  /// No description provided for @updateSignaturePending.
-  ///
-  /// In ru, this message translates to:
-  /// **'Файлы обновления сверяются с контрольными суммами из релиза.'**
-  String get updateSignaturePending;
-
-  /// No description provided for @updateManualSigWarning.
-  ///
-  /// In ru, this message translates to:
-  /// **'Файлы ниже сверены с контрольными суммами релиза. Выполните команду, если скачивали их из официального релиза.'**
-  String get updateManualSigWarning;
 
   /// No description provided for @updateVersionRevoked.
   ///
   /// In ru, this message translates to:
-  /// **'Эта версия отозвана разработчиком. Дождитесь исправленного релиза.'**
+  /// **'Эта версия отозвана разработчиком'**
   String get updateVersionRevoked;
-
-  /// No description provided for @updateRolloutPending.
-  ///
-  /// In ru, this message translates to:
-  /// **'Новая версия распространяется постепенно и будет предложена вам автоматически.'**
-  String get updateRolloutPending;
 
   /// No description provided for @updateRollbacking.
   ///
@@ -1602,7 +1464,7 @@ abstract class S {
   /// No description provided for @updateRollbackError.
   ///
   /// In ru, this message translates to:
-  /// **'Автоматический откат не удался. Если новая версия не работает, переустановите предыдущий релиз вручную.'**
+  /// **'Автоматический откат не удался'**
   String get updateRollbackError;
 
   /// No description provided for @updateRollbackCacheError.
@@ -1617,16 +1479,10 @@ abstract class S {
   /// **'Скопировать команду'**
   String get updateCopyCommand;
 
-  /// No description provided for @updateChecksDisabled.
-  ///
-  /// In ru, this message translates to:
-  /// **'Автоматические проверки отключены в настройках.'**
-  String get updateChecksDisabled;
-
   /// No description provided for @updateInstalled.
   ///
   /// In ru, this message translates to:
-  /// **'Обновление установлено. Откройте Sora снова.'**
+  /// **'Обновление установлено'**
   String get updateInstalled;
 
   /// No description provided for @projectLinks.
@@ -1683,34 +1539,22 @@ abstract class S {
   /// **'Показать описание'**
   String get showDescription;
 
-  /// No description provided for @pendingConnectionChanges.
-  ///
-  /// In ru, this message translates to:
-  /// **'Чтобы применить изменения, переподключитесь.'**
-  String get pendingConnectionChanges;
-
-  /// No description provided for @reconnectNow.
-  ///
-  /// In ru, this message translates to:
-  /// **'Применить и переподключить'**
-  String get reconnectNow;
-
   /// No description provided for @errEngineUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Выбранное ядро не поддерживает этот профиль или настройки. Выберите «Авто» либо совместимое ядро.'**
+  /// **'Выбранное ядро не поддерживает этот профиль или настройки'**
   String get errEngineUnsupported;
 
   /// No description provided for @errRestore.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось полностью очистить подключение. Повторите отключение, подробности в журнале.'**
+  /// **'Не удалось полностью очистить подключение'**
   String get errRestore;
 
   /// No description provided for @errSessionEnded.
   ///
   /// In ru, this message translates to:
-  /// **'Эта сессия уже завершена. Обновите состояние подключения.'**
+  /// **'Эта сессия уже завершена'**
   String get errSessionEnded;
 
   /// No description provided for @retryDisconnect.
@@ -1740,13 +1584,13 @@ abstract class S {
   /// No description provided for @modesGuide.
   ///
   /// In ru, this message translates to:
-  /// **'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| mieru | Нет | Нет | Да |\n| NaiveProxy | Да | Нет | Нет |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed**: TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System**: использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor**: обрабатывает трафик в пользовательском пространстве.\n- **MIPS**: собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях. Смените стек и нажмите «Применить и переподключить», чтобы проверить результат в своей сети.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Режим, ядро, DNS и правила сохраняются сразу; при активном соединении нажмите «Применить и переподключить», чтобы они вступили в силу. Перезапуск ядра может прервать загрузки и звонки. Частые нажатия не запускают параллельные подключения; отключение завершает переход и освобождает соединение.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC передаёт TCP через видеозвонок в Jitsi, Яндекс Телемосте или WB Stream. Импортируйте ссылку olcrtc:// или QR-код. Протокол работает с sing-box, Xray и mihomo в режимах прокси и TUN; UDP не поддерживается. Обоим концам нужны совместимые сборки OLC2. Исходный проект архивирован.\n'**
+  /// **'Выбирайте «Авто», если не знаете, какое ядро нужно серверу. Sora сверяет поддержку профиля и настроек перед подключением. Само ядро не меняет скорость тарифа: результат зависит от сервера, маршрута, протокола и сети.\n\n## Режимы\n\n### Весь трафик (TUN)\n\nSora создаёт виртуальный сетевой интерфейс и направляет через него трафик приложений, включая TCP и UDP. Это подходящий режим для Telegram, игр и голосовой связи Discord. Правила могут отправлять отдельные сайты и программы напрямую или блокировать их. Для работы нужны права сетевой службы и сервер, поддерживающий нужный протокол.\n\n### Системный прокси\n\nSora задаёт локальный HTTP/SOCKS-прокси. Его используют приложения, которые учитывают системные настройки прокси. Программа со своим сетевым стеком может пройти напрямую; UDP и голосовые звонки обычно требуют TUN. Этот режим удобен для браузеров и приложений с поддержкой прокси.\n\n### Без сервера\n\nВ Linux Sora использует [zapret](https://github.com/bol-van/zapret): разбивает и меняет HTTP/TLS-запросы, чтобы обходить некоторые проверки DPI. Адрес IP остаётся вашим, соединение идёт к сайту напрямую. Результат зависит от провайдера и способа блокировки.\n\nТекущая интеграция использует tpws и обрабатывает TCP для HTTP и TLS. Она не обходит блокировку по IP, не пересылает UDP и не гарантирует работу Telegram с MTProto. Для голоса Discord, звонков Telegram и таких блокировок выберите VPN-сервер и TUN.\n\n## Ядра\n\n### Авто\n\nSora выбирает установленное ядро, которое поддерживает весь план подключения. Важно всё сразу: протоколы серверов, транспорт, группы, фрагментация и режим. Если выбранный вручную движок несовместим, новое подключение отклоняется до отключения текущего. Выберите «Авто» или другое ядро и примените настройки снова.\n\n### sing-box\n\nВ новых пакетах Sora используется [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), форк [sing-box](https://github.com/SagerNet/sing-box). Он добавляет клиентский XHTTP и VLESS Encryption. Sora распознаёт сборку и её возможности; стандартный sing-box без XHTTP не получает эту возможность по одному лишь названию.\n\nПоддерживаются VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard и параметры AmneziaWG 1.x/2.x, которые умеет импортировать Sora. Полные JSON-профили Xray требуют Xray. Новые параметры AWG 3.x ещё не импортируются. Управление sing-box использует защищённый паролем локальный порт; другие программы на компьютере могут заметить его наличие.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) подходит для VLESS, REALITY, XHTTP, VLESS Encryption и TLS-фрагментации. Он также запускает полные профили Xray от провайдера, сохраняя их маршрутизацию и группы. Профиль такого вида нельзя автоматически превратить в конфиг другого движка без изменения его поведения.\n\nВ поставляемом Xray удалён параметр отключения проверки TLS-сертификата (`allowInsecure`). Для таких обычных серверов «Авто» выбирает sing-box или mihomo. При ручном выборе Xray Sora сообщает о несовместимости до отключения текущего соединения. Для старого полного JSON-профиля нужен обновлённый профиль провайдера с проверяемым сертификатом или его отпечатком.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) поддерживает группы с последовательным резервом и балансировкой, а также XHTTP и AmneziaWG. Выбирайте его, если важен автоматический переход на запасной сервер. Фрагментация TLS из настроек Sora для этого ядра недоступна.\n\n## Совместимость в Sora\n\n| Возможность | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| TUN и TCP/UDP в Linux | Да | Да | Да |\n| XHTTP | Да | Да | Да |\n| VLESS Encryption | Да | Да | Да |\n| Полный профиль Xray | Нет | Да | Нет |\n| TUIC / AnyTLS | Оба | Нет | TUIC |\n| mieru | Нет | Нет | Да |\n| NaiveProxy | Да | Нет | Нет |\n| TLS-фрагментация | Да | Да | Нет |\n| AmneziaWG 1.x/2.x | Да¹ | Нет | Да |\n| Группа с резервом | Нет | Нет² | Да |\n\n¹ Профили с J1/J2/J3/Itime направляются в mihomo; эти параметры нельзя молча отбрасывать. ² Для группы полных профилей Xray запасной профиль выбирает приложение. Точная поддержка зависит от установленной сборки. Её версию можно посмотреть в «О приложении».\n\n## Стек TUN\n\nСтек обрабатывает TCP и UDP внутри виртуального интерфейса. В панели режимов у Xray и mihomo можно выбрать gVisor, System, Mixed или MIPS. Выбор сохраняется отдельно для каждого ядра. В режиме системного прокси и «Без сервера» этот выбор не используется.\n\n- **Mixed**: TCP использует системный стек, UDP обрабатывает gVisor. Это вариант по умолчанию для mihomo в Linux. В Windows Xray и mihomo по умолчанию используют MIPS.\n- **System**: использует системный стек. При проблемах с сетевыми программами попробуйте другой вариант.\n- **gVisor**: обрабатывает трафик в пользовательском пространстве.\n- **MIPS**: собственный IP-стек mihomo, доступный в поставляемой версии 1.19.32.\n\nВ Linux у Xray gVisor работает встроенно и выбран по умолчанию. System, Mixed и MIPS в Linux подключаются через TUN-движок mihomo: он передаёт TCP и UDP в Xray по защищённому локальному SOCKS. Протокол, профиль провайдера и маршрутизация остаются в Xray. Для этих трёх вариантов нужен установленный mihomo. В Windows Xray использует mihomo 1.19.32 или новее для всех четырёх стеков TUN. Протоколы и маршрутизация остаются в Xray. Правила приложений в этой связке поддерживают только прямое соединение и блокировку; на Linux они требуют встроенного gVisor Xray.\n\nСвязка запускает второй процесс. В трёх замерах в Linux без трафика она потребляла примерно на 32–36 МиБ больше физической памяти, чем встроенный TUN Xray. Это не оценка нагрузки при скачивании: расходы процессора и память зависят от соединений. Для sing-box переключатель не добавляется. Ни один вариант не гарантирует более высокую скорость во всех сетях.\n\n## Когда применяются настройки\n\nВыбор сервера автоматически переподключает соединение. Ваши изменения режима, ядра, DNS или правил применяются один раз после короткой паузы с автоматическим переподключением; фоновые обновления не переподключают VPN. Перезапуск ядра может прервать загрузки и звонки.\n\n«Интернет только через VPN» блокирует прямой выход при обрыве туннеля. Это ограничение действует на всю машину, поэтому используйте его осознанно. При явном отключении Sora снимает свои правила. Если очистка не завершилась, повторите отключение и откройте журнал.\n\n## Документация проектов\n\n- [sing-box-lx: настройки и поддержка](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.ru.md)\n- [sing-box: документация](https://sing-box.sagernet.org/)\n- [Xray: документация](https://xtls.github.io/)\n- [mihomo: документация](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: описание и ограничения](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC передаёт TCP через видеозвонок в Jitsi, Яндекс Телемосте или WB Stream. Импортируйте ссылку olcrtc:// или QR-код. Протокол работает с sing-box, Xray и mihomo в режимах прокси и TUN; UDP не поддерживается. Обоим концам нужны совместимые сборки OLC2. Исходный проект архивирован.\n'**
   String get modesGuide;
 
   /// No description provided for @probeServers.
   ///
   /// In ru, this message translates to:
-  /// **'Проверить серверы'**
+  /// **'Пинг'**
   String get probeServers;
 
   /// No description provided for @extensions.
@@ -1782,7 +1626,7 @@ abstract class S {
   /// No description provided for @extSideloadWarning.
   ///
   /// In ru, this message translates to:
-  /// **'Устанавливайте, только если доверяете самоподписанному ключу автора.'**
+  /// **'Самоподписанный ключ'**
   String get extSideloadWarning;
 
   /// No description provided for @extPermissionsWidened.
@@ -1790,12 +1634,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Обновление запрашивает новые разрешения:'**
   String get extPermissionsWidened;
-
-  /// No description provided for @extDangerousAck.
-  ///
-  /// In ru, this message translates to:
-  /// **'Я понимаю, что эти разрешения серьёзные'**
-  String get extDangerousAck;
 
   /// No description provided for @extInstall.
   ///
@@ -1820,12 +1658,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Подтвердить'**
   String get extConfirm;
-
-  /// No description provided for @extOk.
-  ///
-  /// In ru, this message translates to:
-  /// **'ОК'**
-  String get extOk;
 
   /// No description provided for @extCatalog.
   ///
@@ -1926,7 +1758,7 @@ abstract class S {
   /// No description provided for @extEmptyInstalled.
   ///
   /// In ru, this message translates to:
-  /// **'Пока нет установленных расширений.\nНайдите в каталоге или установите из файла.'**
+  /// **'Пока нет установленных расширений'**
   String get extEmptyInstalled;
 
   /// No description provided for @extInstallFromFile.
@@ -1940,12 +1772,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Установить по ссылке'**
   String get extInstallFromUrl;
-
-  /// No description provided for @extUrlHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'https://…/extension.soraext'**
-  String get extUrlHint;
 
   /// No description provided for @extDownload.
   ///
@@ -1971,16 +1797,10 @@ abstract class S {
   /// **'Установка…'**
   String get extInstalling;
 
-  /// No description provided for @extInstallFailed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Не удалось установить'**
-  String get extInstallFailed;
-
   /// No description provided for @extErrSignature.
   ///
   /// In ru, this message translates to:
-  /// **'Проверка подписи не пройдена. Файл может быть повреждён или подменён.'**
+  /// **'Проверка подписи не пройдена'**
   String get extErrSignature;
 
   /// No description provided for @extErrManifest.
@@ -1992,13 +1812,13 @@ abstract class S {
   /// No description provided for @extErrNetwork.
   ///
   /// In ru, this message translates to:
-  /// **'Ошибка сети. Проверьте соединение и попробуйте снова.'**
+  /// **'Ошибка сети'**
   String get extErrNetwork;
 
   /// No description provided for @extErrHash.
   ///
   /// In ru, this message translates to:
-  /// **'Скачанный файл не совпадает с каталогом. Возможно, он подменён.'**
+  /// **'Скачанный файл не совпадает с каталогом'**
   String get extErrHash;
 
   /// No description provided for @extErrMinApp.
@@ -2016,13 +1836,13 @@ abstract class S {
   /// No description provided for @extErrGeneric.
   ///
   /// In ru, this message translates to:
-  /// **'Что-то пошло не так. Попробуйте снова.'**
+  /// **'Что-то пошло не так'**
   String get extErrGeneric;
 
   /// No description provided for @extErrAuthorKeyChanged.
   ///
   /// In ru, this message translates to:
-  /// **'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано. Если вы доверяете новому ключу, удалите расширение и установите его заново явно.'**
+  /// **'Это обновление подписано другим ключом автора, а не тем, что у установленной версии, поэтому оно заблокировано'**
   String get extErrAuthorKeyChanged;
 
   /// No description provided for @extDisabled.
@@ -2118,7 +1938,7 @@ abstract class S {
   /// No description provided for @extConflictsCount.
   ///
   /// In ru, this message translates to:
-  /// **'Требуют решения: {count}'**
+  /// **'Конфликты расширений: {count}'**
   String extConflictsCount(int count);
 
   /// No description provided for @extConflictsResolve.
@@ -2250,13 +2070,13 @@ abstract class S {
   /// No description provided for @extPermRoutingRules.
   ///
   /// In ru, this message translates to:
-  /// **'Добавлять правила маршрутизации (влияет на трафик)'**
+  /// **'Добавлять правила маршрутизации'**
   String get extPermRoutingRules;
 
   /// No description provided for @extPermNetHooks.
   ///
   /// In ru, this message translates to:
-  /// **'Встраиваться в сетевой тракт (модули обхода DPI)'**
+  /// **'Встраиваться в сетевой тракт'**
   String get extPermNetHooks;
 
   /// No description provided for @extPermNetFetch.
@@ -2274,7 +2094,7 @@ abstract class S {
   /// No description provided for @extPermNotYetActive.
   ///
   /// In ru, this message translates to:
-  /// **'В этой версии Sora это разрешение ещё ничего не делает.'**
+  /// **'Отключено'**
   String get extPermNotYetActive;
 
   /// No description provided for @extCapBackground.
@@ -2343,12 +2163,6 @@ abstract class S {
   /// **'Сначала подходящие'**
   String get extSortRelevance;
 
-  /// No description provided for @extPermNetworkDetail.
-  ///
-  /// In ru, this message translates to:
-  /// **'Запросы через VPN разрешены только к этим хостам.'**
-  String get extPermNetworkDetail;
-
   /// No description provided for @extBgTitle.
   ///
   /// In ru, this message translates to:
@@ -2379,12 +2193,6 @@ abstract class S {
   /// **'{count, plural, one{{count} час} few{{count} часа} other{{count} часов}}'**
   String extBgHours(int count);
 
-  /// No description provided for @extBgDisabledNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Включите расширение, чтобы управлять его фоновой задачей.'**
-  String get extBgDisabledNote;
-
   /// No description provided for @extCapNetwork.
   ///
   /// In ru, this message translates to:
@@ -2412,7 +2220,7 @@ abstract class S {
   /// No description provided for @diagnosticNoData.
   ///
   /// In ru, this message translates to:
-  /// **'Запросов пока нет. Сначала откройте сайт проверки скорости.'**
+  /// **'Запросов пока нет'**
   String get diagnosticNoData;
 
   /// No description provided for @qrShareTitle.
@@ -2432,18 +2240,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Скопировать ссылку'**
   String get qrCopyLink;
-
-  /// No description provided for @qrWarning.
-  ///
-  /// In ru, this message translates to:
-  /// **'Показывайте код только тем, кому доверяете.'**
-  String get qrWarning;
-
-  /// No description provided for @qrScanHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выберите снимок экрана или фото с QR-кодом либо вставьте ссылку'**
-  String get qrScanHint;
 
   /// No description provided for @qrFromClipboard.
   ///
@@ -2595,24 +2391,6 @@ abstract class S {
   /// **'Kill switch закрывает DNS'**
   String get dnsLeakCheckKillSwitchDns;
 
-  /// No description provided for @dnsLeakFixConfigureTunnelDns.
-  ///
-  /// In ru, this message translates to:
-  /// **'Задайте DNS туннеля в настройках выше.'**
-  String get dnsLeakFixConfigureTunnelDns;
-
-  /// No description provided for @dnsLeakFixReviewSystemResolvers.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверьте, какие резолверы система использует вне туннеля.'**
-  String get dnsLeakFixReviewSystemResolvers;
-
-  /// No description provided for @dnsLeakFixEnableKillSwitch.
-  ///
-  /// In ru, this message translates to:
-  /// **'Включите kill switch, чтобы DNS оставался в туннеле.'**
-  String get dnsLeakFixEnableKillSwitch;
-
   /// No description provided for @dnsLeakCheckEncryptedDns.
   ///
   /// In ru, this message translates to:
@@ -2624,24 +2402,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Подмена ответов DNS'**
   String get dnsLeakCheckDnsSpoof;
-
-  /// No description provided for @dnsLeakFixReviewEncryptedDns.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.'**
-  String get dnsLeakFixReviewEncryptedDns;
-
-  /// No description provided for @dnsLeakFixUseEncryptedDns.
-  ///
-  /// In ru, this message translates to:
-  /// **'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.'**
-  String get dnsLeakFixUseEncryptedDns;
-
-  /// No description provided for @dnsCheckNeedsConnection.
-  ///
-  /// In ru, this message translates to:
-  /// **'Сначала подключитесь к VPN, затем проверьте утечки.'**
-  String get dnsCheckNeedsConnection;
 
   /// No description provided for @dnsExpected.
   ///
@@ -2694,7 +2454,7 @@ abstract class S {
   /// No description provided for @coreWatchUnstable.
   ///
   /// In ru, this message translates to:
-  /// **'Связь с ядром нестабильна. Подождите немного и попробуйте подключиться снова.'**
+  /// **'Связь с ядром нестабильна'**
   String get coreWatchUnstable;
 
   /// No description provided for @watchReconnect.
@@ -2772,7 +2532,7 @@ abstract class S {
   /// No description provided for @errBenchmarkUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Для замера скорости нужна новая версия ядра. Обновите Sora.'**
+  /// **'Для замера скорости нужна новая версия ядра'**
   String get errBenchmarkUnsupported;
 
   /// No description provided for @benchmarkProgress.
@@ -2790,7 +2550,7 @@ abstract class S {
   /// No description provided for @profilesEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Профилей пока нет. Создайте профиль, чтобы настройки применялись автоматически в известных сетях.'**
+  /// **'Профилей пока нет'**
   String get profilesEmpty;
 
   /// No description provided for @profileAdd.
@@ -2811,12 +2571,6 @@ abstract class S {
   /// **'Wi-Fi-сети (SSID)'**
   String get profileSsids;
 
-  /// No description provided for @profileSsidsHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Дом, Офис через запятую'**
-  String get profileSsidsHint;
-
   /// No description provided for @profileGateways.
   ///
   /// In ru, this message translates to:
@@ -2834,12 +2588,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Применять автоматически'**
   String get profileAutoApply;
-
-  /// No description provided for @profileAutoApplyHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Если выключено, Sora спросит перед применением'**
-  String get profileAutoApplyHint;
 
   /// No description provided for @profileSnapshot.
   ///
@@ -2910,7 +2658,7 @@ abstract class S {
   /// No description provided for @profileNoTriggers.
   ///
   /// In ru, this message translates to:
-  /// **'Добавьте хотя бы один триггер: SSID, шлюз или ASN'**
+  /// **'Нет условий профиля'**
   String get profileNoTriggers;
 
   /// No description provided for @chains.
@@ -2922,7 +2670,7 @@ abstract class S {
   /// No description provided for @chainsEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Цепочек пока нет. Свяжите 2–3 сервера, чтобы трафик шёл через каждый из них.'**
+  /// **'Цепочек пока нет'**
   String get chainsEmpty;
 
   /// No description provided for @chainAdd.
@@ -2937,28 +2685,16 @@ abstract class S {
   /// **'Название цепочки'**
   String get chainName;
 
-  /// No description provided for @chainPickServers.
-  ///
-  /// In ru, this message translates to:
-  /// **'Выберите 2–3 сервера'**
-  String get chainPickServers;
-
-  /// No description provided for @chainOrderHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Перетащите, чтобы изменить порядок: трафик входит сверху, выходит снизу.'**
-  String get chainOrderHint;
-
   /// No description provided for @chainTooFew.
   ///
   /// In ru, this message translates to:
-  /// **'Для цепочки нужны хотя бы два сервера. Добавьте ещё один сервер.'**
+  /// **'Для цепочки нужны хотя бы два сервера'**
   String get chainTooFew;
 
   /// No description provided for @chainTooMany.
   ///
   /// In ru, this message translates to:
-  /// **'В цепочке может быть не больше трёх серверов. Уберите лишние серверы.'**
+  /// **'В цепочке может быть не больше трёх серверов'**
   String get chainTooMany;
 
   /// No description provided for @chainEstimate.
@@ -2988,13 +2724,13 @@ abstract class S {
   /// No description provided for @chainUnsupported.
   ///
   /// In ru, this message translates to:
-  /// **'Выбранное ядро не поддерживает цепочки. Выберите совместимое ядро.'**
+  /// **'Выбранное ядро не поддерживает цепочки'**
   String get chainUnsupported;
 
   /// No description provided for @chainHopMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Один из серверов цепочки больше недоступен. Выберите другой сервер для этого звена.'**
+  /// **'Один из серверов цепочки больше недоступен'**
   String get chainHopMissing;
 
   /// No description provided for @chainHop.
@@ -3030,7 +2766,7 @@ abstract class S {
   /// No description provided for @syncEmpty.
   ///
   /// In ru, this message translates to:
-  /// **'Нет спаренных устройств. Спарьте другое устройство в локальной сети.'**
+  /// **'Нет спаренных устройств'**
   String get syncEmpty;
 
   /// No description provided for @syncPair.
@@ -3075,12 +2811,6 @@ abstract class S {
   /// **'Никогда'**
   String get syncNever;
 
-  /// No description provided for @syncNoLan.
-  ///
-  /// In ru, this message translates to:
-  /// **'Устройства должны быть в одной локальной сети'**
-  String get syncNoLan;
-
   /// No description provided for @syncPaired.
   ///
   /// In ru, this message translates to:
@@ -3099,28 +2829,16 @@ abstract class S {
   /// **'Ожидание другого устройства…'**
   String get syncWaiting;
 
-  /// No description provided for @syncSecureNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Канал защищён сквозным шифрованием. Никаких аккаунтов и облачных серверов.'**
-  String get syncSecureNote;
-
   /// No description provided for @zapretWithVpn.
   ///
   /// In ru, this message translates to:
   /// **'DPI-обход для прямого трафика'**
   String get zapretWithVpn;
 
-  /// No description provided for @zapretWithVpnHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Запускает zapret рядом с VPN-туннелем: трафик туннеля идёт через VPN, прямой трафик через обход.'**
-  String get zapretWithVpnHint;
-
   /// No description provided for @chainDuplicate.
   ///
   /// In ru, this message translates to:
-  /// **'В цепочке повторяется сервер. Выберите разные серверы для каждого звена.'**
+  /// **'В цепочке повторяется сервер'**
   String get chainDuplicate;
 
   /// No description provided for @edit.
@@ -3140,12 +2858,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Автопереключение при деградации'**
   String get autoSwitchOnDegrade;
-
-  /// No description provided for @autoSwitchOnDegradeDetail.
-  ///
-  /// In ru, this message translates to:
-  /// **'Если выбранный сервер сильно замедлится или перестанет отвечать, Sora переключится на лучший из измеренных, но не чаще раза в 10 минут.'**
-  String get autoSwitchOnDegradeDetail;
 
   /// No description provided for @tunStackMixed.
   ///
@@ -3177,16 +2889,10 @@ abstract class S {
   /// **'Название'**
   String get customServerName;
 
-  /// No description provided for @customServerNameHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'Например: мой VPS'**
-  String get customServerNameHint;
-
   /// No description provided for @customServerNameRequired.
   ///
   /// In ru, this message translates to:
-  /// **'Введите название'**
+  /// **'Название не указано'**
   String get customServerNameRequired;
 
   /// No description provided for @customServerAddress.
@@ -3195,16 +2901,10 @@ abstract class S {
   /// **'Адрес'**
   String get customServerAddress;
 
-  /// No description provided for @customServerAddressHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'example.com или 192.0.2.1'**
-  String get customServerAddressHint;
-
   /// No description provided for @customServerAddressRequired.
   ///
   /// In ru, this message translates to:
-  /// **'Введите адрес сервера'**
+  /// **'Адрес не указан'**
   String get customServerAddressRequired;
 
   /// No description provided for @customServerAddressInvalid.
@@ -3219,16 +2919,10 @@ abstract class S {
   /// **'Порт'**
   String get customServerPort;
 
-  /// No description provided for @customServerPortHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'443'**
-  String get customServerPortHint;
-
   /// No description provided for @customServerPortInvalid.
   ///
   /// In ru, this message translates to:
-  /// **'Порт должен быть числом от 1 до 65535'**
+  /// **'Неверный порт'**
   String get customServerPortInvalid;
 
   /// No description provided for @customServerProtocol.
@@ -3242,12 +2936,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Данные для входа'**
   String get customServerCredentials;
-
-  /// No description provided for @customServerOptional.
-  ///
-  /// In ru, this message translates to:
-  /// **'Необязательно'**
-  String get customServerOptional;
 
   /// No description provided for @customServerShowSecret.
   ///
@@ -3267,23 +2955,11 @@ abstract class S {
   /// **'Удалить сервер «{name}»?'**
   String customServerDeleteConfirm(String name);
 
-  /// No description provided for @customServerTest.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверить'**
-  String get customServerTest;
-
   /// No description provided for @leakTestTitle.
   ///
   /// In ru, this message translates to:
   /// **'Проверка утечек'**
   String get leakTestTitle;
-
-  /// No description provided for @leakTestIntro.
-  ///
-  /// In ru, this message translates to:
-  /// **'Проверяет, может ли трафик покинуть устройство в обход туннеля: прямые DNS- и ICMP-запросы, утечки IPv6 и системные резолверы. Запускайте при активном подключении.'**
-  String get leakTestIntro;
 
   /// No description provided for @leakTestRun.
   ///
@@ -3296,12 +2972,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Отмена'**
   String get leakTestCancel;
-
-  /// No description provided for @leakTestNeedsConnection.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подключитесь, чтобы проверить утечки.'**
-  String get leakTestNeedsConnection;
 
   /// No description provided for @leakTestProgress.
   ///
@@ -3332,12 +3002,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Исправить'**
   String get leakTestFix;
-
-  /// No description provided for @leakTestFixedNote.
-  ///
-  /// In ru, this message translates to:
-  /// **'Kill switch включён, запустите проверку снова.'**
-  String get leakTestFixedNote;
 
   /// No description provided for @leakTestCheckDirectDns.
   ///
@@ -3402,7 +3066,7 @@ abstract class S {
   /// No description provided for @syncDaemonMissing.
   ///
   /// In ru, this message translates to:
-  /// **'Компонент sora-sync не найден. Переустановите приложение, чтобы включить синхронизацию устройств.'**
+  /// **'Компонент sora-sync не найден'**
   String get syncDaemonMissing;
 
   /// No description provided for @syncDaemonStarting.
@@ -3414,7 +3078,7 @@ abstract class S {
   /// No description provided for @syncErrAuth.
   ///
   /// In ru, this message translates to:
-  /// **'Служба синхронизации отклонила токен доступа. Перезапустите приложение и попробуйте снова.'**
+  /// **'Служба синхронизации отклонила токен доступа'**
   String get syncErrAuth;
 
   /// No description provided for @syncErrNotFound.
@@ -3432,7 +3096,7 @@ abstract class S {
   /// No description provided for @syncErrUnreachable.
   ///
   /// In ru, this message translates to:
-  /// **'Другое устройство не отвечает. Убедитесь, что оно в той же сети и показывает свой код.'**
+  /// **'Другое устройство не отвечает'**
   String get syncErrUnreachable;
 
   /// No description provided for @syncError.
@@ -3452,12 +3116,6 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Спаривание с устройством…'**
   String get syncJoining;
-
-  /// No description provided for @syncLegacyCleared.
-  ///
-  /// In ru, this message translates to:
-  /// **'Старый список устройств никогда не был по-настоящему спарен, поэтому он очищен. Спарьте устройства заново, теперь по-настоящему.'**
-  String get syncLegacyCleared;
 
   /// No description provided for @syncNewCode.
   ///
@@ -3564,7 +3222,7 @@ abstract class S {
   /// No description provided for @syncUnavailableAndroid.
   ///
   /// In ru, this message translates to:
-  /// **'Синхронизация устройств пока недоступна на Android: там не работает служба синхронизации.'**
+  /// **'Синхронизация недоступна на Android'**
   String get syncUnavailableAndroid;
 
   /// No description provided for @diagnosticPackets.
@@ -3654,19 +3312,19 @@ abstract class S {
   /// No description provided for @customServerWgKeyInvalid.
   ///
   /// In ru, this message translates to:
-  /// **'Ключ должен быть 32 байтами в base64, как выводит wg genkey.'**
+  /// **'Неверный ключ WireGuard'**
   String get customServerWgKeyInvalid;
 
   /// No description provided for @customServerWgCidrInvalid.
   ///
   /// In ru, this message translates to:
-  /// **'Укажите адреса через запятую в виде 10.0.0.2/32.'**
+  /// **'Неверный префикс CIDR'**
   String get customServerWgCidrInvalid;
 
   /// No description provided for @customServerWgKeepaliveInvalid.
   ///
   /// In ru, this message translates to:
-  /// **'Укажите число секунд от 0 до 65535.'**
+  /// **'Неверный интервал keepalive'**
   String get customServerWgKeepaliveInvalid;
 
   /// No description provided for @strictKillSwitch.
@@ -3678,19 +3336,19 @@ abstract class S {
   /// No description provided for @strictKillSwitchWarning.
   ///
   /// In ru, this message translates to:
-  /// **'После подключения блокирует трафик вне VPN даже при сбое, перезапуске ядра или выходе из приложения. Доступ вернётся только после отключения VPN или этой настройки. После перезагрузки блокировка возобновится только при включённом подключении при запуске.'**
+  /// **'Блокировать трафик вне VPN после выхода?'**
   String get strictKillSwitchWarning;
 
   /// No description provided for @extWorkerFailed.
   ///
   /// In ru, this message translates to:
-  /// **'Фоновая задача расширения завершилась с ошибкой. Проверьте журнал расширения.'**
+  /// **'Фоновая задача расширения завершилась с ошибкой'**
   String get extWorkerFailed;
 
   /// No description provided for @extAssetRejected.
   ///
   /// In ru, this message translates to:
-  /// **'В файле расширения нечитаемые цвета или неверные правила. Попросите автора расширения исправить файл.'**
+  /// **'В файле расширения нечитаемые цвета или неверные правила'**
   String get extAssetRejected;
 
   /// No description provided for @extVerifiedSora.
@@ -3738,7 +3396,7 @@ abstract class S {
   /// No description provided for @customServerSecretRequired.
   ///
   /// In ru, this message translates to:
-  /// **'Введите значение'**
+  /// **'Значение не указано'**
   String get customServerSecretRequired;
 
   /// No description provided for @customServerLinkInvalid.
@@ -3747,46 +3405,34 @@ abstract class S {
   /// **'Неверная ссылка на сервер'**
   String get customServerLinkInvalid;
 
-  /// No description provided for @customServerMethodHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'chacha20-ietf-poly1305'**
-  String get customServerMethodHint;
-
-  /// No description provided for @customServerWgAddressesHint.
-  ///
-  /// In ru, this message translates to:
-  /// **'10.0.0.2/32'**
-  String get customServerWgAddressesHint;
-
   /// No description provided for @errInternal.
   ///
   /// In ru, this message translates to:
-  /// **'Внутренняя ошибка Sora. Сохраните журнал и сообщите о сбое.'**
+  /// **'Внутренняя ошибка Sora'**
   String get errInternal;
 
   /// No description provided for @errTls.
   ///
   /// In ru, this message translates to:
-  /// **'Сертификат сервера отклонён. Проверьте часы или обратитесь к провайдеру.'**
+  /// **'Сертификат сервера отклонён'**
   String get errTls;
 
   /// No description provided for @errFileAccess.
   ///
   /// In ru, this message translates to:
-  /// **'Нет доступа к файлу. Проверьте права и свободное место.'**
+  /// **'Нет доступа к файлу'**
   String get errFileAccess;
 
   /// No description provided for @errDataLimit.
   ///
   /// In ru, this message translates to:
-  /// **'Слишком много данных. Выберите меньше элементов и повторите.'**
+  /// **'Слишком много данных'**
   String get errDataLimit;
 
   /// No description provided for @errCredentials.
   ///
   /// In ru, this message translates to:
-  /// **'Сохранённые данные доступа потеряны. Импортируйте сервер заново.'**
+  /// **'Сохранённые данные доступа потеряны'**
   String get errCredentials;
 
   /// No description provided for @subscriptionStale.
@@ -3798,85 +3444,85 @@ abstract class S {
   /// No description provided for @subscriptionNeverUpdated.
   ///
   /// In ru, this message translates to:
-  /// **'Ещё не обновлялась. Повторите.'**
+  /// **'Ещё не обновлялась'**
   String get subscriptionNeverUpdated;
 
   /// Complete HTTP failure message; status 0 means the response code is unknown.
   ///
   /// In ru, this message translates to:
-  /// **'{status, plural, =0 {Сервер отклонил запрос. Проверьте ссылку или обратитесь к провайдеру.} other {Сервер вернул код HTTP {status}. Проверьте ссылку или обратитесь к провайдеру.}}'**
+  /// **'{status, plural, =0 {Сервер отклонил запрос} other {Сервер вернул код HTTP {status}}}'**
   String errHttpStatus(int status);
 
   /// No description provided for @errInvalidServer.
   ///
   /// In ru, this message translates to:
-  /// **'Настройки сервера неполные или не поддерживаются. Обновите подписку.'**
+  /// **'Настройки сервера неполные или не поддерживаются'**
   String get errInvalidServer;
 
   /// No description provided for @errServerIds.
   ///
   /// In ru, this message translates to:
-  /// **'У двух серверов одинаковый идентификатор. Импортируйте их заново.'**
+  /// **'У двух серверов одинаковый идентификатор'**
   String get errServerIds;
 
   /// No description provided for @errRoutingGroup.
   ///
   /// In ru, this message translates to:
-  /// **'Маршрут ссылается на удалённые серверы или повреждённую группу. Обновите подписку.'**
+  /// **'Маршрут ссылается на удалённые серверы или повреждённую группу'**
   String get errRoutingGroup;
 
   /// No description provided for @errConnections.
   ///
   /// In ru, this message translates to:
-  /// **'Список подключений недоступен. Подключитесь или выберите другое ядро.'**
+  /// **'Список подключений недоступен'**
   String get errConnections;
 
   /// No description provided for @errLogs.
   ///
   /// In ru, this message translates to:
-  /// **'Эта служба не ведёт журнал. Обновите Sora.'**
+  /// **'Эта служба не ведёт журнал'**
   String get errLogs;
 
   /// No description provided for @errDiagnostics.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось собрать диагностику. Повторите или сохраните журнал.'**
+  /// **'Не удалось собрать диагностику'**
   String get errDiagnostics;
 
   /// No description provided for @errMissingItem.
   ///
   /// In ru, this message translates to:
-  /// **'Запрошенный элемент больше не существует. Обновите список.'**
+  /// **'Запрошенный элемент больше не существует'**
   String get errMissingItem;
 
   /// No description provided for @errInvalidRequest.
   ///
   /// In ru, this message translates to:
-  /// **'В запросе неверные значения. Проверьте введённые данные и повторите.'**
+  /// **'В запросе неверные значения'**
   String get errInvalidRequest;
 
   /// No description provided for @errProxyLogin.
   ///
   /// In ru, this message translates to:
-  /// **'Системный прокси не поддерживает этот вход. Уберите логин и пароль локального прокси.'**
+  /// **'Системный прокси не поддерживает этот вход'**
   String get errProxyLogin;
 
   /// No description provided for @errLogFilter.
   ///
   /// In ru, this message translates to:
-  /// **'Неверный фильтр журнала. Очистите поиск и повторите.'**
+  /// **'Неверный фильтр журнала'**
   String get errLogFilter;
 
   /// No description provided for @errSubRedirect.
   ///
   /// In ru, this message translates to:
-  /// **'Сервер перенаправил на небезопасный адрес. Запросите новую ссылку у провайдера.'**
+  /// **'Сервер перенаправил на небезопасный адрес'**
   String get errSubRedirect;
 
   /// No description provided for @errProxySetup.
   ///
   /// In ru, this message translates to:
-  /// **'Не удалось настроить системный прокси. Переподключитесь или откройте журнал.'**
+  /// **'Не удалось настроить системный прокси'**
   String get errProxySetup;
 
   /// No description provided for @notificationsToday.
@@ -3918,32 +3564,86 @@ abstract class S {
   /// No description provided for @errSubInterval.
   ///
   /// In ru, this message translates to:
-  /// **'Недопустимый интервал обновления подписки. Выберите интервал, рекомендованный провайдером.'**
+  /// **'Недопустимый интервал обновления подписки'**
   String get errSubInterval;
 
   /// No description provided for @errRule.
   ///
   /// In ru, this message translates to:
-  /// **'В правиле маршрутизации ошибка. Проверьте указанный домен, IP-адрес или программу.'**
+  /// **'В правиле маршрутизации ошибка'**
   String get errRule;
 
   /// No description provided for @errDns.
   ///
   /// In ru, this message translates to:
-  /// **'Некорректные настройки DNS. Проверьте адрес DNS-сервера.'**
+  /// **'Некорректные настройки DNS'**
   String get errDns;
 
   /// No description provided for @errEndpoint.
   ///
   /// In ru, this message translates to:
-  /// **'Некорректный адрес сервера для проверки. Проверьте имя хоста и порт.'**
+  /// **'Некорректный адрес сервера для проверки'**
   String get errEndpoint;
 
   /// No description provided for @errCancelled.
   ///
   /// In ru, this message translates to:
-  /// **'Запрос отменён. При необходимости выполните действие снова.'**
+  /// **'Запрос отменён'**
   String get errCancelled;
+
+  /// No description provided for @customServerOptions.
+  ///
+  /// In ru, this message translates to:
+  /// **'Параметры подключения'**
+  String get customServerOptions;
+
+  /// No description provided for @customServerTransport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Транспорт'**
+  String get customServerTransport;
+
+  /// No description provided for @customServerSecurity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защита'**
+  String get customServerSecurity;
+
+  /// No description provided for @customServerCipher.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шифр'**
+  String get customServerCipher;
+
+  /// No description provided for @customServerWgInterface.
+  ///
+  /// In ru, this message translates to:
+  /// **'Интерфейс'**
+  String get customServerWgInterface;
+
+  /// No description provided for @customServerWgPeer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пир'**
+  String get customServerWgPeer;
+
+  /// No description provided for @extAvailableOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступно на: {platforms}.'**
+  String extAvailableOn(String platforms);
+
+  /// No description provided for @winwsScopeWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить TCP-трафик всех приложений?'**
+  String get winwsScopeWarning;
+
+  /// No description provided for @winwsRequirements.
+  ///
+  /// In ru, this message translates to:
+  /// **'Этот режим VPN недоступен'**
+  String get winwsRequirements;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

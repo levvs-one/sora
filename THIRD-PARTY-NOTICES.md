@@ -2,7 +2,9 @@
 
 Что Sora ставит вместе с собой. Движки скачиваются с выпусков их авторов и
 сверяются по SHA-256 из [`packaging/engines/engines.lock`](packaging/engines/engines.lock);
-Sora их не изменяет. olcrtc собирается из закреплённого архива исходников, проверенного по SHA-256 в `packaging/engines/fetch.sh`.
+Sora их не изменяет. Архивы ByeDPI отдельно проверяются по SHA-256 в
+`packaging/engines/fetch.sh`. olcrtc собирается из закреплённого архива
+исходников, проверенного тем же скриптом.
 
 ## Движки
 
@@ -12,6 +14,7 @@ Sora их не изменяет. olcrtc собирается из закрепл
 | Xray-core | 26.3.27 | Linux, Windows | MPL-2.0 | https://github.com/XTLS/Xray-core/tree/v26.3.27 |
 | mihomo | 1.19.32 | Linux, Windows (сборка compatible) | GPL-3.0 | https://github.com/MetaCubeX/mihomo/tree/v1.19.32 |
 | olcrtc | f3ad8fb7c0d0fa981423f83269526fa94077c23d | Linux amd64/arm64, Windows amd64 | WTFPL 2 | https://github.com/openlibrecommunity/olcrtc/tree/f3ad8fb7c0d0fa981423f83269526fa94077c23d |
+| ByeDPI | 0.17.3 | Linux amd64/arm64, Windows amd64 | MIT | https://github.com/hufrea/byedpi/tree/v0.17.3 |
 | zapret (tpws, nfqws) | 72.1 | Linux | MIT, © bol-van | [`third_party/zapret`](third_party/zapret) |
 
 ## Приложение
@@ -42,8 +45,9 @@ Sora их не изменяет. olcrtc собирается из закрепл
 | go-winio | MIT |
 | tailscale/wf | BSD-3-Clause |
 | gopacket/gopacket 1.7.4 | BSD-3-Clause |
+| go.yaml.in/yaml/v4 4.0.0-rc.6 (импорт подписок) | Apache-2.0, MIT для файлов libyaml |
 
-Тексты лицензий: GPL-3.0 в файле `LICENSE`, Inter в `Inter-LICENSE.txt`, zapret в `zapret-LICENSE.txt` пакета `sora-core`. Лицензии остальных компонентов лежат в их исходном коде по ссылкам выше и на pub.dev.
+Тексты лицензий: GPL-3.0 в файле `LICENSE`, Inter в `Inter-LICENSE.txt`, zapret в `zapret-LICENSE.txt` пакета `sora-core`. Лицензия ByeDPI включена в пакет как `byedpi.LICENSE`. Лицензии остальных компонентов лежат в их исходном коде по ссылкам выше и на pub.dev.
 
 ## WebView All
 
@@ -54,6 +58,54 @@ Linux- и Windows-плагины сохранены в `app/third_party` с пр
 в их `README.md`.
 
 Copyright 2021-2026 [Abandoft](https://github.com/abandoft)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## go-yaml v4
+
+Импорт YAML-подписок использует неизменённый `go.yaml.in/yaml/v4` v4.0.0-rc.6.
+Источник: https://github.com/yaml/go-yaml/tree/v4.0.0-rc.6
+Текст Apache-2.0 приведён в разделе google/pprof.
+
+NOTICE upstream:
+
+The following files were ported to Go from C files of libyaml, and thus are
+still covered by their original MIT license, with the additional copyright
+starting in 2011 when the project was ported over:
+
+- internal/libyaml/api.go
+- internal/libyaml/emitter.go
+- internal/libyaml/parser.go
+- internal/libyaml/reader.go
+- internal/libyaml/scanner.go
+- internal/libyaml/writer.go
+- internal/libyaml/yaml.go
+- internal/libyaml/yamlprivate.go
+
+Copyright 2006-2010 Kirill Simonov
+https://opensource.org/license/mit
+
+All the remaining project files are covered by the Apache license:
+
+Copyright 2011-2019 Canonical Ltd
+Copyright 2025 The go-yaml Project Contributors
+http://www.apache.org/licenses/LICENSE-2.0
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -571,3 +623,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## code.dny.dev/ssrf
+
+The subscription fetcher uses the unmodified v0.3.0 IP address classifier.
+Source: https://github.com/daenney/ssrf/tree/v0.3.0
+
+MIT License
+
+Copyright (c) 2022 Daniele Sluijters
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

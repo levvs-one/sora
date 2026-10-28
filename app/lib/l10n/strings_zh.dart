@@ -205,61 +205,58 @@ class SZh extends S {
   String get errGeneric => '出了点问题';
 
   @override
-  String get errCore => 'Sora 服务没有响应。请稍等片刻后重试。';
+  String get errCore => 'Sora 服务没有响应';
 
   @override
-  String get errAuth => '无法访问 Sora 服务。请重启应用后重试。';
+  String get errAuth => '无法访问 Sora 服务';
 
   @override
-  String get errVersion => 'Sora 应用与服务的版本不一致。请更新 Sora。';
+  String get errVersion => 'Sora 应用与服务的版本不一致';
 
   @override
-  String get errBusy => '上一条命令仍在执行。请等待其完成。';
+  String get errBusy => '上一条命令仍在执行';
 
   @override
-  String get errEngineMissing => '找不到此服务器所需的内核。请检查 Sora 更新。';
+  String get errEngineMissing => '找不到此服务器所需的内核';
 
   @override
-  String get errEngineStart => '内核未能启动。请查看连接日志以了解原因。';
+  String get errEngineStart => '内核未能启动';
 
   @override
-  String get errEngineStopped => '内核已停止。请尝试重新连接。';
+  String get errEngineStopped => '内核已停止';
 
   @override
-  String get errTunnel => '此 VPN 模式不可用。请选择其他模式或检查服务权限。';
+  String get errTunnel => '此 VPN 模式不可用';
 
   @override
-  String get errNetwork => '无法到达服务器';
+  String get errTimeout => '服务器响应超时';
 
   @override
-  String get errTimeout => '服务器响应超时。请一分钟后重试。';
+  String get errFirewall => '无法阻止 VPN 以外的互联网访问';
 
   @override
-  String get errFirewall => '无法阻止 VPN 以外的互联网访问。请查看连接日志以了解原因。';
+  String get errSubFetch => '无法下载订阅';
 
   @override
-  String get errSubFetch => '无法下载订阅。请检查网络连接，一分钟后重试。';
+  String get errSubFormat => '无法识别订阅格式';
 
   @override
-  String get errSubFormat => '无法识别订阅格式。请向订阅提供商索取兼容的订阅链接。';
+  String get errSubEmpty => '订阅中没有服务器';
 
   @override
-  String get errSubEmpty => '订阅中没有服务器。请联系订阅提供商。';
+  String get errSubDuplicate => '此订阅已添加';
 
   @override
-  String get errSubDuplicate => '此订阅已添加。请更新该订阅以获取最新服务器列表。';
+  String get errSubLimit => '订阅数量已达上限';
 
   @override
-  String get errSubLimit => '订阅数量已达上限。请先删除不再使用的订阅，再添加新订阅。';
+  String get errSubScheme => '不支持的订阅链接协议';
 
   @override
-  String get errSubScheme => '订阅链接必须以 https:// 开头。请向提供商索取安全链接。';
+  String get errSecretStore => 'Sora 存储已损坏或无法访问';
 
   @override
-  String get errSecretStore => 'Sora 存储已损坏或无法访问。请检查访问权限，并查看日志中的详细信息。';
-
-  @override
-  String get errNoServers => '没有可连接的服务器。请添加订阅或自己的服务器。';
+  String get errNoServers => '没有可连接的服务器';
 
   @override
   String get connections => '连接';
@@ -313,9 +310,6 @@ class SZh extends S {
   String get dnsAuto => '汽车';
 
   @override
-  String get dnsHint => '地址，逗号分隔';
-
-  @override
   String get fragment => 'TLS 碎片';
 
   @override
@@ -331,13 +325,7 @@ class SZh extends S {
   String get byDefault => '默认';
 
   @override
-  String get rangeHint => '例如，100-200';
-
-  @override
   String get splitPos => '分割仓位';
-
-  @override
-  String get splitPosHint => '例如，1、midsld';
 
   @override
   String get disorder => '重新排序件';
@@ -446,11 +434,6 @@ class SZh extends S {
   String get support => '支持';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine 通过该计算机上的端口进行控制。 其他程序将能够判断 VPN 是否已打开。';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '选择$engine';
   }
@@ -521,9 +504,6 @@ class SZh extends S {
   String get launchAtLogin => '从系统入手';
 
   @override
-  String get launchAtLoginDetail => '登录时 Sora 会自动启动，并隐藏到系统托盘中。';
-
-  @override
   String get closeToTray => '关闭时保留在托盘中';
 
   @override
@@ -558,9 +538,6 @@ class SZh extends S {
   String get noticeInTray => 'Sora 仍在托盘中';
 
   @override
-  String get noticeInTrayBody => '从其图标的菜单中退出';
-
-  @override
   String get noticeLost => '连接丢失';
 
   @override
@@ -588,10 +565,7 @@ class SZh extends S {
   String get importTitle => '添加此订阅？';
 
   @override
-  String get importSealed => '该链接针对Happ进行了加密，只有Happ可以读取。 向您的提供商询问简单的订阅链接。';
-
-  @override
-  String get understood => '好的';
+  String get importSealed => '该链接针对Happ进行了加密，只有Happ可以读取';
 
   @override
   String get noAnswer => '没有答案';
@@ -630,39 +604,10 @@ class SZh extends S {
   String get openLogs => '打开日志';
 
   @override
-  String get tourReplay => '再次显示指南';
-
-  @override
-  String tourStep(int step) {
-    return '第 5 步 $step';
-  }
-
-  @override
   String get tourBack => '后退';
 
   @override
   String get tourNext => '下一个';
-
-  @override
-  String get tourSkip => '跳过';
-
-  @override
-  String get tourFinish => '完毕';
-
-  @override
-  String get tourAdd => '添加您的提供商的订阅链接。';
-
-  @override
-  String get tourServer => '选择一个服务器。 “最快”为您选择一个。';
-
-  @override
-  String get tourConnect => '单击此处连接或断开连接。';
-
-  @override
-  String get tourMode => '选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。';
-
-  @override
-  String get tourSettings => '打开设置。 您可以在那里重播本指南。';
 
   @override
   String get chooseProgram => '选择一个程序';
@@ -674,7 +619,7 @@ class SZh extends S {
   String get runningProcesses => '正在运行的进程';
 
   @override
-  String get programsEmpty => '没有找到应用程序。 尝试另一个名字。';
+  String get programsEmpty => '没有找到应用程序';
 
   @override
   String get selectExe => '选择一个 .exe 文件';
@@ -686,7 +631,7 @@ class SZh extends S {
   String get speedtestSearch => '查找服务';
 
   @override
-  String get speedtestEmpty => '没有匹配项。 更改搜索。';
+  String get speedtestEmpty => '没有匹配项';
 
   @override
   String get speedtestBackToList => '返回服务';
@@ -695,13 +640,13 @@ class SZh extends S {
   String get speedtestOpenBrowser => '在浏览器中打开';
 
   @override
-  String get speedtestUnavailable => '嵌入式浏览器无法启动。 在系统浏览器中打开该服务。';
+  String get speedtestUnavailable => '嵌入式浏览器无法启动';
 
   @override
-  String get speedtestPageFailed => '页面无法加载。 重新加载它或在系统浏览器中打开该服务。';
+  String get speedtestPageFailed => '页面无法加载';
 
   @override
-  String get speedtestExternalFailed => '系统浏览器无法打开。 再试一次。';
+  String get speedtestExternalFailed => '系统浏览器无法打开';
 
   @override
   String get modes => '模式';
@@ -741,46 +686,28 @@ class SZh extends S {
   String get updateNoNotes => '该版本没有注释。';
 
   @override
-  String get updateDropWarning => '当 Sora 及其核心更新时，VPN 连接将断开几秒钟。 继续？';
+  String get updateDropWarning => '断开连接以更新？';
 
   @override
-  String get updateWaitConnection => '等待 VPN 连接和核心准备就绪。';
+  String get updateWaitConnection => '连接尚未就绪';
 
   @override
-  String get updateDownloading => '正在下载并验证文件...';
-
-  @override
-  String get updateInstalling => '正在准备更新或等待管理员身份验证...';
-
-  @override
-  String get updateNetworkError => '无法下载更新。 再试一次。';
+  String get updateNetworkError => '无法下载更新';
 
   @override
   String get updateReleaseError => '发布数据或所需文件丢失或无效。';
 
   @override
-  String get updateChecksumError => '下载的内容与 SHA256SUMS 不匹配。 没有安装任何东西。';
+  String get updateChecksumError => '下载的内容与 SHA256SUMS 不匹配';
 
   @override
-  String get updateInstallError => '更新没有完成。 身份验证可能已被取消。';
+  String get updateInstallError => '更新没有完成';
 
   @override
-  String get updateUnsupported => '此可执行文件不属于受支持的 Sora 软件包对。 使用发行版安装说明。';
+  String get updateUnsupported => '此可执行文件不属于受支持的 Sora 软件包对';
 
   @override
-  String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
-
-  @override
-  String get updateSignaturePending => '更新文件会与随版本发布的校验和比对。';
-
-  @override
-  String get updateManualSigWarning => '下面的文件与版本的校验和一致。如果是从官方版本下载的，请运行该命令。';
-
-  @override
-  String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版。';
-
-  @override
-  String get updateRolloutPending => '新版本正分批推出，届时会自动通知您更新。';
+  String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版';
 
   @override
   String updateRollbacking(String version) {
@@ -793,7 +720,7 @@ class SZh extends S {
   }
 
   @override
-  String get updateRollbackError => '自动回滚失败。若新版本无法运行，请手动重新安装先前的版本。';
+  String get updateRollbackError => '自动回滚失败';
 
   @override
   String get updateRollbackCacheError => '无法准备目前版本的已验证回滚副本，因此未安装更新。';
@@ -802,10 +729,7 @@ class SZh extends S {
   String get updateCopyCommand => '复制命令';
 
   @override
-  String get updateChecksDisabled => '在“设置”中禁用自动检查。';
-
-  @override
-  String get updateInstalled => '已安装更新。 重新打开 Sora。';
+  String get updateInstalled => '已安装更新';
 
   @override
   String get projectLinks => '项目';
@@ -835,19 +759,13 @@ class SZh extends S {
   String get showDescription => '显示说明';
 
   @override
-  String get pendingConnectionChanges => '重新连接以应用这些更改。';
+  String get errEngineUnsupported => '所选引擎不支持此配置文件或设置';
 
   @override
-  String get reconnectNow => '应用并重新连接';
+  String get errRestore => '连接清理不完整';
 
   @override
-  String get errEngineUnsupported => '所选引擎不支持此配置文件或设置。 选择自动或兼容的引擎。';
-
-  @override
-  String get errRestore => '连接清理不完整。 重试断开连接； 详细信息请参阅日志。';
-
-  @override
-  String get errSessionEnded => '本次会议已经结束。 刷新连接状态。';
+  String get errSessionEnded => '本次会议已经结束';
 
   @override
   String get retryDisconnect => '重试断开连接';
@@ -863,10 +781,10 @@ class SZh extends S {
 
   @override
   String get modesGuide =>
-      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。 选择一个堆栈并选择“应用并重新连接”以在您的网络中进行尝试。\n\n## 应用设置\n\n选择服务器会自动重新连接。 模式、引擎、DNS和规则设置立即保存； 在活动连接期间，单击应用并重新连接即可使用它们。 重新启动引擎可能会中断下载和调用。 重复点击不会启动并行连接； 断开连接结束转换并释放连接。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
+      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。\n\n## 应用设置\n\n选择服务器会自动重新连接。 您对模式、引擎、DNS 或规则所作的更改会在短暂停顿后自动重新连接并应用一次；后台刷新不会重新连接 VPN。 重新启动引擎可能会中断下载和通话。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
 
   @override
-  String get probeServers => '检查服务器';
+  String get probeServers => '平';
 
   @override
   String get extensions => '扩展';
@@ -890,13 +808,10 @@ class SZh extends S {
   String get extInstallOne => '1 次安装';
 
   @override
-  String get extSideloadWarning => '仅在信任作者的自签名密钥时安装。';
+  String get extSideloadWarning => '自签名密钥';
 
   @override
   String get extPermissionsWidened => '此更新要求新的权限：';
-
-  @override
-  String get extDangerousAck => '我了解这些权限的影响范围很大';
 
   @override
   String get extInstall => '安装';
@@ -909,9 +824,6 @@ class SZh extends S {
 
   @override
   String get extConfirm => '确认';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => '目录';
@@ -962,16 +874,13 @@ class SZh extends S {
   String get extEmptySearch => '找不到结果';
 
   @override
-  String get extEmptyInstalled => '尚未安装扩展。\n请从目录中寻找，或从文件安装。';
+  String get extEmptyInstalled => '尚未安装扩展';
 
   @override
   String get extInstallFromFile => '从文件安装';
 
   @override
   String get extInstallFromUrl => '从 URL 安装';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => '下载';
@@ -986,19 +895,16 @@ class SZh extends S {
   String get extInstalling => '正在安装…';
 
   @override
-  String get extInstallFailed => '安装失败';
-
-  @override
-  String get extErrSignature => '签名验证失败。文件可能已损毁或遭到窜改。';
+  String get extErrSignature => '签名验证失败';
 
   @override
   String get extErrManifest => '扩展的信息清单无效。';
 
   @override
-  String get extErrNetwork => '网络错误，请检查连接后再试一次。';
+  String get extErrNetwork => '网络错误，请检查连接后再试一次';
 
   @override
-  String get extErrHash => '下载的文件与目录不符，可能遭到窜改。';
+  String get extErrHash => '下载的文件与目录不符，可能遭到窜改';
 
   @override
   String extErrMinApp(String version) {
@@ -1009,10 +915,10 @@ class SZh extends S {
   String get extErrHttpsOnly => '仅允许 https:// 链接';
 
   @override
-  String get extErrGeneric => '发生错误，请再试一次。';
+  String get extErrGeneric => '发生错误，请再试一次';
 
   @override
-  String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
+  String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁';
 
   @override
   String get extDisabled => '已停用';
@@ -1069,7 +975,7 @@ class SZh extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '有 $count 个冲突需要您决定';
+    return '扩展冲突: $count';
   }
 
   @override
@@ -1146,10 +1052,10 @@ class SZh extends S {
   String get extPermThemeApply => '应用应用程序主题';
 
   @override
-  String get extPermRoutingRules => '添加路由规则（影响流量去向）';
+  String get extPermRoutingRules => '添加路由规则';
 
   @override
-  String get extPermNetHooks => '介入网络传输路径（DPI 绕过模块）';
+  String get extPermNetHooks => '介入网络传输路径';
 
   @override
   String get extPermNetFetch => '访问允许清单中的 URL';
@@ -1158,7 +1064,7 @@ class SZh extends S {
   String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => '已停用';
 
   @override
   String get extCapBackground => '在后台执行';
@@ -1196,9 +1102,6 @@ class SZh extends S {
   String get extSortRelevance => '相关性';
 
   @override
-  String get extPermNetworkDetail => 'VPN 请求仅限访问以下主机。';
-
-  @override
   String get extBgTitle => '后台任务';
 
   @override
@@ -1220,9 +1123,6 @@ class SZh extends S {
   }
 
   @override
-  String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
-
-  @override
   String get extCapNetwork => '网络访问';
 
   @override
@@ -1239,7 +1139,7 @@ class SZh extends S {
   String get diagnosticHttp => 'HTTP 诊断';
 
   @override
-  String get diagnosticNoData => '尚未记录请求。 首先打开一个速度测试网站。';
+  String get diagnosticNoData => '尚未记录请求';
 
   @override
   String get qrShareTitle => '透过 QR 分享';
@@ -1249,12 +1149,6 @@ class SZh extends S {
 
   @override
   String get qrCopyLink => '复制链接';
-
-  @override
-  String get qrWarning => '仅与信任的人分享此二维码。';
-
-  @override
-  String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
 
   @override
   String get qrFromClipboard => '从剪贴板粘贴';
@@ -1335,28 +1229,10 @@ class SZh extends S {
   String get dnsLeakCheckKillSwitchDns => '网络锁定的 DNS 保护';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => '请在上方的 DNS 设置中指定隧道 DNS。';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => '检查系统在隧道外会使用哪些解析器。';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => '请启用网络锁定，让 DNS 流量保持在隧道内。';
-
-  @override
   String get dnsLeakCheckEncryptedDns => '操作系统加密 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS 响应伪造';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => '检查系统在隧道外使用的加密 DNS 端点。';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns => '请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。';
-
-  @override
-  String get dnsCheckNeedsConnection => '请先连接 VPN，再检查是否泄漏。';
 
   @override
   String get dnsExpected => '预期';
@@ -1383,7 +1259,7 @@ class SZh extends S {
   String get autoSelectSmart => '智能选择';
 
   @override
-  String get coreWatchUnstable => '与内核的连接不稳定。请稍等片刻后尝试重新连接。';
+  String get coreWatchUnstable => '与内核的连接不稳定';
 
   @override
   String get watchReconnect => '重新连接';
@@ -1422,7 +1298,7 @@ class SZh extends S {
   String get overrideCustomRules => '自订规则';
 
   @override
-  String get errBenchmarkUnsupported => '测速需要更新版本的内核。请更新 Sora。';
+  String get errBenchmarkUnsupported => '测速需要更新版本的内核';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1433,7 +1309,7 @@ class SZh extends S {
   String get profiles => '网络配置文件';
 
   @override
-  String get profilesEmpty => '尚无配置文件。建立后，即可在已知网络中自动应用设置。';
+  String get profilesEmpty => '尚无配置文件';
 
   @override
   String get profileAdd => '添加配置文件';
@@ -1445,9 +1321,6 @@ class SZh extends S {
   String get profileSsids => 'Wi-Fi 网络（SSID）';
 
   @override
-  String get profileSsidsHint => '家庭、办公室，以逗号分隔';
-
-  @override
   String get profileGateways => '网关';
 
   @override
@@ -1455,9 +1328,6 @@ class SZh extends S {
 
   @override
   String get profileAutoApply => '自动应用';
-
-  @override
-  String get profileAutoApplyHint => '关闭时，应用配置文件前会要求确认。';
 
   @override
   String get profileSnapshot => '记住当前设置';
@@ -1501,13 +1371,13 @@ class SZh extends S {
   String get networkUnknown => '无法取得网络信息';
 
   @override
-  String get profileNoTriggers => '请至少添加一个触发条件：SSID、网关或 ASN';
+  String get profileNoTriggers => '没有配置条件';
 
   @override
   String get chains => '代理链';
 
   @override
-  String get chainsEmpty => '尚无代理链。串接 2 至 3 台服务器，让流量依序通过每台服务器。';
+  String get chainsEmpty => '尚无代理链';
 
   @override
   String get chainAdd => '添加代理链';
@@ -1516,16 +1386,10 @@ class SZh extends S {
   String get chainName => '代理链名称';
 
   @override
-  String get chainPickServers => '选择 2 至 3 台服务器';
+  String get chainTooFew => '连接链至少需要两个服务器';
 
   @override
-  String get chainOrderHint => '拖动以调整顺序：流量从上方进入，从下方离开。';
-
-  @override
-  String get chainTooFew => '连接链至少需要两个服务器。请再添加一个服务器。';
-
-  @override
-  String get chainTooMany => '连接链最多支持三个服务器。请移除多余的服务器。';
+  String get chainTooMany => '连接链最多支持三个服务器';
 
   @override
   String get chainEstimate => '预估延迟';
@@ -1542,10 +1406,10 @@ class SZh extends S {
   }
 
   @override
-  String get chainUnsupported => '所选内核不支持链式连接。请选择兼容的内核。';
+  String get chainUnsupported => '所选内核不支持链式连接';
 
   @override
-  String get chainHopMissing => '连接链中的某个服务器已不可用。请为该节点选择其他服务器。';
+  String get chainHopMissing => '连接链中的某个服务器已不可用';
 
   @override
   String chainHop(Object n) {
@@ -1565,7 +1429,7 @@ class SZh extends S {
   String get syncDevices => '我的设备';
 
   @override
-  String get syncEmpty => '尚无配对的设备。请透过局域网与另一台设备配对。';
+  String get syncEmpty => '尚无配对的设备';
 
   @override
   String get syncPair => '配对设备';
@@ -1593,9 +1457,6 @@ class SZh extends S {
   String get syncNever => '从未';
 
   @override
-  String get syncNoLan => '设备必须位于同一个局域网';
-
-  @override
   String get syncPaired => '设备已配对';
 
   @override
@@ -1605,16 +1466,10 @@ class SZh extends S {
   String get syncWaiting => '正在等待另一台设备…';
 
   @override
-  String get syncSecureNote => '通道采用端到端加密，无需账号或云服务器。';
-
-  @override
   String get zapretWithVpn => '直接连接流量的 DPI 绕过';
 
   @override
-  String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
-
-  @override
-  String get chainDuplicate => '连接链中有重复的服务器。请为每个节点选择不同的服务器。';
+  String get chainDuplicate => '连接链中有重复的服务器';
 
   @override
   String get edit => '编辑';
@@ -1624,9 +1479,6 @@ class SZh extends S {
 
   @override
   String get autoSwitchOnDegrade => '质量下降时自动切换';
-
-  @override
-  String get autoSwitchOnDegradeDetail => '若所选服务器大幅变慢或停止回应，Sora 会切换至测量结果最佳的服务器，最多每 10 分钟切换一次。';
 
   @override
   String get tunStackMixed => '混合';
@@ -1644,19 +1496,13 @@ class SZh extends S {
   String get customServerName => '名称';
 
   @override
-  String get customServerNameHint => '例如：我的 VPS';
-
-  @override
-  String get customServerNameRequired => '请输入名称';
+  String get customServerNameRequired => '未填写名称';
 
   @override
   String get customServerAddress => '地址';
 
   @override
-  String get customServerAddressHint => 'example.com 或 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => '请输入服务器地址';
+  String get customServerAddressRequired => '未填写地址';
 
   @override
   String get customServerAddressInvalid => '地址无效';
@@ -1665,19 +1511,13 @@ class SZh extends S {
   String get customServerPort => '端口';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => '端口必须是 1 到 65535 之间的数字';
+  String get customServerPortInvalid => '无效端口';
 
   @override
   String get customServerProtocol => '协议';
 
   @override
   String get customServerCredentials => '登录信息';
-
-  @override
-  String get customServerOptional => '可选';
 
   @override
   String get customServerShowSecret => '显示密钥';
@@ -1691,22 +1531,13 @@ class SZh extends S {
   }
 
   @override
-  String get customServerTest => '测试';
-
-  @override
   String get leakTestTitle => '泄漏测试';
-
-  @override
-  String get leakTestIntro => '检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。';
 
   @override
   String get leakTestRun => '执行测试';
 
   @override
   String get leakTestCancel => '取消';
-
-  @override
-  String get leakTestNeedsConnection => '请先连接，再执行泄漏测试。';
 
   @override
   String leakTestProgress(int count) {
@@ -1727,9 +1558,6 @@ class SZh extends S {
 
   @override
   String get leakTestFix => '修复';
-
-  @override
-  String get leakTestFixedNote => '已启用网络锁定，请重新测试以确认。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';
@@ -1762,13 +1590,13 @@ class SZh extends S {
   String get syncDaemonFailed => '无法启动同步服务';
 
   @override
-  String get syncDaemonMissing => '找不到 sora-sync 元件。请重新安装应用程序以启用设备同步。';
+  String get syncDaemonMissing => '找不到 sora-sync 元件';
 
   @override
   String get syncDaemonStarting => '正在启动同步服务…';
 
   @override
-  String get syncErrAuth => '同步服务拒绝了访问令牌。请重新启动应用程序后再试一次。';
+  String get syncErrAuth => '同步服务拒绝了访问令牌';
 
   @override
   String get syncErrNotFound => '此设备已解除配对';
@@ -1777,7 +1605,7 @@ class SZh extends S {
   String get syncErrPairingActive => '已有进行中的配对会话';
 
   @override
-  String get syncErrUnreachable => '另一台设备没有回应。请确认设备位于同一个网络，且正在显示配对代码。';
+  String get syncErrUnreachable => '另一台设备没有回应';
 
   @override
   String get syncError => '同步错误';
@@ -1789,9 +1617,6 @@ class SZh extends S {
 
   @override
   String get syncJoining => '正在与设备配对…';
-
-  @override
-  String get syncLegacyCleared => '旧设备清单未曾完成实际配对，因此已清除。请重新配对设备，这次会真正建立配对。';
 
   @override
   String get syncNewCode => '新代码';
@@ -1851,8 +1676,7 @@ class SZh extends S {
   String get syncThisDevice => '此设备';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android 上无法同步';
 
   @override
   String get diagnosticPackets => '抓包';
@@ -1899,25 +1723,25 @@ class SZh extends S {
   String get customServerWgKeepalive => 'Keepalive（秒）';
 
   @override
-  String get customServerWgKeyInvalid => '密钥必须是 base64 编码的 32 字节，与 wg genkey 的输出相同。';
+  String get customServerWgKeyInvalid => '无效的 WireGuard 密钥';
 
   @override
-  String get customServerWgCidrInvalid => '请输入以逗号分隔的前缀，例如 10.0.0.2/32。';
+  String get customServerWgCidrInvalid => '无效的 CIDR 前缀';
 
   @override
-  String get customServerWgKeepaliveInvalid => '请输入 0 到 65535 之间的秒数。';
+  String get customServerWgKeepaliveInvalid => '无效的 keepalive 间隔';
 
   @override
   String get strictKillSwitch => '严格网络锁定';
 
   @override
-  String get strictKillSwitchWarning => '连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。';
+  String get strictKillSwitchWarning => '退出后仍阻止 VPN 之外的流量？';
 
   @override
-  String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
+  String get extWorkerFailed => '扩展的后台任务失败';
 
   @override
-  String get extAssetRejected => '扩展文件包含难以辨认的配色或无效规则。请联系扩展作者修正文件。';
+  String get extAssetRejected => '扩展文件包含难以辨认的配色或无效规则';
 
   @override
   String get extVerifiedSora => '经 Sora 验证';
@@ -1943,31 +1767,25 @@ class SZh extends S {
   String get customServerPassword => '密码';
 
   @override
-  String get customServerSecretRequired => '请输入一个值';
+  String get customServerSecretRequired => '未填写值';
 
   @override
   String get customServerLinkInvalid => '服务器链接无效';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora 内部错误';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => '服务器证书被拒绝';
 
   @override
-  String get errInternal => 'Sora 内部错误。请保存日志并报告问题。';
+  String get errFileAccess => '无法访问文件';
 
   @override
-  String get errTls => '服务器证书被拒绝。请检查系统时间或联系服务提供商。';
+  String get errDataLimit => '数据过多';
 
   @override
-  String get errFileAccess => '无法访问文件。请检查权限和可用空间。';
-
-  @override
-  String get errDataLimit => '数据过多。请减少所选项目后重试。';
-
-  @override
-  String get errCredentials => '保存的凭据丢失。请重新导入服务器。';
+  String get errCredentials => '保存的凭据丢失';
 
   @override
   String subscriptionStale(String time) {
@@ -1975,54 +1793,49 @@ class SZh extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => '尚未更新。请重试。';
+  String get subscriptionNeverUpdated => '尚未更新';
 
   @override
   String errHttpStatus(int status) {
-    String _temp0 = intl.Intl.pluralLogic(
-      status,
-      locale: localeName,
-      other: '服务器返回了 HTTP $status。请检查链接或联系提供商。',
-      zero: '服务器拒绝了请求。请检查链接或联系提供商。',
-    );
+    String _temp0 = intl.Intl.pluralLogic(status, locale: localeName, other: '服务器返回了 HTTP $status', zero: '服务器拒绝了请求');
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => '服务器设置不完整或不受支持。请更新订阅。';
+  String get errInvalidServer => '服务器设置不完整或不受支持';
 
   @override
-  String get errServerIds => '两个服务器使用了相同的标识符。请重新导入。';
+  String get errServerIds => '两个服务器使用了相同的标识符';
 
   @override
-  String get errRoutingGroup => '路由指向缺失的服务器或损坏的分组。请更新订阅。';
+  String get errRoutingGroup => '路由指向缺失的服务器或损坏的分组';
 
   @override
-  String get errConnections => '无法显示连接列表。请连接或选择其他内核。';
+  String get errConnections => '无法显示连接列表';
 
   @override
-  String get errLogs => '此服务不保存日志。请更新 Sora。';
+  String get errLogs => '此服务不保存日志';
 
   @override
-  String get errDiagnostics => '无法收集诊断信息。请重试或保存日志。';
+  String get errDiagnostics => '无法收集诊断信息';
 
   @override
-  String get errMissingItem => '请求的项目已不存在。请刷新列表。';
+  String get errMissingItem => '请求的项目已不存在';
 
   @override
-  String get errInvalidRequest => '请求包含无效值。请检查输入后重试。';
+  String get errInvalidRequest => '请求包含无效值';
 
   @override
-  String get errProxyLogin => '系统代理不支持此登录方式。请移除本地代理的用户名和密码。';
+  String get errProxyLogin => '系统代理不支持此登录方式';
 
   @override
-  String get errLogFilter => '日志筛选条件无效。请清空搜索后重试。';
+  String get errLogFilter => '日志筛选条件无效';
 
   @override
-  String get errSubRedirect => '服务器重定向到了不安全的地址。请向服务提供商索取新链接。';
+  String get errSubRedirect => '服务器重定向到了不安全的地址';
 
   @override
-  String get errProxySetup => '无法配置系统代理。请重新连接或打开日志。';
+  String get errProxySetup => '无法配置系统代理';
 
   @override
   String get notificationsToday => '今天';
@@ -2048,19 +1861,48 @@ class SZh extends S {
   }
 
   @override
-  String get errSubInterval => '订阅更新间隔无效。请选择提供商建议的间隔。';
+  String get errSubInterval => '订阅更新间隔无效';
 
   @override
-  String get errRule => '路由规则无效。请检查规则中的域名、IP 地址或应用。';
+  String get errRule => '路由规则无效';
 
   @override
-  String get errDns => 'DNS 设置无效。请检查 DNS 服务器地址。';
+  String get errDns => 'DNS 设置无效';
 
   @override
-  String get errEndpoint => '待检测的服务器地址无效。请检查主机名和端口。';
+  String get errEndpoint => '待检测的服务器地址无效';
 
   @override
-  String get errCancelled => '请求已取消。如有需要，请重新执行操作。';
+  String get errCancelled => '请求已取消';
+
+  @override
+  String get customServerOptions => '连接设置';
+
+  @override
+  String get customServerTransport => '传输';
+
+  @override
+  String get customServerSecurity => '安全';
+
+  @override
+  String get customServerCipher => '加密方式';
+
+  @override
+  String get customServerWgInterface => '接口';
+
+  @override
+  String get customServerWgPeer => '对等端';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '适用平台：$platforms。';
+  }
+
+  @override
+  String get winwsScopeWarning => '更改所有应用的 TCP 流量？';
+
+  @override
+  String get winwsRequirements => '此 VPN 模式不可用';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2263,61 +2105,58 @@ class SZhHans extends SZh {
   String get errGeneric => '出了点问题';
 
   @override
-  String get errCore => 'Sora 服务没有响应。请稍等片刻后重试。';
+  String get errCore => 'Sora 服务没有响应';
 
   @override
-  String get errAuth => '无法访问 Sora 服务。请重启应用后重试。';
+  String get errAuth => '无法访问 Sora 服务';
 
   @override
-  String get errVersion => 'Sora 应用与服务的版本不一致。请更新 Sora。';
+  String get errVersion => 'Sora 应用与服务的版本不一致';
 
   @override
-  String get errBusy => '上一条命令仍在执行。请等待其完成。';
+  String get errBusy => '上一条命令仍在执行';
 
   @override
-  String get errEngineMissing => '找不到此服务器所需的内核。请检查 Sora 更新。';
+  String get errEngineMissing => '找不到此服务器所需的内核';
 
   @override
-  String get errEngineStart => '内核未能启动。请查看连接日志以了解原因。';
+  String get errEngineStart => '内核未能启动';
 
   @override
-  String get errEngineStopped => '内核已停止。请尝试重新连接。';
+  String get errEngineStopped => '内核已停止';
 
   @override
-  String get errTunnel => '此 VPN 模式不可用。请选择其他模式或检查服务权限。';
+  String get errTunnel => '此 VPN 模式不可用';
 
   @override
-  String get errNetwork => '无法到达服务器';
+  String get errTimeout => '服务器响应超时';
 
   @override
-  String get errTimeout => '服务器响应超时。请一分钟后重试。';
+  String get errFirewall => '无法阻止 VPN 以外的互联网访问';
 
   @override
-  String get errFirewall => '无法阻止 VPN 以外的互联网访问。请查看连接日志以了解原因。';
+  String get errSubFetch => '无法下载订阅';
 
   @override
-  String get errSubFetch => '无法下载订阅。请检查网络连接，一分钟后重试。';
+  String get errSubFormat => '无法识别订阅格式';
 
   @override
-  String get errSubFormat => '无法识别订阅格式。请向订阅提供商索取兼容的订阅链接。';
+  String get errSubEmpty => '订阅中没有服务器';
 
   @override
-  String get errSubEmpty => '订阅中没有服务器。请联系订阅提供商。';
+  String get errSubDuplicate => '此订阅已添加';
 
   @override
-  String get errSubDuplicate => '此订阅已添加。请更新该订阅以获取最新服务器列表。';
+  String get errSubLimit => '订阅数量已达上限';
 
   @override
-  String get errSubLimit => '订阅数量已达上限。请先删除不再使用的订阅，再添加新订阅。';
+  String get errSubScheme => '不支持的订阅链接协议';
 
   @override
-  String get errSubScheme => '订阅链接必须以 https:// 开头。请向提供商索取安全链接。';
+  String get errSecretStore => 'Sora 存储已损坏或无法访问';
 
   @override
-  String get errSecretStore => 'Sora 存储已损坏或无法访问。请检查访问权限，并查看日志中的详细信息。';
-
-  @override
-  String get errNoServers => '没有可连接的服务器。请添加订阅或自己的服务器。';
+  String get errNoServers => '没有可连接的服务器';
 
   @override
   String get connections => '连接';
@@ -2371,9 +2210,6 @@ class SZhHans extends SZh {
   String get dnsAuto => '汽车';
 
   @override
-  String get dnsHint => '地址，逗号分隔';
-
-  @override
   String get fragment => 'TLS 碎片';
 
   @override
@@ -2389,13 +2225,7 @@ class SZhHans extends SZh {
   String get byDefault => '默认';
 
   @override
-  String get rangeHint => '例如，100-200';
-
-  @override
   String get splitPos => '分割仓位';
-
-  @override
-  String get splitPosHint => '例如，1、midsld';
 
   @override
   String get disorder => '重新排序件';
@@ -2504,11 +2334,6 @@ class SZhHans extends SZh {
   String get support => '支持';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine 通过该计算机上的端口进行控制。 其他程序将能够判断 VPN 是否已打开。';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '选择$engine';
   }
@@ -2579,9 +2404,6 @@ class SZhHans extends SZh {
   String get launchAtLogin => '从系统入手';
 
   @override
-  String get launchAtLoginDetail => '登录时 Sora 会自动启动，并隐藏到系统托盘中。';
-
-  @override
   String get closeToTray => '关闭时保留在托盘中';
 
   @override
@@ -2616,9 +2438,6 @@ class SZhHans extends SZh {
   String get noticeInTray => 'Sora 仍在托盘中';
 
   @override
-  String get noticeInTrayBody => '从其图标的菜单中退出';
-
-  @override
   String get noticeLost => '连接丢失';
 
   @override
@@ -2646,10 +2465,7 @@ class SZhHans extends SZh {
   String get importTitle => '添加此订阅？';
 
   @override
-  String get importSealed => '该链接针对Happ进行了加密，只有Happ可以读取。 向您的提供商询问简单的订阅链接。';
-
-  @override
-  String get understood => '好的';
+  String get importSealed => '该链接针对Happ进行了加密，只有Happ可以读取';
 
   @override
   String get noAnswer => '没有答案';
@@ -2688,39 +2504,10 @@ class SZhHans extends SZh {
   String get openLogs => '打开日志';
 
   @override
-  String get tourReplay => '再次显示指南';
-
-  @override
-  String tourStep(int step) {
-    return '第 5 步 $step';
-  }
-
-  @override
   String get tourBack => '后退';
 
   @override
   String get tourNext => '下一个';
-
-  @override
-  String get tourSkip => '跳过';
-
-  @override
-  String get tourFinish => '完毕';
-
-  @override
-  String get tourAdd => '添加您的提供商的订阅链接。';
-
-  @override
-  String get tourServer => '选择一个服务器。 “最快”为您选择一个。';
-
-  @override
-  String get tourConnect => '单击此处连接或断开连接。';
-
-  @override
-  String get tourMode => '选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。';
-
-  @override
-  String get tourSettings => '打开设置。 您可以在那里重播本指南。';
 
   @override
   String get chooseProgram => '选择一个程序';
@@ -2732,7 +2519,7 @@ class SZhHans extends SZh {
   String get runningProcesses => '正在运行的进程';
 
   @override
-  String get programsEmpty => '没有找到应用程序。 尝试另一个名字。';
+  String get programsEmpty => '没有找到应用程序';
 
   @override
   String get selectExe => '选择一个 .exe 文件';
@@ -2744,7 +2531,7 @@ class SZhHans extends SZh {
   String get speedtestSearch => '查找服务';
 
   @override
-  String get speedtestEmpty => '没有匹配项。 更改搜索。';
+  String get speedtestEmpty => '没有匹配项';
 
   @override
   String get speedtestBackToList => '返回服务';
@@ -2753,13 +2540,13 @@ class SZhHans extends SZh {
   String get speedtestOpenBrowser => '在浏览器中打开';
 
   @override
-  String get speedtestUnavailable => '嵌入式浏览器无法启动。 在系统浏览器中打开该服务。';
+  String get speedtestUnavailable => '嵌入式浏览器无法启动';
 
   @override
-  String get speedtestPageFailed => '页面无法加载。 重新加载它或在系统浏览器中打开该服务。';
+  String get speedtestPageFailed => '页面无法加载';
 
   @override
-  String get speedtestExternalFailed => '系统浏览器无法打开。 再试一次。';
+  String get speedtestExternalFailed => '系统浏览器无法打开';
 
   @override
   String get modes => '模式';
@@ -2799,46 +2586,28 @@ class SZhHans extends SZh {
   String get updateNoNotes => '该版本没有注释。';
 
   @override
-  String get updateDropWarning => '当 Sora 及其核心更新时，VPN 连接将断开几秒钟。 继续？';
+  String get updateDropWarning => '断开连接以更新？';
 
   @override
-  String get updateWaitConnection => '等待 VPN 连接和核心准备就绪。';
+  String get updateWaitConnection => '连接尚未就绪';
 
   @override
-  String get updateDownloading => '正在下载并验证文件...';
-
-  @override
-  String get updateInstalling => '正在准备更新或等待管理员身份验证...';
-
-  @override
-  String get updateNetworkError => '无法下载更新。 再试一次。';
+  String get updateNetworkError => '无法下载更新';
 
   @override
   String get updateReleaseError => '发布数据或所需文件丢失或无效。';
 
   @override
-  String get updateChecksumError => '下载的内容与 SHA256SUMS 不匹配。 没有安装任何东西。';
+  String get updateChecksumError => '下载的内容与 SHA256SUMS 不匹配';
 
   @override
-  String get updateInstallError => '更新没有完成。 身份验证可能已被取消。';
+  String get updateInstallError => '更新没有完成';
 
   @override
-  String get updateUnsupported => '此可执行文件不属于受支持的 Sora 软件包对。 使用发行版安装说明。';
+  String get updateUnsupported => '此可执行文件不属于受支持的 Sora 软件包对';
 
   @override
-  String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
-
-  @override
-  String get updateSignaturePending => '更新文件会与随版本发布的校验和比对。';
-
-  @override
-  String get updateManualSigWarning => '下面的文件与版本的校验和一致。如果是从官方版本下载的，请运行该命令。';
-
-  @override
-  String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版。';
-
-  @override
-  String get updateRolloutPending => '新版本正分批推出，届时会自动通知您更新。';
+  String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版';
 
   @override
   String updateRollbacking(String version) {
@@ -2851,7 +2620,7 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get updateRollbackError => '自动回滚失败。若新版本无法运行，请手动重新安装先前的版本。';
+  String get updateRollbackError => '自动回滚失败';
 
   @override
   String get updateRollbackCacheError => '无法准备目前版本的已验证回滚副本，因此未安装更新。';
@@ -2860,10 +2629,7 @@ class SZhHans extends SZh {
   String get updateCopyCommand => '复制命令';
 
   @override
-  String get updateChecksDisabled => '在“设置”中禁用自动检查。';
-
-  @override
-  String get updateInstalled => '已安装更新。 重新打开 Sora。';
+  String get updateInstalled => '已安装更新';
 
   @override
   String get projectLinks => '项目';
@@ -2893,19 +2659,13 @@ class SZhHans extends SZh {
   String get showDescription => '显示说明';
 
   @override
-  String get pendingConnectionChanges => '重新连接以应用这些更改。';
+  String get errEngineUnsupported => '所选引擎不支持此配置文件或设置';
 
   @override
-  String get reconnectNow => '应用并重新连接';
+  String get errRestore => '连接清理不完整';
 
   @override
-  String get errEngineUnsupported => '所选引擎不支持此配置文件或设置。 选择自动或兼容的引擎。';
-
-  @override
-  String get errRestore => '连接清理不完整。 重试断开连接； 详细信息请参阅日志。';
-
-  @override
-  String get errSessionEnded => '本次会议已经结束。 刷新连接状态。';
+  String get errSessionEnded => '本次会议已经结束';
 
   @override
   String get retryDisconnect => '重试断开连接';
@@ -2921,10 +2681,10 @@ class SZhHans extends SZh {
 
   @override
   String get modesGuide =>
-      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。 选择一个堆栈并选择“应用并重新连接”以在您的网络中进行尝试。\n\n## 应用设置\n\n选择服务器会自动重新连接。 模式、引擎、DNS和规则设置立即保存； 在活动连接期间，单击应用并重新连接即可使用它们。 重新启动引擎可能会中断下载和调用。 重复点击不会启动并行连接； 断开连接结束转换并释放连接。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
+      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。\n\n## 应用设置\n\n选择服务器会自动重新连接。 您对模式、引擎、DNS 或规则所作的更改会在短暂停顿后自动重新连接并应用一次；后台刷新不会重新连接 VPN。 重新启动引擎可能会中断下载和通话。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
 
   @override
-  String get probeServers => '检查服务器';
+  String get probeServers => '平';
 
   @override
   String get extensions => '扩展';
@@ -2948,13 +2708,10 @@ class SZhHans extends SZh {
   String get extInstallOne => '1 次安装';
 
   @override
-  String get extSideloadWarning => '仅在信任作者的自签名密钥时安装。';
+  String get extSideloadWarning => '自签名密钥';
 
   @override
   String get extPermissionsWidened => '此更新要求新的权限：';
-
-  @override
-  String get extDangerousAck => '我了解这些权限的影响范围很大';
 
   @override
   String get extInstall => '安装';
@@ -2967,9 +2724,6 @@ class SZhHans extends SZh {
 
   @override
   String get extConfirm => '确认';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => '目录';
@@ -3020,16 +2774,13 @@ class SZhHans extends SZh {
   String get extEmptySearch => '找不到结果';
 
   @override
-  String get extEmptyInstalled => '尚未安装扩展。\n请从目录中寻找，或从文件安装。';
+  String get extEmptyInstalled => '尚未安装扩展';
 
   @override
   String get extInstallFromFile => '从文件安装';
 
   @override
   String get extInstallFromUrl => '从 URL 安装';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => '下载';
@@ -3044,19 +2795,16 @@ class SZhHans extends SZh {
   String get extInstalling => '正在安装…';
 
   @override
-  String get extInstallFailed => '安装失败';
-
-  @override
-  String get extErrSignature => '签名验证失败。文件可能已损毁或遭到窜改。';
+  String get extErrSignature => '签名验证失败';
 
   @override
   String get extErrManifest => '扩展的信息清单无效。';
 
   @override
-  String get extErrNetwork => '网络错误，请检查连接后再试一次。';
+  String get extErrNetwork => '网络错误，请检查连接后再试一次';
 
   @override
-  String get extErrHash => '下载的文件与目录不符，可能遭到窜改。';
+  String get extErrHash => '下载的文件与目录不符，可能遭到窜改';
 
   @override
   String extErrMinApp(String version) {
@@ -3067,10 +2815,10 @@ class SZhHans extends SZh {
   String get extErrHttpsOnly => '仅允许 https:// 链接';
 
   @override
-  String get extErrGeneric => '发生错误，请再试一次。';
+  String get extErrGeneric => '发生错误，请再试一次';
 
   @override
-  String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁。若您信任新密钥，请先卸载扩展，再自行重新安装。';
+  String get extErrAuthorKeyChanged => '此更新的作者签署密钥与已安装版本不同，因此已遭封锁';
 
   @override
   String get extDisabled => '已停用';
@@ -3127,7 +2875,7 @@ class SZhHans extends SZh {
 
   @override
   String extConflictsCount(int count) {
-    return '有 $count 个冲突需要您决定';
+    return '扩展冲突: $count';
   }
 
   @override
@@ -3204,10 +2952,10 @@ class SZhHans extends SZh {
   String get extPermThemeApply => '应用应用程序主题';
 
   @override
-  String get extPermRoutingRules => '添加路由规则（影响流量去向）';
+  String get extPermRoutingRules => '添加路由规则';
 
   @override
-  String get extPermNetHooks => '介入网络传输路径（DPI 绕过模块）';
+  String get extPermNetHooks => '介入网络传输路径';
 
   @override
   String get extPermNetFetch => '访问允许清单中的 URL';
@@ -3216,7 +2964,7 @@ class SZhHans extends SZh {
   String get extPermBackground => '执行后台任务';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => '已停用';
 
   @override
   String get extCapBackground => '在后台执行';
@@ -3254,9 +3002,6 @@ class SZhHans extends SZh {
   String get extSortRelevance => '相关性';
 
   @override
-  String get extPermNetworkDetail => 'VPN 请求仅限访问以下主机。';
-
-  @override
   String get extBgTitle => '后台任务';
 
   @override
@@ -3278,9 +3023,6 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get extBgDisabledNote => '请先启用扩展，才能管理后台任务。';
-
-  @override
   String get extCapNetwork => '网络访问';
 
   @override
@@ -3297,7 +3039,7 @@ class SZhHans extends SZh {
   String get diagnosticHttp => 'HTTP 诊断';
 
   @override
-  String get diagnosticNoData => '尚未记录请求。 首先打开一个速度测试网站。';
+  String get diagnosticNoData => '尚未记录请求';
 
   @override
   String get qrShareTitle => '透过 QR 分享';
@@ -3307,12 +3049,6 @@ class SZhHans extends SZh {
 
   @override
   String get qrCopyLink => '复制链接';
-
-  @override
-  String get qrWarning => '仅与信任的人分享此二维码。';
-
-  @override
-  String get qrScanHint => '选择包含二维码的截图或照片，或粘贴链接';
 
   @override
   String get qrFromClipboard => '从剪贴板粘贴';
@@ -3393,28 +3129,10 @@ class SZhHans extends SZh {
   String get dnsLeakCheckKillSwitchDns => '网络锁定的 DNS 保护';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => '请在上方的 DNS 设置中指定隧道 DNS。';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => '检查系统在隧道外会使用哪些解析器。';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => '请启用网络锁定，让 DNS 流量保持在隧道内。';
-
-  @override
   String get dnsLeakCheckEncryptedDns => '操作系统加密 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS 响应伪造';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => '检查系统在隧道外使用的加密 DNS 端点。';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns => '请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。';
-
-  @override
-  String get dnsCheckNeedsConnection => '请先连接 VPN，再检查是否泄漏。';
 
   @override
   String get dnsExpected => '预期';
@@ -3441,7 +3159,7 @@ class SZhHans extends SZh {
   String get autoSelectSmart => '智能选择';
 
   @override
-  String get coreWatchUnstable => '与内核的连接不稳定。请稍等片刻后尝试重新连接。';
+  String get coreWatchUnstable => '与内核的连接不稳定';
 
   @override
   String get watchReconnect => '重新连接';
@@ -3480,7 +3198,7 @@ class SZhHans extends SZh {
   String get overrideCustomRules => '自订规则';
 
   @override
-  String get errBenchmarkUnsupported => '测速需要更新版本的内核。请更新 Sora。';
+  String get errBenchmarkUnsupported => '测速需要更新版本的内核';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -3491,7 +3209,7 @@ class SZhHans extends SZh {
   String get profiles => '网络配置文件';
 
   @override
-  String get profilesEmpty => '尚无配置文件。建立后，即可在已知网络中自动应用设置。';
+  String get profilesEmpty => '尚无配置文件';
 
   @override
   String get profileAdd => '添加配置文件';
@@ -3503,9 +3221,6 @@ class SZhHans extends SZh {
   String get profileSsids => 'Wi-Fi 网络（SSID）';
 
   @override
-  String get profileSsidsHint => '家庭、办公室，以逗号分隔';
-
-  @override
   String get profileGateways => '网关';
 
   @override
@@ -3513,9 +3228,6 @@ class SZhHans extends SZh {
 
   @override
   String get profileAutoApply => '自动应用';
-
-  @override
-  String get profileAutoApplyHint => '关闭时，应用配置文件前会要求确认。';
 
   @override
   String get profileSnapshot => '记住当前设置';
@@ -3559,13 +3271,13 @@ class SZhHans extends SZh {
   String get networkUnknown => '无法取得网络信息';
 
   @override
-  String get profileNoTriggers => '请至少添加一个触发条件：SSID、网关或 ASN';
+  String get profileNoTriggers => '没有配置条件';
 
   @override
   String get chains => '代理链';
 
   @override
-  String get chainsEmpty => '尚无代理链。串接 2 至 3 台服务器，让流量依序通过每台服务器。';
+  String get chainsEmpty => '尚无代理链';
 
   @override
   String get chainAdd => '添加代理链';
@@ -3574,16 +3286,10 @@ class SZhHans extends SZh {
   String get chainName => '代理链名称';
 
   @override
-  String get chainPickServers => '选择 2 至 3 台服务器';
+  String get chainTooFew => '连接链至少需要两个服务器';
 
   @override
-  String get chainOrderHint => '拖动以调整顺序：流量从上方进入，从下方离开。';
-
-  @override
-  String get chainTooFew => '连接链至少需要两个服务器。请再添加一个服务器。';
-
-  @override
-  String get chainTooMany => '连接链最多支持三个服务器。请移除多余的服务器。';
+  String get chainTooMany => '连接链最多支持三个服务器';
 
   @override
   String get chainEstimate => '预估延迟';
@@ -3600,10 +3306,10 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get chainUnsupported => '所选内核不支持链式连接。请选择兼容的内核。';
+  String get chainUnsupported => '所选内核不支持链式连接';
 
   @override
-  String get chainHopMissing => '连接链中的某个服务器已不可用。请为该节点选择其他服务器。';
+  String get chainHopMissing => '连接链中的某个服务器已不可用';
 
   @override
   String chainHop(Object n) {
@@ -3623,7 +3329,7 @@ class SZhHans extends SZh {
   String get syncDevices => '我的设备';
 
   @override
-  String get syncEmpty => '尚无配对的设备。请透过局域网与另一台设备配对。';
+  String get syncEmpty => '尚无配对的设备';
 
   @override
   String get syncPair => '配对设备';
@@ -3651,9 +3357,6 @@ class SZhHans extends SZh {
   String get syncNever => '从未';
 
   @override
-  String get syncNoLan => '设备必须位于同一个局域网';
-
-  @override
   String get syncPaired => '设备已配对';
 
   @override
@@ -3663,16 +3366,10 @@ class SZhHans extends SZh {
   String get syncWaiting => '正在等待另一台设备…';
 
   @override
-  String get syncSecureNote => '通道采用端到端加密，无需账号或云服务器。';
-
-  @override
   String get zapretWithVpn => '直接连接流量的 DPI 绕过';
 
   @override
-  String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
-
-  @override
-  String get chainDuplicate => '连接链中有重复的服务器。请为每个节点选择不同的服务器。';
+  String get chainDuplicate => '连接链中有重复的服务器';
 
   @override
   String get edit => '编辑';
@@ -3682,9 +3379,6 @@ class SZhHans extends SZh {
 
   @override
   String get autoSwitchOnDegrade => '质量下降时自动切换';
-
-  @override
-  String get autoSwitchOnDegradeDetail => '若所选服务器大幅变慢或停止回应，Sora 会切换至测量结果最佳的服务器，最多每 10 分钟切换一次。';
 
   @override
   String get tunStackMixed => '混合';
@@ -3702,19 +3396,13 @@ class SZhHans extends SZh {
   String get customServerName => '名称';
 
   @override
-  String get customServerNameHint => '例如：我的 VPS';
-
-  @override
-  String get customServerNameRequired => '请输入名称';
+  String get customServerNameRequired => '未填写名称';
 
   @override
   String get customServerAddress => '地址';
 
   @override
-  String get customServerAddressHint => 'example.com 或 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => '请输入服务器地址';
+  String get customServerAddressRequired => '未填写地址';
 
   @override
   String get customServerAddressInvalid => '地址无效';
@@ -3723,19 +3411,13 @@ class SZhHans extends SZh {
   String get customServerPort => '端口';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => '端口必须是 1 到 65535 之间的数字';
+  String get customServerPortInvalid => '无效端口';
 
   @override
   String get customServerProtocol => '协议';
 
   @override
   String get customServerCredentials => '登录信息';
-
-  @override
-  String get customServerOptional => '可选';
 
   @override
   String get customServerShowSecret => '显示密钥';
@@ -3749,22 +3431,13 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get customServerTest => '测试';
-
-  @override
   String get leakTestTitle => '泄漏测试';
-
-  @override
-  String get leakTestIntro => '检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。';
 
   @override
   String get leakTestRun => '执行测试';
 
   @override
   String get leakTestCancel => '取消';
-
-  @override
-  String get leakTestNeedsConnection => '请先连接，再执行泄漏测试。';
 
   @override
   String leakTestProgress(int count) {
@@ -3785,9 +3458,6 @@ class SZhHans extends SZh {
 
   @override
   String get leakTestFix => '修复';
-
-  @override
-  String get leakTestFixedNote => '已启用网络锁定，请重新测试以确认。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';
@@ -3820,13 +3490,13 @@ class SZhHans extends SZh {
   String get syncDaemonFailed => '无法启动同步服务';
 
   @override
-  String get syncDaemonMissing => '找不到 sora-sync 元件。请重新安装应用程序以启用设备同步。';
+  String get syncDaemonMissing => '找不到 sora-sync 元件';
 
   @override
   String get syncDaemonStarting => '正在启动同步服务…';
 
   @override
-  String get syncErrAuth => '同步服务拒绝了访问令牌。请重新启动应用程序后再试一次。';
+  String get syncErrAuth => '同步服务拒绝了访问令牌';
 
   @override
   String get syncErrNotFound => '此设备已解除配对';
@@ -3835,7 +3505,7 @@ class SZhHans extends SZh {
   String get syncErrPairingActive => '已有进行中的配对会话';
 
   @override
-  String get syncErrUnreachable => '另一台设备没有回应。请确认设备位于同一个网络，且正在显示配对代码。';
+  String get syncErrUnreachable => '另一台设备没有回应';
 
   @override
   String get syncError => '同步错误';
@@ -3847,9 +3517,6 @@ class SZhHans extends SZh {
 
   @override
   String get syncJoining => '正在与设备配对…';
-
-  @override
-  String get syncLegacyCleared => '旧设备清单未曾完成实际配对，因此已清除。请重新配对设备，这次会真正建立配对。';
 
   @override
   String get syncNewCode => '新代码';
@@ -3909,8 +3576,7 @@ class SZhHans extends SZh {
   String get syncThisDevice => '此设备';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android 上无法同步';
 
   @override
   String get diagnosticPackets => '抓包';
@@ -3957,25 +3623,25 @@ class SZhHans extends SZh {
   String get customServerWgKeepalive => 'Keepalive（秒）';
 
   @override
-  String get customServerWgKeyInvalid => '密钥必须是 base64 编码的 32 字节，与 wg genkey 的输出相同。';
+  String get customServerWgKeyInvalid => '无效的 WireGuard 密钥';
 
   @override
-  String get customServerWgCidrInvalid => '请输入以逗号分隔的前缀，例如 10.0.0.2/32。';
+  String get customServerWgCidrInvalid => '无效的 CIDR 前缀';
 
   @override
-  String get customServerWgKeepaliveInvalid => '请输入 0 到 65535 之间的秒数。';
+  String get customServerWgKeepaliveInvalid => '无效的 keepalive 间隔';
 
   @override
   String get strictKillSwitch => '严格网络锁定';
 
   @override
-  String get strictKillSwitchWarning => '连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。';
+  String get strictKillSwitchWarning => '退出后仍阻止 VPN 之外的流量？';
 
   @override
-  String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
+  String get extWorkerFailed => '扩展的后台任务失败';
 
   @override
-  String get extAssetRejected => '扩展文件包含难以辨认的配色或无效规则。请联系扩展作者修正文件。';
+  String get extAssetRejected => '扩展文件包含难以辨认的配色或无效规则';
 
   @override
   String get extVerifiedSora => '经 Sora 验证';
@@ -4001,31 +3667,25 @@ class SZhHans extends SZh {
   String get customServerPassword => '密码';
 
   @override
-  String get customServerSecretRequired => '请输入一个值';
+  String get customServerSecretRequired => '未填写值';
 
   @override
   String get customServerLinkInvalid => '服务器链接无效';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora 内部错误';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => '服务器证书被拒绝';
 
   @override
-  String get errInternal => 'Sora 内部错误。请保存日志并报告问题。';
+  String get errFileAccess => '无法访问文件';
 
   @override
-  String get errTls => '服务器证书被拒绝。请检查系统时间或联系服务提供商。';
+  String get errDataLimit => '数据过多';
 
   @override
-  String get errFileAccess => '无法访问文件。请检查权限和可用空间。';
-
-  @override
-  String get errDataLimit => '数据过多。请减少所选项目后重试。';
-
-  @override
-  String get errCredentials => '保存的凭据丢失。请重新导入服务器。';
+  String get errCredentials => '保存的凭据丢失';
 
   @override
   String subscriptionStale(String time) {
@@ -4033,54 +3693,49 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get subscriptionNeverUpdated => '尚未更新。请重试。';
+  String get subscriptionNeverUpdated => '尚未更新';
 
   @override
   String errHttpStatus(int status) {
-    String _temp0 = intl.Intl.pluralLogic(
-      status,
-      locale: localeName,
-      other: '服务器返回了 HTTP $status。请检查链接或联系提供商。',
-      zero: '服务器拒绝了请求。请检查链接或联系提供商。',
-    );
+    String _temp0 = intl.Intl.pluralLogic(status, locale: localeName, other: '服务器返回了 HTTP $status', zero: '服务器拒绝了请求');
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => '服务器设置不完整或不受支持。请更新订阅。';
+  String get errInvalidServer => '服务器设置不完整或不受支持';
 
   @override
-  String get errServerIds => '两个服务器使用了相同的标识符。请重新导入。';
+  String get errServerIds => '两个服务器使用了相同的标识符';
 
   @override
-  String get errRoutingGroup => '路由指向缺失的服务器或损坏的分组。请更新订阅。';
+  String get errRoutingGroup => '路由指向缺失的服务器或损坏的分组';
 
   @override
-  String get errConnections => '无法显示连接列表。请连接或选择其他内核。';
+  String get errConnections => '无法显示连接列表';
 
   @override
-  String get errLogs => '此服务不保存日志。请更新 Sora。';
+  String get errLogs => '此服务不保存日志';
 
   @override
-  String get errDiagnostics => '无法收集诊断信息。请重试或保存日志。';
+  String get errDiagnostics => '无法收集诊断信息';
 
   @override
-  String get errMissingItem => '请求的项目已不存在。请刷新列表。';
+  String get errMissingItem => '请求的项目已不存在';
 
   @override
-  String get errInvalidRequest => '请求包含无效值。请检查输入后重试。';
+  String get errInvalidRequest => '请求包含无效值';
 
   @override
-  String get errProxyLogin => '系统代理不支持此登录方式。请移除本地代理的用户名和密码。';
+  String get errProxyLogin => '系统代理不支持此登录方式';
 
   @override
-  String get errLogFilter => '日志筛选条件无效。请清空搜索后重试。';
+  String get errLogFilter => '日志筛选条件无效';
 
   @override
-  String get errSubRedirect => '服务器重定向到了不安全的地址。请向服务提供商索取新链接。';
+  String get errSubRedirect => '服务器重定向到了不安全的地址';
 
   @override
-  String get errProxySetup => '无法配置系统代理。请重新连接或打开日志。';
+  String get errProxySetup => '无法配置系统代理';
 
   @override
   String get notificationsToday => '今天';
@@ -4106,19 +3761,48 @@ class SZhHans extends SZh {
   }
 
   @override
-  String get errSubInterval => '订阅更新间隔无效。请选择提供商建议的间隔。';
+  String get errSubInterval => '订阅更新间隔无效';
 
   @override
-  String get errRule => '路由规则无效。请检查规则中的域名、IP 地址或应用。';
+  String get errRule => '路由规则无效';
 
   @override
-  String get errDns => 'DNS 设置无效。请检查 DNS 服务器地址。';
+  String get errDns => 'DNS 设置无效';
 
   @override
-  String get errEndpoint => '待检测的服务器地址无效。请检查主机名和端口。';
+  String get errEndpoint => '待检测的服务器地址无效';
 
   @override
-  String get errCancelled => '请求已取消。如有需要，请重新执行操作。';
+  String get errCancelled => '请求已取消';
+
+  @override
+  String get customServerOptions => '连接设置';
+
+  @override
+  String get customServerTransport => '传输';
+
+  @override
+  String get customServerSecurity => '安全';
+
+  @override
+  String get customServerCipher => '加密方式';
+
+  @override
+  String get customServerWgInterface => '接口';
+
+  @override
+  String get customServerWgPeer => '对等端';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '适用平台：$platforms。';
+  }
+
+  @override
+  String get winwsScopeWarning => '更改所有应用的 TCP 流量？';
+
+  @override
+  String get winwsRequirements => '此 VPN 模式不可用';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -4321,61 +4005,58 @@ class SZhHant extends SZh {
   String get errGeneric => '出了點問題';
 
   @override
-  String get errCore => 'Sora 服務沒有回應。請稍候片刻再試。';
+  String get errCore => 'Sora 服務沒有回應';
 
   @override
-  String get errAuth => '無法存取 Sora 服務。請重新啟動應用程式後再試。';
+  String get errAuth => '無法存取 Sora 服務';
 
   @override
-  String get errVersion => 'Sora 應用程式與服務的版本不一致。請更新 Sora。';
+  String get errVersion => 'Sora 應用程式與服務的版本不一致';
 
   @override
-  String get errBusy => '上一個命令仍在執行。請等待執行完成。';
+  String get errBusy => '上一個命令仍在執行';
 
   @override
-  String get errEngineMissing => '找不到此伺服器所需的核心。請檢查 Sora 更新。';
+  String get errEngineMissing => '找不到此伺服器所需的核心';
 
   @override
-  String get errEngineStart => '核心無法啟動。請查看連線記錄以瞭解原因。';
+  String get errEngineStart => '核心無法啟動';
 
   @override
-  String get errEngineStopped => '核心已停止。請嘗試重新連線。';
+  String get errEngineStopped => '核心已停止';
 
   @override
-  String get errTunnel => '此 VPN 模式無法使用。請選擇其他模式或檢查服務權限。';
+  String get errTunnel => '此 VPN 模式無法使用';
 
   @override
-  String get errNetwork => '無法到達伺服器';
+  String get errTimeout => '伺服器回應逾時';
 
   @override
-  String get errTimeout => '伺服器回應逾時。請一分鐘後再試。';
+  String get errFirewall => '無法封鎖 VPN 以外的網際網路存取';
 
   @override
-  String get errFirewall => '無法封鎖 VPN 以外的網際網路存取。請查看連線記錄以瞭解原因。';
+  String get errSubFetch => '無法下載訂閱';
 
   @override
-  String get errSubFetch => '無法下載訂閱。請檢查網路連線，一分鐘後再試。';
+  String get errSubFormat => '無法辨識訂閱格式';
 
   @override
-  String get errSubFormat => '無法辨識訂閱格式。請向訂閱供應商索取相容的訂閱連結。';
+  String get errSubEmpty => '訂閱中沒有伺服器';
 
   @override
-  String get errSubEmpty => '訂閱中沒有伺服器。請聯絡訂閱供應商。';
+  String get errSubDuplicate => '已新增此訂閱';
 
   @override
-  String get errSubDuplicate => '已新增此訂閱。請更新該訂閱以取得最新的伺服器清單。';
+  String get errSubLimit => '訂閱數量已達上限';
 
   @override
-  String get errSubLimit => '訂閱數量已達上限。請先刪除不再使用的訂閱，再新增訂閱。';
+  String get errSubScheme => '不支援的訂閱連結協定';
 
   @override
-  String get errSubScheme => '訂閱連結必須以 https:// 開頭。請向供應商索取安全連結。';
+  String get errSecretStore => 'Sora 儲存空間已損壞或無法存取';
 
   @override
-  String get errSecretStore => 'Sora 儲存空間已損壞或無法存取。請檢查存取權限，並查看記錄中的詳細資訊。';
-
-  @override
-  String get errNoServers => '沒有可連線的伺服器。請新增訂閱或自己的伺服器。';
+  String get errNoServers => '沒有可連線的伺服器';
 
   @override
   String get connections => '連接';
@@ -4429,9 +4110,6 @@ class SZhHant extends SZh {
   String get dnsAuto => '汽車';
 
   @override
-  String get dnsHint => '地址，逗號分隔';
-
-  @override
   String get fragment => 'TLS 碎片';
 
   @override
@@ -4447,13 +4125,7 @@ class SZhHant extends SZh {
   String get byDefault => '預設';
 
   @override
-  String get rangeHint => '例如，100-200';
-
-  @override
   String get splitPos => '分割部位';
-
-  @override
-  String get splitPosHint => '例如，1、midsld';
 
   @override
   String get disorder => '重新排序件';
@@ -4562,11 +4234,6 @@ class SZhHant extends SZh {
   String get support => '支援';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine 透過此電腦上的連接埠進行控制。 其他程式將能夠判斷 VPN 是否已開啟。';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '選擇$engine';
   }
@@ -4637,9 +4304,6 @@ class SZhHant extends SZh {
   String get launchAtLogin => '從系統入手';
 
   @override
-  String get launchAtLoginDetail => '登入時 Sora 會自動啟動，並隱藏到系統托盤中。';
-
-  @override
   String get closeToTray => '關閉時保留在托盤中';
 
   @override
@@ -4674,9 +4338,6 @@ class SZhHant extends SZh {
   String get noticeInTray => 'Sora 仍在托盤中';
 
   @override
-  String get noticeInTrayBody => '從其圖標的選單中退出';
-
-  @override
   String get noticeLost => '連線遺失';
 
   @override
@@ -4704,10 +4365,7 @@ class SZhHant extends SZh {
   String get importTitle => '新增此訂閱？';
 
   @override
-  String get importSealed => '此連結針對Happ進行了加密，只有Happ可以讀取。 向您的提供者詢問簡單的訂閱連結。';
-
-  @override
-  String get understood => '好的';
+  String get importSealed => '此連結針對Happ進行了加密，只有Happ可以讀取';
 
   @override
   String get noAnswer => '沒有答案';
@@ -4746,39 +4404,10 @@ class SZhHant extends SZh {
   String get openLogs => '打開日誌';
 
   @override
-  String get tourReplay => '再次顯示指南';
-
-  @override
-  String tourStep(int step) {
-    return '第 5 步 $step';
-  }
-
-  @override
   String get tourBack => '後退';
 
   @override
   String get tourNext => '下一個';
-
-  @override
-  String get tourSkip => '跳過';
-
-  @override
-  String get tourFinish => '完畢';
-
-  @override
-  String get tourAdd => '新增您的提供者的訂閱連結。';
-
-  @override
-  String get tourServer => '選擇一個伺服器。 “最快”為您選擇一個。';
-
-  @override
-  String get tourConnect => '按一下此處連接或斷開連接。';
-
-  @override
-  String get tourMode => '選擇一種模式。 如果 VPN 斷線，終止開關會阻止網路。';
-
-  @override
-  String get tourSettings => '打開設定。 您可以在那裡重播本指南。';
 
   @override
   String get chooseProgram => '選擇一個程序';
@@ -4790,7 +4419,7 @@ class SZhHant extends SZh {
   String get runningProcesses => '正在運行的進程';
 
   @override
-  String get programsEmpty => '沒有找到應用程式。 嘗試另一個名字。';
+  String get programsEmpty => '沒有找到應用程式';
 
   @override
   String get selectExe => '選擇一個 .exe 檔案';
@@ -4802,7 +4431,7 @@ class SZhHant extends SZh {
   String get speedtestSearch => '尋找服務';
 
   @override
-  String get speedtestEmpty => '沒有匹配項。 更改搜尋。';
+  String get speedtestEmpty => '沒有匹配項';
 
   @override
   String get speedtestBackToList => '返回服務';
@@ -4811,13 +4440,13 @@ class SZhHant extends SZh {
   String get speedtestOpenBrowser => '在瀏覽器中開啟';
 
   @override
-  String get speedtestUnavailable => '嵌入式瀏覽器無法啟動。 在系統瀏覽器中開啟該服務。';
+  String get speedtestUnavailable => '嵌入式瀏覽器無法啟動';
 
   @override
-  String get speedtestPageFailed => '頁面無法載入。 重新載入它或在系統瀏覽器中開啟該服務。';
+  String get speedtestPageFailed => '頁面無法載入';
 
   @override
-  String get speedtestExternalFailed => '系統瀏覽器無法開啟。 再試一次。';
+  String get speedtestExternalFailed => '系統瀏覽器無法開啟';
 
   @override
   String get modes => '模式';
@@ -4857,46 +4486,28 @@ class SZhHant extends SZh {
   String get updateNoNotes => '該版本沒有註解。';
 
   @override
-  String get updateDropWarning => '當 Sora 及其核心更新時，VPN 連線將斷開幾秒鐘。 繼續？';
+  String get updateDropWarning => '中斷連線以更新？';
 
   @override
-  String get updateWaitConnection => '等待 VPN 連線和核心準備就緒。';
+  String get updateWaitConnection => '連線尚未就緒';
 
   @override
-  String get updateDownloading => '正在下載並驗證文件...';
-
-  @override
-  String get updateInstalling => '正在準備更新或等待管理員身份驗證...';
-
-  @override
-  String get updateNetworkError => '無法下載更新。 再試一次。';
+  String get updateNetworkError => '無法下載更新';
 
   @override
   String get updateReleaseError => '發布資料或所需文件遺失或無效。';
 
   @override
-  String get updateChecksumError => '下載的內容與 SHA256SUMS 不符。 沒有安裝任何東西。';
+  String get updateChecksumError => '下載的內容與 SHA256SUMS 不符';
 
   @override
-  String get updateInstallError => '更新沒有完成。 身份驗證可能已被取消。';
+  String get updateInstallError => '更新沒有完成';
 
   @override
-  String get updateUnsupported => '此可執行檔不屬於受支援的 Sora 軟體包對。 使用發行版安裝說明。';
+  String get updateUnsupported => '此可執行檔不屬於受支援的 Sora 軟體包對';
 
   @override
-  String get updateManual => '在終端機中執行此命令以安裝兩個經過驗證的軟體包，然後重新開啟 Sora。 檔案保留在下載目錄中。 VPN 連線將會中斷。';
-
-  @override
-  String get updateSignaturePending => '更新檔案會與隨版本發布的檢查碼比對。';
-
-  @override
-  String get updateManualSigWarning => '下方檔案與版本的檢查碼相符。如果是從官方版本下載的，請執行該指令。';
-
-  @override
-  String get updateVersionRevoked => '開發者已撤回此版本，請等待修正版。';
-
-  @override
-  String get updateRolloutPending => '新版本正分批推出，屆時會自動通知您更新。';
+  String get updateVersionRevoked => '開發者已撤回此版本，請等待修正版';
 
   @override
   String updateRollbacking(String version) {
@@ -4909,7 +4520,7 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get updateRollbackError => '自動還原失敗。若新版本無法運作，請手動重新安裝先前的版本。';
+  String get updateRollbackError => '自動還原失敗';
 
   @override
   String get updateRollbackCacheError => '無法準備目前版本的已驗證還原副本，因此未安裝更新。';
@@ -4918,10 +4529,7 @@ class SZhHant extends SZh {
   String get updateCopyCommand => '複製指令';
 
   @override
-  String get updateChecksDisabled => '在「設定」中停用自動檢查。';
-
-  @override
-  String get updateInstalled => '已安裝更新。 重新開啟 Sora。';
+  String get updateInstalled => '已安裝更新';
 
   @override
   String get projectLinks => '專案';
@@ -4951,19 +4559,13 @@ class SZhHant extends SZh {
   String get showDescription => '顯示說明';
 
   @override
-  String get pendingConnectionChanges => '重新連接以套用這些變更。';
+  String get errEngineUnsupported => '所選引擎不支援此設定檔或設定';
 
   @override
-  String get reconnectNow => '應用並重新連接';
+  String get errRestore => '連線清理不完整';
 
   @override
-  String get errEngineUnsupported => '所選引擎不支援此設定檔或設定。 選擇自動或相容的引擎。';
-
-  @override
-  String get errRestore => '連線清理不完整。 重試斷開連線；詳細資訊請參閱日誌。';
-
-  @override
-  String get errSessionEnded => '本次會議已經結束。 刷新連線狀態。';
+  String get errSessionEnded => '本次會議已經結束';
 
   @override
   String get retryDisconnect => '重試斷開連接';
@@ -4979,10 +4581,10 @@ class SZhHant extends SZh {
 
   @override
   String get modesGuide =>
-      '如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| mieru | 沒有 | 沒有 | 是的 |\n| NaiveProxy | 是的 | 沒有 | 沒有 |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed**: TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 Linux 上 mihomo 的預設值。在 Windows 上，Xray 和 mihomo 預設使用 MIPS。\n- **System**: 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor**: 處理用戶空間中的流量。\n- **MIPS**: mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows 上，Xray 的四種 TUN 協定堆疊均使用 mihomo 1.19.32 或更新版本。協定與路由仍由 Xray 處理。此組合中的應用程式規則僅支援直連與封鎖；在 Linux 上，這些規則需要 Xray 內建的 gVisor。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。 選擇一個堆疊並選擇“應用並重新連接”以在您的網路中進行嘗試。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。 模式、引擎、DNS和規則設定立即儲存；在活動連線期間，按一下應用並重新連線即可使用它們。 重新啟動引擎可能會中斷下載和呼叫。 重複點擊不會啟動並行連接；斷開連接結束轉換並釋放連接。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 透過 Jitsi、Yandex Telemost 或 WB Stream 的視訊通話傳輸 TCP。請匯入 olcrtc:// 連結或 QR 碼。它支援 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支援 UDP。兩端需要相容的 OLC2 建置版本。上游專案已封存。\n';
+      '如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| mieru | 沒有 | 沒有 | 是的 |\n| NaiveProxy | 是的 | 沒有 | 沒有 |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed**: TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 Linux 上 mihomo 的預設值。在 Windows 上，Xray 和 mihomo 預設使用 MIPS。\n- **System**: 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor**: 處理用戶空間中的流量。\n- **MIPS**: mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows 上，Xray 的四種 TUN 協定堆疊均使用 mihomo 1.19.32 或更新版本。協定與路由仍由 Xray 處理。此組合中的應用程式規則僅支援直連與封鎖；在 Linux 上，這些規則需要 Xray 內建的 gVisor。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。 您對模式、引擎、DNS 或規則所做的變更會在短暫停頓後自動重新連線並套用一次；背景重新整理不會重新連線 VPN。 重新啟動引擎可能會中斷下載和通話。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 透過 Jitsi、Yandex Telemost 或 WB Stream 的視訊通話傳輸 TCP。請匯入 olcrtc:// 連結或 QR 碼。它支援 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支援 UDP。兩端需要相容的 OLC2 建置版本。上游專案已封存。\n';
 
   @override
-  String get probeServers => '檢查伺服器';
+  String get probeServers => '平';
 
   @override
   String get extensions => '擴充';
@@ -5006,13 +4608,10 @@ class SZhHant extends SZh {
   String get extInstallOne => '1 次安裝';
 
   @override
-  String get extSideloadWarning => '僅在信任作者的自簽章金鑰時安裝。';
+  String get extSideloadWarning => '自簽署金鑰';
 
   @override
   String get extPermissionsWidened => '此更新要求新的權限：';
-
-  @override
-  String get extDangerousAck => '我瞭解這些權限的影響範圍很大';
 
   @override
   String get extInstall => '安裝';
@@ -5025,9 +4624,6 @@ class SZhHant extends SZh {
 
   @override
   String get extConfirm => '確認';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => '目錄';
@@ -5078,16 +4674,13 @@ class SZhHant extends SZh {
   String get extEmptySearch => '找不到結果';
 
   @override
-  String get extEmptyInstalled => '尚未安裝擴充功能。\n請從目錄中尋找，或從檔案安裝。';
+  String get extEmptyInstalled => '尚未安裝擴充功能';
 
   @override
   String get extInstallFromFile => '從檔案安裝';
 
   @override
   String get extInstallFromUrl => '從 URL 安裝';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => '下載';
@@ -5102,19 +4695,16 @@ class SZhHant extends SZh {
   String get extInstalling => '正在安裝…';
 
   @override
-  String get extInstallFailed => '安裝失敗';
-
-  @override
-  String get extErrSignature => '簽章驗證失敗。檔案可能已損毀或遭到竄改。';
+  String get extErrSignature => '簽章驗證失敗';
 
   @override
   String get extErrManifest => '擴充功能的資訊清單無效。';
 
   @override
-  String get extErrNetwork => '網路錯誤，請檢查連接後再試一次。';
+  String get extErrNetwork => '網路錯誤，請檢查連接後再試一次';
 
   @override
-  String get extErrHash => '下載的檔案與目錄不符，可能遭到竄改。';
+  String get extErrHash => '下載的檔案與目錄不符，可能遭到竄改';
 
   @override
   String extErrMinApp(String version) {
@@ -5125,10 +4715,10 @@ class SZhHant extends SZh {
   String get extErrHttpsOnly => '僅允許 https:// 連結';
 
   @override
-  String get extErrGeneric => '發生錯誤，請再試一次。';
+  String get extErrGeneric => '發生錯誤，請再試一次';
 
   @override
-  String get extErrAuthorKeyChanged => '此更新的作者簽署金鑰與已安裝版本不同，因此已遭封鎖。若您信任新金鑰，請先解除安裝擴充功能，再自行重新安裝。';
+  String get extErrAuthorKeyChanged => '此更新的作者簽署金鑰與已安裝版本不同，因此已遭封鎖';
 
   @override
   String get extDisabled => '已停用';
@@ -5185,7 +4775,7 @@ class SZhHant extends SZh {
 
   @override
   String extConflictsCount(int count) {
-    return '有 $count 個衝突需要您決定';
+    return '擴充功能衝突: $count';
   }
 
   @override
@@ -5262,10 +4852,10 @@ class SZhHant extends SZh {
   String get extPermThemeApply => '套用應用程式佈景主題';
 
   @override
-  String get extPermRoutingRules => '新增路由規則（影響流量去向）';
+  String get extPermRoutingRules => '新增路由規則';
 
   @override
-  String get extPermNetHooks => '介入網路傳輸路徑（DPI 繞過模組）';
+  String get extPermNetHooks => '介入網路傳輸路徑';
 
   @override
   String get extPermNetFetch => '存取允許清單中的 URL';
@@ -5274,7 +4864,7 @@ class SZhHant extends SZh {
   String get extPermBackground => '執行背景工作';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => '已停用';
 
   @override
   String get extCapBackground => '在背景執行';
@@ -5312,9 +4902,6 @@ class SZhHant extends SZh {
   String get extSortRelevance => '相關程度';
 
   @override
-  String get extPermNetworkDetail => 'VPN 請求僅限存取以下主機。';
-
-  @override
   String get extBgTitle => '背景工作';
 
   @override
@@ -5336,9 +4923,6 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get extBgDisabledNote => '請先啟用擴充功能，才能管理背景工作。';
-
-  @override
   String get extCapNetwork => '網路存取';
 
   @override
@@ -5355,7 +4939,7 @@ class SZhHant extends SZh {
   String get diagnosticHttp => 'HTTP 診斷';
 
   @override
-  String get diagnosticNoData => '尚未記錄請求。 首先打開一個速度測試網站。';
+  String get diagnosticNoData => '尚未記錄請求';
 
   @override
   String get qrShareTitle => '透過 QR 分享';
@@ -5365,12 +4949,6 @@ class SZhHant extends SZh {
 
   @override
   String get qrCopyLink => '複製連結';
-
-  @override
-  String get qrWarning => '僅與信任的人分享此 QR 碼。';
-
-  @override
-  String get qrScanHint => '選擇包含 QR 碼的截圖或相片，或貼上連結';
 
   @override
   String get qrFromClipboard => '從剪貼簿貼上';
@@ -5451,28 +5029,10 @@ class SZhHant extends SZh {
   String get dnsLeakCheckKillSwitchDns => '網路鎖定的 DNS 保護';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => '請在上方的 DNS 設定中指定通道 DNS。';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => '檢查系統在通道外會使用哪些解析器。';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => '請啟用網路鎖定，讓 DNS 流量保持在通道內。';
-
-  @override
   String get dnsLeakCheckEncryptedDns => '作業系統加密 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS 回應偽造';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => '檢查系統在通道外使用的加密 DNS 端點。';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns => '請為通道使用加密 DNS（DoT 或 DoH），避免解析器偽造回應。';
-
-  @override
-  String get dnsCheckNeedsConnection => '請先連接 VPN，再檢查是否洩漏。';
 
   @override
   String get dnsExpected => '預期';
@@ -5499,7 +5059,7 @@ class SZhHant extends SZh {
   String get autoSelectSmart => '智慧選擇';
 
   @override
-  String get coreWatchUnstable => '與核心的連線不穩定。請稍候片刻再嘗試重新連線。';
+  String get coreWatchUnstable => '與核心的連線不穩定';
 
   @override
   String get watchReconnect => '重新連接';
@@ -5538,7 +5098,7 @@ class SZhHant extends SZh {
   String get overrideCustomRules => '自訂規則';
 
   @override
-  String get errBenchmarkUnsupported => '測速需要較新版本的核心。請更新 Sora。';
+  String get errBenchmarkUnsupported => '測速需要較新版本的核心';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -5549,7 +5109,7 @@ class SZhHant extends SZh {
   String get profiles => '網路設定檔';
 
   @override
-  String get profilesEmpty => '尚無設定檔。建立後，即可在已知網路中自動套用設定。';
+  String get profilesEmpty => '尚無設定檔';
 
   @override
   String get profileAdd => '新增設定檔';
@@ -5561,9 +5121,6 @@ class SZhHant extends SZh {
   String get profileSsids => 'Wi-Fi 網路（SSID）';
 
   @override
-  String get profileSsidsHint => '住家、辦公室，以逗號分隔';
-
-  @override
   String get profileGateways => '閘道';
 
   @override
@@ -5571,9 +5128,6 @@ class SZhHant extends SZh {
 
   @override
   String get profileAutoApply => '自動套用';
-
-  @override
-  String get profileAutoApplyHint => '關閉時，套用設定檔前會要求確認。';
 
   @override
   String get profileSnapshot => '記住目前設定';
@@ -5617,13 +5171,13 @@ class SZhHant extends SZh {
   String get networkUnknown => '無法取得網路資訊';
 
   @override
-  String get profileNoTriggers => '請至少新增一個觸發條件：SSID、閘道或 ASN';
+  String get profileNoTriggers => '沒有設定條件';
 
   @override
   String get chains => '代理鏈';
 
   @override
-  String get chainsEmpty => '尚無代理鏈。串接 2 至 3 台伺服器，讓流量依序通過每台伺服器。';
+  String get chainsEmpty => '尚無代理鏈';
 
   @override
   String get chainAdd => '新增代理鏈';
@@ -5632,16 +5186,10 @@ class SZhHant extends SZh {
   String get chainName => '代理鏈名稱';
 
   @override
-  String get chainPickServers => '選擇 2 至 3 台伺服器';
+  String get chainTooFew => '連線鏈至少需要兩個伺服器';
 
   @override
-  String get chainOrderHint => '拖曳以調整順序：流量從上方進入，從下方離開。';
-
-  @override
-  String get chainTooFew => '連線鏈至少需要兩個伺服器。請再新增一個伺服器。';
-
-  @override
-  String get chainTooMany => '連線鏈最多支援三個伺服器。請移除多餘的伺服器。';
+  String get chainTooMany => '連線鏈最多支援三個伺服器';
 
   @override
   String get chainEstimate => '預估延遲';
@@ -5658,10 +5206,10 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get chainUnsupported => '所選核心不支援鏈式連線。請選擇相容的核心。';
+  String get chainUnsupported => '所選核心不支援鏈式連線';
 
   @override
-  String get chainHopMissing => '連線鏈中的某個伺服器已無法使用。請為該節點選擇其他伺服器。';
+  String get chainHopMissing => '連線鏈中的某個伺服器已無法使用';
 
   @override
   String chainHop(Object n) {
@@ -5681,7 +5229,7 @@ class SZhHant extends SZh {
   String get syncDevices => '我的裝置';
 
   @override
-  String get syncEmpty => '尚無配對的裝置。請透過區域網路與另一台裝置配對。';
+  String get syncEmpty => '尚無配對的裝置';
 
   @override
   String get syncPair => '配對裝置';
@@ -5709,9 +5257,6 @@ class SZhHant extends SZh {
   String get syncNever => '從未';
 
   @override
-  String get syncNoLan => '裝置必須位於同一個區域網路';
-
-  @override
   String get syncPaired => '裝置已配對';
 
   @override
@@ -5721,16 +5266,10 @@ class SZhHant extends SZh {
   String get syncWaiting => '正在等待另一台裝置…';
 
   @override
-  String get syncSecureNote => '通道採用端對端加密，不需要帳號或雲端伺服器。';
-
-  @override
   String get zapretWithVpn => '直接連線流量的 DPI 繞過';
 
   @override
-  String get zapretWithVpnHint => '與 VPN 通道並行執行 zapret：通道流量使用 VPN，直接連線流量則透過繞過機制。';
-
-  @override
-  String get chainDuplicate => '連線鏈中有重複的伺服器。請為每個節點選擇不同的伺服器。';
+  String get chainDuplicate => '連線鏈中有重複的伺服器';
 
   @override
   String get edit => '編輯';
@@ -5740,9 +5279,6 @@ class SZhHant extends SZh {
 
   @override
   String get autoSwitchOnDegrade => '品質下降時自動切換';
-
-  @override
-  String get autoSwitchOnDegradeDetail => '若所選伺服器大幅變慢或停止回應，Sora 會切換至測量結果最佳的伺服器，最多每 10 分鐘切換一次。';
 
   @override
   String get tunStackMixed => '混合';
@@ -5760,19 +5296,13 @@ class SZhHant extends SZh {
   String get customServerName => '名稱';
 
   @override
-  String get customServerNameHint => '例如：我的 VPS';
-
-  @override
-  String get customServerNameRequired => '請輸入名稱';
+  String get customServerNameRequired => '未填寫名稱';
 
   @override
   String get customServerAddress => '位址';
 
   @override
-  String get customServerAddressHint => 'example.com 或 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => '請輸入伺服器位址';
+  String get customServerAddressRequired => '未填寫位址';
 
   @override
   String get customServerAddressInvalid => '位址無效';
@@ -5781,19 +5311,13 @@ class SZhHant extends SZh {
   String get customServerPort => '連接埠';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => '連接埠必須是 1 到 65535 之間的數字';
+  String get customServerPortInvalid => '無效連接埠';
 
   @override
   String get customServerProtocol => '協定';
 
   @override
   String get customServerCredentials => '登入資訊';
-
-  @override
-  String get customServerOptional => '選填';
 
   @override
   String get customServerShowSecret => '顯示機密資訊';
@@ -5807,22 +5331,13 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get customServerTest => '測試';
-
-  @override
   String get leakTestTitle => '洩漏測試';
-
-  @override
-  String get leakTestIntro => '檢查流量能否不經通道離開裝置：包括直接 DNS 和 ICMP 請求、IPv6 對外流量以及系統解析器。請在連接時執行。';
 
   @override
   String get leakTestRun => '執行測試';
 
   @override
   String get leakTestCancel => '取消';
-
-  @override
-  String get leakTestNeedsConnection => '請先連接，再執行洩漏測試。';
 
   @override
   String leakTestProgress(int count) {
@@ -5843,9 +5358,6 @@ class SZhHant extends SZh {
 
   @override
   String get leakTestFix => '修正';
-
-  @override
-  String get leakTestFixedNote => '已啟用網路鎖定，請重新測試以確認。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';
@@ -5878,13 +5390,13 @@ class SZhHant extends SZh {
   String get syncDaemonFailed => '無法啟動同步服務';
 
   @override
-  String get syncDaemonMissing => '找不到 sora-sync 元件。請重新安裝應用程式以啟用裝置同步。';
+  String get syncDaemonMissing => '找不到 sora-sync 元件';
 
   @override
   String get syncDaemonStarting => '正在啟動同步服務…';
 
   @override
-  String get syncErrAuth => '同步服務拒絕了存取權杖。請重新啟動應用程式後再試一次。';
+  String get syncErrAuth => '同步服務拒絕了存取權杖';
 
   @override
   String get syncErrNotFound => '此裝置已解除配對';
@@ -5893,7 +5405,7 @@ class SZhHant extends SZh {
   String get syncErrPairingActive => '已有進行中的配對工作階段';
 
   @override
-  String get syncErrUnreachable => '另一台裝置沒有回應。請確認裝置位於同一個網路，且正在顯示配對代碼。';
+  String get syncErrUnreachable => '另一台裝置沒有回應';
 
   @override
   String get syncError => '同步錯誤';
@@ -5905,9 +5417,6 @@ class SZhHant extends SZh {
 
   @override
   String get syncJoining => '正在與裝置配對…';
-
-  @override
-  String get syncLegacyCleared => '舊裝置清單未曾完成實際配對，因此已清除。請重新配對裝置，這次會真正建立配對。';
 
   @override
   String get syncNewCode => '新代碼';
@@ -5967,8 +5476,7 @@ class SZhHant extends SZh {
   String get syncThisDevice => '此裝置';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android 上無法同步';
 
   @override
   String get diagnosticPackets => '抓包';
@@ -6015,26 +5523,25 @@ class SZhHant extends SZh {
   String get customServerWgKeepalive => 'Keepalive（秒）';
 
   @override
-  String get customServerWgKeyInvalid => '金鑰必須是 base64 編碼的 32 位元組，與 wg genkey 的輸出相同。';
+  String get customServerWgKeyInvalid => '無效的 WireGuard 金鑰';
 
   @override
-  String get customServerWgCidrInvalid => '請輸入以逗號分隔的前綴，例如 10.0.0.2/32。';
+  String get customServerWgCidrInvalid => '無效的 CIDR 前綴';
 
   @override
-  String get customServerWgKeepaliveInvalid => '請輸入 0 到 65535 之間的秒數。';
+  String get customServerWgKeepaliveInvalid => '無效的 keepalive 間隔';
 
   @override
   String get strictKillSwitch => '嚴格網路鎖定';
 
   @override
-  String get strictKillSwitchWarning =>
-      '連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。';
+  String get strictKillSwitchWarning => '結束後仍封鎖 VPN 以外的流量？';
 
   @override
-  String get extWorkerFailed => '擴充功能的背景工作失敗。請查看擴充功能記錄。';
+  String get extWorkerFailed => '擴充功能的背景工作失敗';
 
   @override
-  String get extAssetRejected => '擴充功能檔案包含難以辨識的配色或無效規則。請聯絡擴充功能作者修正檔案。';
+  String get extAssetRejected => '擴充功能檔案包含難以辨識的配色或無效規則';
 
   @override
   String get extVerifiedSora => '經 Sora 驗證';
@@ -6060,31 +5567,25 @@ class SZhHant extends SZh {
   String get customServerPassword => '密碼';
 
   @override
-  String get customServerSecretRequired => '請輸入一個值';
+  String get customServerSecretRequired => '未填寫值';
 
   @override
   String get customServerLinkInvalid => '伺服器連結無效';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora 內部錯誤';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => '伺服器憑證遭拒';
 
   @override
-  String get errInternal => 'Sora 內部錯誤。請儲存日誌並回報問題。';
+  String get errFileAccess => '無法存取檔案';
 
   @override
-  String get errTls => '伺服器憑證遭拒。請檢查系統時間或聯絡服務供應商。';
+  String get errDataLimit => '資料過多';
 
   @override
-  String get errFileAccess => '無法存取檔案。請檢查權限和可用空間。';
-
-  @override
-  String get errDataLimit => '資料過多。請減少所選項目後重試。';
-
-  @override
-  String get errCredentials => '儲存的憑證遺失。請重新匯入伺服器。';
+  String get errCredentials => '儲存的憑證遺失';
 
   @override
   String subscriptionStale(String time) {
@@ -6092,54 +5593,49 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get subscriptionNeverUpdated => '尚未更新。請重試。';
+  String get subscriptionNeverUpdated => '尚未更新';
 
   @override
   String errHttpStatus(int status) {
-    String _temp0 = intl.Intl.pluralLogic(
-      status,
-      locale: localeName,
-      other: '伺服器傳回了 HTTP $status。請檢查連結或聯絡供應商。',
-      zero: '伺服器拒絕了要求。請檢查連結或聯絡供應商。',
-    );
+    String _temp0 = intl.Intl.pluralLogic(status, locale: localeName, other: '伺服器傳回了 HTTP $status', zero: '伺服器拒絕了要求');
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => '伺服器設定不完整或不受支援。請更新訂閱。';
+  String get errInvalidServer => '伺服器設定不完整或不受支援';
 
   @override
-  String get errServerIds => '兩個伺服器使用了相同的識別碼。請重新匯入。';
+  String get errServerIds => '兩個伺服器使用了相同的識別碼';
 
   @override
-  String get errRoutingGroup => '路由指向遺失的伺服器或損壞的群組。請更新訂閱。';
+  String get errRoutingGroup => '路由指向遺失的伺服器或損壞的群組';
 
   @override
-  String get errConnections => '無法顯示連線清單。請連線或選擇其他核心。';
+  String get errConnections => '無法顯示連線清單';
 
   @override
-  String get errLogs => '此服務不儲存日誌。請更新 Sora。';
+  String get errLogs => '此服務不儲存日誌';
 
   @override
-  String get errDiagnostics => '無法收集診斷資訊。請重試或儲存日誌。';
+  String get errDiagnostics => '無法收集診斷資訊';
 
   @override
-  String get errMissingItem => '請求的項目已不存在。請重新整理清單。';
+  String get errMissingItem => '請求的項目已不存在';
 
   @override
-  String get errInvalidRequest => '請求包含無效值。請檢查輸入後重試。';
+  String get errInvalidRequest => '請求包含無效值';
 
   @override
-  String get errProxyLogin => '系統代理不支援此登入方式。請移除本機代理的使用者名稱和密碼。';
+  String get errProxyLogin => '系統代理不支援此登入方式';
 
   @override
-  String get errLogFilter => '日誌篩選條件無效。請清空搜尋後重試。';
+  String get errLogFilter => '日誌篩選條件無效';
 
   @override
-  String get errSubRedirect => '伺服器重新導向至不安全的位址。請向服務供應商索取新連結。';
+  String get errSubRedirect => '伺服器重新導向至不安全的位址';
 
   @override
-  String get errProxySetup => '無法設定系統代理。請重新連線或開啟日誌。';
+  String get errProxySetup => '無法設定系統代理';
 
   @override
   String get notificationsToday => '今天';
@@ -6165,17 +5661,46 @@ class SZhHant extends SZh {
   }
 
   @override
-  String get errSubInterval => '訂閱更新間隔無效。請選擇供應商建議的間隔。';
+  String get errSubInterval => '訂閱更新間隔無效';
 
   @override
-  String get errRule => '路由規則無效。請檢查規則中的網域、IP 位址或應用程式。';
+  String get errRule => '路由規則無效';
 
   @override
-  String get errDns => 'DNS 設定無效。請檢查 DNS 伺服器位址。';
+  String get errDns => 'DNS 設定無效';
 
   @override
-  String get errEndpoint => '待測試的伺服器位址無效。請檢查主機名稱和連接埠。';
+  String get errEndpoint => '待測試的伺服器位址無效';
 
   @override
-  String get errCancelled => '要求已取消。如有需要，請重新執行操作。';
+  String get errCancelled => '要求已取消';
+
+  @override
+  String get customServerOptions => '連線設定';
+
+  @override
+  String get customServerTransport => '傳輸';
+
+  @override
+  String get customServerSecurity => '安全性';
+
+  @override
+  String get customServerCipher => '加密方式';
+
+  @override
+  String get customServerWgInterface => '介面';
+
+  @override
+  String get customServerWgPeer => '對等端';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return '適用平台：$platforms。';
+  }
+
+  @override
+  String get winwsScopeWarning => '變更所有應用程式的 TCP 流量？';
+
+  @override
+  String get winwsRequirements => '此 VPN 模式無法使用';
 }

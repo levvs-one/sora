@@ -168,8 +168,15 @@ no network access in v1.
 
 ## 5. Catalog
 
-The team catalog is `catalog.json` plus `catalog.json.minisig` (minisign,
-team key; trusted comment `timestamp:..\tfile:catalog.json\tsha256:..`).
+The published v1.1.2 app uses `catalog.json` and `catalog.json.minisig`.
+The compatible host candidate uses `catalog-1.1.3.json` and its `.minisig`.
+Both use the team key and the same catalog signature role, with trusted
+comment `timestamp:..\tfile:catalog.json\tsha256:..`. The versioned path
+separates listings but does not add a cryptographic scope or rollback
+protection. The repository seed is a copy of the existing signed catalog;
+it does not establish that a new host or extension has been published.
+The versioned files must be available and verify at the configured URL before
+shipping a host that uses it. See [catalog publishing](../extensions/README.md).
 Shape:
 
 ```json
@@ -226,6 +233,13 @@ Additive catalog fields (all optional):
   fraction.
 - `screenshots`: ≤ 8 https image URLs for the detail page.
 - `changelog`: version/date(RFC3339)/notes rows, newest first.
+- `platforms`: optional list of at most 16 distinct lowercase OS identifiers
+  (1..32 ASCII letters/digits/underscore/hyphen, starting with a letter).
+  Examples: `linux`, `windows`, `macos`, `android`, `ios`. Omitted or empty
+  means no catalog OS restriction, preserving earlier entries. Unknown future
+  OS identifiers remain listed and are unavailable on other hosts.
+  This metadata filters installation, not catalog visibility. It does not
+  certify architecture, driver, operating-system edition or backend availability.
 - `capabilities`: subset of the manifest capability registry; the store
   filters on these ("Themes", "Bypasses & network hooks", ...).
 
@@ -464,17 +478,86 @@ extension's log, including overlaps with user rules. Rules are never removed
 because of an overlap: an overlap may be partial.
 
 Enable, disable, update, rollback and uninstall recompute the session plan.
-A live session reconnects through the app's serialized selection mechanism
-when its resulting plan changes. The extension detail screen lists enabled
+An explicit user edit reconnects a live session once through the app's debounced,
+serialized replacement path when its resulting plan changes. Background refreshes
+only update the mirror and do not authorize reconnects. The extension detail screen lists enabled
 contributions with their match, action and comment; disabled extensions have
 no active contributions. Logs show overlaps and runtime failures.
 
 Source examples with throwaway public keys and local build/sign guides:
 `examples/theme-midnight`, `examples/routing-split`.
 
-### 8.3 Network hooks: not applied
+### 8.3 Selected bypass profiles
 
-`network_hook` still requires capability `network-hook`, permission
-`net.hooks` and a safe descriptor entry. Packages can carry that descriptor,
-but **network hooks are not applied**. Hook loading and DPI bypass remain
-out of scope. No worker or declarative API exposes a traffic hook.
+The app consumes version-2 declarative profiles through the existing
+`network_hook` pointer, `network-hook` capability and dangerous `net.hooks`
+permission. This is not a worker callback on packets.
+
+```json
+{
+  "hook_version": 2,
+  "backend": "tpws",
+  "profiles": {
+    "TCP+TLS": {"splitPos":["1","midsld"],"disorder":true,"tlsRecord":"1"},
+    "HTTP": {"splitPos":["2"],"hostCase":true,"domainCase":true,"methodEol":true}
+  }
+}
+```
+
+Version 2 supports `tpws` on Linux and `byedpi` on Windows. Linux ByeDPI
+profiles additionally require the core's `serverless-bydpi` capability. Version 3
+selects explicit platform/backend variants and adds Windows `winws` with the
+literal `system-tcp-80-443` scope and fresh host consent. See the
+[Windows adapter contract](security/extension-bypass-profiles.md#windows-winws-adapter).
+These are installed host backends: an extension never supplies their executable.
+The descriptor is at most 1 MiB, contains 1..16 profiles with nonblank
+names of at most 64 UTF-8 bytes, and each value is a protobuf-JSON
+`BypassStrategy`. Unknown top-level and strategy fields reject the asset.
+The extension's schema supplies a string setting named `profile` whose
+default names an existing profile. The app rejects unknown selections
+before writing settings. The CLI checks descriptor shape and protobuf
+types; core plan validation checks native strategy semantics before start.
+
+There are no executable paths, scripts, flags, arbitrary engine fragments,
+packet-reading callbacks or new credential APIs. The old proposed version-1
+engine-fragment descriptor is not interpreted as version 2. Windows WinDivert/winws is the separate version-3 packet-filter adapter,
+not a SOCKS backend. It is available only when the core confirms its verified
+bundle and the user accepts the host-owned system-filter warning.
+
+Installation does not select or connect a profile. Enabled, granted holders
+of net.hooks use the existing exclusive conflict decision, including
+contenders with invalid assets. The user selects the winning profile in
+the mode picker or connects explicitly from its detail screen. Its plan
+contains a copy of that strategy, separate from manual bypass settings.
+Changing an active profile reuses the serialized authenticated core
+Connect flow. A failed replacement retains the old core session. Disabling,
+removing, revoking or losing the selected grant/winner stops that session
+instead of silently substituting another profile. The selection remains
+visible; reconnect fails until it becomes available or the user chooses
+another mode. Cancellation cannot undo a request already accepted by the
+core; an in-flight connection is followed by Disconnect.
+
+The app owns this grant boundary. The core validates an ordinary control
+peer's SessionPlan and does not independently attest the app's extension
+registry or grants. A compromised app/control peer remains outside it.
+
+Sources: `extensions/sources/zapret` (Linux built-in settings) and
+`extensions/sources/byedpi` (Windows driverless backend).
+They are source projects, not published catalog entries. Production
+publication must choose the actual first host release with this consumer
+and set the matching min_app_version before author/team signing.
+The source's minimum version is not deployment evidence.
+
+Catalog bytes and packages are delivered separately from the application.
+Opening/refreshing the catalog fetches and verifies its current team
+signature; compatible additions require no client rebuild. A new native
+backend or API still requires a host that implements it. Catalog visibility
+must not imply installability or claim that old clients have new capabilities.
+The catalog shows OS/version requirements before download and blocks incompatible
+install/update actions without hiding the listing. Signed manifest and runtime
+checks still run afterward. Native architecture/backend checks and the actual
+minimum published host version still need validation before these sources ship.
+
+No profile promises DPI evasion on every network. Loading a Windows driver
+in a disposable test environment proves neither shaping effectiveness nor
+support for every Windows edition, architecture and protection configuration.

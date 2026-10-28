@@ -15,7 +15,10 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/sync/semaphore"
+
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -151,6 +154,7 @@ type Server struct {
 	extSched    *ext.Scheduler
 	secrets     SecretStore
 	parser      parser.LinkParser
+	parseSlots  *semaphore.Weighted
 	redactors   *redactorCache
 	prober      Prober
 	measurer    Measurer
@@ -252,6 +256,7 @@ func New(cfg Config) (*Server, error) {
 		sessions:    cfg.Sessions,
 		secrets:     cfg.Secrets,
 		parser:      parser.LinkParser{MaxItems: cfg.MaxImportItems},
+		parseSlots:  semaphore.NewWeighted(maxConcurrentParses),
 		redactors:   &redactorCache{byRef: make(map[string]*engine.Redactor)},
 		extSched:    cfg.ExtScheduler,
 		prober:      cfg.Prober,
@@ -317,6 +322,12 @@ func (s *Server) apiVersion() *corev1.ApiVersion {
 	}
 	if provider, ok := s.measurer.(interface{ BypassAvailable() bool }); ok && provider.BypassAvailable() {
 		capabilities = append(capabilities, "serverless")
+	}
+	if provider, ok := s.measurer.(interface{ WinwsAvailable() bool }); ok && provider.WinwsAvailable() {
+		capabilities = append(capabilities, "serverless-winws")
+	}
+	if provider, ok := s.measurer.(interface{ ByeDPIAvailable() bool }); ok && provider.ByeDPIAvailable() {
+		capabilities = append(capabilities, "serverless-bydpi")
 	}
 	if len(chainEngines(s.measurer)) > 0 {
 		capabilities = append(capabilities, "chains")
@@ -940,10 +951,15 @@ func maskText(mask func(string) string, text string) string {
 // ParseImport parses a subscription into a plan with credential references.
 // Credentials go directly to the vault; failed parsing leaves the store
 // unchanged.
-func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) (*corev1.ParseImportResponse, error) {
+func (s *Server) ParseImport(ctx context.Context, req *corev1.ParseImportRequest) (*corev1.ParseImportResponse, error) {
 	id := requestID(req.GetRequestId())
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return nil, transportStatus(err)
+	}
+	ctx, cancel := requestDeadline(ctx, importTimeout)
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return nil, status.FromContextError(err).Err()
 	}
 	payload := req.GetPayload()
 	if len(payload) == 0 {
@@ -961,8 +977,12 @@ func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) 
 			"control: this core cannot store credentials, so it cannot import")
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
 	}
-	servers, err := s.parsePayload(payload, referenceOf)
+	servers, err := s.parsePayload(ctx, payload, referenceOf)
 	if err != nil {
+		if ctx.Err() != nil {
+			return nil, status.FromContextError(ctx.Err()).Err()
+		}
+
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
 	}
 	puts := make(map[string][]byte, len(servers))
@@ -974,6 +994,9 @@ func (s *Server) ParseImport(_ context.Context, req *corev1.ParseImportRequest) 
 	for _, server := range servers {
 		puts[server.reference] = server.document
 		plan.Outbounds = append(plan.Outbounds, server.spec)
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, status.FromContextError(err).Err()
 	}
 	if err := s.secrets.Apply(puts, nil); err != nil {
 		return &corev1.ParseImportResponse{Error: toWire(err, nil, id)}, nil
@@ -990,10 +1013,18 @@ type importedServer struct {
 	document  []byte
 }
 
+// maxConcurrentParses shares a decoding/preparation budget across manual
+// imports and subscription refreshes, matching the four background workers.
+const maxConcurrentParses = 4
+
 // parsePayload detects the format before parsing, rejecting unknown input
 // instead of returning an empty import. It prepares servers without writing;
 // refFor supplies vault references for one atomic update.
-func (s *Server) parsePayload(payload []byte, refFor func(parser.OutboundSpec) (string, error)) ([]importedServer, error) {
+func (s *Server) parsePayload(ctx context.Context, payload []byte, refFor func(parser.OutboundSpec) (string, error)) ([]importedServer, error) {
+	if err := s.parseSlots.Acquire(ctx, 1); err != nil {
+		return nil, err
+	}
+	defer s.parseSlots.Release(1)
 	if _, err := (parser.ImportDetector{MaxItems: s.parser.MaxItems}).Detect(payload); err != nil {
 		return nil, importError(err)
 	}
@@ -1136,8 +1167,8 @@ func subscriptionInfoToWire(info subscription.Info) *corev1.SubscriptionInfo {
 // thousands of servers degrades into a longer stream instead of dying on a
 // per-request limit. A failing chunk does not abort the others: the first
 // chunk error is remembered, the remaining chunks still run, and the RPC
-// then returns that error (mapped through transportStatus, as before) -
-// partial results, no silent loss.
+// then reports that first failure through a detail-free terminal status.
+// Successfully streamed results remain available to the caller.
 func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.ServerStreamingServer[corev1.ProbeResult]) error {
 	if _, err := s.checkVersion(req.GetApiVersion()); err != nil {
 		return transportStatus(err)
@@ -1192,21 +1223,24 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		}
 	}
 	opts := req.GetOptions()
-	for _, chunk := range chunkServers(endpoints, ProbeChunkSize) {
-		if ctx.Err() != nil {
-			break
-		}
-		note(connect(chunk, nil))
-	}
-	for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
-		if ctx.Err() != nil {
-			break
-		}
-		note(s.measureOutbounds(ctx, opts, chunk, id, results, &wg, connect))
-	}
+	// A chunk owns a backend request slot until its results finish. Start
+	// the next chunk then, while the handler delivers current results.
 	go func() {
-		wg.Wait()
-		close(results)
+		defer close(results)
+		for _, chunk := range chunkServers(endpoints, ProbeChunkSize) {
+			if ctx.Err() != nil {
+				return
+			}
+			note(connect(chunk, nil))
+			wg.Wait()
+		}
+		for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
+			if ctx.Err() != nil {
+				return
+			}
+			note(s.measureOutbounds(ctx, opts, chunk, id, results, &wg, connect))
+			wg.Wait()
+		}
 	}()
 	for result := range results {
 		if err := stream.Send(result); err != nil {
@@ -1214,7 +1248,7 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		}
 	}
 	if firstErr != nil {
-		return transportStatus(firstErr)
+		return rpcStatus(firstErr)
 	}
 	return nil
 }

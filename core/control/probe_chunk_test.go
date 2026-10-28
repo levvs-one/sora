@@ -9,6 +9,9 @@ import (
 	"testing"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/levvs-one/sora-client/core/control"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
@@ -193,17 +196,16 @@ func TestProbeRequestOverSafetyLimitRejected(t *testing.T) {
 
 // TestProbePartialChunkFailure: when one chunk's prober call fails, the other
 // chunks still stream their results; the failed chunk's servers simply have
-// no results. The terminal mapping goes through the pre-existing
-// transportStatus, exactly as a whole-request prober failure behaved before
-// chunking (domain errors stay in-band, so the RPC itself succeeds).
+// no fabricated samples. After the other chunks finish, a terminal status
+// reports the failure without discarding their successful results.
 func TestProbePartialChunkFailure(t *testing.T) {
 	const n = 300
 	p := &chunkProber{failOn: 2}
 	stream := &probeStream{ctx: context.Background()}
 	err := probeServer(t, &fakeMeasurer{}, p).ProbeServers(
 		chunkProbeRequest(n, corev1.ProbeMethod_PROBE_METHOD_CONNECT), stream)
-	if err != nil {
-		t.Fatalf("a failed chunk must not fail the RPC itself: %v", err)
+	if status.Code(err) != codes.Internal {
+		t.Fatalf("a failed chunk must have a terminal Internal status: %v", err)
 	}
 	// Batches 1 and 3 streamed; batch 2's servers have no results.
 	if len(stream.sent) != n-control.ProbeChunkSize {

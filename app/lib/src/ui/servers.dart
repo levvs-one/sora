@@ -12,13 +12,13 @@ import '../generated/sora/core/v1/core_control.pb.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../groups.dart';
 import '../sora.dart';
+import '../notifications.dart';
 import 'addserver.dart';
 import 'benchmark.dart';
 import 'kit.dart';
 import 'qr.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
-import 'tour.dart';
 import 'announcement.dart';
 
 /// Keeps subscription order while building only visible server rows.
@@ -74,7 +74,7 @@ class _ServersScreenState extends State<ServersScreen> {
         SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
       else
         RoundButton(
-          icon: Symbols.network_ping_rounded,
+          icon: Symbols.radar_rounded,
           label: s.probeServers,
           onTap: sora.canProbe ? () => unawaited(sora.probe()) : null,
         ),
@@ -86,10 +86,7 @@ class _ServersScreenState extends State<ServersScreen> {
           label: s.measureSpeed,
           onTap: sora.canBenchmark ? () => push<void>(context, const BenchmarkScreen()) : null,
         ),
-      _tourTarget(
-        0,
-        RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
-      ),
+      RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
       if (sora.customServers.isEmpty) const _OwnServerAction(),
       RoundButton(
         icon: Symbols.qr_code_scanner_rounded,
@@ -117,14 +114,11 @@ class _ServersScreenState extends State<ServersScreen> {
     );
     final automatic = Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: _tourTarget(
-        1,
-        DecoratedBox(
-          decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: _ServerRow(id: 'auto', name: s.serverAuto),
-          ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: _ServerRow(id: 'auto', name: s.serverAuto),
         ),
       ),
     );
@@ -229,10 +223,6 @@ class _ServersScreenState extends State<ServersScreen> {
     );
     return widget.embedded ? list : Scaffold(backgroundColor: palette.background, body: list);
   }
-
-  Widget _tourTarget(int step, Widget child) => widget.embedded && SoraScope.of(context).subscriptions.isNotEmpty
-      ? TourTarget(step: step, radius: step == 0 ? 18 : 12, child: child)
-      : child;
 }
 
 List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty
@@ -329,6 +319,9 @@ class _ServerRow extends StatelessWidget {
         : entry!.isGroup
         ? pickMember(entry!, sora.latency, bandwidth: sora.bandwidth, autoSelect: sora.settings.autoSelectMode)
         : entry!.members.single;
+    final pinging = entry == null
+        ? sora.pendingProbes.contains(id)
+        : entry!.members.any((o) => sora.pendingProbes.contains(o.id));
     final measuredId = shown?.id ?? id;
     final measured = sora.latency.containsKey(measuredId);
     final ms = sora.latency[measuredId];
@@ -393,15 +386,18 @@ class _ServerRow extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          !measured
-                              ? ''
-                              : ms == null
-                              ? s.noAnswer
-                              : s.milliseconds(ms),
-                          textAlign: TextAlign.right,
-                          style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
-                        ),
+                        if (pinging)
+                          CupertinoActivityIndicator(key: ValueKey('ping-row-$id'), radius: 8, color: palette.ink)
+                        else
+                          Text(
+                            !measured
+                                ? ''
+                                : ms == null
+                                ? s.noAnswer
+                                : s.milliseconds(ms),
+                            textAlign: TextAlign.right,
+                            style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                          ),
                         if (bps != null || staleBps != null)
                           Text(
                             s.speedMbps(mbpsOf(bps ?? staleBps!)),
@@ -516,7 +512,7 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                   message: '${s.probeServers}: ${state.displayName}',
                   child: RoundButton(
                     key: ValueKey('probe-subscription-${state.settings.id}'),
-                    icon: Symbols.network_ping_rounded,
+                    icon: Symbols.radar_rounded,
                     label: '${s.probeServers}: ${state.displayName}',
                     onTap: !sora.canProbe || state.outbounds.isEmpty
                         ? null
@@ -796,26 +792,35 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                   const SizedBox(width: 8),
                   SizedBox(
                     width: 64,
-                    child: Text(
-                      !measured
-                          ? ''
-                          : ms == null
-                          ? s.noAnswer
-                          : s.milliseconds(ms),
-                      textAlign: TextAlign.right,
-                      style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
-                    ),
+                    child: sora.pendingProbes.contains(customId)
+                        ? Align(
+                            alignment: Alignment.centerRight,
+                            child: CupertinoActivityIndicator(
+                              key: ValueKey('ping-row-$customId'),
+                              radius: 8,
+                              color: palette.ink,
+                            ),
+                          )
+                        : Text(
+                            !measured
+                                ? ''
+                                : ms == null
+                                ? s.noAnswer
+                                : s.milliseconds(ms),
+                            textAlign: TextAlign.right,
+                            style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                          ),
                   ),
                   Tooltip(
-                    message: s.customServerTest,
+                    message: s.probeServers,
                     child: Pressable(
-                      onTap: _testing ? null : () => unawaited(_test()),
+                      onTap: _testing || sora.probing ? null : () => unawaited(_test()),
                       radius: 8,
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: _testing
                             ? const SizedBox(width: 18, height: 18, child: CupertinoActivityIndicator(radius: 9))
-                            : Icon(Symbols.network_check_rounded, size: 18, color: palette.ink2),
+                            : Icon(Symbols.radar_rounded, size: 18, color: palette.ink2),
                       ),
                     ),
                   ),
@@ -865,22 +870,45 @@ String formatBytes(S s, Int64 bytes, String locale) {
 
 /// Returns a warning for expired subscriptions, expiry within three days or
 /// less than 10% traffic remaining. Returns null otherwise.
-String? subscriptionWarning(S s, SubscriptionState sub, String locale) {
+AppNotification? subscriptionWarning(S s, SubscriptionState sub, String locale, {DateTime? at}) {
   const soon = Duration(days: 3);
   const little = 0.1;
+  final time = at ?? DateTime.now();
   final info = sub.info;
+  String? body, key;
+  final args = <String, String>{'name': sub.displayName};
   if (info.hasExpire()) {
-    final left = info.expire.toDateTime().difference(DateTime.now());
-    if (left.isNegative) return '${sub.displayName}: ${s.expired.toLowerCase()}';
-    if (left < soon) return s.expiresIn(sub.displayName, left.inDays);
-  }
-  if (info.hasUsage && info.totalBytes > Int64.ZERO) {
-    final rest = info.totalBytes - info.uploadBytes - info.downloadBytes;
-    if (rest.toDouble() < info.totalBytes.toDouble() * little) {
-      return s.trafficLow(sub.displayName, formatBytes(s, rest < Int64.ZERO ? Int64.ZERO : rest, locale));
+    final left = info.expire.toDateTime().difference(time);
+    if (left.isNegative) {
+      body = '${sub.displayName}: ${s.expired.toLowerCase()}';
+      key = 'notice.expired';
+    } else if (left < soon) {
+      body = s.expiresIn(sub.displayName, left.inDays);
+      key = 'notice.expiring';
+      args['days'] = '${left.inDays}';
     }
   }
-  return null;
+  if (body == null && info.hasUsage && info.totalBytes > Int64.ZERO) {
+    final rest = info.totalBytes - info.uploadBytes - info.downloadBytes;
+    if (rest.toDouble() < info.totalBytes.toDouble() * little) {
+      final remaining = rest < Int64.ZERO ? Int64.ZERO : rest;
+      body = s.trafficLow(sub.displayName, formatBytes(s, remaining, locale));
+      key = 'notice.traffic';
+      final (amount, unit) = Sora.scaleBytes(remaining);
+      args['amount'] = NumberFormat(amount >= 100 || unit == 0 ? '0' : '0.#', 'en').format(amount);
+      args['unit'] = '$unit';
+    }
+  }
+  if (body == null) return null;
+  return AppNotification(
+    time: time,
+    title: s.noticeSubscription,
+    body: body,
+    action: 'subscription',
+    argument: sub.settings.id,
+    messageKey: key!,
+    messageArgs: args,
+  );
 }
 
 String protocolLine(OutboundSpec server) => [

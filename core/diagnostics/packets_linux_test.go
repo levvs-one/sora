@@ -4,6 +4,7 @@ package diagnostics_test
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net"
 	"os"
@@ -101,5 +102,29 @@ func TestNativeLinuxOwnedTunCapture(t *testing.T) {
 	case <-reader:
 	case <-time.After(time.Second):
 		t.Fatal("TUN reader did not release")
+	}
+}
+
+func TestCapturePacketsRejectsCancelledBeforeDeviceOpen(t *testing.T) {
+	for _, expired := range []bool{false, true} {
+		name := "cancelled"
+		ctx, cancel := context.WithCancel(context.Background())
+		if expired {
+			cancel()
+			name = "expired"
+			ctx, cancel = context.WithDeadline(context.Background(), time.Now().Add(-time.Second))
+		} else {
+			cancel()
+		}
+		t.Run(name, func(t *testing.T) {
+			defer cancel()
+			data, err := diagnostics.CapturePackets(ctx, "sora-missing", time.Second)
+			if !errors.Is(err, ctx.Err()) || len(data) != 0 {
+				t.Fatalf("cancelled capture = %d bytes, %v; want %v", len(data), err, ctx.Err())
+			}
+		})
+	}
+	if _, err := diagnostics.CapturePackets(context.Background(), "sora-missing", time.Second); err == nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("live caller with absent device = %v", err)
 	}
 }

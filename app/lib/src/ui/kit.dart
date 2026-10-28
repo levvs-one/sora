@@ -235,6 +235,57 @@ class Heading extends StatelessWidget {
   );
 }
 
+/// Shows the cause of an unavailable extension action.
+class InfoButton extends StatelessWidget {
+  const InfoButton({super.key, required this.title, required this.description});
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return IconButton(
+      key: ValueKey('info-$title'),
+      tooltip: '${MaterialLocalizations.of(context).moreButtonTooltip}: $title',
+      icon: Icon(Symbols.info_rounded, size: 18, color: palette.ink),
+      style: IconButton.styleFrom(
+        minimumSize: const Size(36, 36),
+        padding: const EdgeInsets.all(8),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      onPressed: () => showDialog<void>(
+        context: context,
+        barrierColor: palette.scrim,
+        animationStyle: AnimationStyle(
+          duration: Motion.of(context, Motion.medium),
+          reverseDuration: Motion.of(context, Motion.medium),
+        ),
+        builder: (context) => AlertDialog(
+          key: const ValueKey('feature-info-dialog'),
+          backgroundColor: palette.raised,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          constraints: const BoxConstraints(maxWidth: 420),
+          insetPadding: const EdgeInsets.all(24),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          scrollable: true,
+          title: Text(title, style: Styles.heading.copyWith(color: palette.ink)),
+          content: Text(description, style: Styles.body.copyWith(color: palette.ink, height: 1.5)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(S.of(context).close, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Shows a dialog and returns true on confirmation. [destructive] colours the
 /// action red; disabling [cancellable] removes the cancel button for a
 /// single-action informational dialog.
@@ -368,11 +419,16 @@ class Tile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      title,
-                      style: (titleStyle ?? Styles.body).copyWith(color: titleColor ?? palette.ink),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: (titleStyle ?? Styles.body).copyWith(color: titleColor ?? palette.ink),
+                          ),
+                        ),
+                      ],
                     ),
                     if (detail != null)
                       Padding(
@@ -395,12 +451,10 @@ class Tile extends StatelessWidget {
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, required this.title, this.detail, required this.value, required this.onChanged});
+  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged});
 
   final String title;
 
-  /// Honest one-line explanation shown under the title, e.g. a throttle bound.
-  final String? detail;
   final bool value;
   final ValueChanged<bool>? onChanged;
 
@@ -409,7 +463,6 @@ class SwitchTile extends StatelessWidget {
     final palette = Palette.of(context);
     return Tile(
       title: title,
-      detail: detail,
       onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: CupertinoSwitch(
         value: value,
@@ -532,7 +585,7 @@ class Segments<T> extends StatelessWidget {
         children: [
           Positioned.fill(
             child: AnimatedAlign(
-              alignment: Alignment(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
+              alignment: AlignmentDirectional(keys.length == 1 ? 0 : -1 + 2 * index / (keys.length - 1), 0),
               duration: Motion.of(context, Motion.medium),
               curve: Motion.curve,
               child: FractionallySizedBox(
@@ -666,7 +719,7 @@ class PrimaryButton extends StatelessWidget {
         ),
         child: busy
             ? CupertinoActivityIndicator(color: palette.surface)
-            : Text(label, style: Styles.bodyStrong.copyWith(color: onTap == null ? palette.ink3 : palette.surface)),
+            : Text(label, style: Styles.bodyStrong.copyWith(color: onTap == null ? palette.ink : palette.surface)),
       ),
     );
   }
@@ -693,7 +746,7 @@ class PillButton extends StatelessWidget {
           color: onTap == null ? palette.raisedField : palette.ink,
           borderRadius: BorderRadius.circular(18),
         ),
-        child: Text(label, style: Styles.bodyStrong.copyWith(color: onTap == null ? palette.ink3 : palette.surface)),
+        child: Text(label, style: Styles.bodyStrong.copyWith(color: onTap == null ? palette.ink : palette.surface)),
       ),
     );
   }
@@ -742,7 +795,7 @@ class BackgroundFailureState extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(describe(s, failure), style: Styles.caption.copyWith(color: palette.ink2)),
+            child: Text(describe(s, failure), style: Styles.caption.copyWith(color: palette.ink)),
           ),
           if (retry != null) RoundButton(icon: Symbols.refresh_rounded, label: s.refresh, onTap: retry),
         ],

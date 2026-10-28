@@ -221,7 +221,7 @@ class _OverrideSection extends StatelessWidget {
             if (edited.isEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: Text(s.overrideEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(s.overrideEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
               )
             else
               for (final serverId in edited)
@@ -239,6 +239,7 @@ class _OverrideSection extends StatelessWidget {
                 onTap: () async {
                   if (await confirm(context, question: s.overrideClear, action: s.overrideClear)) {
                     sora.overrides.drop(subscriptionId);
+                    sora.applyConnectionChanges();
                   }
                 },
               ),
@@ -283,6 +284,7 @@ class _OverrideRow extends StatelessWidget {
                   next.add(serverId);
                 }
                 sora.overrides.put(subscriptionId, override.copyWith(hidden: next));
+                sora.applyConnectionChanges();
               },
               radius: 8,
               child: Padding(
@@ -414,6 +416,7 @@ class _ServerPickerState extends State<_ServerPicker> {
                               widget.subscriptionId,
                               sora.overrides.of(widget.subscriptionId).copyWith(hidden: next),
                             );
+                            sora.applyConnectionChanges();
                             setState(() {});
                           },
                           radius: 8,

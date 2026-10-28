@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'notifications.dart';
 
 /// Random UUID v4 for the staged-rollout install cohort (S11a). Not a
-/// security token — only a stable, uniformly distributed install identity.
+/// security token - only a stable, uniformly distributed install identity.
 String _newInstallUuid() {
   final random = Random.secure();
   final bytes = List<int>.generate(16, (_) => random.nextInt(256));
@@ -52,7 +52,6 @@ class Settings {
     'proxySnapshot',
     'trayHintShown',
     'sidebarExpanded',
-    'tourDone',
     'notificationHistory',
     'subscriptionFailures',
     'speedtestService',
@@ -85,11 +84,6 @@ class Settings {
   }
 
   Future<void> _migrate() async {
-    if (!_store.containsKey('tourDone')) {
-      // Detect upgrades before migration writes its own defaults.
-      final existing = _keys.where((key) => key != 'tourDone').any(_store.containsKey);
-      await _store.setBool('tourDone', existing);
-    }
     if (!_store.containsKey('installUuid')) {
       // Stable per-install identifier for the staged-rollout cohort (S11a).
       // Generated once; the cohort (SHA-256(uuid) mod 100) never changes
@@ -195,9 +189,10 @@ class Settings {
   int get probeTimeout => _store.getInt('probeTimeout') ?? 0;
   set probeTimeout(int value) => _store.setInt('probeTimeout', value);
 
-  /// zapret handshake splitting for bypass mode. Defaults match the strategy
-  /// verified with real traffic by the interop test.
-  List<String> get splitPos => _store.getStringList('splitPos') ?? const ['1', 'midsld'];
+  /// Windows uses native ByeDPI byte offsets; tpws domain markers are Linux-only.
+  static List<String> get defaultSplitPos => Platform.isWindows ? const ['1'] : const ['1', 'midsld'];
+
+  List<String> get splitPos => _store.getStringList('splitPos') ?? defaultSplitPos;
   set splitPos(List<String> value) => _store.setStringList('splitPos', value);
   bool get disorder => _store.getBool('disorder') ?? true;
   set disorder(bool value) => _store.setBool('disorder', value);
@@ -294,7 +289,7 @@ class Settings {
   set autoSelectMode(String value) => _store.setString('autoSelectMode', value);
 
   /// Switches the pinned server to the best measured alternative when it
-  /// degrades (stops answering or gets clearly slower) — at most once every
+  /// degrades (stops answering or gets clearly slower) - at most once every
   /// 10 minutes. Never touches 'auto', groups, profiles or bypass.
   bool get autoSwitchOnDegrade => _store.getBool('autoSwitchOnDegrade') ?? false;
   set autoSwitchOnDegrade(bool value) => _store.setBool('autoSwitchOnDegrade', value);
@@ -344,9 +339,6 @@ class Settings {
   String get speedtestService => _store.getString('speedtestService') ?? '';
   Future<void> saveSpeedtestService(String value) => _store.setString('speedtestService', value);
 
-  bool get tourDone => _store.getBool('tourDone') ?? false;
-  Future<void> completeTour() => _store.setBool('tourDone', true);
-
   /// Failure timestamps and keys only, never provider links or error details.
   String get subscriptionFailures => _store.getString('subscriptionFailures') ?? '{}';
   set subscriptionFailures(String value) => _store.setString('subscriptionFailures', value);
@@ -367,7 +359,7 @@ class Settings {
   /// `pendingUpdate`, `lastRollback`), the rollout `installUuid`, the
   /// crash-recovery marker `sessionIntent`, the system-proxy snapshot
   /// `proxySnapshot`, `benchmarkHistory`, `notificationHistory`, and UI
-  /// chrome (`trayHintShown`, `sidebarExpanded`, `tourDone`,
+  /// chrome (`trayHintShown`, `sidebarExpanded`,
   /// `speedtestService`, `dnsLeakLastCheck`). The JSON-backed
   /// stores (`subscriptionOverrides`, `networkProfiles`, `proxyChains`) sync as their own document
   /// kinds so their stores can reload after an import.
@@ -474,7 +466,7 @@ class Settings {
     final pending = pendingUpdate;
     final rolledBack = lastRollback;
     await _store.clear();
-    await completeTour();
+
     await saveNotificationHistory(history);
     subscriptionFailures = failures;
     if (notified.isNotEmpty) await saveNotifiedUpdate(notified);
@@ -484,7 +476,7 @@ class Settings {
     // The post-update health marker is a safety mechanism, not a preference:
     // a reset must not silently disarm the rollback of an update that is
     // still inside its health window. The rollback notice is kept for the
-    // same reason — the user should still learn that a rollback happened.
+    // same reason - the user should still learn that a rollback happened.
     if (pending.isNotEmpty) await savePendingUpdate(pending);
     if (rolledBack.isNotEmpty) await _store.setString('lastRollback', rolledBack);
     if (snapshot.isNotEmpty) await saveProxySnapshot(snapshot);

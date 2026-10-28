@@ -1,6 +1,6 @@
 # The desktop application. It depends on the core package of the same version,
 # so installing "sora" is all a person does. Run from the repository root after
-# building the app into app/build/linux/x64/release/bundle (see README.md).
+# building the native app bundle (SORA_FLUTTER_ARCH=x64 or arm64; see README.md).
 name: sora
 arch: ${SORA_ARCH}
 platform: linux
@@ -32,9 +32,10 @@ contents:
     file_info: {mode: 0755}
   - src: ./packaging/linux/io.github.levvs-one.sora.update.policy
     dst: /usr/share/polkit-1/actions/io.github.levvs-one.sora.update.policy
-  - src: ./app/build/linux/x64/release/bundle/
+  - src: ./app/build/linux/${SORA_FLUTTER_ARCH}/release/bundle/
     dst: /usr/lib/sora/app
     type: tree
+    expand: true
   - src: /usr/lib/sora/app/sora
     dst: /usr/bin/sora
     type: symlink

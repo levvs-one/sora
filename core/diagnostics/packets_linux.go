@@ -17,6 +17,9 @@ import (
 // CapturePackets reads only the interface owned by the authenticated session.
 // A short snap length keeps packet headers useful without retaining full bodies.
 func CapturePackets(ctx context.Context, device string, duration time.Duration) ([]byte, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, errs.Wrap(err, errs.CodeCancelled, errs.KeyCancelled)
+	}
 	handle, err := pcapgo.NewEthernetHandle(device)
 	if err != nil {
 		return nil, errs.Wrap(err, errs.CodeUnavailable, errs.KeyDiagnosticsFailed)

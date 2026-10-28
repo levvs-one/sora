@@ -205,64 +205,58 @@ class SKk extends S {
   String get errGeneric => 'Бірдеңе дұрыс болмады';
 
   @override
-  String get errCore => 'Sora қызметі жауап бермейді. Сәл күтіп, қайталап көріңіз.';
+  String get errCore => 'Sora қызметі жауап бермейді';
 
   @override
-  String get errAuth => 'Sora қызметіне кіруге рұқсат жоқ. Қолданбаны қайта іске қосып, қайталап көріңіз.';
+  String get errAuth => 'Sora қызметіне кіруге рұқсат жоқ';
 
   @override
-  String get errVersion => 'Sora қолданбасы мен қызметінің нұсқалары әртүрлі. Sora-ны жаңартыңыз.';
+  String get errVersion => 'Sora қолданбасы мен қызметінің нұсқалары әртүрлі';
 
   @override
-  String get errBusy => 'Алдыңғы пәрмен әлі орындалып жатыр. Аяқталғанша күтіңіз.';
+  String get errBusy => 'Алдыңғы пәрмен әлі орындалып жатыр';
 
   @override
-  String get errEngineMissing => 'Бұл серверге қажетті ядро табылмады. Sora жаңартуларын тексеріңіз.';
+  String get errEngineMissing => 'Бұл серверге қажетті ядро табылмады';
 
   @override
-  String get errEngineStart => 'Ядро іске қосылмады. Себебін қосылым журналынан қараңыз.';
+  String get errEngineStart => 'Ядро іске қосылмады';
 
   @override
-  String get errEngineStopped => 'Ядро тоқтады. Қайта қосылып көріңіз.';
+  String get errEngineStopped => 'Ядро тоқтады';
 
   @override
-  String get errTunnel => 'Бұл VPN режимі қолжетімсіз. Басқа режимді таңдаңыз немесе қызмет рұқсаттарын тексеріңіз.';
+  String get errTunnel => 'Бұл VPN режимі қолжетімсіз';
 
   @override
-  String get errNetwork => 'Серверге қол жеткізу мүмкін емес';
+  String get errTimeout => 'Сервер уақытында жауап бермеді';
 
   @override
-  String get errTimeout => 'Сервер уақытында жауап бермеді. Бір минуттан кейін қайталап көріңіз.';
+  String get errFirewall => 'VPN-нен тыс интернетке кіруді бұғаттау мүмкін болмады';
 
   @override
-  String get errFirewall =>
-      'VPN-нен тыс интернетке кіруді бұғаттау мүмкін болмады. Себебін қосылым журналынан қараңыз.';
+  String get errSubFetch => 'Жазылымды жүктеу мүмкін болмады';
 
   @override
-  String get errSubFetch =>
-      'Жазылымды жүктеу мүмкін болмады. Интернетті тексеріп, бір минуттан кейін қайталап көріңіз.';
+  String get errSubFormat => 'Жазылым пішімі танылмады';
 
   @override
-  String get errSubFormat => 'Жазылым пішімі танылмады. Провайдерден үйлесімді жазылым сілтемесін сұраңыз.';
+  String get errSubEmpty => 'Жазылымда серверлер жоқ';
 
   @override
-  String get errSubEmpty => 'Жазылымда серверлер жоқ. Жазылым провайдеріне хабарласыңыз.';
+  String get errSubDuplicate => 'Бұл жазылым қосылған';
 
   @override
-  String get errSubDuplicate => 'Бұл жазылым қосылған. Соңғы серверлерді алу үшін оны жаңартыңыз.';
+  String get errSubLimit => 'Жазылым санының шегіне жеттіңіз';
 
   @override
-  String get errSubLimit => 'Жазылым санының шегіне жеттіңіз. Жаңасын қоспас бұрын пайдаланылмайтын жазылымды жойыңыз.';
+  String get errSubScheme => 'Жазылым сілтемесінің схемасы қолдау таппайды';
 
   @override
-  String get errSubScheme => 'Жазылым сілтемесі https:// деп басталуы керек. Провайдерден қауіпсіз сілтеме сұраңыз.';
+  String get errSecretStore => 'Sora қоймасы зақымдалған немесе қолжетімсіз';
 
   @override
-  String get errSecretStore =>
-      'Sora қоймасы зақымдалған немесе қолжетімсіз. Кіру рұқсаттарын және журналдағы мәліметтерді тексеріңіз.';
-
-  @override
-  String get errNoServers => 'Қосылуға арналған серверлер жоқ. Жазылым немесе өз серверіңізді қосыңыз.';
+  String get errNoServers => 'Қосылуға арналған серверлер жоқ';
 
   @override
   String get connections => 'Қосылымдар';
@@ -316,9 +310,6 @@ class SKk extends S {
   String get dnsAuto => 'Авто';
 
   @override
-  String get dnsHint => 'Мекенжайлар, үтірмен бөлінген';
-
-  @override
   String get fragment => 'TLS фрагментациясы';
 
   @override
@@ -334,13 +325,7 @@ class SKk extends S {
   String get byDefault => 'Әдепкі';
 
   @override
-  String get rangeHint => 'Мысалы, 100-200';
-
-  @override
   String get splitPos => 'Позицияларды бөлу';
-
-  @override
-  String get splitPosHint => 'Мысалы, 1, midsld';
 
   @override
   String get disorder => 'Бөлшектердің ретін өзгерту';
@@ -449,11 +434,6 @@ class SKk extends S {
   String get support => 'Қолдау';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine осы компьютердегі порт арқылы басқарылады. Басқа бағдарламалар VPN қосулы екенін айта алады.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine таңдаңыз';
   }
@@ -529,9 +509,6 @@ class SKk extends S {
   String get launchAtLogin => 'Жүйеден бастаңыз';
 
   @override
-  String get launchAtLoginDetail => 'Жүйеге кіргенде Sora автоматты түрде іске қосылып, науада қалады.';
-
-  @override
   String get closeToTray => 'Жабылған кезде науада ұстаңыз';
 
   @override
@@ -566,9 +543,6 @@ class SKk extends S {
   String get noticeInTray => 'Sora әлі науада';
 
   @override
-  String get noticeInTrayBody => 'Оның белгішесінің мәзірінен шығыңыз';
-
-  @override
   String get noticeLost => 'Байланыс жоғалды';
 
   @override
@@ -596,11 +570,7 @@ class SKk extends S {
   String get importTitle => 'Осы жазылымды қосу керек пе?';
 
   @override
-  String get importSealed =>
-      'Бұл сілтеме Happ үшін шифрланған және оны тек Happ оқи алады. Провайдеріңізден қарапайым жазылым сілтемесін сұраңыз.';
-
-  @override
-  String get understood => 'Жарайды';
+  String get importSealed => 'Бұл сілтеме Happ үшін шифрланған және оны тек Happ оқи алады';
 
   @override
   String get noAnswer => 'жауап жоқ';
@@ -639,39 +609,10 @@ class SKk extends S {
   String get openLogs => 'Журналдарды ашыңыз';
 
   @override
-  String get tourReplay => 'Нұсқаулықты қайта көрсетіңіз';
-
-  @override
-  String tourStep(int step) {
-    return '$step/5 қадамы';
-  }
-
-  @override
   String get tourBack => 'Артқа';
 
   @override
   String get tourNext => 'Келесі';
-
-  @override
-  String get tourSkip => 'Өткізіп жіберу';
-
-  @override
-  String get tourFinish => 'Дайын';
-
-  @override
-  String get tourAdd => 'Провайдеріңіздің жазылым сілтемесін қосыңыз.';
-
-  @override
-  String get tourServer => 'Серверді таңдаңыз. «Ең жылдам» сіз үшін біреуін таңдайды.';
-
-  @override
-  String get tourConnect => 'Қосылу немесе ажырату үшін осы жерді басыңыз.';
-
-  @override
-  String get tourMode => 'Режимді таңдаңыз. VPN өшірілсе, коммутаторды өшіріңіз.';
-
-  @override
-  String get tourSettings => 'Параметрлерді ашыңыз. Сіз бұл нұсқаулықты сол жерде қайталай аласыз.';
 
   @override
   String get chooseProgram => 'Бағдарламаны таңдаңыз';
@@ -683,7 +624,7 @@ class SKk extends S {
   String get runningProcesses => 'Орындалатын процестер';
 
   @override
-  String get programsEmpty => 'Қолданбалар табылмады. Басқа атауды қолданып көріңіз.';
+  String get programsEmpty => 'Қолданбалар табылмады';
 
   @override
   String get selectExe => 'exe файлын таңдаңыз';
@@ -695,7 +636,7 @@ class SKk extends S {
   String get speedtestSearch => 'Қызметті табыңыз';
 
   @override
-  String get speedtestEmpty => 'Сәйкестік жоқ. Іздеуді өзгертіңіз.';
+  String get speedtestEmpty => 'Сәйкестік жоқ';
 
   @override
   String get speedtestBackToList => 'Қызметтерге оралу';
@@ -704,13 +645,13 @@ class SKk extends S {
   String get speedtestOpenBrowser => 'Браузерде ашыңыз';
 
   @override
-  String get speedtestUnavailable => 'Енгізілген браузер іске қосылмады. Жүйе шолғышында қызметті ашыңыз.';
+  String get speedtestUnavailable => 'Енгізілген браузер іске қосылмады';
 
   @override
-  String get speedtestPageFailed => 'Бет жүктелмеді. Оны қайта жүктеңіз немесе жүйе шолғышында қызметті ашыңыз.';
+  String get speedtestPageFailed => 'Бет жүктелмеді';
 
   @override
-  String get speedtestExternalFailed => 'Жүйе браузері ашылмайды. Қайтадан байқап көріңіз.';
+  String get speedtestExternalFailed => 'Жүйе браузері ашылмайды';
 
   @override
   String get modes => 'Режимдер';
@@ -750,51 +691,28 @@ class SKk extends S {
   String get updateNoNotes => 'Шығарылымда ескертулер жоқ.';
 
   @override
-  String get updateDropWarning =>
-      'Sora және оның негізгі жаңартылуы кезінде VPN қосылымы бірнеше секундқа үзіледі. Жалғастыру керек пе?';
+  String get updateDropWarning => 'Жаңарту үшін қосылымды үзу керек пе?';
 
   @override
-  String get updateWaitConnection => 'VPN қосылымы мен ядросы дайын болғанша күтіңіз.';
+  String get updateWaitConnection => 'Қосылым дайын емес';
 
   @override
-  String get updateDownloading => 'Файлдар жүктелуде және тексерілуде...';
-
-  @override
-  String get updateInstalling => 'Жаңарту дайындалуда немесе әкімшінің аутентификациясын күтуде...';
-
-  @override
-  String get updateNetworkError => 'Жаңартуды жүктеп алу мүмкін болмады. Қайтадан байқап көріңіз.';
+  String get updateNetworkError => 'Жаңартуды жүктеп алу мүмкін болмады';
 
   @override
   String get updateReleaseError => 'Шығарылым деректері немесе қажетті файлдар жоқ немесе жарамсыз.';
 
   @override
-  String get updateChecksumError => 'Жүктеп алу SHA256SUMS сәйкес емес. Ештеңе орнатылмады.';
+  String get updateChecksumError => 'Жүктеп алу SHA256SUMS сәйкес емес';
 
   @override
-  String get updateInstallError => 'Жаңарту аяқталмады. Аутентификация жойылған болуы мүмкін.';
+  String get updateInstallError => 'Жаңарту аяқталмады';
 
   @override
-  String get updateUnsupported =>
-      'Бұл орындалатын файл қолдау көрсетілетін Sora бума жұбына тиесілі емес. Шығаруды орнату нұсқауларын пайдаланыңыз.';
+  String get updateUnsupported => 'Бұл орындалатын файл қолдау көрсетілетін Sora бума жұбына тиесілі емес';
 
   @override
-  String get updateManual =>
-      'Тексерілген екі буманы орнату үшін осы пәрменді терминалда іске қосыңыз, содан кейін Sora қайта ашыңыз. Файлдар жүктеп алу каталогында қалады. VPN байланысы үзіледі.';
-
-  @override
-  String get updateSignaturePending =>
-      'Жаңарту файлдары шығарылыммен бірге жарияланған бақылау сомаларымен салыстырылады.';
-
-  @override
-  String get updateManualSigWarning =>
-      'Төмендегі файлдар шығарылымның бақылау сомаларына сәйкес келеді. Оларды ресми шығарылымнан жүктесеңіз, пәрменді орындаңыз.';
-
-  @override
-  String get updateVersionRevoked => 'Әзірлеуші бұл нұсқаны қайтарып алды. Түзетілген шығарылымды күтіңіз.';
-
-  @override
-  String get updateRolloutPending => 'Жаңарақ нұсқасы бірте-бірте шығарылады және сізге автоматты түрде ұсынылады.';
+  String get updateVersionRevoked => 'Әзірлеуші бұл нұсқаны қайтарып алды';
 
   @override
   String updateRollbacking(String version) {
@@ -807,8 +725,7 @@ class SKk extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Автоматты кері қайтару сәтсіз аяқталды. Жаңа нұсқа жұмыс істемесе, алдыңғы шығарылымды қолмен қайта орнатыңыз.';
+  String get updateRollbackError => 'Автоматты кері қайтару сәтсіз аяқталды';
 
   @override
   String get updateRollbackCacheError =>
@@ -818,10 +735,7 @@ class SKk extends S {
   String get updateCopyCommand => 'Көшіру пәрмені';
 
   @override
-  String get updateChecksDisabled => 'Параметрлерде автоматты тексерулер өшірілген.';
-
-  @override
-  String get updateInstalled => 'Жаңарту орнатылды. Sora қайта ашыңыз.';
+  String get updateInstalled => 'Жаңарту орнатылды';
 
   @override
   String get projectLinks => 'Жоба';
@@ -851,21 +765,13 @@ class SKk extends S {
   String get showDescription => 'Сипаттаманы көрсету';
 
   @override
-  String get pendingConnectionChanges => 'Бұл өзгертулерді қолдану үшін қайта қосылыңыз.';
+  String get errEngineUnsupported => 'Таңдалған қозғалтқыш бұл профильді немесе параметрлерді қолдамайды';
 
   @override
-  String get reconnectNow => 'Қолданыңыз және қайта қосыңыз';
+  String get errRestore => 'Байланысты тазалау аяқталмады';
 
   @override
-  String get errEngineUnsupported =>
-      'Таңдалған қозғалтқыш бұл профильді немесе параметрлерді қолдамайды. Автоматты немесе үйлесімді қозғалтқышты таңдаңыз.';
-
-  @override
-  String get errRestore =>
-      'Байланысты тазалау аяқталмады. Ажыратуды қайталап көріңіз; мәліметтер алу үшін журналды қараңыз.';
-
-  @override
-  String get errSessionEnded => 'Бұл сеанс әлдеқашан аяқталды. Қосылым күйін жаңартыңыз.';
+  String get errSessionEnded => 'Бұл сеанс әлдеқашан аяқталды';
 
   @override
   String get retryDisconnect => 'Ажыратуды қайталап көріңіз';
@@ -881,10 +787,10 @@ class SKk extends S {
 
   @override
   String get modesGuide =>
-      'Серверге қандай қозғалтқыш қажет екенін білмесеңіз, Авто опциясын таңдаңыз. Sora қосылу алдында профиль мен параметрлерді тексереді. Қозғалтқыш жоспарыңыздың өткізу қабілеттілігін арттыра алмайды: өнімділік серверге, маршрутқа, протоколға және желіге байланысты.\n\n## Режимдер\n\n### Барлық трафик (TUN)\n\nSora виртуалды желі интерфейсін жасайды және ол арқылы TCP және UDP қоса, қолданба трафигін бағыттайды. Бұл режимді Telegram, ойындар және Discord дауысы үшін пайдаланыңыз. Ережелер нақты сайттарды немесе бағдарламаларды тікелей жібере алады немесе оларды блоктай алады. Желі қызметіне рұқсат және қажетті протоколды қолдайтын сервер қажет.\n\n### System прокси\n\nSora жергілікті HTTP/SOCKS проксиін конфигурациялайды. Жүйенің прокси параметрлерін құрметтейтін қолданбалар оны пайдаланады. Өз желілік стегі бар қолданбалар тікелей қосыла алады; UDP және дауыстық қоңырауларға әдетте TUN қажет. Бұл режим прокси қолдауы бар браузерлер мен қолданбаларға сәйкес келеді.\n\n### Сервер жоқ\n\nLinux жүйесінде Sora HTTP/TLS сұрауларын бөлу және пішінін өзгерту және кейбір DPI тексерулерін айналып өту үшін [zapret](https://github.com/bol-van/zapret) пайдаланады. IP мекенжайыңыз өзгеріссіз қалады және қосылымдар тікелей веб-сайтқа өтеді. Нәтижелер провайдеріңізге және блоктау әдісіне байланысты.\n\nАғымдағы біріктіру TCP арқылы HTTP және TLS үшін tpws пайдаланады. Ол IP блоктауын немесе UDP релесін айналып өтпейді және Telegram MTProto қосылымдарына кепілдік бере алмайды. Discord дауысы, Telegram қоңыраулары және осындай шектеулер үшін TUN бар VPN серверін пайдаланыңыз.\n\n## Қозғалтқыштар\n\n### Авто\n\nSora барлық қосылу жоспарын қолдайтын орнатылған қозғалтқышты таңдайды: сервер протоколдары, тасымалдаулар, топтар, фрагментация және режим. Сәйкес келмейтін қолмен таңдау ағымдағы қосылымды тоқтатудан бұрын қабылданбайды. Автоматты немесе басқа қозғалтқышты таңдап, параметрлерді қайта қолданыңыз.\n\n### sing-box\n\nЖаңа Sora пакеттеріне клиенттік XHTTP және VLESS Encryption қосатын [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) шанышқысы кіреді. Sora құрастыруды және оның мүмкіндіктерін таниды. XHTTP жоқ жоғары ағынды құрастыру бұл мүмкіндікті тек оның атынан ғана ала алмайды.\n\nVLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard протоколдары және Sora импорттай алатын AmneziaWG 1.x/2.x параметрлері қолдау табады. Толық Xray JSON профильдері үшін Xray қажет. Жаңа AWG 3.x өрістерін әзірше импорттау мүмкін емес. sing-box құпиясөзбен қорғалған жергілікті басқару портын пайдаланады; компьютердегі басқа қолданбалар оны анықтай алады.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption және TLS фрагментациясын қолдайды. Ол сонымен қатар Xray провайдерінің толық профильдерін олардың маршруттары мен топтарын сақтай отырып іске қосады. Мұндай профильдерді мінез-құлқын өзгертпестен автоматты түрде басқа қозғалтқышқа түрлендіру мүмкін емес.\n\nЖинақтағы Xray TLS сертификатын тексеруді өшіретін параметрді жойды (`allowInsecure`). Бұл параметрді қажет ететін қарапайым серверлер үшін sing-box немесе mihomo опциясын автоматты түрде таңдайды. Xray таңдау ағымдағы қосылымды тоқтату алдында сәйкессіздікті қолмен хабарлайды. Ескі толық JSON профильдері тексерілетін сертификат немесе сертификат PIN коды бар жаңартылған провайдер профилін қажет етеді.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) реттелген қалпына келтіру және жүктемені теңестіру топтарын, XHTTP және AmneziaWG қолдайды. Сақтық көшірме серверіне автоматты ауыстыру маңызды болғанда оны таңдаңыз. Sora TLS фрагментация параметрі бұл қозғалтқышта қолжетімсіз.\n\n## Sora ішіндегі үйлесімділік\n\n| Ерекшелігі | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN және TCP/UDP | Иә | Иә | Иә |\n| XHTTP | Иә | Иә | Иә |\n| VLESS Encryption | Иә | Иә | Иә |\n| Толық Xray профилі | Жоқ | Иә | Жоқ |\n| TUIC / AnyTLS | Екеуі де | Жоқ | TUIC |\n| mieru | Жоқ | Жоқ | Иә |\n| NaiveProxy | Иә | Жоқ | Жоқ |\n| TLS фрагментациясы | Иә | Иә | Жоқ |\n| AmneziaWG 1.x/2.x | Иә¹ | Жоқ | Иә |\n| Тапсырыс берілген резервтік топ | Жоқ | No² | Иә |\n\n¹ J1/J2/J3/Itime профильдері mihomo пайдаланады; бұл өрістерді ешқашан үнсіз тастауға болмайды. ² Толық Xray профильдерінің тобы үшін қолданба сақтық көшірме профилін таңдайды. Қолдау орнатылған құрылымға байланысты; туралы нұсқасын тексеріңіз.\n\n## TUN стек\n\nСтек виртуалды интерфейстің ішінде TCP және UDP өңдейді. Режимдер панелінде Xray және mihomo gVisor, System, Mixed және MIPS ұсынады. Әрбір қозғалтқыш өз таңдауын сақтайды. System прокси және серверсіз режимдері бұл теңшеуді пайдаланбайды.\n\n- **Mixed**: TCP жүйелік стекті пайдаланады, ал gVisor UDP өңдейді. Бұл Linux жүйесіндегі mihomo үшін әдепкі нұсқа. Windows жүйесінде Xray және mihomo әдепкі бойынша MIPS пайдаланады.\n- **System**: жүйелік стек пайдаланады. Желілік қолданбаларда ақаулықтар туындаса, басқа опцияны қолданып көріңіз.\n- **gVisor**: пайдаланушылар кеңістігіндегі трафикті өңдейді.\n- **MIPS**: mihomo жеке IP стегі, жинақталған 1.19.32 нұсқасында қолжетімді.\n\nLinux жүйесінде Xray әдепкі бойынша кірістірілген gVisor пайдаланады. Linux жүйесіндегі System, Mixed және MIPS TUN қозғалтқышы ретінде mihomo пайдаланады, TCP және UDP аутентификацияланған жергілікті SOCKS сілтемесі арқылы Xray файлына бағыттайды. Xray протоколды, провайдер профилін және маршруттауды сақтайды. Бұл үш опция орнатылған mihomo қажет. Windows жүйесінде Xray барлық төрт TUN стегі үшін mihomo 1.19.32 немесе жаңасын пайдаланады. Протоколдар мен маршруттау Xray жүйесінде қалады. Бұл тіркесімде қолданба ережелері тек тікелей қосылуды және бұғаттауды қолдайды; Linux жүйесінде бұл ережелер Xray кірістірілген gVisor стегін қажет етеді.\n\nКөпір екінші процесті жүргізеді. Linux құрылғысындағы үш бос өлшеу кезінде ол жергілікті Xray TUN-ға қарағанда 32–36 МБ артық физикалық жадты пайдаланды. Бұл жүктеу жүктемесін өлшемейді: процессор мен жад құны қосылымдарға байланысты. sing-box стек селекторы жоқ. Ешбір стек әрбір желіде жақсы өнімділікке кепілдік бермейді. Стекті таңдап, оны желіде сынап көру үшін Қолдану және қайта қосылу опциясын таңдаңыз.\n\n## Параметрлерді қолдану\n\nСерверді таңдау автоматты түрде қайта қосылады. Режим, қозғалтқыш, DNS және ереже параметрлері бірден сақталады; белсенді қосылым кезінде оларды пайдалану үшін Қолдану түймесін басып, қайта қосылыңыз. Қозғалтқышты қайта іске қосу жүктеп алулар мен қоңырауларды тоқтатуы мүмкін. Қайталанатын шертулер параллель қосылымдарды бастамайды; ажырату ауысуды аяқтайды және қосылымды босатады.\n\nТек VPN арқылы Интернет туннель құлаған кезде тікелей трафикті блоктайды. Бұл бүкіл машинаға әсер етеді. Айқын ажырату Sora ережелерін жояды. Тазалау аяқталмаса, қайта ажыратып көріңіз және журналды ашыңыз.\n\n## Жобалық құжаттама\n\n- [sing-box-lx: конфигурация және қолдау](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box құжаттамасы](https://sing-box.sagernet.org/)\n- [Xray құжаттамасы](https://xtls.github.io/)\n- [mihomo құжаттамасы](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: жұмыс және шектеулер](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP трафигін Jitsi, Яндекс Телемост немесе WB Stream бейнеқоңырауы арқылы өткізеді. olcrtc:// сілтемесін немесе QR кодын импорттаңыз. Прокси және TUN режимдерінде sing-box, Xray және mihomo арқылы жұмыс істейді; UDP қолдау көрсетілмейді. Екі жаққа да үйлесімді OLC2 жинақтары қажет. Бастапқы жоба мұрағатталған.\n';
+      'Серверге қандай қозғалтқыш қажет екенін білмесеңіз, Авто опциясын таңдаңыз. Sora қосылу алдында профиль мен параметрлерді тексереді. Қозғалтқыш жоспарыңыздың өткізу қабілеттілігін арттыра алмайды: өнімділік серверге, маршрутқа, протоколға және желіге байланысты.\n\n## Режимдер\n\n### Барлық трафик (TUN)\n\nSora виртуалды желі интерфейсін жасайды және ол арқылы TCP және UDP қоса, қолданба трафигін бағыттайды. Бұл режимді Telegram, ойындар және Discord дауысы үшін пайдаланыңыз. Ережелер нақты сайттарды немесе бағдарламаларды тікелей жібере алады немесе оларды блоктай алады. Желі қызметіне рұқсат және қажетті протоколды қолдайтын сервер қажет.\n\n### System прокси\n\nSora жергілікті HTTP/SOCKS проксиін конфигурациялайды. Жүйенің прокси параметрлерін құрметтейтін қолданбалар оны пайдаланады. Өз желілік стегі бар қолданбалар тікелей қосыла алады; UDP және дауыстық қоңырауларға әдетте TUN қажет. Бұл режим прокси қолдауы бар браузерлер мен қолданбаларға сәйкес келеді.\n\n### Сервер жоқ\n\nLinux жүйесінде Sora HTTP/TLS сұрауларын бөлу және пішінін өзгерту және кейбір DPI тексерулерін айналып өту үшін [zapret](https://github.com/bol-van/zapret) пайдаланады. IP мекенжайыңыз өзгеріссіз қалады және қосылымдар тікелей веб-сайтқа өтеді. Нәтижелер провайдеріңізге және блоктау әдісіне байланысты.\n\nАғымдағы біріктіру TCP арқылы HTTP және TLS үшін tpws пайдаланады. Ол IP блоктауын немесе UDP релесін айналып өтпейді және Telegram MTProto қосылымдарына кепілдік бере алмайды. Discord дауысы, Telegram қоңыраулары және осындай шектеулер үшін TUN бар VPN серверін пайдаланыңыз.\n\n## Қозғалтқыштар\n\n### Авто\n\nSora барлық қосылу жоспарын қолдайтын орнатылған қозғалтқышты таңдайды: сервер протоколдары, тасымалдаулар, топтар, фрагментация және режим. Сәйкес келмейтін қолмен таңдау ағымдағы қосылымды тоқтатудан бұрын қабылданбайды. Автоматты немесе басқа қозғалтқышты таңдап, параметрлерді қайта қолданыңыз.\n\n### sing-box\n\nЖаңа Sora пакеттеріне клиенттік XHTTP және VLESS Encryption қосатын [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) шанышқысы кіреді. Sora құрастыруды және оның мүмкіндіктерін таниды. XHTTP жоқ жоғары ағынды құрастыру бұл мүмкіндікті тек оның атынан ғана ала алмайды.\n\nVLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard протоколдары және Sora импорттай алатын AmneziaWG 1.x/2.x параметрлері қолдау табады. Толық Xray JSON профильдері үшін Xray қажет. Жаңа AWG 3.x өрістерін әзірше импорттау мүмкін емес. sing-box құпиясөзбен қорғалған жергілікті басқару портын пайдаланады; компьютердегі басқа қолданбалар оны анықтай алады.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption және TLS фрагментациясын қолдайды. Ол сонымен қатар Xray провайдерінің толық профильдерін олардың маршруттары мен топтарын сақтай отырып іске қосады. Мұндай профильдерді мінез-құлқын өзгертпестен автоматты түрде басқа қозғалтқышқа түрлендіру мүмкін емес.\n\nЖинақтағы Xray TLS сертификатын тексеруді өшіретін параметрді жойды (`allowInsecure`). Бұл параметрді қажет ететін қарапайым серверлер үшін sing-box немесе mihomo опциясын автоматты түрде таңдайды. Xray таңдау ағымдағы қосылымды тоқтату алдында сәйкессіздікті қолмен хабарлайды. Ескі толық JSON профильдері тексерілетін сертификат немесе сертификат PIN коды бар жаңартылған провайдер профилін қажет етеді.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) реттелген қалпына келтіру және жүктемені теңестіру топтарын, XHTTP және AmneziaWG қолдайды. Сақтық көшірме серверіне автоматты ауыстыру маңызды болғанда оны таңдаңыз. Sora TLS фрагментация параметрі бұл қозғалтқышта қолжетімсіз.\n\n## Sora ішіндегі үйлесімділік\n\n| Ерекшелігі | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN және TCP/UDP | Иә | Иә | Иә |\n| XHTTP | Иә | Иә | Иә |\n| VLESS Encryption | Иә | Иә | Иә |\n| Толық Xray профилі | Жоқ | Иә | Жоқ |\n| TUIC / AnyTLS | Екеуі де | Жоқ | TUIC |\n| mieru | Жоқ | Жоқ | Иә |\n| NaiveProxy | Иә | Жоқ | Жоқ |\n| TLS фрагментациясы | Иә | Иә | Жоқ |\n| AmneziaWG 1.x/2.x | Иә¹ | Жоқ | Иә |\n| Тапсырыс берілген резервтік топ | Жоқ | No² | Иә |\n\n¹ J1/J2/J3/Itime профильдері mihomo пайдаланады; бұл өрістерді ешқашан үнсіз тастауға болмайды. ² Толық Xray профильдерінің тобы үшін қолданба сақтық көшірме профилін таңдайды. Қолдау орнатылған құрылымға байланысты; туралы нұсқасын тексеріңіз.\n\n## TUN стек\n\nСтек виртуалды интерфейстің ішінде TCP және UDP өңдейді. Режимдер панелінде Xray және mihomo gVisor, System, Mixed және MIPS ұсынады. Әрбір қозғалтқыш өз таңдауын сақтайды. System прокси және серверсіз режимдері бұл теңшеуді пайдаланбайды.\n\n- **Mixed**: TCP жүйелік стекті пайдаланады, ал gVisor UDP өңдейді. Бұл Linux жүйесіндегі mihomo үшін әдепкі нұсқа. Windows жүйесінде Xray және mihomo әдепкі бойынша MIPS пайдаланады.\n- **System**: жүйелік стек пайдаланады. Желілік қолданбаларда ақаулықтар туындаса, басқа опцияны қолданып көріңіз.\n- **gVisor**: пайдаланушылар кеңістігіндегі трафикті өңдейді.\n- **MIPS**: mihomo жеке IP стегі, жинақталған 1.19.32 нұсқасында қолжетімді.\n\nLinux жүйесінде Xray әдепкі бойынша кірістірілген gVisor пайдаланады. Linux жүйесіндегі System, Mixed және MIPS TUN қозғалтқышы ретінде mihomo пайдаланады, TCP және UDP аутентификацияланған жергілікті SOCKS сілтемесі арқылы Xray файлына бағыттайды. Xray протоколды, провайдер профилін және маршруттауды сақтайды. Бұл үш опция орнатылған mihomo қажет. Windows жүйесінде Xray барлық төрт TUN стегі үшін mihomo 1.19.32 немесе жаңасын пайдаланады. Протоколдар мен маршруттау Xray жүйесінде қалады. Бұл тіркесімде қолданба ережелері тек тікелей қосылуды және бұғаттауды қолдайды; Linux жүйесінде бұл ережелер Xray кірістірілген gVisor стегін қажет етеді.\n\nКөпір екінші процесті жүргізеді. Linux құрылғысындағы үш бос өлшеу кезінде ол жергілікті Xray TUN-ға қарағанда 32–36 МБ артық физикалық жадты пайдаланды. Бұл жүктеу жүктемесін өлшемейді: процессор мен жад құны қосылымдарға байланысты. sing-box стек селекторы жоқ. Ешбір стек әрбір желіде жақсы өнімділікке кепілдік бермейді.\n\n## Параметрлерді қолдану\n\nСерверді таңдағанда қосылым автоматты түрде қайта орнатылады. Режимге, ядроға, DNS не ережелерге енгізген өзгерістеріңіз қысқа үзілістен кейін автоматты қайта қосылумен бір рет қолданылады; фондық жаңартулар VPN-ді қайта қоспайды. Ядроны қайта іске қосу жүктеп алулар мен қоңырауларды үзуі мүмкін.\n\nТек VPN арқылы Интернет туннель құлаған кезде тікелей трафикті блоктайды. Бұл бүкіл машинаға әсер етеді. Айқын ажырату Sora ережелерін жояды. Тазалау аяқталмаса, қайта ажыратып көріңіз және журналды ашыңыз.\n\n## Жобалық құжаттама\n\n- [sing-box-lx: конфигурация және қолдау](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box құжаттамасы](https://sing-box.sagernet.org/)\n- [Xray құжаттамасы](https://xtls.github.io/)\n- [mihomo құжаттамасы](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: жұмыс және шектеулер](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP трафигін Jitsi, Яндекс Телемост немесе WB Stream бейнеқоңырауы арқылы өткізеді. olcrtc:// сілтемесін немесе QR кодын импорттаңыз. Прокси және TUN режимдерінде sing-box, Xray және mihomo арқылы жұмыс істейді; UDP қолдау көрсетілмейді. Екі жаққа да үйлесімді OLC2 жинақтары қажет. Бастапқы жоба мұрағатталған.\n';
 
   @override
-  String get probeServers => 'Серверлерді тексеріңіз';
+  String get probeServers => 'Пинг';
 
   @override
   String get extensions => 'Кеңейтімдер';
@@ -908,13 +814,10 @@ class SKk extends S {
   String get extInstallOne => '1 орнату';
 
   @override
-  String get extSideloadWarning => 'Автордың өзі қол қойған кілтіне сенсеңіз ғана орнатыңыз.';
+  String get extSideloadWarning => 'Өзі қол қойған кілт';
 
   @override
   String get extPermissionsWidened => 'Жаңарту жаңа рұқсаттарды сұрайды:';
-
-  @override
-  String get extDangerousAck => 'Мен бұл рұқсаттардың маңызды екенін түсінемін';
 
   @override
   String get extInstall => 'Орнату';
@@ -927,9 +830,6 @@ class SKk extends S {
 
   @override
   String get extConfirm => 'Растау';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Каталог';
@@ -980,17 +880,13 @@ class SKk extends S {
   String get extEmptySearch => 'Ештеңе табылмады';
 
   @override
-  String get extEmptyInstalled =>
-      'Әлі ешқандай кеңейтімдер орнатылмаған.\nКаталогтан біреуін табыңыз немесе файлдан орнатыңыз.';
+  String get extEmptyInstalled => 'Әлі ешқандай кеңейтімдер орнатылмаған';
 
   @override
   String get extInstallFromFile => 'Файлдан орнату';
 
   @override
   String get extInstallFromUrl => 'URL бастап орнату';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Жүктеп алу';
@@ -1005,19 +901,16 @@ class SKk extends S {
   String get extInstalling => 'Орнатуда…';
 
   @override
-  String get extInstallFailed => 'Орнату сәтсіз аяқталды';
-
-  @override
-  String get extErrSignature => 'Қолтаңбаны тексеру сәтсіз аяқталды. Файл зақымдалған немесе бұрмаланған болуы мүмкін.';
+  String get extErrSignature => 'Қолтаңбаны тексеру сәтсіз аяқталды';
 
   @override
   String get extErrManifest => 'Кеңейтім манифесті жарамсыз.';
 
   @override
-  String get extErrNetwork => 'Желі қатесі. Байланысты тексеріп, әрекетті қайталаңыз.';
+  String get extErrNetwork => 'Желі қатесі';
 
   @override
-  String get extErrHash => 'Жүктеп алу каталогқа сәйкес келмейді. Ол бұрмаланған болуы мүмкін.';
+  String get extErrHash => 'Жүктеп алу каталогқа сәйкес келмейді';
 
   @override
   String extErrMinApp(String version) {
@@ -1028,11 +921,11 @@ class SKk extends S {
   String get extErrHttpsOnly => 'Тек https:// сілтемелерге рұқсат етілген';
 
   @override
-  String get extErrGeneric => 'Бірдеңе дұрыс болмады. Қайталап көріңіз.';
+  String get extErrGeneric => 'Бірдеңе дұрыс болмады';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Бұл жаңарту орнатылған нұсқаға қарағанда басқа автор кілтімен қол қойылған, сондықтан ол бұғатталды. Жаңа кілтке сенсеңіз, кеңейтімді жойып, оны қайта орнатыңыз.';
+      'Бұл жаңарту орнатылған нұсқаға қарағанда басқа автор кілтімен қол қойылған, сондықтан ол бұғатталды';
 
   @override
   String get extDisabled => 'Өшірулі';
@@ -1089,7 +982,7 @@ class SKk extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count қақтығыстар сіздің шешіміңізді қажет етеді';
+    return 'Кеңейтім қайшылықтары: $count';
   }
 
   @override
@@ -1166,10 +1059,10 @@ class SKk extends S {
   String get extPermThemeApply => 'Тақырыптарды қолдану';
 
   @override
-  String get extPermRoutingRules => 'Маршруттау ережелерін қосу (желі трафигі қай жерде жүретініне әсер етеді)';
+  String get extPermRoutingRules => 'Маршруттау ережелерін қосу';
 
   @override
-  String get extPermNetHooks => 'Желі жолына біріктіру (DPI айналып өту модульдері)';
+  String get extPermNetHooks => 'Желі жолына біріктіру';
 
   @override
   String get extPermNetFetch => 'Рұқсат етілген тізімнен URL сұрау';
@@ -1178,7 +1071,7 @@ class SKk extends S {
   String get extPermBackground => 'Фондық тапсырмаларды іске қосыңыз';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Өшірулі';
 
   @override
   String get extCapBackground => 'Фондық режимде жұмыс істейді';
@@ -1216,9 +1109,6 @@ class SKk extends S {
   String get extSortRelevance => 'Сәйкестік';
 
   @override
-  String get extPermNetworkDetail => 'VPN сұрауларына тек төмендегі хосттарға рұқсат етіледі.';
-
-  @override
   String get extBgTitle => 'Фондық тапсырма';
 
   @override
@@ -1240,9 +1130,6 @@ class SKk extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Фондық тапсырманы басқару үшін кеңейтімді қосыңыз.';
-
-  @override
   String get extCapNetwork => 'Желіге кіру';
 
   @override
@@ -1259,7 +1146,7 @@ class SKk extends S {
   String get diagnosticHttp => 'HTTP диагностикасы';
 
   @override
-  String get diagnosticNoData => 'Жазылған сұраулар әлі жоқ. Алдымен жылдамдықты тексеру веб-сайтын ашыңыз.';
+  String get diagnosticNoData => 'Жазылған сұраулар әлі жоқ';
 
   @override
   String get qrShareTitle => 'QR кодын бөлісіңіз';
@@ -1269,12 +1156,6 @@ class SKk extends S {
 
   @override
   String get qrCopyLink => 'Сілтемені көшіру';
-
-  @override
-  String get qrWarning => 'Кодты тек сенімді адамдармен бөлісіңіз.';
-
-  @override
-  String get qrScanHint => 'QR коды бар скриншотты не фотоны таңдаңыз немесе сілтемені қойыңыз';
 
   @override
   String get qrFromClipboard => 'Буферден қою';
@@ -1355,30 +1236,10 @@ class SKk extends S {
   String get dnsLeakCheckKillSwitchDns => 'Желі бұғаттауының DNS қорғанысы';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Жоғарыдағы DNS параметрлерінде туннель үшін DNS конфигурациялаңыз.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'Жүйе туннельден тыс қандай шешушілерді пайдаланатынын тексеріңіз.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS трафигі туннельде қалуы үшін желі бұғаттауын қосыңыз.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Жүйенің шифрланған DNS қызметі';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Жалған DNS жауаптар';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Жүйе туннельден тыс қандай шифрланған DNS соңғы нүктелерді пайдаланатынын тексеріңіз.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Резолверлер жауаптарды қолдан жасай алмауы үшін туннельде шифрланған DNS (DoT немесе DoH) пайдаланыңыз.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Алдымен VPN желісіне қосылыңыз, содан кейін ағып кетуді тексеріңіз.';
 
   @override
   String get dnsExpected => 'Күтілетін';
@@ -1405,7 +1266,7 @@ class SKk extends S {
   String get autoSelectSmart => 'Ақылды таңдау';
 
   @override
-  String get coreWatchUnstable => 'Ядромен байланыс тұрақсыз. Сәл күтіп, қайта қосылып көріңіз.';
+  String get coreWatchUnstable => 'Ядромен байланыс тұрақсыз';
 
   @override
   String get watchReconnect => 'Қайта қосыңыз';
@@ -1444,7 +1305,7 @@ class SKk extends S {
   String get overrideCustomRules => 'Жеке ережелер';
 
   @override
-  String get errBenchmarkUnsupported => 'Жылдамдықты өлшеу үшін ядроның жаңарақ нұсқасы қажет. Sora-ны жаңартыңыз.';
+  String get errBenchmarkUnsupported => 'Жылдамдықты өлшеу үшін ядроның жаңарақ нұсқасы қажет';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1455,8 +1316,7 @@ class SKk extends S {
   String get profiles => 'Желі профильдері';
 
   @override
-  String get profilesEmpty =>
-      'Әзірге профильдер жоқ. Белгілі желілерде параметрлерді автоматты түрде қолдану үшін біреуін жасаңыз.';
+  String get profilesEmpty => 'Әзірге профильдер жоқ';
 
   @override
   String get profileAdd => 'Профиль қосу';
@@ -1468,9 +1328,6 @@ class SKk extends S {
   String get profileSsids => 'Wi-Fi желілер (SSID)';
 
   @override
-  String get profileSsidsHint => 'Үй, кеңсе үтірмен бөлінген';
-
-  @override
   String get profileGateways => 'Желілік шлюздер';
 
   @override
@@ -1478,9 +1335,6 @@ class SKk extends S {
 
   @override
   String get profileAutoApply => 'Автоматты түрде қолдану';
-
-  @override
-  String get profileAutoApplyHint => 'Өшірулі болса, профильді қолдану алдында растау сұралады.';
 
   @override
   String get profileSnapshot => 'Ағымдағы параметрлерді есте сақтаңыз';
@@ -1524,14 +1378,13 @@ class SKk extends S {
   String get networkUnknown => 'Желі туралы ақпарат қолжетімді емес';
 
   @override
-  String get profileNoTriggers => 'Кем дегенде бір триггерді қосыңыз: SSID, шлюз немесе ASN';
+  String get profileNoTriggers => 'Профиль шарттары жоқ';
 
   @override
   String get chains => 'Прокси-тізбектер';
 
   @override
-  String get chainsEmpty =>
-      'Әлі тізбектер жоқ. 2–3 серверді байланыстырыңыз, осылайша олардың әрқайсысы арқылы трафик өтеді.';
+  String get chainsEmpty => 'Әлі тізбектер жоқ';
 
   @override
   String get chainAdd => 'Жаңа тізбек';
@@ -1540,16 +1393,10 @@ class SKk extends S {
   String get chainName => 'Тізбек атауы';
 
   @override
-  String get chainPickServers => '2–3 серверді таңдаңыз';
+  String get chainTooFew => 'Тізбекке кемінде екі сервер қажет';
 
   @override
-  String get chainOrderHint => 'Қайта реттеу үшін сүйреңіз: трафик жоғарғы жағынан кіреді және төменгі жағынан шығады.';
-
-  @override
-  String get chainTooFew => 'Тізбекке кемінде екі сервер қажет. Тағы бір сервер қосыңыз.';
-
-  @override
-  String get chainTooMany => 'Тізбекте ең көбі үш сервер болуы мүмкін. Артық серверлерді алып тастаңыз.';
+  String get chainTooMany => 'Тізбекте ең көбі үш сервер болуы мүмкін';
 
   @override
   String get chainEstimate => 'Болжалды кідіріс';
@@ -1566,10 +1413,10 @@ class SKk extends S {
   }
 
   @override
-  String get chainUnsupported => 'Таңдалған ядро тізбектерді қолдамайды. Үйлесімді ядроны таңдаңыз.';
+  String get chainUnsupported => 'Таңдалған ядро тізбектерді қолдамайды';
 
   @override
-  String get chainHopMissing => 'Тізбектегі бір сервер енді қолжетімсіз. Сол буын үшін басқа сервер таңдаңыз.';
+  String get chainHopMissing => 'Тізбектегі бір сервер енді қолжетімсіз';
 
   @override
   String chainHop(Object n) {
@@ -1589,7 +1436,7 @@ class SKk extends S {
   String get syncDevices => 'Менің құрылғыларым';
 
   @override
-  String get syncEmpty => 'Жұптастырылған құрылғылар жоқ. Жергілікті желі арқылы басқа құрылғыны жұптаңыз.';
+  String get syncEmpty => 'Жұптастырылған құрылғылар жоқ';
 
   @override
   String get syncPair => 'Құрылғыны жұптаңыз';
@@ -1617,9 +1464,6 @@ class SKk extends S {
   String get syncNever => 'Ешқашан';
 
   @override
-  String get syncNoLan => 'Құрылғылар бір жергілікті желіде болуы керек';
-
-  @override
   String get syncPaired => 'Құрылғы жұпталған';
 
   @override
@@ -1629,17 +1473,10 @@ class SKk extends S {
   String get syncWaiting => 'Басқа құрылғы күтілуде…';
 
   @override
-  String get syncSecureNote => 'Шифрланған арна. Есептік жазбалар, бұлттық серверлер жоқ.';
-
-  @override
   String get zapretWithVpn => 'Тікелей желі трафигі үшін DPI сүзгісін айналып өтіңіз';
 
   @override
-  String get zapretWithVpnHint =>
-      'zapret VPN туннелімен қатар іске қосылады: туннель трафигі VPN арқылы, тікелей трафик бұғаттауды айналып өту құралы арқылы өтеді.';
-
-  @override
-  String get chainDuplicate => 'Тізбекте бір сервер қайталанған. Әр буын үшін бөлек сервер таңдаңыз.';
+  String get chainDuplicate => 'Тізбекте бір сервер қайталанған';
 
   @override
   String get edit => 'Өңдеу';
@@ -1649,10 +1486,6 @@ class SKk extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Тозуды автоматты түрде қосу';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Таңдалған сервер қатты баяуласа немесе жауап бермесе, Sora өлшеу нәтижесі ең жақсы серверге ауысады, бірақ 10 минутта бір реттен жиі емес.';
 
   @override
   String get tunStackMixed => 'Аралас';
@@ -1670,19 +1503,13 @@ class SKk extends S {
   String get customServerName => 'Аты';
 
   @override
-  String get customServerNameHint => 'Мысалы: менің VPS';
-
-  @override
-  String get customServerNameRequired => 'Атын енгізіңіз';
+  String get customServerNameRequired => 'Атау көрсетілмеген';
 
   @override
   String get customServerAddress => 'Мекенжай';
 
   @override
-  String get customServerAddressHint => 'example.com немесе 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Сервер мекенжайын енгізіңіз';
+  String get customServerAddressRequired => 'Мекенжай көрсетілмеген';
 
   @override
   String get customServerAddressInvalid => 'Жарамсыз мекенжай';
@@ -1691,19 +1518,13 @@ class SKk extends S {
   String get customServerPort => 'Порт';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Порт 1-ден 65535-ке дейінгі сан болуы керек';
+  String get customServerPortInvalid => 'Порт жарамсыз';
 
   @override
   String get customServerProtocol => 'Протокол';
 
   @override
   String get customServerCredentials => 'Жүйеге кіру ақпараты';
-
-  @override
-  String get customServerOptional => 'Қосымша';
 
   @override
   String get customServerShowSecret => 'Құпияны көрсету';
@@ -1717,23 +1538,13 @@ class SKk extends S {
   }
 
   @override
-  String get customServerTest => 'Сынақ';
-
-  @override
   String get leakTestTitle => 'Деректердің ағып кетуіне сынақ';
-
-  @override
-  String get leakTestIntro =>
-      'Трафиктің құрылғыдан туннельден тыс шыға алатынын тексереді: тікелей DNS және ICMP сұраулары, IPv6 шығысы және жүйелік резолверлер. Қосылым белсенді кезде іске қосыңыз.';
 
   @override
   String get leakTestRun => 'Тексеріңіз';
 
   @override
   String get leakTestCancel => 'Болдырмау';
-
-  @override
-  String get leakTestNeedsConnection => 'Деректердің ағып кетуін тексеру үшін VPN желісіне қосылыңыз.';
 
   @override
   String leakTestProgress(int count) {
@@ -1759,9 +1570,6 @@ class SKk extends S {
 
   @override
   String get leakTestFix => 'Түзету';
-
-  @override
-  String get leakTestFixedNote => 'Желі бұғаттауы қосулы. Тексеру үшін сынақты қайта іске қосыңыз.';
 
   @override
   String get leakTestCheckDirectDns => 'Тікелей DNS';
@@ -1794,15 +1602,13 @@ class SKk extends S {
   String get syncDaemonFailed => 'Синхрондау қызметін бастау мүмкін болмады';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync компоненті табылмады. Құрылғыны синхрондауды қосу үшін қолданбаны қайта орнатыңыз.';
+  String get syncDaemonMissing => 'sora-sync компоненті табылмады';
 
   @override
   String get syncDaemonStarting => 'Синхрондау қызметін бастау…';
 
   @override
-  String get syncErrAuth =>
-      'Синхрондау қызметі кіру таңбалауышын қабылдамады. Қолданбаны қайта іске қосып, әрекетті қайталаңыз.';
+  String get syncErrAuth => 'Синхрондау қызметі кіру таңбалауышын қабылдамады';
 
   @override
   String get syncErrNotFound => 'Құрылғы енді жұпталмаған';
@@ -1811,8 +1617,7 @@ class SKk extends S {
   String get syncErrPairingActive => 'Жұптастыру сеансы әлдеқашан ашық';
 
   @override
-  String get syncErrUnreachable =>
-      'Басқа құрылғы жауап бермеді. Оның бір желіде екеніне және оның кодын көрсететініне көз жеткізіңіз.';
+  String get syncErrUnreachable => 'Басқа құрылғы жауап бермеді';
 
   @override
   String get syncError => 'Синхрондау қатесі';
@@ -1824,10 +1629,6 @@ class SKk extends S {
 
   @override
   String get syncJoining => 'Құрылғымен жұптастыру…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Ескі құрылғылар тізімі ешқашан шынымен жұпталмаған, сондықтан ол тазартылды. Құрылғыларыңызды қайта жұптаңыз, бұл жолы нақты.';
 
   @override
   String get syncNewCode => 'Жаңа код';
@@ -1887,8 +1688,7 @@ class SKk extends S {
   String get syncThisDevice => 'Бұл құрылғы';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android жүйесінде синхрондау қолжетімсіз';
 
   @override
   String get diagnosticPackets => 'Пакетті түсіру';
@@ -1935,27 +1735,25 @@ class SKk extends S {
   String get customServerWgKeepalive => 'Keepalive, секунд';
 
   @override
-  String get customServerWgKeyInvalid => 'Кілт wg genkey шығаратындай base64 түріндегі 32 байт болуы керек.';
+  String get customServerWgKeyInvalid => 'WireGuard кілті жарамсыз';
 
   @override
-  String get customServerWgCidrInvalid => 'Үтірмен бөлінген префикстерді енгізіңіз, мысалы 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'CIDR префиксі жарамсыз';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0-ден 65535-ке дейінгі секунд санын енгізіңіз.';
+  String get customServerWgKeepaliveInvalid => 'Keepalive аралығы жарамсыз';
 
   @override
   String get strictKillSwitch => 'Қатаң желі бұғаттауы';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Қосылғаннан кейін ақау, қайта іске қосу немесе қолданбадан шығу кезінде де VPN сыртындағы трафикті бұғаттайды. Қолжетімділік тек қосылымды үзгенде немесе осы параметрді өшіргенде қалпына келеді. Құрылғы қайта жүктелген соң бұғаттау іске қосылғанда қосылу қосулы болса ғана жалғасады.';
+  String get strictKillSwitchWarning => 'Шыққаннан кейін VPN сыртындағы трафикті бұғаттау керек пе?';
 
   @override
-  String get extWorkerFailed => 'Кеңейтімнің фондық тапсырмасы орындалмады. Кеңейтім журналын тексеріңіз.';
+  String get extWorkerFailed => 'Кеңейтімнің фондық тапсырмасы орындалмады';
 
   @override
-  String get extAssetRejected =>
-      'Кеңейтім файлында оқылмайтын түстер немесе жарамсыз ережелер бар. Кеңейтім авторынан файлды түзетуді сұраңыз.';
+  String get extAssetRejected => 'Кеңейтім файлында оқылмайтын түстер немесе жарамсыз ережелер бар';
 
   @override
   String get extVerifiedSora => 'Sora тексерген';
@@ -1981,31 +1779,25 @@ class SKk extends S {
   String get customServerPassword => 'Құпиясөз';
 
   @override
-  String get customServerSecretRequired => 'Мән енгізіңіз';
+  String get customServerSecretRequired => 'Мән көрсетілмеген';
 
   @override
   String get customServerLinkInvalid => 'Сервер сілтемесі жарамсыз';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora ішкі қатесі';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Сервер сертификаты қабылданбады';
 
   @override
-  String get errInternal => 'Sora ішкі қатесі. Журналды сақтап, ақау туралы хабарлаңыз.';
+  String get errFileAccess => 'Файлға қолжетімсіз';
 
   @override
-  String get errTls => 'Сервер сертификаты қабылданбады. Сағатты тексеріңіз немесе провайдерге хабарласыңыз.';
+  String get errDataLimit => 'Дерек тым көп';
 
   @override
-  String get errFileAccess => 'Файлға қолжетімсіз. Рұқсаттар мен бос орынды тексеріңіз.';
-
-  @override
-  String get errDataLimit => 'Дерек тым көп. Азырақ элемент таңдап, қайталап көріңіз.';
-
-  @override
-  String get errCredentials => 'Сақталған кіру деректері жоқ. Серверді қайта импорттаңыз.';
+  String get errCredentials => 'Сақталған кіру деректері жоқ';
 
   @override
   String subscriptionStale(String time) {
@@ -2013,55 +1805,54 @@ class SKk extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Әлі жаңартылмады. Қайталап көріңіз.';
+  String get subscriptionNeverUpdated => 'Әлі жаңартылмады';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Сервер HTTP $status кодын қайтарды. Сілтемені тексеріңіз немесе провайдерге хабарласыңыз.',
-      zero: 'Сервер сұрауды қабылдамады. Сілтемені тексеріңіз немесе провайдерге хабарласыңыз.',
+      other: 'Сервер HTTP $status кодын қайтарды',
+      zero: 'Сервер сұрауды қабылдамады',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Сервер баптаулары толық емес немесе қолдау көрсетілмейді. Жазылымды жаңартыңыз.';
+  String get errInvalidServer => 'Сервер баптаулары толық емес немесе қолдау көрсетілмейді';
 
   @override
-  String get errServerIds => 'Екі сервердің идентификаторы бірдей. Оларды қайта импорттаңыз.';
+  String get errServerIds => 'Екі сервердің идентификаторы бірдей';
 
   @override
-  String get errRoutingGroup => 'Бағыт жоқ серверлерге немесе бүлінген топқа сілтейді. Жазылымды жаңартыңыз.';
+  String get errRoutingGroup => 'Бағыт жоқ серверлерге немесе бүлінген топқа сілтейді';
 
   @override
-  String get errConnections => 'Қосылымдар тізімі қолжетімсіз. Қосылыңыз немесе басқа қозғалтқыш таңдаңыз.';
+  String get errConnections => 'Қосылымдар тізімі қолжетімсіз';
 
   @override
-  String get errLogs => 'Бұл қызмет журнал жүргізбейді. Sora-ны жаңартыңыз.';
+  String get errLogs => 'Бұл қызмет журнал жүргізбейді';
 
   @override
-  String get errDiagnostics => 'Диагностика жиналмады. Қайталап көріңіз немесе журналды сақтаңыз.';
+  String get errDiagnostics => 'Диагностика жиналмады';
 
   @override
-  String get errMissingItem => 'Сұралған элемент енді жоқ. Тізімді жаңартыңыз.';
+  String get errMissingItem => 'Сұралған элемент енді жоқ';
 
   @override
-  String get errInvalidRequest => 'Сұрауда жарамсыз мәндер бар. Енгізілген деректерді тексеріп, қайталаңыз.';
+  String get errInvalidRequest => 'Сұрауда жарамсыз мәндер бар';
 
   @override
-  String get errProxyLogin =>
-      'Жүйелік прокси бұл кіруді қолдамайды. Жергілікті проксидің пайдаланушы аты мен құпиясөзін өшіріңіз.';
+  String get errProxyLogin => 'Жүйелік прокси бұл кіруді қолдамайды';
 
   @override
-  String get errLogFilter => 'Журнал сүзгісі жарамсыз. Іздеуді тазалап, қайталаңыз.';
+  String get errLogFilter => 'Журнал сүзгісі жарамсыз';
 
   @override
-  String get errSubRedirect => 'Сервер қауіпті мекенжайға бағыттады. Провайдерден жаңа сілтеме сұраңыз.';
+  String get errSubRedirect => 'Сервер қауіпті мекенжайға бағыттады';
 
   @override
-  String get errProxySetup => 'Жүйелік прокси бапталмады. Қайта қосылыңыз немесе журналды ашыңыз.';
+  String get errProxySetup => 'Жүйелік прокси бапталмады';
 
   @override
   String get notificationsToday => 'Бүгін';
@@ -2087,17 +1878,46 @@ class SKk extends S {
   }
 
   @override
-  String get errSubInterval => 'Жазылымды жаңарту аралығы жарамсыз. Провайдер ұсынған аралықты таңдаңыз.';
+  String get errSubInterval => 'Жазылымды жаңарту аралығы жарамсыз';
 
   @override
-  String get errRule => 'Бағыттау ережесі жарамсыз. Ережедегі доменді, IP мекенжайын немесе қолданбаны тексеріңіз.';
+  String get errRule => 'Бағыттау ережесі жарамсыз';
 
   @override
-  String get errDns => 'DNS баптаулары жарамсыз. DNS серверінің мекенжайын тексеріңіз.';
+  String get errDns => 'DNS баптаулары жарамсыз';
 
   @override
-  String get errEndpoint => 'Тексерілетін сервердің мекенжайы жарамсыз. Хост атауы мен портты тексеріңіз.';
+  String get errEndpoint => 'Тексерілетін сервердің мекенжайы жарамсыз';
 
   @override
-  String get errCancelled => 'Сұрау тоқтатылды. Қажет болса, әрекетті қайталаңыз.';
+  String get errCancelled => 'Сұрау тоқтатылды';
+
+  @override
+  String get customServerOptions => 'Қосылым параметрлері';
+
+  @override
+  String get customServerTransport => 'Тасымалдау';
+
+  @override
+  String get customServerSecurity => 'Қауіпсіздік';
+
+  @override
+  String get customServerCipher => 'Шифр';
+
+  @override
+  String get customServerWgInterface => 'Интерфейс';
+
+  @override
+  String get customServerWgPeer => 'Пир';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Қолжетімді платформалар: $platforms.';
+  }
+
+  @override
+  String get winwsScopeWarning => 'Барлық қолданбалардың TCP трафигін өзгерту керек пе?';
+
+  @override
+  String get winwsRequirements => 'Бұл VPN режимі қолжетімсіз';
 }

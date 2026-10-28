@@ -79,6 +79,24 @@ endif()
 set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
 set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}")
 
+# App-local compiler runtimes are required on machines without Visual Studio.
+# Use the toolchain's redistributables, not DLLs downloaded from third parties.
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT Runtime)
+set(CMAKE_INSTALL_DEBUG_LIBRARIES FALSE)
+include(InstallRequiredSystemLibraries)
+set(SORA_RUNTIME_NAMES "")
+foreach(SORA_RUNTIME IN LISTS CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  get_filename_component(SORA_RUNTIME_NAME "${SORA_RUNTIME}" NAME)
+  string(TOLOWER "${SORA_RUNTIME_NAME}" SORA_RUNTIME_NAME)
+  list(APPEND SORA_RUNTIME_NAMES "${SORA_RUNTIME_NAME}")
+endforeach()
+foreach(SORA_REQUIRED_RUNTIME IN ITEMS msvcp140.dll vcruntime140.dll vcruntime140_1.dll)
+  if(NOT SORA_REQUIRED_RUNTIME IN_LIST SORA_RUNTIME_NAMES)
+    message(FATAL_ERROR "Missing compiler redistributable: ${SORA_REQUIRED_RUNTIME}")
+  endif()
+endforeach()
+
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
   COMPONENT Runtime)
 

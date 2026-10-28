@@ -182,16 +182,18 @@ update replaces it.
   gap to paper over.
 - **Manual rollback** (when auto-rollback cannot run): download the previous
   release's packages from the GitHub Releases page, verify `SHA256SUMS`
-  (and the `.minisig` signature once the key ceremony is done), then install
+  and the required `.minisig` signature with the pinned team verifier, then install
   for your distro, e.g. `sudo dpkg -i sora-core_<ver>_amd64.deb
   sora_<ver>_amd64.deb`, `sudo dnf install ./sora-core-<ver>-1.x86_64.rpm
   ./sora-<ver>-1.x86_64.rpm`, or `sudo pacman -U
   sora-core-<ver>-1-x86_64.pkg.tar.zst sora-<ver>-1-x86_64.pkg.tar.zst`.
   The stale `pendingUpdate` marker is harmless: the reinstalled old build
   sees `marker.to != version` and clears it silently.
-- **Windows:** the in-app update path is blocked fail-closed (A2), so no
-  marker is ever written and rollback does not apply. Reinstall the previous
-  `Sora-Setup-<ver>-x64.exe` by hand if needed.
+- **Windows:** the updater verifies signed metadata, size and hash before
+  handing off to the installer. Automatic rollback is not implemented, so no
+  rollback marker is written. Reinstall an independently verified previous
+  `Sora-Setup-<ver>-x64.exe` by hand if needed; the native MSI probes do not
+  implement production Sora rollback.
 
 ### Validation checklist before pushing the feed
 
@@ -206,7 +208,8 @@ update replaces it.
 - **Manual install on openSUSE (zypper):** when the privileged helper is not
   available, the app prints a manual fallback command built from the same
   arguments the helper uses, plain `zypper --non-interactive install` with
-  GPG signature verification intact, matching the helper. The app
+  GPG signature verification intact. The privileged helper separately accepts
+  the RPM after authenticating its Minisign metadata and package header. The app
   does not silently weaken verification on the fallback path, so the RPMs
   must be GPG-signed; the release-signing key ceremony is still pending
   (owner blocker). Until it is done, installing on openSUSE requires either
@@ -218,5 +221,8 @@ update replaces it.
 - The feed is fetched over plain HTTPS from `raw.githubusercontent.com`;
   integrity of the *policy* rests on TLS. This does not weaken artifact
   integrity: hashes/signatures are still verified against the GitHub release.
-- Release-signature verification in-app is still pending (key ceremony -
-  owner blocker, out of scope here).
+- Version 1.1.3 is the first schema 1 signed baseline. Unsigned 1.1.2 cannot
+  be used as a rollback target. Initial migration uses the installation script
+  with its documented HTTPS bootstrap trust boundary; this does not add
+  signature checks to an already installed legacy updater. Future Linux
+  updates can cache signed 1.1.3 as their rollback baseline.

@@ -55,6 +55,11 @@ contents:
     dst: /usr/lib/sora/engines/geoip.dat
   - src: ./dist/engines/geosite.dat
     dst: /usr/lib/sora/engines/geosite.dat
+  - src: ./dist/engines/byedpi
+    dst: /usr/lib/sora/engines/byedpi
+    file_info: {mode: 0755}
+  - src: ./dist/engines/byedpi.LICENSE
+    dst: /usr/share/licenses/sora-core/byedpi.LICENSE
   # zapret by bol-van (MIT), built from third_party/zapret unchanged.
   - src: ./dist/engines/tpws
     dst: /usr/lib/sora/engines/tpws

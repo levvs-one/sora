@@ -30,7 +30,7 @@ var commands = []command{
 	{"pack", "Build a .soraext package from a project dir", cmdPack},
 	{"sign", "Sign a .soraext with the author's minisign key", cmdSign},
 	{"keygen", "Generate a minisign keypair for signing extensions", cmdKeygen},
-	{"sign-file", "Sign a team catalog or revocation list with the team key", cmdSignFile},
+	{"sign-file", "Sign a team catalog, revocation list or release manifest", cmdSignFile},
 	{"publish", "Pre-publish gate: validate + policy checks", cmdPublish},
 	{"dev", "Dev mode: serve with live reload and re-validation", cmdDev},
 	{"serve", "Serve a project with a mocked window.soraExt", cmdServe},

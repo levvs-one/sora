@@ -7,13 +7,13 @@ import (
 )
 
 func TestExtensionProxyRejectsEveryDirectPath(t *testing.T) {
-	for _, target := range []string{"vpn", "chain", "safe", "direct", "bypass", "provider", "mixed", "cycle", "unknown", "pass", "reject", "dns", "unsafe-chain"} {
+	for _, target := range []string{"vpn", "chain", "safe", "direct", "bypass", "byedpi", "winws", "provider", "mixed", "cycle", "unknown", "pass", "reject", "dns", "unsafe-chain"} {
 		t.Run(target, func(t *testing.T) {
 			p := &Plan{
 				Outbounds: []Outbound{
 					{ID: "vpn", Protocol: ProtocolSOCKS5, Server: "127.0.0.1", Port: 1080},
 					{ID: "chain", Protocol: ProtocolSOCKS5, Server: "127.0.0.1", Port: 1081, Via: "vpn"},
-					{ID: "bypass", Protocol: ProtocolBypass}, {ID: "provider", Protocol: ProtocolXrayProfile},
+					{ID: "bypass", Protocol: ProtocolBypass}, {ID: "byedpi", Protocol: ProtocolByeDPI}, {ID: "winws", Protocol: ProtocolWinws}, {ID: "provider", Protocol: ProtocolXrayProfile},
 					{ID: "unsafe-chain", Protocol: ProtocolSOCKS5, Via: "bypass"},
 				},
 				Groups: []Group{

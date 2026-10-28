@@ -11,6 +11,7 @@ import '../notifications.dart';
 import '../sora.dart';
 import 'kit.dart';
 import 'notifications_screen.dart';
+import 'notification_text.dart';
 
 class ToastVisibility extends InheritedWidget {
   const ToastVisibility({super.key, required this.visible, required super.child});
@@ -31,25 +32,26 @@ class _ToastTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
+    final words = notificationText(S.of(context), notice);
     final body = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          notice.title,
+          words.title,
           key: ObjectKey(notice),
           style: Styles.bodyStrong.copyWith(color: palette.ink, height: 4 / 3),
         ),
-        if (notice.body.isNotEmpty) ...[
+        if (words.body.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
-            notice.body,
-            style: Styles.secondary.copyWith(color: palette.ink2, height: 16 / 13),
+            words.body,
+            style: Styles.secondary.copyWith(color: palette.ink, height: 16 / 13),
           ),
         ],
       ],
     );
-    // Toastification limits titles to two lines, which would hide recovery steps.
+    // Localized causes must remain readable at large text scales.
     final content = DefaultTextStyle(style: DefaultTextStyle.of(context).style, child: body);
     if (notice.action.isEmpty) return content;
     return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: content);
@@ -123,7 +125,7 @@ class _NotificationToastsState extends State<NotificationToasts> {
             child: Pressable(
               onTap: close,
               radius: 8,
-              child: SizedBox.square(dimension: 30, child: Icon(Symbols.close_rounded, size: 18, color: palette.ink2)),
+              child: SizedBox.square(dimension: 30, child: Icon(Symbols.close_rounded, size: 18, color: palette.ink)),
             ),
           ),
         ),

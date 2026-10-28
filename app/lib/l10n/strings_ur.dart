@@ -205,63 +205,58 @@ class SUr extends S {
   String get errGeneric => 'کچھ غلط ہو گیا۔';
 
   @override
-  String get errCore => 'Sora سروس جواب نہیں دے رہی۔ کچھ دیر انتظار کر کے دوبارہ کوشش کریں۔';
+  String get errCore => 'Sora سروس جواب نہیں دے رہی';
 
   @override
-  String get errAuth => 'Sora سروس تک رسائی مسترد ہو گئی۔ ایپ دوبارہ شروع کر کے پھر کوشش کریں۔';
+  String get errAuth => 'Sora سروس تک رسائی مسترد ہو گئی';
 
   @override
-  String get errVersion => 'Sora ایپ اور سروس کے ورژن مختلف ہیں۔ Sora کو اپ ڈیٹ کریں۔';
+  String get errVersion => 'Sora ایپ اور سروس کے ورژن مختلف ہیں';
 
   @override
-  String get errBusy => 'پچھلی کمانڈ ابھی چل رہی ہے۔ اس کے مکمل ہونے کا انتظار کریں۔';
+  String get errBusy => 'پچھلی کمانڈ ابھی چل رہی ہے';
 
   @override
-  String get errEngineMissing => 'اس سرور کے لیے درکار انجن نہیں ملا۔ Sora کی اپ ڈیٹس چیک کریں۔';
+  String get errEngineMissing => 'اس سرور کے لیے درکار انجن نہیں ملا';
 
   @override
-  String get errEngineStart => 'انجن شروع نہیں ہو سکا۔ وجہ جاننے کے لیے کنکشن کا لاگ دیکھیں۔';
+  String get errEngineStart => 'انجن شروع نہیں ہو سکا';
 
   @override
-  String get errEngineStopped => 'انجن بند ہو گیا۔ دوبارہ کنکٹ کرنے کی کوشش کریں۔';
+  String get errEngineStopped => 'انجن بند ہو گیا';
 
   @override
-  String get errTunnel => 'یہ VPN موڈ دستیاب نہیں۔ دوسرا موڈ منتخب کریں یا سروس کی اجازتیں چیک کریں۔';
+  String get errTunnel => 'یہ VPN موڈ دستیاب نہیں';
 
   @override
-  String get errNetwork => 'سرور تک نہیں پہنچ سکتا';
+  String get errTimeout => 'سرور نے وقت پر جواب نہیں دیا';
 
   @override
-  String get errTimeout => 'سرور نے وقت پر جواب نہیں دیا۔ ایک منٹ بعد دوبارہ کوشش کریں۔';
+  String get errFirewall => 'VPN سے باہر انٹرنیٹ تک رسائی بند نہیں کی جا سکی';
 
   @override
-  String get errFirewall => 'VPN سے باہر انٹرنیٹ تک رسائی بند نہیں کی جا سکی۔ وجہ جاننے کے لیے کنکشن کا لاگ دیکھیں۔';
+  String get errSubFetch => 'سبسکرپشن ڈاؤن لوڈ نہیں ہو سکی';
 
   @override
-  String get errSubFetch => 'سبسکرپشن ڈاؤن لوڈ نہیں ہو سکی۔ انٹرنیٹ کنکشن چیک کر کے ایک منٹ بعد دوبارہ کوشش کریں۔';
+  String get errSubFormat => 'سبسکرپشن کا فارمیٹ پہچانا نہیں جا سکا';
 
   @override
-  String get errSubFormat => 'سبسکرپشن کا فارمیٹ پہچانا نہیں جا سکا۔ فراہم کنندہ سے موافق سبسکرپشن لنک مانگیں۔';
+  String get errSubEmpty => 'سبسکرپشن میں کوئی سرور نہیں ہے';
 
   @override
-  String get errSubEmpty => 'سبسکرپشن میں کوئی سرور نہیں ہے۔ سبسکرپشن فراہم کنندہ سے رابطہ کریں۔';
+  String get errSubDuplicate => 'یہ سبسکرپشن پہلے سے شامل ہے';
 
   @override
-  String get errSubDuplicate => 'یہ سبسکرپشن پہلے سے شامل ہے۔ تازہ سرور حاصل کرنے کے لیے اسے اپ ڈیٹ کریں۔';
+  String get errSubLimit => 'سبسکرپشنز کی حد پوری ہو گئی ہے';
 
   @override
-  String get errSubLimit =>
-      'سبسکرپشنز کی حد پوری ہو گئی ہے۔ نئی سبسکرپشن شامل کرنے سے پہلے کوئی غیر ضروری سبسکرپشن ہٹا دیں۔';
+  String get errSubScheme => 'سبسکرپشن لنک کی اسکیم معاون نہیں';
 
   @override
-  String get errSubScheme => 'سبسکرپشن لنک https:// سے شروع ہونا چاہیے۔ فراہم کنندہ سے محفوظ لنک مانگیں۔';
+  String get errSecretStore => 'Sora کا ذخیرہ خراب ہے یا اس تک رسائی ممکن نہیں';
 
   @override
-  String get errSecretStore =>
-      'Sora کا ذخیرہ خراب ہے یا اس تک رسائی ممکن نہیں۔ رسائی کی اجازتیں اور لاگ میں تفصیلات چیک کریں۔';
-
-  @override
-  String get errNoServers => 'کنکٹ کرنے کے لیے کوئی سرور نہیں ہے۔ سبسکرپشن یا اپنا سرور شامل کریں۔';
+  String get errNoServers => 'کنکٹ کرنے کے لیے کوئی سرور نہیں ہے';
 
   @override
   String get connections => 'کنکشنز';
@@ -315,9 +310,6 @@ class SUr extends S {
   String get dnsAuto => 'آٹو';
 
   @override
-  String get dnsHint => 'پتے، کوما سے الگ';
-
-  @override
   String get fragment => 'TLS فریگمنٹیشن';
 
   @override
@@ -333,13 +325,7 @@ class SUr extends S {
   String get byDefault => 'طے شدہ';
 
   @override
-  String get rangeHint => 'مثال کے طور پر، 100-200';
-
-  @override
   String get splitPos => 'پوزیشنیں تقسیم کریں۔';
-
-  @override
-  String get splitPosHint => 'مثال کے طور پر، 1، midsld';
 
   @override
   String get disorder => 'ٹکڑوں کو دوبارہ ترتیب دیں۔';
@@ -448,11 +434,6 @@ class SUr extends S {
   String get support => 'حمایت';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine کو اس کمپیوٹر پر ایک پورٹ کے ذریعے کنٹرول کیا جاتا ہے۔ دوسرے پروگرام یہ بتا سکیں گے کہ VPN آن ہے۔';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine کا انتخاب کریں۔';
   }
@@ -528,9 +509,6 @@ class SUr extends S {
   String get launchAtLogin => 'سسٹم کے ساتھ شروع کریں۔';
 
   @override
-  String get launchAtLoginDetail => 'سائن ان کرنے پر Sora خودکار طور پر شروع ہوگا اور ٹرے میں رہے گا۔';
-
-  @override
   String get closeToTray => 'بند ہونے پر ٹرے میں رکھیں';
 
   @override
@@ -565,9 +543,6 @@ class SUr extends S {
   String get noticeInTray => 'Sora ابھی بھی ٹرے میں ہے۔';
 
   @override
-  String get noticeInTrayBody => 'اس کے آئیکن کے مینو سے باہر نکلیں۔';
-
-  @override
   String get noticeLost => 'کنکشن ٹوٹ گیا۔';
 
   @override
@@ -595,11 +570,7 @@ class SUr extends S {
   String get importTitle => 'اس سبسکرپشن کو شامل کریں؟';
 
   @override
-  String get importSealed =>
-      'یہ لنک Happ کے لیے خفیہ کردہ ہے، اور صرف Happ اسے پڑھ سکتا ہے۔ اپنے فراہم کنندہ سے سادہ سبسکرپشن لنک طلب کریں۔';
-
-  @override
-  String get understood => 'ٹھیک ہے';
+  String get importSealed => 'یہ لنک Happ کے لیے خفیہ کردہ ہے، اور صرف Happ اسے پڑھ سکتا ہے';
 
   @override
   String get noAnswer => 'کوئی جواب نہیں';
@@ -638,39 +609,10 @@ class SUr extends S {
   String get openLogs => 'نوشتہ جات کھولیں۔';
 
   @override
-  String get tourReplay => 'دوبارہ گائیڈ دکھائیں۔';
-
-  @override
-  String tourStep(int step) {
-    return '5 میں سے $step مرحلہ';
-  }
-
-  @override
   String get tourBack => 'پیچھے';
 
   @override
   String get tourNext => 'اگلا';
-
-  @override
-  String get tourSkip => 'چھوڑیں۔';
-
-  @override
-  String get tourFinish => 'ہو گیا';
-
-  @override
-  String get tourAdd => 'اپنے فراہم کنندہ کی رکنیت کا لنک شامل کریں۔';
-
-  @override
-  String get tourServer => 'ایک سرور چنیں۔ \"تیز ترین\" آپ کے لیے ایک کا انتخاب کرتا ہے۔';
-
-  @override
-  String get tourConnect => 'جڑنے یا منقطع کرنے کے لیے یہاں کلک کریں۔';
-
-  @override
-  String get tourMode => 'ایک موڈ کا انتخاب کریں۔ VPN گرنے پر Kill سوئچ انٹرنیٹ کو بلاک کر دیتا ہے۔';
-
-  @override
-  String get tourSettings => 'ترتیبات کھولیں۔ آپ وہاں اس گائیڈ کو دوبارہ چلا سکتے ہیں۔';
 
   @override
   String get chooseProgram => 'ایک پروگرام کا انتخاب کریں۔';
@@ -682,7 +624,7 @@ class SUr extends S {
   String get runningProcesses => 'چلنے والے عمل';
 
   @override
-  String get programsEmpty => 'کوئی درخواستیں نہیں ملی۔ دوسرا نام آزمائیں۔';
+  String get programsEmpty => 'کوئی درخواستیں نہیں ملی';
 
   @override
   String get selectExe => 'ایک .exe فائل کا انتخاب کریں۔';
@@ -694,7 +636,7 @@ class SUr extends S {
   String get speedtestSearch => 'ایک سروس تلاش کریں۔';
 
   @override
-  String get speedtestEmpty => 'کوئی میچ نہیں تلاش کو تبدیل کریں۔';
+  String get speedtestEmpty => 'کوئی میچ نہیں تلاش کو تبدیل کریں';
 
   @override
   String get speedtestBackToList => 'خدمات پر واپس جائیں۔';
@@ -703,13 +645,13 @@ class SUr extends S {
   String get speedtestOpenBrowser => 'براؤزر میں کھولیں۔';
 
   @override
-  String get speedtestUnavailable => 'سرایت شدہ براؤزر شروع نہیں ہو سکا۔ اپنے سسٹم براؤزر میں سروس کھولیں۔';
+  String get speedtestUnavailable => 'سرایت شدہ براؤزر شروع نہیں ہو سکا';
 
   @override
-  String get speedtestPageFailed => 'صفحہ لوڈ نہیں ہو سکا۔ اسے دوبارہ لوڈ کریں یا اپنے سسٹم براؤزر میں سروس کھولیں۔';
+  String get speedtestPageFailed => 'صفحہ لوڈ نہیں ہو سکا';
 
   @override
-  String get speedtestExternalFailed => 'سسٹم براؤزر نہیں کھل سکا۔ دوبارہ کوشش کریں۔';
+  String get speedtestExternalFailed => 'سسٹم براؤزر نہیں کھل سکا';
 
   @override
   String get modes => 'موڈز';
@@ -749,50 +691,28 @@ class SUr extends S {
   String get updateNoNotes => 'ریلیز میں کوئی نوٹ نہیں ہے۔';
 
   @override
-  String get updateDropWarning =>
-      'VPN کنکشن چند سیکنڈز کے لیے گر جائے گا جبکہ Sora اور اس کی بنیادی اپ ڈیٹ۔ جاری رکھیں؟';
+  String get updateDropWarning => 'اپ ڈیٹ کے لیے کنکشن منقطع کریں؟';
 
   @override
-  String get updateWaitConnection => 'VPN کنکشن اور کور کے تیار ہونے کا انتظار کریں۔';
+  String get updateWaitConnection => 'کنکشن تیار نہیں';
 
   @override
-  String get updateDownloading => 'فائلیں ڈاؤن لوڈ اور تصدیق کی جا رہی ہیں...';
-
-  @override
-  String get updateInstalling => 'اپ ڈیٹ کی تیاری ہو رہی ہے یا ایڈمنسٹریٹر کی تصدیق کا انتظار کر رہا ہے...';
-
-  @override
-  String get updateNetworkError => 'اپ ڈیٹ ڈاؤن لوڈ نہیں ہو سکا۔ دوبارہ کوشش کریں۔';
+  String get updateNetworkError => 'اپ ڈیٹ ڈاؤن لوڈ نہیں ہو سکا';
 
   @override
   String get updateReleaseError => 'ریلیز ڈیٹا یا مطلوبہ فائلیں غائب یا غلط ہیں۔';
 
   @override
-  String get updateChecksumError => 'ڈاؤن لوڈ SHA256SUMS سے مماثل نہیں ہے۔ کچھ بھی انسٹال نہیں تھا۔';
+  String get updateChecksumError => 'ڈاؤن لوڈ SHA256SUMS سے مماثل نہیں ہے';
 
   @override
-  String get updateInstallError => 'اپ ڈیٹ ختم نہیں ہوا۔ ہو سکتا ہے توثیق منسوخ کر دی گئی ہو۔';
+  String get updateInstallError => 'اپ ڈیٹ ختم نہیں ہوا';
 
   @override
-  String get updateUnsupported =>
-      'یہ قابل عمل Sora پیکیج جوڑے کی ملکیت نہیں ہے۔ ریلیز کی تنصیب کی ہدایات کا استعمال کریں۔';
+  String get updateUnsupported => 'یہ قابل عمل Sora پیکیج جوڑے کی ملکیت نہیں ہے';
 
   @override
-  String get updateManual =>
-      'دونوں تصدیق شدہ پیکیجز کو انسٹال کرنے کے لیے اس کمانڈ کو ٹرمینل میں چلائیں، پھر Sora کو دوبارہ کھولیں۔ فائلیں ڈاؤن لوڈ ڈائرکٹری میں رہتی ہیں۔ VPN کنکشن ختم ہو جائے گا۔';
-
-  @override
-  String get updateSignaturePending => 'اپڈیٹ فائلوں کا موازنہ ریلیز کے ساتھ شائع کردہ چیک سم سے کیا جاتا ہے۔';
-
-  @override
-  String get updateManualSigWarning =>
-      'نیچے دی گئی فائلیں ریلیز کے چیک سم سے ملتی ہیں۔ اگر آپ نے انہیں سرکاری ریلیز سے ڈاؤن لوڈ کیا ہے تو کمانڈ چلائیں۔';
-
-  @override
-  String get updateVersionRevoked => 'ڈویلپر نے یہ ورژن واپس لے لیا ہے۔ براہ کرم درست ریلیز کا انتظار کریں۔';
-
-  @override
-  String get updateRolloutPending => 'ایک نیا ورژن بتدریج شروع ہو رہا ہے اور خود بخود آپ کو پیش کیا جائے گا۔';
+  String get updateVersionRevoked => 'ڈویلپر نے یہ ورژن واپس لے لیا ہے';
 
   @override
   String updateRollbacking(String version) {
@@ -805,8 +725,7 @@ class SUr extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'خودکار رول بیک ناکام ہوگیا۔ اگر نیا ورژن کام نہیں کرتا ہے تو پچھلی ریلیز کو دستی طور پر دوبارہ انسٹال کریں۔';
+  String get updateRollbackError => 'خودکار رول بیک ناکام ہوگیا';
 
   @override
   String get updateRollbackCacheError =>
@@ -816,10 +735,7 @@ class SUr extends S {
   String get updateCopyCommand => 'کمانڈ کاپی کریں۔';
 
   @override
-  String get updateChecksDisabled => 'خودکار چیک سیٹنگز میں غیر فعال ہیں۔';
-
-  @override
-  String get updateInstalled => 'اپ ڈیٹ انسٹال ہو گیا۔ Sora دوبارہ کھولیں۔';
+  String get updateInstalled => 'اپ ڈیٹ انسٹال ہو گیا';
 
   @override
   String get projectLinks => 'پروجیکٹ';
@@ -849,20 +765,13 @@ class SUr extends S {
   String get showDescription => 'تفصیل دکھائیں۔';
 
   @override
-  String get pendingConnectionChanges => 'ان تبدیلیوں کو لاگو کرنے کے لیے دوبارہ جڑیں۔';
+  String get errEngineUnsupported => 'منتخب انجن اس پروفائل یا سیٹنگز کو سپورٹ نہیں کرتا ہے';
 
   @override
-  String get reconnectNow => 'لاگو کریں اور دوبارہ جڑیں۔';
+  String get errRestore => 'کنکشن کی صفائی نامکمل تھی';
 
   @override
-  String get errEngineUnsupported =>
-      'منتخب انجن اس پروفائل یا سیٹنگز کو سپورٹ نہیں کرتا ہے۔ آٹو یا ہم آہنگ انجن کا انتخاب کریں۔';
-
-  @override
-  String get errRestore => 'کنکشن کی صفائی نامکمل تھی۔ منقطع کرنے کی دوبارہ کوشش کریں؛ تفصیلات کے لیے لاگ دیکھیں۔';
-
-  @override
-  String get errSessionEnded => 'یہ سیشن پہلے ہی ختم ہو چکا ہے۔ کنکشن کی حالت کو تازہ کریں۔';
+  String get errSessionEnded => 'یہ سیشن پہلے ہی ختم ہو چکا ہے';
 
   @override
   String get retryDisconnect => 'منقطع کرنے کی دوبارہ کوشش کریں۔';
@@ -878,10 +787,10 @@ class SUr extends S {
 
   @override
   String get modesGuide =>
-      'اگر آپ کو یقین نہیں ہے کہ آپ کے سرور کو کس انجن کی ضرورت ہے تو آٹو کا انتخاب کریں۔ Sora کنیکٹ کرنے سے پہلے پروفائل اور سیٹنگز کو چیک کرتا ہے۔ ایک انجن آپ کے پلان کی بینڈوتھ کو نہیں بڑھا سکتا: کارکردگی کا انحصار سرور، روٹ، پروٹوکول اور نیٹ ورک پر ہوتا ہے۔\n\n## موڈز\n\n### تمام ٹریفک (TUN)\n\nSora ایک ورچوئل نیٹ ورک انٹرفیس بناتا ہے اور اس کے ذریعے ایپلیکیشن ٹریفک کو روٹ کرتا ہے، بشمول TCP اور UDP۔ اس موڈ کو Telegram، گیمز اور Discord آواز کے لیے استعمال کریں۔ قواعد مخصوص سائٹوں یا پروگراموں کو براہ راست بھیج سکتے ہیں یا انہیں بلاک کر سکتے ہیں۔ نیٹ ورک سروس کو اجازت اور سرور کی ضرورت ہے جو مطلوبہ پروٹوکول کو سپورٹ کرتا ہو۔\n\n### System پراکسی\n\nSora ایک مقامی HTTP/SOCKS پراکسی کو ترتیب دیتا ہے۔ وہ ایپلیکیشنز جو سسٹم پراکسی سیٹنگز کا احترام کرتی ہیں اسے استعمال کرتی ہیں۔ ان کے اپنے نیٹ ورک اسٹیک والی درخواستیں براہ راست جڑ سکتی ہیں۔ UDP اور وائس کالز کو عام طور پر TUN کی ضرورت ہوتی ہے۔ یہ موڈ پراکسی سپورٹ والے براؤزرز اور ایپلیکیشنز کے لیے موزوں ہے۔\n\n### کوئی سرور نہیں۔\n\nLinux پر، Sora HTTP/TLS درخواستوں کو تقسیم کرنے اور نئی شکل دینے اور کچھ DPI چیکس کو نظرانداز کرنے کے لیے [zapret](https://github.com/bol-van/zapret) کا استعمال کرتا ہے۔ آپ کا IP وہی رہتا ہے اور کنکشن براہ راست ویب سائٹ پر جاتے ہیں۔ نتائج کا انحصار آپ کے فراہم کنندہ اور بلاک کرنے کے طریقہ پر ہے۔\n\nموجودہ انضمام TCP پر HTTP اور TLS کے لیے tpws استعمال کرتا ہے۔ یہ IP بلاکنگ یا ریلے UDP کو نظرانداز نہیں کرتا ہے، اور Telegram کے MTProto کنکشن کی ضمانت نہیں دے سکتا ہے۔ Discord آواز، Telegram کالز اور اس قسم کی پابندیوں کے لیے TUN کے ساتھ VPN سرور استعمال کریں۔\n\n## انجن\n\n### آٹو\n\nSora ایک انسٹال شدہ انجن کا انتخاب کرتا ہے جو پورے کنکشن پلان کو سپورٹ کرتا ہے: سرور پروٹوکول، ٹرانسپورٹ، گروپس، فریگمنٹیشن اور موڈ۔ موجودہ کنکشن کو روکنے سے پہلے ایک غیر موازن دستی انتخاب کو مسترد کر دیا جاتا ہے۔ آٹو یا دوسرا انجن منتخب کریں اور سیٹنگز کو دوبارہ لاگو کریں۔\n\n### sing-box\n\nنئے Sora پیکیجز میں [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) شامل ہیں، [sing-box](https://github.com/SagerNet/sing-box) کا ایک کانٹا، کلائنٹ سائیڈ XHTTP اور VLESS Encryption شامل کرنا۔ Sora تعمیر اور اس کی صلاحیتوں کو تسلیم کرتا ہے۔ XHTTP کے بغیر اپ اسٹریم کی تعمیر صرف اپنے نام سے یہ صلاحیت حاصل نہیں کرتی ہے۔\n\nمعاون پروٹوکول میں VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard اور AmneziaWG 1.x/2.x کے وہ پیرامیٹر شامل ہیں جنہیں Sora درآمد کر سکتا ہے۔ مکمل Xray JSON پروفائل کے لیے Xray درکار ہے۔ نئے AWG 3.x فیلڈ ابھی درآمد نہیں کیے جا سکتے۔ sing-box پاس ورڈ سے محفوظ مقامی کنٹرول پورٹ استعمال کرتا ہے، جسے کمپیوٹر کی دوسری ایپلیکیشنز تلاش کر سکتی ہیں۔\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption اور TLS فریگمنٹیشن کو سپورٹ کرتا ہے۔ یہ مکمل فراہم کنندہ Xray پروفائلز کو بھی چلاتا ہے جبکہ ان کی روٹنگ اور گروپس کو محفوظ رکھتا ہے۔ ایسے پروفائلز کو ان کے رویے کو تبدیل کیے بغیر خود بخود دوسرے انجن میں تبدیل نہیں کیا جا سکتا۔\n\nبنڈل شدہ Xray نے اس ترتیب کو ہٹا دیا جو TLS سرٹیفکیٹ کی تصدیق کو غیر فعال کرتی ہے (`allowInsecure`)۔ آٹو sing-box یا mihomo کو اس ترتیب کی ضرورت والے عام سرورز کے لیے منتخب کرتا ہے۔ موجودہ کنکشن کو روکنے سے پہلے Xray کو منتخب کرنا دستی طور پر عدم مطابقت کی اطلاع دیتا ہے۔ پرانے مکمل JSON پروفائلز کو قابل تصدیق سرٹیفکیٹ یا سرٹیفکیٹ پن کے ساتھ ایک اپ ڈیٹ فراہم کنندہ پروفائل کی ضرورت ہے۔\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) آرڈر شدہ فال بیک اور لوڈ بیلنسنگ گروپس، XHTTP اور AmneziaWG کو سپورٹ کرتا ہے۔ اسے منتخب کریں جب بیک اپ سرور میں خودکار طور پر ناکام ہو جائے۔ Sora کی TLS فریگمنٹیشن سیٹنگ اس انجن کے ساتھ دستیاب نہیں ہے۔\n\n## Sora میں مطابقت\n\n| خصوصیت | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN اور TCP/UDP | جی ہاں | جی ہاں | جی ہاں |\n| XHTTP | جی ہاں | جی ہاں | جی ہاں |\n| VLESS Encryption | جی ہاں | جی ہاں | جی ہاں |\n| مکمل Xray پروفائل | نہیں | جی ہاں | نہیں |\n| TUIC / AnyTLS | دونوں | نہیں | TUIC |\n| mieru | نہیں | نہیں | جی ہاں |\n| NaiveProxy | جی ہاں | نہیں | نہیں |\n| TLS فریگمنٹیشن | جی ہاں | جی ہاں | نہیں |\n| AmneziaWG 1.x/2.x | ہاں¹ | نہیں | جی ہاں |\n| حکم دیا فال بیک گروپ | نہیں | No² | جی ہاں |\n\nJ1/J2/J3/Itime والے پروفائلز mihomo استعمال کرتے ہیں؛ ان شعبوں کو کبھی بھی خاموشی سے ضائع نہیں کیا جانا چاہیے۔ ² مکمل Xray پروفائلز کے گروپ کے لیے، ایپ بیک اپ پروفائل کا انتخاب کرتی ہے۔ سپورٹ نصب شدہ تعمیر پر منحصر ہے؛ اس کا ورژن About میں چیک کریں۔\n\n## TUN اسٹیک\n\nاسٹیک ورچوئل انٹرفیس کے اندر TCP اور UDP کو ہینڈل کرتا ہے۔ موڈز پینل میں، Xray اور mihomo gVisor، System، Mixed اور MIPS پیش کرتے ہیں۔ ہر انجن اپنی ترجیح بچاتا ہے۔ System پراکسی اور سرور لیس موڈز اس ترجیح کو استعمال نہیں کرتے ہیں۔\n\n- **Mixed**: TCP سسٹم اسٹیک کا استعمال کرتا ہے، جبکہ gVisor UDP کو ہینڈل کرتا ہے۔ Linux پر یہ mihomo کے لیے ڈیفالٹ ہے۔ Windows پر Xray اور mihomo ڈیفالٹ طور پر MIPS استعمال کرتے ہیں۔\n- **System**: سسٹم اسٹیک استعمال کرتا ہے۔ اگر نیٹ ورک ایپلیکیشنز کو مسائل کا سامنا کرنا پڑتا ہے تو دوسرا آپشن آزمائیں۔\n- **gVisor**: یوزر اسپیس میں ٹریفک کو ہینڈل کرتا ہے۔\n- **MIPS**: mihomo کا اپنا IP اسٹیک، بنڈل ورژن 1.19.32 میں دستیاب ہے۔\n\nLinux پر، Xray اپنے بلٹ ان gVisor کو بطور ڈیفالٹ استعمال کرتا ہے۔ System، Mixed اور MIPS Linux پر mihomo کو TUN انجن کے طور پر استعمال کرتے ہیں، TCP اور UDP کو ایک مستند مقامی SOCKS لنک کے ذریعے Xray کو فارورڈ کرتے ہیں۔ Xray پروٹوکول، فراہم کنندہ پروفائل اور روٹنگ کو برقرار رکھتا ہے۔ ان تینوں اختیارات کے لیے انسٹال mihomo کی ضرورت ہے۔ Windows پر Xray چاروں TUN اسٹیکس کے لیے mihomo 1.19.32 یا نیا ورژن استعمال کرتا ہے۔ پروٹوکول اور روٹنگ Xray میں رہتے ہیں۔ اس امتزاج میں ایپ کے قواعد صرف براہ راست کنکشن اور بلاک کرنے کی حمایت کرتے ہیں؛ Linux پر ان قواعد کے لیے Xray کا بلٹ ان gVisor درکار ہے۔\n\nپل ایک دوسرا عمل چلاتا ہے۔ Linux پر تین بیکار پیمائشوں میں، اس نے مقامی Xray TUN سے تقریباً 32–36 MiB زیادہ جسمانی میموری استعمال کی۔ یہ ڈاؤن لوڈ لوڈ کی پیمائش نہیں کرتا ہے: CPU اور میموری کے اخراجات کنکشن پر منحصر ہیں۔ sing-box میں کوئی اسٹیک سلیکٹر نہیں ہے۔ کوئی اسٹیک ہر نیٹ ورک میں بہتر کارکردگی کی ضمانت نہیں دیتا۔ ایک اسٹیک کا انتخاب کریں اور اسے اپنے نیٹ ورک میں آزمانے کے لیے اپلائی کریں اور دوبارہ جڑیں کو منتخب کریں۔\n\n## ترتیبات کا اطلاق کرنا\n\nسرور کا انتخاب خود بخود دوبارہ جڑ جاتا ہے۔ موڈ، انجن، DNS اور اصول کی ترتیبات فوری طور پر محفوظ ہو جاتی ہیں۔ ایک فعال کنکشن کے دوران، لاگو کریں پر کلک کریں اور انہیں استعمال کرنے کے لیے دوبارہ جڑیں۔ انجن کو دوبارہ شروع کرنے سے ڈاؤن لوڈز اور کالز میں خلل پڑ سکتا ہے۔ بار بار کلک کرنے سے متوازی کنکشن شروع نہیں ہوتے ہیں۔ منقطع ہونے سے منتقلی ختم ہوجاتی ہے اور کنکشن جاری ہوجاتا ہے۔\n\nسرنگ گرنے پر صرف VPN کے ذریعے انٹرنیٹ براہ راست ٹریفک کو روکتا ہے۔ یہ پوری مشین کو متاثر کرتا ہے۔ واضح طور پر منقطع ہونا Sora کے قواعد کو ہٹا دیتا ہے۔ اگر کلین اپ ختم نہیں ہوتا ہے تو دوبارہ رابطہ منقطع کرنے کی کوشش کریں اور لاگ کو کھولیں۔\n\n## پروجیکٹ کی دستاویزات\n\n- [sing-box-lx: کنفیگریشن اور سپورٹ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box دستاویزات](https://sing-box.sagernet.org/)\n- [Xray دستاویزات](https://xtls.github.io/)\n- [mihomo دستاویزات](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: آپریشن اور حدود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC، Jitsi، Yandex Telemost یا WB Stream کی ویڈیو کال کے ذریعے TCP ٹریفک منتقل کرتا ہے۔ olcrtc:// لنک یا QR کوڈ درآمد کریں۔ یہ پراکسی اور TUN موڈ میں sing-box، Xray اور mihomo کے ساتھ کام کرتا ہے؛ UDP کی معاونت نہیں ہے۔ دونوں سروں پر OLC2 کے ہم آہنگ نسخے درکار ہیں۔ اصل منصوبہ آرکائیو کر دیا گیا ہے۔\n';
+      'اگر آپ کو یقین نہیں ہے کہ آپ کے سرور کو کس انجن کی ضرورت ہے تو آٹو کا انتخاب کریں۔ Sora کنیکٹ کرنے سے پہلے پروفائل اور سیٹنگز کو چیک کرتا ہے۔ ایک انجن آپ کے پلان کی بینڈوتھ کو نہیں بڑھا سکتا: کارکردگی کا انحصار سرور، روٹ، پروٹوکول اور نیٹ ورک پر ہوتا ہے۔\n\n## موڈز\n\n### تمام ٹریفک (TUN)\n\nSora ایک ورچوئل نیٹ ورک انٹرفیس بناتا ہے اور اس کے ذریعے ایپلیکیشن ٹریفک کو روٹ کرتا ہے، بشمول TCP اور UDP۔ اس موڈ کو Telegram، گیمز اور Discord آواز کے لیے استعمال کریں۔ قواعد مخصوص سائٹوں یا پروگراموں کو براہ راست بھیج سکتے ہیں یا انہیں بلاک کر سکتے ہیں۔ نیٹ ورک سروس کو اجازت اور سرور کی ضرورت ہے جو مطلوبہ پروٹوکول کو سپورٹ کرتا ہو۔\n\n### System پراکسی\n\nSora ایک مقامی HTTP/SOCKS پراکسی کو ترتیب دیتا ہے۔ وہ ایپلیکیشنز جو سسٹم پراکسی سیٹنگز کا احترام کرتی ہیں اسے استعمال کرتی ہیں۔ ان کے اپنے نیٹ ورک اسٹیک والی درخواستیں براہ راست جڑ سکتی ہیں۔ UDP اور وائس کالز کو عام طور پر TUN کی ضرورت ہوتی ہے۔ یہ موڈ پراکسی سپورٹ والے براؤزرز اور ایپلیکیشنز کے لیے موزوں ہے۔\n\n### کوئی سرور نہیں۔\n\nLinux پر، Sora HTTP/TLS درخواستوں کو تقسیم کرنے اور نئی شکل دینے اور کچھ DPI چیکس کو نظرانداز کرنے کے لیے [zapret](https://github.com/bol-van/zapret) کا استعمال کرتا ہے۔ آپ کا IP وہی رہتا ہے اور کنکشن براہ راست ویب سائٹ پر جاتے ہیں۔ نتائج کا انحصار آپ کے فراہم کنندہ اور بلاک کرنے کے طریقہ پر ہے۔\n\nموجودہ انضمام TCP پر HTTP اور TLS کے لیے tpws استعمال کرتا ہے۔ یہ IP بلاکنگ یا ریلے UDP کو نظرانداز نہیں کرتا ہے، اور Telegram کے MTProto کنکشن کی ضمانت نہیں دے سکتا ہے۔ Discord آواز، Telegram کالز اور اس قسم کی پابندیوں کے لیے TUN کے ساتھ VPN سرور استعمال کریں۔\n\n## انجن\n\n### آٹو\n\nSora ایک انسٹال شدہ انجن کا انتخاب کرتا ہے جو پورے کنکشن پلان کو سپورٹ کرتا ہے: سرور پروٹوکول، ٹرانسپورٹ، گروپس، فریگمنٹیشن اور موڈ۔ موجودہ کنکشن کو روکنے سے پہلے ایک غیر موازن دستی انتخاب کو مسترد کر دیا جاتا ہے۔ آٹو یا دوسرا انجن منتخب کریں اور سیٹنگز کو دوبارہ لاگو کریں۔\n\n### sing-box\n\nنئے Sora پیکیجز میں [sing-box-lx](https://github.com/Leadaxe/sing-box-lx) شامل ہیں، [sing-box](https://github.com/SagerNet/sing-box) کا ایک کانٹا، کلائنٹ سائیڈ XHTTP اور VLESS Encryption شامل کرنا۔ Sora تعمیر اور اس کی صلاحیتوں کو تسلیم کرتا ہے۔ XHTTP کے بغیر اپ اسٹریم کی تعمیر صرف اپنے نام سے یہ صلاحیت حاصل نہیں کرتی ہے۔\n\nمعاون پروٹوکول میں VLESS، VMess، Trojan، Shadowsocks، Hysteria2، TUIC، AnyTLS، WireGuard اور AmneziaWG 1.x/2.x کے وہ پیرامیٹر شامل ہیں جنہیں Sora درآمد کر سکتا ہے۔ مکمل Xray JSON پروفائل کے لیے Xray درکار ہے۔ نئے AWG 3.x فیلڈ ابھی درآمد نہیں کیے جا سکتے۔ sing-box پاس ورڈ سے محفوظ مقامی کنٹرول پورٹ استعمال کرتا ہے، جسے کمپیوٹر کی دوسری ایپلیکیشنز تلاش کر سکتی ہیں۔\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption اور TLS فریگمنٹیشن کو سپورٹ کرتا ہے۔ یہ مکمل فراہم کنندہ Xray پروفائلز کو بھی چلاتا ہے جبکہ ان کی روٹنگ اور گروپس کو محفوظ رکھتا ہے۔ ایسے پروفائلز کو ان کے رویے کو تبدیل کیے بغیر خود بخود دوسرے انجن میں تبدیل نہیں کیا جا سکتا۔\n\nبنڈل شدہ Xray نے اس ترتیب کو ہٹا دیا جو TLS سرٹیفکیٹ کی تصدیق کو غیر فعال کرتی ہے (`allowInsecure`)۔ آٹو sing-box یا mihomo کو اس ترتیب کی ضرورت والے عام سرورز کے لیے منتخب کرتا ہے۔ موجودہ کنکشن کو روکنے سے پہلے Xray کو منتخب کرنا دستی طور پر عدم مطابقت کی اطلاع دیتا ہے۔ پرانے مکمل JSON پروفائلز کو قابل تصدیق سرٹیفکیٹ یا سرٹیفکیٹ پن کے ساتھ ایک اپ ڈیٹ فراہم کنندہ پروفائل کی ضرورت ہے۔\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) آرڈر شدہ فال بیک اور لوڈ بیلنسنگ گروپس، XHTTP اور AmneziaWG کو سپورٹ کرتا ہے۔ اسے منتخب کریں جب بیک اپ سرور میں خودکار طور پر ناکام ہو جائے۔ Sora کی TLS فریگمنٹیشن سیٹنگ اس انجن کے ساتھ دستیاب نہیں ہے۔\n\n## Sora میں مطابقت\n\n| خصوصیت | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN اور TCP/UDP | جی ہاں | جی ہاں | جی ہاں |\n| XHTTP | جی ہاں | جی ہاں | جی ہاں |\n| VLESS Encryption | جی ہاں | جی ہاں | جی ہاں |\n| مکمل Xray پروفائل | نہیں | جی ہاں | نہیں |\n| TUIC / AnyTLS | دونوں | نہیں | TUIC |\n| mieru | نہیں | نہیں | جی ہاں |\n| NaiveProxy | جی ہاں | نہیں | نہیں |\n| TLS فریگمنٹیشن | جی ہاں | جی ہاں | نہیں |\n| AmneziaWG 1.x/2.x | ہاں¹ | نہیں | جی ہاں |\n| حکم دیا فال بیک گروپ | نہیں | No² | جی ہاں |\n\nJ1/J2/J3/Itime والے پروفائلز mihomo استعمال کرتے ہیں؛ ان شعبوں کو کبھی بھی خاموشی سے ضائع نہیں کیا جانا چاہیے۔ ² مکمل Xray پروفائلز کے گروپ کے لیے، ایپ بیک اپ پروفائل کا انتخاب کرتی ہے۔ سپورٹ نصب شدہ تعمیر پر منحصر ہے؛ اس کا ورژن About میں چیک کریں۔\n\n## TUN اسٹیک\n\nاسٹیک ورچوئل انٹرفیس کے اندر TCP اور UDP کو ہینڈل کرتا ہے۔ موڈز پینل میں، Xray اور mihomo gVisor، System، Mixed اور MIPS پیش کرتے ہیں۔ ہر انجن اپنی ترجیح بچاتا ہے۔ System پراکسی اور سرور لیس موڈز اس ترجیح کو استعمال نہیں کرتے ہیں۔\n\n- **Mixed**: TCP سسٹم اسٹیک کا استعمال کرتا ہے، جبکہ gVisor UDP کو ہینڈل کرتا ہے۔ Linux پر یہ mihomo کے لیے ڈیفالٹ ہے۔ Windows پر Xray اور mihomo ڈیفالٹ طور پر MIPS استعمال کرتے ہیں۔\n- **System**: سسٹم اسٹیک استعمال کرتا ہے۔ اگر نیٹ ورک ایپلیکیشنز کو مسائل کا سامنا کرنا پڑتا ہے تو دوسرا آپشن آزمائیں۔\n- **gVisor**: یوزر اسپیس میں ٹریفک کو ہینڈل کرتا ہے۔\n- **MIPS**: mihomo کا اپنا IP اسٹیک، بنڈل ورژن 1.19.32 میں دستیاب ہے۔\n\nLinux پر، Xray اپنے بلٹ ان gVisor کو بطور ڈیفالٹ استعمال کرتا ہے۔ System، Mixed اور MIPS Linux پر mihomo کو TUN انجن کے طور پر استعمال کرتے ہیں، TCP اور UDP کو ایک مستند مقامی SOCKS لنک کے ذریعے Xray کو فارورڈ کرتے ہیں۔ Xray پروٹوکول، فراہم کنندہ پروفائل اور روٹنگ کو برقرار رکھتا ہے۔ ان تینوں اختیارات کے لیے انسٹال mihomo کی ضرورت ہے۔ Windows پر Xray چاروں TUN اسٹیکس کے لیے mihomo 1.19.32 یا نیا ورژن استعمال کرتا ہے۔ پروٹوکول اور روٹنگ Xray میں رہتے ہیں۔ اس امتزاج میں ایپ کے قواعد صرف براہ راست کنکشن اور بلاک کرنے کی حمایت کرتے ہیں؛ Linux پر ان قواعد کے لیے Xray کا بلٹ ان gVisor درکار ہے۔\n\nپل ایک دوسرا عمل چلاتا ہے۔ Linux پر تین بیکار پیمائشوں میں، اس نے مقامی Xray TUN سے تقریباً 32–36 MiB زیادہ جسمانی میموری استعمال کی۔ یہ ڈاؤن لوڈ لوڈ کی پیمائش نہیں کرتا ہے: CPU اور میموری کے اخراجات کنکشن پر منحصر ہیں۔ sing-box میں کوئی اسٹیک سلیکٹر نہیں ہے۔ کوئی اسٹیک ہر نیٹ ورک میں بہتر کارکردگی کی ضمانت نہیں دیتا۔\n\n## ترتیبات کا اطلاق کرنا\n\nسرور منتخب کرنے پر کنکشن خود بخود دوبارہ قائم ہو جاتا ہے۔ موڈ، انجن، DNS یا قواعد میں آپ کی تبدیلیاں مختصر وقفے کے بعد خودکار دوبارہ اتصال کے ساتھ ایک بار لاگو ہوتی ہیں؛ پس منظر کی تازہ کاریاں VPN کو دوبارہ متصل نہیں کرتیں۔ انجن دوبارہ شروع کرنے سے ڈاؤن لوڈز اور کالز میں خلل پڑ سکتا ہے۔\n\nسرنگ گرنے پر صرف VPN کے ذریعے انٹرنیٹ براہ راست ٹریفک کو روکتا ہے۔ یہ پوری مشین کو متاثر کرتا ہے۔ واضح طور پر منقطع ہونا Sora کے قواعد کو ہٹا دیتا ہے۔ اگر کلین اپ ختم نہیں ہوتا ہے تو دوبارہ رابطہ منقطع کرنے کی کوشش کریں اور لاگ کو کھولیں۔\n\n## پروجیکٹ کی دستاویزات\n\n- [sing-box-lx: کنفیگریشن اور سپورٹ](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box دستاویزات](https://sing-box.sagernet.org/)\n- [Xray دستاویزات](https://xtls.github.io/)\n- [mihomo دستاویزات](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: آپریشن اور حدود](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC، Jitsi، Yandex Telemost یا WB Stream کی ویڈیو کال کے ذریعے TCP ٹریفک منتقل کرتا ہے۔ olcrtc:// لنک یا QR کوڈ درآمد کریں۔ یہ پراکسی اور TUN موڈ میں sing-box، Xray اور mihomo کے ساتھ کام کرتا ہے؛ UDP کی معاونت نہیں ہے۔ دونوں سروں پر OLC2 کے ہم آہنگ نسخے درکار ہیں۔ اصل منصوبہ آرکائیو کر دیا گیا ہے۔\n';
 
   @override
-  String get probeServers => 'سرورز کو چیک کریں۔';
+  String get probeServers => 'پنگ';
 
   @override
   String get extensions => 'ایکسٹینشنز';
@@ -905,13 +814,10 @@ class SUr extends S {
   String get extInstallOne => '1 انسٹال کریں۔';
 
   @override
-  String get extSideloadWarning => 'صرف تب انسٹال کریں جب آپ مصنف کی خود دستخط کردہ کلید پر بھروسہ کرتے ہوں۔';
+  String get extSideloadWarning => 'خود دستخط شدہ کلید';
 
   @override
   String get extPermissionsWidened => 'اپ ڈیٹ نئی اجازتیں مانگتا ہے:';
-
-  @override
-  String get extDangerousAck => 'میں سمجھتا ہوں کہ یہ اجازتیں سنجیدہ ہیں۔';
 
   @override
   String get extInstall => 'انسٹال کریں۔';
@@ -924,9 +830,6 @@ class SUr extends S {
 
   @override
   String get extConfirm => 'تصدیق کریں۔';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'کیٹلاگ';
@@ -977,17 +880,13 @@ class SUr extends S {
   String get extEmptySearch => 'کچھ نہیں ملا';
 
   @override
-  String get extEmptyInstalled =>
-      'ابھی تک کوئی ایکسٹینشن انسٹال نہیں ہے۔\nکیٹلاگ میں ایک تلاش کریں یا فائل سے انسٹال کریں۔';
+  String get extEmptyInstalled => 'ابھی تک کوئی ایکسٹینشن انسٹال نہیں ہے';
 
   @override
   String get extInstallFromFile => 'فائل سے انسٹال کریں۔';
 
   @override
   String get extInstallFromUrl => 'URL سے انسٹال کریں';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'ڈاؤن لوڈ کریں۔';
@@ -1002,19 +901,16 @@ class SUr extends S {
   String get extInstalling => 'انسٹال ہو رہا ہے…';
 
   @override
-  String get extInstallFailed => 'انسٹال ناکام ہو گیا۔';
-
-  @override
-  String get extErrSignature => 'دستخطی چیک ناکام ہو گیا۔ فائل کو نقصان پہنچا یا اس کے ساتھ چھیڑ چھاڑ ہوسکتی ہے۔';
+  String get extErrSignature => 'دستخطی چیک ناکام ہو گیا';
 
   @override
   String get extErrManifest => 'ایکسٹینشن مینی فیسٹ غلط ہے۔';
 
   @override
-  String get extErrNetwork => 'نیٹ ورک کی خرابی۔ اپنا کنکشن چیک کریں اور دوبارہ کوشش کریں۔';
+  String get extErrNetwork => 'نیٹ ورک کی خرابی';
 
   @override
-  String get extErrHash => 'ڈاؤن لوڈ کیٹلاگ سے میل نہیں کھاتا۔ ہو سکتا ہے اس کے ساتھ چھیڑ چھاڑ کی گئی ہو۔';
+  String get extErrHash => 'ڈاؤن لوڈ کیٹلاگ سے میل نہیں کھاتا';
 
   @override
   String extErrMinApp(String version) {
@@ -1025,11 +921,11 @@ class SUr extends S {
   String get extErrHttpsOnly => 'صرف https:// لنکس کی اجازت ہے۔';
 
   @override
-  String get extErrGeneric => 'کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔';
+  String get extErrGeneric => 'کچھ غلط ہو گیا';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'اس اپ ڈیٹ پر انسٹال شدہ ورژن سے مختلف مصنف کی کلید کے ساتھ دستخط کیے گئے ہیں، اس لیے اسے بلاک کر دیا گیا تھا۔ اگر آپ کو نئی کلید پر بھروسہ ہے، تو ایکسٹینشن اَن انسٹال کریں اور اسے دوبارہ واضح طور پر انسٹال کریں۔';
+      'اس اپ ڈیٹ پر انسٹال شدہ ورژن سے مختلف مصنف کی کلید کے ساتھ دستخط کیے گئے ہیں، اس لیے اسے بلاک کر دیا گیا تھا';
 
   @override
   String get extDisabled => 'غیر فعال';
@@ -1086,7 +982,7 @@ class SUr extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count تنازعات کو آپ کے فیصلے کی ضرورت ہے۔';
+    return 'توسیع کے تنازعات: $count';
   }
 
   @override
@@ -1163,10 +1059,10 @@ class SUr extends S {
   String get extPermThemeApply => 'تھیمز کا اطلاق کریں۔';
 
   @override
-  String get extPermRoutingRules => 'روٹنگ کے اصول شامل کریں (جہاں نیٹ ورک ٹریفک جاتا ہے اس پر اثر پڑتا ہے)';
+  String get extPermRoutingRules => 'روٹنگ کے اصول شامل کریں';
 
   @override
-  String get extPermNetHooks => 'نیٹ ورک پاتھ میں ضم کریں (DPI بائی پاس ماڈیولز)';
+  String get extPermNetHooks => 'نیٹ ورک پاتھ میں ضم کریں';
 
   @override
   String get extPermNetFetch => 'URL کی اجازت دی گئی فہرست سے درخواست کریں۔';
@@ -1175,7 +1071,7 @@ class SUr extends S {
   String get extPermBackground => 'پس منظر کے کام چلائیں۔';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'غیر فعال';
 
   @override
   String get extCapBackground => 'پس منظر میں چلتا ہے۔';
@@ -1213,9 +1109,6 @@ class SUr extends S {
   String get extSortRelevance => 'مطابقت';
 
   @override
-  String get extPermNetworkDetail => 'VPN درخواستیں صرف نیچے دیے گئے ہوسٹس تک پہنچ سکتی ہیں۔';
-
-  @override
   String get extBgTitle => 'پس منظر کا کام';
 
   @override
@@ -1237,9 +1130,6 @@ class SUr extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'اس کے پس منظر کے کام کو منظم کرنے کے لیے ایکسٹینشن کو فعال کریں۔';
-
-  @override
   String get extCapNetwork => 'نیٹ ورک تک رسائی';
 
   @override
@@ -1256,7 +1146,7 @@ class SUr extends S {
   String get diagnosticHttp => 'HTTP تشخیص';
 
   @override
-  String get diagnosticNoData => 'ابھی تک کوئی ریکارڈ شدہ درخواستیں نہیں ہیں۔ پہلے اسپیڈ ٹیسٹ کی ویب سائٹ کھولیں۔';
+  String get diagnosticNoData => 'ابھی تک کوئی ریکارڈ شدہ درخواستیں نہیں ہیں';
 
   @override
   String get qrShareTitle => 'شیئر کریں QR کوڈ';
@@ -1266,12 +1156,6 @@ class SUr extends S {
 
   @override
   String get qrCopyLink => 'لنک کاپی کریں۔';
-
-  @override
-  String get qrWarning => 'یہ کوڈ صرف قابل اعتماد لوگوں کو دکھائیں۔';
-
-  @override
-  String get qrScanHint => 'QR کوڈ والا اسکرین شاٹ یا تصویر منتخب کریں، یا لنک پیسٹ کریں';
 
   @override
   String get qrFromClipboard => 'کلپ بورڈ سے پیسٹ کریں۔';
@@ -1352,30 +1236,10 @@ class SUr extends S {
   String get dnsLeakCheckKillSwitchDns => 'نیٹ ورک بندش سے DNS کا تحفظ';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'اوپر دی گئی DNS ترتیبات میں سرنگ کے لئے DNS کو ترتیب دیں۔';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'چیک کریں کہ آپ کا سسٹم سرنگ کے باہر کون سے ریزولورز استعمال کرے گا۔';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS ٹریفک کو ٹنل کے اندر رکھنے کے لیے نیٹ ورک بندش فعال کریں۔';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'سسٹم کا خفیہ کردہ DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'جعلی DNS جوابات';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'چیک کریں کہ کون سے خفیہ کردہ DNS اینڈ پوائنٹس کو آپ کا سسٹم ٹنل کے باہر استعمال کرتا ہے۔';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'ٹنل کے لیے خفیہ کردہ DNS (DoT یا DoH) استعمال کریں تاکہ ریزولورز جعلی جواب نہ دے سکیں۔';
-
-  @override
-  String get dnsCheckNeedsConnection => 'پہلے VPN سے جڑیں، پھر لیک کی جانچ کریں۔';
 
   @override
   String get dnsExpected => 'متوقع';
@@ -1402,7 +1266,7 @@ class SUr extends S {
   String get autoSelectSmart => 'سمارٹ انتخاب';
 
   @override
-  String get coreWatchUnstable => 'کور سے رابطہ غیر مستحکم ہے۔ کچھ دیر انتظار کر کے دوبارہ کنکٹ کرنے کی کوشش کریں۔';
+  String get coreWatchUnstable => 'کور سے رابطہ غیر مستحکم ہے';
 
   @override
   String get watchReconnect => 'دوبارہ جڑیں۔';
@@ -1441,7 +1305,7 @@ class SUr extends S {
   String get overrideCustomRules => 'اپنے اصول';
 
   @override
-  String get errBenchmarkUnsupported => 'رفتار کی پیمائش کے لیے کور کا نیا ورژن درکار ہے۔ Sora کو اپ ڈیٹ کریں۔';
+  String get errBenchmarkUnsupported => 'رفتار کی پیمائش کے لیے کور کا نیا ورژن درکار ہے';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1452,8 +1316,7 @@ class SUr extends S {
   String get profiles => 'نیٹ ورک پروفائلز';
 
   @override
-  String get profilesEmpty =>
-      'ابھی تک کوئی پروفائل نہیں ہے۔ معلوم نیٹ ورکس پر خود بخود ترتیبات کو لاگو کرنے کے لیے ایک بنائیں۔';
+  String get profilesEmpty => 'ابھی تک کوئی پروفائل نہیں ہے';
 
   @override
   String get profileAdd => 'پروفائل شامل کریں۔';
@@ -1465,9 +1328,6 @@ class SUr extends S {
   String get profileSsids => 'Wi-Fi نیٹ ورکس (SSID)';
 
   @override
-  String get profileSsidsHint => 'گھر، دفتر کوما سے الگ کیا گیا۔';
-
-  @override
   String get profileGateways => 'نیٹ ورک گیٹ ویز';
 
   @override
@@ -1475,9 +1335,6 @@ class SUr extends S {
 
   @override
   String get profileAutoApply => 'خود بخود لاگو کریں';
-
-  @override
-  String get profileAutoApplyHint => 'بند ہونے پر پروفائل لاگو کرنے سے پہلے تصدیق مانگی جائے گی۔';
 
   @override
   String get profileSnapshot => 'موجودہ ترتیبات کو یاد رکھیں';
@@ -1521,14 +1378,13 @@ class SUr extends S {
   String get networkUnknown => 'نیٹ ورک کی معلومات دستیاب نہیں ہے۔';
 
   @override
-  String get profileNoTriggers => 'کم از کم ایک ٹرگر شامل کریں: SSID، گیٹ وے یا ASN';
+  String get profileNoTriggers => 'پروفائل کی شرائط موجود نہیں';
 
   @override
   String get chains => 'پراکسی چینز';
 
   @override
-  String get chainsEmpty =>
-      'ابھی تک کوئی زنجیر نہیں ہے۔ 2–3 سرورز کو لنک کریں تاکہ ٹریفک ان میں سے ہر ایک سے گزر جائے۔';
+  String get chainsEmpty => 'ابھی تک کوئی زنجیر نہیں ہے';
 
   @override
   String get chainAdd => 'نیا سلسلہ';
@@ -1537,17 +1393,10 @@ class SUr extends S {
   String get chainName => 'سلسلہ کا نام';
 
   @override
-  String get chainPickServers => '2–3 سرور چنیں۔';
+  String get chainTooFew => 'چین کے لیے کم از کم دو سرور درکار ہیں';
 
   @override
-  String get chainOrderHint =>
-      'دوبارہ ترتیب دینے کے لیے گھسیٹیں: ٹریفک اوپر سے داخل ہوتا ہے اور نیچے سے باہر نکلتا ہے۔';
-
-  @override
-  String get chainTooFew => 'چین کے لیے کم از کم دو سرور درکار ہیں۔ ایک اور سرور شامل کریں۔';
-
-  @override
-  String get chainTooMany => 'چین میں زیادہ سے زیادہ تین سرور ہو سکتے ہیں۔ اضافی سرور ہٹا دیں۔';
+  String get chainTooMany => 'چین میں زیادہ سے زیادہ تین سرور ہو سکتے ہیں';
 
   @override
   String get chainEstimate => 'تخمینی تاخیر';
@@ -1564,10 +1413,10 @@ class SUr extends S {
   }
 
   @override
-  String get chainUnsupported => 'منتخب انجن سرور چین کی سہولت نہیں دیتا۔ موافق انجن منتخب کریں۔';
+  String get chainUnsupported => 'منتخب انجن سرور چین کی سہولت نہیں دیتا';
 
   @override
-  String get chainHopMissing => 'چین کا ایک سرور اب دستیاب نہیں۔ اس مرحلے کے لیے دوسرا سرور منتخب کریں۔';
+  String get chainHopMissing => 'چین کا ایک سرور اب دستیاب نہیں';
 
   @override
   String chainHop(Object n) {
@@ -1587,7 +1436,7 @@ class SUr extends S {
   String get syncDevices => 'میرے آلات';
 
   @override
-  String get syncEmpty => 'کوئی جوڑا بنائے گئے آلات نہیں ہیں۔ مقامی نیٹ ورک پر دوسرے آلے کو جوڑیں۔';
+  String get syncEmpty => 'کوئی جوڑا بنائے گئے آلات نہیں ہیں';
 
   @override
   String get syncPair => 'ڈیوائس جوڑیں';
@@ -1615,9 +1464,6 @@ class SUr extends S {
   String get syncNever => 'کبھی نہیں۔';
 
   @override
-  String get syncNoLan => 'آلات کا ایک ہی مقامی نیٹ ورک پر ہونا ضروری ہے۔';
-
-  @override
   String get syncPaired => 'ڈیوائس کا جوڑا بنایا گیا۔';
 
   @override
@@ -1627,18 +1473,10 @@ class SUr extends S {
   String get syncWaiting => 'دوسرے آلے کا انتظار کر رہا ہے…';
 
   @override
-  String get syncSecureNote =>
-      'اینڈ ٹو اینڈ انکرپٹڈ چینل۔ کوئی اکاؤنٹ نہیں، کوئی کلاؤڈ سرور نہیں۔ براہ راست نیٹ ورک ٹریفک کے لیے';
-
-  @override
   String get zapretWithVpn => 'بائی پاس DPI فلٹرنگ';
 
   @override
-  String get zapretWithVpnHint =>
-      'VPN ٹنل کے ساتھ zapret چلاتا ہے: ٹنل کی ٹریفک VPN سے اور براہ راست ٹریفک پابندی سے بچنے کے طریقے سے گزرتی ہے۔';
-
-  @override
-  String get chainDuplicate => 'چین میں ایک سرور دہرایا گیا ہے۔ ہر مرحلے کے لیے الگ سرور منتخب کریں۔';
+  String get chainDuplicate => 'چین میں ایک سرور دہرایا گیا ہے';
 
   @override
   String get edit => 'ترمیم کریں۔';
@@ -1648,10 +1486,6 @@ class SUr extends S {
 
   @override
   String get autoSwitchOnDegrade => 'انحطاط پر آٹو سوئچ';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'اگر منتخب سرور بہت سست ہو جائے یا جواب دینا بند کر دے، تو Sora پیمائش کے مطابق بہترین سرور پر منتقل ہوتا ہے، لیکن ہر 10 منٹ میں زیادہ سے زیادہ ایک بار۔';
 
   @override
   String get tunStackMixed => 'مخلوط';
@@ -1669,19 +1503,13 @@ class SUr extends S {
   String get customServerName => 'نام';
 
   @override
-  String get customServerNameHint => 'مثال کے طور پر: میرا VPS';
-
-  @override
-  String get customServerNameRequired => 'نام درج کریں۔';
+  String get customServerNameRequired => 'نام درج نہیں';
 
   @override
   String get customServerAddress => 'پتہ';
 
   @override
-  String get customServerAddressHint => 'example.com یا 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'سرور کا پتہ درج کریں۔';
+  String get customServerAddressRequired => 'پتہ درج نہیں';
 
   @override
   String get customServerAddressInvalid => 'غلط پتہ';
@@ -1690,19 +1518,13 @@ class SUr extends S {
   String get customServerPort => 'پورٹ';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'پورٹ کا نمبر 1 سے 65535 تک ہونا چاہیے۔';
+  String get customServerPortInvalid => 'غلط پورٹ';
 
   @override
   String get customServerProtocol => 'پروٹوکول';
 
   @override
   String get customServerCredentials => 'لاگ ان کی معلومات';
-
-  @override
-  String get customServerOptional => 'اختیاری';
 
   @override
   String get customServerShowSecret => 'راز دکھائیں۔';
@@ -1716,23 +1538,13 @@ class SUr extends S {
   }
 
   @override
-  String get customServerTest => 'ٹیسٹ';
-
-  @override
   String get leakTestTitle => 'ڈیٹا لیک کے لیے ٹیسٹ';
-
-  @override
-  String get leakTestIntro =>
-      'جانچتا ہے کہ آیا ٹریفک ٹنل کے باہر سے ڈیوائس سے نکل سکتی ہے: براہ راست DNS اور ICMP درخواستیں، IPv6 اخراج اور سسٹم ریزولورز۔ کنکشن فعال ہونے پر چلائیں۔';
 
   @override
   String get leakTestRun => 'چیک کریں۔';
 
   @override
   String get leakTestCancel => 'منسوخ کریں۔';
-
-  @override
-  String get leakTestNeedsConnection => 'لیک ٹیسٹ چلانے کے لیے جڑیں۔';
 
   @override
   String leakTestProgress(int count) {
@@ -1753,9 +1565,6 @@ class SUr extends S {
 
   @override
   String get leakTestFix => 'درست کریں۔';
-
-  @override
-  String get leakTestFixedNote => 'نیٹ ورک بندش فعال ہے۔ تصدیق کے لیے دوبارہ ٹیسٹ چلائیں۔';
 
   @override
   String get leakTestCheckDirectDns => 'براہ راست DNS';
@@ -1788,15 +1597,13 @@ class SUr extends S {
   String get syncDaemonFailed => 'مطابقت پذیری سروس شروع نہیں کی جا سکی';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync جزو نہیں ملا۔ ڈیوائس کی مطابقت پذیری کو فعال کرنے کے لیے ایپ کو دوبارہ انسٹال کریں۔';
+  String get syncDaemonMissing => 'sora-sync جزو نہیں ملا';
 
   @override
   String get syncDaemonStarting => 'مطابقت پذیری سروس شروع ہو رہی ہے…';
 
   @override
-  String get syncErrAuth =>
-      'مطابقت پذیری سروس نے رسائی ٹوکن کو مسترد کر دیا۔ ایپ کو دوبارہ شروع کریں اور دوبارہ کوشش کریں۔';
+  String get syncErrAuth => 'مطابقت پذیری سروس نے رسائی ٹوکن کو مسترد کر دیا';
 
   @override
   String get syncErrNotFound => 'آلہ اب جوڑا نہیں ہے۔';
@@ -1805,8 +1612,7 @@ class SUr extends S {
   String get syncErrPairingActive => 'جوڑا بنانے کا سیشن پہلے ہی کھلا ہوا ہے۔';
 
   @override
-  String get syncErrUnreachable =>
-      'دوسرے آلے نے جواب نہیں دیا۔ یقینی بنائیں کہ یہ ایک ہی نیٹ ورک پر ہے اور اس کا کوڈ دکھا رہا ہے۔';
+  String get syncErrUnreachable => 'دوسرے آلے نے جواب نہیں دیا';
 
   @override
   String get syncError => 'مطابقت پذیری کی خرابی۔';
@@ -1818,10 +1624,6 @@ class SUr extends S {
 
   @override
   String get syncJoining => 'آلہ کے ساتھ جوڑا بنایا جا رہا ہے…';
-
-  @override
-  String get syncLegacyCleared =>
-      'پرانی ڈیوائس کی فہرست کبھی بھی اصل میں جوڑی نہیں بنی تھی، اس لیے اسے صاف کر دیا گیا۔ اپنے آلات کو دوبارہ جوڑیں، اس بار حقیقی طور پر۔';
 
   @override
   String get syncNewCode => 'نیا کوڈ';
@@ -1881,8 +1683,7 @@ class SUr extends S {
   String get syncThisDevice => 'یہ آلہ';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android پر مطابقت پذیری دستیاب نہیں';
 
   @override
   String get diagnosticPackets => 'پیکٹ کی گرفتاری';
@@ -1929,27 +1730,25 @@ class SUr extends S {
   String get customServerWgKeepalive => 'Keepalive، سیکنڈ';
 
   @override
-  String get customServerWgKeyInvalid => 'کلید wg genkey کی طرح base64 میں 32 بائٹ ہونی چاہیے۔';
+  String get customServerWgKeyInvalid => 'غلط WireGuard کلید';
 
   @override
-  String get customServerWgCidrInvalid => 'کوما سے الگ پری فکس درج کریں، جیسے 10.0.0.2/32۔';
+  String get customServerWgCidrInvalid => 'غلط CIDR سابقہ';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0 سے 65535 تک سیکنڈ درج کریں۔';
+  String get customServerWgKeepaliveInvalid => 'غلط keepalive وقفہ';
 
   @override
   String get strictKillSwitch => 'سخت نیٹ ورک بندش';
 
   @override
-  String get strictKillSwitchWarning =>
-      'اتصال کے بعد، خرابی، دوبارہ آغاز یا ایپ بند ہونے پر بھی VPN سے باہر کی ٹریفک روکتا ہے۔ رسائی صرف اتصال منقطع کرنے یا اس اختیار کو بند کرنے سے بحال ہوتی ہے۔ آلہ دوبارہ شروع ہونے پر بندش صرف اسی وقت بحال ہوتی ہے جب آغاز پر اتصال فعال ہو۔';
+  String get strictKillSwitchWarning => 'باہر نکلنے کے بعد VPN سے باہر کی ٹریفک بند رکھیں؟';
 
   @override
-  String get extWorkerFailed => 'ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا۔ ایکسٹینشن کا لاگ دیکھیں۔';
+  String get extWorkerFailed => 'ایکسٹینشن کا پس منظر کا کام ناکام ہوگیا';
 
   @override
-  String get extAssetRejected =>
-      'ایکسٹینشن کی فائل میں ایسے رنگ ہیں جن سے پڑھنا مشکل ہے یا اصول درست نہیں۔ ایکسٹینشن کے مصنف سے فائل درست کرنے کو کہیں۔';
+  String get extAssetRejected => 'ایکسٹینشن کی فائل میں ایسے رنگ ہیں جن سے پڑھنا مشکل ہے یا اصول درست نہیں';
 
   @override
   String get extVerifiedSora => 'Sora سے تصدیق شدہ';
@@ -1975,31 +1774,25 @@ class SUr extends S {
   String get customServerPassword => 'پاس ورڈ';
 
   @override
-  String get customServerSecretRequired => 'ایک قدر درج کریں';
+  String get customServerSecretRequired => 'قدر درج نہیں';
 
   @override
   String get customServerLinkInvalid => 'سرور کا لنک درست نہیں';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora میں اندرونی خرابی';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'سرور کا سرٹیفکیٹ مسترد ہو گیا';
 
   @override
-  String get errInternal => 'Sora میں اندرونی خرابی۔ لاگ محفوظ کریں اور مسئلے کی اطلاع دیں۔';
+  String get errFileAccess => 'فائل تک رسائی نہیں';
 
   @override
-  String get errTls => 'سرور کا سرٹیفکیٹ مسترد ہو گیا۔ گھڑی چیک کریں یا فراہم کنندہ سے رابطہ کریں۔';
+  String get errDataLimit => 'ڈیٹا بہت زیادہ ہے';
 
   @override
-  String get errFileAccess => 'فائل تک رسائی نہیں۔ اجازتیں اور خالی جگہ چیک کریں۔';
-
-  @override
-  String get errDataLimit => 'ڈیٹا بہت زیادہ ہے۔ کم آئٹمز منتخب کریں اور دوبارہ کوشش کریں۔';
-
-  @override
-  String get errCredentials => 'محفوظ لاگ ان معلومات موجود نہیں۔ سرور دوبارہ درآمد کریں۔';
+  String get errCredentials => 'محفوظ لاگ ان معلومات موجود نہیں';
 
   @override
   String subscriptionStale(String time) {
@@ -2007,54 +1800,54 @@ class SUr extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'ابھی اپ ڈیٹ نہیں ہوا۔ دوبارہ کوشش کریں۔';
+  String get subscriptionNeverUpdated => 'ابھی اپ ڈیٹ نہیں ہوا';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'سرور نے HTTP $status کوڈ واپس کیا۔ لنک چیک کریں یا فراہم کنندہ سے رابطہ کریں۔',
-      zero: 'سرور نے درخواست مسترد کر دی۔ لنک چیک کریں یا فراہم کنندہ سے رابطہ کریں۔',
+      other: 'سرور نے HTTP $status کوڈ واپس کیا',
+      zero: 'سرور نے درخواست مسترد کر دی',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'سرور کی ترتیبات نامکمل یا غیر معاون ہیں۔ سبسکرپشن اپ ڈیٹ کریں۔';
+  String get errInvalidServer => 'سرور کی ترتیبات نامکمل یا غیر معاون ہیں';
 
   @override
-  String get errServerIds => 'دو سروروں کا شناخت کنندہ ایک ہے۔ انہیں دوبارہ درآمد کریں۔';
+  String get errServerIds => 'دو سروروں کا شناخت کنندہ ایک ہے';
 
   @override
-  String get errRoutingGroup => 'راستہ غیر موجود سروروں یا خراب گروپ کی طرف ہے۔ سبسکرپشن اپ ڈیٹ کریں۔';
+  String get errRoutingGroup => 'راستہ غیر موجود سروروں یا خراب گروپ کی طرف ہے';
 
   @override
-  String get errConnections => 'کنکشن کی فہرست دستیاب نہیں۔ جڑیں یا دوسرا انجن منتخب کریں۔';
+  String get errConnections => 'کنکشن کی فہرست دستیاب نہیں';
 
   @override
-  String get errLogs => 'یہ سروس لاگ نہیں رکھتی۔ Sora اپ ڈیٹ کریں۔';
+  String get errLogs => 'یہ سروس لاگ نہیں رکھتی';
 
   @override
-  String get errDiagnostics => 'تشخیص جمع نہیں ہو سکی۔ دوبارہ کوشش کریں یا لاگ محفوظ کریں۔';
+  String get errDiagnostics => 'تشخیص جمع نہیں ہو سکی';
 
   @override
-  String get errMissingItem => 'مطلوبہ آئٹم اب موجود نہیں۔ فہرست تازہ کریں۔';
+  String get errMissingItem => 'مطلوبہ آئٹم اب موجود نہیں';
 
   @override
-  String get errInvalidRequest => 'درخواست میں غلط قدریں ہیں۔ درج کردہ معلومات چیک کریں اور دوبارہ کوشش کریں۔';
+  String get errInvalidRequest => 'درخواست میں غلط قدریں ہیں';
 
   @override
-  String get errProxyLogin => 'سسٹم پراکسی اس لاگ ان کی معاونت نہیں کرتی۔ مقامی پراکسی کا صارف نام اور پاس ورڈ ہٹائیں۔';
+  String get errProxyLogin => 'سسٹم پراکسی اس لاگ ان کی معاونت نہیں کرتی';
 
   @override
-  String get errLogFilter => 'لاگ فلٹر غلط ہے۔ تلاش صاف کریں اور دوبارہ کوشش کریں۔';
+  String get errLogFilter => 'لاگ فلٹر غلط ہے';
 
   @override
-  String get errSubRedirect => 'سرور نے غیر محفوظ پتے پر بھیج دیا۔ فراہم کنندہ سے نیا لنک مانگیں۔';
+  String get errSubRedirect => 'سرور نے غیر محفوظ پتے پر بھیج دیا';
 
   @override
-  String get errProxySetup => 'سسٹم پراکسی ترتیب نہیں دی جا سکی۔ دوبارہ جڑیں یا لاگ کھولیں۔';
+  String get errProxySetup => 'سسٹم پراکسی ترتیب نہیں دی جا سکی';
 
   @override
   String get notificationsToday => 'آج';
@@ -2080,17 +1873,46 @@ class SUr extends S {
   }
 
   @override
-  String get errSubInterval => 'سبسکرپشن اپ ڈیٹ کرنے کا وقفہ درست نہیں۔ فراہم کنندہ کا تجویز کردہ وقفہ منتخب کریں۔';
+  String get errSubInterval => 'سبسکرپشن اپ ڈیٹ کرنے کا وقفہ درست نہیں';
 
   @override
-  String get errRule => 'روٹنگ کا ایک اصول درست نہیں۔ اصول میں دیا گیا ڈومین، IP پتہ یا ایپ چیک کریں۔';
+  String get errRule => 'روٹنگ کا ایک اصول درست نہیں';
 
   @override
-  String get errDns => 'DNS کی ترتیبات درست نہیں۔ DNS سرور کا پتہ چیک کریں۔';
+  String get errDns => 'DNS کی ترتیبات درست نہیں';
 
   @override
-  String get errEndpoint => 'جانچ کے لیے سرور کا پتہ درست نہیں۔ ہوسٹ کا نام اور پورٹ چیک کریں۔';
+  String get errEndpoint => 'جانچ کے لیے سرور کا پتہ درست نہیں';
 
   @override
-  String get errCancelled => 'درخواست منسوخ ہو گئی۔ ضرورت ہو تو عمل دوبارہ کریں۔';
+  String get errCancelled => 'درخواست منسوخ ہو گئی';
+
+  @override
+  String get customServerOptions => 'کنکشن کی ترتیبات';
+
+  @override
+  String get customServerTransport => 'ٹرانسپورٹ';
+
+  @override
+  String get customServerSecurity => 'سیکیورٹی';
+
+  @override
+  String get customServerCipher => 'خفیہ کاری';
+
+  @override
+  String get customServerWgInterface => 'انٹرفیس';
+
+  @override
+  String get customServerWgPeer => 'پیئر';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'ان پلیٹ فارمز پر دستیاب: $platforms۔';
+  }
+
+  @override
+  String get winwsScopeWarning => 'تمام ایپس کی TCP ٹریفک تبدیل کریں؟';
+
+  @override
+  String get winwsRequirements => 'یہ VPN موڈ دستیاب نہیں';
 }

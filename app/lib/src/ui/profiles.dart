@@ -44,7 +44,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
       if (fingerprint.gateway != null && fingerprint.gateway!.isNotEmpty) fingerprint.gateway!,
       if (fingerprint.asn != null && fingerprint.asn!.isNotEmpty) 'AS${fingerprint.asn}',
     ];
-    return s.networkNow(parts.join(' · '));
+    return s.networkNow(parts.join(', '));
   }
 
   String _triggerSummary(NetworkProfile profile) {
@@ -91,7 +91,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                     Text(
                       s.profilesEmpty,
                       textAlign: TextAlign.center,
-                      style: Styles.secondary.copyWith(color: palette.ink2),
+                      style: Styles.secondary.copyWith(color: palette.ink),
                     ),
                   ],
                 ),
@@ -179,7 +179,7 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
       if (_draft.preset != null) _draft.preset!,
       if (engine != null && engine.isNotEmpty) engine,
     ];
-    return parts.join(' · ');
+    return parts.join(', ');
   }
 
   Future<void> _editList({
@@ -262,7 +262,6 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final palette = Palette.of(context);
     return Screen(
       title: widget.profile == null ? s.profileAdd : s.profileName,
       actions: [RoundButton(icon: Symbols.check_rounded, label: s.save, onTap: _save)],
@@ -275,7 +274,7 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
               value: _draft.ssids.isEmpty ? null : _draft.ssids.join(', '),
               onTap: () => _editList(
                 title: s.profileSsids,
-                hint: s.profileSsidsHint,
+                hint: s.profileSsids,
                 initial: _draft.ssids,
                 apply: (v) => _draft.ssids = v,
               ),
@@ -304,10 +303,6 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
               title: s.profileAutoApply,
               value: _draft.autoApply,
               onChanged: (v) => setState(() => _draft.autoApply = v),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
-              child: Text(s.profileAutoApplyHint, style: Styles.secondary.copyWith(color: palette.ink2)),
             ),
           ],
         ),

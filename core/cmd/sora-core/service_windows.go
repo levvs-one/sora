@@ -169,7 +169,10 @@ func uninstallService() error {
 
 // stopService requests a stop and waits within the core's system-restoration
 // budget.
-func stopService(s *mgr.Service) error {
+func stopService(s interface {
+	Query() (svc.Status, error)
+	Control(svc.Cmd) (svc.Status, error)
+}) error {
 	status, err := s.Query()
 	if err != nil {
 		return err
@@ -177,8 +180,10 @@ func stopService(s *mgr.Service) error {
 	if status.State == svc.Stopped {
 		return nil
 	}
-	if _, err := s.Control(svc.Stop); err != nil && !errors.Is(err, windows.ERROR_SERVICE_NOT_ACTIVE) {
-		return err
+	if status.State != svc.StopPending {
+		if _, err := s.Control(svc.Stop); err != nil && !errors.Is(err, windows.ERROR_SERVICE_NOT_ACTIVE) {
+			return err
+		}
 	}
 	for deadline := time.Now().Add(30 * time.Second); time.Now().Before(deadline); time.Sleep(200 * time.Millisecond) {
 		if status, err = s.Query(); err != nil || status.State == svc.Stopped {
@@ -186,4 +191,22 @@ func stopService(s *mgr.Service) error {
 		}
 	}
 	return errors.New("the service did not stop within 30 seconds")
+}
+
+// stopInstalledService preserves the registration and configuration on upgrade.
+func stopInstalledService() error {
+	m, err := mgr.Connect()
+	if err != nil {
+		return fmt.Errorf("service manager: %w", err)
+	}
+	defer func() { _ = m.Disconnect() }()
+	s, err := m.OpenService(serviceName)
+	if errors.Is(err, windows.ERROR_SERVICE_DOES_NOT_EXIST) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	defer func() { _ = s.Close() }()
+	return stopService(s)
 }

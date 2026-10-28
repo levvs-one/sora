@@ -20,20 +20,22 @@ jobs:
     name: Workflow lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install actionlint
         run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
       - name: Run actionlint
         run: ./actionlint -color
+      - name: Check release metadata producer
+        run: python3 -B packaging/install/test_release_manifest.py
 
   proto:
     name: Proto
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: '1.23'
           cache: false
@@ -63,10 +65,10 @@ jobs:
       run:
         working-directory: core
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: core/go.mod
           cache: false
@@ -112,7 +114,7 @@ jobs:
           sudo unshare --net env SORA_ISOLATED_PACKET_TEST=1 SORA_ORIGINAL_NETNS="$original" \
             "$RUNNER_TEMP/sora-packet-tests" -test.v -test.run '^TestNativeLinuxOwnedTunCapture$' -test.timeout 15s
       - name: Lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           # Built with a Go new enough for the go directive of core/go.mod.
           version: v2.14.0
@@ -129,8 +131,8 @@ jobs:
       run:
         working-directory: ${{ matrix.module }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: core/go.mod
           cache: false
@@ -143,7 +145,7 @@ jobs:
       - name: Test
         run: go test -race ./...
       - name: Lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
         with:
           version: v2.14.0
           working-directory: ${{ matrix.module }}
@@ -155,18 +157,18 @@ jobs:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.6
           channel: stable
       # test/sync_daemon_test.dart builds and drives the real sora-sync.
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: service/sync/go.mod
           cache: false
       - name: Install Linux build dependencies
-        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev bubblewrap shellcheck
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev bubblewrap shellcheck xvfb
       - name: Get packages
         run: flutter pub get
       - name: Check formatting
@@ -175,36 +177,142 @@ jobs:
         run: flutter analyze
       - name: Test
         run: flutter test
+      - name: Check release-version catalog compatibility
+        run: |
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
+          echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
+          flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+      - name: Verify the live extension catalog for a tagged release
+        if: github.ref_type == 'tag'
+        run: >-
+          flutter test --no-pub --dart-define=SORA_VERIFY_LIVE_CATALOG=true
+          test/ext_revocation_catalog_test.dart
+          --plain-name 'release catalog is available with a trusted signature'
       - name: Connection and export races over an isolated RPC socket
         run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
         run: flutter build linux --release
+      - name: Native signed extension panel in WebKitGTK
+        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
       - name: Check the Linux update helper
         working-directory: .
         run: |
           shellcheck packaging/linux/sora-update
-          # Ubuntu 24.04 runners keep unprivileged user namespaces behind
-          # AppArmor; the helper test runs inside one.
-          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-          python3 packaging/linux/test_update.py -v
+          sudo env "PATH=$PATH" "GOCACHE=$(go env GOCACHE)" "GOMODCACHE=$(go env GOMODCACHE)" python3 -B packaging/linux/test_update.py -v
 
-  windows:
-    name: Windows
-    timeout-minutes: 90
-    # The whole chain on a real Windows: build, install the service with the
-    # installer, reach it from the app over the named pipe, uninstall.
-    runs-on: windows-latest
+  msi-rollback-fixture:
+    name: Build native MSI rollback probe
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v5
         with:
           go-version-file: core/go.mod
           cache: false
+      - name: Build pinned open-source MSI compiler and fixtures
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gcc pkg-config ninja-build valac bison gettext gobject-introspection libgirepository1.0-dev libglib2.0-dev libgsf-1-dev libgcab-dev libxml2-dev uuid-dev python3-venv
+          fixture_tool_root="$RUNNER_TEMP/msi-tool"
+          mkdir -p "$fixture_tool_root/src"
+          curl -fsSL --connect-timeout 15 --max-time 120 --max-filesize 437664 https://download.gnome.org/sources/msitools/0.106/msitools-0.106.tar.xz -o "$fixture_tool_root/source.tar.xz"
+          printf '%s  %s\n' 1ed34279cf8080f14f1b8f10e649474125492a089912e7ca70e59dfa2e5a659b "$fixture_tool_root/source.tar.xz" | sha256sum -c -
+          tar -xJf "$fixture_tool_root/source.tar.xz" --strip-components=1 -C "$fixture_tool_root/src"
+          python3 -m venv "$fixture_tool_root/venv"
+          "$fixture_tool_root/venv/bin/pip" --disable-pip-version-check install meson==1.12.1
+          "$fixture_tool_root/venv/bin/meson" setup "$fixture_tool_root/build" "$fixture_tool_root/src" --prefix="$fixture_tool_root/install" --libdir=lib -Dintrospection=true
+          "$fixture_tool_root/venv/bin/meson" compile -C "$fixture_tool_root/build"
+          "$fixture_tool_root/venv/bin/meson" install -C "$fixture_tool_root/build"
+          env PATH="$fixture_tool_root/install/bin:$PATH" LD_LIBRARY_PATH="$fixture_tool_root/install/lib" python3 -B packaging/windows/build_msi_fixture.py "$RUNNER_TEMP/msi-fixtures"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: msi-transaction-fixtures
+          path: ${{ runner.temp }}/msi-fixtures
+          if-no-files-found: error
+
+  windows-zapret-compatibility:
+    name: Windows Zapret runtime compatibility
+    runs-on: windows-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: core/go.mod
+          cache: false
+      - name: Build actual native runtime boundary tests
+        shell: pwsh
+        working-directory: core
+        run: |
+          go test -c -o "$env:RUNNER_TEMP/winws-native-test.exe" ./engine/winws
+          if ($LASTEXITCODE -ne 0) { throw 'Winws native fixture build failed' }
+      - name: Download pinned upstream archive
+        shell: pwsh
+        run: |
+          curl.exe --fail --location --proto '=https' --connect-timeout 15 --max-time 120 --max-filesize 7959200 --output "$env:RUNNER_TEMP/zapret-v72.13.zip" https://github.com/bol-van/zapret/releases/download/v72.13/zapret-v72.13.zip
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned Zapret fixture download failed' }
+      - name: Signed driver initializes with a filter that captures nothing
+        shell: pwsh
+        env:
+          SORA_ISOLATED_ZAPRET_TEST: '1'
+          SORA_WINWS_NATIVE_TEST: ${{ runner.temp }}/winws-native-test.exe
+        run: |
+          python -B packaging/windows/test_zapret_compatibility.py "$env:RUNNER_TEMP/zapret-v72.13.zip" "$env:RUNNER_TEMP/sora-zapret-loader" 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP/zapret-loader-evidence.log"
+          if ($LASTEXITCODE -ne 0) { throw 'Native Zapret loader compatibility failed' }
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-zapret-loader-evidence
+          path: |
+            ${{ runner.temp }}/zapret-loader-evidence.log
+            ${{ runner.temp }}/sora-zapret-loader/winws.log
+          if-no-files-found: ignore
+
+  windows:
+    name: Windows
+    needs: [msi-rollback-fixture]
+    timeout-minutes: 90
+    # The whole chain on a real Windows: build, install the service with the
+    # installer, reach it from the app over the named pipe, uninstall.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: core/go.mod
+          cache: false
       - name: Version
         shell: bash
         run: |
-          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.0.$GITHUB_RUN_NUMBER; fi
+          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
+      - name: Installer signature and bootstrap contracts
+        shell: pwsh
+        run: |
+          python packaging/install/test_installers.py
+          if ($LASTEXITCODE -ne 0) { throw 'Installer signature rejection tests failed' }
+      - uses: actions/download-artifact@v8
+        with:
+          name: msi-transaction-fixtures
+          path: ${{ runner.temp }}/msi-fixtures
+      - name: Native MSI restores files and service after startup or readiness failure
+        shell: pwsh
+        run: |
+          python -B packaging/windows/test_msi_transaction.py "$env:RUNNER_TEMP\msi-fixtures"
+          if ($LASTEXITCODE -ne 0) { throw 'Native MSI rollback or commit control failed' }
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-msi-transaction-evidence
+          path: |
+            ${{ runner.temp }}/msi-fixtures/logs
+            ${{ runner.temp }}/msi-fixtures/service/logs
+          if-no-files-found: ignore
       - name: Test the core on Windows
         working-directory: core
         shell: bash
@@ -213,6 +321,12 @@ jobs:
         working-directory: core
         shell: bash
         run: go test -count=20 -run 'TestJavaScriptProcess/(memory|CPU)_budget' ./ext
+      - name: Installer refuses replacement until the service stops
+        shell: pwsh
+        run: |
+          choco install innosetup --version 6.7.1 --no-progress -y
+          python -B packaging/windows/test_service_stop.py
+          if ($LASTEXITCODE -ne 0) { throw 'Installer service-stop gate failed' }
       - name: Build the core
         working-directory: core
         shell: bash
@@ -224,6 +338,13 @@ jobs:
       - name: Fetch and verify the engines
         shell: bash
         run: packaging/engines/fetch.sh windows-amd64 dist/windows/engines
+      - name: Native Windows DPI proxy carries HTTP and TLS
+        working-directory: core
+        shell: pwsh
+        run: |
+          $env:SORA_BYPASS_BIN = (Resolve-Path '../dist/windows/engines/byedpi.exe').Path
+          go test -count=1 -v ./engine/bypass -run '^TestNativeWindowsProxyCarriesHTTPAndTLS$' -timeout 30s
+          if ($LASTEXITCODE -ne 0) { throw 'Native DPI transport or rejected-plan preservation failed' }
       - name: TCP, UDP and bulk throughput through every Windows TUN stack
         working-directory: core
         shell: pwsh
@@ -234,7 +355,7 @@ jobs:
           $env:SORA_ENGINES_DIR = (Resolve-Path '../dist/windows/engines').Path
           go test -count=1 -v ./engine/interop -run '^TestWindowsTunSwitchesCarryTCPAndUDP$' -timeout 10m 2>&1 | Tee-Object -FilePath "$env:RUNNER_TEMP\windows-tun-throughput.log"
           if ($LASTEXITCODE -ne 0) { throw 'Windows TUN packet or throughput checks failed' }
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: windows-tun-throughput
@@ -248,14 +369,50 @@ jobs:
         working-directory: app
         run: |
           flutter pub get
-          flutter test test/app_test.dart
-          if ($LASTEXITCODE -ne 0) { throw 'Windows defaults and plan tests failed' }
+          flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart test/winws_profile_test.dart test/extension_bypass_test.dart test/connections_screen_test.dart
+          if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan, metadata or extension package tests failed' }
           flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+      - name: Check release-version catalog compatibility
+        working-directory: app
+        shell: pwsh
+        run: |
+          $json = dart pub deps --json
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot read the app package version' }
+          $dependencies = ($json -join [Environment]::NewLine) | ConvertFrom-Json
+          $roots = @($dependencies.packages | Where-Object { $_.kind -eq 'root' })
+          if ($roots.Count -ne 1 -or $roots[0].name -ne 'sora') { throw 'Unexpected app package root' }
+          $version = ($roots[0].version -split '\+')[0]
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$version") { throw 'Tag and app version differ' }
+          "SORA_COMPAT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+          if ($LASTEXITCODE -ne 0) { throw 'Release-version catalog compatibility failed' }
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate-host extension catalog UI failed' }
+          flutter test --timeout=180s '--dart-define=SORA_VERSION=1.1.2' test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          if ($LASTEXITCODE -ne 0) { throw 'Published-host extension catalog UI gate failed' }
+      - name: Native signed extension panel and bridge
+        working-directory: app
+        run: |
+          flutter test test/panel_bootstrap_js_test.dart test/extension_panel_startup_test.dart
+          if ($LASTEXITCODE -ne 0) { throw 'Panel bootstrap or lifecycle failed' }
+          flutter test integration_test/extension_panel_test.dart -d windows --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
+          if ($LASTEXITCODE -ne 0) { throw 'Signed extension panel or native bridge failed' }
       - name: Build the installer
         shell: pwsh
         run: |
-          choco install innosetup --version 6.7.1 --no-progress -y
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ env.SORA_VERSION }} packaging\windows\sora.iss
+      - name: Inspect Windows release security
+        shell: pwsh
+        env:
+          SORA_AUTHENTICODE_CONFIGURED: ${{ secrets.WINDOWS_SIGNING_CERTIFICATE != '' }}
+        run: |
+          & .\packaging\windows\check-security.ps1 -Path @('dist', 'app/build/windows/x64/runner/Release') -ReportPath "$env:RUNNER_TEMP/windows-security.json"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-security-evidence
+          path: ${{ runner.temp }}/windows-security.json
+          if-no-files-found: ignore
       - name: Screenshots of the installer
         shell: pwsh
         run: |
@@ -280,22 +437,32 @@ jobs:
       - name: Check install.ps1
         shell: pwsh
         run: |
-          # The PowerShell Gallery sometimes answers "no match" for a moment;
-          # retry before treating it as a failure of the script under test.
-          for ($i = 1; $i -le 5; $i++) {
-            try { Install-Module PSScriptAnalyzer -Force -Scope CurrentUser -ErrorAction Stop; break }
-            catch { if ($i -eq 5) { throw }; Start-Sleep -Seconds (10 * $i) }
+          # Gallery resolution can fail repeatedly; verify the official release before importing it.
+          $archive = Join-Path $env:RUNNER_TEMP 'PSScriptAnalyzer.1.25.0.nupkg'
+          curl.exe --fail --location --proto '=https' --proto-redir '=https' --connect-timeout 15 --max-time 180 --max-filesize 14658674 --silent --show-error --output $archive https://github.com/PowerShell/PSScriptAnalyzer/releases/download/1.25.0/PSScriptAnalyzer.1.25.0.nupkg
+          if ($LASTEXITCODE -ne 0) { throw 'PSScriptAnalyzer download failed' }
+          if ((Get-Item -LiteralPath $archive).Length -ne 14658674 -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne '14e634c828eb98efb9f40b2918ba90f139ed5eccdf663a2a747736d996995d60') {
+            throw 'PSScriptAnalyzer archive size or hash mismatch'
           }
-          $found = Invoke-ScriptAnalyzer -Path packaging\install\install.ps1 -Severity Warning, Error
+          $module = Join-Path $env:RUNNER_TEMP 'PSScriptAnalyzer-1.25.0'
+          [IO.Compression.ZipFile]::ExtractToDirectory($archive, $module)
+          Import-Module (Join-Path $module 'PSScriptAnalyzer.psd1') -Force -ErrorAction Stop
+          if ((Get-Module PSScriptAnalyzer).Version -ne [version]'1.25.0') { throw 'Unexpected PSScriptAnalyzer version' }
+          $found = foreach ($script in @('packaging/install/install.ps1', 'packaging/windows/check-security.ps1')) {
+            Invoke-ScriptAnalyzer -Path $script -Severity Warning, Error
+          }
           $found | Format-Table -AutoSize
-          if ($found) { throw "PSScriptAnalyzer found problems in install.ps1" }
+          if ($found) { throw "PSScriptAnalyzer found problems in Windows packaging scripts" }
       - name: Install with install.ps1 and check the service
         shell: pwsh
         run: |
-          # The same script people run, on the installer this job built.
           $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
-          "$((Get-FileHash -Algorithm SHA256 $setup.FullName).Hash.ToLowerInvariant())  $($setup.Name)" | Set-Content -Encoding ascii dist\SHA256SUMS
-          $env:SORA_DIST = "$PWD\dist"
+          New-Item -ItemType Directory install-test | Out-Null
+          Copy-Item -LiteralPath $setup.FullName -Destination install-test
+          python packaging/install/prepare_test_release.py install-test $env:SORA_VERSION test-tools
+          if ($LASTEXITCODE -ne 0) { throw 'Signed installer fixture preparation failed' }
+          $env:SORA_DIST = "$PWD\install-test"
+          $env:SORA_VERIFIER = "$PWD\test-tools\sora-verifier.exe"
           & .\packaging\install\install.ps1
           # Silent setup must reopen the app as well as install the service.
           for ($i = 0; $i -lt 30; $i++) {
@@ -320,6 +487,35 @@ jobs:
             & "${env:ProgramFiles}\Sora\core\sora-core.exe" -check -data-dir "${env:ProgramData}\Sora" -engines-dir "${env:ProgramFiles}\Sora\core\engines"
             throw "SoraCore is not running"
           }
+      - name: Upgrade the running installation before pipe checks
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
+          $log = Join-Path $env:RUNNER_TEMP 'sora-upgrade.log'
+          $upgrade = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=`"$log`"" -PassThru
+          if (-not $upgrade.WaitForExit(120000)) { throw 'Upgrade did not finish within two minutes' }
+          if ($upgrade.ExitCode -ne 0) {
+            Get-Content -LiteralPath $log -Tail 40
+            throw "Upgrade failed: $($upgrade.ExitCode)"
+          }
+          for ($i = 0; $i -lt 30; $i++) {
+            $service = Get-Service SoraCore -ErrorAction SilentlyContinue
+            if ($service -and $service.Status -eq 'Running') { break }
+            Start-Sleep -Seconds 1
+          }
+          if (-not $service -or $service.Status -ne 'Running') { throw 'Upgrade did not restart SoraCore' }
+          for ($i = 0; $i -lt 30; $i++) {
+            if (Get-Process sora -ErrorAction SilentlyContinue) { break }
+            Start-Sleep -Seconds 1
+          }
+          if (-not (Get-Process sora -ErrorAction SilentlyContinue)) { throw 'Upgrade did not reopen Sora' }
+          Get-Process sora -ErrorAction SilentlyContinue | Stop-Process
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: windows-upgrade-evidence
+          path: ${{ runner.temp }}/sora-upgrade.log
+          if-no-files-found: ignore
       - name: The app reaches the installed core over the pipe
         working-directory: app
         env:
@@ -409,7 +605,7 @@ jobs:
           [System.Drawing.Graphics]::FromImage($shot).CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
           $shot.Save("screenshots\app.png")
           Stop-Process -Id $app.Id -Force
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: windows-screenshots
@@ -421,14 +617,73 @@ jobs:
           Start-Process "${env:ProgramFiles}\Sora\unins000.exe" -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES' -Wait
           Start-Sleep -Seconds 3
           if (Get-Service SoraCore -ErrorAction SilentlyContinue) { throw "the service outlived the uninstaller" }
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: sora-windows-x64
           path: dist/Sora-Setup-*.exe
           if-no-files-found: error
+      - name: Build a review-only compatible Windows host
+        if: github.event_name == 'pull_request'
+        working-directory: app
+        shell: pwsh
+        env:
+          SORA_REVIEW_HEAD: '${{ github.event.pull_request.head.sha }}'
+          SORA_REVIEW_BASE: '${{ github.event.pull_request.base.sha }}'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:SORA_COMPAT_VERSION -notmatch '^\d+\.\d+\.\d+$') { throw 'Missing candidate app version' }
+          foreach ($revision in @($env:GITHUB_SHA, $env:SORA_REVIEW_HEAD, $env:SORA_REVIEW_BASE)) {
+            if ($revision -notmatch '^[0-9a-f]{40}$') { throw 'Missing pull request revision' }
+          }
+          flutter build windows --release --no-pub "--dart-define=SORA_VERSION=$env:SORA_COMPAT_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate app build failed' }
+          $bundle = (Resolve-Path 'build/windows/x64/runner/Release').Path
+          if (-not (Test-Path -LiteralPath (Join-Path $bundle 'sora.exe'))) { throw 'Candidate app is missing' }
+          $core = Join-Path $env:GITHUB_WORKSPACE 'dist/windows/sora-core.exe'
+          $env:CGO_ENABLED = '0'
+          Push-Location (Join-Path $env:GITHUB_WORKSPACE 'core')
+          try {
+            go build -trimpath -ldflags "-s -w -X main.buildVersion=$env:SORA_COMPAT_VERSION" -o $core ./cmd/sora-core
+            if ($LASTEXITCODE -ne 0) { throw 'Candidate core build failed' }
+          } finally {
+            Pop-Location
+          }
+          $compiler = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'packaging/windows/sora.iss'
+          & $compiler "/DAppVersion=$env:SORA_COMPAT_VERSION" $script
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate installer build failed' }
+          $setup = Join-Path $env:GITHUB_WORKSPACE "dist/Sora-Setup-$($env:SORA_COMPAT_VERSION)-x64.exe"
+          if (-not (Test-Path -LiteralPath $setup)) { throw 'Candidate installer is missing' }
+          if ((Get-AuthenticodeSignature -LiteralPath $setup).Status -ne 'NotSigned') {
+            throw 'Review installer unexpectedly has an Authenticode signature'
+          }
+          $review = Join-Path $env:RUNNER_TEMP 'sora-windows-host-review'
+          New-Item -ItemType Directory -Path $review -ErrorAction Stop | Out-Null
+          Copy-Item -LiteralPath $bundle -Destination (Join-Path $review 'app') -Recurse
+          Copy-Item -LiteralPath $setup -Destination (Join-Path $review "Sora-Setup-$($env:SORA_COMPAT_VERSION)-x64-UNSIGNED-CANDIDATE.exe")
+          @(
+            'REVIEW ONLY: unsigned candidate installer and app, not a release.',
+            "Candidate version: $env:SORA_COMPAT_VERSION",
+            "PR head: $env:SORA_REVIEW_HEAD",
+            "PR base: $env:SORA_REVIEW_BASE",
+            "CI checkout: $env:GITHUB_SHA",
+            'Installer includes the candidate core and pinned engines; it was not run.',
+            'No signed release manifest, trusted bootstrap or rollback baseline is included.',
+            'The hashes identify these files; they do not authenticate their origin.'
+          ) | Set-Content -LiteralPath (Join-Path $review 'README-UNSIGNED.txt') -Encoding utf8
+          Get-ChildItem -LiteralPath $review -File -Recurse | Where-Object { $_.Name -ne 'README-UNSIGNED.txt' } | Sort-Object FullName | ForEach-Object {
+            $relative = [IO.Path]::GetRelativePath($review, $_.FullName).Replace('\', '/')
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $relative"
+          } | Set-Content -LiteralPath (Join-Path $review 'UNSIGNED-SHA256.txt') -Encoding ascii
+      - uses: actions/upload-artifact@v6
+        if: github.event_name == 'pull_request'
+        with:
+          name: 'windows-host-review-unsigned-${{ github.sha }}'
+          path: '${{ runner.temp }}/sora-windows-host-review'
+          if-no-files-found: error
 
   linux-packages:
-    name: Linux packages
+    name: Linux packages (${{ matrix.arch }}, ${{ matrix.runner }})
     timeout-minutes: 60
     # zapret is C linked against the distribution's netfilter libraries, so
     # each architecture is built natively on its own runner.
@@ -439,18 +694,22 @@ jobs:
         include:
           - arch: amd64
             runner: ubuntu-latest
+            flutter_arch: x64
+            elf_machine: Advanced Micro Devices X86-64
           - arch: arm64
             runner: ubuntu-24.04-arm
+            flutter_arch: arm64
+            elf_machine: AArch64
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: core/go.mod
           cache: false
       - name: Version
         shell: bash
         run: |
-          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.0~$GITHUB_RUN_NUMBER; fi
+          if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
       - name: Install nfpm
         run: |
@@ -464,6 +723,58 @@ jobs:
         run: CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ../../dist/sora-sync ./cmd/sora-sync
       - name: Fetch and verify the engines
         run: packaging/engines/fetch.sh ${{ matrix.arch }} dist/engines
+      - name: Native ByeDPI proxy in an isolated network
+        working-directory: core
+        run: |
+          go test -race -c -o "$RUNNER_TEMP/sora-bydpi-tests" ./engine/bypass
+          go test -race -c -o "$RUNNER_TEMP/sora-bydpi-engine-tests" ./engine/interop
+          go build -o "$RUNNER_TEMP/sora-bydpi-core-probe" ./testdata/coexist
+          for binary in byedpi sing-box xray mihomo; do test -x "$PWD/../dist/engines/$binary"; done
+          # Root mapped inside the user namespace cannot traverse the runner's home.
+          private=$(sudo mktemp -d /tmp/sora-bydpi-ci.XXXXXXXX)
+          trap 'sudo rm -rf -- "$private"' EXIT
+          sudo install -d -m 0700 "$private"/{home,config,cache,data,tmp,engines,coredata}
+          sudo install -m 0755 "$RUNNER_TEMP/sora-bydpi-tests" "$private/proxy-tests"
+          sudo install -m 0755 "$RUNNER_TEMP/sora-bydpi-engine-tests" "$private/engine-tests"
+          sudo install -m 0755 "$RUNNER_TEMP/sora-bydpi-core-probe" "$private/probe"
+          sudo install -m 0755 "$PWD/../dist/sora-core" "$private/sora-core"
+          sudo install -m 0644 "$PWD/../extensions/sources/byedpi/hook.json" "$private/hook.json"
+          for binary in byedpi sing-box xray mihomo; do
+            sudo install -m 0755 "$PWD/../dist/engines/$binary" "$private/engines/$binary"
+          done
+          for database in geoip.dat geosite.dat; do
+            sudo install -m 0644 "$PWD/../dist/engines/$database" "$private/engines/$database"
+          done
+          original=$(readlink /proc/self/ns/net)
+          sudo unshare --user --map-root-user --net env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SORA_DATA_DIR -u SSH_AUTH_SOCK \
+            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/tmp" TMPDIR="$private/tmp" \
+            SORA_PARENT_NETNS="$original" SORA_BYPASS_ISOLATED=1 SORA_BYPASS_BIN="$private/engines/byedpi" SORA_ENGINES_DIR="$private/engines" \
+            sh -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              ip link set lo up
+              "$1/proxy-tests" -test.v -test.run "^TestNativeLinuxByeDPIProxyCarriesHTTPAndTLS$" -test.timeout 30s
+              "$1/engine-tests" -test.v -test.run "^TestIsolatedNativeByeDPIEngineTraffic$" -test.timeout 2m
+              "$1/sora-core" -socket "$1/core.sock" -data-dir "$1/coredata" -engines-dir "$1/engines" -allow-file-keys > "$1/core.log" 2>&1 &
+              pid=$!
+              cleanup_core() { kill -TERM "$pid" 2>/dev/null || :; wait "$pid" 2>/dev/null || :; }
+              trap cleanup_core EXIT
+              count=0
+              while [ ! -S "$1/core.sock" ] && [ "$count" -lt 150 ]; do
+                if ! kill -0 "$pid" 2>/dev/null; then cat "$1/core.log"; exit 1; fi
+                sleep 0.1
+                count=$((count + 1))
+              done
+              if [ ! -S "$1/core.sock" ]; then cat "$1/core.log"; exit 1; fi
+              "$1/probe" "$1/core.sock" byedpi "$1/hook.json" || { cat "$1/core.log"; exit 1; }
+            ' sh "$private"
+      - name: Xray profile geodata in an isolated filesystem
+        if: matrix.arch == 'amd64'
+        working-directory: core
+        run: |
+          sudo apt-get install -y -qq bubblewrap
+          go test -race -c -o "$RUNNER_TEMP/sora-profile-assets-tests" ./engine/xray
+          sudo env "SORA_ENGINES_DIR=$PWD/../dist/engines" "$RUNNER_TEMP/sora-profile-assets-tests" \
+            -test.v -test.run '^TestIsolatedXrayExternalAssetTraversalFixture$' -test.timeout 45s
       - name: Xray TUN replacement, TCP/UDP DNS and extension fetch through every engine
         if: matrix.arch == 'amd64'
         working-directory: core
@@ -488,7 +799,7 @@ jobs:
           for job in $(jobs -p); do wait "$job" || status=1; done
           cat coexist-*.log
           exit $status
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always() && matrix.arch == 'amd64'
         with:
           name: coexistence-logs
@@ -507,53 +818,324 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq libcap-dev libnetfilter-queue-dev libnfnetlink-dev libmnl-dev zlib1g-dev
           packaging/zapret/build.sh dist/engines
-      # Flutter publishes no Linux SDK for arm64 hosts, so the desktop app is
-      # packaged for amd64 only; the core and engines are built for both.
+      - name: Native Zapret core in isolated peer networks
+        timeout-minutes: 5
+        working-directory: core
+        run: |
+          go build -o "$RUNNER_TEMP/sora-zapret-core-probe" ./testdata/coexist
+          for binary in tpws sing-box xray mihomo; do test -x "$PWD/../dist/engines/$binary"; done
+          private=$(sudo mktemp -d /tmp/sora-zapret-ci.XXXXXXXX)
+          trap 'sudo rm -rf -- "$private"' EXIT
+          sudo install -d -m 0700 "$private"/{home,config,cache,data,tmp,engines,coredata}
+          sudo install -m 0755 "$RUNNER_TEMP/sora-zapret-core-probe" "$private/probe"
+          sudo install -m 0755 "$PWD/../dist/sora-core" "$private/sora-core"
+          sudo install -m 0644 "$PWD/../extensions/sources/zapret/hook.json" "$private/hook.json"
+          for binary in tpws sing-box xray mihomo; do
+            sudo install -m 0755 "$PWD/../dist/engines/$binary" "$private/engines/$binary"
+          done
+          for database in geoip.dat geosite.dat; do
+            sudo install -m 0644 "$PWD/../dist/engines/$database" "$private/engines/$database"
+          done
+          original=$(readlink /proc/self/ns/net)
+          original_mount=$(readlink /proc/self/ns/mnt)
+          sudo unshare --user --map-root-user --net --mount --propagation private env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SORA_DATA_DIR -u SSH_AUTH_SOCK \
+            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/tmp" TMPDIR="$private/tmp" \
+            SORA_PARENT_NETNS="$original" SORA_PARENT_MNTNS="$original_mount" SORA_BYPASS_ISOLATED=1 sh -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              test "$(readlink /proc/self/ns/mnt)" != "$SORA_PARENT_MNTNS"
+              printf "%s\\n" "198.18.0.2 example.com" > "$1/hosts"
+              mount --bind "$1/hosts" /etc/hosts
+              here=$(readlink /proc/self/ns/net)
+              ip link set lo up
+              unshare -n sleep 180 &
+              peer=$!
+              server=
+              cleanup() {
+                for pid in "$server" "$peer"; do
+                  if [ -n "$pid" ]; then kill "$pid" 2>/dev/null || :; fi
+                done
+                wait 2>/dev/null || :
+              }
+              trap cleanup EXIT
+              for n in $(seq 1 50); do
+                peer_ns=$(readlink "/proc/$peer/ns/net")
+                if [ "$peer_ns" != "$here" ]; then break; fi
+                sleep 0.1
+              done
+              test "$peer_ns" != "$here"
+              ip link add sora-test-a type veth peer name sora-test-b
+              ip link set sora-test-b netns "$peer"
+              ip addr add 198.18.0.1/30 dev sora-test-a
+              ip link set sora-test-a up
+              nsenter -t "$peer" -n ip link set lo up
+              nsenter -t "$peer" -n ip addr add 198.18.0.2/30 dev sora-test-b
+              nsenter -t "$peer" -n ip link set sora-test-b up
+              nsenter -t "$peer" -n "$1/probe" zapret-target "$1/targets.json" > "$1/server.log" 2>&1 &
+              server=$!
+              for n in $(seq 1 100); do
+                [ -s "$1/targets.json" ] && break
+                if ! kill -0 "$server" 2>/dev/null; then cat "$1/server.log"; exit 1; fi
+                sleep 0.1
+              done
+              if [ ! -s "$1/targets.json" ]; then cat "$1/server.log"; exit 1; fi
+              # Run core and TPWS without root inside the isolated network.
+              unshare --user --map-user=1000 --map-group=1000 sh -e -c '"'"'
+                "$1/sora-core" -socket "$1/core.sock" -data-dir "$1/coredata" -engines-dir "$1/engines" -allow-file-keys > "$1/core.log" 2>&1 &
+                core=$!
+                cleanup_core() { kill -TERM "$core" 2>/dev/null || :; wait "$core" 2>/dev/null || :; }
+                trap cleanup_core EXIT
+                for n in $(seq 1 150); do
+                  [ -S "$1/core.sock" ] && break
+                  if ! kill -0 "$core" 2>/dev/null; then cat "$1/core.log"; exit 1; fi
+                  sleep 0.1
+                done
+                if [ ! -S "$1/core.sock" ]; then cat "$1/core.log"; exit 1; fi
+                "$1/probe" "$1/core.sock" zapret "$1/hook.json" "$1/targets.json" || { cat "$1/core.log"; exit 1; }
+              '"'"' sh "$1"
+            ' sh "$private"
       - uses: subosito/flutter-action@v2
         if: matrix.arch == 'amd64'
         with:
           flutter-version: 3.47.6
           channel: stable
+      # There is no arm64 SDK archive, but the same official Flutter revision
+      # bootstraps its arm64 Dart SDK and engine artifacts on an arm64 host.
+      - name: Set up the pinned Flutter SDK on ARM64
+        if: matrix.arch == 'arm64'
+        run: |
+          test "$(uname -m)" = aarch64
+          git clone --depth 1 --branch 3.47.6 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          test "$(git -C "$RUNNER_TEMP/flutter" rev-parse HEAD)" = 5fc346839b5d0eef006ed8404392afb4dfae428d
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/flutter/bin/flutter" --version
       - name: Build the app
-        if: matrix.arch == 'amd64'
         working-directory: app
         run: |
-          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
+          sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb bubblewrap shellcheck
           flutter pub get
-          flutter build linux --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+          flutter build linux --release --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+      - name: App and Zapret through isolated peer networks
+        timeout-minutes: 15
+        working-directory: app
+        run: |
+          set -euo pipefail
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          sdk_root=$(cd "$(dirname "$(command -v flutter)")/.." && pwd -P)
+          pub_cache="${PUB_CACHE:-$HOME/.pub-cache}"
+          (cd ../tools/sora-ext && go build -o "$RUNNER_TEMP/sora-ext-preflight" ./cmd/sora-ext)
+          private=$(sudo mktemp -d /tmp/sora-live-app-XXXXXXXX)
+          trap 'sudo rm -rf -- "$private"' EXIT
+          sudo install -d -m 0700 "$private"/{home,config,cache,data,runtime,engines,source}
+          sudo install -m 0755 ../dist/sora-core "$private/sora-core"
+          sudo install -m 0755 "$RUNNER_TEMP/sora-ext-preflight" "$private/sora-ext-preflight"
+          sudo install -m 0755 "$RUNNER_TEMP/sora-zapret-core-probe" "$private/probe"
+          for file in tpws mihomo; do sudo install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
+          for file in geoip.dat geosite.dat; do sudo install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
+          tar -C "$GITHUB_WORKSPACE" --exclude=app/build --exclude=app/.dart_tool -cf - app extensions/sources | sudo tar -C "$private/source" -xf -
+          sudo cp -a "$sdk_root" "$private/flutter"
+          sudo cp -a "$pub_cache" "$private/pub-cache"
+          sudo chown -R root:root "$private/source" "$private/flutter" "$private/pub-cache"
+          # Flutter may initialize its own tool before honoring pub's offline
+          # flag, so prepare this private copy before isolating the test.
+          sudo env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
+            setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all \
+            bash -e -c 'cd "$1/flutter/packages/flutter_tools"; "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile; cd "$1/source/app"; flutter pub get --offline --enforce-lockfile' bash "$private"
+          parent_net=$(readlink /proc/self/ns/net)
+          parent_user=$(readlink /proc/self/ns/user)
+          sudo unshare --user --map-root-user --net \
+            env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
+            SORA_LIVE_BYPASS=1 SORA_BYPASS_ISOLATED=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
+            bash -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
+              here=$(readlink /proc/self/ns/net)
+              ip link set lo up
+              unshare -n setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all sleep 360 &
+              peer=$!
+              server=
+              cleanup() {
+                for pid in "$server" "$peer"; do
+                  [ -n "$pid" ] || continue
+                  kill "$pid" 2>/dev/null || :
+                  wait "$pid" 2>/dev/null || :
+                done
+              }
+              trap cleanup EXIT
+              for n in $(seq 1 50); do
+                peer_ns=$(readlink "/proc/$peer/ns/net")
+                if [ "$peer_ns" != "$here" ]; then break; fi
+                sleep 0.1
+              done
+              test "$peer_ns" != "$here"
+              test "$peer_ns" != "$SORA_PARENT_NETNS"
+              ip link add sora-app-a type veth peer name sora-app-b
+              ip link set sora-app-b netns "$peer"
+              ip addr add 198.18.0.1/30 dev sora-app-a
+              ip link set sora-app-a up
+              nsenter -t "$peer" -n ip link set lo up
+              nsenter -t "$peer" -n ip addr add 198.18.0.2/30 dev sora-app-b
+              nsenter -t "$peer" -n ip link set sora-app-b up
+              nsenter -t "$peer" -n setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$1/probe" zapret-target "$1/targets.json" &
+              server=$!
+              for n in $(seq 1 100); do
+                [ -s "$1/targets.json" ] && break
+                if ! kill -0 "$server" 2>/dev/null; then exit 1; fi
+                sleep 0.1
+              done
+              test -s "$1/targets.json"
+              cd "$1/source/app"
+              setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$2" test/extension_bypass_test.dart --plain-name "signed Zapret profile connects the app to a real isolated core"
+            ' bash "$private" "$version"
+      - name: Check the architecture of every bundled native binary
+        env:
+          SORA_FLUTTER_ARCH: ${{ matrix.flutter_arch }}
+          SORA_ELF_MACHINE: ${{ matrix.elf_machine }}
+        run: |
+          bundle="app/build/linux/$SORA_FLUTTER_ARCH/release/bundle"
+          test -x "$bundle/sora"
+          test -f "$bundle/lib/libapp.so"
+          test -f "$bundle/lib/libflutter_linux_gtk.so"
+          while IFS= read -r -d '' binary; do
+            echo "$binary"
+            readelf -h "$binary" | grep -E "Machine:[[:space:]]+$SORA_ELF_MACHINE$"
+          done < <(find "$bundle" -type f \( -name sora -o -name '*.so' \) -print0)
+      - name: Check release-version catalog compatibility on ARM64
+        if: matrix.arch == 'arm64'
+        working-directory: app
+        run: |
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
+          echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
+          flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+      - name: App and ByeDPI through an isolated real core
+        timeout-minutes: 15
+        working-directory: app
+        run: |
+          set -euo pipefail
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          sdk_root=$(cd "$(dirname "$(command -v flutter)")/.." && pwd -P)
+          pub_cache="${PUB_CACHE:-$HOME/.pub-cache}"
+          (cd ../tools/sora-ext && go build -o "$RUNNER_TEMP/sora-ext-preflight" ./cmd/sora-ext)
+          private=$(sudo mktemp -d /tmp/sora-live-app-XXXXXXXX)
+          trap 'sudo rm -rf -- "$private"' EXIT
+          sudo install -d -m 0700 "$private"/{home,config,cache,data,runtime,engines,source}
+          sudo install -m 0755 ../dist/sora-core "$private/sora-core"
+          sudo install -m 0755 "$RUNNER_TEMP/sora-ext-preflight" "$private/sora-ext-preflight"
+          for file in byedpi mihomo; do sudo install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
+          for file in geoip.dat geosite.dat; do sudo install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
+          tar -C "$GITHUB_WORKSPACE" --exclude=app/build --exclude=app/.dart_tool -cf - app extensions/sources | sudo tar -C "$private/source" -xf -
+          sudo cp -a "$sdk_root" "$private/flutter"
+          sudo cp -a "$pub_cache" "$private/pub-cache"
+          sudo chown -R root:root "$private/source" "$private/flutter" "$private/pub-cache"
+          # Flutter may initialize its own tool before honoring pub's offline
+          # flag, so prepare this private copy before isolating the test.
+          sudo env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
+            setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all \
+            bash -e -c 'cd "$1/flutter/packages/flutter_tools"; "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile; cd "$1/source/app"; flutter pub get --offline --enforce-lockfile' bash "$private"
+          parent_net=$(readlink /proc/self/ns/net)
+          parent_user=$(readlink /proc/self/ns/user)
+          sudo unshare --user --map-root-user --net \
+            env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            CI=true HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$private/flutter/bin:/usr/local/bin:/usr/bin:/bin" PUB_CACHE="$private/pub-cache" GOPROXY=off \
+            SORA_LIVE_BYPASS=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
+            bash -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
+              ip link set lo up
+              cd "$1/source/app"
+              exec setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$2" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
+            ' bash "$private" "$version"
+      - name: Native signed extension panel on ARM64
+        if: matrix.arch == 'arm64'
+        working-directory: app
+        run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
+      - name: Native ARM64 update and rollback contracts
+        if: matrix.arch == 'arm64'
+        run: |
+          set -euo pipefail
+          {
+            (cd core && go test -race ./cmd/sora-core -run '^Test(PrepareUpdate|UpdateSnapshot)' -v)
+            (cd app && flutter test test/update_metadata_test.dart)
+            sudo env "PATH=$PATH" "GOCACHE=$(go env GOCACHE)" "GOMODCACHE=$(go env GOMODCACHE)" python3 -B packaging/linux/test_update.py -v
+          } 2>&1 | tee "$RUNNER_TEMP/arm64-update-contract.log"
+      - uses: actions/upload-artifact@v6
+        if: always() && matrix.arch == 'arm64'
+        with:
+          name: arm64-update-contract-evidence
+          path: ${{ runner.temp }}/arm64-update-contract.log
+          if-no-files-found: ignore
       - name: Package
         env:
           SORA_ARCH: ${{ matrix.arch }}
+          SORA_FLUTTER_ARCH: ${{ matrix.flutter_arch }}
         run: |
-          configs=(packaging/linux/nfpm.yaml)
-          if [ "$SORA_ARCH" = amd64 ]; then configs+=(packaging/linux/nfpm-app.yaml); fi
+          configs=(packaging/linux/nfpm.yaml packaging/linux/nfpm-app.yaml)
           for config in "${configs[@]}"; do
             for packager in deb rpm archlinux; do
               nfpm package --config "$config" --packager "$packager" --target dist/
             done
           done
-      - name: Install with install.sh on Ubuntu, Fedora and Arch
+      - name: Install the native core and app on Ubuntu
+        timeout-minutes: 20
+        # The same script people run, on an expendable native runner.
+        run: |
+          set -euo pipefail
+          {
+            shellcheck packaging/install/install.sh
+            # The hosted runner restricts unprivileged namespace setup.
+            sudo env "PATH=$PATH" python3 -B packaging/install/test_installers.py
+            mkdir -p install-test
+            cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
+            python3 packaging/install/prepare_test_release.py install-test "$SORA_VERSION" test-tools
+            SORA_DIST=install-test SORA_VERIFIER="$PWD/test-tools/sora-verifier" sh packaging/install/install.sh
+            for _ in $(seq 1 30); do systemctl is-active --quiet sora-core && break; sleep 1; done
+            systemctl is-active sora-core
+            for package in sora-core sora; do
+              test "$(dpkg-query -W -f='${Architecture}' "$package")" = '${{ matrix.arch }}'
+              test "$(dpkg-query -W -f='${Version}' "$package")" = "$SORA_VERSION"
+            done
+            test -x /usr/bin/sora
+            readelf -h /usr/bin/sora | grep -E 'Machine:[[:space:]]+${{ matrix.elf_machine }}$'
+            test -x /usr/lib/sora/engines/byedpi
+            readelf -h /usr/lib/sora/engines/byedpi | grep -E 'Machine:[[:space:]]+${{ matrix.elf_machine }}$'
+            cmp /usr/share/licenses/sora-core/byedpi.LICENSE packaging/engines/byedpi.LICENSE
+            /usr/bin/sora-core -version
+            probe="/tmp/sora-installed-core-probe-$GITHUB_RUN_ID"
+            (cd core && CGO_ENABLED=0 go build -o "$probe" ./testdata/coexist)
+            # This account is admitted by the service's existing peer-UID rule.
+            sudo -u sora "$probe" /run/sora/core.sock logs
+            echo 'Installed native packages and authenticated core IPC passed.'
+          } 2>&1 | tee "$RUNNER_TEMP/linux-install.log"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: linux-install-${{ matrix.arch }}-evidence
+          path: ${{ runner.temp }}/linux-install.log
+          if-no-files-found: ignore
+      - name: Installed service diagnostics
+        if: failure()
+        run: sudo journalctl -u sora-core --no-pager -n 60
+      - name: Install with install.sh on Fedora and Arch
         if: matrix.arch == 'amd64'
         timeout-minutes: 20
-        # The same script people run, on the packages this job built.
         run: |
-          shellcheck packaging/install/install.sh
-          mkdir -p install-test
-          cp dist/*.deb dist/*.rpm dist/*.pkg.tar.zst install-test/
-          (cd install-test && sha256sum -- * > SHA256SUMS)
-          SORA_DIST=install-test sh packaging/install/install.sh
-          for _ in $(seq 1 30); do systemctl is-active --quiet sora-core && break; sleep 1; done
-          systemctl is-active sora-core
-          test -x /usr/bin/sora
-          /usr/bin/sora-core -version
           # Distribution mirrors drop a download now and then. A package that
           # does not install fails all three runs.
           retry() { for _ in 1 2; do "$@" && return; sleep 15; done; "$@"; }
-          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION fedora:latest \
+          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION -e SORA_VERIFIER=/w/test-tools/sora-verifier fedora:latest \
             sh -c 'dnf -y -q install systemd >/dev/null && sh packaging/install/install.sh && rpm -q sora sora-core'
-          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION archlinux:latest \
+          retry docker run --rm -v "$PWD:/w" -w /w -e SORA_DIST=install-test -e SORA_VERSION -e SORA_VERIFIER=/w/test-tools/sora-verifier archlinux:latest \
             sh -c 'pacman -Sy --noconfirm >/dev/null && sh packaging/install/install.sh && pacman -Q sora sora-core'
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: sora-linux-${{ matrix.arch }}
           path: |
@@ -572,7 +1154,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           pattern: sora-*
@@ -580,9 +1162,8 @@ jobs:
           merge-multiple: true
       - name: Install scripts
         run: cp packaging/install/install.sh packaging/install/install.ps1 dist/
-      - name: Checksums
-        working-directory: dist
-        run: sha256sum -- * > SHA256SUMS
+      - name: Release metadata and checksums
+        run: python3 -B packaging/install/release_manifest.py dist "${GITHUB_REF_NAME#v}"
       - name: Draft the release
         env:
           GH_TOKEN: ${{ github.token }}

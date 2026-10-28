@@ -1,32 +1,26 @@
 # {{.Name}}
 
-A Sora network-hook extension (DPI-bypass fragments).
+A declarative profile for the installed Linux Zapret/tpws backend. This source
+requires the host's version-2 bypass-profile consumer; publication must set
+min_app_version to the actual first host release carrying that consumer.
+Unreleased source support is not a promise about deployed Sora versions.
 
-> **Status: contract per `reports/extensions-40/spec-net-hooks.md`.** The
-> manifest side is real; core-side compilation of fragments is not
-> implemented yet.
+The version-2 descriptor contains only backend (tpws on Linux, byedpi on
+Windows) and 1..16 named protobuf BypassStrategy profiles. The extension-local
+profile setting selects one. No paths, shell arguments, scripts, downloaded
+executables or arbitrary engine config fragments are accepted.
 
-## hook.json (L1: declarative engine fragments)
+The user grants dangerous net.hooks permission, resolves competing holders,
+then explicitly connects the profile from the extension or mode picker.
+Installation alone does not connect. Manual bypass settings stay separate.
+Changing a selected profile reapplies the connection through the authenticated
+core API; disabling or removing it disconnects without choosing a substitute.
+Core validation and existing native backend constraints still apply.
 
-No extension code runs on the traffic path - the engine compiles these
-fragments into its own config:
+Windows WinDivert/winws is a different backend and is not supplied here.
+This extension does not add a driver, MITM certificate, or access to VPN keys.
 
-- `hook_version: 1`
-- `engine_fragments[]`: `engines` (e.g. `sing-box`), `match`
-  (`domain_suffix` here), `params` - strictly per-engine (allowlisted,
-  typed, ranged). An unknown param rejects the whole fragment.
-- Fragments merge into the session plan as a named extension layer; on
-  conflict with user settings **the user wins**.
-
-No MITM by design: a hook gets no keys, installs no CA, decrypts nothing.
-
-## Ship
-
-```sh
-sora-ext validate
-sora-ext pack . -o {{.ID}}.soraext
-sora-ext sign --key .sora/author.key {{.ID}}.soraext
-```
-
-The `net.hooks` permission is **dangerous**: the install prompt requires
-explicit confirmation, and updates that add it re-prompt the user.
+Build and sign with the ordinary author-key and team-catalog review flow:
+sora-ext validate; sora-ext pack . -o {{.ID}}.soraext;
+sora-ext sign --key .sora/author.key {{.ID}}.soraext.
+Production signing and publication are separate authorized operations.

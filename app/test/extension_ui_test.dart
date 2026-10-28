@@ -32,9 +32,20 @@ import 'package:sora/src/ui/shell.dart';
 
 import 'ext_runtimes_test.dart' show seed;
 
-final _catalogBytes = File('../extensions/catalog.json').readAsBytesSync();
+// These interaction tests target the published Hello entry independently of
+// how many other extensions the locally seeded catalog contains.
+final _catalogBytes = () {
+  final doc = jsonDecode(File('../extensions/catalog.json').readAsStringSync()) as Map<String, dynamic>;
+  final hello = (doc['extensions'] as List).cast<Map<String, dynamic>>().firstWhere(
+    (entry) => entry['id'] == 'org.sora.hello-panel',
+  );
+  doc['extensions'] = [hello];
+  return Uint8List.fromList(utf8.encode(jsonEncode(doc)));
+}();
 final _entry = ExtensionCatalog.parse(_catalogBytes).entries.single;
 final _packageBytes = File('../extensions/packages/${_entry.downloadUrl.split('/').last}').readAsBytesSync();
+final _versionParts = _entry.version.split('.');
+final _nextVersion = '${_versionParts[0]}.${_versionParts[1]}.${int.parse(_versionParts[2]) + 1}';
 
 class _Routes extends NavigatorObserver {
   final dialogs = <Route<dynamic>>{};
@@ -201,36 +212,39 @@ void main() {
     expect(find.byType(VerifiedBadge), findsNothing);
   });
 
-  testWidgets('sideload warning wraps and dangerous permissions still require consent', (tester) async {
+  testWidgets('sideload key status and dangerous permissions still require consent', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(420, 800);
     addTearDown(tester.view.reset);
     final manifest = ExtManifest.parse(File('../examples/routing-split/sora-extension.json').readAsStringSync());
     await tester.pumpWidget(_app(Scaffold(body: InstallPermissionPrompt(manifest: manifest, sideload: true))));
-    expect(find.text('Install only if you trust the author’s self-signed key.'), findsOneWidget);
+    expect(find.text('Self-signed key'), findsOneWidget);
     expect(tester.widget<PrimaryButton>(find.byType(PrimaryButton)).onTap, isNull);
-    await tester.tap(find.text('I understand these permissions are powerful'));
+    await tester.tap(find.text('Confirm'));
     await tester.pump();
     expect(tester.widget<PrimaryButton>(find.byType(PrimaryButton)).onTap, isNotNull);
     expect(tester.takeException(), isNull);
   });
 
   for (final installed in [false, true]) {
-    testWidgets('detail has one header and actions before description, installed=$installed', (tester) async {
+    testWidgets('detail has one header and actions before permissions without explanatory copy, installed=$installed', (
+      tester,
+    ) async {
       final store = await _store(tester, installed: installed);
       addTearDown(store.dispose);
       await tester.pumpWidget(_app(ExtensionDetailScreen(entry: _entry), store: store));
       await _io(tester);
       await tester.pumpAndSettle();
       expect(find.byType(ExtensionName), findsOneWidget);
-      expect(find.text('Sora, 1.0.0'), findsOneWidget);
+      expect(find.text('${_entry.author}, ${_entry.version}'), findsOneWidget);
       expect(find.text('Author'), findsNothing);
       expect(find.text('Version'), findsNothing);
       expect(find.text('Changelog'), findsNothing);
       expect(find.byType(Group), findsOneWidget);
       expect(tester.widget<VerifiedBadge>(find.byType(VerifiedBadge)).size, 16);
       final action = find.text(installed ? 'Open' : 'Install');
-      expect(tester.getTopLeft(action).dy, lessThan(tester.getTopLeft(find.text(_entry.description)).dy));
+      expect(find.text(_entry.description), findsNothing);
+      expect(tester.getTopLeft(action).dy, lessThan(tester.getTopLeft(find.byType(PermissionRow).first).dy));
       expect(find.byType(PermissionRow), findsNWidgets(_entry.permissions.length));
       expect(tester.takeException(), isNull);
     });
@@ -242,11 +256,11 @@ void main() {
     final json =
         ((jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>)['extensions'] as List).single
             as Map<String, dynamic>;
-    final update = CatalogEntry.fromJson({...json, 'version': '1.0.1'});
+    final update = CatalogEntry.fromJson({...json, 'version': _nextVersion});
     await tester.pumpWidget(_app(ExtensionDetailScreen(entry: update), store: store));
     await _io(tester);
     await tester.pumpAndSettle();
-    expect(find.text('Update to 1.0.1'), findsOneWidget);
+    expect(find.text('Update to $_nextVersion'), findsOneWidget);
     expect(find.text('Open'), findsOneWidget);
     expect(find.byType(VerifiedBadge), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -320,10 +334,10 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('update all waits for the failure dialog and keeps the installed version', (tester) async {
+  testWidgets('update all reports a notification and keeps the installed version', (tester) async {
     final store = await _store(tester, installed: true);
     final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
-    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = '1.0.1';
+    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = _nextVersion;
     await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
     final sora = Sora(await Settings.load(), extensions: store);
     addTearDown(sora.dispose);
@@ -343,21 +357,148 @@ void main() {
       await tester.tap(updateAll);
       await tester.pump();
       client.chunks.addError(http.ClientException('connection lost'));
-      for (var i = 0; i < 100 && find.text('Install failed').evaluate().isEmpty; i++) {
+      for (var i = 0; i < 100 && find.byType(SnackBar).evaluate().isEmpty; i++) {
         await _io(tester);
       }
       await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text('Install failed'), findsOneWidget);
-      expect(tester.widget<PrimaryButton>(updateAll).busy, isTrue);
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text(sora.strings.extErrNetwork), findsOneWidget);
+      expect(tester.widget<PrimaryButton>(updateAll).busy, isFalse);
       expect(client.closed, isTrue);
       expect(store.get(_entry.id)?.version, _entry.version);
-      await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
     }, () => client);
     expect(tester.widget<PrimaryButton>(updateAll).busy, isFalse);
     expect(find.byType(Dialog), findsNothing);
     expect(observer.maximum, 1);
     expect(tester.takeException(), isNull);
+  });
+
+  for (final field in ['id', 'version', 'min_app_version', 'permissions', 'capabilities', 'size', 'size-too-small']) {
+    testWidgets('catalog package with mismatched $field is rejected before approval', (tester) async {
+      final store = await _store(tester);
+      final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+      final row = (catalog['extensions'] as List).single as Map<String, dynamic>;
+      switch (field) {
+        case 'id':
+          row[field] = 'org.sora.other-fixture';
+        case 'version':
+          row[field] = _nextVersion;
+        case 'min_app_version':
+          row[field] = '0.0.1';
+        case 'permissions':
+          row[field] = <String>[];
+        case 'capabilities':
+          row[field] = ['theme'];
+        case 'size':
+          row[field] = _packageBytes.length + 1;
+        case 'size-too-small':
+          row['size'] = _packageBytes.length - 1;
+      }
+      await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+      final sora = Sora(await Settings.load(), extensions: store);
+      addTearDown(sora.dispose);
+      await tester.pumpWidget(
+        SoraScope(
+          sora: sora,
+          child: _app(const ExtensionsScreen(), store: store),
+        ),
+      );
+      await _ready(tester);
+      final client = _DownloadClient();
+      await http.runWithClient(() async {
+        await tester.tap(find.text('Install'));
+        await tester.pump();
+        client.chunks.add(_packageBytes);
+        unawaited(client.chunks.close());
+        for (
+          var i = 0;
+          i < 100 &&
+              find.byType(InstallPermissionPrompt).evaluate().isEmpty &&
+              find.byType(SnackBar).evaluate().isEmpty;
+          i++
+        ) {
+          await _io(tester);
+        }
+        expect(find.byType(InstallPermissionPrompt), findsNothing);
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(store.installed, isEmpty);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      }, () => client);
+    });
+  }
+
+  testWidgets('optional catalog capabilities and reordered permissions accept a matching package', (tester) async {
+    final store = await _store(tester);
+    final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+    final row = (catalog['extensions'] as List).single as Map<String, dynamic>;
+    row['permissions'] = (row['permissions'] as List).reversed.toList();
+    row.remove('capabilities');
+    await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+    final sora = Sora(await Settings.load(), extensions: store);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: _app(const ExtensionsScreen(), store: store),
+      ),
+    );
+    await _ready(tester);
+    final client = _DownloadClient();
+    await http.runWithClient(() async {
+      await tester.tap(find.text('Install'));
+      await tester.pump();
+      client.chunks.add(_packageBytes);
+      unawaited(client.chunks.close());
+      for (var i = 0; i < 100 && find.byType(InstallPermissionPrompt).evaluate().isEmpty; i++) {
+        await _io(tester);
+      }
+      expect(find.byType(InstallPermissionPrompt), findsOneWidget);
+      await tester.tap(find.descendant(of: find.byType(InstallPermissionPrompt), matching: find.text('Install')));
+      for (var i = 0; i < 100 && store.get(_entry.id) == null; i++) {
+        await _io(tester);
+      }
+      expect(store.get(_entry.id)?.version, _entry.version);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => client);
+  });
+
+  testWidgets('a mismatched catalog update keeps the installed version', (tester) async {
+    final store = await _store(tester, installed: true);
+    final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = _nextVersion;
+    await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+    final sora = Sora(await Settings.load(), extensions: store);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: _app(const ExtensionsScreen(), store: store),
+      ),
+    );
+    await _ready(tester);
+    final client = _DownloadClient();
+    await http.runWithClient(() async {
+      await tester.tap(find.text('Update'));
+      await tester.pump();
+      client.chunks.add(_packageBytes);
+      unawaited(client.chunks.close());
+      for (
+        var i = 0;
+        i < 100 && find.byType(InstallPermissionPrompt).evaluate().isEmpty && find.byType(SnackBar).evaluate().isEmpty;
+        i++
+      ) {
+        await _io(tester);
+      }
+      expect(find.byType(InstallPermissionPrompt), findsNothing);
+      expect(find.textContaining(sora.strings.extUpdateFailedKept), findsOneWidget);
+      expect(store.get(_entry.id)?.version, _entry.version);
+      expect(store.isEnabled(_entry.id), isTrue);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => client);
   });
 
   for (final corrupt in [false, true]) {
@@ -385,15 +526,15 @@ void main() {
           var i = 0;
           i < 100 &&
               find.byType(InstallPermissionPrompt).evaluate().isEmpty &&
-              find.text('Install failed').evaluate().isEmpty;
+              find.byType(SnackBar).evaluate().isEmpty;
           i++
         ) {
           await _io(tester);
         }
         if (corrupt) {
-          expect(find.text('Install failed'), findsOneWidget);
+          expect(find.byType(SnackBar), findsOneWidget);
+          expect(find.text(sora.strings.extErrHash), findsOneWidget);
           expect(store.installed, isEmpty);
-          await tester.tap(find.text('OK'));
         } else {
           expect(find.byType(InstallPermissionPrompt), findsOneWidget);
           expect(find.byType(Dialog), findsOneWidget);
@@ -451,7 +592,7 @@ void extensionScreenshots() {
       for (final theme in ['light', 'dark']) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-        await settings.completeTour();
+
         settings
           ..language = lang
           ..theme = theme

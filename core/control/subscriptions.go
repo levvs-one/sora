@@ -118,6 +118,9 @@ type subscriptionBook struct {
 	srv     *Server
 	backoff engine.Backoff
 	now     func() time.Time
+	// Saved-link fetches outlive the UI request, but must end with the core.
+	savedCtx    context.Context
+	cancelSaved context.CancelFunc
 
 	mu      sync.Mutex
 	records map[string]*subscriptionRecord
@@ -130,18 +133,25 @@ type subscriptionBook struct {
 	// lookup. A failed parse yields a nil list, exactly as the eager
 	// load did, so deferring it changes no observable behaviour.
 	pendingLists map[string]bool
+	// pendingFetch retains only explicit new/changed-link saves while an older
+	// fetch owns the per-subscription slot. It is not an automatic retry.
+	pendingFetch map[string]bool
 	updating     map[string]bool
 	watchers     map[chan *corev1.SubscriptionState]struct{}
 	wake         chan struct{}
 }
 
 func newSubscriptionBook(srv *Server) *subscriptionBook {
+	savedCtx, cancelSaved := context.WithCancel(context.Background())
 	b := &subscriptionBook{
 		srv:          srv,
+		savedCtx:     savedCtx,
+		cancelSaved:  cancelSaved,
 		backoff:      engine.Backoff{Initial: time.Minute, Max: time.Hour, Factor: 2},
 		now:          time.Now,
 		records:      map[string]*subscriptionRecord{},
 		lists:        map[string][]*corev1.OutboundSpec{},
+		pendingFetch: map[string]bool{},
 		pendingLists: map[string]bool{},
 		updating:     map[string]bool{},
 		watchers:     map[chan *corev1.SubscriptionState]struct{}{},
@@ -320,10 +330,11 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	state := b.stateLocked(rec.ID)
 	b.notifyLocked(state, logs.LevelInfo, "Subscription saved")
 	if fetchNow {
-		go func() { _, _ = b.refresh(context.Background(), rec.ID) }()
+		b.pendingFetch[rec.ID] = true
+		b.startSavedRefreshLocked(rec.ID)
 	}
 	b.poke()
-	return state, nil
+	return b.stateLocked(rec.ID), nil
 }
 
 // persistLocked writes the subscription record and update's vault changes
@@ -357,6 +368,7 @@ func (b *subscriptionBook) delete(id string) error {
 	delete(b.records, id)
 	delete(b.lists, id)
 	delete(b.pendingLists, id)
+	delete(b.pendingFetch, id)
 	b.notifyLocked(&corev1.SubscriptionState{Settings: &corev1.SubscriptionSettings{Id: id}, Deleted: true}, logs.LevelInfo, "Subscription removed")
 	return nil
 }
@@ -364,26 +376,63 @@ func (b *subscriptionBook) delete(id string) error {
 // refresh fetches a subscription now. If already running, it returns the
 // current state with updating set.
 func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.SubscriptionState, error) {
-	b.mu.Lock()
-	rec, ok := b.records[id]
-	if !ok {
-		b.mu.Unlock()
-		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: no subscription %s", id)
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
-	if b.updating[id] {
+	b.mu.Lock()
+	rec, err := b.startRefreshLocked(id)
+	if err != nil {
+		b.mu.Unlock()
+		return nil, err
+	}
+	if rec == nil {
 		state := b.stateLocked(id)
 		b.mu.Unlock()
 		return state, nil
 	}
+	b.mu.Unlock()
+	return b.fetchAccepted(ctx, rec)
+}
+
+// startRefreshLocked reserves the existing per-ID slot and snapshots the saved
+// request. The caller must hold b.mu; nil means another fetch owns the slot.
+func (b *subscriptionBook) startRefreshLocked(id string) (*subscriptionRecord, error) {
+	rec, ok := b.records[id]
+	if !ok {
+		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: no subscription %s", id)
+	}
+	if b.updating[id] {
+		return nil, nil
+	}
 	if b.srv.fetcher == nil && !isLocalServerLink(rec.URL) {
-		b.mu.Unlock()
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionFetch, "control: this core cannot fetch subscriptions")
 	}
 	b.updating[id] = true
-	link, agent := rec.URL, rec.UserAgent
+	delete(b.pendingFetch, id)
 	b.notifyLocked(b.stateLocked(id), logs.LevelInfo, "Subscription update started")
-	b.mu.Unlock()
+	snapshot := *rec
+	return &snapshot, nil
+}
 
+// startSavedRefreshLocked consumes a saved-link intent only when its fetch is
+// admitted. Rapid saves coalesce in b.records without creating waiting workers.
+func (b *subscriptionBook) startSavedRefreshLocked(id string) {
+	if !b.pendingFetch[id] || b.savedCtx.Err() != nil {
+		return
+	}
+	rec, err := b.startRefreshLocked(id)
+	if err != nil {
+		delete(b.pendingFetch, id)
+		return
+	}
+	if rec != nil {
+		go func() { _, _ = b.fetchAccepted(b.savedCtx, rec) }()
+	}
+}
+
+func (b *subscriptionBook) fetchAccepted(ctx context.Context, rec *subscriptionRecord) (*corev1.SubscriptionState, error) {
+	id, link, agent := rec.ID, rec.URL, rec.UserAgent
+	requestCtx := ctx
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
 	var fetched subscription.Result
@@ -393,10 +442,13 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 	} else {
 		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
 	}
+	if err == nil {
+		err = ctx.Err()
+	}
 	answered := err == nil
 	var servers []importedServer
 	if err == nil {
-		servers, err = b.srv.parsePayload(fetched.Body, serverRefFor(id))
+		servers, err = b.srv.parsePayload(ctx, fetched.Body, serverRefFor(id))
 		if isLocalServerLink(link) && len(servers) == 1 {
 			fetched.Info.Title = servers[0].spec.GetDisplayName()
 		}
@@ -404,6 +456,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	defer b.startSavedRefreshLocked(id)
 	delete(b.updating, id)
 	current, ok := b.records[id]
 	if !ok || current.URL != link {
@@ -411,10 +464,21 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 		// changed during the fetch.
 		return nil, errs.Newf(errs.CodeNotFound, errs.KeySubscriptionNotFound, "control: subscription %s changed during the update", id)
 	}
+	if err == nil {
+		err = ctx.Err()
+	}
 	next := *current
 	next.LastAttempt = b.now().UTC()
 	if err == nil {
-		err = b.applyUpdateLocked(&next, fetched.Info, servers)
+		err = b.applyUpdateLocked(ctx, &next, fetched.Info, servers)
+	}
+	// Cancellation of the caller/shutdown must release Updating without
+	// replacing credentials or recording the provider as failed. The book's
+	// own fetch timeout still records a normal failure and keeps backoff.
+	if err != nil && requestCtx.Err() != nil {
+		state := b.stateLocked(id)
+		b.notifyLocked(state, logs.LevelInfo, "Subscription update cancelled")
+		return state, requestCtx.Err()
 	}
 	if err != nil {
 		// Failed updates must preserve the last successful server list.
@@ -446,7 +510,7 @@ func (b *subscriptionBook) refresh(ctx context.Context, id string) (*corev1.Subs
 
 // applyUpdateLocked atomically stores the record, list, and credentials,
 // removing dropped servers and unused list chunks.
-func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subscription.Info, servers []importedServer) error {
+func (b *subscriptionBook) applyUpdateLocked(ctx context.Context, rec *subscriptionRecord, info subscription.Info, servers []importedServer) error {
 	list := &corev1.FetchSubscriptionResponse{}
 	puts := map[string][]byte{}
 	keep := map[string]bool{}
@@ -480,6 +544,9 @@ func (b *subscriptionBook) applyUpdateLocked(rec *subscriptionRecord, info subsc
 	updated.Info = info
 	updated.LastSuccess, updated.Failures, updated.LastError = updated.LastAttempt, 0, nil
 	updated.FailureSince = time.Time{}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if err := b.persistLocked(&updated, puts, deletes); err != nil {
 		return err
 	}
@@ -522,6 +589,9 @@ func (b *subscriptionBook) nextUpdate(rec *subscriptionRecord) time.Time {
 // run starts due updates and waits for the next deadline, change, or
 // schedulerCheck.
 func (b *subscriptionBook) run(ctx context.Context) {
+	stopSaved := context.AfterFunc(ctx, b.cancelSaved)
+	defer stopSaved()
+	defer b.cancelSaved()
 	slots := make(chan struct{}, parallelUpdates)
 	for {
 		now := b.now()

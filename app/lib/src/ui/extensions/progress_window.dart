@@ -88,7 +88,7 @@ class InstallProgressWindow extends StatelessWidget {
                 Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: TextButton(
-                    style: TextButton.styleFrom(foregroundColor: palette.ink2, textStyle: Styles.secondary),
+                    style: TextButton.styleFrom(foregroundColor: palette.ink, textStyle: Styles.secondary),
                     onPressed: onCancel,
                     child: Text(s.extCancel),
                   ),

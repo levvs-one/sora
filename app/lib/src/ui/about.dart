@@ -14,6 +14,7 @@ import '../design/theme.dart';
 import '../desktop/desktop.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../sora.dart';
+import '../notifications.dart';
 import '../updates.dart';
 import 'kit.dart';
 
@@ -26,11 +27,50 @@ class AboutScreen extends StatefulWidget {
 
 class _AboutScreenState extends State<AboutScreen> {
   About? _about;
+  late final AppUpdater _updates = SoraScope.read(context).updates;
+  UpdateError? _reportedError;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_load()));
+    _updates.addListener(_updateChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _updateChanged();
+      unawaited(_load());
+    });
+  }
+
+  @override
+  void dispose() {
+    _updates.removeListener(_updateChanged);
+    super.dispose();
+  }
+
+  void _updateChanged() {
+    final error = _updates.error;
+    if (!mounted || error == _reportedError) return;
+    _reportedError = error;
+    if (error == null) return;
+    final s = S.of(context);
+    unawaited(
+      SoraScope.read(context).recordNotification(
+        AppNotification(
+          time: DateTime.now(),
+          title: s.updates,
+          body: switch (error) {
+            UpdateError.network => s.updateNetworkError,
+            UpdateError.release => s.updateReleaseError,
+            UpdateError.checksum => s.updateChecksumError,
+            UpdateError.installation => s.updateInstallError,
+            UpdateError.connecting => s.updateWaitConnection,
+            UpdateError.unsupported => s.updateUnsupported,
+            UpdateError.rollback => s.updateRollbackError,
+            UpdateError.rollbackCache => s.updateRollbackCacheError,
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> _load({FailureMode mode = FailureMode.background}) async {
@@ -96,7 +136,7 @@ class _AboutScreenState extends State<AboutScreen> {
             if (updates.versionRevoked)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                child: Text(s.updateVersionRevoked, style: Styles.secondary.copyWith(color: palette.danger)),
+                child: Text(s.updateVersionRevoked, style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -115,14 +155,6 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
               ),
             ),
-            // A newer release exists but this install's cohort is not
-            // included in the staged rollout yet: say so instead
-            // of silently showing nothing.
-            if (updates.rolloutPending && !updates.hasUpdate)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(s.updateRolloutPending, style: Styles.secondary.copyWith(color: palette.ink2)),
-              ),
             if (release != null) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
@@ -132,21 +164,21 @@ class _AboutScreenState extends State<AboutScreen> {
                     Text(s.updateNotes(release.version), style: Styles.bodyStrong.copyWith(color: palette.ink)),
                     const SizedBox(height: 8),
                     if (release.notes.isEmpty)
-                      Text(s.updateNoNotes, style: Styles.secondary.copyWith(color: palette.ink2))
+                      Text(s.updateNoNotes, style: Styles.secondary.copyWith(color: palette.ink))
                     else
                       MarkdownBody(
                         key: const ValueKey('release-notes'),
                         data: release.notes,
                         selectable: true,
                         imageBuilder: (_, _, alt) =>
-                            Text(alt ?? '', style: Styles.secondary.copyWith(color: palette.ink2)),
+                            Text(alt ?? '', style: Styles.secondary.copyWith(color: palette.ink)),
                         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                          p: Styles.secondary.copyWith(color: palette.ink2),
+                          p: Styles.secondary.copyWith(color: palette.ink),
                           a: Styles.secondary.copyWith(color: palette.ink, decoration: TextDecoration.underline),
                           h1: Styles.heading.copyWith(color: palette.ink),
                           h2: Styles.bodyStrong.copyWith(color: palette.ink),
                           h3: Styles.bodyStrong.copyWith(color: palette.ink),
-                          listBullet: Styles.secondary.copyWith(color: palette.ink2),
+                          listBullet: Styles.secondary.copyWith(color: palette.ink),
                           code: Styles.caption.copyWith(color: palette.ink),
                         ),
                         onTapLink: (_, href, _) {
@@ -206,9 +238,9 @@ class _AboutScreenState extends State<AboutScreen> {
                           Expanded(
                             child: Text(switch (updates.stage) {
                               UpdateStage.checking => s.updateChecking,
-                              UpdateStage.installing => s.updateInstalling,
-                              _ => s.updateDownloading,
-                            }, style: Styles.caption.copyWith(color: palette.ink2)),
+                              UpdateStage.installing => s.extInstalling,
+                              _ => s.extDownloading,
+                            }, style: Styles.caption.copyWith(color: palette.ink)),
                           ),
                           if (updates.stage == UpdateStage.downloading || updates.stage == UpdateStage.checking)
                             Pressable(
@@ -217,43 +249,25 @@ class _AboutScreenState extends State<AboutScreen> {
                               semanticButton: true,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink2)),
+                                child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink)),
                               ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      // Honest limitation (D15): file hashes are checked, but
-                      // the release signature is not verified in-app yet.
-                      Text(s.updateSignaturePending, style: Styles.caption.copyWith(color: palette.ink2)),
                     ],
                     if (!canInstall) ...[
                       const SizedBox(height: 8),
-                      Text(s.updateWaitConnection, style: Styles.secondary.copyWith(color: palette.ink2)),
+                      Text(s.updateWaitConnection, style: Styles.secondary.copyWith(color: palette.ink)),
                     ],
                   ],
                 ),
-              ),
-            if (updates.error case final error?)
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(switch (error) {
-                  UpdateError.network => s.updateNetworkError,
-                  UpdateError.release => s.updateReleaseError,
-                  UpdateError.checksum => s.updateChecksumError,
-                  UpdateError.installation => s.updateInstallError,
-                  UpdateError.connecting => s.updateWaitConnection,
-                  UpdateError.unsupported => s.updateUnsupported,
-                  UpdateError.rollback => s.updateRollbackError,
-                  UpdateError.rollbackCache => s.updateRollbackCacheError,
-                }, style: Styles.dangerSecondary(context)),
               ),
             // Automatic rollback status. The notice survives the
             // restart the rollback performs (persisted in settings).
             if (updates.rollbackTarget case final target? when updates.rollbackBusy)
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             if (updates.lastRollback case final notice?)
               Padding(
@@ -263,7 +277,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   children: [
                     Text(
                       s.updateRolledBack(notice.to, notice.from),
-                      style: Styles.secondary.copyWith(color: palette.ink2),
+                      style: Styles.secondary.copyWith(color: palette.ink),
                     ),
                     const SizedBox(height: 8),
                     Pressable(
@@ -284,12 +298,6 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Honest fail-closed warning (D15): the manifest
-                    // signature was not verified, only the file hashes.
-                    Text(s.updateManualSigWarning, style: Styles.dangerSecondary(context)),
-                    const SizedBox(height: 8),
-                    Text(s.updateManual, style: Styles.secondary.copyWith(color: palette.ink2)),
-                    const SizedBox(height: 8),
                     SelectableText(
                       command,
                       key: const ValueKey('update-command'),
@@ -304,8 +312,6 @@ class _AboutScreenState extends State<AboutScreen> {
                   ],
                 ),
               ),
-            if (!updates.checking && release == null && !sora.settings.checkUpdates)
-              Tile(title: s.updateChecksDisabled),
           ],
         ),
         BackgroundFailureState(
@@ -400,7 +406,7 @@ class _LicensesScreenState extends State<_LicensesScreen> {
               child: TextButton.icon(
                 onPressed: () => setState(() => _licenses = _load()),
                 icon: const Icon(Symbols.refresh_rounded),
-                label: Text('${s.errGeneric}. ${s.refresh}'),
+                label: Text(s.errGeneric),
               ),
             );
           }

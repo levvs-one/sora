@@ -7,6 +7,7 @@ import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../desktop/links.dart';
 import '../sora.dart';
+import '../notifications.dart';
 import 'kit.dart';
 
 /// Prompts for a subscription URL. Prefills [link] from a browser or messenger
@@ -45,7 +46,7 @@ Future<void> showSubscriptionSheet(BuildContext context, {String? link, String n
 }
 
 /// Shows a centred field sheet with a scale transition. [submit] returns an
-/// error to display below the field, or null to close the sheet.
+/// error to announce in a notification, or null to close the sheet.
 Future<void> showFieldSheet(
   BuildContext context, {
   required String title,
@@ -125,11 +126,14 @@ class _FieldSheetState extends State<_FieldSheet> {
   @override
   void initState() {
     super.initState();
-    _field.addListener(() => setState(() => _failure = null));
+    _field.addListener(_changed);
   }
+
+  void _changed() => setState(() => _failure = null);
 
   @override
   void dispose() {
+    _field.removeListener(_changed);
     if (widget.controller == null) _field.dispose();
     super.dispose();
   }
@@ -147,6 +151,20 @@ class _FieldSheetState extends State<_FieldSheet> {
         _busy = false;
         _failure = failure.isEmpty ? null : failure;
       });
+      // An empty failure means the action already reported its own notification.
+      if (failure.isNotEmpty) {
+        unawaited(
+          SoraScope.read(context).recordNotification(
+            AppNotification(
+              time: DateTime.now(),
+              title: widget.title,
+              body: failure,
+              failureKey: 'form.field_validation',
+              argument: widget.title,
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -172,34 +190,39 @@ class _FieldSheetState extends State<_FieldSheet> {
                 children: [
                   Text(widget.title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
                   const SizedBox(height: 16),
-                  TextField(
-                    controller: _field,
-                    autofocus: true,
-                    keyboardType: widget.keyboard,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    onSubmitted: (_) => unawaited(_go()),
-                    style: Styles.body.copyWith(color: palette.ink),
-                    decoration: InputDecoration(
-                      hintText: widget.hint,
-                      hintStyle: Styles.body.copyWith(color: palette.ink3),
-                      filled: true,
-                      fillColor: palette.raisedField,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                  Semantics(
+                    label: widget.title,
+                    hint: _failure,
+                    child: TextField(
+                      controller: _field,
+                      autofocus: true,
+                      keyboardType: widget.keyboard,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      onSubmitted: (_) => unawaited(_go()),
+                      style: Styles.body.copyWith(color: palette.ink),
+                      decoration: InputDecoration(
+                        hintText: widget.hint,
+                        hintStyle: Styles.body.copyWith(color: palette.ink),
+                        filled: true,
+                        fillColor: palette.raisedField,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: _failure == null ? Colors.transparent : palette.danger),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide(color: _failure == null ? palette.ink : palette.danger, width: 2),
+                        ),
+                      ),
                     ),
                   ),
                   if (widget.extra != null) ...[const SizedBox(height: 12), widget.extra!],
-                  AnimatedSize(
-                    duration: Motion.of(context, Motion.fast),
-                    curve: Motion.curve,
-                    child: _failure == null
-                        ? const SizedBox(width: double.infinity)
-                        : Padding(
-                            padding: const EdgeInsets.fromLTRB(4, 10, 4, 0),
-                            child: Text(_failure!, style: Styles.dangerCaption(context)),
-                          ),
-                  ),
                   const SizedBox(height: 18),
                   ListenableBuilder(
                     listenable: _field,

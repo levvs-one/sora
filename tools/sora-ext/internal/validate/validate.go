@@ -185,6 +185,14 @@ func ValidateProject(dir string) *Result {
 			})
 		}
 	}
+	if x != nil && x.NetworkHook != nil {
+		path := filepath.Join(dir, filepath.FromSlash(x.NetworkHook.Entry))
+		if raw, err := os.ReadFile(path); err == nil {
+			if err := validateBypassAsset(raw); err != nil {
+				r.Issues = append(r.Issues, Issue{Code: "invalid-bypass-profile", File: path, Message: err.Error()})
+			}
+		}
+	}
 	checkProjectIntegrity(dir, manifestPath, r)
 	return r
 }
@@ -207,6 +215,11 @@ func ValidatePackage(path string) *Result {
 	if err := pkg.Verify(); err != nil {
 		r.Issues = append(r.Issues, explain(nil, nil, err))
 		return r
+	}
+	if pkg.ManifestExt != nil && pkg.ManifestExt.NetworkHook != nil {
+		if err := validateBypassAsset(pkg.Files[pkg.ManifestExt.NetworkHook.Entry]); err != nil {
+			r.Issues = append(r.Issues, Issue{Code: "invalid-bypass-profile", Message: err.Error()})
+		}
 	}
 	warnDangerous(r, pkg.Manifest)
 	warnUnenforced(r, pkg.Manifest)

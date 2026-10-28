@@ -50,3 +50,38 @@ func TestStrategiesAreChecked(t *testing.T) {
 		t.Fatalf("a valid strategy was refused: %v", err)
 	}
 }
+
+func TestByeDPIUsesAnExplicitLocalProxy(t *testing.T) {
+	strategy := &engine.BypassStrategy{SplitPos: []string{"1"}}
+	p := &engine.Plan{Outbounds: []engine.Outbound{{ID: "dpi", Protocol: engine.Protocol("byedpi"), Bypass: strategy}}}
+	if !Has(p) {
+		t.Fatal("explicit ByeDPI was not selected as a bypass proxy")
+	}
+	out := Rewrite(p, map[string]int{key(*strategy): 4242})
+	if o := out.Outbounds[0]; o.Protocol != engine.ProtocolSOCKS5 || o.Server != "127.0.0.1" || o.Port != 4242 {
+		t.Fatalf("explicit ByeDPI was not rewritten to its local proxy: %+v", o)
+	}
+	if p.Outbounds[0].Protocol != engine.Protocol("byedpi") {
+		t.Fatal("the caller's plan must not change")
+	}
+}
+
+func TestProxyDoesNotSwitchBackendsOrAcceptMissingStrategies(t *testing.T) {
+	for _, pair := range [][2]engine.Protocol{{engine.ProtocolBypass, engine.ProtocolByeDPI}, {engine.ProtocolByeDPI, engine.ProtocolBypass}} {
+		wrapper := Wrap(nil, "not-executed", t.TempDir(), nil, pair[0])
+		plan := &engine.Plan{Outbounds: []engine.Outbound{{ID: "dpi", Protocol: pair[1], Bypass: &engine.BypassStrategy{SplitPos: []string{"1"}}}}}
+		if err := wrapper.Validate(t.Context(), plan); err == nil {
+			t.Fatal("validation silently changed the proxy backend")
+		}
+		if err := wrapper.Apply(t.Context(), plan); err == nil {
+			t.Fatal("application silently changed the proxy backend")
+		}
+		plan.Outbounds[0] = engine.Outbound{ID: "dpi", Protocol: pair[0]}
+		if err := wrapper.Validate(t.Context(), plan); err == nil {
+			t.Fatal("validation accepted a missing strategy")
+		}
+		if err := wrapper.Apply(t.Context(), plan); err == nil {
+			t.Fatal("application accepted a missing strategy")
+		}
+	}
+}

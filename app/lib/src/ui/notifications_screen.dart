@@ -10,6 +10,7 @@ import '../notifications.dart';
 import '../sora.dart';
 import '../speedtest_services.dart';
 import 'kit.dart';
+import 'notification_text.dart';
 import 'logs.dart';
 import 'subscription.dart';
 import 'speedtest.dart';
@@ -40,8 +41,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final repeated = rows.where((row) {
         final first = row.first;
         return first.time.difference(notice.time).abs() <= const Duration(minutes: 2) &&
-            (first.title, first.body, first.action, first.argument, first.failureKey) ==
-                (notice.title, notice.body, notice.action, notice.argument, notice.failureKey);
+            (notificationText(s, first), first.action, first.argument, first.failureKey) ==
+                (notificationText(s, notice), notice.action, notice.argument, notice.failureKey);
       }).firstOrNull;
       if (repeated == null) {
         rows.add([notice]);
@@ -92,7 +93,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         key: const ValueKey('notifications-clear'),
                         onPressed: sora.history.isEmpty ? null : () => unawaited(sora.clearNotifications()),
                         style: TextButton.styleFrom(
-                          foregroundColor: palette.ink2,
+                          foregroundColor: palette.ink,
                           disabledForegroundColor: palette.ink3,
                           textStyle: Styles.secondary,
                           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -104,7 +105,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   const SizedBox(height: 16),
                   if (days.isEmpty)
-                    Text(s.notificationsEmpty, style: Styles.secondary.copyWith(color: palette.ink2))
+                    Text(s.notificationsEmpty, style: Styles.secondary.copyWith(color: palette.ink))
                   else
                     Expanded(
                       child: ListView(
@@ -183,6 +184,7 @@ class NotificationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final notice = notices.first;
     final s = S.of(context), palette = Palette.of(context);
+    final words = notificationText(s, notice);
     final unread = notices.any((n) => !n.read);
     final action = switch (notice.action) {
       'connect' => s.retryConnect,
@@ -199,7 +201,7 @@ class NotificationRow extends StatelessWidget {
       hint: action,
       button: action != null || unread,
       child: Tooltip(
-        message: [notice.title, if (notice.body.isNotEmpty && notice.body != notice.title) notice.body].join('\n'),
+        message: [words.title, if (words.body.isNotEmpty && words.body != words.title) words.body].join('\n'),
         child: InkWell(
           onTap: action == null && !unread
               ? null
@@ -244,8 +246,8 @@ class NotificationRow extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                notice.title,
-                                maxLines: notice.body.isEmpty || notice.body == notice.title ? 2 : 1,
+                                words.title,
+                                maxLines: words.body.isEmpty || words.body == words.title ? 2 : 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: Styles.bodyStrong.copyWith(fontSize: 14, height: 1.2, color: palette.ink),
                               ),
@@ -264,13 +266,13 @@ class NotificationRow extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (notice.body.isNotEmpty && notice.body != notice.title) ...[
+                        if (words.body.isNotEmpty && words.body != words.title) ...[
                           const SizedBox(height: 2),
                           Text(
-                            notice.body,
+                            words.body,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: Styles.secondary.copyWith(color: palette.ink2),
+                            style: Styles.secondary.copyWith(color: palette.ink),
                           ),
                         ],
                       ],

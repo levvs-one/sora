@@ -13,12 +13,15 @@ import 'package:intl/intl.dart';
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
 import '../kit.dart';
+import '../modes.dart';
 import '../../ext/catalog.dart';
 import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
 import '../../ext/permissions.dart';
 import '../../ext/store.dart';
 import '../../rules.dart';
+import '../../sora.dart';
+import '../../ext/bypass.dart';
 import 'panel_screen.dart';
 import 'permissions_sheet.dart';
 import 'widgets.dart';
@@ -118,10 +121,6 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                           _header(context, m, entry),
                           const SizedBox(height: 24),
                           _actions(context, store, m, live, entry),
-                          if (m.description.isNotEmpty) ...[
-                            const SizedBox(height: 24),
-                            Text(m.description, style: Styles.body.copyWith(fontSize: 14, color: palette.ink)),
-                          ],
                           _SectionHeading(s.extPermissionsTitle),
                           Group(
                             children: [
@@ -131,7 +130,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     if (m.permissions.isEmpty)
-                                      Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink2))
+                                      Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink))
                                     else
                                       for (final p in m.permissions) ...[
                                         PermissionRow(
@@ -141,12 +140,15 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                         // Same marker as the install prompt: a
                                         // permission whose runtime is not built must say
                                         // so here too, not only before the grant.
-                                        if (isNotYetActive(p))
+                                        if (isNotYetActive(p) ||
+                                            (p == 'net.hooks' &&
+                                                live != null &&
+                                                live.manifest.networkHookEntry == null))
                                           Padding(
                                             padding: const EdgeInsets.only(left: 28, bottom: 4),
                                             child: Text(
                                               s.extPermNotYetActive,
-                                              style: Styles.caption.copyWith(color: palette.ink2),
+                                              style: Styles.caption.copyWith(color: palette.ink),
                                             ),
                                           ),
                                         if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
@@ -203,7 +205,6 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                 for (final r in store.routingRules.where((r) => r.extensionId == live.id))
                                   Tile(
                                     title: r.rule.shown,
-                                    detail: r.comment.isEmpty ? null : r.comment,
                                     trailing: Text(switch (r.rule.target) {
                                       RuleTarget.direct => s.ruleDirect,
                                       RuleTarget.proxy => s.ruleProxy,
@@ -308,6 +309,18 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     CatalogEntry? entry,
   ) {
     final s = S.of(context);
+    final compatibility = entry == null ? null : catalogCompatibilityText(s, entry);
+    if (live == null && compatibility != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(s.extInstall, style: Styles.bodyStrong.copyWith(color: Palette.of(context).ink)),
+          ),
+          InfoButton(title: s.extInstall, description: compatibility),
+        ],
+      );
+    }
     if (live == null) {
       // Not installed: install straight from the detail screen.
       return PrimaryButton(label: s.extInstall, onTap: entry == null ? null : () => widget.onInstall?.call(entry));
@@ -319,7 +332,21 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       children: [
         if (needsUpdate) ...[
           const SizedBox(height: 8),
-          PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
+          if (compatibility != null)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    s.extUpdateTo(entry.version),
+                    style: Styles.bodyStrong.copyWith(color: Palette.of(context).ink),
+                  ),
+                ),
+                InfoButton(title: s.extUpdateTo(entry.version), description: compatibility),
+              ],
+            )
+          else
+            PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
         if (live.enabled && m.panels.length == 1) ...[
           if (needsUpdate)
@@ -333,6 +360,10 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
               label: s.extOpen,
               onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: m.panels.single.id)),
             ),
+          const SizedBox(height: 12),
+        ],
+        if (store.bypassProfile('$extensionBypassPrefix${live.id}') != null) ...[
+          PrimaryButton(label: s.trayConnect, busy: _saving, onTap: _saving ? null : () => _connectBypass(live.id)),
           const SizedBox(height: 12),
         ],
         SwitchTile(
@@ -384,7 +415,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text(s.extCancel, style: TextStyle(color: palette.ink2)),
+                  child: Text(s.extCancel, style: TextStyle(color: palette.ink)),
                 ),
               ],
             ),
@@ -393,8 +424,11 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       ),
     );
     if (ok == true) {
+      if (!context.mounted) return;
       try {
+        final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
         await action();
+        sora?.applyConnectionChanges();
       } catch (_) {
         // Lifecycle edge cases (disk, registry) must not fail silently: the
         // confirm dialog is already gone, so say what happened.
@@ -407,11 +441,38 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     }
   }
 
+  Future<void> _connectBypass(String id) async {
+    final store = ExtScope.of(context);
+    setState(() => _saving = true);
+    try {
+      if (!await ensureSystemFilterConsent(context, '$extensionBypassPrefix$id') || !mounted) return;
+      await store.setSettings(id, _settings ?? await store.getSettings(id));
+      final profile = store.bypassProfile('$extensionBypassPrefix$id');
+      if (profile == null) throw ExtAssetError('bypass profile is unavailable');
+      if (!mounted) return;
+      final sora = SoraScope.read(context);
+      await sora.change((settings) => settings.tunnel = 'tun', replan: false);
+      await sora.select(profile.choiceId);
+      sora.applyConnectionChanges();
+      if (sora.selected == profile.choiceId && (sora.phase == Phase.off || sora.phase == Phase.offline)) {
+        await sora.connect();
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).extAssetRejected)));
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   Future<void> _saveSettings(String id) async {
+    final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
     final store = ExtScope.of(context);
     setState(() => _saving = true);
     try {
       await store.setSettings(id, _settings!);
+      sora?.applyConnectionChanges();
     } catch (_) {
       // The form only produces type-correct values, so this is a persistence
       // failure: say so and re-read the stored values instead of leaving the
@@ -451,7 +512,7 @@ class _QuietButton extends StatelessWidget {
     final palette = Palette.of(context);
     return TextButton.icon(
       style: TextButton.styleFrom(
-        foregroundColor: danger ? palette.danger : palette.ink2,
+        foregroundColor: danger ? palette.danger : palette.ink,
         minimumSize: const Size(44, 44),
         textStyle: Styles.secondary.copyWith(fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -626,7 +687,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context), palette = Palette.of(context);
+    final s = S.of(context);
     final config = _config;
     final editable = widget.interactive && !_busy;
     return Column(
@@ -645,11 +706,6 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
                 : null,
           ),
           _intervalTile(config, editable),
-          if (!widget.interactive)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-              child: Text(s.extBgDisabledNote, style: Styles.caption.copyWith(color: palette.ink2)),
-            ),
         ],
       ],
     );
@@ -712,7 +768,7 @@ class _ScreenshotsCarouselState extends State<_ScreenshotsCarousel> {
                     children: [
                       Icon(Symbols.broken_image_rounded, color: palette.ink3),
                       const SizedBox(height: 6),
-                      Text(s.extImageFailed, style: Styles.caption.copyWith(color: palette.ink2)),
+                      Text(s.extImageFailed, style: Styles.caption.copyWith(color: palette.ink)),
                     ],
                   ),
                 ),

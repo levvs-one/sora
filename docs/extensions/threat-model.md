@@ -67,7 +67,7 @@ worker gates and the app bridge.
 | routing.rules | Manifest validation | Enabled grants, shared match parser, ordered direct/proxy/block rules |
 | settings.read / settings.write | No app-settings API | Inert; own extension settings are permissionless |
 | tray | No consumer | Unimplemented |
-| net.hooks | No consumer | Unimplemented, dangerous permission |
+| net.hooks | Ordinary authenticated SessionPlan validation, no extension executable loader | Enabled grant, explicit profile choice, conflict winner, typed version-2/3 tpws/byedpi/winws profiles; disable disconnects |
 
 Unknown worker methods and unknown PanelBridge methods are rejected.
 Worker calls to getConnections, getServers and notify are checked before
@@ -77,7 +77,7 @@ by the app store. Granting settings.read/write exposes no app configuration.
 
 Routing rules are dangerous: they can bypass or block matching traffic,
 after user rules and before defaults. They cannot select a server. Network
-hooks and DPI bypass remain out of scope.
+hooks are limited to selected declarative profiles for already installed bypass backends. Windows winws additionally requires fresh host consent and native bundle checks; arbitrary traffic-path code remains out of scope.
 
 ## 4. Credential boundary
 
@@ -133,6 +133,7 @@ installs and updates; already installed extensions can continue running.
 A failed download falls back to the verified cache. A modified cache fails
 signature verification. An offline device cannot receive a new kill order.
 When a match disables an extension, panels close and worker streams cancel.
+A selected bypass-profile connection is disconnected without substitution.
 
 This policy lives in app/lib/src/ext/revocations.dart and store.dart.
 There is no service-side cache or revocation arm.
@@ -210,4 +211,7 @@ Remaining risks include WebView renderer vulnerabilities, Go/goja native
 vulnerabilities, author or team key compromise, malicious allowlisted
 hosts, routing consent mistakes and delayed offline revocations. Updating
 a public key requires an app release; pinning does not recover a stolen
-private key. Network hooks remain unapplied.
+private key. The app mediates bypass-profile grants; a control peer can already
+supply ordinary SessionPlans. Version-3 Windows winws integrates a system TCP
+80/443 filter after native capability checks and host consent; it is not a
+per-application packet sandbox. Arbitrary engine-fragment hooks are not exposed.

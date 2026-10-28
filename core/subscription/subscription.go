@@ -10,9 +10,13 @@ import (
 	"net/http"
 	"net/netip"
 	"net/url"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
+
+	"code.dny.dev/ssrf"
+	"golang.org/x/net/idna"
 
 	"github.com/levvs-one/sora-client/core/errs"
 )
@@ -66,6 +70,7 @@ type Options struct {
 // Fetcher retrieves subscription bodies.
 type Fetcher struct {
 	client       *http.Client
+	localClient  *http.Client
 	timeout      time.Duration
 	maxRedirects int
 	maxBody      int
@@ -85,11 +90,6 @@ func New(opts Options) *Fetcher {
 	client := opts.HTTPClient
 	if client == nil {
 		client = &http.Client{
-			// Handle redirects here so every hop is validated and
-			// counted.
-			CheckRedirect: func(*http.Request, []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
 			Transport: &http.Transport{
 				Proxy:                 http.ProxyFromEnvironment,
 				DialContext:           dialChecked,
@@ -102,8 +102,22 @@ func New(opts Options) *Fetcher {
 			},
 		}
 	}
+	// A connection admitted by a local-origin request must never be reused
+	// by an internet-origin request: reuse bypasses DialContext entirely.
+	transport := client.Transport
+	if transport == nil {
+		transport = http.DefaultTransport
+	}
+	localTransport := transport
+	if standard, ok := transport.(*http.Transport); ok {
+		localTransport = standard.Clone()
+	}
+	stopRedirect := func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	publicClient := &http.Client{Transport: transport, CheckRedirect: stopRedirect, Jar: client.Jar, Timeout: client.Timeout}
+	localClient := &http.Client{Transport: localTransport, CheckRedirect: stopRedirect, Jar: client.Jar, Timeout: client.Timeout}
 	return &Fetcher{
-		client:       client,
+		client:       publicClient,
+		localClient:  localClient,
 		timeout:      opts.Timeout,
 		maxRedirects: opts.MaxRedirects,
 		maxBody:      opts.MaxBodyBytes,
@@ -154,6 +168,15 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 
 // hop returns one response's body and headers or its redirect target.
 func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byte, http.Header, string, error) {
+	allowPrivate, _ := ctx.Value(privateKey{}).(bool)
+	host := target.Hostname()
+	if addr, err := netip.ParseAddr(host); err == nil {
+		if !publicAddr(addr) && (!allowPrivate || !isPrivateHost(host)) {
+			return nil, nil, "", outsideInternet()
+		}
+	} else if numericHost.MatchString(host) || (!allowPrivate && (host == "localhost" || strings.HasSuffix(host, ".localhost"))) {
+		return nil, nil, "", outsideInternet()
+	}
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, target.String(), nil)
 	if err != nil {
 		// HTTP errors include bearer URLs; rebuild details using only
@@ -167,7 +190,11 @@ func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byt
 	// body limit.
 	request.Header.Set("Accept-Encoding", "identity")
 
-	response, err := f.client.Do(request)
+	client := f.client
+	if allowPrivate {
+		client = f.localClient
+	}
+	response, err := client.Do(request)
 	if err != nil {
 		return nil, nil, "", errs.From(err)
 	}
@@ -255,9 +282,31 @@ func ValidateReference(reference string) (*url.URL, error) {
 		return nil, errs.Newf(errs.CodeUnsupported, errs.KeySubscriptionScheme,
 			"subscription: the reference is not an http or https url")
 	}
-	if parsed.Host == "" {
+	if parsed.Hostname() == "" {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionScheme,
 			"subscription: the reference has no host")
+	}
+	if _, err := netip.ParseAddr(parsed.Hostname()); err != nil {
+		host, err := idna.Lookup.ToASCII(parsed.Hostname())
+		if err != nil {
+			return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionScheme,
+				"subscription: the reference has an invalid host")
+		}
+		host = strings.TrimSuffix(strings.ToLower(host), ".")
+		if host == "" || strings.HasSuffix(host, ".") || strings.Contains(host, "..") {
+			return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionScheme,
+				"subscription: the reference has an invalid host")
+		}
+		// Normalisation must not turn a hostname into an implicitly trusted
+		// local IP literal (for example full-width decimal characters).
+		if _, err := netip.ParseAddr(host); err == nil {
+			return nil, outsideInternet()
+		}
+		if port := parsed.Port(); port != "" {
+			parsed.Host = net.JoinHostPort(host, port)
+		} else {
+			parsed.Host = host
+		}
 	}
 	return parsed, nil
 }
@@ -287,7 +336,7 @@ func UserAgentFor(asked string) (string, error) {
 // networks.
 type privateKey struct{}
 
-// isPrivateHost reports whether host is a private IP literal or localhost.
+// isPrivateHost reports whether host is an explicit local IP literal.
 // DNS answers are deliberately ignored: an attacker controlling DNS could
 // otherwise flip a hostname into the private range and permit dials to
 // internal addresses. Hostnames resolving to private addresses
@@ -297,12 +346,28 @@ func isPrivateHost(host string) bool {
 	if err != nil {
 		return false
 	}
-	return !publicAddr(addr)
+	addr = addr.Unmap()
+	return addr.IsPrivate() || addr.IsLoopback() || addr.IsLinkLocalUnicast()
 }
 
+var internetAddresses = ssrf.New()
+
+// Numeric last labels cover legacy decimal/octal/hex IPv4 spellings accepted
+// by some proxy resolvers. They are refused, never interpreted as hostnames.
+var numericHost = regexp.MustCompile(`(?i)(?:^|\.)(?:[0-9]+|0x[0-9a-f]+)$`)
+
 func publicAddr(addr netip.Addr) bool {
+	if !addr.IsValid() || addr.Zone() != "" {
+		return false
+	}
 	addr = addr.Unmap()
-	return addr.IsGlobalUnicast() && !addr.IsPrivate()
+	if ssrf.IPv6NAT64Prefix.Contains(addr) {
+		// Preserve DNS64 connectivity without allowing encapsulated private
+		// IPv4 addresses through the well-known translation prefix.
+		bytes := addr.As16()
+		addr = netip.AddrFrom4([4]byte(bytes[12:16]))
+	}
+	return internetAddresses.SafeAddr(addr) == nil
 }
 
 // dialChecked rejects private resolved addresses unless the subscription is
@@ -328,9 +393,13 @@ func checkDial(allowPrivate bool, address string) error {
 	if err != nil {
 		return err
 	}
-	if allowPrivate || publicAddr(addr) {
+	if publicAddr(addr) || (allowPrivate && isPrivateHost(host)) {
 		return nil
 	}
+	return outsideInternet()
+}
+
+func outsideInternet() error {
 	return errs.Newf(errs.CodePermissionDenied, errs.KeySubscriptionRedirect,
 		"subscription: the request was led to an address outside the internet")
 }

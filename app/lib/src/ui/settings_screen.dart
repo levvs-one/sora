@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart' show CupertinoSwitch;
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ import 'profiles.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
-import 'shell.dart';
 import 'sync.dart';
 import 'modes.dart';
 
@@ -49,7 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Match core validation to reject invalid settings before connection.
   static final _range = RegExp(r'^\d{1,5}-\d{1,5}$');
   static final _packets = RegExp(r'^(tlshello|\d{1,3}-\d{1,3})$');
-  static final _position = RegExp(r'^(-?\d{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-]\d{1,4})?)$');
+  static final _position = Platform.isWindows
+      ? RegExp(r'^-?\d{1,4}$')
+      : RegExp(r'^(-?\d{1,4}|(method|host|endhost|sld|midsld|endsld|sniext)([+-]\d{1,4})?)$');
 
   @override
   void initState() {
@@ -170,7 +172,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           source: 'log-settings',
           retry: () => unawaited(_readLog(mode: FailureMode.action)),
         ),
-        if (sora.needsReconnect) ...[const ConnectionChanges(), const SizedBox(height: 16)],
         Group(
           children: [
             ChoiceTile<String>(
@@ -207,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (desktop != null)
               SwitchTile(
                 title: s.launchAtLogin,
-                detail: s.launchAtLoginDetail,
+
                 value: settings.launchAtLogin,
                 onChanged: (v) async {
                   await sora.change((x) => x.launchAtLogin = v, replan: false);
@@ -255,8 +256,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.animations,
               onChanged: (v) => set((x) => x.animations = v, replan: false),
             ),
-            if (context.getInheritedWidgetOfExactType<ShellScope>() case final shell?)
-              LinkTile(title: s.tourReplay, onTap: shell.replayTour),
           ],
         ),
 
@@ -302,7 +301,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.fragmentPackets.isEmpty ? s.byDefault : settings.fragmentPackets,
                 onTap: () => _edit(
                   title: s.fragmentPackets,
-                  hint: 'tlshello',
+                  hint: s.fragmentPackets,
                   initial: settings.fragmentPackets,
                   valid: _packets.hasMatch,
                   apply: (x, v) => x.fragmentPackets = v,
@@ -313,7 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.fragmentLength.isEmpty ? s.byDefault : settings.fragmentLength,
                 onTap: () => _edit(
                   title: s.fragmentLength,
-                  hint: s.rangeHint,
+                  hint: s.byDefault,
                   initial: settings.fragmentLength,
                   valid: _range.hasMatch,
                   apply: (x, v) => x.fragmentLength = v,
@@ -324,7 +323,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.fragmentInterval.isEmpty ? s.byDefault : settings.fragmentInterval,
                 onTap: () => _edit(
                   title: s.fragmentInterval,
-                  hint: s.rangeHint,
+                  hint: s.byDefault,
                   initial: settings.fragmentInterval,
                   valid: _range.hasMatch,
                   apply: (x, v) => x.fragmentInterval = v,
@@ -343,17 +342,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.splitPos.join(', '),
                 onTap: () => _edit(
                   title: s.splitPos,
-                  hint: s.splitPosHint,
+                  hint: s.splitPos,
                   initial: settings.splitPos.join(', '),
                   valid: (v) => _parts(v).every(_position.hasMatch),
-                  apply: (x, v) => x.splitPos = v.isEmpty ? const ['1', 'midsld'] : _parts(v),
+                  apply: (x, v) => x.splitPos = v.isEmpty ? Settings.defaultSplitPos : _parts(v),
                 ),
               ),
               SwitchTile(title: s.disorder, value: settings.disorder, onChanged: (v) => set((x) => x.disorder = v)),
               ChoiceTile<String>(
                 title: s.tlsRecord,
                 value: settings.tlsRecord,
-                choices: {'': s.tlsRecordNo, 'sniext': s.tlsRecordSni, '1': s.tlsRecordFirst},
+                choices: {'': s.tlsRecordNo, if (!Platform.isWindows) 'sniext': s.tlsRecordSni, '1': s.tlsRecordFirst},
                 onChanged: (v) => set((x) => x.tlsRecord = v),
               ),
               SwitchTile(title: s.hostCase, value: settings.hostCase, onChanged: (v) => set((x) => x.hostCase = v)),
@@ -374,7 +373,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.probeUrl.isEmpty ? s.byDefault : Uri.parse(settings.probeUrl).host,
               onTap: () => _edit(
                 title: s.probeUrl,
-                hint: 'https://www.gstatic.com/generate_204',
+                hint: s.probeUrl,
                 initial: settings.probeUrl,
                 valid: _web,
                 apply: (x, v) => x.probeUrl = v,
@@ -394,7 +393,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchTile(
               title: s.autoSwitchOnDegrade,
-              detail: s.autoSwitchOnDegradeDetail,
+
               value: settings.autoSwitchOnDegrade,
               onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
             ),

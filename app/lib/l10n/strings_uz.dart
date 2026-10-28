@@ -205,64 +205,58 @@ class SUz extends S {
   String get errGeneric => 'Nimadir xato ketdi';
 
   @override
-  String get errCore => 'Sora xizmati javob bermayapti. Biroz kutib, qayta urinib koʻring.';
+  String get errCore => 'Sora xizmati javob bermayapti';
 
   @override
-  String get errAuth => 'Sora xizmatiga kirish rad etildi. Ilovani qayta ishga tushirib, yana urinib koʻring.';
+  String get errAuth => 'Sora xizmatiga kirish rad etildi';
 
   @override
-  String get errVersion => 'Sora ilovasi va xizmati turli versiyalarda. Sora’ni yangilang.';
+  String get errVersion => 'Sora ilovasi va xizmati turli versiyalarda';
 
   @override
-  String get errBusy => 'Oldingi buyruq hali bajarilmoqda. Uning tugashini kuting.';
+  String get errBusy => 'Oldingi buyruq hali bajarilmoqda';
 
   @override
-  String get errEngineMissing => 'Bu server uchun kerakli yadro topilmadi. Sora yangilanishlarini tekshiring.';
+  String get errEngineMissing => 'Bu server uchun kerakli yadro topilmadi';
 
   @override
-  String get errEngineStart => 'Yadro ishga tushmadi. Sababini ulanish jurnalidan koʻring.';
+  String get errEngineStart => 'Yadro ishga tushmadi';
 
   @override
-  String get errEngineStopped => 'Yadro toʻxtadi. Qayta ulanishga urinib koʻring.';
+  String get errEngineStopped => 'Yadro toʻxtadi';
 
   @override
-  String get errTunnel => 'Bu VPN rejimi mavjud emas. Boshqa rejimni tanlang yoki xizmat ruxsatlarini tekshiring.';
+  String get errTunnel => 'Bu VPN rejimi mavjud emas';
 
   @override
-  String get errNetwork => 'Serverga ulanib boʻlmadi';
+  String get errTimeout => 'Server vaqtida javob bermadi';
 
   @override
-  String get errTimeout => 'Server vaqtida javob bermadi. Bir daqiqadan keyin qayta urinib koʻring.';
+  String get errFirewall => 'VPN tashqarisidagi internetga kirishni bloklab boʻlmadi';
 
   @override
-  String get errFirewall =>
-      'VPN tashqarisidagi internetga kirishni bloklab boʻlmadi. Sababini ulanish jurnalidan koʻring.';
+  String get errSubFetch => 'Obunani yuklab boʻlmadi';
 
   @override
-  String get errSubFetch => 'Obunani yuklab boʻlmadi. Internetni tekshirib, bir daqiqadan keyin qayta urinib koʻring.';
+  String get errSubFormat => 'Obuna formati tanilmadi';
 
   @override
-  String get errSubFormat => 'Obuna formati tanilmadi. Provayderdan mos obuna havolasini soʻrang.';
+  String get errSubEmpty => 'Obunada serverlar yoʻq';
 
   @override
-  String get errSubEmpty => 'Obunada serverlar yoʻq. Obuna provayderiga murojaat qiling.';
+  String get errSubDuplicate => 'Bu obuna allaqachon qoʻshilgan';
 
   @override
-  String get errSubDuplicate => 'Bu obuna allaqachon qoʻshilgan. Eng soʻnggi serverlarni olish uchun uni yangilang.';
+  String get errSubLimit => 'Obunalar soni chegarasiga yetildi';
 
   @override
-  String get errSubLimit =>
-      'Obunalar soni chegarasiga yetildi. Yangisini qoʻshishdan oldin keraksiz obunani oʻchiring.';
+  String get errSubScheme => 'Obuna havolasi sxemasi qo‘llab-quvvatlanmaydi';
 
   @override
-  String get errSubScheme => 'Obuna havolasi https:// bilan boshlanishi kerak. Provayderdan xavfsiz havola soʻrang.';
+  String get errSecretStore => 'Sora xotirasi buzilgan yoki unga kirib boʻlmayapti';
 
   @override
-  String get errSecretStore =>
-      'Sora xotirasi buzilgan yoki unga kirib boʻlmayapti. Kirish ruxsatlari va jurnaldagi tafsilotlarni tekshiring.';
-
-  @override
-  String get errNoServers => 'Ulanish uchun serverlar yoʻq. Obuna yoki oʻz serveringizni qoʻshing.';
+  String get errNoServers => 'Ulanish uchun serverlar yoʻq';
 
   @override
   String get connections => 'Ulanishlar';
@@ -316,9 +310,6 @@ class SUz extends S {
   String get dnsAuto => 'Avtomatik';
 
   @override
-  String get dnsHint => 'Manzillar, vergul bilan ajratilgan';
-
-  @override
   String get fragment => 'TLS parchalanishi';
 
   @override
@@ -334,13 +325,7 @@ class SUz extends S {
   String get byDefault => 'Standart';
 
   @override
-  String get rangeHint => 'Masalan, 100-200';
-
-  @override
   String get splitPos => 'Bo\'lingan pozitsiyalar';
-
-  @override
-  String get splitPosHint => 'Masalan, 1, midsld';
 
   @override
   String get disorder => 'Parchalarni qayta tartiblash';
@@ -449,11 +434,6 @@ class SUz extends S {
   String get support => 'Qo\'llab-quvvatlash';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine ushbu kompyuterdagi port orqali boshqariladi. Boshqa dasturlar VPN yoqilganligini aniqlay oladi.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine ni tanlang';
   }
@@ -529,9 +509,6 @@ class SUz extends S {
   String get launchAtLogin => 'Tizimdan boshlang';
 
   @override
-  String get launchAtLoginDetail => 'Tizimga kirganingizda Sora avtomatik ishga tushadi va laganda qoladi.';
-
-  @override
   String get closeToTray => 'Yopiq holatda patnisda saqlang';
 
   @override
@@ -566,9 +543,6 @@ class SUz extends S {
   String get noticeInTray => 'Sora hali ham tagida';
 
   @override
-  String get noticeInTrayBody => 'Uning belgisi menyusidan chiqing';
-
-  @override
   String get noticeLost => 'Ulanish uzildi';
 
   @override
@@ -596,11 +570,7 @@ class SUz extends S {
   String get importTitle => 'Bu obuna qo‘shilsinmi?';
 
   @override
-  String get importSealed =>
-      'Bu havola Happ uchun shifrlangan va uni faqat Happ o‘qiy oladi. Provayderingizdan oddiy obuna havolasini so\'rang.';
-
-  @override
-  String get understood => 'KELISHDIKMI';
+  String get importSealed => 'Bu havola Happ uchun shifrlangan va uni faqat Happ o‘qiy oladi';
 
   @override
   String get noAnswer => 'javob yo\'q';
@@ -639,39 +609,10 @@ class SUz extends S {
   String get openLogs => 'Jurnallarni oching';
 
   @override
-  String get tourReplay => 'Yo‘riqnomani yana ko‘rsatish';
-
-  @override
-  String tourStep(int step) {
-    return '$step/5 qadam';
-  }
-
-  @override
   String get tourBack => 'Orqaga';
 
   @override
   String get tourNext => 'Keyingisi';
-
-  @override
-  String get tourSkip => 'Oʻtkazib yuborish';
-
-  @override
-  String get tourFinish => 'Bajarildi';
-
-  @override
-  String get tourAdd => 'Provayderingizning obuna havolasini qo\'shing.';
-
-  @override
-  String get tourServer => 'Serverni tanlang. “Eng tez” siz uchun birini tanlaydi.';
-
-  @override
-  String get tourConnect => 'Ulanish yoki uzish uchun shu yerni bosing.';
-
-  @override
-  String get tourMode => 'Tartibni tanlang. Agar VPN tushib qolsa, o\'chirish kaliti internetni bloklaydi.';
-
-  @override
-  String get tourSettings => 'Sozlamalarni oching. Siz ushbu qo\'llanmani u erda takrorlashingiz mumkin.';
 
   @override
   String get chooseProgram => 'Dasturni tanlang';
@@ -683,7 +624,7 @@ class SUz extends S {
   String get runningProcesses => 'Ishlayotgan jarayonlar';
 
   @override
-  String get programsEmpty => 'Hech qanday ilova topilmadi. Boshqa nomni sinab ko\'ring.';
+  String get programsEmpty => 'Hech qanday ilova topilmadi';
 
   @override
   String get selectExe => 'exe faylini tanlang';
@@ -695,7 +636,7 @@ class SUz extends S {
   String get speedtestSearch => 'Xizmat toping';
 
   @override
-  String get speedtestEmpty => 'Mos kelmadi. Qidiruvni o\'zgartiring.';
+  String get speedtestEmpty => 'Mos kelmadi';
 
   @override
   String get speedtestBackToList => 'Xizmatlarga qaytish';
@@ -704,13 +645,13 @@ class SUz extends S {
   String get speedtestOpenBrowser => 'Brauzerda oching';
 
   @override
-  String get speedtestUnavailable => 'O\'rnatilgan brauzer ishga tushmadi. Tizim brauzerida xizmatni oching.';
+  String get speedtestUnavailable => 'O\'rnatilgan brauzer ishga tushmadi';
 
   @override
-  String get speedtestPageFailed => 'Sahifa yuklanmadi. Uni qayta yuklang yoki tizim brauzerida xizmatni oching.';
+  String get speedtestPageFailed => 'Sahifa yuklanmadi';
 
   @override
-  String get speedtestExternalFailed => 'Tizim brauzeri ochilmadi. Qayta urinib ko\'ring.';
+  String get speedtestExternalFailed => 'Tizim brauzeri ochilmadi';
 
   @override
   String get modes => 'Tartiblar';
@@ -750,53 +691,29 @@ class SUz extends S {
   String get updateNoNotes => 'Relizda hech qanday eslatma yo\'q.';
 
   @override
-  String get updateDropWarning =>
-      'Sora va uning asosiy yangilanishi vaqtida VPN ulanishi bir necha soniyaga uziladi. Davom ettirilsinmi?';
+  String get updateDropWarning => 'Yangilash uchun ulanish uzilsinmi?';
 
   @override
-  String get updateWaitConnection => 'VPN ulanishi va yadro tayyor bo\'lishini kuting.';
+  String get updateWaitConnection => 'Ulanish tayyor emas';
 
   @override
-  String get updateDownloading => 'Fayllar yuklab olinmoqda va tekshirilmoqda...';
-
-  @override
-  String get updateInstalling => 'Yangilanish tayyorlanmoqda yoki administrator autentifikatsiyasi kutilmoqda...';
-
-  @override
-  String get updateNetworkError => 'Yangilanishni yuklab boʻlmadi. Qayta urinib ko\'ring.';
+  String get updateNetworkError => 'Yangilanishni yuklab boʻlmadi';
 
   @override
   String get updateReleaseError => 'Chiqarish ma\'lumotlari yoki kerakli fayllar etishmayotgan yoki yaroqsiz.';
 
   @override
-  String get updateChecksumError => 'Yuklab olish SHA256SUMSga mos kelmaydi. Hech narsa o\'rnatilmagan.';
+  String get updateChecksumError => 'Yuklab olish SHA256SUMSga mos kelmaydi';
 
   @override
-  String get updateInstallError => 'Yangilash tugamadi. Autentifikatsiya bekor qilingan bo\'lishi mumkin.';
+  String get updateInstallError => 'Yangilash tugamadi';
 
   @override
   String get updateUnsupported =>
-      'Bu bajariladigan fayl qoʻllab-quvvatlanadigan Sora paketlar juftligiga tegishli emas. Chiqarishni o\'rnatish ko\'rsatmalaridan foydalaning.';
+      'Bu bajariladigan fayl qoʻllab-quvvatlanadigan Sora paketlar juftligiga tegishli emas';
 
   @override
-  String get updateManual =>
-      'Ikkala tasdiqlangan paketni o\'rnatish uchun ushbu buyruqni terminalda ishga tushiring, so\'ngra Sora ni qayta oching. Fayllar yuklab olish katalogida qoladi. VPN ulanishi uziladi.';
-
-  @override
-  String get updateSignaturePending =>
-      'Yangilanish fayllari reliz bilan e’lon qilingan nazorat yig‘indilari bilan solishtiriladi.';
-
-  @override
-  String get updateManualSigWarning =>
-      'Quyidagi fayllar relizning nazorat yig‘indilariga mos keladi. Ularni rasmiy relizdan yuklab olgan bo‘lsangiz, buyruqni bajaring.';
-
-  @override
-  String get updateVersionRevoked =>
-      'Ishlab chiquvchi ushbu versiyani bekor qildi. Iltimos, tuzatilgan nashrni kuting.';
-
-  @override
-  String get updateRolloutPending =>
-      'Yangiroq versiya asta-sekin chiqarilmoqda va sizga avtomatik ravishda taklif qilinadi.';
+  String get updateVersionRevoked => 'Ishlab chiquvchi ushbu versiyani bekor qildi';
 
   @override
   String updateRollbacking(String version) {
@@ -809,8 +726,7 @@ class SUz extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Avtomatik orqaga qaytarish amalga oshmadi. Agar yangi versiya ishlamasa, oldingi versiyani qo\'lda qayta o\'rnating.';
+  String get updateRollbackError => 'Avtomatik orqaga qaytarish amalga oshmadi';
 
   @override
   String get updateRollbackCacheError =>
@@ -820,10 +736,7 @@ class SUz extends S {
   String get updateCopyCommand => 'Nusxa ko\'chirish buyrug\'i';
 
   @override
-  String get updateChecksDisabled => 'Avtomatik tekshirish sozlamalarida o\'chirib qo\'yilgan.';
-
-  @override
-  String get updateInstalled => 'Yangilash oʻrnatildi. Sora-ni qayta oching.';
+  String get updateInstalled => 'Yangilash oʻrnatildi';
 
   @override
   String get projectLinks => 'Loyiha';
@@ -853,21 +766,13 @@ class SUz extends S {
   String get showDescription => 'Tavsifni ko\'rsatish';
 
   @override
-  String get pendingConnectionChanges => 'Ushbu oʻzgarishlarni qoʻllash uchun qayta ulaning.';
+  String get errEngineUnsupported => 'Tanlangan vosita ushbu profil yoki sozlamalarni qo\'llab-quvvatlamaydi';
 
   @override
-  String get reconnectNow => 'Qo\'llash va qayta ulaning';
+  String get errRestore => 'Ulanishni tozalash tugallanmadi';
 
   @override
-  String get errEngineUnsupported =>
-      'Tanlangan vosita ushbu profil yoki sozlamalarni qo\'llab-quvvatlamaydi. Avtomatik yoki mos dvigatelni tanlang.';
-
-  @override
-  String get errRestore =>
-      'Ulanishni tozalash tugallanmadi. Ulanishni qaytadan urinish; tafsilotlar uchun jurnalga qarang.';
-
-  @override
-  String get errSessionEnded => 'Bu seans allaqachon tugagan. Ulanish holatini yangilang.';
+  String get errSessionEnded => 'Bu seans allaqachon tugagan';
 
   @override
   String get retryDisconnect => 'Qaytadan uzib ko‘ring';
@@ -883,10 +788,10 @@ class SUz extends S {
 
   @override
   String get modesGuide =>
-      'Agar serveringizga qaysi dvigatel kerakligini bilmasangiz, Auto-ni tanlang. Sora ulanishdan oldin profil va sozlamalarni tekshiradi. Dvigatel rejangizning tarmoqli kengligini oshira olmaydi: ishlash server, marshrut, protokol va tarmoqqa bog\'liq.\n\n## rejimlar\n\n### Barcha trafik (TUN)\n\nSora virtual tarmoq interfeysini yaratadi va u orqali dastur trafigini, jumladan TCP va UDP ni yo\'naltiradi. Telegram, o\'yinlar va Discord ovozi uchun ushbu rejimdan foydalaning. Qoidalar aniq saytlar yoki dasturlarni bevosita yuborishi yoki ularni bloklashi mumkin. Tarmoq xizmatiga ruxsat va kerakli protokolni qo\'llab-quvvatlaydigan server kerak.\n\n### System proksi-server\n\nSora mahalliy HTTP/SOCKS proksi-serverini sozlaydi. Tizim proksi-server sozlamalarini hurmat qiladigan ilovalar undan foydalanadi. O\'z tarmoq stekiga ega ilovalar to\'g\'ridan-to\'g\'ri ulanishi mumkin; UDP va ovozli qo\'ng\'iroqlar uchun odatda TUN kerak. Ushbu rejim proksi-serverni qo\'llab-quvvatlaydigan brauzerlar va ilovalarga mos keladi.\n\n### Server yo\'q\n\nLinux da Sora HTTP/TLS soʻrovlarini boʻlish va qayta shakllantirish hamda baʼzi DPI tekshiruvlarini chetlab oʻtish uchun [zapret](https://github.com/bol-van/zapret) dan foydalanadi. Sizning IP-manzilingiz bir xil bo\'lib qoladi va ulanishlar to\'g\'ridan-to\'g\'ri veb-saytga o\'tadi. Natijalar provayderingizga va blokirovka usuliga bog\'liq.\n\nJoriy integratsiya TCP orqali HTTP va TLS uchun tpws dan foydalanadi. U IP blokirovkasini chetlab o\'tmaydi yoki UDP o\'tkazmaydi va Telegram MTProto ulanishlarini kafolatlay olmaydi. Discord ovozli, Telegram qo\'ng\'iroqlari va bunday cheklovlar uchun TUN bilan VPN serveridan foydalaning.\n\n## Dvigatellar\n\n### Avtomatik\n\nSora butun ulanish rejasini qo\'llab-quvvatlaydigan o\'rnatilgan dvigatelni tanlaydi: server protokollari, transportlar, guruhlar, parchalanish va rejim. Mos kelmaydigan qo\'lda tanlov joriy ulanishni to\'xtatishdan oldin rad etiladi. Avtomatik yoki boshqa dvigatelni tanlang va sozlamalarni qaytadan qo\'llang.\n\n### sing-box\n\nYangi Sora paketlariga mijoz tomoni XHTTP va VLESS Encryption qo‘shilgan [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) vilkalari kiradi. Sora qurilish va uning imkoniyatlarini tan oladi. XHTTP bo\'lmagan yuqori oqim bu imkoniyatni faqat o\'z nomidan olmaydi.\n\nQo‘llab-quvvatlanadigan protokollar: VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard va Sora import qila oladigan AmneziaWG 1.x/2.x parametrlari. To‘liq Xray JSON profillari uchun Xray kerak. Yangi AWG 3.x maydonlarini hozircha import qilib bo‘lmaydi. sing-box parol bilan himoyalangan mahalliy boshqaruv portidan foydalanadi; kompyuterdagi boshqa ilovalar bu portni aniqlashi mumkin.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption va TLS parchalanishini qoʻllab-quvvatlaydi. Shuningdek, u Xray provayderi profillarini marshrutlash va guruhlarini saqlab qolgan holda boshqaradi. Bunday profillarni xatti-harakatlarini o\'zgartirmasdan avtomatik ravishda boshqa dvigatelga aylantirib bo\'lmaydi.\n\nTo‘plamdagi Xray TLS sertifikatini tekshirishni o‘chirib qo‘yuvchi sozlamani olib tashladi (`allowInsecure`). Ushbu sozlamani talab qiladigan oddiy serverlar uchun avtomatik sing-box yoki mihomo ni tanlaydi. Xray ni tanlash joriy ulanishni to\'xtatishdan oldin nomuvofiqlik haqida qo\'lda xabar beradi. Eski toʻliq JSON profillari tasdiqlanishi mumkin boʻlgan sertifikat yoki sertifikat PIN-kodi bilan yangilangan provayder profiliga muhtoj.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) buyurtma qilingan qayta tiklash va yukni muvozanatlash guruhlarini, XHTTP va AmneziaWGni qo\'llab-quvvatlaydi. Zaxira serverga avtomatik o\'tish muhim bo\'lganda uni tanlang. Sora ning TLS parchalanish sozlamalari ushbu dvigatelda mavjud emas.\n\n## Sora da moslik\n\n| Xususiyat | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN va TCP/UDP | Ha | Ha | Ha |\n| XHTTP | Ha | Ha | Ha |\n| VLESS Encryption | Ha | Ha | Ha |\n| To\'liq Xray profili | Yo\'q | Ha | Yo\'q |\n| TUIC / AnyTLS | Ikkala | Yo\'q | TUIC |\n| mieru | Yo\'q | Yo\'q | Ha |\n| NaiveProxy | Ha | Yo\'q | Yo\'q |\n| TLS parchalanishi | Ha | Ha | Yo\'q |\n| AmneziaWG 1.x/2.x | Ha¹ | Yo\'q | Ha |\n| Buyurtma qilingan zaxira guruh | Yo\'q | No² | Ha |\n\n¹ J1/J2/J3/Itime profillari mihomo dan foydalanadi; bu maydonlar hech qachon jimgina tashlanmasligi kerak. ² To‘liq Xray profillari guruhi uchun ilova zaxira profilini tanlaydi. Qo\'llab-quvvatlash o\'rnatilgan tuzilishga bog\'liq; Haqida uning versiyasini tekshiring.\n\n## TUN to\'plami\n\nStack virtual interfeys ichida TCP va UDP bilan ishlaydi. Tartiblar panelida Xray va mihomo gVisor, System, Mixed va MIPS ni taklif qiladi. Har bir dvigatel o\'z afzalliklarini saqlaydi. System proksi-server va Serversiz rejimlar bu afzallikdan foydalanmaydi.\n\n- **Mixed**: TCP tizim stekidan foydalanadi, gVisor esa UDP bilan ishlaydi. Bu Linux tizimida mihomo uchun standart variant. Windows tizimida Xray va mihomo odatda MIPS dan foydalanadi.\n- **System**: tizim stekidan foydalanadi. Agar tarmoq ilovalari muammolarga duch kelsa, boshqa variantni sinab ko\'ring.\n- **gVisor**: foydalanuvchilar maydonidagi trafikni boshqaradi.\n- **MIPS**: mihomo ning shaxsiy IP-stacki, 1.19.32. paketli versiyasida mavjud.\n\nLinux da Xray sukut bo\'yicha o\'rnatilgan gVisor dan foydalanadi. Linux da System, Mixed va MIPS TUN dvigateli sifatida mihomo dan foydalanadi, TCP va UDPni autentifikatsiya qilingan mahalliy SOCKS havolasi orqali Xray ga yo‘naltiradi. Xray protokol, provayder profili va marshrutni saqlab qoladi. Ushbu uchta variant o\'rnatilgan mihomo ni talab qiladi. Windows da Xray barcha to‘rtta TUN steki uchun mihomo 1.19.32 yoki yangi versiyasidan foydalanadi. Protokollar va yo‘naltirish Xray ichida qoladi. Bu birikmada ilova qoidalari faqat to‘g‘ridan-to‘g‘ri ulanish va bloklashni qo‘llaydi; Linux da bu qoidalar Xray ichki gVisor stekini talab qiladi.\n\nKo\'prik ikkinchi jarayonni amalga oshiradi. Linuxda uchta bo\'sh o\'lchovda u mahalliy Xray TUNga qaraganda 32–36 MiB ko\'proq jismoniy xotira ishlatgan. Bu yuklab olish yukini o\'lchamaydi: CPU va xotira narxi ulanishlarga bog\'liq. sing-box da stek selektori yo\'q. Hech qanday stek har bir tarmoqda yaxshiroq ishlashni kafolatlamaydi. Uni tarmoqda sinab ko\'rish uchun stekni tanlang va Qo\'llash va qayta ulanishni tanlang.\n\n## Sozlamalarni qo\'llash\n\nServerni tanlash avtomatik ravishda qayta ulanadi. Rejim, vosita, DNS va qoida sozlamalari darhol saqlanadi; faol ulanish vaqtida ulardan foydalanish uchun Ilova tugmasini bosing va qayta ulaning. Dvigatelni qayta ishga tushirish yuklab olish va qo\'ng\'iroqlarni to\'xtatishi mumkin. Takroriy bosish parallel ulanishlarni boshlamaydi; o\'chirish o\'tishni tugatadi va ulanishni bo\'shatadi.\n\nTunnel qulaganda faqat VPN orqali Internet to\'g\'ridan-to\'g\'ri trafikni bloklaydi. Bu butun mashinaga ta\'sir qiladi. Aniq uzilish Sora qoidalarini olib tashlaydi. Agar tozalash tugamasa, qaytadan uzib ko\'ring va jurnalni oching.\n\n## Loyiha hujjatlari\n\n- [sing-box-lx: konfiguratsiya va qo\'llab-quvvatlash](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box hujjatlari](https://sing-box.sagernet.org/)\n- [Xray hujjatlari](https://xtls.github.io/)\n- [mihomo hujjatlari](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: ishlash va cheklovlar](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP trafikini Jitsi, Yandex Telemost yoki WB Stream videoqo‘ng‘irog‘i orqali uzatadi. olcrtc:// havolasini yoki QR kodini import qiling. Proksi va TUN rejimlarida sing-box, Xray va mihomo bilan ishlaydi; UDP qo‘llab-quvvatlanmaydi. Har ikki tomonga mos OLC2 yig‘ilmalari kerak. Asl loyiha arxivlangan.\n';
+      'Agar serveringizga qaysi dvigatel kerakligini bilmasangiz, Auto-ni tanlang. Sora ulanishdan oldin profil va sozlamalarni tekshiradi. Dvigatel rejangizning tarmoqli kengligini oshira olmaydi: ishlash server, marshrut, protokol va tarmoqqa bog\'liq.\n\n## rejimlar\n\n### Barcha trafik (TUN)\n\nSora virtual tarmoq interfeysini yaratadi va u orqali dastur trafigini, jumladan TCP va UDP ni yo\'naltiradi. Telegram, o\'yinlar va Discord ovozi uchun ushbu rejimdan foydalaning. Qoidalar aniq saytlar yoki dasturlarni bevosita yuborishi yoki ularni bloklashi mumkin. Tarmoq xizmatiga ruxsat va kerakli protokolni qo\'llab-quvvatlaydigan server kerak.\n\n### System proksi-server\n\nSora mahalliy HTTP/SOCKS proksi-serverini sozlaydi. Tizim proksi-server sozlamalarini hurmat qiladigan ilovalar undan foydalanadi. O\'z tarmoq stekiga ega ilovalar to\'g\'ridan-to\'g\'ri ulanishi mumkin; UDP va ovozli qo\'ng\'iroqlar uchun odatda TUN kerak. Ushbu rejim proksi-serverni qo\'llab-quvvatlaydigan brauzerlar va ilovalarga mos keladi.\n\n### Server yo\'q\n\nLinux da Sora HTTP/TLS soʻrovlarini boʻlish va qayta shakllantirish hamda baʼzi DPI tekshiruvlarini chetlab oʻtish uchun [zapret](https://github.com/bol-van/zapret) dan foydalanadi. Sizning IP-manzilingiz bir xil bo\'lib qoladi va ulanishlar to\'g\'ridan-to\'g\'ri veb-saytga o\'tadi. Natijalar provayderingizga va blokirovka usuliga bog\'liq.\n\nJoriy integratsiya TCP orqali HTTP va TLS uchun tpws dan foydalanadi. U IP blokirovkasini chetlab o\'tmaydi yoki UDP o\'tkazmaydi va Telegram MTProto ulanishlarini kafolatlay olmaydi. Discord ovozli, Telegram qo\'ng\'iroqlari va bunday cheklovlar uchun TUN bilan VPN serveridan foydalaning.\n\n## Dvigatellar\n\n### Avtomatik\n\nSora butun ulanish rejasini qo\'llab-quvvatlaydigan o\'rnatilgan dvigatelni tanlaydi: server protokollari, transportlar, guruhlar, parchalanish va rejim. Mos kelmaydigan qo\'lda tanlov joriy ulanishni to\'xtatishdan oldin rad etiladi. Avtomatik yoki boshqa dvigatelni tanlang va sozlamalarni qaytadan qo\'llang.\n\n### sing-box\n\nYangi Sora paketlariga mijoz tomoni XHTTP va VLESS Encryption qo‘shilgan [sing-box-lx](https://github.com/Leadaxe/sing-box-lx), [sing-box](https://github.com/SagerNet/sing-box) vilkalari kiradi. Sora qurilish va uning imkoniyatlarini tan oladi. XHTTP bo\'lmagan yuqori oqim bu imkoniyatni faqat o\'z nomidan olmaydi.\n\nQo‘llab-quvvatlanadigan protokollar: VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, AnyTLS, WireGuard va Sora import qila oladigan AmneziaWG 1.x/2.x parametrlari. To‘liq Xray JSON profillari uchun Xray kerak. Yangi AWG 3.x maydonlarini hozircha import qilib bo‘lmaydi. sing-box parol bilan himoyalangan mahalliy boshqaruv portidan foydalanadi; kompyuterdagi boshqa ilovalar bu portni aniqlashi mumkin.\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) VLESS, REALITY, XHTTP, VLESS Encryption va TLS parchalanishini qoʻllab-quvvatlaydi. Shuningdek, u Xray provayderi profillarini marshrutlash va guruhlarini saqlab qolgan holda boshqaradi. Bunday profillarni xatti-harakatlarini o\'zgartirmasdan avtomatik ravishda boshqa dvigatelga aylantirib bo\'lmaydi.\n\nTo‘plamdagi Xray TLS sertifikatini tekshirishni o‘chirib qo‘yuvchi sozlamani olib tashladi (`allowInsecure`). Ushbu sozlamani talab qiladigan oddiy serverlar uchun avtomatik sing-box yoki mihomo ni tanlaydi. Xray ni tanlash joriy ulanishni to\'xtatishdan oldin nomuvofiqlik haqida qo\'lda xabar beradi. Eski toʻliq JSON profillari tasdiqlanishi mumkin boʻlgan sertifikat yoki sertifikat PIN-kodi bilan yangilangan provayder profiliga muhtoj.\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) buyurtma qilingan qayta tiklash va yukni muvozanatlash guruhlarini, XHTTP va AmneziaWGni qo\'llab-quvvatlaydi. Zaxira serverga avtomatik o\'tish muhim bo\'lganda uni tanlang. Sora ning TLS parchalanish sozlamalari ushbu dvigatelda mavjud emas.\n\n## Sora da moslik\n\n| Xususiyat | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN va TCP/UDP | Ha | Ha | Ha |\n| XHTTP | Ha | Ha | Ha |\n| VLESS Encryption | Ha | Ha | Ha |\n| To\'liq Xray profili | Yo\'q | Ha | Yo\'q |\n| TUIC / AnyTLS | Ikkala | Yo\'q | TUIC |\n| mieru | Yo\'q | Yo\'q | Ha |\n| NaiveProxy | Ha | Yo\'q | Yo\'q |\n| TLS parchalanishi | Ha | Ha | Yo\'q |\n| AmneziaWG 1.x/2.x | Ha¹ | Yo\'q | Ha |\n| Buyurtma qilingan zaxira guruh | Yo\'q | No² | Ha |\n\n¹ J1/J2/J3/Itime profillari mihomo dan foydalanadi; bu maydonlar hech qachon jimgina tashlanmasligi kerak. ² To‘liq Xray profillari guruhi uchun ilova zaxira profilini tanlaydi. Qo\'llab-quvvatlash o\'rnatilgan tuzilishga bog\'liq; Haqida uning versiyasini tekshiring.\n\n## TUN to\'plami\n\nStack virtual interfeys ichida TCP va UDP bilan ishlaydi. Tartiblar panelida Xray va mihomo gVisor, System, Mixed va MIPS ni taklif qiladi. Har bir dvigatel o\'z afzalliklarini saqlaydi. System proksi-server va Serversiz rejimlar bu afzallikdan foydalanmaydi.\n\n- **Mixed**: TCP tizim stekidan foydalanadi, gVisor esa UDP bilan ishlaydi. Bu Linux tizimida mihomo uchun standart variant. Windows tizimida Xray va mihomo odatda MIPS dan foydalanadi.\n- **System**: tizim stekidan foydalanadi. Agar tarmoq ilovalari muammolarga duch kelsa, boshqa variantni sinab ko\'ring.\n- **gVisor**: foydalanuvchilar maydonidagi trafikni boshqaradi.\n- **MIPS**: mihomo ning shaxsiy IP-stacki, 1.19.32. paketli versiyasida mavjud.\n\nLinux da Xray sukut bo\'yicha o\'rnatilgan gVisor dan foydalanadi. Linux da System, Mixed va MIPS TUN dvigateli sifatida mihomo dan foydalanadi, TCP va UDPni autentifikatsiya qilingan mahalliy SOCKS havolasi orqali Xray ga yo‘naltiradi. Xray protokol, provayder profili va marshrutni saqlab qoladi. Ushbu uchta variant o\'rnatilgan mihomo ni talab qiladi. Windows da Xray barcha to‘rtta TUN steki uchun mihomo 1.19.32 yoki yangi versiyasidan foydalanadi. Protokollar va yo‘naltirish Xray ichida qoladi. Bu birikmada ilova qoidalari faqat to‘g‘ridan-to‘g‘ri ulanish va bloklashni qo‘llaydi; Linux da bu qoidalar Xray ichki gVisor stekini talab qiladi.\n\nKo\'prik ikkinchi jarayonni amalga oshiradi. Linuxda uchta bo\'sh o\'lchovda u mahalliy Xray TUNga qaraganda 32–36 MiB ko\'proq jismoniy xotira ishlatgan. Bu yuklab olish yukini o\'lchamaydi: CPU va xotira narxi ulanishlarga bog\'liq. sing-box da stek selektori yo\'q. Hech qanday stek har bir tarmoqda yaxshiroq ishlashni kafolatlamaydi.\n\n## Sozlamalarni qo\'llash\n\nServer tanlanganda ulanish avtomatik qayta o‘rnatiladi. Rejim, yadro, DNS yoki qoidalarga kiritgan oʻzgarishlaringiz qisqa tanaffusdan keyin avtomatik qayta ulanish bilan bir marta qoʻllanadi; fondagi yangilanishlar VPNni qayta ulamaydi. Yadroni qayta ishga tushirish yuklab olishlar va qo‘ng‘iroqlarni uzishi mumkin.\n\nTunnel qulaganda faqat VPN orqali Internet to\'g\'ridan-to\'g\'ri trafikni bloklaydi. Bu butun mashinaga ta\'sir qiladi. Aniq uzilish Sora qoidalarini olib tashlaydi. Agar tozalash tugamasa, qaytadan uzib ko\'ring va jurnalni oching.\n\n## Loyiha hujjatlari\n\n- [sing-box-lx: konfiguratsiya va qo\'llab-quvvatlash](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box hujjatlari](https://sing-box.sagernet.org/)\n- [Xray hujjatlari](https://xtls.github.io/)\n- [mihomo hujjatlari](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret: ishlash va cheklovlar](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC TCP trafikini Jitsi, Yandex Telemost yoki WB Stream videoqo‘ng‘irog‘i orqali uzatadi. olcrtc:// havolasini yoki QR kodini import qiling. Proksi va TUN rejimlarida sing-box, Xray va mihomo bilan ishlaydi; UDP qo‘llab-quvvatlanmaydi. Har ikki tomonga mos OLC2 yig‘ilmalari kerak. Asl loyiha arxivlangan.\n';
 
   @override
-  String get probeServers => 'Serverlarni tekshiring';
+  String get probeServers => 'Ping';
 
   @override
   String get extensions => 'Kengaytmalar';
@@ -910,13 +815,10 @@ class SUz extends S {
   String get extInstallOne => '1 ta oʻrnatish';
 
   @override
-  String get extSideloadWarning => 'Faqat muallif o‘zi imzolagan kalitga ishonsangiz o‘rnating.';
+  String get extSideloadWarning => 'O‘zi imzolagan kalit';
 
   @override
   String get extPermissionsWidened => 'Yangilanish yangi ruxsatlarni talab qiladi:';
-
-  @override
-  String get extDangerousAck => 'Men bu ruxsatlar jiddiy ekanligini tushunaman';
 
   @override
   String get extInstall => 'O\'rnatish';
@@ -929,9 +831,6 @@ class SUz extends S {
 
   @override
   String get extConfirm => 'Tasdiqlash';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Katalog';
@@ -982,16 +881,13 @@ class SUz extends S {
   String get extEmptySearch => 'Hech narsa topilmadi';
 
   @override
-  String get extEmptyInstalled => 'Kengaytmalar hali oʻrnatilmagan.\nKatalogdan birini toping yoki fayldan o\'rnating.';
+  String get extEmptyInstalled => 'Kengaytmalar hali oʻrnatilmagan';
 
   @override
   String get extInstallFromFile => 'Fayldan oʻrnating';
 
   @override
   String get extInstallFromUrl => 'URL dan oʻrnating';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Yuklab olish';
@@ -1006,20 +902,16 @@ class SUz extends S {
   String get extInstalling => 'O‘rnatilmoqda…';
 
   @override
-  String get extInstallFailed => 'O‘rnatish amalga oshmadi';
-
-  @override
-  String get extErrSignature =>
-      'Imzo tekshiruvi muvaffaqiyatsiz tugadi. Fayl shikastlangan yoki oʻzgartirilgan boʻlishi mumkin.';
+  String get extErrSignature => 'Imzo tekshiruvi muvaffaqiyatsiz tugadi';
 
   @override
   String get extErrManifest => 'Kengaytma manifesti yaroqsiz.';
 
   @override
-  String get extErrNetwork => 'Tarmoq xatosi. Ulanishingizni tekshiring va qaytadan urining.';
+  String get extErrNetwork => 'Tarmoq xatosi';
 
   @override
-  String get extErrHash => 'Yuklash katalogga mos kelmaydi. Bu o\'zgartirilgan bo\'lishi mumkin.';
+  String get extErrHash => 'Yuklash katalogga mos kelmaydi';
 
   @override
   String extErrMinApp(String version) {
@@ -1030,11 +922,11 @@ class SUz extends S {
   String get extErrHttpsOnly => 'Faqat https:// havolalarga ruxsat berilgan';
 
   @override
-  String get extErrGeneric => 'Nimadir xato ketdi. Iltimos, qayta urinib koʻring.';
+  String get extErrGeneric => 'Nimadir xato ketdi';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Ushbu yangilanish o\'rnatilgan versiyadan boshqa muallif kaliti bilan imzolangan, shuning uchun u bloklangan. Agar siz yangi kalitga ishonsangiz, kengaytmani o\'chirib tashlang va uni qayta o\'rnating.';
+      'Ushbu yangilanish o\'rnatilgan versiyadan boshqa muallif kaliti bilan imzolangan, shuning uchun u bloklangan';
 
   @override
   String get extDisabled => 'Oʻchirilgan';
@@ -1091,7 +983,7 @@ class SUz extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count ziddiyatlar sizning qaroringizga muhtoj';
+    return 'Kengaytma ziddiyati: $count';
   }
 
   @override
@@ -1168,11 +1060,10 @@ class SUz extends S {
   String get extPermThemeApply => 'Mavzularni qo\'llash';
 
   @override
-  String get extPermRoutingRules =>
-      'Marshrutlash qoidalarini qo\'shing (tarmoq trafigining qayerga ketishiga ta\'sir qiladi)';
+  String get extPermRoutingRules => 'Marshrutlash qoidalarini qo\'shing';
 
   @override
-  String get extPermNetHooks => 'Tarmoq yoʻliga integratsiyalash (DPI chetlab oʻtish modullari)';
+  String get extPermNetHooks => 'Tarmoq yoʻliga integratsiyalash';
 
   @override
   String get extPermNetFetch => 'Ruxsat berilgan roʻyxatdan URL soʻrovi';
@@ -1181,7 +1072,7 @@ class SUz extends S {
   String get extPermBackground => 'Fon vazifalarini bajaring';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Oʻchirilgan';
 
   @override
   String get extCapBackground => 'Orqa fonda ishlaydi';
@@ -1219,9 +1110,6 @@ class SUz extends S {
   String get extSortRelevance => 'Tegishlilik';
 
   @override
-  String get extPermNetworkDetail => 'VPN so‘rovlariga faqat quyidagi xostlarga ruxsat beriladi.';
-
-  @override
   String get extBgTitle => 'Fon vazifasi';
 
   @override
@@ -1243,9 +1131,6 @@ class SUz extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Fon vazifasini boshqarish uchun kengaytmani yoqing.';
-
-  @override
   String get extCapNetwork => 'Tarmoqqa kirish';
 
   @override
@@ -1262,8 +1147,7 @@ class SUz extends S {
   String get diagnosticHttp => 'HTTP diagnostikasi';
 
   @override
-  String get diagnosticNoData =>
-      'Hozircha hech qanday soʻrov qayd etilmagan. Avval tezlikni tekshirish veb-saytini oching.';
+  String get diagnosticNoData => 'Hozircha hech qanday soʻrov qayd etilmagan';
 
   @override
   String get qrShareTitle => 'QR kodini ulashing';
@@ -1273,12 +1157,6 @@ class SUz extends S {
 
   @override
   String get qrCopyLink => 'Havolani nusxalash';
-
-  @override
-  String get qrWarning => 'Kodni faqat ishonchli odamlarga ko‘rsating.';
-
-  @override
-  String get qrScanHint => 'QR kodli skrinshot yoki rasmni tanlang yoki havolani joylang';
 
   @override
   String get qrFromClipboard => 'Buferdan joylashtirish';
@@ -1359,31 +1237,10 @@ class SUz extends S {
   String get dnsLeakCheckKillSwitchDns => 'Tarmoq qulfi orqali DNS himoyasi';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Yuqoridagi DNS sozlamalarida tunnel uchun DNS ni sozlang.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Tizim tunnel tashqarisida qaysi nom yechuvchilardan foydalanishini tekshiring.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS trafigi tunnelda qolishi uchun tarmoq qulfini yoqing.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Tizimning shifrlangan DNS xizmati';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Soxta DNS javoblar';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Tizimingiz tunneldan tashqarida qaysi shifrlangan DNS so‘nggi nuqtalardan foydalanishini tekshiring.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Nom yechuvchilar javoblarni soxtalashtira olmasligi uchun tunnelda shifrlangan DNS (DoT yoki DoH) ishlating.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Avval VPN ga ulaning, keyin sizib chiqmasligini tekshiring.';
 
   @override
   String get dnsExpected => 'kutilmoqda';
@@ -1410,7 +1267,7 @@ class SUz extends S {
   String get autoSelectSmart => 'Aqlli tanlov';
 
   @override
-  String get coreWatchUnstable => 'Yadro bilan aloqa beqaror. Biroz kutib, qayta ulanishga urinib koʻring.';
+  String get coreWatchUnstable => 'Yadro bilan aloqa beqaror';
 
   @override
   String get watchReconnect => 'Qayta ulaning';
@@ -1449,7 +1306,7 @@ class SUz extends S {
   String get overrideCustomRules => 'O\'z qoidalari';
 
   @override
-  String get errBenchmarkUnsupported => 'Tezlikni oʻlchash uchun yangiroq yadro kerak. Sora’ni yangilang.';
+  String get errBenchmarkUnsupported => 'Tezlikni oʻlchash uchun yangiroq yadro kerak';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1460,8 +1317,7 @@ class SUz extends S {
   String get profiles => 'Tarmoq profillari';
 
   @override
-  String get profilesEmpty =>
-      'Hozircha profillar yo‘q. Ma\'lum tarmoqlarda sozlamalarni avtomatik qo\'llash uchun bitta yarating.';
+  String get profilesEmpty => 'Hozircha profillar yo‘q';
 
   @override
   String get profileAdd => 'Profil qo‘shish';
@@ -1473,9 +1329,6 @@ class SUz extends S {
   String get profileSsids => 'Wi-Fi tarmoqlari (SSID)';
 
   @override
-  String get profileSsidsHint => 'Uy, Ofis vergul bilan ajratilgan';
-
-  @override
   String get profileGateways => 'Tarmoq shlyuzlari';
 
   @override
@@ -1483,9 +1336,6 @@ class SUz extends S {
 
   @override
   String get profileAutoApply => 'Avtomatik qoʻllash';
-
-  @override
-  String get profileAutoApplyHint => 'Oʻchirilgan boʻlsa, profilni qoʻllashdan oldin tasdiq soʻraladi.';
 
   @override
   String get profileSnapshot => 'Joriy sozlamalarni eslab qoling';
@@ -1529,14 +1379,13 @@ class SUz extends S {
   String get networkUnknown => 'Tarmoq maʼlumotlari mavjud emas';
 
   @override
-  String get profileNoTriggers => 'Kamida bitta trigger qo‘shing: SSID, shlyuz yoki ASN';
+  String get profileNoTriggers => 'Profil shartlari yo‘q';
 
   @override
   String get chains => 'Proksi zanjirlar';
 
   @override
-  String get chainsEmpty =>
-      'Hali zanjir yo\'q. 2–3 serverni bog\'lang, shunda trafik ularning har biri orqali o\'tadi.';
+  String get chainsEmpty => 'Hali zanjir yo\'q';
 
   @override
   String get chainAdd => 'Yangi zanjir';
@@ -1545,16 +1394,10 @@ class SUz extends S {
   String get chainName => 'zanjir nomi';
 
   @override
-  String get chainPickServers => '2–3 ta serverni tanlang';
+  String get chainTooFew => 'Zanjirga kamida ikkita server kerak';
 
   @override
-  String get chainOrderHint => 'Qayta tartiblash uchun torting: trafik tepadan kiradi va pastdan chiqadi.';
-
-  @override
-  String get chainTooFew => 'Zanjirga kamida ikkita server kerak. Yana bir server qoʻshing.';
-
-  @override
-  String get chainTooMany => 'Zanjirda koʻpi bilan uchta server boʻlishi mumkin. Ortiqcha serverlarni olib tashlang.';
+  String get chainTooMany => 'Zanjirda koʻpi bilan uchta server boʻlishi mumkin';
 
   @override
   String get chainEstimate => 'Taxminiy kechikish';
@@ -1571,11 +1414,10 @@ class SUz extends S {
   }
 
   @override
-  String get chainUnsupported => 'Tanlangan yadro zanjirlarni qoʻllamaydi. Mos yadroni tanlang.';
+  String get chainUnsupported => 'Tanlangan yadro zanjirlarni qoʻllamaydi';
 
   @override
-  String get chainHopMissing =>
-      'Zanjirdagi serverlardan biri endi mavjud emas. Shu bosqich uchun boshqa server tanlang.';
+  String get chainHopMissing => 'Zanjirdagi serverlardan biri endi mavjud emas';
 
   @override
   String chainHop(Object n) {
@@ -1595,7 +1437,7 @@ class SUz extends S {
   String get syncDevices => 'Mening qurilmalarim';
 
   @override
-  String get syncEmpty => 'Juftlangan qurilmalar yoʻq. Mahalliy tarmoq orqali boshqa qurilmani juftlang.';
+  String get syncEmpty => 'Juftlangan qurilmalar yoʻq';
 
   @override
   String get syncPair => 'Qurilmani juftlash';
@@ -1623,9 +1465,6 @@ class SUz extends S {
   String get syncNever => 'Hech qachon';
 
   @override
-  String get syncNoLan => 'Qurilmalar bir xil mahalliy tarmoqda bo‘lishi kerak';
-
-  @override
   String get syncPaired => 'Qurilma juftlandi';
 
   @override
@@ -1635,17 +1474,10 @@ class SUz extends S {
   String get syncWaiting => 'Boshqa qurilma kutilmoqda…';
 
   @override
-  String get syncSecureNote => 'Kanal uchdan uchgacha shifrlangan. Hisoblar va bulut serverlari kerak emas.';
-
-  @override
   String get zapretWithVpn => 'To\'g\'ridan-to\'g\'ri tarmoq trafigi uchun DPI filtrlashni chetlab o\'ting';
 
   @override
-  String get zapretWithVpnHint =>
-      'zapret VPN tunneli bilan birga ishlaydi: tunnel trafigi VPN orqali, toʻgʻridan-toʻgʻri trafik esa cheklovni chetlab oʻtish vositasi orqali oʻtadi.';
-
-  @override
-  String get chainDuplicate => 'Zanjirda bir server takrorlangan. Har bir bosqich uchun boshqa server tanlang.';
+  String get chainDuplicate => 'Zanjirda bir server takrorlangan';
 
   @override
   String get edit => 'Tahrirlash';
@@ -1655,10 +1487,6 @@ class SUz extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Sifat pasayganda avtomatik almashtirish';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Tanlangan server juda sekinlashsa yoki javob bermay qolsa, Sora oʻlchovlarga koʻra eng yaxshi serverga oʻtadi, ammo har 10 daqiqada bir martadan koʻp emas.';
 
   @override
   String get tunStackMixed => 'Aralash';
@@ -1676,19 +1504,13 @@ class SUz extends S {
   String get customServerName => 'Nomi';
 
   @override
-  String get customServerNameHint => 'Masalan: mening VPS';
-
-  @override
-  String get customServerNameRequired => 'Nomini kiriting';
+  String get customServerNameRequired => 'Nom ko‘rsatilmagan';
 
   @override
   String get customServerAddress => 'Manzil';
 
   @override
-  String get customServerAddressHint => 'example.com yoki 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Server manzilini kiriting';
+  String get customServerAddressRequired => 'Manzil ko‘rsatilmagan';
 
   @override
   String get customServerAddressInvalid => 'Manzil noto‘g‘ri';
@@ -1697,19 +1519,13 @@ class SUz extends S {
   String get customServerPort => 'Port';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Port 1 dan 65535 gacha bo\'lgan raqam bo\'lishi kerak';
+  String get customServerPortInvalid => 'Port noto‘g‘ri';
 
   @override
   String get customServerProtocol => 'Protokol';
 
   @override
   String get customServerCredentials => 'Kirish ma\'lumotlari';
-
-  @override
-  String get customServerOptional => 'Majburiy emas';
 
   @override
   String get customServerShowSecret => 'Sirni ko\'rsatish';
@@ -1723,23 +1539,13 @@ class SUz extends S {
   }
 
   @override
-  String get customServerTest => 'Sinov';
-
-  @override
   String get leakTestTitle => 'Ma\'lumotlar sizib chiqishi uchun sinov';
-
-  @override
-  String get leakTestIntro =>
-      'Trafik qurilmadan tunnel tashqarisida chiqa olishini tekshiradi: bevosita DNS va ICMP soʻrovlari, IPv6 chiqishi va tizim nom yechuvchilari. Ulanish faol boʻlganda ishga tushiring.';
 
   @override
   String get leakTestRun => 'Tekshiring';
 
   @override
   String get leakTestCancel => 'Bekor qilish';
-
-  @override
-  String get leakTestNeedsConnection => 'Ma\'lumotlar sizib chiqishini tekshirish uchun VPN ga ulaning.';
 
   @override
   String leakTestProgress(int count) {
@@ -1765,9 +1571,6 @@ class SUz extends S {
 
   @override
   String get leakTestFix => 'Tuzatish';
-
-  @override
-  String get leakTestFixedNote => 'Tarmoq qulfi yoqilgan. Tekshirish uchun sinovni qayta ishga tushiring.';
 
   @override
   String get leakTestCheckDirectDns => 'Toʻgʻridan-toʻgʻri DNS';
@@ -1800,15 +1603,13 @@ class SUz extends S {
   String get syncDaemonFailed => 'Sinxronizatsiya xizmatini ishga tushirib bo‘lmadi';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync komponenti topilmadi. Qurilmani sinxronlashni yoqish uchun ilovani qayta oʻrnating.';
+  String get syncDaemonMissing => 'sora-sync komponenti topilmadi';
 
   @override
   String get syncDaemonStarting => 'Sinxronizatsiya xizmati ishga tushirilmoqda…';
 
   @override
-  String get syncErrAuth =>
-      'Sinxronizatsiya xizmati kirish tokenini rad etdi. Ilovani qayta ishga tushiring va qaytadan urinib ko\'ring.';
+  String get syncErrAuth => 'Sinxronizatsiya xizmati kirish tokenini rad etdi';
 
   @override
   String get syncErrNotFound => 'Qurilma endi juftlanmagan';
@@ -1817,8 +1618,7 @@ class SUz extends S {
   String get syncErrPairingActive => 'Juftlash seansi allaqachon ochiq';
 
   @override
-  String get syncErrUnreachable =>
-      'Boshqa qurilma javob bermadi. U bir xil tarmoqda ekanligiga va uning kodini ko\'rsatayotganiga ishonch hosil qiling.';
+  String get syncErrUnreachable => 'Boshqa qurilma javob bermadi';
 
   @override
   String get syncError => 'Sinxronizatsiya xatosi';
@@ -1830,10 +1630,6 @@ class SUz extends S {
 
   @override
   String get syncJoining => 'Qurilma bilan juftlanmoqda…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Eski qurilmalar roʻyxati amalda juftlanmagan edi, shu sababli tozalandi. Qurilmalaringizni qayta juftlang, bu safar haqiqiy juftlik yaratiladi.';
 
   @override
   String get syncNewCode => 'Yangi kod';
@@ -1893,8 +1689,7 @@ class SUz extends S {
   String get syncThisDevice => 'Ushbu qurilma';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android’da sinxronlash mavjud emas';
 
   @override
   String get diagnosticPackets => 'Paketni suratga olish';
@@ -1941,27 +1736,25 @@ class SUz extends S {
   String get customServerWgKeepalive => 'Keepalive, soniya';
 
   @override
-  String get customServerWgKeyInvalid => 'Kalit wg genkey chiqargandek base64’da 32 bayt bo‘lishi kerak.';
+  String get customServerWgKeyInvalid => 'WireGuard kaliti noto‘g‘ri';
 
   @override
-  String get customServerWgCidrInvalid => 'Vergul bilan ajratilgan prefikslarni kiriting, masalan 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'CIDR prefiksi noto‘g‘ri';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0 dan 65535 gacha soniya sonini kiriting.';
+  String get customServerWgKeepaliveInvalid => 'Keepalive oralig‘i noto‘g‘ri';
 
   @override
   String get strictKillSwitch => 'Qatʼiy tarmoq qulfi';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Ulangandan keyin nosozlik, qayta ishga tushirish yoki ilovadan chiqishda ham VPN tashqarisidagi trafikni bloklaydi. Kirish faqat ulanish uzilganda yoki bu sozlama oʻchirilganda tiklanadi. Qurilma qayta yoqilganda bloklash faqat ishga tushishda ulanish yoqilgan boʻlsa davom etadi.';
+  String get strictKillSwitchWarning => 'Chiqishdan keyin VPN tashqarisidagi trafik bloklansinmi?';
 
   @override
-  String get extWorkerFailed => 'Kengaytmaning fon vazifasi bajarilmadi. Kengaytma jurnalini tekshiring.';
+  String get extWorkerFailed => 'Kengaytmaning fon vazifasi bajarilmadi';
 
   @override
-  String get extAssetRejected =>
-      'Kengaytma faylida oʻqishni qiyinlashtiradigan ranglar yoki notoʻgʻri qoidalar bor. Kengaytma muallifidan faylni tuzatishni soʻrang.';
+  String get extAssetRejected => 'Kengaytma faylida oʻqishni qiyinlashtiradigan ranglar yoki notoʻgʻri qoidalar bor';
 
   @override
   String get extVerifiedSora => 'Sora tomonidan tasdiqlangan';
@@ -1987,31 +1780,25 @@ class SUz extends S {
   String get customServerPassword => 'Parol';
 
   @override
-  String get customServerSecretRequired => 'Qiymat kiriting';
+  String get customServerSecretRequired => 'Qiymat ko‘rsatilmagan';
 
   @override
   String get customServerLinkInvalid => 'Server havolasi noto‘g‘ri';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora ichki xatosi';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Server sertifikati rad etildi';
 
   @override
-  String get errInternal => 'Sora ichki xatosi. Jurnalni saqlang va muammo haqida xabar bering.';
+  String get errFileAccess => 'Faylga kirib bo‘lmaydi';
 
   @override
-  String get errTls => 'Server sertifikati rad etildi. Soatni tekshiring yoki provayderga murojaat qiling.';
+  String get errDataLimit => 'Ma’lumot juda ko‘p';
 
   @override
-  String get errFileAccess => 'Faylga kirib bo‘lmaydi. Ruxsatlar va bo‘sh joyni tekshiring.';
-
-  @override
-  String get errDataLimit => 'Ma’lumot juda ko‘p. Kamroq element tanlab, qayta urinib ko‘ring.';
-
-  @override
-  String get errCredentials => 'Saqlangan kirish ma’lumotlari yo‘q. Serverni qayta import qiling.';
+  String get errCredentials => 'Saqlangan kirish ma’lumotlari yo‘q';
 
   @override
   String subscriptionStale(String time) {
@@ -2019,56 +1806,54 @@ class SUz extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Hali yangilanmagan. Qayta urinib ko‘ring.';
+  String get subscriptionNeverUpdated => 'Hali yangilanmagan';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Server HTTP $status kodini qaytardi. Havolani tekshiring yoki provayderga murojaat qiling.',
-      zero: 'Server soʻrovni rad etdi. Havolani tekshiring yoki provayderga murojaat qiling.',
+      other: 'Server HTTP $status kodini qaytardi',
+      zero: 'Server soʻrovni rad etdi',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Server sozlamalari to‘liq emas yoki qo‘llanmaydi. Obunani yangilang.';
+  String get errInvalidServer => 'Server sozlamalari to‘liq emas yoki qo‘llanmaydi';
 
   @override
-  String get errServerIds => 'Ikki server bir xil identifikatorga ega. Ularni qayta import qiling.';
+  String get errServerIds => 'Ikki server bir xil identifikatorga ega';
 
   @override
-  String get errRoutingGroup => 'Yo‘nalish yo‘q serverlarga yoki buzilgan guruhga ishora qilmoqda. Obunani yangilang.';
+  String get errRoutingGroup => 'Yo‘nalish yo‘q serverlarga yoki buzilgan guruhga ishora qilmoqda';
 
   @override
-  String get errConnections => 'Ulanishlar ro‘yxati mavjud emas. Ulaning yoki boshqa mexanizmni tanlang.';
+  String get errConnections => 'Ulanishlar ro‘yxati mavjud emas';
 
   @override
-  String get errLogs => 'Bu xizmat jurnal yuritmaydi. Sora’ni yangilang.';
+  String get errLogs => 'Bu xizmat jurnal yuritmaydi';
 
   @override
-  String get errDiagnostics => 'Diagnostika yig‘ilmadi. Qayta urining yoki jurnalni saqlang.';
+  String get errDiagnostics => 'Diagnostika yig‘ilmadi';
 
   @override
-  String get errMissingItem => 'So‘ralgan element endi mavjud emas. Ro‘yxatni yangilang.';
+  String get errMissingItem => 'So‘ralgan element endi mavjud emas';
 
   @override
-  String get errInvalidRequest =>
-      'So‘rovda noto‘g‘ri qiymatlar bor. Kiritilgan ma’lumotlarni tekshirib, qayta urining.';
+  String get errInvalidRequest => 'So‘rovda noto‘g‘ri qiymatlar bor';
 
   @override
-  String get errProxyLogin =>
-      'Tizim proksisi bu kirishni qo‘llamaydi. Mahalliy proksi foydalanuvchi nomi va parolini o‘chiring.';
+  String get errProxyLogin => 'Tizim proksisi bu kirishni qo‘llamaydi';
 
   @override
-  String get errLogFilter => 'Jurnal filtri noto‘g‘ri. Qidiruvni tozalab, qayta urining.';
+  String get errLogFilter => 'Jurnal filtri noto‘g‘ri';
 
   @override
-  String get errSubRedirect => 'Server xavfli manzilga yo‘naltirdi. Provayderdan yangi havola so‘rang.';
+  String get errSubRedirect => 'Server xavfli manzilga yo‘naltirdi';
 
   @override
-  String get errProxySetup => 'Tizim proksisi sozlanmadi. Qayta ulaning yoki jurnalni oching.';
+  String get errProxySetup => 'Tizim proksisi sozlanmadi';
 
   @override
   String get notificationsToday => 'Bugun';
@@ -2094,18 +1879,46 @@ class SUz extends S {
   }
 
   @override
-  String get errSubInterval => 'Obunani yangilash oraligʻi notoʻgʻri. Provayder tavsiya qilgan oraliqni tanlang.';
+  String get errSubInterval => 'Obunani yangilash oraligʻi notoʻgʻri';
 
   @override
-  String get errRule =>
-      'Yoʻnaltirish qoidasida xato bor. Qoidada koʻrsatilgan domen, IP manzil yoki ilovani tekshiring.';
+  String get errRule => 'Yoʻnaltirish qoidasida xato bor';
 
   @override
-  String get errDns => 'DNS sozlamalari notoʻgʻri. DNS serverining manzilini tekshiring.';
+  String get errDns => 'DNS sozlamalari notoʻgʻri';
 
   @override
-  String get errEndpoint => 'Tekshiriladigan server manzili notoʻgʻri. Xost nomi va portini tekshiring.';
+  String get errEndpoint => 'Tekshiriladigan server manzili notoʻgʻri';
 
   @override
-  String get errCancelled => 'Soʻrov bekor qilindi. Kerak boʻlsa, amalni takrorlang.';
+  String get errCancelled => 'Soʻrov bekor qilindi';
+
+  @override
+  String get customServerOptions => 'Ulanish sozlamalari';
+
+  @override
+  String get customServerTransport => 'Transport';
+
+  @override
+  String get customServerSecurity => 'Xavfsizlik';
+
+  @override
+  String get customServerCipher => 'Shifr';
+
+  @override
+  String get customServerWgInterface => 'Interfeys';
+
+  @override
+  String get customServerWgPeer => 'Tengdosh';
+
+  @override
+  String extAvailableOn(String platforms) {
+    return 'Mavjud platformalar: $platforms.';
+  }
+
+  @override
+  String get winwsScopeWarning => 'Barcha ilovalarning TCP trafigi o‘zgartirilsinmi?';
+
+  @override
+  String get winwsRequirements => 'Bu VPN rejimi mavjud emas';
 }

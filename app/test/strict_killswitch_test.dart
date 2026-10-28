@@ -92,7 +92,7 @@ void main() {
 
   testWidgets('mode panel exposes an opt-in strict switch and its warning', (tester) async {
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings.animations = false;
     final sora = Sora(settings);
     addTearDown(sora.dispose);
@@ -102,8 +102,18 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('advanced-protection')));
     await tester.pumpAndSettle();
+    expect(find.text(sora.strings.strictKillSwitchWarning), findsNothing);
+    expect(find.byKey(ValueKey('info-${sora.strings.strictKillSwitch}')), findsNothing);
+    await tester.tap(find.text(sora.strings.strictKillSwitch));
+    await tester.pumpAndSettle();
     expect(find.text(sora.strings.strictKillSwitchWarning), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('strict-kill-switch')));
+    expect(settings.strictKillSwitch, isFalse);
+    await tester.tap(find.text(sora.strings.cancel));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(sora.strings.strictKillSwitch));
+    await tester.pumpAndSettle();
+    expect(settings.strictKillSwitch, isFalse);
+    await tester.tap(find.text(sora.strings.strictKillSwitch).last);
     await tester.pumpAndSettle();
     expect(settings.strictKillSwitch, isTrue);
     expect(settings.killSwitch, isTrue);

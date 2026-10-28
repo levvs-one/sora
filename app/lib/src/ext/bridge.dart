@@ -27,6 +27,7 @@ class BridgeError implements Exception {
 }
 
 class PanelBridge {
+  static const channelName = 'SoraExtHost';
   PanelBridge({
     required this.extensionId,
     required this.granted,
@@ -60,7 +61,7 @@ class PanelBridge {
   /// to the panel as 'internal'.
   final Future<void> Function(Map<String, dynamic>) setSettings;
 
-  /// Handles one JSON message posted to the `soraExt` JavaScript channel.
+  /// Handles one JSON message posted to the internal native JavaScript channel.
   /// Always returns a JSON reply: {id, ok, result?} or {id, ok, error}.
   Future<String> handle(String raw) async {
     dynamic decoded;
@@ -128,10 +129,11 @@ class PanelBridge {
     return jsonEncode({'id': id, 'ok': ok, 'error': ?error, if (ok) 'result': result});
   }
 
-  /// Injected into the panel before any page script runs. `soraExt` here is
-  /// the JavaScriptChannel name registered on the WebView controller.
-  static const String bootstrapJs = '''
-window.soraExt = (() => {
+  /// Capture the private native channel before exposing the public panel API.
+  /// Sharing its name with window.soraExt would overwrite postMessage.
+  static const String bootstrapJs =
+      '''
+window.soraExt = ((nativeHost) => {
   let seq = 0;
   const pending = {};
   const listeners = [];
@@ -141,14 +143,19 @@ window.soraExt = (() => {
         const id = ++seq;
         pending[id] = {resolve, reject};
         try {
-          soraExt.postMessage(JSON.stringify({id, method, args: args || {}}));
-        } catch (e) { delete pending[id]; reject(e); }
+          nativeHost.postMessage(JSON.stringify({id, method, args: args || {}}));
+        } catch (_) {
+          delete pending[id];
+          const error = new Error('Extension host unavailable');
+          error.code = 'internal';
+          reject(error);
+        }
       });
     },
     onEvent(cb) {
-      if (typeof cb !== 'function') return () {};
+      if (typeof cb !== 'function') throw new TypeError('onEvent callback must be a function');
       listeners.push(cb);
-      return () {
+      return () => {
         const i = listeners.indexOf(cb);
         if (i >= 0) listeners.splice(i, 1);
       };
@@ -173,6 +180,6 @@ window.soraExt = (() => {
       for (const cb of listeners) { try { cb(kind, detail); } catch (e) {} }
     }
   };
-})();
+})(window.$channelName);
 ''';
 }

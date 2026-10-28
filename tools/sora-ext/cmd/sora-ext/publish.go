@@ -104,10 +104,10 @@ func cmdPublish(args []string) int {
 		"id": m.ID, "name": m.Name, "version": m.Version,
 		"description": m.Description, "author": m.Author.Name,
 		"author_identity": m.Author.Identity, "author_key": m.Author.PublicKey,
-		"permissions": m.Permissions, "min_app_version": m.MinAppVersion,
+		"permissions": m.Permissions, "capabilities": append([]string{}, m.Capabilities...), "min_app_version": m.MinAppVersion,
 		"sha256": sum, "size": size,
 	}
 	out, _ := json.MarshalIndent(entry, "  ", "  ")
-	fmt.Printf("\n  catalog entry (fill in icon_url/download_url, then submit):\n  %s\n", out)
+	fmt.Printf("\n  catalog entry (fill in icon_url/download_url and review supported platforms, then submit):\n  %s\n", out)
 	return 0
 }

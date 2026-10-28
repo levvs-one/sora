@@ -270,6 +270,9 @@ func downloadGoodput(ctx context.Context, proxyAddr, rawURL string, duration tim
 	}
 	defer client.CloseIdleConnections()
 
+	// Short responses can finish before a post-launch clock is recorded.
+	// Include the workers' complete transfer in the measurement window.
+	start := time.Now()
 	ctx, cancel := context.WithTimeout(ctx, duration)
 	defer cancel()
 
@@ -322,7 +325,6 @@ func downloadGoodput(ctx context.Context, proxyAddr, rawURL string, duration tim
 		}(i)
 	}
 
-	start := time.Now()
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 	done := make(chan struct{})

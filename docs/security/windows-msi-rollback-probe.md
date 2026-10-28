@@ -1,0 +1,137 @@
+# Native Windows transaction probe
+
+This is an isolated feasibility test for S5, not a replacement Sora installer.
+The shipped Inno package, update signature checks and release artifact profile
+are unchanged. The probe asks Windows Installer to own the transaction instead
+of placing a recovery timer in the possibly broken new application.
+
+Two per-user fixture MSI packages share a component and upgrade identity and
+contain different planted payloads. A deferred readiness action observes the
+installed bytes and writes a separate observation before accepting or refusing
+commit. The native Windows CI must establish all three outcomes:
+
+1. Old installation succeeds, with its bytes and product registration present.
+2. New bytes are actually observed, readiness refuses completion, and Windows
+   Installer restores old bytes and the old registration. Aborting before copy
+   cannot pass: the observation must prove that new bytes were read.
+3. Retrying the same new package with successful readiness commits new bytes
+   and only the new product registration. Cleanup must uninstall its files.
+
+Only a disposable GitHub Windows runner executes the MSI files. The test refuses
+ordinary local execution and existing fixture product registrations, uses fresh
+GUIDs and private temporary paths, and checks the generated artifacts' hashes.
+This guard prevents accidental local use; an environment variable is not a
+security sandbox. The fixture executable only reads/writes planted files and
+has no service, network, route or firewall code. Detailed MSI logs are retained.
+
+## Per-user transaction evidence
+
+Local wixl 0.106 successfully built both x64 packages. Exported MSI tables prove
+`InstallInitialize=1500 < RemoveExistingProducts=1501 < ProcessComponents=1600`
+and `InstallFiles=4000 < ProbeReady=4001 < InstallFinalize=6600`. The builder also
+requires the readiness action's deferred bit and rejects ignore-failure actions.
+The convenience MajorUpgrade default would remove the previous product before
+the transaction; this probe authors the sequence explicitly and checks output.
+
+The local compiler was extracted into a private directory from signed Arch
+packages, verified against the existing public distribution keyring; no package
+was installed on the owner or home-pc. CI builds the same upstream 0.106 from
+the pinned 437,664-byte source archive (SHA-256
+`1ed34279cf8080f14f1b8f10e649474125492a089912e7ca70e59dfa2e5a659b`).
+Native Windows run 40245959213, job 121328115049 passed on commit `560a1f63`:
+baseline returned 0, the checked post-copy action returned 1 and MSI returned
+1603, retry returned 0, and uninstall returned 0. The test required old bytes
+and product states `(5, -1)` after rejection and new bytes/states `(-1, 5)`
+after commit. Artifact `windows-msi-transaction-evidence` (12618662790) contains
+verbose MSI logs and all three native command lines. Compilation/table checks
+alone would not establish these outcomes. Initial introspection and native
+property-quoting setup failures were corrected before this evidence.
+
+## LocalSystem service transaction probe
+
+A second, per-machine profile adds a fresh `SoraMSIFixture-<random identity>`
+service; it never registers or queries `SoraCore`. Existing `x/sys/windows/svc`
+and `go-winio` implement the finite fixture and its private named pipe, without
+new project dependencies. The fixture has no engine, routes, firewall, network
+listener or access to Sora settings. Only the disposable Windows CI runner
+executes it; local construction does not change any SCM registration.
+
+The native MSI tables own service registration, start, stop and removal. The
+deferred checked gate runs after `StartServices` and before the post-copy refusal
+action, inside `InstallInitialize`/`InstallFinalize`. It requires both `Running`
+and an expected version reply whose kernel pipe-server PID equals the SCM PID
+queried before and after the reply. This is a fixture identity check, not a
+complete process-lifetime or general IPC-authentication policy.
+
+The required outcomes are baseline old service, refusal of an executable that
+fails during `StartPending`, refusal after new service readiness and new file
+observation, successful retry, and removal of files/product/service registrations.
+Both rejected upgrades must restore old bytes, old product registration and a
+running old-version pipe response. A saved JSON record reports each result.
+The first service run (40246925410/job 121330587711) confirmed old-version
+readiness with matching pipe/SCM PID 4160, then timed out at the failed new
+service's `StartServices` operation after 120 seconds. Restoration is not yet
+confirmed. The follow-up makes the mandatory-service bit explicit and retains
+flushed MSI logs, a timeout SCM snapshot and checker output. The timeout and
+old-running/registration assertions remain unchanged. The vital-bit follow-up
+(40247519100/job 121332412620) also timed out. Its snapshot established that
+the fixture really stopped with Win32 exit 1066/service exit 7 and PID 0, while
+MSI remained in `StartServices`; the mandatory-service bit alone did not resolve
+the wait.
+
+Startup now has its own MSI control row with `Wait=0`; a separate stop/removal
+row retains `Wait=1` before file replacement. The checked gate observes SCM
+startup with the existing manager API and a standard-library ticker, rejects
+`Stopped`, and uses one five-second context/deadline for readiness and the pipe
+reply. It does not start services or relax the old-running assertions. Native
+execution of this bounded-start design still awaits CI.
+
+Local construction requires explicit removal sequence 1501: with multiple
+custom actions wixl's relative ordering produced 5903, caught by the existing
+table assertion before execution. The service table is inspected for own-process,
+demand-start, passwordless LocalSystem and wait/start/stop/uninstall flags. The
+compiler does not implement the parsed `Vital` service flag. Its existing
+companion `msibuild` therefore sets the native `msidbServiceInstallErrorControlVital`
+bit in the single service row; the exported table must contain exactly 32769
+(normal plus vital). No handwritten MSI database writer is introduced. The
+separate checked readiness action remains mandatory. The runner checks removal
+using the native missing-service error.
+
+## Tool choice
+
+Inspected 26 October 2026 before authoring the probe. Existing `msi.dll` supplies
+rollback/product-state APIs on supported Windows; standard Go/Python libraries
+build the inert observer, decode tables and verify outcomes. No handwritten MSI
+database writer, crypto protocol or production update state machine is added.
+
+| Candidate | Release | Stars / open | Weight | License / compatibility |
+| --- | --- | --- | --- | --- |
+| WiX 7.0.0 | 2026-04-06 | 1,163 / 7 (GitHub incl. PR) | 12,365,824 B CLI MSI | MS-RL plus OSMF/EULA conditions; .NET build SDK |
+| Velopack 1.2.161 | 2026-09-29 | 2,415 / 40 (GitHub incl. PR) | 146,884,263 B vpk tool nupkg | MIT; SDK startup hooks and its updater/layout |
+| msitools/wixl 0.106 | 2025-03-20 | 9 / 23 (GitLab stars/issues) | 437,664 B source archive | GPL-2.0-or-later / LGPL-2.1-or-later build tools; Linux GLib/Vala, x64 MSI output |
+
+WiX's current maintenance terms cannot be accepted on an assumed revenue
+exemption. Velopack offers a per-machine MSI mode, but integrating its updater
+does not itself establish Sora's LocalSystem service/authenticated rollback
+contract. MSIX services require Windows 10 2004+, above Sora's 1809 floor.
+Selected wixl adds a Linux CI build tool while leaving Sora's runtime and
+installer family intact during this test. Its libraries are not bundled into
+Sora. The existing Sora repository is GPLv3; no new commercial service is used.
+
+This probe does not demonstrate Sora SCM/IPC/network readiness, configuration
+format reversal, signed rollback eligibility, Inno-to-MSI migration, reboot or
+power-loss recovery. Those must be designed and tested before changing shipped
+installation. Passing this test is evidence for a native transaction component,
+not completion of S5 or permission to publish a new packaging family.
+
+Sources: [Windows Installer rollback](https://learn.microsoft.com/en-us/windows/win32/msi/rollback-installation),
+[removal sequencing](https://learn.microsoft.com/en-us/windows/win32/msi/removeexistingproducts-action),
+[deferred actions](https://learn.microsoft.com/en-us/windows/win32/msi/deferred-execution-custom-actions),
+[service installation](https://learn.microsoft.com/en-us/windows/win32/msi/serviceinstall-table),
+[service lifecycle](https://learn.microsoft.com/en-us/windows/win32/msi/servicecontrol-table),
+[pipe server process identity](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnamedpipeserverprocessid),
+[SCM process identity](https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-queryservicestatusex),
+[msitools 0.106](https://download.gnome.org/sources/msitools/0.106/),
+[WiX terms](https://docs.firegiant.com/wix/osmf/),
+[Velopack Windows layout](https://docs.velopack.io/packaging/operating-systems/windows),
+[MSIX service OS floor](https://learn.microsoft.com/en-us/windows/msix/desktop/managing-your-msix-deployment-targetdevices).

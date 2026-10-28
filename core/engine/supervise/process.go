@@ -55,6 +55,7 @@ func Start(ctx context.Context, spec Spec) (*Process, error) {
 	}
 	//nolint:gosec,noctx // spec.Path is a probed engine binary; the goroutine below and Stop own shutdown, so ctx must not gain kill rights over the process
 	cmd := exec.Command(spec.Path, spec.Args...)
+	cmd.WaitDelay = time.Second
 	HideWindow(cmd)
 	cmd.Dir = spec.Dir
 	cmd.Env = SafeEnv()
@@ -70,7 +71,7 @@ func Start(ctx context.Context, spec Spec) (*Process, error) {
 	}
 	cmd.Stdout = out
 	cmd.Stderr = out
-	if err := cmd.Start(); err != nil {
+	if err := startRuntimeProcess(cmd); err != nil {
 		return nil, fmt.Errorf("%s: start engine: %w", spec.Name, err)
 	}
 
@@ -180,6 +181,7 @@ func Check(ctx context.Context, spec Spec) error {
 	ctx, cancel := context.WithTimeout(ctx, 20*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, spec.Path, spec.Args...) //nolint:gosec // spec.Path is a probed engine binary, the config arrives on stdin
+	cmd.WaitDelay = time.Second
 	HideWindow(cmd)
 	cmd.Dir = spec.Dir
 	cmd.Env = SafeEnv()
