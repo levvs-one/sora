@@ -24,8 +24,11 @@ them with the team key compiled into both (`core/ext/sign.go`,
 
 Signing adds a signature to the archive and changes its package hash and size.
 Use the values reported by `publish` **after** author signing for the catalog;
-the command validates and prints an entry but does not upload it. Verify the
-signed catalog with the pinned production root before delivering it.
+the command validates and prints an entry but does not upload it. For a catalog
+install, package size and hash must match the entry; the signed manifest's id,
+version, minimum app version and permissions must also match. When an entry
+declares capabilities, they must match the manifest; older entries may omit
+them. Verify the signed catalog with the pinned production root before delivering it.
 
 Zapret, ByeDPI and the updated Hello source currently target the 1.1.3 host
 candidate. Publish them only after an actual compatible host is available.

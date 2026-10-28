@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/cupertino.dart' show CupertinoSearchTextField, CupertinoSwitch;
+import 'package:flutter/foundation.dart' show setEquals;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart' as crypto;
@@ -242,6 +243,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         source: source,
         expectedSha256: entry?.sha256,
         authorKeyPin: entry?.authorKey,
+        catalogEntry: entry,
         changelog: changelog,
         window: window,
         verified: entry?.badges.contains('staff') ?? false,
@@ -275,6 +277,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       body.add(chunk);
       onProgress(body.length, total);
     }
+    if (expectedSize != null && body.length != expectedSize) {
+      throw Exception('download size does not match the catalog entry');
+    }
     return body.takeBytes();
   }
 
@@ -291,13 +296,14 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     required String? expectedSha256,
     List<CatalogChangelogEntry>? changelog,
     String? authorKeyPin,
+    CatalogEntry? catalogEntry,
     ExtensionInstallDialog? window,
     bool verified = false,
   }) async {
     final s = S.of(context);
     if (!context.mounted) return false;
     final progress = window ?? ExtensionInstallDialog(context, const InstallProgressWindow(stage: InstallStage.verify));
-    var isUpdate = false;
+    var isUpdate = catalogEntry != null && _store.get(catalogEntry.id) != null;
     Future<void> showFailure(String message) async {
       await progress.close();
       if (context.mounted) {
@@ -315,6 +321,17 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       // Catalog installs verify against the catalog-pinned author key,
       // never against the manifest's self-attested one.
       await pkg.verify(authorKeyLine: authorKeyPin);
+      // Catalog v1 permits entries without capability metadata.
+      if (source == 'catalog' &&
+          (catalogEntry == null ||
+              pkg.manifest.id != catalogEntry.id ||
+              pkg.manifest.version != catalogEntry.version ||
+              pkg.manifest.minAppVersion != catalogEntry.minAppVersion ||
+              !setEquals(pkg.manifest.permissions.toSet(), catalogEntry.permissions.toSet()) ||
+              (catalogEntry.capabilities.isNotEmpty &&
+                  !setEquals(pkg.manifest.capabilities.toSet(), catalogEntry.capabilities.toSet())))) {
+        throw PackageError('manifest does not match the catalog entry');
+      }
       // min_app_version gate against the running app.
       if (_appVersion.isNotEmpty && compareVersions(pkg.manifest.minAppVersion, _appVersion) > 0) {
         throw PackageError('needs app ${pkg.manifest.minAppVersion}');

@@ -371,6 +371,133 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  for (final field in ['id', 'version', 'min_app_version', 'permissions', 'capabilities', 'size', 'size-too-small']) {
+    testWidgets('catalog package with mismatched $field is rejected before approval', (tester) async {
+      final store = await _store(tester);
+      final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+      final row = (catalog['extensions'] as List).single as Map<String, dynamic>;
+      switch (field) {
+        case 'id':
+          row[field] = 'org.sora.other-fixture';
+        case 'version':
+          row[field] = _nextVersion;
+        case 'min_app_version':
+          row[field] = '0.0.1';
+        case 'permissions':
+          row[field] = <String>[];
+        case 'capabilities':
+          row[field] = ['theme'];
+        case 'size':
+          row[field] = _packageBytes.length + 1;
+        case 'size-too-small':
+          row['size'] = _packageBytes.length - 1;
+      }
+      await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+      final sora = Sora(await Settings.load(), extensions: store);
+      addTearDown(sora.dispose);
+      await tester.pumpWidget(
+        SoraScope(
+          sora: sora,
+          child: _app(const ExtensionsScreen(), store: store),
+        ),
+      );
+      await _ready(tester);
+      final client = _DownloadClient();
+      await http.runWithClient(() async {
+        await tester.tap(find.text('Install'));
+        await tester.pump();
+        client.chunks.add(_packageBytes);
+        unawaited(client.chunks.close());
+        for (
+          var i = 0;
+          i < 100 &&
+              find.byType(InstallPermissionPrompt).evaluate().isEmpty &&
+              find.byType(SnackBar).evaluate().isEmpty;
+          i++
+        ) {
+          await _io(tester);
+        }
+        expect(find.byType(InstallPermissionPrompt), findsNothing);
+        expect(find.byType(SnackBar), findsOneWidget);
+        expect(store.installed, isEmpty);
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+      }, () => client);
+    });
+  }
+
+  testWidgets('optional catalog capabilities and reordered permissions accept a matching package', (tester) async {
+    final store = await _store(tester);
+    final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+    final row = (catalog['extensions'] as List).single as Map<String, dynamic>;
+    row['permissions'] = (row['permissions'] as List).reversed.toList();
+    row.remove('capabilities');
+    await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+    final sora = Sora(await Settings.load(), extensions: store);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: _app(const ExtensionsScreen(), store: store),
+      ),
+    );
+    await _ready(tester);
+    final client = _DownloadClient();
+    await http.runWithClient(() async {
+      await tester.tap(find.text('Install'));
+      await tester.pump();
+      client.chunks.add(_packageBytes);
+      unawaited(client.chunks.close());
+      for (var i = 0; i < 100 && find.byType(InstallPermissionPrompt).evaluate().isEmpty; i++) {
+        await _io(tester);
+      }
+      expect(find.byType(InstallPermissionPrompt), findsOneWidget);
+      await tester.tap(find.descendant(of: find.byType(InstallPermissionPrompt), matching: find.text('Install')));
+      for (var i = 0; i < 100 && store.get(_entry.id) == null; i++) {
+        await _io(tester);
+      }
+      expect(store.get(_entry.id)?.version, _entry.version);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => client);
+  });
+
+  testWidgets('a mismatched catalog update keeps the installed version', (tester) async {
+    final store = await _store(tester, installed: true);
+    final catalog = jsonDecode(utf8.decode(_catalogBytes)) as Map<String, dynamic>;
+    ((catalog['extensions'] as List).single as Map<String, dynamic>)['version'] = _nextVersion;
+    await tester.runAsync(() => store.catalogCache.store(utf8.encode(jsonEncode(catalog))));
+    final sora = Sora(await Settings.load(), extensions: store);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(
+      SoraScope(
+        sora: sora,
+        child: _app(const ExtensionsScreen(), store: store),
+      ),
+    );
+    await _ready(tester);
+    final client = _DownloadClient();
+    await http.runWithClient(() async {
+      await tester.tap(find.text('Update'));
+      await tester.pump();
+      client.chunks.add(_packageBytes);
+      unawaited(client.chunks.close());
+      for (
+        var i = 0;
+        i < 100 && find.byType(InstallPermissionPrompt).evaluate().isEmpty && find.byType(SnackBar).evaluate().isEmpty;
+        i++
+      ) {
+        await _io(tester);
+      }
+      expect(find.byType(InstallPermissionPrompt), findsNothing);
+      expect(find.textContaining(sora.strings.extUpdateFailedKept), findsOneWidget);
+      expect(store.get(_entry.id)?.version, _entry.version);
+      expect(store.isEnabled(_entry.id), isTrue);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => client);
+  });
+
   for (final corrupt in [false, true]) {
     testWidgets('catalog flow keeps one route through approval or error, corrupt=$corrupt', (tester) async {
       final store = await _store(tester);
