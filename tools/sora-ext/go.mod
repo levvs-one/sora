@@ -9,7 +9,7 @@ replace github.com/levvs-one/sora-client/core => ../../core
 require (
 	aead.dev/minisign v0.3.0
 	github.com/levvs-one/sora-client/core v0.0.0-00010101000000-000000000000
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 )
 
 require (
