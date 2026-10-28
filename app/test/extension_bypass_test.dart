@@ -940,6 +940,11 @@ void main() {
       expect(parentUser, matches(RegExp(r'^user:\[\d+\]$')));
       expect(await Link('/proc/self/ns/net').target(), isNot(parentNet));
       expect(await Link('/proc/self/ns/user').target(), isNot(parentUser));
+      final status = await File('/proc/self/status').readAsLines();
+      for (final key in ['CapInh:', 'CapPrm:', 'CapEff:', 'CapBnd:', 'CapAmb:']) {
+        final line = status.singleWhere((line) => line.startsWith(key));
+        expect(line.split(RegExp(r'\s+')).last, matches(RegExp(r'^0+$')), reason: key);
+      }
       expect(await Directory(root!).resolveSymbolicLinks(), root);
       expect(root.split(Platform.pathSeparator).last, startsWith('sora-live-app-'));
       expect((await Directory(root).stat()).mode & 0x3f, 0);
