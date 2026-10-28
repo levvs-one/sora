@@ -100,7 +100,7 @@ class InstallerSignatureTest(unittest.TestCase):
                 # This intercepts only the final OS execution boundary; signature
                 # verification runs the real native verifier with the fixture root.
                 driver = case / "driver.ps1"
-                # Windows reconstructs ProgramFiles when the shell starts; isolate it in that session.
+                # Set the fixture location after PowerShell has initialized its environment.
                 driver.write_text("if ($env:SORA_TEST_PROGRAM_FILES) { $env:ProgramFiles = $env:SORA_TEST_PROGRAM_FILES }\nfunction Start-Process { [IO.File]::WriteAllText($env:SORA_INSTALL_MARKER, 'reached'); throw 'INSTALL_BOUNDARY_REACHED' }\n& $env:SORA_INSTALL_SCRIPT\n")
                 env["SORA_INSTALL_SCRIPT"] = str(script)
                 env["SORA_INSTALL_MARKER"] = str(case / "installation")
