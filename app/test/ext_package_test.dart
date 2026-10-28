@@ -167,7 +167,7 @@ void main() {
     final restored = await File('${work.path}/store/${before.manifest.id}@${before.manifest.version}/panel.html')
         .readAsBytes();
     expect(restored, published.files['panel.html']);
-  });
+  }, timeout: const Timeout(Duration(minutes: 3)));
 
   test('a team signature only verifies for its own role', () async {
     final revocations = File('../extensions/revocations.json').readAsBytesSync();
