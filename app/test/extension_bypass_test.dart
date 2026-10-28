@@ -1067,6 +1067,92 @@ void main() {
       expect(response, startsWith('HTTP/1.1 200'));
       expect(response, contains(payload));
 
+      final certificate = '$root/tls-cert.pem';
+      final privateKey = '$root/tls-test-key.pem';
+      final generated = await Process.run('openssl', [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-nodes',
+        '-days',
+        '1',
+        '-subj',
+        '/CN=localhost',
+        '-addext',
+        'subjectAltName=DNS:localhost',
+        '-keyout',
+        privateKey,
+        '-out',
+        certificate,
+      ]);
+      expect(generated.exitCode, 0, reason: 'temporary TLS certificate generation failed');
+      final serverContext = SecurityContext()
+        ..useCertificateChain(certificate)
+        ..usePrivateKey(privateKey);
+      final secureServer = await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, serverContext);
+      addTearDown(() => secureServer.close(force: true));
+      secureServer.listen((request) async {
+        final body = await utf8.decoder.bind(request).join();
+        request.response.write(body);
+        await request.response.close();
+      });
+
+      Future<Socket> connectTunnel() async {
+        final tunnel = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
+        addTearDown(tunnel.destroy);
+        final bytes = <int>[];
+        final ready = Completer<String>();
+        late StreamSubscription<List<int>> subscription;
+        subscription = tunnel.listen(
+          (chunk) {
+            bytes.addAll(chunk);
+            final header = latin1.decode(bytes);
+            if (header.contains('\r\n\r\n') && !ready.isCompleted) {
+              subscription.pause();
+              ready.complete(header);
+            }
+          },
+          onError: (Object error, StackTrace stack) {
+            if (!ready.isCompleted) ready.completeError(error, stack);
+          },
+        );
+        addTearDown(subscription.cancel);
+        tunnel.write(
+          'CONNECT 127.0.0.1:${secureServer.port} HTTP/1.1\r\n'
+          'Host: 127.0.0.1:${secureServer.port}\r\n\r\n',
+        );
+        final header = await ready.future.timeout(const Duration(seconds: 10));
+        expect(header, startsWith('HTTP/1.1 200'));
+        return tunnel;
+      }
+
+      final untrusted = await connectTunnel();
+      await expectLater(
+        SecureSocket.secure(
+          untrusted,
+          host: 'localhost',
+          context: SecurityContext(withTrustedRoots: false),
+        ).timeout(const Duration(seconds: 10)),
+        throwsA(isA<HandshakeException>()),
+      );
+      final trustedContext = SecurityContext(withTrustedRoots: false)..setTrustedCertificates(certificate);
+      final secure = await SecureSocket.secure(
+        await connectTunnel(),
+        host: 'localhost',
+        context: trustedContext,
+      ).timeout(const Duration(seconds: 10));
+      addTearDown(secure.destroy);
+      secure.write(
+        'POST / HTTP/1.1\r\n'
+        'Host: localhost\r\n'
+        'Content-Length: ${utf8.encode(payload).length}\r\n'
+        'Connection: close\r\n\r\n$payload',
+      );
+      final tlsResponse = await utf8.decoder.bind(secure).join().timeout(const Duration(seconds: 10));
+      expect(tlsResponse, startsWith('HTTP/1.1 200'));
+      expect(tlsResponse, contains(payload));
+
       await store.setEnabled(byedpi.manifest.id, false);
       await until(() => sora.phase == Phase.off, 'disable disconnect');
       expect(sora.currentPlan.outbounds, isEmpty);
