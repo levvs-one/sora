@@ -387,10 +387,11 @@ void main() {
         await tester.pumpAndSettle();
         unawaited(chooseProgram(navigator.context));
         await tester.pump();
-        for (var i = 0; i < 8; i++) {
-          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
+        for (var i = 0; i < 100 && find.byType(CircularProgressIndicator).evaluate().isNotEmpty; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
           await tester.pump();
         }
+        expect(find.byType(CircularProgressIndicator), findsNothing);
         await save('program-picker');
         navigator.pop();
         await tester.pumpAndSettle();
