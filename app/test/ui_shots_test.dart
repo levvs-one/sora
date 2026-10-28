@@ -793,7 +793,8 @@ void main() {
                     as String;
             await tester.tap(find.byKey(const ValueKey('custom-paste')));
             await settleLive();
-            expect(find.byKey(const ValueKey('custom-peerKey')), findsOneWidget);
+            expect(find.byKey(const ValueKey('custom-peerKey')), findsNothing);
+            expect(tester.widget<PrimaryButton>(find.byKey(const ValueKey('custom-save'))).label, s.save);
             await save('ownserver-form-wireguard', language, theme);
             await tester.tap(find.byKey(const ValueKey('custom-save')));
             await settleLive();
