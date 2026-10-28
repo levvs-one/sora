@@ -617,6 +617,45 @@ jobs:
           name: sora-windows-x64
           path: dist/Sora-Setup-*.exe
           if-no-files-found: error
+      - name: Build a review-only compatible Windows app
+        if: github.event_name == 'pull_request'
+        working-directory: app
+        shell: pwsh
+        env:
+          SORA_REVIEW_HEAD: '${{ github.event.pull_request.head.sha }}'
+          SORA_REVIEW_BASE: '${{ github.event.pull_request.base.sha }}'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:SORA_COMPAT_VERSION -notmatch '^\d+\.\d+\.\d+$') { throw 'Missing candidate app version' }
+          foreach ($revision in @($env:GITHUB_SHA, $env:SORA_REVIEW_HEAD, $env:SORA_REVIEW_BASE)) {
+            if ($revision -notmatch '^[0-9a-f]{40}$') { throw 'Missing pull request revision' }
+          }
+          flutter build windows --release --no-pub "--dart-define=SORA_VERSION=$env:SORA_COMPAT_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate app build failed' }
+          $bundle = (Resolve-Path 'build/windows/x64/runner/Release').Path
+          if (-not (Test-Path -LiteralPath (Join-Path $bundle 'sora.exe'))) { throw 'Candidate app is missing' }
+          $review = Join-Path $env:RUNNER_TEMP 'sora-windows-app-review'
+          New-Item -ItemType Directory -Path $review -ErrorAction Stop | Out-Null
+          Copy-Item -LiteralPath $bundle -Destination (Join-Path $review 'app') -Recurse
+          @(
+            'REVIEW ONLY: unsigned candidate app, not an installer or release.',
+            "Candidate version: $env:SORA_COMPAT_VERSION",
+            "PR head: $env:SORA_REVIEW_HEAD",
+            "PR base: $env:SORA_REVIEW_BASE",
+            "CI checkout: $env:GITHUB_SHA",
+            'No core, engines, release signature or trusted bootstrap is included.',
+            'The hashes identify these files; they do not authenticate their origin.'
+          ) | Set-Content -LiteralPath (Join-Path $review 'README-UNSIGNED.txt') -Encoding utf8
+          Get-ChildItem -LiteralPath (Join-Path $review 'app') -File -Recurse | Sort-Object FullName | ForEach-Object {
+            $relative = [IO.Path]::GetRelativePath($review, $_.FullName).Replace('\', '/')
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $relative"
+          } | Set-Content -LiteralPath (Join-Path $review 'UNSIGNED-SHA256.txt') -Encoding ascii
+      - uses: actions/upload-artifact@v6
+        if: github.event_name == 'pull_request'
+        with:
+          name: 'windows-app-review-unsigned-${{ github.sha }}'
+          path: '${{ runner.temp }}/sora-windows-app-review'
+          if-no-files-found: error
 
   linux-packages:
     name: Linux packages (${{ matrix.arch }}, ${{ matrix.runner }})
