@@ -74,7 +74,7 @@ void main() {
     expect(yandex, findsNothing);
     await tester.enterText(find.byKey(const ValueKey('speedtest-search')), 'unknown-service');
     await tester.pumpAndSettle();
-    expect(find.text('Ничего не найдено. Измените запрос.'), findsOneWidget);
+    expect(find.text('Ничего не найдено'), findsOneWidget);
     await tester.enterText(find.byKey(const ValueKey('speedtest-search')), 'fast.com');
     await tester.pumpAndSettle();
     final fast = find.byKey(const ValueKey('speedtest-service-https://fast.com/'));
@@ -151,7 +151,7 @@ void main() {
     });
     addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
     await start(tester);
-    expect(find.text('Встроенный браузер не запустился. Откройте сервис в системном браузере.'), findsWidgets);
+    expect(find.text('Встроенный браузер не запустился'), findsWidgets);
     expect(find.byKey(const ValueKey('speedtest-fallback')), findsOneWidget);
     await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle();

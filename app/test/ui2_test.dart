@@ -324,9 +324,7 @@ void main() {
     }
     await tester.tap(find.byKey(const ValueKey('engine-sing-box')));
     await tester.pumpAndSettle();
-    expect(sora.settings.engine, '');
-    await tester.tap(find.text('Выбрать sing-box'));
-    await tester.pumpAndSettle();
+    expect(find.text('Выбрать sing-box'), findsNothing);
     expect(sora.settings.engine, 'sing-box');
     expect(sora.settings.controlPort, isTrue);
     await tester.tap(find.byKey(const ValueKey('mode-tun')));

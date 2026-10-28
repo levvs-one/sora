@@ -425,7 +425,7 @@ void main() {
           await tester.tap(find.descendant(of: card, matching: find.text('Zapret')));
           await tester.pumpAndSettle();
           expect(find.byType(ExtensionDetailScreen), findsOneWidget);
-          expect(find.text('This permission does nothing in this version of Sora yet.'), findsNothing);
+          expect(find.text('Disabled'), findsNothing);
           Navigator.of(tester.element(find.byType(ExtensionDetailScreen))).pop();
           await tester.pumpAndSettle();
         }
@@ -439,16 +439,10 @@ void main() {
         expect(prompt, findsOneWidget, reason: id);
         expect(tester.widget<InstallPermissionPrompt>(prompt).manifest.id, id);
         if (id != 'org.sora.hello-panel') {
-          expect(
-            find.descendant(
-              of: prompt,
-              matching: find.text('This permission does nothing in this version of Sora yet.'),
-            ),
-            findsNothing,
-          );
+          expect(find.descendant(of: prompt, matching: find.text('Disabled')), findsNothing);
           final confirm = find.descendant(of: prompt, matching: find.byType(PrimaryButton));
           expect(tester.widget<PrimaryButton>(confirm).onTap, isNull);
-          await tester.tap(find.text('I understand these permissions are powerful'));
+          await tester.tap(find.text('Confirm'));
           await tester.pump();
           expect(tester.widget<PrimaryButton>(confirm).onTap, isNotNull);
         }
@@ -469,7 +463,7 @@ void main() {
       expect(store.bypassProfiles, isEmpty);
       await tester.tap(find.text('Installed'));
       await tester.pumpAndSettle();
-      final conflictBanner = find.text('1 conflicts need your decision');
+      final conflictBanner = find.text('Extension conflicts: 1');
       for (var i = 0; i < 1000 && conflictBanner.evaluate().isEmpty; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
         await tester.pump(const Duration(milliseconds: 20));
@@ -479,7 +473,7 @@ void main() {
       await tester.pumpAndSettle();
       final conflictDialog = find.byType(Dialog);
       expect(conflictDialog, findsOneWidget);
-      expect(find.text('This permission does nothing in this version of Sora yet.'), findsNothing);
+      expect(find.text('Disabled'), findsNothing);
       final confirm = find.descendant(of: conflictDialog, matching: find.byType(PrimaryButton));
       expect(tester.widget<PrimaryButton>(confirm).onTap, isNull);
       await tester.tap(find.descendant(of: conflictDialog, matching: find.text('ByeDPI')));
@@ -500,7 +494,7 @@ void main() {
       expect(store.bypassProfiles.single.extensionId, 'org.sora.byedpi');
       expect(conflictDialog, findsNothing);
       await tester.pumpAndSettle();
-      expect(find.text('1 conflicts need your decision'), findsNothing);
+      expect(find.text('Extension conflicts: 1'), findsNothing);
 
       late ExtPackage generic;
       await tester.runAsync(() async {
@@ -524,7 +518,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('This permission does nothing in this version of Sora yet.'), findsOneWidget);
+      expect(find.text('Disabled'), findsOneWidget);
       await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('Cancel')));
       await tester.pumpAndSettle();
       await tester.runAsync(() => install(generic));
@@ -536,15 +530,12 @@ void main() {
       await tester.tap(conflictBanner);
       await tester.pumpAndSettle();
       final dormant = find.byWidgetPredicate(
-        (widget) =>
-            widget is Semantics &&
-            widget.properties.label ==
-                'Dormant network wins. This permission does nothing in this version of Sora yet.',
+        (widget) => widget is Semantics && widget.properties.label == 'Dormant network wins. Disabled',
       );
       final active = find.byWidgetPredicate(
         (widget) => widget is Semantics && widget.properties.label == 'Zapret wins',
       );
-      final inactiveNotice = find.text('This permission does nothing in this version of Sora yet.');
+      final inactiveNotice = find.text('Disabled');
       expect(find.descendant(of: dormant, matching: inactiveNotice), findsOneWidget);
       expect(find.descendant(of: active, matching: inactiveNotice), findsNothing);
       await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('Cancel')));
@@ -553,7 +544,7 @@ void main() {
       await tester.ensureVisible(dormantCard);
       await tester.tap(dormantCard);
       await tester.pumpAndSettle();
-      expect(find.text('This permission does nothing in this version of Sora yet.'), findsOneWidget);
+      expect(find.text('Disabled'), findsOneWidget);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
     }, () => client);

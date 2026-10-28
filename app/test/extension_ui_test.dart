@@ -212,22 +212,24 @@ void main() {
     expect(find.byType(VerifiedBadge), findsNothing);
   });
 
-  testWidgets('sideload warning wraps and dangerous permissions still require consent', (tester) async {
+  testWidgets('sideload key status and dangerous permissions still require consent', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(420, 800);
     addTearDown(tester.view.reset);
     final manifest = ExtManifest.parse(File('../examples/routing-split/sora-extension.json').readAsStringSync());
     await tester.pumpWidget(_app(Scaffold(body: InstallPermissionPrompt(manifest: manifest, sideload: true))));
-    expect(find.text('Install only if you trust the author’s self-signed key.'), findsOneWidget);
+    expect(find.text('Self-signed key'), findsOneWidget);
     expect(tester.widget<PrimaryButton>(find.byType(PrimaryButton)).onTap, isNull);
-    await tester.tap(find.text('I understand these permissions are powerful'));
+    await tester.tap(find.text('Confirm'));
     await tester.pump();
     expect(tester.widget<PrimaryButton>(find.byType(PrimaryButton)).onTap, isNotNull);
     expect(tester.takeException(), isNull);
   });
 
   for (final installed in [false, true]) {
-    testWidgets('detail has one header and actions before description, installed=$installed', (tester) async {
+    testWidgets('detail has one header and actions before permissions without explanatory copy, installed=$installed', (
+      tester,
+    ) async {
       final store = await _store(tester, installed: installed);
       addTearDown(store.dispose);
       await tester.pumpWidget(_app(ExtensionDetailScreen(entry: _entry), store: store));
@@ -241,7 +243,8 @@ void main() {
       expect(find.byType(Group), findsOneWidget);
       expect(tester.widget<VerifiedBadge>(find.byType(VerifiedBadge)).size, 16);
       final action = find.text(installed ? 'Open' : 'Install');
-      expect(tester.getTopLeft(action).dy, lessThan(tester.getTopLeft(find.text(_entry.description)).dy));
+      expect(find.text(_entry.description), findsNothing);
+      expect(tester.getTopLeft(action).dy, lessThan(tester.getTopLeft(find.byType(PermissionRow).first).dy));
       expect(find.byType(PermissionRow), findsNWidgets(_entry.permissions.length));
       expect(tester.takeException(), isNull);
     });
