@@ -156,14 +156,18 @@ void main() {
     work = await Directory.systemTemp.createTemp('sora-panel-startup-');
     store = ExtensionStore(dir: work.path);
     await store.load();
-    final package = ExtPackage.open(File('../extensions/packages/hello-panel-1.0.0.soraext').readAsBytesSync());
-    await store.install(
-      package,
+    final entry = ExtensionCatalog.parse(File('../extensions/catalog.json').readAsBytesSync()).find(id)!;
+    final bytes = File('../extensions/packages/${entry.downloadUrl.split('/').last}').readAsBytesSync();
+    final package = ExtPackage.open(bytes);
+    expect(bytes.length, entry.size);
+    expect(package.manifest.id, entry.id);
+    expect(package.manifest.version, entry.version);
+    await store.installBytes(
+      bytes,
       source: 'catalog',
-      granted: package.manifest.permissions,
-      authorKeyPin: ExtensionCatalog.parse(File('../extensions/catalog.json').readAsBytesSync()).entries
-          .singleWhere((e) => e.id == id)
-          .authorKey,
+      granted: entry.permissions,
+      expectedSha256: entry.sha256,
+      authorKeyPin: entry.authorKey,
     );
     sora = _DelayedSora(await Settings.load(), store);
     previous = WebViewPlatform.instance;

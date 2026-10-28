@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -20,10 +22,12 @@ import 'package:webview_all/webview_all.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  for (final useSource in [false, true]) {
+  for (final scenario in ['published package', 'current source', 'candidate catalog']) {
     testWidgets(
-      'signed Hello Panel ${useSource ? 'current source' : 'published package'} opens twice and exchanges native bridge messages without a core',
+      'signed Hello Panel $scenario opens twice in the native WebView and exchanges bridge messages without a running core or owner network',
       (tester) async {
+        final useSource = scenario == 'current source';
+        final useCandidate = scenario == 'candidate catalog';
         const root = String.fromEnvironment('SORA_PANEL_FIXTURE_ROOT');
         expect(root, isNotEmpty, reason: 'Pass the repository path as SORA_PANEL_FIXTURE_ROOT.');
         const id = 'org.sora.hello-panel';
@@ -35,8 +39,10 @@ void main() {
         final store = ExtensionStore(dir: work.path);
         await store.load();
         late ExtPackage package;
+        late Uint8List packageBytes;
         late String authorPin;
-        if (useSource) {
+        String? expectedSha256;
+        if (useSource || useCandidate) {
           final tool = '${work.path}/sora-ext${Platform.isWindows ? '.exe' : ''}';
           final build = await Process.run('go', [
             'build',
@@ -70,17 +76,61 @@ void main() {
             final result = await Process.run(tool, args);
             expect(result.exitCode, 0, reason: '${result.stderr}');
           }
-          package = ExtPackage.open(await File(output).readAsBytes());
-        } else {
-          package = ExtPackage.open(await File('$root/extensions/packages/hello-panel-1.0.0.soraext').readAsBytes());
-          final catalog = ExtensionCatalog.parse(await File('$root/extensions/catalog.json').readAsBytes());
-          authorPin = catalog.entries.singleWhere((entry) => entry.id == id).authorKey;
+          packageBytes = await File(output).readAsBytes();
+          package = ExtPackage.open(packageBytes);
+          if (useCandidate) {
+            // Local test catalog only: the package has a temporary author
+            // signature and does not use the production team signing key.
+            final catalogDir = await Directory('${work.path}/candidate-catalog/packages').create(recursive: true);
+            const name = 'hello-panel-candidate.soraext';
+            await File('${catalogDir.path}/$name').writeAsBytes(packageBytes);
+            final doc = jsonDecode(await File('$root/extensions/catalog.json').readAsString()) as Map<String, dynamic>;
+            final oldEntry = (doc['extensions'] as List).cast<Map<String, dynamic>>().firstWhere(
+              (entry) => entry['id'] == id,
+            );
+            doc['extensions'] = [
+              {
+                ...oldEntry,
+                'version': package.manifest.version,
+                'min_app_version': package.manifest.minAppVersion,
+                'author_key': authorPin,
+                'permissions': package.manifest.permissions,
+                'capabilities': package.manifest.capabilities,
+                'download_url': 'https://example.invalid/$name',
+                'sha256': crypto.sha256.convert(packageBytes).toString(),
+                'size': packageBytes.length,
+              },
+            ];
+            await File('${work.path}/candidate-catalog/catalog.json').writeAsString(jsonEncode(doc));
+          }
         }
+        if (!useSource) {
+          final catalogRoot = useCandidate ? '${work.path}/candidate-catalog' : '$root/extensions';
+          final catalog = ExtensionCatalog.parse(await File('$catalogRoot/catalog.json').readAsBytes());
+          final entry = catalog.find(id)!;
+          packageBytes = await File('$catalogRoot/packages/${entry.downloadUrl.split('/').last}').readAsBytes();
+          package = ExtPackage.open(packageBytes);
+          expect(packageBytes.length, entry.size);
+          expect(package.manifest.id, entry.id);
+          expect(package.manifest.version, entry.version);
+          expect(package.manifest.minAppVersion, entry.minAppVersion);
+          expect(package.manifest.permissions, unorderedEquals(entry.permissions));
+          authorPin = entry.authorKey;
+          expectedSha256 = entry.sha256;
+        }
+        final modernPanel = compareVersions(package.manifest.version, '1.0.1') >= 0;
         if (const bool.fromEnvironment('SORA_PANEL_CHECK_VERSION')) {
           expect(appVersion, matches(RegExp(r'^\d+\.\d+\.\d+$')));
           expect(compareVersions(package.manifest.minAppVersion, appVersion), lessThanOrEqualTo(0));
         }
-        await store.install(package, source: 'catalog', granted: package.manifest.permissions, authorKeyPin: authorPin);
+        await store.installBytes(
+          packageBytes,
+          source: 'catalog',
+          granted: package.manifest.permissions,
+          expectedSha256: expectedSha256,
+          authorKeyPin: authorPin,
+        );
+        debugPrint('Native panel scenario=$scenario installed ${package.manifest.id}@${package.manifest.version}');
         final sora = Sora(await Settings.load(), extensions: store);
         var bodyFailed = false;
         try {
@@ -137,11 +187,11 @@ void main() {
             // No core is started: the real API must report its not-connected code,
             // rather than leave the signed page waiting on an unresolved promise.
             await until(
-              useSource
+              modernPanel
                   ? "document.getElementById('content')?.textContent.includes('Connect Sora') === true"
                   : "document.getElementById('content')?.textContent.includes('not-connected') === true",
             );
-            if (useSource) {
+            if (modernPanel) {
               final noticesBeforeFailure = sora.history.length;
               await controller.runJavaScript("""
                 window.sourceFailureProof = null;
@@ -223,14 +273,16 @@ void main() {
             expect(sora.link, isNull);
             expect(sora.sessionId, isNull);
             debugPrint(
-              'Native signed panel source=$useSource cycle $cycle: initial rejection, settings, permission gate and notification passed',
+              'Native signed panel scenario=$scenario cycle $cycle: initial rejection, settings, permission gate and notification passed',
             );
             if (cycle == 1) {
               if (useSource) {
                 final project = Directory('${work.path}/source');
                 final manifestFile = File('${project.path}/sora-extension.json');
                 final manifest = jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
-                manifest['version'] = '1.0.2';
+                final version = package.manifest.version.split('.');
+                final nextVersion = '${version[0]}.${version[1]}.${int.parse(version[2]) + 1}';
+                manifest['version'] = nextVersion;
                 (manifest['permissions'] as List).remove('notifications');
                 await manifestFile.writeAsString(jsonEncode(manifest));
                 final tool = '${work.path}/sora-ext${Platform.isWindows ? '.exe' : ''}';
@@ -249,7 +301,7 @@ void main() {
                   granted: upgrade.manifest.permissions,
                   authorKeyPin: authorPin,
                 );
-                expect(store.get(id)!.version, '1.0.2');
+                expect(store.get(id)!.version, nextVersion);
               } else {
                 await store.setEnabled(id, false);
               }
@@ -257,7 +309,7 @@ void main() {
               expect(find.byType(WebViewWidget), findsNothing);
               expect(find.byType(CircularProgressIndicator), findsNothing);
               debugPrint(
-                'Native panel source=$useSource: disable or signed permission-reducing update removed the surface',
+                'Native panel scenario=$scenario: disable or signed permission-reducing update removed the surface',
               );
             }
             await tester.pumpWidget(const SizedBox());
