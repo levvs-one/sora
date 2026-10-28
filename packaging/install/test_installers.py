@@ -95,6 +95,14 @@ class InstallerSignatureTest(unittest.TestCase):
                     public = (self.tools / "fixture-public-key.txt").read_text().strip()
                     script = case / "install.ps1"
                     script.write_text(self.script.read_text().replace("RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+", public))
+                elif installed_verifier:
+                    script = case / "install.ps1"
+                    text = self.script.read_text().replace(
+                        "$verifierFile = Get-Item -LiteralPath $verifier -ErrorAction SilentlyContinue",
+                        '$verifierFile = Get-Item -LiteralPath $verifier -ErrorAction SilentlyContinue\nWrite-Output "TEST verifier=$verifier exists=$([bool]$verifierFile) container=$($verifierFile.PSIsContainer) attributes=$($verifierFile.Attributes)"')
+                    text = text.replace("    if ($helpText -notmatch '-verify-release')",
+                                        "    Write-Output \"TEST help=$helpText\"\n    if ($helpText -notmatch '-verify-release')")
+                    script.write_text(text)
                 else:
                     script = self.script
                 # This intercepts only the final OS execution boundary; signature

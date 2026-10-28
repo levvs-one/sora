@@ -291,6 +291,11 @@ jobs:
         run: |
           if [ "$GITHUB_REF_TYPE" = tag ]; then version=${GITHUB_REF_NAME#v}; else version=0.0.$GITHUB_RUN_NUMBER; fi
           echo "SORA_VERSION=$version" >> "$GITHUB_ENV"
+      - name: Installer signature and bootstrap contracts
+        shell: pwsh
+        run: |
+          python packaging/install/test_installers.py
+          if ($LASTEXITCODE -ne 0) { throw 'Installer signature rejection tests failed' }
       - uses: actions/download-artifact@v8
         with:
           name: msi-transaction-fixtures
@@ -451,8 +456,6 @@ jobs:
       - name: Install with install.ps1 and check the service
         shell: pwsh
         run: |
-          python packaging/install/test_installers.py
-          if ($LASTEXITCODE -ne 0) { throw 'Installer signature rejection tests failed' }
           $setup = Get-ChildItem dist\Sora-Setup-*.exe | Select-Object -First 1
           New-Item -ItemType Directory install-test | Out-Null
           Copy-Item -LiteralPath $setup.FullName -Destination install-test
