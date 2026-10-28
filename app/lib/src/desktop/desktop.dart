@@ -137,7 +137,10 @@ class Desktop with WindowListener {
     if (!sora.settings.trayHintShown) {
       sora.settings.trayHintShown = true;
       unawaited(
-        _tell(AppNotification(time: DateTime.now(), title: _s.noticeInTray, body: '', messageKey: 'notice.tray'), always: true),
+        _tell(
+          AppNotification(time: DateTime.now(), title: _s.noticeInTray, body: '', messageKey: 'notice.tray'),
+          always: true,
+        ),
       );
     }
   }
