@@ -26,7 +26,7 @@ class InstallerSignatureTest(unittest.TestCase):
         prepare(cls.inputs, "1.2.3", cls.tools)
         cls.script = Path(__file__).with_name("install.ps1" if os.name == "nt" else "install.sh").resolve()
 
-    def run_installer(self, variant, shell="pwsh", architecture=None, expected_packages=None, crypto_available=True):
+    def run_installer(self, variant, shell="pwsh", architecture=None, expected_packages=None, crypto_available=True, installed_verifier=False):
         bootstrap = variant.startswith("bootstrap-")
         if bootstrap:
             variant = variant.removeprefix("bootstrap-")
@@ -84,9 +84,14 @@ class InstallerSignatureTest(unittest.TestCase):
                 verifier = target
             if os.name == "nt":
                 env = {**os.environ, "SORA_VERSION": version, "SORA_DIST": str(distribution), "SORA_VERIFIER": str(verifier)}
-                if bootstrap:
+                if bootstrap or installed_verifier:
                     env.pop("SORA_VERIFIER", None)
                     env["ProgramFiles"] = str(case / "no-installed-client")
+                    if installed_verifier:
+                        installed = Path(env["ProgramFiles"]) / "Sora/core/sora-core.exe"
+                        installed.parent.mkdir(parents=True)
+                        shutil.copyfile(verifier, installed)
+                if bootstrap:
                     public = (self.tools / "fixture-public-key.txt").read_text().strip()
                     script = case / "install.ps1"
                     script.write_text(self.script.read_text().replace("RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+", public))
@@ -118,6 +123,8 @@ class InstallerSignatureTest(unittest.TestCase):
                 boundary.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > /tmp/test/' + case.name + '/installation\n')
                 boundary.chmod(0o755)
                 command += ["--ro-bind", str(boundary), "/usr/bin/apt-get"]
+                if installed_verifier:
+                    command += ["--ro-bind", str(verifier), "/usr/bin/sora-core"]
                 mounted = Path("/tmp/test")
                 shutil.copyfile(self.script, case / "install.sh")
                 if bootstrap:
@@ -126,7 +133,7 @@ class InstallerSignatureTest(unittest.TestCase):
                     script.write_text(script.read_text().replace("RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+", public))
                 command += ["--setenv", "PATH", "/usr/bin", "--setenv", "TMPDIR", "/tmp",
                             "--setenv", "SORA_VERSION", version, "--setenv", "SORA_DIST", str(mounted / distribution.relative_to(self.root))]
-                command += (["--unsetenv", "SORA_VERIFIER"] if bootstrap else
+                command += (["--unsetenv", "SORA_VERIFIER"] if bootstrap or installed_verifier else
                             ["--setenv", "SORA_VERIFIER", str(mounted / verifier.relative_to(self.root))])
                 command += ["--", "/usr/bin/sh", "-c",
                             'printf "%s\\n" SORA_INSTALLER_SANDBOX_READY; exec /usr/bin/sh "$1"',
@@ -148,6 +155,12 @@ class InstallerSignatureTest(unittest.TestCase):
             with self.subTest(variant=variant):
                 result, reached = self.run_installer("bootstrap-" + variant)
                 self.assertFalse(reached, result.stdout + result.stderr)
+
+    def test_default_installed_verifier_remains_strict(self):
+        for variant in ("valid", "modified signature", "metadata-wrong-size"):
+            with self.subTest(variant=variant):
+                result, reached = self.run_installer(variant, installed_verifier=True)
+                self.assertEqual(reached, variant == "valid", result.stdout + result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Windows without crypto tools deliberately trusts HTTPS bootstrap")
     def test_bootstrap_authenticates_the_comment_signature(self):
@@ -211,6 +224,10 @@ class InstallerSignatureTest(unittest.TestCase):
         for variant in ("valid", "metadata-wrong-size", "metadata-legacy", "metadata-oversize"):
             with self.subTest(variant=variant):
                 result, reached = self.run_installer(variant, shell="powershell.exe")
+                self.assertEqual(reached, variant == "valid", result.stdout + result.stderr)
+        for variant in ("valid", "modified signature", "metadata-wrong-size"):
+            with self.subTest(default_verifier=variant):
+                result, reached = self.run_installer(variant, shell="powershell.exe", installed_verifier=True)
                 self.assertEqual(reached, variant == "valid", result.stdout + result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Linux namespace startup control")

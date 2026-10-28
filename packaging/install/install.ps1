@@ -20,7 +20,23 @@ if (-not $verifierFile -or $verifierFile.PSIsContainer -or ($verifierFile.Attrib
     if ($env:SORA_VERIFIER) { throw 'The explicitly selected trusted verifier is unavailable.' }
     $verifier = $null
 } elseif (-not $env:SORA_VERIFIER) {
-    $helpText = (& $verifier -h 2>&1 | Out-String)
+    # PowerShell 5.1 turns redirected native stderr into terminating errors.
+    # Go writes help to stderr, so capture it without a PowerShell pipeline.
+    $probe = [Diagnostics.Process]::new()
+    $probe.StartInfo.FileName = $verifier
+    $probe.StartInfo.Arguments = '-h'
+    $probe.StartInfo.UseShellExecute = $false
+    $probe.StartInfo.CreateNoWindow = $true
+    $probe.StartInfo.RedirectStandardOutput = $true
+    $probe.StartInfo.RedirectStandardError = $true
+    try {
+        [void]$probe.Start()
+        $helpOutput = $probe.StandardOutput.ReadToEndAsync()
+        $helpError = $probe.StandardError.ReadToEndAsync()
+        if (-not $probe.WaitForExit(5000)) { $probe.Kill(); throw 'Installed verifier help timed out.' }
+        if (-not $helpOutput.Wait(5000) -or -not $helpError.Wait(5000)) { throw 'Installed verifier output timed out.' }
+        $helpText = $helpOutput.Result + $helpError.Result
+    } finally { $probe.Dispose() }
     if ($helpText -notmatch '-verify-release') { $verifier = $null }
 }
 if ($env:SORA_DIST -and $verifier) {
