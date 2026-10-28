@@ -927,227 +927,289 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   }, skip: !Platform.isWindows);
 
-  test(
-    'signed network profile connects the app to a real isolated core',
-    () async {
-      final env = Platform.environment;
-      expect(Platform.isLinux, isTrue);
-      final backend = env['SORA_LIVE_BYPASS_BACKEND'] ?? 'byedpi';
-      expect(backend, anyOf('byedpi', 'tpws'));
-      final root = env['SORA_LIVE_BYPASS_ROOT'];
-      final parentNet = env['SORA_PARENT_NETNS'];
-      final parentUser = env['SORA_PARENT_USERNS'];
-      expect(root, isNotNull);
-      expect(parentNet, matches(RegExp(r'^net:\[\d+\]$')));
-      expect(parentUser, matches(RegExp(r'^user:\[\d+\]$')));
-      expect(await Link('/proc/self/ns/net').target(), isNot(parentNet));
-      expect(await Link('/proc/self/ns/user').target(), isNot(parentUser));
-      final status = await File('/proc/self/status').readAsLines();
-      for (final key in ['CapInh:', 'CapPrm:', 'CapEff:', 'CapBnd:', 'CapAmb:']) {
-        final line = status.singleWhere((line) => line.startsWith(key));
-        expect(line.split(RegExp(r'\s+')).last, matches(RegExp(r'^0+$')), reason: key);
-      }
-      expect(await Directory(root!).resolveSymbolicLinks(), root);
-      expect(root.split(Platform.pathSeparator).last, startsWith('sora-live-app-'));
-      expect((await Directory(root).stat()).mode & 0x3f, 0);
-      expect(env['TMPDIR'], root);
+  Future<void> liveNetworkProfile(String backend) async {
+    final env = Platform.environment;
+    expect(Platform.isLinux, isTrue);
+    final root = env['SORA_LIVE_BYPASS_ROOT'];
+    final parentNet = env['SORA_PARENT_NETNS'];
+    final parentUser = env['SORA_PARENT_USERNS'];
+    expect(root, isNotNull);
+    expect(parentNet, matches(RegExp(r'^net:\[\d+\]$')));
+    expect(parentUser, matches(RegExp(r'^user:\[\d+\]$')));
+    expect(await Link('/proc/self/ns/net').target(), isNot(parentNet));
+    expect(await Link('/proc/self/ns/user').target(), isNot(parentUser));
+    final status = await File('/proc/self/status').readAsLines();
+    for (final key in ['CapInh:', 'CapPrm:', 'CapEff:', 'CapBnd:', 'CapAmb:']) {
+      final line = status.singleWhere((line) => line.startsWith(key));
+      expect(line.split(RegExp(r'\s+')).last, matches(RegExp(r'^0+$')), reason: key);
+    }
+    expect(await Directory(root!).resolveSymbolicLinks(), root);
+    expect(root.split(Platform.pathSeparator).last, startsWith('sora-live-app-'));
+    expect((await Directory(root).stat()).mode & 0x3f, 0);
+    expect(env['TMPDIR'], root);
+    Uri? peerHttpTarget;
+    Uri? peerTlsTarget;
+    List<int>? peerCertificate;
+    if (backend == 'tpws') {
       final targetsFile = File('$root/targets.json');
       expect(FileSystemEntity.typeSync(targetsFile.path, followLinks: false), FileSystemEntityType.file);
       final targets = jsonDecode(await targetsFile.readAsString()) as Map<String, dynamic>;
-      final httpTarget = Uri.parse(targets['HTTP'] as String);
-      final tlsTarget = Uri.parse(targets['HTTPS'] as String);
-      for (final (target, scheme) in [(httpTarget, 'http'), (tlsTarget, 'https')]) {
+      peerHttpTarget = Uri.parse(targets['HTTP'] as String);
+      peerTlsTarget = Uri.parse(targets['HTTPS'] as String);
+      for (final (target, scheme) in [(peerHttpTarget, 'http'), (peerTlsTarget, 'https')]) {
         expect(target.scheme, scheme);
         expect(target.host, '198.18.0.2');
         expect(target.port, inInclusiveRange(1, 65535));
       }
       final encodedCertificate = targets['Certificate'] as String;
       final certificateLines = RegExp(r'.{1,64}').allMatches(encodedCertificate).map((m) => m.group(0)).join('\n');
-      final trustedCertificate = utf8.encode(
-        '-----BEGIN CERTIFICATE-----\n$certificateLines\n-----END CERTIFICATE-----\n',
+      peerCertificate = utf8.encode('-----BEGIN CERTIFICATE-----\n$certificateLines\n-----END CERTIFICATE-----\n');
+    }
+    for (final entry in {
+      'HOME': 'home',
+      'XDG_CONFIG_HOME': 'config',
+      'XDG_CACHE_HOME': 'cache',
+      'XDG_DATA_HOME': 'data',
+      'XDG_RUNTIME_DIR': 'runtime',
+    }.entries) {
+      final path = '$root/${entry.value}';
+      expect(env[entry.key], path, reason: entry.key);
+      expect(await Directory(path).resolveSymbolicLinks(), path, reason: entry.key);
+    }
+    for (final key in [
+      'DBUS_SESSION_BUS_ADDRESS',
+      'DISPLAY',
+      'WAYLAND_DISPLAY',
+      'NOTIFY_SOCKET',
+      'SSH_AUTH_SOCK',
+      'SORA_DATA_DIR',
+    ]) {
+      expect(env.containsKey(key), isFalse, reason: key);
+    }
+    expect(socket, '$root/core.sock');
+    expect(FileSystemEntity.typeSync(socket!, followLinks: false), FileSystemEntityType.notFound);
+    final binary = '$root/sora-core';
+    final engines = '$root/engines';
+    expect(await File(binary).exists(), isTrue);
+    expect(await File('$engines/$backend').exists(), isTrue);
+    expect(await File('$engines/mihomo').exists(), isTrue);
+
+    final log = StringBuffer();
+    void capture(String chunk) {
+      if (log.length < 8192) log.write(chunk);
+    }
+
+    final core = await Process.start(binary, [
+      '-socket',
+      socket,
+      '-data-dir',
+      '$root/coredata',
+      '-engines-dir',
+      engines,
+      '-allow-file-keys',
+    ]);
+    core.stdout.transform(utf8.decoder).listen(capture);
+    core.stderr.transform(utf8.decoder).listen(capture);
+    addTearDown(() async {
+      core.kill(ProcessSignal.sigterm);
+      await core.exitCode.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          core.kill(ProcessSignal.sigkill);
+          return core.exitCode;
+        },
       );
-      for (final entry in {
-        'HOME': 'home',
-        'XDG_CONFIG_HOME': 'config',
-        'XDG_CACHE_HOME': 'cache',
-        'XDG_DATA_HOME': 'data',
-        'XDG_RUNTIME_DIR': 'runtime',
-      }.entries) {
-        final path = '$root/${entry.value}';
-        expect(env[entry.key], path, reason: entry.key);
-        expect(await Directory(path).resolveSymbolicLinks(), path, reason: entry.key);
-      }
-      for (final key in [
-        'DBUS_SESSION_BUS_ADDRESS',
-        'DISPLAY',
-        'WAYLAND_DISPLAY',
-        'NOTIFY_SOCKET',
-        'SSH_AUTH_SOCK',
-        'SORA_DATA_DIR',
-      ]) {
-        expect(env.containsKey(key), isFalse, reason: key);
-      }
-      expect(socket, '$root/core.sock');
-      expect(FileSystemEntity.typeSync(socket!, followLinks: false), FileSystemEntityType.notFound);
-      final binary = '$root/sora-core';
-      final engines = '$root/engines';
-      expect(await File(binary).exists(), isTrue);
-      expect(await File('$engines/$backend').exists(), isTrue);
-      expect(await File('$engines/mihomo').exists(), isTrue);
+    });
 
-      final log = StringBuffer();
-      void capture(String chunk) {
-        if (log.length < 8192) log.write(chunk);
+    Future<void> until(bool Function() condition, String stage) async {
+      final deadline = DateTime.now().add(const Duration(seconds: 30));
+      while (!condition()) {
+        if (DateTime.now().isAfter(deadline)) fail('$stage timed out; core log: $log');
+        await Future<void>.delayed(const Duration(milliseconds: 25));
       }
+    }
 
-      final core = await Process.start(binary, [
-        '-socket',
-        socket,
-        '-data-dir',
-        '$root/coredata',
-        '-engines-dir',
-        engines,
-        '-allow-file-keys',
+    await until(() => FileSystemEntity.typeSync(socket, followLinks: false) != FileSystemEntityType.notFound, 'socket');
+    final sourceName = backend == 'tpws' ? 'zapret' : 'byedpi';
+    final package = await signed(sourceOverride: Directory('../extensions/sources/$sourceName'));
+    await install(package);
+    final settings = await Settings.load();
+    settings.tunnel = 'proxy';
+    settings.engine = 'mihomo';
+    settings.blockAds = false;
+    final destination = backend == 'tpws' ? '198.18.0.2' : '127.0.0.1';
+    settings.rules = ['proxy $destination/32'];
+    final sora = Sora(settings, extensions: store);
+    ownedBySora = true;
+    final running = sora.run();
+    addTearDown(() async {
+      try {
+        if (sora.phase == Phase.connected || sora.phase == Phase.connecting || sora.phase == Phase.reconnecting) {
+          await sora.disconnect().timeout(const Duration(seconds: 15));
+        }
+      } finally {
+        sora.dispose();
+        await running.timeout(const Duration(seconds: 10));
+      }
+    });
+    await until(
+      () => backend == 'byedpi' ? sora.coreCapabilities.contains('serverless-bydpi') : sora.serverlessAvailable,
+      'core capability',
+    );
+    final choice = store.bypassProfiles.single.choiceId;
+    await sora.select(choice);
+    expect(sora.currentPlan.outbounds.single.protocol, backend == 'byedpi' ? 'byedpi' : 'bypass');
+    expect(sora.currentPlan.networkControlAllowed, isFalse);
+    expect(sora.currentPlan.outbounds.single.bypass.splitPos, backend == 'byedpi' ? ['1'] : ['1', 'midsld']);
+    expect(sora.currentPlan.routes.single.destination, '$destination/32');
+    expect(sora.currentPlan.routes.single.outboundId, Sora.bypassId);
+    await sora.connect();
+    expect(sora.phase, Phase.connected, reason: 'failure=${sora.failure}; core log: $log');
+    final proxy = sora.localProxy;
+    expect(proxy, isNotNull);
+    expect(InternetAddress.tryParse(proxy!.host)?.isLoopback, isTrue);
+    expect(proxy.port, greaterThan(0));
+
+    late final Uri httpTarget, tlsTarget;
+    late final String tlsName;
+    late final List<int> trustedCertificate;
+    if (backend == 'tpws') {
+      httpTarget = peerHttpTarget!;
+      tlsTarget = peerTlsTarget!;
+      tlsName = 'example.com';
+      trustedCertificate = peerCertificate!;
+    } else {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => server.close(force: true));
+      server.listen((request) async {
+        final body = await utf8.decoder.bind(request).join();
+        request.response.write(body);
+        await request.response.close();
+      });
+      final certificate = '$root/tls-cert.pem';
+      final privateKey = '$root/tls-test-key.pem';
+      final generated = await Process.run('openssl', [
+        'req',
+        '-x509',
+        '-newkey',
+        'rsa:2048',
+        '-nodes',
+        '-days',
+        '1',
+        '-subj',
+        '/CN=localhost',
+        '-addext',
+        'subjectAltName=DNS:localhost',
+        '-keyout',
+        privateKey,
+        '-out',
+        certificate,
       ]);
-      core.stdout.transform(utf8.decoder).listen(capture);
-      core.stderr.transform(utf8.decoder).listen(capture);
-      addTearDown(() async {
-        core.kill(ProcessSignal.sigterm);
-        await core.exitCode.timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            core.kill(ProcessSignal.sigkill);
-            return core.exitCode;
-          },
-        );
+      expect(generated.exitCode, 0, reason: 'temporary TLS certificate generation failed');
+      final serverContext = SecurityContext()
+        ..useCertificateChain(certificate)
+        ..usePrivateKey(privateKey);
+      final secureServer = await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, serverContext);
+      addTearDown(() => secureServer.close(force: true));
+      secureServer.listen((request) async {
+        final body = await utf8.decoder.bind(request).join();
+        request.response.write(body);
+        await request.response.close();
       });
+      httpTarget = Uri(scheme: 'http', host: '127.0.0.1', port: server.port, path: '/');
+      tlsTarget = Uri(scheme: 'https', host: '127.0.0.1', port: secureServer.port);
+      tlsName = 'localhost';
+      trustedCertificate = await File(certificate).readAsBytes();
+    }
 
-      Future<void> until(bool Function() condition, String stage) async {
-        final deadline = DateTime.now().add(const Duration(seconds: 30));
-        while (!condition()) {
-          if (DateTime.now().isAfter(deadline)) fail('$stage timed out; core log: $log');
-          await Future<void>.delayed(const Duration(milliseconds: 25));
-        }
-      }
+    final connection = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
+    addTearDown(connection.destroy);
+    const payload = 'signed candidate through isolated core';
+    connection.write(
+      'POST ${httpTarget.replace(path: '/')} HTTP/1.1\r\n'
+      'Host: ${httpTarget.authority}\r\n'
+      'Content-Length: ${utf8.encode(payload).length}\r\n'
+      'Connection: close\r\n\r\n$payload',
+    );
+    final response = await utf8.decoder.bind(connection).join().timeout(const Duration(seconds: 10));
+    expect(response, startsWith('HTTP/1.1 200'), reason: 'backend=$backend; core log: $log');
+    expect(response, contains(payload));
 
-      await until(
-        () => FileSystemEntity.typeSync(socket, followLinks: false) != FileSystemEntityType.notFound,
-        'socket',
-      );
-      final sourceName = backend == 'tpws' ? 'zapret' : 'byedpi';
-      final package = await signed(sourceOverride: Directory('../extensions/sources/$sourceName'));
-      await install(package);
-      final settings = await Settings.load();
-      settings.tunnel = 'proxy';
-      settings.engine = 'mihomo';
-      settings.blockAds = false;
-      settings.rules = ['proxy 198.18.0.2/32'];
-      final sora = Sora(settings, extensions: store);
-      ownedBySora = true;
-      final running = sora.run();
-      addTearDown(() async {
-        try {
-          if (sora.phase == Phase.connected || sora.phase == Phase.connecting || sora.phase == Phase.reconnecting) {
-            await sora.disconnect().timeout(const Duration(seconds: 15));
+    Future<Socket> connectTunnel() async {
+      final tunnel = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
+      addTearDown(tunnel.destroy);
+      final bytes = <int>[];
+      final ready = Completer<String>();
+      late StreamSubscription<List<int>> subscription;
+      subscription = tunnel.listen(
+        (chunk) {
+          bytes.addAll(chunk);
+          final header = latin1.decode(bytes);
+          if (header.contains('\r\n\r\n') && !ready.isCompleted) {
+            subscription.pause();
+            ready.complete(header);
           }
-        } finally {
-          sora.dispose();
-          await running.timeout(const Duration(seconds: 10));
-        }
-      });
-      await until(
-        () => backend == 'byedpi' ? sora.coreCapabilities.contains('serverless-bydpi') : sora.serverlessAvailable,
-        'core capability',
+        },
+        onError: (Object error, StackTrace stack) {
+          if (!ready.isCompleted) ready.completeError(error, stack);
+        },
       );
-      final choice = store.bypassProfiles.single.choiceId;
-      await sora.select(choice);
-      expect(sora.currentPlan.outbounds.single.protocol, backend == 'byedpi' ? 'byedpi' : 'bypass');
-      expect(sora.currentPlan.networkControlAllowed, isFalse);
-      expect(sora.currentPlan.outbounds.single.bypass.splitPos, backend == 'byedpi' ? ['1'] : ['1', 'midsld']);
-      expect(sora.currentPlan.routes.single.destination, '198.18.0.2/32');
-      expect(sora.currentPlan.routes.single.outboundId, Sora.bypassId);
-      await sora.connect();
-      expect(sora.phase, Phase.connected, reason: 'failure=${sora.failure}; core log: $log');
-      final proxy = sora.localProxy;
-      expect(proxy, isNotNull);
-      expect(InternetAddress.tryParse(proxy!.host)?.isLoopback, isTrue);
-      expect(proxy.port, greaterThan(0));
-
-      final connection = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
-      addTearDown(connection.destroy);
-      const payload = 'signed candidate through isolated core';
-      connection.write(
-        'POST ${httpTarget.replace(path: '/')} HTTP/1.1\r\n'
-        'Host: ${httpTarget.authority}\r\n'
-        'Content-Length: ${utf8.encode(payload).length}\r\n'
-        'Connection: close\r\n\r\n$payload',
+      addTearDown(subscription.cancel);
+      tunnel.write(
+        'CONNECT ${tlsTarget.authority} HTTP/1.1\r\n'
+        'Host: ${tlsTarget.authority}\r\n\r\n',
       );
-      final response = await utf8.decoder.bind(connection).join().timeout(const Duration(seconds: 10));
-      expect(response, startsWith('HTTP/1.1 200'), reason: 'backend=$backend; core log: $log');
-      expect(response, contains(payload));
+      final header = await ready.future.timeout(const Duration(seconds: 10));
+      expect(header, startsWith('HTTP/1.1 200'));
+      return tunnel;
+    }
 
-      Future<Socket> connectTunnel() async {
-        final tunnel = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
-        addTearDown(tunnel.destroy);
-        final bytes = <int>[];
-        final ready = Completer<String>();
-        late StreamSubscription<List<int>> subscription;
-        subscription = tunnel.listen(
-          (chunk) {
-            bytes.addAll(chunk);
-            final header = latin1.decode(bytes);
-            if (header.contains('\r\n\r\n') && !ready.isCompleted) {
-              subscription.pause();
-              ready.complete(header);
-            }
-          },
-          onError: (Object error, StackTrace stack) {
-            if (!ready.isCompleted) ready.completeError(error, stack);
-          },
-        );
-        addTearDown(subscription.cancel);
-        tunnel.write(
-          'CONNECT ${tlsTarget.authority} HTTP/1.1\r\n'
-          'Host: ${tlsTarget.authority}\r\n\r\n',
-        );
-        final header = await ready.future.timeout(const Duration(seconds: 10));
-        expect(header, startsWith('HTTP/1.1 200'));
-        return tunnel;
-      }
+    final untrusted = await connectTunnel();
+    await expectLater(
+      SecureSocket.secure(
+        untrusted,
+        host: tlsName,
+        context: SecurityContext(withTrustedRoots: false),
+      ).timeout(const Duration(seconds: 10)),
+      throwsA(isA<HandshakeException>()),
+    );
+    final trustedContext = SecurityContext(withTrustedRoots: false)..setTrustedCertificatesBytes(trustedCertificate);
+    final secure = await SecureSocket.secure(
+      await connectTunnel(),
+      host: tlsName,
+      context: trustedContext,
+    ).timeout(const Duration(seconds: 10));
+    addTearDown(secure.destroy);
+    secure.write(
+      'POST / HTTP/1.1\r\n'
+      'Host: $tlsName\r\n'
+      'Content-Length: ${utf8.encode(payload).length}\r\n'
+      'Connection: close\r\n\r\n$payload',
+    );
+    final tlsResponse = await utf8.decoder.bind(secure).join().timeout(const Duration(seconds: 10));
+    expect(tlsResponse, startsWith('HTTP/1.1 200'));
+    expect(tlsResponse, contains(payload));
 
-      final untrusted = await connectTunnel();
-      await expectLater(
-        SecureSocket.secure(
-          untrusted,
-          host: 'example.com',
-          context: SecurityContext(withTrustedRoots: false),
-        ).timeout(const Duration(seconds: 10)),
-        throwsA(isA<HandshakeException>()),
-      );
-      final trustedContext = SecurityContext(withTrustedRoots: false)..setTrustedCertificatesBytes(trustedCertificate);
-      final secure = await SecureSocket.secure(
-        await connectTunnel(),
-        host: 'example.com',
-        context: trustedContext,
-      ).timeout(const Duration(seconds: 10));
-      addTearDown(secure.destroy);
-      secure.write(
-        'POST / HTTP/1.1\r\n'
-        'Host: example.com\r\n'
-        'Content-Length: ${utf8.encode(payload).length}\r\n'
-        'Connection: close\r\n\r\n$payload',
-      );
-      final tlsResponse = await utf8.decoder.bind(secure).join().timeout(const Duration(seconds: 10));
-      expect(tlsResponse, startsWith('HTTP/1.1 200'));
-      expect(tlsResponse, contains(payload));
+    await store.setEnabled(package.manifest.id, false);
+    await until(() => sora.phase == Phase.off, 'disable disconnect');
+    expect(sora.currentPlan.outbounds, isEmpty);
+  }
 
-      await store.setEnabled(package.manifest.id, false);
-      await until(() => sora.phase == Phase.off, 'disable disconnect');
-      expect(sora.currentPlan.outbounds, isEmpty);
-    },
+  test(
+    'signed ByeDPI profile connects the app to a real isolated core',
+    () => liveNetworkProfile('byedpi'),
     skip: Platform.environment['SORA_LIVE_BYPASS'] == '1'
         ? false
         : 'requires a guarded private user and network namespace with real core and engines',
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
+
+  test(
+    'signed Zapret profile connects the app to a real isolated core',
+    () => liveNetworkProfile('tpws'),
+    skip: Platform.environment['SORA_LIVE_BYPASS'] == '1'
+        ? false
+        : 'requires guarded private user and peer network namespaces with real core and engines',
     timeout: const Timeout(Duration(minutes: 3)),
   );
 

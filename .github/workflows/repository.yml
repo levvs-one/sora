@@ -844,30 +844,7 @@ jobs:
           sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb bubblewrap shellcheck
           flutter pub get
           flutter build linux --release --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
-      - name: Check the architecture of every bundled native binary
-        env:
-          SORA_FLUTTER_ARCH: ${{ matrix.flutter_arch }}
-          SORA_ELF_MACHINE: ${{ matrix.elf_machine }}
-        run: |
-          bundle="app/build/linux/$SORA_FLUTTER_ARCH/release/bundle"
-          test -x "$bundle/sora"
-          test -f "$bundle/lib/libapp.so"
-          test -f "$bundle/lib/libflutter_linux_gtk.so"
-          while IFS= read -r -d '' binary; do
-            echo "$binary"
-            readelf -h "$binary" | grep -E "Machine:[[:space:]]+$SORA_ELF_MACHINE$"
-          done < <(find "$bundle" -type f \( -name sora -o -name '*.so' \) -print0)
-      - name: Check release-version catalog compatibility on ARM64
-        if: matrix.arch == 'arm64'
-        working-directory: app
-        run: |
-          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
-          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
-          echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
-          flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
-          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
-          flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
-      - name: App and network profiles through an isolated real core
+      - name: App and Zapret through isolated peer networks
         timeout-minutes: 8
         working-directory: app
         run: |
@@ -877,7 +854,7 @@ jobs:
           mkdir -p "$private"/{home,config,cache,data,runtime,engines}
           install -m 0755 ../dist/sora-core "$private/sora-core"
           install -m 0755 "$RUNNER_TEMP/sora-zapret-core-probe" "$private/probe"
-          for file in byedpi tpws mihomo; do install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
+          for file in tpws mihomo; do install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
           for file in geoip.dat geosite.dat; do install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
           (cd ../tools/sora-ext && go build -o "$private/sora-ext-preflight" ./cmd/sora-ext)
           version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
@@ -886,17 +863,16 @@ jobs:
           runner_uid=$(id -u)
           runner_gid=$(id -g)
           test "$runner_uid" -ne 0 && test "$runner_gid" -ne 0
-          sudo unshare --user --map-users="1000:$runner_uid:1" --map-user=0 --map-groups="1000:$runner_gid:1" --map-group=0 --net \
+          sudo -g "#$runner_gid" unshare --net \
             env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
             HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
             PATH="$PATH" PUB_CACHE="${PUB_CACHE:-$HOME/.pub-cache}" GOCACHE="$(go env GOCACHE)" GOMODCACHE="$(go env GOMODCACHE)" GOPROXY=off \
             SORA_LIVE_BYPASS=1 SORA_BYPASS_ISOLATED=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
             bash -e -c '
               test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
-              test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
               here=$(readlink /proc/self/ns/net)
               ip link set lo up
-              unshare -n setpriv --reuid=1000 --regid=1000 --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all sleep 360 &
+              unshare -n setpriv --reuid="$3" --regid="$4" --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all sleep 360 &
               peer=$!
               server=
               cleanup() {
@@ -921,22 +897,69 @@ jobs:
               nsenter -t "$peer" -n ip link set lo up
               nsenter -t "$peer" -n ip addr add 198.18.0.2/30 dev sora-app-b
               nsenter -t "$peer" -n ip link set sora-app-b up
-              nsenter -t "$peer" -n setpriv --reuid=1000 --regid=1000 --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$2/probe" zapret-target "$2/targets.json" &
+              nsenter -t "$peer" -n setpriv --reuid="$3" --regid="$4" --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$2/probe" zapret-target "$2/targets.json" &
               server=$!
               for n in $(seq 1 100); do
-                if setpriv --reuid=1000 --regid=1000 --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all /usr/bin/test -s "$2/targets.json"; then break; fi
+                [ -s "$2/targets.json" ] && break
                 if ! kill -0 "$server" 2>/dev/null; then exit 1; fi
                 sleep 0.1
               done
-              setpriv --reuid=1000 --regid=1000 --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all /usr/bin/test -s "$2/targets.json"
-              setpriv --reuid=1000 --regid=1000 --clear-groups --bounding-set=-all --inh-caps=-all --ambient-caps=-all bash -e -s -- "$1" <<\SORA_TESTS
-          version=$1
-          for backend in byedpi tpws; do
-            echo "Testing $backend"
-            SORA_LIVE_BYPASS_BACKEND="$backend" flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name "signed network profile connects the app to a real isolated core"
-          done
-          SORA_TESTS
-            ' bash "$version" "$private"
+              test -s "$2/targets.json"
+              unshare --user --map-users="0:$3:1" --map-groups="0:$4:1" --setuid=0 --keep-caps \
+                setpriv --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$1" test/extension_bypass_test.dart --plain-name "signed Zapret profile connects the app to a real isolated core"
+            ' bash "$version" "$private" "$runner_uid" "$runner_gid"
+      - name: Check the architecture of every bundled native binary
+        env:
+          SORA_FLUTTER_ARCH: ${{ matrix.flutter_arch }}
+          SORA_ELF_MACHINE: ${{ matrix.elf_machine }}
+        run: |
+          bundle="app/build/linux/$SORA_FLUTTER_ARCH/release/bundle"
+          test -x "$bundle/sora"
+          test -f "$bundle/lib/libapp.so"
+          test -f "$bundle/lib/libflutter_linux_gtk.so"
+          while IFS= read -r -d '' binary; do
+            echo "$binary"
+            readelf -h "$binary" | grep -E "Machine:[[:space:]]+$SORA_ELF_MACHINE$"
+          done < <(find "$bundle" -type f \( -name sora -o -name '*.so' \) -print0)
+      - name: Check release-version catalog compatibility on ARM64
+        if: matrix.arch == 'arm64'
+        working-directory: app
+        run: |
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
+          echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
+          flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+      - name: App and ByeDPI through an isolated real core
+        timeout-minutes: 6
+        working-directory: app
+        run: |
+          set -euo pipefail
+          private=$(realpath "$(mktemp -d "$RUNNER_TEMP/sora-live-app-XXXXXXXX")")
+          trap 'rm -rf -- "$private"' EXIT
+          mkdir -p "$private"/{home,config,cache,data,runtime,engines}
+          install -m 0755 ../dist/sora-core "$private/sora-core"
+          for file in byedpi mihomo; do install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
+          for file in geoip.dat geosite.dat; do install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
+          (cd ../tools/sora-ext && go build -o "$private/sora-ext-preflight" ./cmd/sora-ext)
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          parent_net=$(readlink /proc/self/ns/net)
+          parent_user=$(readlink /proc/self/ns/user)
+          runner_uid=$(id -u)
+          runner_gid=$(id -g)
+          test "$runner_uid" -ne 0 && test "$runner_gid" -ne 0
+          sudo -g "#$runner_gid" unshare --net \
+            env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$PATH" PUB_CACHE="${PUB_CACHE:-$HOME/.pub-cache}" GOCACHE="$(go env GOCACHE)" GOMODCACHE="$(go env GOMODCACHE)" GOPROXY=off \
+            SORA_LIVE_BYPASS=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
+            bash -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              ip link set lo up
+              exec unshare --user --map-users="0:$1:1" --map-groups="0:$2:1" --setuid=0 --keep-caps \
+                setpriv --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$3" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
+            ' bash "$runner_uid" "$runner_gid" "$version"
       - name: Native signed extension panel on ARM64
         if: matrix.arch == 'arm64'
         working-directory: app
