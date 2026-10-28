@@ -185,6 +185,12 @@ jobs:
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
           flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
           flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+      - name: Verify the live extension catalog for a tagged release
+        if: github.ref_type == 'tag'
+        run: >-
+          flutter test --no-pub --dart-define=SORA_VERIFY_LIVE_CATALOG=true
+          test/ext_revocation_catalog_test.dart
+          --plain-name 'release catalog is available with a trusted signature'
       - name: Connection and export races over an isolated RPC socket
         run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
