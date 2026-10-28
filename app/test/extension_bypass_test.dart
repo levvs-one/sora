@@ -155,8 +155,19 @@ void main() {
       'packages/material_symbols_icons/MaterialSymbolsRounded',
     )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
     fixture = await Directory.systemTemp.createTemp('sora-bypass-signed-');
-    tool = '${fixture.path}/sora-ext${Platform.isWindows ? '.exe' : ''}';
-    await command('go', ['build', '-o', tool, './cmd/sora-ext'], workingDirectory: '../tools/sora-ext');
+    if (Platform.environment['SORA_LIVE_BYPASS'] == '1') {
+      expect(Platform.isLinux, isTrue);
+      final root = Platform.environment['SORA_LIVE_BYPASS_ROOT'];
+      expect(root, isNotNull);
+      expect(await Directory(root!).resolveSymbolicLinks(), root);
+      expect(root.split(Platform.pathSeparator).last, startsWith('sora-live-app-'));
+      expect((await Directory(root).stat()).mode & 0x3f, 0);
+      tool = '$root/sora-ext-preflight';
+      expect(FileSystemEntity.typeSync(tool, followLinks: false), FileSystemEntityType.file);
+    } else {
+      tool = '${fixture.path}/sora-ext${Platform.isWindows ? '.exe' : ''}';
+      await command('go', ['build', '-o', tool, './cmd/sora-ext'], workingDirectory: '../tools/sora-ext');
+    }
     await command(tool, ['keygen', '-o', '${fixture.path}/temporary-author']);
     publicKey = (await File('${fixture.path}/temporary-author.pub').readAsLines()).last.trim();
     pkg = await signed();
