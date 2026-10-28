@@ -2,8 +2,8 @@
 
 This change connects a signed declarative extension to existing host behavior:
 Linux Zapret/tpws and Windows driverless ByeDPI. Version 3 adds platform variants
-for the separate Windows WinDivert/winws adapter described below. Source code
-does not publish signed catalog bytes or make an older client support this API.
+for the separate Windows WinDivert/winws adapter described below. An older
+client does not support this API.
 
 The app checks the package signature and catalog-pinned author identity before
 validating or extracting a descriptor. hook_version 2 accepts only bounded
@@ -75,13 +75,13 @@ or exploit claim.
 
 ## Distribution
 
-The signed public catalog and published packages are unchanged. Source projects
-must get the actual first supported host version before production author/team
-signing. Catalog refresh already delivers separately signed additions without
-rebuilding a compatible app. Catalog preflight now presents version/OS requirements without hiding entries;
-it does not replace native checks. Production signing approval and publication
-remain separate required work. The unpublished manifest must identify the actual
-first released host carrying both the app consumer and native adapter.
+Zapret 1.0.0 and ByeDPI 1.0.0 are author and team signed in
+`extensions/catalog-1.1.3.json` with min_app_version 1.1.3, the first released
+host carrying both the app consumer and the native adapter. The legacy
+`catalog.json` for v1.1.2 clients does not list them. Catalog refresh delivers
+separately signed additions without rebuilding a compatible app. Catalog
+preflight presents version/OS requirements without hiding entries; it does not
+replace native checks.
 
 Local validation: full Flutter suite 547 passed / 71 prerequisite skips,
 then 12 profile/transport/UI cases passed with both private gRPC cases enabled;

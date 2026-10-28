@@ -168,15 +168,13 @@ no network access in v1.
 
 ## 5. Catalog
 
-The published v1.1.2 app uses `catalog.json` and `catalog.json.minisig`.
-The compatible host candidate uses `catalog-1.1.3.json` and its `.minisig`.
+The v1.1.2 app uses `catalog.json` and `catalog.json.minisig`.
+Sora 1.1.3 and later use `catalog-1.1.3.json` and its `.minisig`.
 Both use the team key and the same catalog signature role, with trusted
 comment `timestamp:..\tfile:catalog.json\tsha256:..`. The versioned path
 separates listings but does not add a cryptographic scope or rollback
-protection. The repository seed is a copy of the existing signed catalog;
-it does not establish that a new host or extension has been published.
-The versioned files must be available and verify at the configured URL before
-shipping a host that uses it. See [catalog publishing](../extensions/README.md).
+protection. A versioned catalog must be available and verify at its URL before
+a host that uses it ships. See [catalog publishing](../extensions/README.md).
 Shape:
 
 ```json
@@ -541,12 +539,10 @@ The app owns this grant boundary. The core validates an ordinary control
 peer's SessionPlan and does not independently attest the app's extension
 registry or grants. A compromised app/control peer remains outside it.
 
-Sources: `extensions/sources/zapret` (Linux built-in settings) and
-`extensions/sources/byedpi` (Windows driverless backend).
-They are source projects, not published catalog entries. Production
-publication must choose the actual first host release with this consumer
-and set the matching min_app_version before author/team signing.
-The source's minimum version is not deployment evidence.
+Sources: `extensions/sources/zapret` (Linux tpws, Windows winws) and
+`extensions/sources/byedpi` (driverless backend on Linux and Windows).
+Both are published as 1.0.0 in `catalog-1.1.3.json` with min_app_version
+1.1.3, the first release carrying this consumer.
 
 Catalog bytes and packages are delivered separately from the application.
 Opening/refreshing the catalog fetches and verifies its current team
@@ -555,8 +551,7 @@ backend or API still requires a host that implements it. Catalog visibility
 must not imply installability or claim that old clients have new capabilities.
 The catalog shows OS/version requirements before download and blocks incompatible
 install/update actions without hiding the listing. Signed manifest and runtime
-checks still run afterward. Native architecture/backend checks and the actual
-minimum published host version still need validation before these sources ship.
+checks still run afterward, including the native architecture and backend checks.
 
 No profile promises DPI evasion on every network. Loading a Windows driver
 in a disposable test environment proves neither shaping effectiveness nor

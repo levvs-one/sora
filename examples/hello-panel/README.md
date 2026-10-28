@@ -34,6 +34,6 @@ through the granted notification API. Automatic disconnected refreshes are
 quiet. The bundled Inter font and its original OFL licence are served locally;
 the panel makes no external font or data requests.
 
-This source update targets the 1.1.3 host release candidate; it does not
-replace the signed 1.0.0 package in extensions/. Publish it only after a
-compatible host is available, using the normal author/team signatures.
+Version 1.0.1 requires Sora 1.1.3 and is published in
+`extensions/catalog-1.1.3.json`. The signed 1.0.0 package stays in the legacy
+`catalog.json` for v1.1.2 clients.
