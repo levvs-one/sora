@@ -617,6 +617,65 @@ jobs:
           name: sora-windows-x64
           path: dist/Sora-Setup-*.exe
           if-no-files-found: error
+      - name: Build a review-only compatible Windows host
+        if: github.event_name == 'pull_request'
+        working-directory: app
+        shell: pwsh
+        env:
+          SORA_REVIEW_HEAD: '${{ github.event.pull_request.head.sha }}'
+          SORA_REVIEW_BASE: '${{ github.event.pull_request.base.sha }}'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:SORA_COMPAT_VERSION -notmatch '^\d+\.\d+\.\d+$') { throw 'Missing candidate app version' }
+          foreach ($revision in @($env:GITHUB_SHA, $env:SORA_REVIEW_HEAD, $env:SORA_REVIEW_BASE)) {
+            if ($revision -notmatch '^[0-9a-f]{40}$') { throw 'Missing pull request revision' }
+          }
+          flutter build windows --release --no-pub "--dart-define=SORA_VERSION=$env:SORA_COMPAT_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate app build failed' }
+          $bundle = (Resolve-Path 'build/windows/x64/runner/Release').Path
+          if (-not (Test-Path -LiteralPath (Join-Path $bundle 'sora.exe'))) { throw 'Candidate app is missing' }
+          $core = Join-Path $env:GITHUB_WORKSPACE 'dist/windows/sora-core.exe'
+          $env:CGO_ENABLED = '0'
+          Push-Location (Join-Path $env:GITHUB_WORKSPACE 'core')
+          try {
+            go build -trimpath -ldflags "-s -w -X main.buildVersion=$env:SORA_COMPAT_VERSION" -o $core ./cmd/sora-core
+            if ($LASTEXITCODE -ne 0) { throw 'Candidate core build failed' }
+          } finally {
+            Pop-Location
+          }
+          $compiler = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'packaging/windows/sora.iss'
+          & $compiler "/DAppVersion=$env:SORA_COMPAT_VERSION" $script
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate installer build failed' }
+          $setup = Join-Path $env:GITHUB_WORKSPACE "dist/Sora-Setup-$($env:SORA_COMPAT_VERSION)-x64.exe"
+          if (-not (Test-Path -LiteralPath $setup)) { throw 'Candidate installer is missing' }
+          if ((Get-AuthenticodeSignature -LiteralPath $setup).Status -ne 'NotSigned') {
+            throw 'Review installer unexpectedly has an Authenticode signature'
+          }
+          $review = Join-Path $env:RUNNER_TEMP 'sora-windows-host-review'
+          New-Item -ItemType Directory -Path $review -ErrorAction Stop | Out-Null
+          Copy-Item -LiteralPath $bundle -Destination (Join-Path $review 'app') -Recurse
+          Copy-Item -LiteralPath $setup -Destination (Join-Path $review "Sora-Setup-$($env:SORA_COMPAT_VERSION)-x64-UNSIGNED-CANDIDATE.exe")
+          @(
+            'REVIEW ONLY: unsigned candidate installer and app, not a release.',
+            "Candidate version: $env:SORA_COMPAT_VERSION",
+            "PR head: $env:SORA_REVIEW_HEAD",
+            "PR base: $env:SORA_REVIEW_BASE",
+            "CI checkout: $env:GITHUB_SHA",
+            'Installer includes the candidate core and pinned engines; it was not run.',
+            'No signed release manifest, trusted bootstrap or rollback baseline is included.',
+            'The hashes identify these files; they do not authenticate their origin.'
+          ) | Set-Content -LiteralPath (Join-Path $review 'README-UNSIGNED.txt') -Encoding utf8
+          Get-ChildItem -LiteralPath $review -File -Recurse | Where-Object { $_.Name -ne 'README-UNSIGNED.txt' } | Sort-Object FullName | ForEach-Object {
+            $relative = [IO.Path]::GetRelativePath($review, $_.FullName).Replace('\', '/')
+            "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $relative"
+          } | Set-Content -LiteralPath (Join-Path $review 'UNSIGNED-SHA256.txt') -Encoding ascii
+      - uses: actions/upload-artifact@v6
+        if: github.event_name == 'pull_request'
+        with:
+          name: 'windows-host-review-unsigned-${{ github.sha }}'
+          path: '${{ runner.temp }}/sora-windows-host-review'
+          if-no-files-found: error
 
   linux-packages:
     name: Linux packages (${{ matrix.arch }}, ${{ matrix.runner }})
