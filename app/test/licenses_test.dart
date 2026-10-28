@@ -31,7 +31,7 @@ void main() {
         addTearDown(tester.view.reset);
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-        await settings.completeTour();
+
         settings
           ..theme = theme
           ..language = 'ru'

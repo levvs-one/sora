@@ -36,7 +36,7 @@ void main() {
   testWidgets('home status has one owner and hides actions during transitions', (tester) async {
     SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings.animations = false;
     settings.sessionIntent = jsonEncode({'server': 'auto', 'at': DateTime.now().millisecondsSinceEpoch});
     final sora = _ScreenSora(settings, SyncDaemon())
@@ -109,7 +109,7 @@ void main() {
         for (final theme in ['light', 'dark']) {
           SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
           final settings = await Settings.load();
-          await settings.completeTour();
+
           settings
             ..language = language
             ..theme = theme

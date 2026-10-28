@@ -51,7 +51,7 @@ class _ToastTitle extends StatelessWidget {
         ],
       ],
     );
-    // Toastification limits titles to two lines, which would hide recovery steps.
+    // Localized causes must remain readable at large text scales.
     final content = DefaultTextStyle(style: DefaultTextStyle.of(context).style, child: body);
     if (notice.action.isEmpty) return content;
     return Semantics(button: true, onTap: () => runNotificationAction(context, notice), child: content);

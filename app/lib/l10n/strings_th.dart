@@ -205,62 +205,58 @@ class STh extends S {
   String get errGeneric => 'มีบางอย่างผิดพลาด';
 
   @override
-  String get errCore => 'บริการ Sora ไม่ตอบสนอง โปรดรอสักครู่แล้วลองอีกครั้ง';
+  String get errCore => 'บริการ Sora ไม่ตอบสนอง';
 
   @override
-  String get errAuth => 'ไม่อนุญาตให้เข้าถึงบริการ Sora โปรดเริ่มแอปใหม่แล้วลองอีกครั้ง';
+  String get errAuth => 'ไม่อนุญาตให้เข้าถึงบริการ Sora';
 
   @override
-  String get errVersion => 'แอปและบริการ Sora เป็นคนละเวอร์ชัน โปรดอัปเดต Sora';
+  String get errVersion => 'แอปและบริการ Sora เป็นคนละเวอร์ชัน';
 
   @override
-  String get errBusy => 'คำสั่งก่อนหน้ายังทำงานอยู่ โปรดรอให้เสร็จสิ้น';
+  String get errBusy => 'คำสั่งก่อนหน้ายังทำงานอยู่';
 
   @override
-  String get errEngineMissing => 'ไม่พบเอนจินที่ต้องใช้กับเซิร์ฟเวอร์นี้ โปรดตรวจสอบการอัปเดต Sora';
+  String get errEngineMissing => 'ไม่พบเอนจินที่ต้องใช้กับเซิร์ฟเวอร์นี้';
 
   @override
-  String get errEngineStart => 'เริ่มเอนจินไม่ได้ โปรดดูสาเหตุในบันทึกการเชื่อมต่อ';
+  String get errEngineStart => 'เริ่มเอนจินไม่ได้';
 
   @override
-  String get errEngineStopped => 'เอนจินหยุดทำงานแล้ว โปรดลองเชื่อมต่ออีกครั้ง';
+  String get errEngineStopped => 'เอนจินหยุดทำงานแล้ว';
 
   @override
-  String get errTunnel => 'โหมด VPN นี้ไม่พร้อมใช้งาน เลือกโหมดอื่นหรือตรวจสอบสิทธิ์ของบริการ';
+  String get errTunnel => 'โหมด VPN นี้ไม่พร้อมใช้งาน';
 
   @override
-  String get errNetwork => 'ไม่สามารถเข้าถึงเซิร์ฟเวอร์ได้';
+  String get errTimeout => 'เซิร์ฟเวอร์ไม่ตอบสนองภายในเวลาที่กำหนด';
 
   @override
-  String get errTimeout => 'เซิร์ฟเวอร์ไม่ตอบสนองภายในเวลาที่กำหนด โปรดลองอีกครั้งในอีกหนึ่งนาที';
+  String get errFirewall => 'บล็อกการเข้าถึงอินเทอร์เน็ตนอก VPN ไม่ได้';
 
   @override
-  String get errFirewall => 'บล็อกการเข้าถึงอินเทอร์เน็ตนอก VPN ไม่ได้ โปรดดูสาเหตุในบันทึกการเชื่อมต่อ';
+  String get errSubFetch => 'ดาวน์โหลดการสมัครไม่ได้';
 
   @override
-  String get errSubFetch => 'ดาวน์โหลดการสมัครไม่ได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองอีกครั้งในอีกหนึ่งนาที';
+  String get errSubFormat => 'ไม่รู้จักรูปแบบการสมัครนี้';
 
   @override
-  String get errSubFormat => 'ไม่รู้จักรูปแบบการสมัครนี้ โปรดขอลิงก์การสมัครที่รองรับจากผู้ให้บริการ';
+  String get errSubEmpty => 'การสมัครนี้ไม่มีเซิร์ฟเวอร์';
 
   @override
-  String get errSubEmpty => 'การสมัครนี้ไม่มีเซิร์ฟเวอร์ โปรดติดต่อผู้ให้บริการการสมัคร';
+  String get errSubDuplicate => 'เพิ่มการสมัครนี้ไว้แล้ว';
 
   @override
-  String get errSubDuplicate => 'เพิ่มการสมัครนี้ไว้แล้ว โปรดอัปเดตเพื่อรับรายชื่อเซิร์ฟเวอร์ล่าสุด';
+  String get errSubLimit => 'จำนวนการสมัครถึงขีดจำกัดแล้ว';
 
   @override
-  String get errSubLimit => 'จำนวนการสมัครถึงขีดจำกัดแล้ว โปรดลบรายการที่ไม่ใช้ก่อนเพิ่มรายการใหม่';
+  String get errSubScheme => 'ไม่รองรับรูปแบบลิงก์การสมัครนี้';
 
   @override
-  String get errSubScheme => 'ลิงก์การสมัครต้องขึ้นต้นด้วย https:// โปรดขอลิงก์ที่ปลอดภัยจากผู้ให้บริการ';
+  String get errSecretStore => 'พื้นที่จัดเก็บของ Sora เสียหายหรือเข้าถึงไม่ได้';
 
   @override
-  String get errSecretStore =>
-      'พื้นที่จัดเก็บของ Sora เสียหายหรือเข้าถึงไม่ได้ โปรดตรวจสอบสิทธิ์การเข้าถึงและดูรายละเอียดในบันทึก';
-
-  @override
-  String get errNoServers => 'ไม่มีเซิร์ฟเวอร์ให้เชื่อมต่อ โปรดเพิ่มการสมัครหรือเซิร์ฟเวอร์ของคุณเอง';
+  String get errNoServers => 'ไม่มีเซิร์ฟเวอร์ให้เชื่อมต่อ';
 
   @override
   String get connections => 'การเชื่อมต่อ';
@@ -314,9 +310,6 @@ class STh extends S {
   String get dnsAuto => 'อัตโนมัติ';
 
   @override
-  String get dnsHint => 'ที่อยู่ คั่นด้วยเครื่องหมายจุลภาค';
-
-  @override
   String get fragment => 'การกระจายตัวของ TLS';
 
   @override
@@ -332,13 +325,7 @@ class STh extends S {
   String get byDefault => 'ค่าเริ่มต้น';
 
   @override
-  String get rangeHint => 'ตัวอย่างเช่น 100-200';
-
-  @override
   String get splitPos => 'แยกตำแหน่ง';
-
-  @override
-  String get splitPosHint => 'ตัวอย่างเช่น 1, midsld';
 
   @override
   String get disorder => 'จัดลำดับชิ้นส่วนใหม่';
@@ -447,11 +434,6 @@ class STh extends S {
   String get support => 'สนับสนุน';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine ถูกควบคุมผ่านพอร์ตบนคอมพิวเตอร์เครื่องนี้ โปรแกรมอื่นๆ จะสามารถบอกได้ว่า VPN เปิดอยู่';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'เลือก $engine';
   }
@@ -527,9 +509,6 @@ class STh extends S {
   String get launchAtLogin => 'เริ่มต้นด้วยระบบ';
 
   @override
-  String get launchAtLoginDetail => 'Sora จะเริ่มทำงานอัตโนมัติเมื่อคุณเข้าสู่ระบบและอยู่ในถาดระบบ';
-
-  @override
   String get closeToTray => 'เก็บในถาดเมื่อปิด';
 
   @override
@@ -564,9 +543,6 @@ class STh extends S {
   String get noticeInTray => 'Sora ยังอยู่ในถาด';
 
   @override
-  String get noticeInTrayBody => 'ออกจากเมนูของไอคอน';
-
-  @override
   String get noticeLost => 'การเชื่อมต่อขาดหายไป';
 
   @override
@@ -594,11 +570,7 @@ class STh extends S {
   String get importTitle => 'เพิ่มการสมัครสมาชิกนี้หรือไม่?';
 
   @override
-  String get importSealed =>
-      'ลิงก์นี้ได้รับการเข้ารหัสสำหรับ Happ และมีเพียง Happ เท่านั้นที่สามารถอ่านได้ สอบถามผู้ให้บริการของคุณเกี่ยวกับลิงค์สมัครสมาชิกธรรมดา';
-
-  @override
-  String get understood => 'ตกลง';
+  String get importSealed => 'ลิงก์นี้ได้รับการเข้ารหัสสำหรับ Happ และมีเพียง Happ เท่านั้นที่สามารถอ่านได้';
 
   @override
   String get noAnswer => 'ไม่มีคำตอบ';
@@ -637,39 +609,10 @@ class STh extends S {
   String get openLogs => 'เปิดบันทึก';
 
   @override
-  String get tourReplay => 'แสดงคำแนะนำอีกครั้ง';
-
-  @override
-  String tourStep(int step) {
-    return 'ขั้นตอนที่ $step จาก 5';
-  }
-
-  @override
   String get tourBack => 'กลับ';
 
   @override
   String get tourNext => 'ต่อไป';
-
-  @override
-  String get tourSkip => 'ข้าม';
-
-  @override
-  String get tourFinish => 'เสร็จแล้ว';
-
-  @override
-  String get tourAdd => 'เพิ่มลิงค์สมัครสมาชิกของผู้ให้บริการของคุณ';
-
-  @override
-  String get tourServer => 'เลือกเซิร์ฟเวอร์ “เร็วที่สุด” เลือกหนึ่งรายการสำหรับคุณ';
-
-  @override
-  String get tourConnect => 'คลิกที่นี่เพื่อเชื่อมต่อหรือยกเลิกการเชื่อมต่อ';
-
-  @override
-  String get tourMode => 'เลือกโหมด Kill switch จะบล็อกอินเทอร์เน็ตหาก VPN หลุด';
-
-  @override
-  String get tourSettings => 'เปิดการตั้งค่า คุณสามารถเล่นซ้ำคู่มือนี้ได้ที่นั่น';
 
   @override
   String get chooseProgram => 'เลือกโปรแกรม';
@@ -681,7 +624,7 @@ class STh extends S {
   String get runningProcesses => 'กระบวนการที่กำลังทำงานอยู่';
 
   @override
-  String get programsEmpty => 'ไม่พบแอปพลิเคชัน ลองใช้ชื่ออื่น';
+  String get programsEmpty => 'ไม่พบแอปพลิเคชัน';
 
   @override
   String get selectExe => 'เลือกไฟล์ .exe';
@@ -693,7 +636,7 @@ class STh extends S {
   String get speedtestSearch => 'ค้นหาบริการ';
 
   @override
-  String get speedtestEmpty => 'ไม่มีการแข่งขัน เปลี่ยนการค้นหา';
+  String get speedtestEmpty => 'ไม่มีการแข่งขัน';
 
   @override
   String get speedtestBackToList => 'กลับไปที่บริการ';
@@ -702,13 +645,13 @@ class STh extends S {
   String get speedtestOpenBrowser => 'เปิดในเบราว์เซอร์';
 
   @override
-  String get speedtestUnavailable => 'เบราว์เซอร์แบบฝังตัวไม่สามารถเริ่มทำงานได้ เปิดบริการในเบราว์เซอร์ระบบของคุณ';
+  String get speedtestUnavailable => 'เบราว์เซอร์แบบฝังตัวไม่สามารถเริ่มทำงานได้';
 
   @override
-  String get speedtestPageFailed => 'ไม่สามารถโหลดหน้านี้ได้ โหลดซ้ำหรือเปิดบริการในเบราว์เซอร์ระบบของคุณ';
+  String get speedtestPageFailed => 'ไม่สามารถโหลดหน้านี้ได้';
 
   @override
-  String get speedtestExternalFailed => 'เบราว์เซอร์ระบบไม่สามารถเปิดได้ ลองอีกครั้ง';
+  String get speedtestExternalFailed => 'เบราว์เซอร์ระบบไม่สามารถเปิดได้';
 
   @override
   String get modes => 'โหมด';
@@ -748,42 +691,28 @@ class STh extends S {
   String get updateNoNotes => 'การเปิดตัวไม่มีบันทึก';
 
   @override
-  String get updateDropWarning => 'การเชื่อมต่อ VPN จะลดลงไม่กี่วินาทีในขณะที่ Sora และการอัปเดตหลัก ดำเนินการต่อ?';
+  String get updateDropWarning => 'ตัดการเชื่อมต่อเพื่ออัปเดตหรือไม่?';
 
   @override
-  String get updateWaitConnection => 'รอให้การเชื่อมต่อ VPN และคอร์พร้อม';
+  String get updateWaitConnection => 'การเชื่อมต่อยังไม่พร้อม';
 
   @override
-  String get updateDownloading => 'กำลังดาวน์โหลดและยืนยันไฟล์...';
-
-  @override
-  String get updateInstalling => 'กำลังเตรียมการอัปเดตหรือรอการรับรองความถูกต้องของผู้ดูแลระบบ...';
-
-  @override
-  String get updateNetworkError => 'ไม่สามารถดาวน์โหลดการอัปเดตได้ ลองอีกครั้ง';
+  String get updateNetworkError => 'ไม่สามารถดาวน์โหลดการอัปเดตได้';
 
   @override
   String get updateReleaseError => 'ข้อมูลการเผยแพร่หรือไฟล์ที่จำเป็นหายไปหรือไม่ถูกต้อง';
 
   @override
-  String get updateChecksumError => 'การดาวน์โหลดไม่ตรงกับ SHA256SUMS ไม่มีอะไรถูกติดตั้ง';
+  String get updateChecksumError => 'การดาวน์โหลดไม่ตรงกับ SHA256SUMS';
 
   @override
-  String get updateInstallError => 'การอัปเดตไม่เสร็จสิ้น การรับรองความถูกต้องอาจถูกยกเลิก';
+  String get updateInstallError => 'การอัปเดตไม่เสร็จสิ้น';
 
   @override
-  String get updateUnsupported =>
-      'ไฟล์ปฏิบัติการนี้ไม่ได้เป็นเจ้าของโดยคู่แพ็คเกจ Sora ที่รองรับ ใช้คำแนะนำในการติดตั้งรีลีส';
-
-  @override
-  String get updateManual =>
-      'เรียกใช้คำสั่งนี้ในเทอร์มินัลเพื่อติดตั้งแพ็คเกจที่ตรวจสอบแล้วทั้งสองรายการ จากนั้นเปิด Sora อีกครั้ง ไฟล์จะยังคงอยู่ในไดเร็กทอรีดาวน์โหลด การเชื่อมต่อ VPN จะลดลง';
+  String get updateUnsupported => 'ไฟล์ปฏิบัติการนี้ไม่ได้เป็นเจ้าของโดยคู่แพ็คเกจ Sora ที่รองรับ';
 
   @override
   String get updateVersionRevoked => 'ผู้พัฒนาได้ถอนเวอร์ชันนี้ออกแล้ว กรุณารอการแก้ไขการเผยแพร่';
-
-  @override
-  String get updateRolloutPending => 'เวอร์ชันใหม่กำลังทยอยเปิดตัว และจะเสนอให้คุณโดยอัตโนมัติ';
 
   @override
   String updateRollbacking(String version) {
@@ -796,8 +725,7 @@ class STh extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'การย้อนกลับอัตโนมัติล้มเหลว หากเวอร์ชันใหม่ใช้งานไม่ได้ ให้ติดตั้งเวอร์ชันก่อนหน้าใหม่ด้วยตนเอง';
+  String get updateRollbackError => 'การย้อนกลับอัตโนมัติล้มเหลว';
 
   @override
   String get updateRollbackCacheError =>
@@ -807,10 +735,7 @@ class STh extends S {
   String get updateCopyCommand => 'คำสั่งคัดลอก';
 
   @override
-  String get updateChecksDisabled => 'การตรวจสอบอัตโนมัติถูกปิดใช้งานในการตั้งค่า';
-
-  @override
-  String get updateInstalled => 'ติดตั้งการอัปเดตแล้ว เปิด Sora อีกครั้ง';
+  String get updateInstalled => 'ติดตั้งการอัปเดตแล้ว';
 
   @override
   String get projectLinks => 'โครงการ';
@@ -840,15 +765,13 @@ class STh extends S {
   String get showDescription => 'แสดงคำอธิบาย';
 
   @override
-  String get errEngineUnsupported =>
-      'เอ็นจิ้นที่เลือกไม่รองรับโปรไฟล์หรือการตั้งค่านี้ เลือกอัตโนมัติหรือเครื่องยนต์ที่รองรับ';
+  String get errEngineUnsupported => 'เอ็นจิ้นที่เลือกไม่รองรับโปรไฟล์หรือการตั้งค่านี้';
 
   @override
-  String get errRestore =>
-      'การล้างข้อมูลการเชื่อมต่อไม่สมบูรณ์ ลองยกเลิกการเชื่อมต่ออีกครั้ง ดูบันทึกเพื่อดูรายละเอียด';
+  String get errRestore => 'การล้างข้อมูลการเชื่อมต่อไม่สมบูรณ์';
 
   @override
-  String get errSessionEnded => 'เซสชันนี้สิ้นสุดแล้ว รีเฟรชสถานะการเชื่อมต่อ';
+  String get errSessionEnded => 'เซสชันนี้สิ้นสุดแล้ว';
 
   @override
   String get retryDisconnect => 'ลองตัดการเชื่อมต่ออีกครั้ง';
@@ -891,13 +814,10 @@ class STh extends S {
   String get extInstallOne => '1 ติดตั้ง';
 
   @override
-  String get extSideloadWarning => 'ติดตั้งเฉพาะเมื่อคุณเชื่อถือคีย์ที่ผู้สร้างลงนามเองเท่านั้น';
+  String get extSideloadWarning => 'คีย์ที่ลงนามด้วยตนเอง';
 
   @override
   String get extPermissionsWidened => 'การอัปเดตจะขอสิทธิ์ใหม่:';
-
-  @override
-  String get extDangerousAck => 'ฉันเข้าใจว่าการอนุญาตเหล่านี้เป็นเรื่องร้ายแรง';
 
   @override
   String get extInstall => 'ติดตั้ง';
@@ -910,9 +830,6 @@ class STh extends S {
 
   @override
   String get extConfirm => 'ยืนยัน';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'แคตตาล็อก';
@@ -963,16 +880,13 @@ class STh extends S {
   String get extEmptySearch => 'ไม่พบอะไรเลย';
 
   @override
-  String get extEmptyInstalled => 'ยังไม่ได้ติดตั้งส่วนขยาย\nค้นหารายการหนึ่งในแค็ตตาล็อกหรือติดตั้งจากไฟล์';
+  String get extEmptyInstalled => 'ยังไม่ได้ติดตั้งส่วนขยาย';
 
   @override
   String get extInstallFromFile => 'ติดตั้งจากไฟล์';
 
   @override
   String get extInstallFromUrl => 'ติดตั้งจาก URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'ดาวน์โหลด';
@@ -987,16 +901,13 @@ class STh extends S {
   String get extInstalling => 'กำลังติดตั้ง...';
 
   @override
-  String get extInstallFailed => 'การติดตั้งล้มเหลว';
-
-  @override
-  String get extErrSignature => 'การตรวจสอบลายเซ็นล้มเหลว ไฟล์อาจเสียหายหรือถูกดัดแปลง';
+  String get extErrSignature => 'การตรวจสอบลายเซ็นล้มเหลว';
 
   @override
   String get extErrManifest => 'รายการส่วนขยายไม่ถูกต้อง';
 
   @override
-  String get extErrNetwork => 'ข้อผิดพลาดของเครือข่าย ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง';
+  String get extErrNetwork => 'ข้อผิดพลาดของเครือข่าย';
 
   @override
   String get extErrHash => 'การดาวน์โหลดไม่ตรงกับแค็ตตาล็อก ก็อาจถูกแทรกแซงได้';
@@ -1010,11 +921,11 @@ class STh extends S {
   String get extErrHttpsOnly => 'อนุญาตเฉพาะลิงก์ https:// เท่านั้น';
 
   @override
-  String get extErrGeneric => 'มีบางอย่างผิดพลาด โปรดลองอีกครั้ง';
+  String get extErrGeneric => 'มีบางอย่างผิดพลาด';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'การอัปเดตนี้ลงนามด้วยรหัสผู้สร้างที่แตกต่างจากเวอร์ชันที่ติดตั้ง ดังนั้นจึงถูกบล็อก หากคุณเชื่อถือคีย์ใหม่ ให้ถอนการติดตั้งส่วนขยายและติดตั้งอีกครั้งอย่างชัดเจน';
+      'การอัปเดตนี้ลงนามด้วยรหัสผู้สร้างที่แตกต่างจากเวอร์ชันที่ติดตั้ง ดังนั้นจึงถูกบล็อก';
 
   @override
   String get extDisabled => 'ปิดใช้งาน';
@@ -1071,7 +982,7 @@ class STh extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count ข้อขัดแย้งต้องให้คุณตัดสินใจ';
+    return 'ข้อขัดแย้งของส่วนขยาย: $count';
   }
 
   @override
@@ -1148,10 +1059,10 @@ class STh extends S {
   String get extPermThemeApply => 'ใช้ธีม';
 
   @override
-  String get extPermRoutingRules => 'เพิ่มกฎการกำหนดเส้นทาง (ส่งผลต่อตำแหน่งที่การรับส่งข้อมูลเครือข่าย)';
+  String get extPermRoutingRules => 'เพิ่มกฎการกำหนดเส้นทาง';
 
   @override
-  String get extPermNetHooks => 'รวมเข้ากับเส้นทางเครือข่าย (DPI โมดูลบายพาส)';
+  String get extPermNetHooks => 'รวมเข้ากับเส้นทางเครือข่าย';
 
   @override
   String get extPermNetFetch => 'ขอ URL จากรายการที่อนุญาต';
@@ -1160,7 +1071,7 @@ class STh extends S {
   String get extPermBackground => 'เรียกใช้งานพื้นหลัง';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'ปิดใช้งาน';
 
   @override
   String get extCapBackground => 'ทำงานอยู่เบื้องหลัง';
@@ -1198,9 +1109,6 @@ class STh extends S {
   String get extSortRelevance => 'ความเกี่ยวข้อง';
 
   @override
-  String get extPermNetworkDetail => 'คำขอผ่าน VPN เข้าถึงได้เฉพาะโฮสต์ด้านล่างเท่านั้น';
-
-  @override
   String get extBgTitle => 'งานเบื้องหลัง';
 
   @override
@@ -1222,9 +1130,6 @@ class STh extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'เปิดใช้งานส่วนขยายเพื่อจัดการงานพื้นหลัง';
-
-  @override
   String get extCapNetwork => 'การเข้าถึงเครือข่าย';
 
   @override
@@ -1241,7 +1146,7 @@ class STh extends S {
   String get diagnosticHttp => 'การวินิจฉัย HTTP';
 
   @override
-  String get diagnosticNoData => 'ยังไม่มีการร้องขอที่บันทึกไว้ เปิดเว็บไซต์ทดสอบความเร็วก่อน';
+  String get diagnosticNoData => 'ยังไม่มีการร้องขอที่บันทึกไว้';
 
   @override
   String get qrShareTitle => 'แบ่งปันรหัส QR';
@@ -1251,12 +1156,6 @@ class STh extends S {
 
   @override
   String get qrCopyLink => 'คัดลอกลิงค์';
-
-  @override
-  String get qrWarning => 'แชร์รหัสนี้กับคนที่คุณไว้ใจเท่านั้น';
-
-  @override
-  String get qrScanHint => 'เลือกภาพหน้าจอหรือรูปภาพที่มีคิวอาร์โค้ด หรือวางลิงก์';
 
   @override
   String get qrFromClipboard => 'วางจากคลิปบอร์ด';
@@ -1337,29 +1236,10 @@ class STh extends S {
   String get dnsLeakCheckKillSwitchDns => 'การป้องกัน DNS ด้วยการตัดเครือข่าย';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'กำหนดค่า DNS สำหรับช่องสัญญาณในการตั้งค่า DNS ด้านบน';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'ตรวจสอบว่ารีโซลเวอร์ใดที่ระบบของคุณจะใช้นอกอุโมงค์';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'เปิดการตัดเครือข่ายเพื่อให้การรับส่งข้อมูล DNS อยู่ในอุโมงค์';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'DNS แบบเข้ารหัสของระบบ';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'ปลอมแปลงคำตอบ DNS';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => 'ตรวจสอบว่าปลายทาง DNS ที่เข้ารหัสซึ่งระบบของคุณใช้นอกอุโมงค์';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'ใช้ DNS แบบเข้ารหัส (DoT หรือ DoH) ในอุโมงค์เพื่อป้องกันตัวแปลงชื่อปลอมคำตอบ';
-
-  @override
-  String get dnsCheckNeedsConnection => 'เชื่อมต่อกับ VPN ก่อน จากนั้นจึงตรวจสอบรอยรั่ว';
 
   @override
   String get dnsExpected => 'คาดว่า';
@@ -1386,7 +1266,7 @@ class STh extends S {
   String get autoSelectSmart => 'ทางเลือกที่ชาญฉลาด';
 
   @override
-  String get coreWatchUnstable => 'การเชื่อมต่อกับคอร์ไม่เสถียร โปรดรอสักครู่แล้วลองเชื่อมต่ออีกครั้ง';
+  String get coreWatchUnstable => 'การเชื่อมต่อกับคอร์ไม่เสถียร';
 
   @override
   String get watchReconnect => 'เชื่อมต่อใหม่';
@@ -1425,7 +1305,7 @@ class STh extends S {
   String get overrideCustomRules => 'กฎของตัวเอง';
 
   @override
-  String get errBenchmarkUnsupported => 'การวัดความเร็วต้องใช้คอร์เวอร์ชันใหม่กว่า โปรดอัปเดต Sora';
+  String get errBenchmarkUnsupported => 'การวัดความเร็วต้องใช้คอร์เวอร์ชันใหม่กว่า';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1436,7 +1316,7 @@ class STh extends S {
   String get profiles => 'โปรไฟล์เครือข่าย';
 
   @override
-  String get profilesEmpty => 'ยังไม่มีโปรไฟล์ สร้างหนึ่งรายการเพื่อใช้การตั้งค่าโดยอัตโนมัติกับเครือข่ายที่รู้จัก';
+  String get profilesEmpty => 'ยังไม่มีโปรไฟล์';
 
   @override
   String get profileAdd => 'เพิ่มโปรไฟล์';
@@ -1448,9 +1328,6 @@ class STh extends S {
   String get profileSsids => 'Wi-Fi เครือข่าย (SSID)';
 
   @override
-  String get profileSsidsHint => 'บ้าน, สำนักงาน คั่นด้วยเครื่องหมายจุลภาค';
-
-  @override
   String get profileGateways => 'เกตเวย์เครือข่าย';
 
   @override
@@ -1458,9 +1335,6 @@ class STh extends S {
 
   @override
   String get profileAutoApply => 'นำไปใช้โดยอัตโนมัติ';
-
-  @override
-  String get profileAutoApplyHint => 'หากปิดไว้ จะขอการยืนยันก่อนใช้โปรไฟล์';
 
   @override
   String get profileSnapshot => 'จำการตั้งค่าปัจจุบัน';
@@ -1504,13 +1378,13 @@ class STh extends S {
   String get networkUnknown => 'ข้อมูลเครือข่ายไม่พร้อมใช้งาน';
 
   @override
-  String get profileNoTriggers => 'เพิ่มทริกเกอร์อย่างน้อยหนึ่งรายการ: SSID เกตเวย์ หรือ ASN';
+  String get profileNoTriggers => 'ไม่มีเงื่อนไขโปรไฟล์';
 
   @override
   String get chains => 'พร็อกซีเชน';
 
   @override
-  String get chainsEmpty => 'ยังไม่มีโซ่ เชื่อมโยงเซิร์ฟเวอร์ 2–3 ตัวเพื่อให้การรับส่งข้อมูลผ่านแต่ละเซิร์ฟเวอร์';
+  String get chainsEmpty => 'ยังไม่มีโซ่';
 
   @override
   String get chainAdd => 'โซ่ใหม่';
@@ -1519,16 +1393,10 @@ class STh extends S {
   String get chainName => 'ชื่อลูกโซ่';
 
   @override
-  String get chainPickServers => 'เลือกเซิร์ฟเวอร์ 2–3 เครื่อง';
+  String get chainTooFew => 'ลูกโซ่ต้องมีเซิร์ฟเวอร์อย่างน้อยสองเครื่อง';
 
   @override
-  String get chainOrderHint => 'ลากเพื่อเรียงลำดับใหม่: การจราจรเข้าที่ด้านบนและออกที่ด้านล่าง';
-
-  @override
-  String get chainTooFew => 'ลูกโซ่ต้องมีเซิร์ฟเวอร์อย่างน้อยสองเครื่อง โปรดเพิ่มเซิร์ฟเวอร์อีกหนึ่งเครื่อง';
-
-  @override
-  String get chainTooMany => 'ลูกโซ่มีเซิร์ฟเวอร์ได้ไม่เกินสามเครื่อง โปรดนำเซิร์ฟเวอร์ส่วนเกินออก';
+  String get chainTooMany => 'ลูกโซ่มีเซิร์ฟเวอร์ได้ไม่เกินสามเครื่อง';
 
   @override
   String get chainEstimate => 'เวลาแฝงโดยประมาณ';
@@ -1545,10 +1413,10 @@ class STh extends S {
   }
 
   @override
-  String get chainUnsupported => 'เอนจินที่เลือกไม่รองรับการเชื่อมต่อแบบลูกโซ่ โปรดเลือกเอนจินที่รองรับ';
+  String get chainUnsupported => 'เอนจินที่เลือกไม่รองรับการเชื่อมต่อแบบลูกโซ่';
 
   @override
-  String get chainHopMissing => 'เซิร์ฟเวอร์หนึ่งในลูกโซ่ไม่พร้อมใช้งานแล้ว โปรดเลือกเซิร์ฟเวอร์อื่นสำหรับจุดนั้น';
+  String get chainHopMissing => 'เซิร์ฟเวอร์หนึ่งในลูกโซ่ไม่พร้อมใช้งานแล้ว';
 
   @override
   String chainHop(Object n) {
@@ -1568,7 +1436,7 @@ class STh extends S {
   String get syncDevices => 'อุปกรณ์ของฉัน';
 
   @override
-  String get syncEmpty => 'ไม่มีอุปกรณ์ที่จับคู่ จับคู่อุปกรณ์อื่นผ่านเครือข่ายท้องถิ่น';
+  String get syncEmpty => 'ไม่มีอุปกรณ์ที่จับคู่';
 
   @override
   String get syncPair => 'จับคู่อุปกรณ์';
@@ -1596,9 +1464,6 @@ class STh extends S {
   String get syncNever => 'ไม่เคย';
 
   @override
-  String get syncNoLan => 'อุปกรณ์ต้องอยู่ในเครือข่ายท้องถิ่นเดียวกัน';
-
-  @override
   String get syncPaired => 'จับคู่อุปกรณ์แล้ว';
 
   @override
@@ -1608,13 +1473,10 @@ class STh extends S {
   String get syncWaiting => 'กำลังรออุปกรณ์อื่น...';
 
   @override
-  String get syncSecureNote => 'ช่องทางการเข้ารหัสจากต้นทางถึงปลายทาง ไม่มีบัญชี ไม่มีเซิร์ฟเวอร์คลาวด์';
-
-  @override
   String get zapretWithVpn => 'บายพาส DPI กรองการรับส่งข้อมูลเครือข่ายโดยตรง';
 
   @override
-  String get chainDuplicate => 'มีเซิร์ฟเวอร์ซ้ำในลูกโซ่ โปรดเลือกเซิร์ฟเวอร์ที่ต่างกันสำหรับแต่ละจุด';
+  String get chainDuplicate => 'มีเซิร์ฟเวอร์ซ้ำในลูกโซ่';
 
   @override
   String get edit => 'แก้ไข';
@@ -1624,10 +1486,6 @@ class STh extends S {
 
   @override
   String get autoSwitchOnDegrade => 'เปิดการย่อยสลายอัตโนมัติ';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'หากเซิร์ฟเวอร์ที่เลือกช้าลงมากหรือไม่ตอบสนอง Sora จะสลับไปยังเซิร์ฟเวอร์ที่ได้ผลการวัดดีที่สุด โดยไม่เกินหนึ่งครั้งทุก 10 นาที';
 
   @override
   String get tunStackMixed => 'คละ';
@@ -1645,19 +1503,13 @@ class STh extends S {
   String get customServerName => 'ชื่อ';
 
   @override
-  String get customServerNameHint => 'ตัวอย่างเช่น: VPS ของฉัน';
-
-  @override
-  String get customServerNameRequired => 'ใส่ชื่อ';
+  String get customServerNameRequired => 'ไม่ได้ระบุชื่อ';
 
   @override
   String get customServerAddress => 'ที่อยู่';
 
   @override
-  String get customServerAddressHint => 'example.com หรือ 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'ป้อนที่อยู่เซิร์ฟเวอร์';
+  String get customServerAddressRequired => 'ไม่ได้ระบุที่อยู่';
 
   @override
   String get customServerAddressInvalid => 'ที่อยู่ไม่ถูกต้อง';
@@ -1666,19 +1518,13 @@ class STh extends S {
   String get customServerPort => 'พอร์ต';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'พอร์ตต้องเป็นตัวเลขตั้งแต่ 1 ถึง 65535';
+  String get customServerPortInvalid => 'พอร์ตไม่ถูกต้อง';
 
   @override
   String get customServerProtocol => 'โปรโตคอล';
 
   @override
   String get customServerCredentials => 'ข้อมูลการเข้าสู่ระบบ';
-
-  @override
-  String get customServerOptional => 'ไม่บังคับ';
 
   @override
   String get customServerShowSecret => 'แสดงความลับ';
@@ -1692,9 +1538,6 @@ class STh extends S {
   }
 
   @override
-  String get customServerTest => 'ทดสอบ';
-
-  @override
   String get leakTestTitle => 'ทดสอบการรั่วไหลของข้อมูล';
 
   @override
@@ -1702,9 +1545,6 @@ class STh extends S {
 
   @override
   String get leakTestCancel => 'ยกเลิก';
-
-  @override
-  String get leakTestNeedsConnection => 'เชื่อมต่อกับ VPN เพื่อทดสอบข้อมูลรั่วไหล';
 
   @override
   String leakTestProgress(int count) {
@@ -1725,9 +1565,6 @@ class STh extends S {
 
   @override
   String get leakTestFix => 'แก้ไข';
-
-  @override
-  String get leakTestFixedNote => 'เปิดการตัดเครือข่ายแล้ว เรียกใช้การทดสอบอีกครั้งเพื่อตรวจสอบ';
 
   @override
   String get leakTestCheckDirectDns => 'โดยตรง DNS';
@@ -1760,7 +1597,7 @@ class STh extends S {
   String get syncDaemonFailed => 'ไม่สามารถเริ่มบริการซิงค์ได้';
 
   @override
-  String get syncDaemonMissing => 'ไม่พบองค์ประกอบ sora-sync ติดตั้งแอปอีกครั้งเพื่อเปิดใช้งานการซิงค์อุปกรณ์';
+  String get syncDaemonMissing => 'ไม่พบองค์ประกอบ sora-sync';
 
   @override
   String get syncDaemonStarting => 'กำลังเริ่มบริการซิงค์...';
@@ -1775,7 +1612,7 @@ class STh extends S {
   String get syncErrPairingActive => 'เซสชั่นการจับคู่เปิดอยู่แล้ว';
 
   @override
-  String get syncErrUnreachable => 'อุปกรณ์อีกเครื่องไม่รับสาย ตรวจสอบให้แน่ใจว่าอยู่ในเครือข่ายเดียวกันและแสดงรหัส';
+  String get syncErrUnreachable => 'อุปกรณ์อีกเครื่องไม่ตอบสนอง';
 
   @override
   String get syncError => 'ข้อผิดพลาดในการซิงโครไนซ์';
@@ -1787,10 +1624,6 @@ class STh extends S {
 
   @override
   String get syncJoining => 'กำลังจับคู่กับอุปกรณ์...';
-
-  @override
-  String get syncLegacyCleared =>
-      'รายการอุปกรณ์เก่าไม่เคยจับคู่จริงๆ ดังนั้นจึงถูกล้างออกไป จับคู่อุปกรณ์ของคุณอีกครั้งแบบเรียลไทม์ในครั้งนี้';
 
   @override
   String get syncNewCode => 'รหัสใหม่';
@@ -1850,8 +1683,7 @@ class STh extends S {
   String get syncThisDevice => 'อุปกรณ์นี้';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'การซิงค์ไม่พร้อมใช้งานบน Android';
 
   @override
   String get diagnosticPackets => 'การจับแพ็คเก็ต';
@@ -1898,26 +1730,25 @@ class STh extends S {
   String get customServerWgKeepalive => 'Keepalive (วินาที)';
 
   @override
-  String get customServerWgKeyInvalid => 'คีย์ต้องเป็น base64 ขนาด 32 ไบต์ แบบที่ wg genkey แสดง';
+  String get customServerWgKeyInvalid => 'คีย์ WireGuard ไม่ถูกต้อง';
 
   @override
-  String get customServerWgCidrInvalid => 'ป้อนพรีฟิกซ์คั่นด้วยจุลภาค เช่น 10.0.0.2/32';
+  String get customServerWgCidrInvalid => 'คำนำหน้า CIDR ไม่ถูกต้อง';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'ป้อนจำนวนวินาทีตั้งแต่ 0 ถึง 65535';
+  String get customServerWgKeepaliveInvalid => 'ช่วงเวลา keepalive ไม่ถูกต้อง';
 
   @override
   String get strictKillSwitch => 'การตัดเครือข่ายแบบเข้มงวด';
 
   @override
-  String get strictKillSwitchWarning =>
-      'หลังเชื่อมต่อ การรับส่งข้อมูลนอก VPN จะยังถูกบล็อกแม้ออกจากแอปจนกว่าคุณจะยกเลิกการเชื่อมต่อ';
+  String get strictKillSwitchWarning => 'บล็อกการรับส่งข้อมูลนอก VPN หลังออกจากแอปหรือไม่?';
 
   @override
-  String get extWorkerFailed => 'งานเบื้องหลังของส่วนขยายล้มเหลว ตรวจสอบบันทึกของส่วนขยาย';
+  String get extWorkerFailed => 'งานเบื้องหลังของส่วนขยายล้มเหลว';
 
   @override
-  String get extAssetRejected => 'ไฟล์ส่วนขยายมีสีที่อ่านได้ยากหรือกฎที่ไม่ถูกต้อง โปรดขอให้ผู้สร้างส่วนขยายแก้ไขไฟล์';
+  String get extAssetRejected => 'ไฟล์ส่วนขยายมีสีที่อ่านได้ยากหรือกฎที่ไม่ถูกต้อง';
 
   @override
   String get extVerifiedSora => 'ตรวจสอบโดย Sora';
@@ -1943,31 +1774,25 @@ class STh extends S {
   String get customServerPassword => 'รหัสผ่าน';
 
   @override
-  String get customServerSecretRequired => 'ป้อนค่า';
+  String get customServerSecretRequired => 'ไม่ได้ระบุค่า';
 
   @override
   String get customServerLinkInvalid => 'ลิงก์เซิร์ฟเวอร์ไม่ถูกต้อง';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'เกิดข้อผิดพลาดภายใน Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'ใบรับรองเซิร์ฟเวอร์ถูกปฏิเสธ';
 
   @override
-  String get errInternal => 'เกิดข้อผิดพลาดภายใน Sora บันทึกบันทึกเหตุการณ์แล้วรายงานปัญหา';
+  String get errFileAccess => 'เข้าถึงไฟล์ไม่ได้';
 
   @override
-  String get errTls => 'ใบรับรองเซิร์ฟเวอร์ถูกปฏิเสธ ตรวจสอบเวลาหรือติดต่อผู้ให้บริการ';
+  String get errDataLimit => 'ข้อมูลมากเกินไป';
 
   @override
-  String get errFileAccess => 'เข้าถึงไฟล์ไม่ได้ ตรวจสอบสิทธิ์และพื้นที่ว่าง';
-
-  @override
-  String get errDataLimit => 'ข้อมูลมากเกินไป เลือกรายการให้น้อยลงแล้วลองอีกครั้ง';
-
-  @override
-  String get errCredentials => 'ไม่พบข้อมูลเข้าสู่ระบบที่บันทึกไว้ นำเข้าเซิร์ฟเวอร์อีกครั้ง';
+  String get errCredentials => 'ไม่พบข้อมูลเข้าสู่ระบบที่บันทึกไว้';
 
   @override
   String subscriptionStale(String time) {
@@ -1975,54 +1800,54 @@ class STh extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'ยังไม่ได้อัปเดต ลองอีกครั้ง';
+  String get subscriptionNeverUpdated => 'ยังไม่ได้อัปเดต';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'เซิร์ฟเวอร์ส่งรหัส HTTP $status กลับมา โปรดตรวจสอบลิงก์หรือติดต่อผู้ให้บริการ',
-      zero: 'เซิร์ฟเวอร์ปฏิเสธคำขอ โปรดตรวจสอบลิงก์หรือติดต่อผู้ให้บริการ',
+      other: 'เซิร์ฟเวอร์ส่งรหัส HTTP $status กลับมา',
+      zero: 'เซิร์ฟเวอร์ปฏิเสธคำขอ',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'การตั้งค่าเซิร์ฟเวอร์ไม่ครบหรือไม่รองรับ อัปเดตการสมัครสมาชิก';
+  String get errInvalidServer => 'การตั้งค่าเซิร์ฟเวอร์ไม่ครบหรือไม่รองรับ';
 
   @override
-  String get errServerIds => 'เซิร์ฟเวอร์สองตัวใช้รหัสเดียวกัน นำเข้าใหม่อีกครั้ง';
+  String get errServerIds => 'เซิร์ฟเวอร์สองตัวใช้รหัสเดียวกัน';
 
   @override
-  String get errRoutingGroup => 'เส้นทางอ้างถึงเซิร์ฟเวอร์ที่หายไปหรือกลุ่มที่เสียหาย อัปเดตการสมัครสมาชิก';
+  String get errRoutingGroup => 'เส้นทางอ้างถึงเซิร์ฟเวอร์ที่หายไปหรือกลุ่มที่เสียหาย';
 
   @override
-  String get errConnections => 'รายการการเชื่อมต่อไม่พร้อมใช้งาน เชื่อมต่อหรือเลือกเอนจินอื่น';
+  String get errConnections => 'รายการการเชื่อมต่อไม่พร้อมใช้งาน';
 
   @override
-  String get errLogs => 'บริการนี้ไม่เก็บบันทึกเหตุการณ์ อัปเดต Sora';
+  String get errLogs => 'บริการนี้ไม่เก็บบันทึกเหตุการณ์';
 
   @override
-  String get errDiagnostics => 'รวบรวมการวินิจฉัยไม่ได้ ลองอีกครั้งหรือบันทึกบันทึกเหตุการณ์';
+  String get errDiagnostics => 'รวบรวมการวินิจฉัยไม่ได้';
 
   @override
-  String get errMissingItem => 'รายการที่ขอไม่มีแล้ว รีเฟรชรายการ';
+  String get errMissingItem => 'รายการที่ขอไม่มีแล้ว';
 
   @override
-  String get errInvalidRequest => 'คำขอมีค่าที่ไม่ถูกต้อง ตรวจสอบข้อมูลที่ป้อนแล้วลองอีกครั้ง';
+  String get errInvalidRequest => 'คำขอมีค่าที่ไม่ถูกต้อง';
 
   @override
-  String get errProxyLogin => 'พร็อกซีระบบไม่รองรับการเข้าสู่ระบบนี้ ลบชื่อผู้ใช้และรหัสผ่านของพร็อกซีภายใน';
+  String get errProxyLogin => 'พร็อกซีระบบไม่รองรับการเข้าสู่ระบบนี้';
 
   @override
-  String get errLogFilter => 'ตัวกรองบันทึกเหตุการณ์ไม่ถูกต้อง ล้างการค้นหาแล้วลองอีกครั้ง';
+  String get errLogFilter => 'ตัวกรองบันทึกเหตุการณ์ไม่ถูกต้อง';
 
   @override
-  String get errSubRedirect => 'เซิร์ฟเวอร์เปลี่ยนเส้นทางไปยังที่อยู่ที่ไม่ปลอดภัย ขอรับลิงก์ใหม่จากผู้ให้บริการ';
+  String get errSubRedirect => 'เซิร์ฟเวอร์เปลี่ยนเส้นทางไปยังที่อยู่ที่ไม่ปลอดภัย';
 
   @override
-  String get errProxySetup => 'ตั้งค่าพร็อกซีระบบไม่ได้ เชื่อมต่อใหม่หรือเปิดบันทึกเหตุการณ์';
+  String get errProxySetup => 'ตั้งค่าพร็อกซีระบบไม่ได้';
 
   @override
   String get notificationsToday => 'วันนี้';
@@ -2048,19 +1873,19 @@ class STh extends S {
   }
 
   @override
-  String get errSubInterval => 'ช่วงเวลาอัปเดตการสมัครไม่ถูกต้อง โปรดเลือกช่วงเวลาที่ผู้ให้บริการแนะนำ';
+  String get errSubInterval => 'ช่วงเวลาอัปเดตการสมัครไม่ถูกต้อง';
 
   @override
-  String get errRule => 'กฎการกำหนดเส้นทางไม่ถูกต้อง โปรดตรวจสอบโดเมน ที่อยู่ IP หรือแอปในกฎ';
+  String get errRule => 'กฎการกำหนดเส้นทางไม่ถูกต้อง';
 
   @override
-  String get errDns => 'การตั้งค่า DNS ไม่ถูกต้อง โปรดตรวจสอบที่อยู่เซิร์ฟเวอร์ DNS';
+  String get errDns => 'การตั้งค่า DNS ไม่ถูกต้อง';
 
   @override
-  String get errEndpoint => 'ที่อยู่เซิร์ฟเวอร์ที่จะทดสอบไม่ถูกต้อง โปรดตรวจสอบชื่อโฮสต์และพอร์ต';
+  String get errEndpoint => 'ที่อยู่เซิร์ฟเวอร์ที่จะทดสอบไม่ถูกต้อง';
 
   @override
-  String get errCancelled => 'คำขอถูกยกเลิกแล้ว โปรดทำรายการอีกครั้งหากจำเป็น';
+  String get errCancelled => 'คำขอถูกยกเลิกแล้ว';
 
   @override
   String get customServerOptions => 'การตั้งค่าการเชื่อมต่อ';
@@ -2081,18 +1906,13 @@ class STh extends S {
   String get customServerWgPeer => 'เพียร์';
 
   @override
-  String get customServerOptionsInfo => 'ใช้การตั้งค่าการรับส่งข้อมูลและ TLS จากผู้ให้บริการ หรือวางลิงก์เซิร์ฟเวอร์';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'ใช้ได้บน: $platforms';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret เปลี่ยนทราฟฟิก TCPบนพอร์ต 80 และ 443 สำหรับแอป Windows ทั้งหมด นี่ไม่ใช่ VPN ไดรเวอร์ WinDivert อาจยังโหลดอยู่จนกว่าจะรีสตาร์ต Windows';
+  String get winwsScopeWarning => 'เปลี่ยนการรับส่งข้อมูล TCP ของทุกแอปหรือไม่?';
 
   @override
-  String get winwsRequirements =>
-      'ต้องใช้ Windows x64 แบบเนทีฟ, WLANAPI และชุด WinDivert ที่ตรวจสอบแล้ว หาก Windows บล็อกไดรเวอร์ โหมดนี้จะใช้งานไม่ได้';
+  String get winwsRequirements => 'โหมด VPN นี้ไม่พร้อมใช้งาน';
 }

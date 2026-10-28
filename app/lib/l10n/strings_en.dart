@@ -205,66 +205,58 @@ class SEn extends S {
   String get errGeneric => 'Something went wrong';
 
   @override
-  String get errCore => 'The Sora service is not responding. Wait a moment and try again.';
+  String get errCore => 'The Sora service is not responding';
 
   @override
-  String get errAuth => 'Access to the Sora service was denied. Restart the app and try again.';
+  String get errAuth => 'Access to the Sora service was denied';
 
   @override
-  String get errVersion => 'The Sora app and service have different versions. Update Sora.';
+  String get errVersion => 'The Sora app and service have different versions';
 
   @override
-  String get errBusy => 'The previous command is still running. Wait for it to finish.';
+  String get errBusy => 'The previous command is still running';
 
   @override
-  String get errEngineMissing => 'The engine for this server is missing. Check for Sora updates.';
+  String get errEngineMissing => 'The engine for this server is missing';
 
   @override
-  String get errEngineStart => 'The engine could not start. Check the connection log for the cause.';
+  String get errEngineStart => 'The engine could not start';
 
   @override
-  String get errEngineStopped => 'The engine stopped. Try connecting again.';
+  String get errEngineStopped => 'The engine stopped';
 
   @override
-  String get errTunnel => 'This VPN mode is unavailable. Choose another mode or check service permissions.';
+  String get errTunnel => 'This VPN mode is unavailable';
 
   @override
-  String get errNetwork => 'Cannot reach the server';
+  String get errTimeout => 'The server did not respond in time';
 
   @override
-  String get errTimeout => 'The server did not respond in time. Try again in a minute.';
+  String get errFirewall => 'Internet access outside the VPN could not be blocked';
 
   @override
-  String get errFirewall =>
-      'Internet access outside the VPN could not be blocked. Check the connection log for the cause.';
+  String get errSubFetch => 'The subscription could not be downloaded';
 
   @override
-  String get errSubFetch =>
-      'The subscription could not be downloaded. Check your internet connection and try again in a minute.';
+  String get errSubFormat => 'The subscription format was not recognized';
 
   @override
-  String get errSubFormat =>
-      'The subscription format was not recognized. Ask your provider for a compatible subscription link.';
+  String get errSubEmpty => 'The subscription has no servers';
 
   @override
-  String get errSubEmpty => 'The subscription has no servers. Contact your subscription provider.';
+  String get errSubDuplicate => 'This subscription has already been added';
 
   @override
-  String get errSubDuplicate => 'This subscription has already been added. Refresh it to get the latest servers.';
+  String get errSubLimit => 'The subscription limit has been reached';
 
   @override
-  String get errSubLimit =>
-      'The subscription limit has been reached. Remove an unused subscription before adding another.';
+  String get errSubScheme => 'Unsupported subscription link scheme';
 
   @override
-  String get errSubScheme => 'Subscription links must start with https://. Ask your provider for a secure link.';
+  String get errSecretStore => 'Sora storage is damaged or inaccessible';
 
   @override
-  String get errSecretStore =>
-      'Sora storage is damaged or inaccessible. Check access permissions and the log for details.';
-
-  @override
-  String get errNoServers => 'There are no servers to connect to. Add a subscription or your own server.';
+  String get errNoServers => 'There are no servers to connect to';
 
   @override
   String get connections => 'Connections';
@@ -318,9 +310,6 @@ class SEn extends S {
   String get dnsAuto => 'Auto';
 
   @override
-  String get dnsHint => 'Addresses, comma separated';
-
-  @override
   String get fragment => 'TLS fragmentation';
 
   @override
@@ -336,13 +325,7 @@ class SEn extends S {
   String get byDefault => 'Default';
 
   @override
-  String get rangeHint => 'For example, 100-200';
-
-  @override
   String get splitPos => 'Split positions';
-
-  @override
-  String get splitPosHint => 'For example, 1, midsld';
 
   @override
   String get disorder => 'Reorder pieces';
@@ -451,11 +434,6 @@ class SEn extends S {
   String get support => 'Support';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine is controlled through a port on this computer. Other programs will be able to tell that a VPN is on.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'Choose $engine';
   }
@@ -526,9 +504,6 @@ class SEn extends S {
   String get launchAtLogin => 'Start with the system';
 
   @override
-  String get launchAtLoginDetail => 'Sora will launch automatically when you sign in, hidden in the tray.';
-
-  @override
   String get closeToTray => 'Keep in the tray when closed';
 
   @override
@@ -563,9 +538,6 @@ class SEn extends S {
   String get noticeInTray => 'Sora is still in the tray';
 
   @override
-  String get noticeInTrayBody => 'Quit from the menu of its icon';
-
-  @override
   String get noticeLost => 'Connection lost';
 
   @override
@@ -593,11 +565,7 @@ class SEn extends S {
   String get importTitle => 'Add this subscription?';
 
   @override
-  String get importSealed =>
-      'This link is encrypted for Happ, and only Happ can read it. Ask your provider for the plain subscription link.';
-
-  @override
-  String get understood => 'OK';
+  String get importSealed => 'This link is encrypted for Happ, and only Happ can read it';
 
   @override
   String get noAnswer => 'no answer';
@@ -636,39 +604,10 @@ class SEn extends S {
   String get openLogs => 'Open logs';
 
   @override
-  String get tourReplay => 'Show guide again';
-
-  @override
-  String tourStep(int step) {
-    return 'Step $step of 5';
-  }
-
-  @override
   String get tourBack => 'Back';
 
   @override
   String get tourNext => 'Next';
-
-  @override
-  String get tourSkip => 'Skip';
-
-  @override
-  String get tourFinish => 'Done';
-
-  @override
-  String get tourAdd => 'Add your provider’s subscription link.';
-
-  @override
-  String get tourServer => 'Pick a server. “Fastest” selects one for you.';
-
-  @override
-  String get tourConnect => 'Click here to connect or disconnect.';
-
-  @override
-  String get tourMode => 'Choose a mode. Kill switch blocks internet if the VPN drops.';
-
-  @override
-  String get tourSettings => 'Open settings. You can replay this guide there.';
 
   @override
   String get chooseProgram => 'Choose a program';
@@ -680,7 +619,7 @@ class SEn extends S {
   String get runningProcesses => 'Running processes';
 
   @override
-  String get programsEmpty => 'No applications found. Try another name.';
+  String get programsEmpty => 'No applications found';
 
   @override
   String get selectExe => 'Choose an .exe file';
@@ -692,7 +631,7 @@ class SEn extends S {
   String get speedtestSearch => 'Find a service';
 
   @override
-  String get speedtestEmpty => 'No matches. Change the search.';
+  String get speedtestEmpty => 'No matches';
 
   @override
   String get speedtestBackToList => 'Back to services';
@@ -701,13 +640,13 @@ class SEn extends S {
   String get speedtestOpenBrowser => 'Open in browser';
 
   @override
-  String get speedtestUnavailable => 'The embedded browser could not start. Open the service in your system browser.';
+  String get speedtestUnavailable => 'The embedded browser could not start';
 
   @override
-  String get speedtestPageFailed => 'The page could not load. Reload it or open the service in your system browser.';
+  String get speedtestPageFailed => 'The page could not load';
 
   @override
-  String get speedtestExternalFailed => 'The system browser could not open. Try again.';
+  String get speedtestExternalFailed => 'The system browser could not open';
 
   @override
   String get modes => 'Modes';
@@ -747,45 +686,28 @@ class SEn extends S {
   String get updateNoNotes => 'The release has no notes.';
 
   @override
-  String get updateDropWarning =>
-      'The VPN connection will drop for a few seconds while Sora and its core update. Continue?';
+  String get updateDropWarning => 'Disconnect to update?';
 
   @override
-  String get updateWaitConnection => 'Wait for the VPN connection and core to become ready.';
+  String get updateWaitConnection => 'Connection is not ready';
 
   @override
-  String get updateDownloading => 'Downloading and verifying files...';
-
-  @override
-  String get updateInstalling => 'Preparing the update or waiting for administrator authentication...';
-
-  @override
-  String get updateNetworkError => 'Could not download the update. Try again.';
+  String get updateNetworkError => 'Could not download the update';
 
   @override
   String get updateReleaseError => 'The release data or required files are missing or invalid.';
 
   @override
-  String get updateChecksumError => 'The download does not match SHA256SUMS. Nothing was installed.';
+  String get updateChecksumError => 'The download does not match SHA256SUMS';
 
   @override
-  String get updateInstallError => 'The update did not finish. Authentication may have been cancelled.';
+  String get updateInstallError => 'The update did not finish';
 
   @override
-  String get updateUnsupported =>
-      'This executable is not owned by a supported Sora package pair. Use the release installation instructions.';
+  String get updateUnsupported => 'This executable is not owned by a supported Sora package pair';
 
   @override
-  String get updateManual =>
-      'Run this command in a terminal to install both verified packages, then reopen Sora. The files stay in the download directory. The VPN connection will drop.';
-
-  @override
-  String get updateVersionRevoked =>
-      'This version has been recalled by the developer. Please wait for a fixed release.';
-
-  @override
-  String get updateRolloutPending =>
-      'A newer version is rolling out gradually and will be offered to you automatically.';
+  String get updateVersionRevoked => 'This version has been recalled by the developer';
 
   @override
   String updateRollbacking(String version) {
@@ -798,8 +720,7 @@ class SEn extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatic rollback failed. If the new version does not work, reinstall the previous release manually.';
+  String get updateRollbackError => 'Automatic rollback failed';
 
   @override
   String get updateRollbackCacheError =>
@@ -809,10 +730,7 @@ class SEn extends S {
   String get updateCopyCommand => 'Copy command';
 
   @override
-  String get updateChecksDisabled => 'Automatic checks are disabled in Settings.';
-
-  @override
-  String get updateInstalled => 'Update installed. Reopen Sora.';
+  String get updateInstalled => 'Update installed';
 
   @override
   String get projectLinks => 'Project';
@@ -842,14 +760,13 @@ class SEn extends S {
   String get showDescription => 'Show description';
 
   @override
-  String get errEngineUnsupported =>
-      'The selected engine does not support this profile or settings. Choose Auto or a compatible engine.';
+  String get errEngineUnsupported => 'The selected engine does not support this profile or settings';
 
   @override
-  String get errRestore => 'Connection cleanup was incomplete. Retry disconnecting; see the log for details.';
+  String get errRestore => 'Connection cleanup was incomplete';
 
   @override
-  String get errSessionEnded => 'This session has already ended. Refresh the connection state.';
+  String get errSessionEnded => 'This session has already ended';
 
   @override
   String get retryDisconnect => 'Retry disconnecting';
@@ -892,13 +809,10 @@ class SEn extends S {
   String get extInstallOne => '1 install';
 
   @override
-  String get extSideloadWarning => 'Install only if you trust the author’s self-signed key.';
+  String get extSideloadWarning => 'Self-signed key';
 
   @override
   String get extPermissionsWidened => 'The update asks for new permissions:';
-
-  @override
-  String get extDangerousAck => 'I understand these permissions are powerful';
 
   @override
   String get extInstall => 'Install';
@@ -911,9 +825,6 @@ class SEn extends S {
 
   @override
   String get extConfirm => 'Confirm';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Catalog';
@@ -964,16 +875,13 @@ class SEn extends S {
   String get extEmptySearch => 'Nothing found';
 
   @override
-  String get extEmptyInstalled => 'No extensions installed yet.\nFind one in the catalog or install from a file.';
+  String get extEmptyInstalled => 'No extensions installed yet';
 
   @override
   String get extInstallFromFile => 'Install from file';
 
   @override
   String get extInstallFromUrl => 'Install from URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Download';
@@ -988,19 +896,16 @@ class SEn extends S {
   String get extInstalling => 'Installing…';
 
   @override
-  String get extInstallFailed => 'Install failed';
-
-  @override
-  String get extErrSignature => 'The signature check failed. The file may be damaged or tampered with.';
+  String get extErrSignature => 'The signature check failed';
 
   @override
   String get extErrManifest => 'The extension manifest is invalid.';
 
   @override
-  String get extErrNetwork => 'Network error. Check your connection and try again.';
+  String get extErrNetwork => 'Network error';
 
   @override
-  String get extErrHash => 'The download does not match the catalog. It may have been tampered with.';
+  String get extErrHash => 'The download does not match the catalog';
 
   @override
   String extErrMinApp(String version) {
@@ -1011,11 +916,11 @@ class SEn extends S {
   String get extErrHttpsOnly => 'Only https:// links are allowed';
 
   @override
-  String get extErrGeneric => 'Something went wrong. Please try again.';
+  String get extErrGeneric => 'Something went wrong';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'This update is signed with a different author key than the installed version, so it was blocked. If you trust the new key, uninstall the extension and install it again explicitly.';
+      'This update is signed with a different author key than the installed version, so it was blocked';
 
   @override
   String get extDisabled => 'Disabled';
@@ -1072,7 +977,7 @@ class SEn extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count conflicts need your decision';
+    return 'Extension conflicts: $count';
   }
 
   @override
@@ -1149,10 +1054,10 @@ class SEn extends S {
   String get extPermThemeApply => 'Apply themes to the app';
 
   @override
-  String get extPermRoutingRules => 'Add routing rules (affects where traffic goes)';
+  String get extPermRoutingRules => 'Add routing rules';
 
   @override
-  String get extPermNetHooks => 'Hook into the network path (DPI bypass modules)';
+  String get extPermNetHooks => 'Hook into the network path';
 
   @override
   String get extPermNetFetch => 'Fetch URLs from an allowlist';
@@ -1161,7 +1066,7 @@ class SEn extends S {
   String get extPermBackground => 'Run background tasks';
 
   @override
-  String get extPermNotYetActive => 'This permission does nothing in this version of Sora yet.';
+  String get extPermNotYetActive => 'Disabled';
 
   @override
   String get extCapBackground => 'Runs in the background';
@@ -1199,9 +1104,6 @@ class SEn extends S {
   String get extSortRelevance => 'Relevance';
 
   @override
-  String get extPermNetworkDetail => 'VPN requests can reach only the hosts below.';
-
-  @override
   String get extBgTitle => 'Background task';
 
   @override
@@ -1223,9 +1125,6 @@ class SEn extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Enable the extension to manage its background task.';
-
-  @override
   String get extCapNetwork => 'Network access';
 
   @override
@@ -1242,7 +1141,7 @@ class SEn extends S {
   String get diagnosticHttp => 'HTTP diagnostics';
 
   @override
-  String get diagnosticNoData => 'No recorded requests yet. Open a speed test website first.';
+  String get diagnosticNoData => 'No recorded requests yet';
 
   @override
   String get qrShareTitle => 'Share via QR';
@@ -1252,12 +1151,6 @@ class SEn extends S {
 
   @override
   String get qrCopyLink => 'Copy link';
-
-  @override
-  String get qrWarning => 'Only share this code with people you trust.';
-
-  @override
-  String get qrScanHint => 'Choose a screenshot or photo with a QR code, or paste a link';
 
   @override
   String get qrFromClipboard => 'Paste from clipboard';
@@ -1343,29 +1236,10 @@ class SEn extends S {
   String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
 
   @override
   String get dnsExpected => 'Expected';
@@ -1392,7 +1266,7 @@ class SEn extends S {
   String get autoSelectSmart => 'Smart choice';
 
   @override
-  String get coreWatchUnstable => 'The connection to the core is unstable. Wait a moment and try connecting again.';
+  String get coreWatchUnstable => 'The connection to the core is unstable';
 
   @override
   String get watchReconnect => 'Reconnect';
@@ -1431,7 +1305,7 @@ class SEn extends S {
   String get overrideCustomRules => 'Custom rules';
 
   @override
-  String get errBenchmarkUnsupported => 'Speed measurement requires a newer core. Update Sora.';
+  String get errBenchmarkUnsupported => 'Speed measurement requires a newer core';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1442,7 +1316,7 @@ class SEn extends S {
   String get profiles => 'Network profiles';
 
   @override
-  String get profilesEmpty => 'No profiles yet. Create one to apply settings automatically on known networks.';
+  String get profilesEmpty => 'No profiles yet';
 
   @override
   String get profileAdd => 'Add profile';
@@ -1454,9 +1328,6 @@ class SEn extends S {
   String get profileSsids => 'Wi-Fi networks (SSID)';
 
   @override
-  String get profileSsidsHint => 'Home, Office, comma separated';
-
-  @override
   String get profileGateways => 'Gateways';
 
   @override
@@ -1464,9 +1335,6 @@ class SEn extends S {
 
   @override
   String get profileAutoApply => 'Apply automatically';
-
-  @override
-  String get profileAutoApplyHint => 'Ask before applying when off';
 
   @override
   String get profileSnapshot => 'Remember current settings';
@@ -1510,13 +1378,13 @@ class SEn extends S {
   String get networkUnknown => 'Network info unavailable';
 
   @override
-  String get profileNoTriggers => 'Add at least one trigger: SSID, gateway or ASN';
+  String get profileNoTriggers => 'No profile conditions';
 
   @override
   String get chains => 'Proxy chains';
 
   @override
-  String get chainsEmpty => 'No chains yet. Link 2–3 servers so traffic hops through each of them.';
+  String get chainsEmpty => 'No chains yet';
 
   @override
   String get chainAdd => 'New chain';
@@ -1525,16 +1393,10 @@ class SEn extends S {
   String get chainName => 'Chain name';
 
   @override
-  String get chainPickServers => 'Pick 2–3 servers';
+  String get chainTooFew => 'A chain needs at least two servers';
 
   @override
-  String get chainOrderHint => 'Drag to reorder: traffic enters at the top and exits at the bottom.';
-
-  @override
-  String get chainTooFew => 'A chain needs at least two servers. Add another server.';
-
-  @override
-  String get chainTooMany => 'A chain can have at most three servers. Remove the extra servers.';
+  String get chainTooMany => 'A chain can have at most three servers';
 
   @override
   String get chainEstimate => 'Estimated latency';
@@ -1551,10 +1413,10 @@ class SEn extends S {
   }
 
   @override
-  String get chainUnsupported => 'The selected engine does not support chains. Choose a compatible engine.';
+  String get chainUnsupported => 'The selected engine does not support chains';
 
   @override
-  String get chainHopMissing => 'A server in the chain is no longer available. Choose another server for that hop.';
+  String get chainHopMissing => 'A server in the chain is no longer available';
 
   @override
   String chainHop(Object n) {
@@ -1574,7 +1436,7 @@ class SEn extends S {
   String get syncDevices => 'My devices';
 
   @override
-  String get syncEmpty => 'No paired devices. Pair another device over the local network.';
+  String get syncEmpty => 'No paired devices';
 
   @override
   String get syncPair => 'Pair a device';
@@ -1602,9 +1464,6 @@ class SEn extends S {
   String get syncNever => 'Never';
 
   @override
-  String get syncNoLan => 'Devices must be on the same local network';
-
-  @override
   String get syncPaired => 'Device paired';
 
   @override
@@ -1614,13 +1473,10 @@ class SEn extends S {
   String get syncWaiting => 'Waiting for the other device…';
 
   @override
-  String get syncSecureNote => 'End-to-end encrypted channel. No accounts, no cloud servers.';
-
-  @override
   String get zapretWithVpn => 'DPI bypass for direct traffic';
 
   @override
-  String get chainDuplicate => 'A server appears more than once in the chain. Choose a different server for each hop.';
+  String get chainDuplicate => 'A server appears more than once in the chain';
 
   @override
   String get edit => 'Edit';
@@ -1630,10 +1486,6 @@ class SEn extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Auto-switch on degradation';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'If the selected server slows down a lot or stops answering, Sora switches to the best measured one, at most once every 10 minutes.';
 
   @override
   String get tunStackMixed => 'Mixed';
@@ -1651,19 +1503,13 @@ class SEn extends S {
   String get customServerName => 'Name';
 
   @override
-  String get customServerNameHint => 'E.g. My VPS';
-
-  @override
-  String get customServerNameRequired => 'Enter a name';
+  String get customServerNameRequired => 'Name is missing';
 
   @override
   String get customServerAddress => 'Address';
 
   @override
-  String get customServerAddressHint => 'example.com or 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Enter the server address';
+  String get customServerAddressRequired => 'Address is missing';
 
   @override
   String get customServerAddressInvalid => 'Invalid address';
@@ -1672,19 +1518,13 @@ class SEn extends S {
   String get customServerPort => 'Port';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Port must be a number from 1 to 65535';
+  String get customServerPortInvalid => 'Invalid port';
 
   @override
   String get customServerProtocol => 'Protocol';
 
   @override
   String get customServerCredentials => 'Credentials';
-
-  @override
-  String get customServerOptional => 'Optional';
 
   @override
   String get customServerShowSecret => 'Show secret';
@@ -1698,9 +1538,6 @@ class SEn extends S {
   }
 
   @override
-  String get customServerTest => 'Test';
-
-  @override
   String get leakTestTitle => 'Leak test';
 
   @override
@@ -1708,9 +1545,6 @@ class SEn extends S {
 
   @override
   String get leakTestCancel => 'Cancel';
-
-  @override
-  String get leakTestNeedsConnection => 'Connect to run the leak test.';
 
   @override
   String leakTestProgress(int count) {
@@ -1736,9 +1570,6 @@ class SEn extends S {
 
   @override
   String get leakTestFix => 'Fix';
-
-  @override
-  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';
@@ -1771,13 +1602,13 @@ class SEn extends S {
   String get syncDaemonFailed => 'Couldn\'t start the sync service';
 
   @override
-  String get syncDaemonMissing => 'The sora-sync component wasn\'t found. Reinstall the app to enable device sync.';
+  String get syncDaemonMissing => 'The sora-sync component wasn\'t found';
 
   @override
   String get syncDaemonStarting => 'Starting the sync service…';
 
   @override
-  String get syncErrAuth => 'The sync service rejected the access token. Restart the app and try again.';
+  String get syncErrAuth => 'The sync service rejected the access token';
 
   @override
   String get syncErrNotFound => 'The device is no longer paired';
@@ -1786,8 +1617,7 @@ class SEn extends S {
   String get syncErrPairingActive => 'A pairing session is already open';
 
   @override
-  String get syncErrUnreachable =>
-      'The other device didn\'t answer. Make sure it\'s on the same network and showing its code.';
+  String get syncErrUnreachable => 'The other device didn\'t answer';
 
   @override
   String get syncError => 'Sync error';
@@ -1799,10 +1629,6 @@ class SEn extends S {
 
   @override
   String get syncJoining => 'Pairing with the device…';
-
-  @override
-  String get syncLegacyCleared =>
-      'The old device list was never actually paired, so it was cleared. Pair your devices again, for real this time.';
 
   @override
   String get syncNewCode => 'New code';
@@ -1862,8 +1688,7 @@ class SEn extends S {
   String get syncThisDevice => 'This device';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet: the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Sync is unavailable on Android';
 
   @override
   String get diagnosticPackets => 'Packet capture';
@@ -1910,27 +1735,25 @@ class SEn extends S {
   String get customServerWgKeepalive => 'Keepalive, seconds';
 
   @override
-  String get customServerWgKeyInvalid => 'The key must be 32 bytes of base64, as wg genkey prints.';
+  String get customServerWgKeyInvalid => 'Invalid WireGuard key';
 
   @override
-  String get customServerWgCidrInvalid => 'Enter comma separated prefixes such as 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Invalid CIDR prefix';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'Enter a number of seconds from 0 to 65535.';
+  String get customServerWgKeepaliveInvalid => 'Invalid keepalive interval';
 
   @override
   String get strictKillSwitch => 'Strict kill switch';
 
   @override
-  String get strictKillSwitchWarning =>
-      'After connecting, traffic outside the VPN stays blocked after app exit until you disconnect.';
+  String get strictKillSwitchWarning => 'Block traffic outside the VPN after exiting?';
 
   @override
-  String get extWorkerFailed => 'The extension background task failed. Check the extension log.';
+  String get extWorkerFailed => 'The extension background task failed';
 
   @override
-  String get extAssetRejected =>
-      'The extension file contains unreadable colors or invalid rules. Ask the extension author to correct the file.';
+  String get extAssetRejected => 'The extension file contains unreadable colors or invalid rules';
 
   @override
   String get extVerifiedSora => 'Verified by Sora';
@@ -1956,31 +1779,25 @@ class SEn extends S {
   String get customServerPassword => 'Password';
 
   @override
-  String get customServerSecretRequired => 'Enter a value';
+  String get customServerSecretRequired => 'Value is missing';
 
   @override
   String get customServerLinkInvalid => 'Invalid server link';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora hit an internal error';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Server certificate rejected';
 
   @override
-  String get errInternal => 'Sora hit an internal error. Export the log and report it.';
+  String get errFileAccess => 'Cannot access the file';
 
   @override
-  String get errTls => 'Server certificate rejected. Check the clock or contact the provider.';
+  String get errDataLimit => 'Too much data';
 
   @override
-  String get errFileAccess => 'Cannot access the file. Check permissions and free space.';
-
-  @override
-  String get errDataLimit => 'Too much data. Select fewer items and retry.';
-
-  @override
-  String get errCredentials => 'Saved credentials are missing. Import the server again.';
+  String get errCredentials => 'Saved credentials are missing';
 
   @override
   String subscriptionStale(String time) {
@@ -1988,54 +1805,54 @@ class SEn extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Not updated yet. Retry.';
+  String get subscriptionNeverUpdated => 'Not updated yet';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'The server returned HTTP $status. Check the link or contact your provider.',
-      zero: 'The server rejected the request. Check the link or contact your provider.',
+      other: 'The server returned HTTP $status',
+      zero: 'The server rejected the request',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Server settings are incomplete or unsupported. Refresh the subscription.';
+  String get errInvalidServer => 'Server settings are incomplete or unsupported';
 
   @override
-  String get errServerIds => 'Two servers share an identifier. Import them again.';
+  String get errServerIds => 'Two servers share an identifier';
 
   @override
-  String get errRoutingGroup => 'Routing refers to missing servers or a broken group. Refresh the subscription.';
+  String get errRoutingGroup => 'Routing refers to missing servers or a broken group';
 
   @override
-  String get errConnections => 'Connections are unavailable. Connect or choose another engine to view them.';
+  String get errConnections => 'Connections are unavailable';
 
   @override
-  String get errLogs => 'This service has no log record. Update Sora.';
+  String get errLogs => 'This service has no log record';
 
   @override
-  String get errDiagnostics => 'Could not collect diagnostics. Try again or save the log.';
+  String get errDiagnostics => 'Could not collect diagnostics';
 
   @override
-  String get errMissingItem => 'The requested item no longer exists. Refresh the list.';
+  String get errMissingItem => 'The requested item no longer exists';
 
   @override
-  String get errInvalidRequest => 'The request contains invalid values. Check your input and retry.';
+  String get errInvalidRequest => 'The request contains invalid values';
 
   @override
-  String get errProxyLogin => 'The system proxy cannot use this login. Remove the local proxy username and password.';
+  String get errProxyLogin => 'The system proxy cannot use this login';
 
   @override
-  String get errLogFilter => 'The log filter is invalid. Clear the search and retry.';
+  String get errLogFilter => 'The log filter is invalid';
 
   @override
-  String get errSubRedirect => 'The server redirected to an unsafe address. Ask your provider for a new link.';
+  String get errSubRedirect => 'The server redirected to an unsafe address';
 
   @override
-  String get errProxySetup => 'Could not configure the system proxy. Reconnect or open the log.';
+  String get errProxySetup => 'Could not configure the system proxy';
 
   @override
   String get notificationsToday => 'Today';
@@ -2061,20 +1878,19 @@ class SEn extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'The subscription update interval is invalid. Choose the interval recommended by your provider.';
+  String get errSubInterval => 'The subscription update interval is invalid';
 
   @override
-  String get errRule => 'A routing rule is invalid. Check the domain, IP address or application in the rule.';
+  String get errRule => 'A routing rule is invalid';
 
   @override
-  String get errDns => 'The DNS settings are invalid. Check the DNS server address.';
+  String get errDns => 'The DNS settings are invalid';
 
   @override
-  String get errEndpoint => 'The server address for the check is invalid. Check the hostname and port.';
+  String get errEndpoint => 'The server address for the check is invalid';
 
   @override
-  String get errCancelled => 'The request was cancelled. Repeat the action if needed.';
+  String get errCancelled => 'The request was cancelled';
 
   @override
   String get customServerOptions => 'Connection settings';
@@ -2095,19 +1911,13 @@ class SEn extends S {
   String get customServerWgPeer => 'Peer';
 
   @override
-  String get customServerOptionsInfo =>
-      'Use the transport and TLS settings supplied by your provider, or paste a server link.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'Available on: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret changes TCP traffic on ports 80 and 443 for every Windows app. It is not a VPN. The WinDivert driver may remain loaded until Windows restarts.';
+  String get winwsScopeWarning => 'Change TCP traffic for all apps?';
 
   @override
-  String get winwsRequirements =>
-      'Requires native Windows x64, WLANAPI and the verified WinDivert bundle. If Windows blocks the driver, this mode is unavailable.';
+  String get winwsRequirements => 'This VPN mode is unavailable';
 }

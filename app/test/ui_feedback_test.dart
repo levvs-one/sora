@@ -110,61 +110,16 @@ void main() {
   });
 
   for (final brightness in Brightness.values) {
-    testWidgets('help is opt-in, contrast ink, does not toggle, Escape restores focus $brightness', (tester) async {
-      var toggles = 0;
-      await mount(
-        tester,
-        (context) => Center(
-          child: SizedBox(
-            width: 840,
-            child: Group(
-              children: [
-                SwitchTile(
-                  title: S.of(context).autoSwitchOnDegrade,
-                  info: S.of(context).autoSwitchOnDegradeDetail,
-                  value: false,
-                  onChanged: (_) => toggles++,
-                ),
-              ],
-            ),
-          ),
-        ),
-        brightness: brightness,
-      );
-      final s = sora.strings;
-      expect(find.text(s.autoSwitchOnDegradeDetail), findsNothing);
-      await shot(tester, 'settings-${brightness.name}');
-      await tester.tap(find.byType(InfoButton));
-      await tester.pumpAndSettle();
-      expect(toggles, 0);
-      expect(find.text(s.autoSwitchOnDegradeDetail), findsOneWidget);
-      final text = tester.widget<Text>(find.text(s.autoSwitchOnDegradeDetail));
-      expect(text.style!.color, brightness == Brightness.light ? Palette.light.ink : Palette.dark.ink);
-      await shot(tester, 'info-${brightness.name}');
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('feature-info-dialog')), findsNothing);
-      await tester.tap(find.text(s.autoSwitchOnDegrade));
-      await tester.pumpAndSettle();
-      expect(toggles, 1);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('actual settings keep explanations behind info $brightness', (tester) async {
+    testWidgets('settings contain labels and controls without explanatory dialogs $brightness', (tester) async {
       await mount(tester, (_) => const SettingsScreen(), brightness: brightness);
-      final s = sora.strings;
-      expect(find.text(s.autoSwitchOnDegradeDetail), findsNothing);
-      final info = find.byKey(ValueKey('info-${s.autoSwitchOnDegrade}'));
-      await tester.scrollUntilVisible(info, 240, scrollable: find.byType(Scrollable).first);
-      await tester.pumpAndSettle();
+      expect(find.byType(InfoButton), findsNothing);
+      await tester.scrollUntilVisible(
+        find.text(sora.strings.autoSwitchOnDegrade),
+        240,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byType(InfoButton), findsNothing);
       await shot(tester, 'settings-full-${brightness.name}');
-      await tester.tap(info);
-      await tester.pumpAndSettle();
-      expect(find.text(s.autoSwitchOnDegradeDetail), findsOneWidget);
-      expect(sora.settings.autoSwitchOnDegrade, isFalse);
-      await shot(tester, 'settings-info-${brightness.name}');
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
 
@@ -197,7 +152,7 @@ void main() {
     });
   }
 
-  testWidgets('small window and large type keep form and help scrollable', (tester) async {
+  testWidgets('small window and large type keep the form scrollable without help', (tester) async {
     await mount(
       tester,
       (context) => TextButton(onPressed: () => showAddServerSheet(context), child: const Text('open')),
@@ -206,14 +161,7 @@ void main() {
     );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
-    final info = find.byKey(ValueKey('info-${sora.strings.customServerOptions}'));
-    await tester.ensureVisible(info);
-    await tester.tap(info);
-    await tester.pumpAndSettle();
-    expect(find.text(sora.strings.customServerOptionsInfo), findsOneWidget);
-    await shot(tester, 'info-narrow-large');
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pumpAndSettle();
+    expect(find.byType(InfoButton), findsNothing);
     expect(find.byType(AddServerScreen), findsOneWidget);
     await shot(tester, 'server-narrow-large');
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
@@ -222,21 +170,15 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('desktop launch help is opt-in and reconnect banner is absent everywhere', (tester) async {
+  testWidgets('desktop settings have no help or reconnect banner', (tester) async {
     sora.needsReconnect = true;
     await mount(tester, (_) => DesktopScope(desktop: Desktop(sora, navigator), child: const SettingsScreen()));
     final s = sora.strings;
-    expect(find.text(s.launchAtLoginDetail), findsNothing);
+    expect(find.byType(InfoButton), findsNothing);
     expect(find.byKey(const ValueKey('apply-connection-changes')), findsNothing);
     expect(find.text('Чтобы применить изменения, переподключитесь.'), findsNothing);
     expect(find.text('Применить и переподключить'), findsNothing);
     await shot(tester, 'settings-no-reconnect-desktop');
-    await tester.tap(find.byKey(ValueKey('info-${s.launchAtLogin}')));
-    await tester.pumpAndSettle();
-    expect(find.text(s.launchAtLoginDetail), findsOneWidget);
-    expect(tester.widget<Text>(find.text(s.launchAtLoginDetail)).style!.color, Palette.light.ink);
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pumpAndSettle();
     await tester.tap(find.text(s.modes));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('mode-panel')), findsOneWidget);

@@ -235,7 +235,7 @@ class Heading extends StatelessWidget {
   );
 }
 
-/// On-demand help keeps setting rows short without losing their explanation.
+/// Shows the cause of an unavailable extension action.
 class InfoButton extends StatelessWidget {
   const InfoButton({super.key, required this.title, required this.description});
   final String title;
@@ -382,7 +382,6 @@ class Tile extends StatelessWidget {
     super.key,
     required this.title,
     this.detail,
-    this.info,
     this.trailing,
     this.onTap,
     this.detailColor,
@@ -395,7 +394,6 @@ class Tile extends StatelessWidget {
   final Color? titleColor;
   final TextStyle? titleStyle;
   final String? detail;
-  final String? info;
   final Color? detailColor;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -430,7 +428,6 @@ class Tile extends StatelessWidget {
                             style: (titleStyle ?? Styles.body).copyWith(color: titleColor ?? palette.ink),
                           ),
                         ),
-                        if (info != null) InfoButton(title: title, description: info!),
                       ],
                     ),
                     if (detail != null)
@@ -454,11 +451,10 @@ class Tile extends StatelessWidget {
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, required this.title, this.info, required this.value, required this.onChanged});
+  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged});
 
   final String title;
 
-  final String? info;
   final bool value;
   final ValueChanged<bool>? onChanged;
 
@@ -467,7 +463,6 @@ class SwitchTile extends StatelessWidget {
     final palette = Palette.of(context);
     return Tile(
       title: title,
-      info: info,
       onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: CupertinoSwitch(
         value: value,

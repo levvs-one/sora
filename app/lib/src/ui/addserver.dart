@@ -579,11 +579,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                   Group(
                                     children: [
                                       if (['socks5', 'http', 'mieru', 'naive'].contains(_protocol))
-                                        _field(
-                                          'user',
-                                          s.customServerUser,
-                                          info: _protocol == 'mieru' ? null : s.customServerOptional,
-                                        ),
+                                        _field('user', s.customServerUser),
                                       if (_protocol == 'shadowsocks') _field('method', s.customServerCipher),
                                       _field(
                                         'credentials',
@@ -593,30 +589,16 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                             ? 'UUID'
                                             : s.customServerPassword,
                                         secret: true,
-                                        info: _keepStored
-                                            ? s.customServerOptional
-                                            : _wireGuard
-                                            ? s.customServerWgKeyInvalid
-                                            : null,
                                       ),
                                       if (_protocol == 'tuic') _field('password', s.customServerPassword, secret: true),
-                                      if (_wireGuard)
-                                        _field(
-                                          'addresses',
-                                          s.customServerWgAddresses,
-                                          info: s.customServerWgCidrInvalid,
-                                        ),
+                                      if (_wireGuard) _field('addresses', s.customServerWgAddresses),
                                     ],
                                   ),
                                 if (_wireGuard && _peer)
                                   Group(
                                     children: [
-                                      _field('peerKey', s.customServerWgPeerKey, info: s.customServerWgKeyInvalid),
-                                      _field(
-                                        'allowedIps',
-                                        s.customServerWgAllowedIps,
-                                        info: s.customServerWgCidrInvalid,
-                                      ),
+                                      _field('peerKey', s.customServerWgPeerKey),
+                                      _field('allowedIps', s.customServerWgAllowedIps),
                                       ExpansionTile(
                                         key: const ValueKey('custom-wg-peer-options'),
                                         title: Text(
@@ -633,18 +615,8 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                           duration: Motion.of(context, const Duration(milliseconds: 180)),
                                         ),
                                         children: [
-                                          _field(
-                                            'presharedKey',
-                                            s.customServerWgPresharedKey,
-                                            secret: true,
-                                            info: '${s.customServerOptional}. ${s.customServerWgKeyInvalid}',
-                                          ),
-                                          _field(
-                                            'keepalive',
-                                            s.customServerWgKeepalive,
-                                            digits: true,
-                                            info: '${s.customServerOptional}. ${s.customServerWgKeepaliveInvalid}',
-                                          ),
+                                          _field('presharedKey', s.customServerWgPresharedKey, secret: true),
+                                          _field('keepalive', s.customServerWgKeepalive, digits: true),
                                         ],
                                       ),
                                     ],
@@ -661,10 +633,6 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                                 s.customServerOptions,
                                                 style: Styles.body.copyWith(color: palette.ink),
                                               ),
-                                            ),
-                                            InfoButton(
-                                              title: s.customServerOptions,
-                                              description: s.customServerOptionsInfo,
                                             ),
                                           ],
                                         ),
@@ -744,28 +712,23 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                                 },
                                               )
                                             else
-                                              _field(
-                                                key,
-                                                switch (key) {
-                                                  'server_name' => 'SNI',
-                                                  'fingerprint' => 'uTLS',
-                                                  'alpn' => 'ALPN',
-                                                  'public_key' => 'REALITY, ${s.customServerWgPeerKey}',
-                                                  'short_id' => 'REALITY, Short ID',
-                                                  'spider_x' => 'REALITY, SpiderX',
-                                                  'path' => 'Path',
-                                                  'host_header' => 'HTTP Host',
-                                                  'service_name' => 'gRPC, serviceName',
-                                                  'mode' => 'XHTTP, mode',
-                                                  'flow' => 'VLESS, flow',
-                                                  'encryption' => 'VLESS, encryption',
-                                                  'obfs_param' => 'Salamander, ${s.customServerPassword}',
-                                                  'port_range' => 'Mieru, ${s.customServerPort}',
-                                                  _ => key,
-                                                },
-                                                secret: key == 'obfs_param',
-                                                info: null,
-                                              ),
+                                              _field(key, switch (key) {
+                                                'server_name' => 'SNI',
+                                                'fingerprint' => 'uTLS',
+                                                'alpn' => 'ALPN',
+                                                'public_key' => 'REALITY, ${s.customServerWgPeerKey}',
+                                                'short_id' => 'REALITY, Short ID',
+                                                'spider_x' => 'REALITY, SpiderX',
+                                                'path' => 'Path',
+                                                'host_header' => 'HTTP Host',
+                                                'service_name' => 'gRPC, serviceName',
+                                                'mode' => 'XHTTP, mode',
+                                                'flow' => 'VLESS, flow',
+                                                'encryption' => 'VLESS, encryption',
+                                                'obfs_param' => 'Salamander, ${s.customServerPassword}',
+                                                'port_range' => 'Mieru, ${s.customServerPort}',
+                                                _ => key,
+                                              }, secret: key == 'obfs_param'),
                                         ],
                                       ),
                                     ],
@@ -805,7 +768,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
     );
   }
 
-  Widget _field(String key, String label, {String? info, bool digits = false, bool secret = false}) {
+  Widget _field(String key, String label, {bool digits = false, bool secret = false}) {
     final s = S.of(context), palette = Palette.of(context);
     final editingWireGuard =
         _wireGuard &&
@@ -836,7 +799,6 @@ class _AddServerScreenState extends State<AddServerScreen> {
               Flexible(
                 child: Text(label, style: Styles.row.copyWith(color: palette.ink)),
               ),
-              if (info != null) InfoButton(title: label, description: info),
             ],
           ),
           const SizedBox(height: 8),

@@ -166,7 +166,7 @@ class Sora extends ChangeNotifier {
       AppNotification(
         time: DateTime.now(),
         title: strings.updateAvailable(release.version),
-        body: strings.updateOpenAbout,
+        body: '',
         messageKey: 'notice.update',
         messageArgs: {'version': release.version},
         action: 'update',

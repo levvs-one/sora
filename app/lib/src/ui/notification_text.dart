@@ -31,10 +31,10 @@ import 'kit.dart' show describe;
     'notice.next' => (title: entry, body: s.noticeNext),
     'notice.returned' => (title: entry, body: s.noticeMainBack),
     'notice.degraded' => (title: entry, body: s.noticeDegraded),
-    'notice.update' => (title: s.updateAvailable(args['version'] ?? ''), body: s.updateOpenAbout),
+    'notice.update' => (title: s.updateAvailable(args['version'] ?? ''), body: ''),
     'notice.profileAsk' => (title: s.profileApplyAsk(args['name'] ?? ''), body: ''),
     'notice.profileApplied' => (title: s.profileApplied(args['name'] ?? ''), body: ''),
-    'notice.tray' => (title: s.noticeInTray, body: s.noticeInTrayBody),
+    'notice.tray' => (title: s.noticeInTray, body: ''),
     'notice.expired' => (title: s.noticeSubscription, body: '${args['name']}: ${s.expired.toLowerCase()}'),
     'notice.expiring' => (
       title: s.noticeSubscription,
@@ -107,7 +107,7 @@ Map<String, String> _labels(S s) => {
       return (key: 'notice.connectionLost', args: const {});
     }
     if (notice.title == old.noticeRestored) return (key: 'notice.connectionRestored', args: {'entry': notice.body});
-    if (notice.title == old.noticeInTray && notice.body == old.noticeInTrayBody) {
+    if (notice.title == old.noticeInTray) {
       return (key: 'notice.tray', args: const {});
     }
     if (notice.action == 'logs') {
@@ -118,7 +118,7 @@ Map<String, String> _labels(S s) => {
     if (notice.body == old.noticeMainBack && notice.action.isEmpty) {
       return (key: 'notice.returned', args: {'entry': notice.title});
     }
-    if (notice.action == 'update' && notice.body == old.updateOpenAbout) {
+    if (notice.action == 'update') {
       final version = _capture(old.updateAvailable(_marker), notice.title);
       if (version != null) return (key: 'notice.update', args: {'version': version});
     }

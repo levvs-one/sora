@@ -272,7 +272,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
           children: [LinkTile(title: s.chainName, value: _name.isEmpty ? null : _name, onTap: _editName)],
         ),
         const SizedBox(height: 16),
-        Heading(s.chainPickServers),
+        Heading(s.servers),
         Group(
           children: [
             for (final server in servers)
@@ -286,7 +286,6 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        Heading(s.chainOrderHint),
         if (_hops.isEmpty)
           Group(
             children: [Tile(title: s.chainTooFew, titleColor: palette.ink)],

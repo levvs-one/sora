@@ -166,7 +166,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                   TextField(
                     controller: controller,
                     keyboardType: TextInputType.url,
-                    decoration: InputDecoration(hintText: s.extUrlHint),
+                    decoration: InputDecoration(labelText: s.extInstallFromUrl),
                     onSubmitted: (_) => Navigator.pop(context, controller.text.trim()),
                   ),
                   const SizedBox(height: 16),
@@ -816,7 +816,6 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
       rating: e.rating,
       installs: e.installs,
       verified: e.badges.contains('staff'),
-      subtitle: e.description,
       permissions: e.permissions,
       onTap: () => push<void>(
         context,

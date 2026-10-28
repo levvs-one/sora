@@ -205,63 +205,58 @@ class SFa extends S {
   String get errGeneric => 'مشکلی پیش آمد';
 
   @override
-  String get errCore => 'سرویس Sora پاسخ نمی‌دهد. کمی صبر کنید و دوباره تلاش کنید.';
+  String get errCore => 'سرویس Sora پاسخ نمی‌دهد';
 
   @override
-  String get errAuth => 'دسترسی به سرویس Sora رد شد. برنامه را دوباره اجرا کنید و باز تلاش کنید.';
+  String get errAuth => 'دسترسی به سرویس Sora رد شد';
 
   @override
-  String get errVersion => 'نسخه برنامه و سرویس Sora یکسان نیست. Sora را به‌روزرسانی کنید.';
+  String get errVersion => 'نسخه برنامه و سرویس Sora یکسان نیست';
 
   @override
-  String get errBusy => 'دستور قبلی هنوز در حال اجراست. منتظر پایان آن بمانید.';
+  String get errBusy => 'دستور قبلی هنوز در حال اجراست';
 
   @override
-  String get errEngineMissing => 'موتور لازم برای این سرور پیدا نشد. به‌روزرسانی‌های Sora را بررسی کنید.';
+  String get errEngineMissing => 'موتور لازم برای این سرور پیدا نشد';
 
   @override
-  String get errEngineStart => 'موتور راه‌اندازی نشد. دلیل را در گزارش اتصال بررسی کنید.';
+  String get errEngineStart => 'موتور راه‌اندازی نشد';
 
   @override
-  String get errEngineStopped => 'موتور متوقف شد. دوباره برای اتصال تلاش کنید.';
+  String get errEngineStopped => 'موتور متوقف شد';
 
   @override
-  String get errTunnel => 'این حالت VPN در دسترس نیست. حالت دیگری انتخاب کنید یا مجوزهای سرویس را بررسی کنید.';
+  String get errTunnel => 'این حالت VPN در دسترس نیست';
 
   @override
-  String get errNetwork => 'دسترسی به سرور امکان پذیر نیست';
+  String get errTimeout => 'سرور به‌موقع پاسخ نداد';
 
   @override
-  String get errTimeout => 'سرور به‌موقع پاسخ نداد. یک دقیقه دیگر دوباره تلاش کنید.';
+  String get errFirewall => 'مسدود کردن دسترسی به اینترنت خارج از VPN ممکن نشد';
 
   @override
-  String get errFirewall => 'مسدود کردن دسترسی به اینترنت خارج از VPN ممکن نشد. دلیل را در گزارش اتصال بررسی کنید.';
+  String get errSubFetch => 'اشتراک دریافت نشد';
 
   @override
-  String get errSubFetch => 'اشتراک دریافت نشد. اتصال اینترنت را بررسی کنید و یک دقیقه دیگر دوباره تلاش کنید.';
+  String get errSubFormat => 'قالب اشتراک شناسایی نشد';
 
   @override
-  String get errSubFormat => 'قالب اشتراک شناسایی نشد. از ارائه‌دهنده پیوند اشتراک سازگار بخواهید.';
+  String get errSubEmpty => 'اشتراک هیچ سروری ندارد';
 
   @override
-  String get errSubEmpty => 'اشتراک هیچ سروری ندارد. با ارائه‌دهنده اشتراک تماس بگیرید.';
+  String get errSubDuplicate => 'این اشتراک قبلاً اضافه شده است';
 
   @override
-  String get errSubDuplicate => 'این اشتراک قبلاً اضافه شده است. برای دریافت فهرست جدید سرورها آن را به‌روزرسانی کنید.';
+  String get errSubLimit => 'به سقف تعداد اشتراک‌ها رسیده‌اید';
 
   @override
-  String get errSubLimit =>
-      'به سقف تعداد اشتراک‌ها رسیده‌اید. پیش از افزودن اشتراک جدید، اشتراکی را که استفاده نمی‌کنید حذف کنید.';
+  String get errSubScheme => 'طرح پیوند اشتراک پشتیبانی نمی‌شود';
 
   @override
-  String get errSubScheme => 'پیوند اشتراک باید با https:// شروع شود. از ارائه‌دهنده پیوند امن بخواهید.';
+  String get errSecretStore => 'فضای ذخیره‌سازی Sora آسیب دیده یا در دسترس نیست';
 
   @override
-  String get errSecretStore =>
-      'فضای ذخیره‌سازی Sora آسیب دیده یا در دسترس نیست. مجوزهای دسترسی و جزئیات گزارش را بررسی کنید.';
-
-  @override
-  String get errNoServers => 'سروری برای اتصال وجود ندارد. اشتراک یا سرور شخصی خود را اضافه کنید.';
+  String get errNoServers => 'سروری برای اتصال وجود ندارد';
 
   @override
   String get connections => 'اتصالات';
@@ -315,9 +310,6 @@ class SFa extends S {
   String get dnsAuto => 'خودکار';
 
   @override
-  String get dnsHint => 'آدرس ها، با کاما از هم جدا شده اند';
-
-  @override
   String get fragment => 'تکه تکه شدن TLS';
 
   @override
@@ -333,13 +325,7 @@ class SFa extends S {
   String get byDefault => 'پیش فرض';
 
   @override
-  String get rangeHint => 'مثلا 100-200';
-
-  @override
   String get splitPos => 'تقسیم موقعیت ها';
-
-  @override
-  String get splitPosHint => 'به عنوان مثال، 1، midsld';
 
   @override
   String get disorder => 'سفارش مجدد قطعات';
@@ -448,11 +434,6 @@ class SFa extends S {
   String get support => 'پشتیبانی کنید';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine از طریق پورت این کامپیوتر کنترل می شود. سایر برنامه ها می توانند به روشن بودن VPN بگویند.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine را انتخاب کنید';
   }
@@ -528,9 +509,6 @@ class SFa extends S {
   String get launchAtLogin => 'با سیستم شروع کنید';
 
   @override
-  String get launchAtLoginDetail => 'Sora هنگام ورود به سیستم به‌طور خودکار اجرا می‌شود و در سینی سیستم باقی می‌ماند.';
-
-  @override
   String get closeToTray => 'وقتی بسته است در سینی نگه دارید';
 
   @override
@@ -565,9 +543,6 @@ class SFa extends S {
   String get noticeInTray => 'Sora هنوز در سینی است';
 
   @override
-  String get noticeInTrayBody => 'از منوی نماد آن خارج شوید';
-
-  @override
   String get noticeLost => 'اتصال قطع شد';
 
   @override
@@ -595,11 +570,7 @@ class SFa extends S {
   String get importTitle => 'این اشتراک اضافه شود؟';
 
   @override
-  String get importSealed =>
-      'این پیوند برای Happ رمزگذاری شده است و فقط Happ می تواند آن را بخواند. از ارائه دهنده خود لینک اشتراک ساده را بخواهید.';
-
-  @override
-  String get understood => 'باشه';
+  String get importSealed => 'این پیوند برای Happ رمزگذاری شده است و فقط Happ می تواند آن را بخواند';
 
   @override
   String get noAnswer => 'بدون پاسخ';
@@ -638,39 +609,10 @@ class SFa extends S {
   String get openLogs => 'لاگ ها را باز کنید';
 
   @override
-  String get tourReplay => 'راهنما را دوباره نشان دهید';
-
-  @override
-  String tourStep(int step) {
-    return 'مرحله $step از 5';
-  }
-
-  @override
   String get tourBack => 'برگشت';
 
   @override
   String get tourNext => 'بعدی';
-
-  @override
-  String get tourSkip => 'پرش کنید';
-
-  @override
-  String get tourFinish => 'انجام شد';
-
-  @override
-  String get tourAdd => 'پیوند اشتراک ارائه دهنده خود را اضافه کنید.';
-
-  @override
-  String get tourServer => 'یک سرور انتخاب کنید \"سریعترین\" یکی را برای شما انتخاب می کند.';
-
-  @override
-  String get tourConnect => 'برای اتصال یا قطع ارتباط اینجا را کلیک کنید.';
-
-  @override
-  String get tourMode => 'یک حالت را انتخاب کنید. در صورت قطع شدن VPN، سوئیچ Kill اینترنت را مسدود می کند.';
-
-  @override
-  String get tourSettings => 'تنظیمات را باز کنید. می توانید این راهنما را دوباره در آنجا پخش کنید.';
 
   @override
   String get chooseProgram => 'یک برنامه را انتخاب کنید';
@@ -682,7 +624,7 @@ class SFa extends S {
   String get runningProcesses => 'فرآیندهای در حال اجرا';
 
   @override
-  String get programsEmpty => 'هیچ برنامه ای یافت نشد نام دیگری را امتحان کنید.';
+  String get programsEmpty => 'هیچ برنامه ای یافت نشد نام دیگری را امتحان کنید';
 
   @override
   String get selectExe => 'یک فایل exe را انتخاب کنید';
@@ -694,7 +636,7 @@ class SFa extends S {
   String get speedtestSearch => 'یک سرویس پیدا کنید';
 
   @override
-  String get speedtestEmpty => 'هیچ مسابقه ای وجود ندارد. جستجو را تغییر دهید';
+  String get speedtestEmpty => 'هیچ مسابقه ای وجود ندارد';
 
   @override
   String get speedtestBackToList => 'بازگشت به خدمات';
@@ -703,15 +645,13 @@ class SFa extends S {
   String get speedtestOpenBrowser => 'در مرورگر باز کنید';
 
   @override
-  String get speedtestUnavailable =>
-      'مرورگر تعبیه شده نمی تواند راه اندازی شود. سرویس را در مرورگر سیستم خود باز کنید.';
+  String get speedtestUnavailable => 'مرورگر تعبیه شده نمی تواند راه اندازی شود';
 
   @override
-  String get speedtestPageFailed =>
-      'صفحه نمی تواند بارگیری شود. آن را دوباره بارگیری کنید یا سرویس را در مرورگر سیستم خود باز کنید.';
+  String get speedtestPageFailed => 'صفحه نمی تواند بارگیری شود';
 
   @override
-  String get speedtestExternalFailed => 'مرورگر سیستم باز نشد. دوباره امتحان کنید.';
+  String get speedtestExternalFailed => 'مرورگر سیستم باز نشد';
 
   @override
   String get modes => 'حالت ها';
@@ -751,43 +691,28 @@ class SFa extends S {
   String get updateNoNotes => 'انتشار هیچ یادداشتی ندارد.';
 
   @override
-  String get updateDropWarning =>
-      'در حالی که Sora و به روز رسانی اصلی آن، اتصال VPN برای چند ثانیه قطع می شود. ادامه دهید؟';
+  String get updateDropWarning => 'اتصال برای به‌روزرسانی قطع شود؟';
 
   @override
-  String get updateWaitConnection => 'منتظر بمانید تا اتصال VPN و هسته آماده شود.';
+  String get updateWaitConnection => 'اتصال آماده نیست';
 
   @override
-  String get updateDownloading => 'دانلود و تایید فایل ها...';
-
-  @override
-  String get updateInstalling => 'در حال آماده سازی به روز رسانی یا انتظار برای احراز هویت سرپرست...';
-
-  @override
-  String get updateNetworkError => 'آپدیت دانلود نشد دوباره امتحان کنید.';
+  String get updateNetworkError => 'آپدیت دانلود نشد دوباره امتحان کنید';
 
   @override
   String get updateReleaseError => 'داده‌های انتشار یا فایل‌های مورد نیاز وجود ندارد یا نامعتبر است.';
 
   @override
-  String get updateChecksumError => 'دانلود با SHA256SUMS مطابقت ندارد. هیچی نصب نشد';
+  String get updateChecksumError => 'دانلود با SHA256SUMS مطابقت ندارد';
 
   @override
-  String get updateInstallError => 'آپدیت تمام نشد. احراز هویت ممکن است لغو شده باشد.';
+  String get updateInstallError => 'آپدیت تمام نشد';
 
   @override
-  String get updateUnsupported =>
-      'این فایل اجرایی متعلق به یک جفت بسته پشتیبانی شده Sora نیست. از دستورالعمل های نصب نسخه استفاده کنید.';
+  String get updateUnsupported => 'این فایل اجرایی متعلق به یک جفت بسته پشتیبانی شده Sora نیست';
 
   @override
-  String get updateManual =>
-      'این دستور را در ترمینال اجرا کنید تا هر دو بسته تایید شده نصب شوند، سپس Sora را دوباره باز کنید. فایل ها در دایرکتوری دانلود می مانند. اتصال VPN قطع می شود.';
-
-  @override
-  String get updateVersionRevoked => 'توسعه دهنده این نسخه را پس گرفته است. لطفا منتظر انتشار تصحیح شده باشید.';
-
-  @override
-  String get updateRolloutPending => 'نسخه جدیدتر به تدریج در حال انتشار است و به طور خودکار به شما ارائه می شود.';
+  String get updateVersionRevoked => 'توسعه دهنده این نسخه را پس گرفته است';
 
   @override
   String updateRollbacking(String version) {
@@ -800,8 +725,7 @@ class SFa extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'بازگشت خودکار شکست خورد. اگر نسخه جدید کار نمی کند، نسخه قبلی را دوباره به صورت دستی نصب کنید.';
+  String get updateRollbackError => 'بازگشت خودکار شکست خورد';
 
   @override
   String get updateRollbackCacheError =>
@@ -811,10 +735,7 @@ class SFa extends S {
   String get updateCopyCommand => 'دستور کپی';
 
   @override
-  String get updateChecksDisabled => 'بررسی خودکار در تنظیمات غیرفعال است.';
-
-  @override
-  String get updateInstalled => 'آپدیت نصب شد Sora را دوباره باز کنید.';
+  String get updateInstalled => 'آپدیت نصب شد Sora را دوباره باز کنید';
 
   @override
   String get projectLinks => 'پروژه';
@@ -844,14 +765,13 @@ class SFa extends S {
   String get showDescription => 'نمایش توضیحات';
 
   @override
-  String get errEngineUnsupported =>
-      'موتور انتخاب شده از این نمایه یا تنظیمات پشتیبانی نمی کند. Auto یا موتور سازگار را انتخاب کنید.';
+  String get errEngineUnsupported => 'موتور انتخاب شده از این نمایه یا تنظیمات پشتیبانی نمی کند';
 
   @override
-  String get errRestore => 'پاکسازی اتصال ناقص بود. قطع ارتباط مجدد را امتحان کنید. برای جزئیات به لاگ مراجعه کنید';
+  String get errRestore => 'پاکسازی اتصال ناقص بود';
 
   @override
-  String get errSessionEnded => 'این جلسه قبلاً به پایان رسیده است. وضعیت اتصال را بازخوانی کنید.';
+  String get errSessionEnded => 'این جلسه قبلاً به پایان رسیده است';
 
   @override
   String get retryDisconnect => 'دوباره سعی کنید اتصال را قطع کنید';
@@ -894,13 +814,10 @@ class SFa extends S {
   String get extInstallOne => '1 نصب';
 
   @override
-  String get extSideloadWarning => 'فقط اگر به کلید خودامضای نویسنده اعتماد دارید نصب کنید.';
+  String get extSideloadWarning => 'کلید خودامضا';
 
   @override
   String get extPermissionsWidened => 'به روز رسانی مجوزهای جدید را می خواهد:';
-
-  @override
-  String get extDangerousAck => 'می‌دانم که این مجوزها جدی هستند';
 
   @override
   String get extInstall => 'نصب';
@@ -913,9 +830,6 @@ class SFa extends S {
 
   @override
   String get extConfirm => 'تأیید کنید';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'کاتالوگ';
@@ -966,17 +880,13 @@ class SFa extends S {
   String get extEmptySearch => 'چیزی پیدا نشد';
 
   @override
-  String get extEmptyInstalled =>
-      'هنوز هیچ برنامه افزودنی نصب نشده است.\nیکی را در کاتالوگ پیدا کنید یا از یک فایل نصب کنید.';
+  String get extEmptyInstalled => 'هنوز هیچ برنامه افزودنی نصب نشده است';
 
   @override
   String get extInstallFromFile => 'نصب از فایل';
 
   @override
   String get extInstallFromUrl => 'نصب از URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'دانلود کنید';
@@ -991,19 +901,16 @@ class SFa extends S {
   String get extInstalling => 'در حال نصب…';
 
   @override
-  String get extInstallFailed => 'نصب انجام نشد';
-
-  @override
-  String get extErrSignature => 'بررسی امضا انجام نشد. ممکن است فایل آسیب دیده یا دستکاری شده باشد.';
+  String get extErrSignature => 'بررسی امضا انجام نشد';
 
   @override
   String get extErrManifest => 'مانیفست افزونه نامعتبر است.';
 
   @override
-  String get extErrNetwork => 'خطای شبکه. اتصال خود را بررسی کنید و دوباره امتحان کنید.';
+  String get extErrNetwork => 'خطای شبکه';
 
   @override
-  String get extErrHash => 'دانلود با کاتالوگ مطابقت ندارد. ممکن است دستکاری شده باشد.';
+  String get extErrHash => 'دانلود با کاتالوگ مطابقت ندارد';
 
   @override
   String extErrMinApp(String version) {
@@ -1014,11 +921,11 @@ class SFa extends S {
   String get extErrHttpsOnly => 'فقط پیوندهای https:// مجاز هستند';
 
   @override
-  String get extErrGeneric => 'مشکلی پیش آمد. لطفا دوباره امتحان کنید.';
+  String get extErrGeneric => 'مشکلی پیش آمد';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد. اگر به کلید جدید اعتماد دارید، برنامه افزودنی را حذف نصب کنید و دوباره آن را به صراحت نصب کنید.';
+      'این به روز رسانی با یک کلید نویسنده متفاوت از نسخه نصب شده امضا شده است، بنابراین مسدود شد';
 
   @override
   String get extDisabled => 'غیرفعال';
@@ -1075,7 +982,7 @@ class SFa extends S {
 
   @override
   String extConflictsCount(int count) {
-    return 'تعارضات $count به تصمیم شما نیاز دارد';
+    return 'تعارضات پسوند: $count';
   }
 
   @override
@@ -1152,10 +1059,10 @@ class SFa extends S {
   String get extPermThemeApply => 'تم ها را اعمال کنید';
 
   @override
-  String get extPermRoutingRules => 'قوانین مسیریابی را اضافه کنید (بر جایی که ترافیک شبکه می رود تأثیر می گذارد)';
+  String get extPermRoutingRules => 'قوانین مسیریابی را اضافه کنید';
 
   @override
-  String get extPermNetHooks => 'ادغام در مسیر شبکه (DPI ماژول های دور زدن)';
+  String get extPermNetHooks => 'ادغام در مسیر شبکه';
 
   @override
   String get extPermNetFetch => 'URL را از لیست مجاز درخواست کنید';
@@ -1164,7 +1071,7 @@ class SFa extends S {
   String get extPermBackground => 'وظایف پس زمینه را اجرا کنید';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'غیرفعال';
 
   @override
   String get extCapBackground => 'در پس‌زمینه اجرا می‌شود';
@@ -1202,9 +1109,6 @@ class SFa extends S {
   String get extSortRelevance => 'ربط';
 
   @override
-  String get extPermNetworkDetail => 'درخواست‌های VPN فقط به میزبان‌های زیر مجازند.';
-
-  @override
   String get extBgTitle => 'کار پس‌زمینه';
 
   @override
@@ -1226,9 +1130,6 @@ class SFa extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'برنامه افزودنی را برای مدیریت وظیفه پس‌زمینه خود فعال کنید.';
-
-  @override
   String get extCapNetwork => 'دسترسی به شبکه';
 
   @override
@@ -1245,7 +1146,7 @@ class SFa extends S {
   String get diagnosticHttp => 'تشخیص HTTP';
 
   @override
-  String get diagnosticNoData => 'هنوز درخواستی ثبت نشده است. ابتدا یک وب سایت تست سرعت باز کنید.';
+  String get diagnosticNoData => 'هنوز درخواستی ثبت نشده است';
 
   @override
   String get qrShareTitle => 'کد QR را به اشتراک بگذارید';
@@ -1255,12 +1156,6 @@ class SFa extends S {
 
   @override
   String get qrCopyLink => 'پیوند را کپی کنید';
-
-  @override
-  String get qrWarning => 'کد را فقط با افراد مورد اعتماد به اشتراک بگذارید.';
-
-  @override
-  String get qrScanHint => 'یک اسکرین‌شات یا عکس دارای کد QR انتخاب کنید یا پیوندی را جای‌گذاری کنید';
 
   @override
   String get qrFromClipboard => 'چسباندن از کلیپ بورد';
@@ -1341,31 +1236,10 @@ class SFa extends S {
   String get dnsLeakCheckKillSwitchDns => 'محافظت DNS با قطع اضطراری';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'DNS را برای تونل در تنظیمات DNS بالا پیکربندی کنید.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'بررسی کنید که سیستم شما از کدام حل کننده ها در خارج از تونل استفاده می کند.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'قطع اضطراری را روشن کنید تا ترافیک DNS درون تونل بماند.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'DNS رمزگذاری‌شدهٔ سیستم‌عامل';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'پاسخ های جعلی DNS';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'بررسی کنید که سیستم شما از کدام نقاط پایانی DNS رمزگذاری شده در خارج از تونل استفاده می کند.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'از DNS (DoT یا DoH) رمزگذاری شده برای تونل استفاده کنید تا حل‌کننده‌ها نتوانند پاسخ‌ها را جعل کنند.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'ابتدا به VPN متصل شوید، سپس نشتی را بررسی کنید.';
 
   @override
   String get dnsExpected => 'مورد انتظار';
@@ -1392,7 +1266,7 @@ class SFa extends S {
   String get autoSelectSmart => 'انتخاب هوشمندانه';
 
   @override
-  String get coreWatchUnstable => 'ارتباط با هسته ناپایدار است. کمی صبر کنید و دوباره برای اتصال تلاش کنید.';
+  String get coreWatchUnstable => 'ارتباط با هسته ناپایدار است';
 
   @override
   String get watchReconnect => 'دوباره وصل شوید';
@@ -1431,7 +1305,7 @@ class SFa extends S {
   String get overrideCustomRules => 'قوانین خود را';
 
   @override
-  String get errBenchmarkUnsupported => 'سنجش سرعت به نسخه جدیدتری از هسته نیاز دارد. Sora را به‌روزرسانی کنید.';
+  String get errBenchmarkUnsupported => 'سنجش سرعت به نسخه جدیدتری از هسته نیاز دارد';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1442,8 +1316,7 @@ class SFa extends S {
   String get profiles => 'نمایه های شبکه';
 
   @override
-  String get profilesEmpty =>
-      'هنوز پروفایلی وجود ندارد. یکی ایجاد کنید تا تنظیمات به طور خودکار در شبکه های شناخته شده اعمال شود.';
+  String get profilesEmpty => 'هنوز پروفایلی وجود ندارد';
 
   @override
   String get profileAdd => 'افزودن نمایه';
@@ -1455,9 +1328,6 @@ class SFa extends S {
   String get profileSsids => 'Wi-Fi شبکه (SSID)';
 
   @override
-  String get profileSsidsHint => 'خانه، دفتر با کاما جدا شده است';
-
-  @override
   String get profileGateways => 'دروازه های شبکه';
 
   @override
@@ -1465,9 +1335,6 @@ class SFa extends S {
 
   @override
   String get profileAutoApply => 'اعمال خودکار';
-
-  @override
-  String get profileAutoApplyHint => 'اگر خاموش باشد، پیش از اعمال نمایه تأیید خواسته می‌شود.';
 
   @override
   String get profileSnapshot => 'تنظیمات فعلی را به خاطر بسپارید';
@@ -1511,14 +1378,13 @@ class SFa extends S {
   String get networkUnknown => 'اطلاعات شبکه در دسترس نیست';
 
   @override
-  String get profileNoTriggers => 'حداقل یک محرک اضافه کنید: SSID، دروازه یا ASN';
+  String get profileNoTriggers => 'شرایط نمایه وجود ندارد';
 
   @override
   String get chains => 'زنجیره های پروکسی';
 
   @override
-  String get chainsEmpty =>
-      'هنوز زنجیر وجود ندارد. 2-3 سرور را پیوند دهید تا ترافیک از طریق هر یک از آنها افزایش یابد.';
+  String get chainsEmpty => 'هنوز زنجیر وجود ندارد';
 
   @override
   String get chainAdd => 'زنجیره جدید';
@@ -1527,16 +1393,10 @@ class SFa extends S {
   String get chainName => 'نام زنجیر';
 
   @override
-  String get chainPickServers => '2 تا 3 سرور را انتخاب کنید';
+  String get chainTooFew => 'زنجیره به دست‌کم دو سرور نیاز دارد';
 
   @override
-  String get chainOrderHint => 'برای ترتیب مجدد بکشید: ترافیک در بالا وارد می شود و در پایین خارج می شود.';
-
-  @override
-  String get chainTooFew => 'زنجیره به دست‌کم دو سرور نیاز دارد. سرور دیگری اضافه کنید.';
-
-  @override
-  String get chainTooMany => 'زنجیره می‌تواند حداکثر سه سرور داشته باشد. سرورهای اضافی را حذف کنید.';
+  String get chainTooMany => 'زنجیره می‌تواند حداکثر سه سرور داشته باشد';
 
   @override
   String get chainEstimate => 'تأخیر تخمینی';
@@ -1553,10 +1413,10 @@ class SFa extends S {
   }
 
   @override
-  String get chainUnsupported => 'موتور انتخاب‌شده از زنجیره پشتیبانی نمی‌کند. موتور سازگاری انتخاب کنید.';
+  String get chainUnsupported => 'موتور انتخاب‌شده از زنجیره پشتیبانی نمی‌کند';
 
   @override
-  String get chainHopMissing => 'یکی از سرورهای زنجیره دیگر در دسترس نیست. برای آن بخش سرور دیگری انتخاب کنید.';
+  String get chainHopMissing => 'یکی از سرورهای زنجیره دیگر در دسترس نیست';
 
   @override
   String chainHop(Object n) {
@@ -1576,7 +1436,7 @@ class SFa extends S {
   String get syncDevices => 'دستگاه های من';
 
   @override
-  String get syncEmpty => 'هیچ دستگاه جفت شده ای وجود ندارد. دستگاه دیگری را از طریق شبکه محلی جفت کنید.';
+  String get syncEmpty => 'هیچ دستگاه جفت شده ای وجود ندارد';
 
   @override
   String get syncPair => 'جفت کردن دستگاه';
@@ -1604,9 +1464,6 @@ class SFa extends S {
   String get syncNever => 'هرگز';
 
   @override
-  String get syncNoLan => 'دستگاه ها باید در یک شبکه محلی باشند';
-
-  @override
   String get syncPaired => 'دستگاه جفت شد';
 
   @override
@@ -1616,13 +1473,10 @@ class SFa extends S {
   String get syncWaiting => 'در انتظار دستگاه دیگر…';
 
   @override
-  String get syncSecureNote => 'کانال رمزگذاری شده سرتاسر. بدون حساب، بدون سرور ابری.';
-
-  @override
   String get zapretWithVpn => 'برای ترافیک مستقیم شبکه، فیلتر DPI را دور بزنید';
 
   @override
-  String get chainDuplicate => 'یک سرور در زنجیره تکرار شده است. برای هر بخش سرور متفاوتی انتخاب کنید.';
+  String get chainDuplicate => 'یک سرور در زنجیره تکرار شده است';
 
   @override
   String get edit => 'ویرایش';
@@ -1632,10 +1486,6 @@ class SFa extends S {
 
   @override
   String get autoSwitchOnDegrade => 'تغییر خودکار در تخریب';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'اگر سرور انتخابی بسیار کند شود یا پاسخ ندهد، Sora به بهترین سرور طبق اندازه‌گیری‌ها تغییر می‌کند، اما حداکثر یک بار در هر 10 دقیقه.';
 
   @override
   String get tunStackMixed => 'مختلط';
@@ -1653,19 +1503,13 @@ class SFa extends S {
   String get customServerName => 'نام';
 
   @override
-  String get customServerNameHint => 'به عنوان مثال: VPS من';
-
-  @override
-  String get customServerNameRequired => 'نام را وارد کنید';
+  String get customServerNameRequired => 'نام وارد نشده است';
 
   @override
   String get customServerAddress => 'نشانی';
 
   @override
-  String get customServerAddressHint => 'example.com یا 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'آدرس سرور را وارد کنید';
+  String get customServerAddressRequired => 'نشانی وارد نشده است';
 
   @override
   String get customServerAddressInvalid => 'آدرس نامعتبر است';
@@ -1674,19 +1518,13 @@ class SFa extends S {
   String get customServerPort => 'درگاه';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'پورت باید از 1 تا 65535 باشد';
+  String get customServerPortInvalid => 'درگاه نامعتبر';
 
   @override
   String get customServerProtocol => 'پروتکل';
 
   @override
   String get customServerCredentials => 'اطلاعات ورود';
-
-  @override
-  String get customServerOptional => 'اختیاری';
 
   @override
   String get customServerShowSecret => 'نمایش راز';
@@ -1700,9 +1538,6 @@ class SFa extends S {
   }
 
   @override
-  String get customServerTest => 'آزمایش';
-
-  @override
   String get leakTestTitle => 'تست نشت داده ها';
 
   @override
@@ -1710,9 +1545,6 @@ class SFa extends S {
 
   @override
   String get leakTestCancel => 'لغو';
-
-  @override
-  String get leakTestNeedsConnection => 'برای آزمایش نشت داده به VPN متصل شوید.';
 
   @override
   String leakTestProgress(int count) {
@@ -1738,9 +1570,6 @@ class SFa extends S {
 
   @override
   String get leakTestFix => 'رفع کنید';
-
-  @override
-  String get leakTestFixedNote => 'قطع اضطراری روشن است. برای بررسی، آزمایش را دوباره اجرا کنید.';
 
   @override
   String get leakTestCheckDirectDns => 'مستقیم DNS';
@@ -1773,15 +1602,13 @@ class SFa extends S {
   String get syncDaemonFailed => 'سرویس همگام‌سازی راه‌اندازی نشد';
 
   @override
-  String get syncDaemonMissing =>
-      'مؤلفه sora-sync پیدا نشد. برای فعال کردن همگام سازی دستگاه، برنامه را دوباره نصب کنید.';
+  String get syncDaemonMissing => 'مؤلفه sora-sync پیدا نشد';
 
   @override
   String get syncDaemonStarting => 'شروع سرویس همگام سازی…';
 
   @override
-  String get syncErrAuth =>
-      'سرویس همگام‌سازی رمز دسترسی را رد کرد. برنامه را مجددا راه اندازی کنید و دوباره امتحان کنید.';
+  String get syncErrAuth => 'سرویس همگام‌سازی رمز دسترسی را رد کرد';
 
   @override
   String get syncErrNotFound => 'دستگاه دیگر جفت نشده است';
@@ -1790,7 +1617,7 @@ class SFa extends S {
   String get syncErrPairingActive => 'یک جلسه جفت سازی از قبل باز است';
 
   @override
-  String get syncErrUnreachable => 'دستگاه دیگر پاسخ نداد. مطمئن شوید که در همان شبکه است و کد آن را نشان می دهد.';
+  String get syncErrUnreachable => 'دستگاه دیگر پاسخ نداد';
 
   @override
   String get syncError => 'خطای همگام سازی';
@@ -1802,10 +1629,6 @@ class SFa extends S {
 
   @override
   String get syncJoining => 'جفت شدن با دستگاه…';
-
-  @override
-  String get syncLegacyCleared =>
-      'لیست دستگاه های قدیمی هرگز جفت نشد، بنابراین پاک شد. دستگاه های خود را دوباره جفت کنید، این بار به صورت واقعی.';
 
   @override
   String get syncNewCode => 'کد جدید';
@@ -1865,8 +1688,7 @@ class SFa extends S {
   String get syncThisDevice => 'این دستگاه';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'همگام‌سازی در Android در دسترس نیست';
 
   @override
   String get diagnosticPackets => 'ضبط بسته';
@@ -1913,27 +1735,25 @@ class SFa extends S {
   String get customServerWgKeepalive => 'Keepalive، ثانیه';
 
   @override
-  String get customServerWgKeyInvalid => 'کلید باید ۳۲ بایت base64 باشد، مانند خروجی wg genkey.';
+  String get customServerWgKeyInvalid => 'کلید WireGuard نامعتبر';
 
   @override
-  String get customServerWgCidrInvalid => 'پیشوندها را با ویرگول جدا کنید، مانند 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'پیشوند CIDR نامعتبر';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'عددی بین 0 تا 65535 ثانیه وارد کنید.';
+  String get customServerWgKeepaliveInvalid => 'فاصله keepalive نامعتبر';
 
   @override
   String get strictKillSwitch => 'قطع اضطراری سخت‌گیرانه';
 
   @override
-  String get strictKillSwitchWarning =>
-      'پس از اتصال، ترافیک خارج از VPN حتی پس از خروج از برنامه تا قطع اتصال مسدود می‌ماند.';
+  String get strictKillSwitchWarning => 'ترافیک خارج از VPN پس از خروج مسدود بماند؟';
 
   @override
-  String get extWorkerFailed => 'وظیفه پس‌زمینه افزونه ناموفق بود. گزارش افزونه را بررسی کنید.';
+  String get extWorkerFailed => 'وظیفه پس‌زمینه افزونه ناموفق بود';
 
   @override
-  String get extAssetRejected =>
-      'فایل افزونه دارای رنگ‌های ناخوانا یا قوانین نامعتبر است. از سازنده افزونه بخواهید فایل را اصلاح کند.';
+  String get extAssetRejected => 'فایل افزونه دارای رنگ‌های ناخوانا یا قوانین نامعتبر است';
 
   @override
   String get extVerifiedSora => 'تأییدشده توسط Sora';
@@ -1959,31 +1779,25 @@ class SFa extends S {
   String get customServerPassword => 'گذرواژه';
 
   @override
-  String get customServerSecretRequired => 'یک مقدار وارد کنید';
+  String get customServerSecretRequired => 'مقدار وارد نشده است';
 
   @override
   String get customServerLinkInvalid => 'پیوند سرور نامعتبر است';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'خطای داخلی Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'گواهی سرور رد شد';
 
   @override
-  String get errInternal => 'خطای داخلی Sora. گزارش را ذخیره کنید و مشکل را اطلاع دهید.';
+  String get errFileAccess => 'دسترسی به فایل ممکن نیست';
 
   @override
-  String get errTls => 'گواهی سرور رد شد. ساعت را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.';
+  String get errDataLimit => 'داده‌ها بیش از حد هستند';
 
   @override
-  String get errFileAccess => 'دسترسی به فایل ممکن نیست. مجوزها و فضای خالی را بررسی کنید.';
-
-  @override
-  String get errDataLimit => 'داده‌ها بیش از حد هستند. موارد کمتری انتخاب کنید و دوباره تلاش کنید.';
-
-  @override
-  String get errCredentials => 'اطلاعات ورود ذخیره‌شده موجود نیست. سرور را دوباره وارد کنید.';
+  String get errCredentials => 'اطلاعات ورود ذخیره‌شده موجود نیست';
 
   @override
   String subscriptionStale(String time) {
@@ -1991,55 +1805,54 @@ class SFa extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'هنوز به‌روزرسانی نشده است. دوباره تلاش کنید.';
+  String get subscriptionNeverUpdated => 'هنوز به‌روزرسانی نشده است';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'سرور کد HTTP $status را برگرداند. پیوند را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.',
-      zero: 'سرور درخواست را رد کرد. پیوند را بررسی کنید یا با ارائه‌دهنده تماس بگیرید.',
+      other: 'سرور کد HTTP $status را برگرداند',
+      zero: 'سرور درخواست را رد کرد',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'تنظیمات سرور ناقص است یا پشتیبانی نمی‌شود. اشتراک را به‌روز کنید.';
+  String get errInvalidServer => 'تنظیمات سرور ناقص است یا پشتیبانی نمی‌شود';
 
   @override
-  String get errServerIds => 'دو سرور شناسه یکسان دارند. آن‌ها را دوباره وارد کنید.';
+  String get errServerIds => 'دو سرور شناسه یکسان دارند';
 
   @override
-  String get errRoutingGroup => 'مسیر به سرورهای ناموجود یا گروه خراب اشاره می‌کند. اشتراک را به‌روز کنید.';
+  String get errRoutingGroup => 'مسیر به سرورهای ناموجود یا گروه خراب اشاره می‌کند';
 
   @override
-  String get errConnections => 'فهرست اتصال‌ها در دسترس نیست. متصل شوید یا موتور دیگری انتخاب کنید.';
+  String get errConnections => 'فهرست اتصال‌ها در دسترس نیست';
 
   @override
-  String get errLogs => 'این سرویس گزارش نگه نمی‌دارد. Sora را به‌روز کنید.';
+  String get errLogs => 'این سرویس گزارش نگه نمی‌دارد';
 
   @override
-  String get errDiagnostics => 'جمع‌آوری عیب‌یابی ممکن نشد. دوباره تلاش کنید یا گزارش را ذخیره کنید.';
+  String get errDiagnostics => 'جمع‌آوری عیب‌یابی ممکن نشد';
 
   @override
-  String get errMissingItem => 'مورد درخواستی دیگر وجود ندارد. فهرست را تازه‌سازی کنید.';
+  String get errMissingItem => 'مورد درخواستی دیگر وجود ندارد';
 
   @override
-  String get errInvalidRequest => 'درخواست شامل مقادیر نامعتبر است. ورودی را بررسی کرده و دوباره تلاش کنید.';
+  String get errInvalidRequest => 'درخواست شامل مقادیر نامعتبر است';
 
   @override
-  String get errProxyLogin =>
-      'پروکسی سیستم از این ورود پشتیبانی نمی‌کند. نام کاربری و گذرواژه پروکسی محلی را حذف کنید.';
+  String get errProxyLogin => 'پروکسی سیستم از این ورود پشتیبانی نمی‌کند';
 
   @override
-  String get errLogFilter => 'فیلتر گزارش نامعتبر است. جستجو را پاک کرده و دوباره تلاش کنید.';
+  String get errLogFilter => 'فیلتر گزارش نامعتبر است';
 
   @override
-  String get errSubRedirect => 'سرور به نشانی ناامن هدایت کرد. از ارائه‌دهنده پیوند جدید بخواهید.';
+  String get errSubRedirect => 'سرور به نشانی ناامن هدایت کرد';
 
   @override
-  String get errProxySetup => 'تنظیم پروکسی سیستم ممکن نشد. دوباره متصل شوید یا گزارش را باز کنید.';
+  String get errProxySetup => 'تنظیم پروکسی سیستم ممکن نشد';
 
   @override
   String get notificationsToday => 'امروز';
@@ -2065,20 +1878,19 @@ class SFa extends S {
   }
 
   @override
-  String get errSubInterval => 'فاصله زمانی به‌روزرسانی اشتراک نامعتبر است. فاصله پیشنهادی ارائه‌دهنده را انتخاب کنید.';
+  String get errSubInterval => 'فاصله زمانی به‌روزرسانی اشتراک نامعتبر است';
 
   @override
-  String get errRule =>
-      'یکی از قوانین مسیریابی نامعتبر است. دامنه، نشانی IP یا برنامه مشخص‌شده در قانون را بررسی کنید.';
+  String get errRule => 'یکی از قوانین مسیریابی نامعتبر است';
 
   @override
-  String get errDns => 'تنظیمات DNS نامعتبر است. نشانی سرور DNS را بررسی کنید.';
+  String get errDns => 'تنظیمات DNS نامعتبر است';
 
   @override
-  String get errEndpoint => 'نشانی سرور مورد آزمایش نامعتبر است. نام میزبان و درگاه را بررسی کنید.';
+  String get errEndpoint => 'نشانی سرور مورد آزمایش نامعتبر است';
 
   @override
-  String get errCancelled => 'درخواست لغو شد. در صورت نیاز دوباره اقدام کنید.';
+  String get errCancelled => 'درخواست لغو شد';
 
   @override
   String get customServerOptions => 'تنظیمات اتصال';
@@ -2099,19 +1911,13 @@ class SFa extends S {
   String get customServerWgPeer => 'همتا';
 
   @override
-  String get customServerOptionsInfo =>
-      'تنظیمات انتقال و TLS ارائه‌دهنده را وارد کنید یا پیوند سرور را جای‌گذاری کنید.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'در دسترس در: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret ترافیک TCP در درگاه‌های 80 و 443 را برای همهٔ برنامه‌های Windows تغییر می‌دهد. این VPN نیست. ممکن است درایور WinDivert تا راه‌اندازی دوبارهٔ Windows بارگذاری‌شده بماند.';
+  String get winwsScopeWarning => 'ترافیک TCP همه برنامه‌ها تغییر کند؟';
 
   @override
-  String get winwsRequirements =>
-      'به Windows x64 بومی، WLANAPI و بستهٔ تأییدشدهٔ WinDivert نیاز است. اگر Windows درایور را مسدود کند، این حالت در دسترس نیست.';
+  String get winwsRequirements => 'این حالت VPN در دسترس نیست';
 }

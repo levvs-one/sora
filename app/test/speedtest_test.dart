@@ -28,7 +28,7 @@ void main() {
     size(tester, width, width < 720 ? 800 : 900);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings
       ..language = 'ru'
       ..animations = false;
@@ -498,7 +498,7 @@ void main() {
       for (final (width, height) in [(1440.0, 900.0), (1000.0, 720.0), (420.0, 800.0)]) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-        await settings.completeTour();
+
         settings
           ..language = 'ru'
           ..theme = theme

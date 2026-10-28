@@ -23,7 +23,6 @@ import 'profiles.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
-import 'shell.dart';
 import 'sync.dart';
 import 'modes.dart';
 
@@ -209,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (desktop != null)
               SwitchTile(
                 title: s.launchAtLogin,
-                info: s.launchAtLoginDetail,
+
                 value: settings.launchAtLogin,
                 onChanged: (v) async {
                   await sora.change((x) => x.launchAtLogin = v, replan: false);
@@ -257,8 +256,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.animations,
               onChanged: (v) => set((x) => x.animations = v, replan: false),
             ),
-            if (context.getInheritedWidgetOfExactType<ShellScope>() case final shell?)
-              LinkTile(title: s.tourReplay, onTap: shell.replayTour),
           ],
         ),
 
@@ -304,7 +301,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.fragmentPackets.isEmpty ? s.byDefault : settings.fragmentPackets,
                 onTap: () => _edit(
                   title: s.fragmentPackets,
-                  hint: 'tlshello',
+                  hint: s.fragmentPackets,
                   initial: settings.fragmentPackets,
                   valid: _packets.hasMatch,
                   apply: (x, v) => x.fragmentPackets = v,
@@ -315,7 +312,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.fragmentLength.isEmpty ? s.byDefault : settings.fragmentLength,
                 onTap: () => _edit(
                   title: s.fragmentLength,
-                  hint: s.rangeHint,
+                  hint: s.byDefault,
                   initial: settings.fragmentLength,
                   valid: _range.hasMatch,
                   apply: (x, v) => x.fragmentLength = v,
@@ -326,7 +323,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.fragmentInterval.isEmpty ? s.byDefault : settings.fragmentInterval,
                 onTap: () => _edit(
                   title: s.fragmentInterval,
-                  hint: s.rangeHint,
+                  hint: s.byDefault,
                   initial: settings.fragmentInterval,
                   valid: _range.hasMatch,
                   apply: (x, v) => x.fragmentInterval = v,
@@ -345,7 +342,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 value: settings.splitPos.join(', '),
                 onTap: () => _edit(
                   title: s.splitPos,
-                  hint: Platform.isWindows ? '1, 2' : s.splitPosHint,
+                  hint: s.splitPos,
                   initial: settings.splitPos.join(', '),
                   valid: (v) => _parts(v).every(_position.hasMatch),
                   apply: (x, v) => x.splitPos = v.isEmpty ? Settings.defaultSplitPos : _parts(v),
@@ -376,7 +373,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.probeUrl.isEmpty ? s.byDefault : Uri.parse(settings.probeUrl).host,
               onTap: () => _edit(
                 title: s.probeUrl,
-                hint: 'https://www.gstatic.com/generate_204',
+                hint: s.probeUrl,
                 initial: settings.probeUrl,
                 valid: _web,
                 apply: (x, v) => x.probeUrl = v,
@@ -396,7 +393,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchTile(
               title: s.autoSwitchOnDegrade,
-              info: s.autoSwitchOnDegradeDetail,
+
               value: settings.autoSwitchOnDegrade,
               onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
             ),

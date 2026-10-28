@@ -76,6 +76,34 @@ void main() {
     }
   });
 
+  test('describe messages contain one cause without a second sentence in every locale', () {
+    final source = File('lib/src/ui/kit.dart').readAsStringSync().split('String describe(').last;
+    final keys = RegExp("'([a-zA-Z][a-zA-Z0-9_.]*)'").allMatches(source).map((m) => m[1]!).toSet()
+      ..add('unknown.failure');
+    final secondSentence = RegExp(r'[.!?。！？۔।։]\s*\S|[\r\n]');
+    final thaiInstruction = RegExp(r' (โปรด|ลอง|ตรวจสอบ|เลือก|นำเข้า|อัปเดต|รีเฟรช|ลบ|ขอรับ|เปิด|โหลด|บันทึก)');
+    for (final locale in S.supportedLocales) {
+      final s = lookupS(locale);
+      for (final key in keys) {
+        for (final status in [null, 403, 503]) {
+          final message = describe(s, CoreFailure(key, httpStatus: status));
+          expect(secondSentence.hasMatch(message), isFalse, reason: '$locale $key: $message');
+          if (locale.languageCode == 'th') {
+            expect(thaiInstruction.hasMatch(message), isFalse, reason: '$locale $key: $message');
+          }
+        }
+      }
+    }
+    expect(
+      describe(lookupS(const Locale('ru')), const CoreFailure('core.network.timeout')),
+      'Сервер не ответил вовремя',
+    );
+    expect(
+      describe(lookupS(const Locale('ru')), const CoreFailure('core.subscription.empty')),
+      'В подписке нет серверов',
+    );
+  });
+
   test('HTTP messages localize known and unknown status without a fabricated code', () {
     for (final locale in S.supportedLocales) {
       final s = lookupS(locale);
@@ -264,7 +292,7 @@ void main() {
 
   testWidgets('repeated action failures keep one visible toast and one history entry', (tester) async {
     final sora = await start();
-    await sora.settings.completeTour();
+
     sora.settings.animations = false;
     await tester.pumpWidget(SoraApp(sora: sora));
     await tester.pumpAndSettle();
@@ -286,14 +314,14 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('action toasts show complete recovery steps in every locale', (tester) async {
+  testWidgets('action toasts show the complete short cause in every locale', (tester) async {
     addTearDown(tester.view.reset);
     tester.view
       ..devicePixelRatio = 1
       ..physicalSize = const Size(420, 900);
     for (final locale in S.supportedLocales) {
       final sora = await start();
-      await sora.settings.completeTour();
+
       sora.settings
         ..language = locale.toString()
         ..animations = false;
@@ -336,7 +364,7 @@ void main() {
 
   testWidgets('notifications and UI resolve unsupported and Chinese system locales identically', (tester) async {
     final sora = await start();
-    await sora.settings.completeTour();
+
     sora.settings.language = 'system';
     await tester.pumpWidget(SoraApp(sora: sora));
     for (final locales in [

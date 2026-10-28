@@ -156,7 +156,7 @@ class _Modes extends StatelessWidget {
     final sora = SoraScope.of(context), s = S.of(context), palette = Palette.of(context);
     final settings = sora.settings;
     final current = sora.bypassSelected ? sora.selected : settings.tunnel;
-    Widget choice(String key, String title, bool selected, VoidCallback choose, {String? info}) => ListTile(
+    Widget choice(String key, String title, bool selected, VoidCallback choose) => ListTile(
       key: ValueKey(key),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       minTileHeight: 52,
@@ -168,7 +168,6 @@ class _Modes extends StatelessWidget {
           Flexible(
             child: Text(title, style: Styles.bodyStrong.copyWith(color: palette.ink)),
           ),
-          if (info != null) InfoButton(title: title, description: info),
         ],
       ),
       onTap: choose,
@@ -208,13 +207,7 @@ class _Modes extends StatelessWidget {
           if (sora.serverlessAvailable) ('bypass', s.serverBypass),
           for (final profile in sora.extensions.bypassProfiles) (profile.choiceId, profile.name),
         ])
-          choice(
-            'mode-$value',
-            title,
-            current == value,
-            () => unawaited(mode(value)),
-            info: sora.extensions.bypassProfile(value)?.systemWide == true ? s.winwsScopeWarning : null,
-          ),
+          choice('mode-$value', title, current == value, () => unawaited(mode(value))),
       ],
     );
     final engines = Column(
@@ -231,17 +224,6 @@ class _Modes extends StatelessWidget {
           ('mihomo', 'mihomo'),
         ])
           choice('engine-$value', title, settings.engine == value, () async {
-            if (value == 'sing-box' && !settings.controlPort) {
-              if (!await confirm(
-                context,
-                question: s.controlPortQuestion('sing-box'),
-                action: s.chooseEngine('sing-box'),
-                destructive: false,
-              )) {
-                return;
-              }
-              if (!context.mounted) return;
-            }
             await sora.change(
               (x) => x
                 ..engine = value

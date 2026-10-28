@@ -205,65 +205,58 @@ class SAz extends S {
   String get errGeneric => 'Nəsə xəta baş verdi';
 
   @override
-  String get errCore => 'Sora xidməti cavab vermir. Bir az gözləyib yenidən cəhd edin.';
+  String get errCore => 'Sora xidməti cavab vermir';
 
   @override
-  String get errAuth => 'Sora xidmətinə giriş rədd edildi. Tətbiqi yenidən başladıb təkrar cəhd edin.';
+  String get errAuth => 'Sora xidmətinə giriş rədd edildi';
 
   @override
-  String get errVersion => 'Sora tətbiqi və xidməti fərqli versiyalardadır. Sora-nı yeniləyin.';
+  String get errVersion => 'Sora tətbiqi və xidməti fərqli versiyalardadır';
 
   @override
-  String get errBusy => 'Əvvəlki əmr hələ icra olunur. Onun tamamlanmasını gözləyin.';
+  String get errBusy => 'Əvvəlki əmr hələ icra olunur';
 
   @override
-  String get errEngineMissing => 'Bu server üçün lazım olan mühərrik tapılmadı. Sora yeniləmələrini yoxlayın.';
+  String get errEngineMissing => 'Bu server üçün lazım olan mühərrik tapılmadı';
 
   @override
-  String get errEngineStart => 'Mühərrik işə düşmədi. Səbəbi öyrənmək üçün bağlantı jurnalına baxın.';
+  String get errEngineStart => 'Mühərrik işə düşmədi';
 
   @override
-  String get errEngineStopped => 'Mühərrik dayandı. Yenidən qoşulmağa cəhd edin.';
+  String get errEngineStopped => 'Mühərrik dayandı';
 
   @override
-  String get errTunnel => 'Bu VPN rejimi əlçatan deyil. Başqa rejim seçin və ya xidmət icazələrini yoxlayın.';
+  String get errTunnel => 'Bu VPN rejimi əlçatan deyil';
 
   @override
-  String get errNetwork => 'Serverə daxil olmaq mümkün deyil';
+  String get errTimeout => 'Server vaxtında cavab vermədi';
 
   @override
-  String get errTimeout => 'Server vaxtında cavab vermədi. Bir dəqiqə sonra yenidən cəhd edin.';
+  String get errFirewall => 'VPN xaricində internetə girişi bloklamaq mümkün olmadı';
 
   @override
-  String get errFirewall =>
-      'VPN xaricində internetə girişi bloklamaq mümkün olmadı. Səbəbi öyrənmək üçün bağlantı jurnalına baxın.';
+  String get errSubFetch => 'Abunəliyi endirmək mümkün olmadı';
 
   @override
-  String get errSubFetch =>
-      'Abunəliyi endirmək mümkün olmadı. İnternet bağlantınızı yoxlayıb bir dəqiqə sonra yenidən cəhd edin.';
+  String get errSubFormat => 'Abunəliyin formatı tanınmadı';
 
   @override
-  String get errSubFormat => 'Abunəliyin formatı tanınmadı. Provayderinizdən uyğun abunəlik keçidi istəyin.';
+  String get errSubEmpty => 'Abunəlikdə server yoxdur';
 
   @override
-  String get errSubEmpty => 'Abunəlikdə server yoxdur. Abunəlik provayderinizə müraciət edin.';
+  String get errSubDuplicate => 'Bu abunəlik artıq əlavə edilib';
 
   @override
-  String get errSubDuplicate => 'Bu abunəlik artıq əlavə edilib. Aktual serverləri almaq üçün onu yeniləyin.';
+  String get errSubLimit => 'Abunəlik sayının həddinə çatılıb';
 
   @override
-  String get errSubLimit =>
-      'Abunəlik sayının həddinə çatılıb. Yenisini əlavə etməzdən əvvəl istifadə etmədiyiniz abunəliyi silin.';
+  String get errSubScheme => 'Abunəlik keçidinin sxemi dəstəklənmir';
 
   @override
-  String get errSubScheme => 'Abunəlik keçidi https:// ilə başlamalıdır. Provayderinizdən təhlükəsiz keçid istəyin.';
+  String get errSecretStore => 'Sora yaddaşı zədələnib və ya əlçatan deyil';
 
   @override
-  String get errSecretStore =>
-      'Sora yaddaşı zədələnib və ya əlçatan deyil. Giriş icazələrini və jurnaldakı təfərrüatları yoxlayın.';
-
-  @override
-  String get errNoServers => 'Qoşulmaq üçün server yoxdur. Abunəlik və ya öz serverinizi əlavə edin.';
+  String get errNoServers => 'Qoşulmaq üçün server yoxdur';
 
   @override
   String get connections => 'Əlaqələr';
@@ -317,9 +310,6 @@ class SAz extends S {
   String get dnsAuto => 'Avtomatik';
 
   @override
-  String get dnsHint => 'Ünvanlar, vergüllə ayrılmış';
-
-  @override
   String get fragment => 'TLS parçalanması';
 
   @override
@@ -335,13 +325,7 @@ class SAz extends S {
   String get byDefault => 'Defolt';
 
   @override
-  String get rangeHint => 'Məsələn, 100-200';
-
-  @override
   String get splitPos => 'Bölünmüş mövqelər';
-
-  @override
-  String get splitPosHint => 'Məsələn, 1, midsld';
 
   @override
   String get disorder => 'Parçaları yenidən sıralayın';
@@ -450,11 +434,6 @@ class SAz extends S {
   String get support => 'Dəstək';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine bu kompüterdəki port vasitəsilə idarə olunur. Digər proqramlar VPN-in aktiv olduğunu söyləyə biləcək.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine seçin';
   }
@@ -530,9 +509,6 @@ class SAz extends S {
   String get launchAtLogin => 'Sistemdən başlayın';
 
   @override
-  String get launchAtLoginDetail => 'Daxil olduqda Sora avtomatik işə düşəcək və nimçədə qalacaq.';
-
-  @override
   String get closeToTray => 'Bağlı halda nimçədə saxlayın';
 
   @override
@@ -567,9 +543,6 @@ class SAz extends S {
   String get noticeInTray => 'Sora hələ də qabdadır';
 
   @override
-  String get noticeInTrayBody => 'Onun simvolunun menyusundan çıxın';
-
-  @override
   String get noticeLost => 'Bağlantı itdi';
 
   @override
@@ -597,11 +570,7 @@ class SAz extends S {
   String get importTitle => 'Bu abunə əlavə edilsin?';
 
   @override
-  String get importSealed =>
-      'Bu keçid Happ üçün şifrələnib və yalnız Happ onu oxuya bilər. Provayderinizdən sadə abunə linkini soruşun.';
-
-  @override
-  String get understood => 'OK';
+  String get importSealed => 'Bu keçid Happ üçün şifrələnib və yalnız Happ onu oxuya bilər';
 
   @override
   String get noAnswer => 'cavab yoxdur';
@@ -640,39 +609,10 @@ class SAz extends S {
   String get openLogs => 'Qeydləri açın';
 
   @override
-  String get tourReplay => 'Bələdçini yenidən göstərin';
-
-  @override
-  String tourStep(int step) {
-    return '5 addımdan $step';
-  }
-
-  @override
   String get tourBack => 'Geri';
 
   @override
   String get tourNext => 'Sonrakı';
-
-  @override
-  String get tourSkip => 'Keç';
-
-  @override
-  String get tourFinish => 'Bitdi';
-
-  @override
-  String get tourAdd => 'Provayderinizin abunə linkini əlavə edin.';
-
-  @override
-  String get tourServer => 'Bir server seçin. “Ən sürətli” sizin üçün birini seçir.';
-
-  @override
-  String get tourConnect => 'Qoşulmaq və ya əlaqəni kəsmək üçün bura klikləyin.';
-
-  @override
-  String get tourMode => 'Bir rejim seçin. VPN düşərsə, keçid bloklarını öldürün.';
-
-  @override
-  String get tourSettings => 'Parametrləri açın. Bu təlimatı orada təkrarlaya bilərsiniz.';
 
   @override
   String get chooseProgram => 'Proqram seçin';
@@ -684,7 +624,7 @@ class SAz extends S {
   String get runningProcesses => 'Çalışan proseslər';
 
   @override
-  String get programsEmpty => 'Heç bir tətbiq tapılmadı. Başqa bir ad sınayın.';
+  String get programsEmpty => 'Heç bir tətbiq tapılmadı';
 
   @override
   String get selectExe => '.exe faylı seçin';
@@ -696,7 +636,7 @@ class SAz extends S {
   String get speedtestSearch => 'Xidmət tapın';
 
   @override
-  String get speedtestEmpty => 'Uyğunluq yoxdur. Axtarışı dəyişdirin.';
+  String get speedtestEmpty => 'Uyğunluq yoxdur';
 
   @override
   String get speedtestBackToList => 'Xidmətlərə qayıt';
@@ -705,14 +645,13 @@ class SAz extends S {
   String get speedtestOpenBrowser => 'Brauzerdə açın';
 
   @override
-  String get speedtestUnavailable => 'Quraşdırılmış brauzer başlaya bilmədi. Xidməti sistem brauzerinizdə açın.';
+  String get speedtestUnavailable => 'Quraşdırılmış brauzer başlaya bilmədi';
 
   @override
-  String get speedtestPageFailed =>
-      'Səhifəni yükləmək mümkün olmadı. Onu yenidən yükləyin və ya xidməti sistem brauzerinizdə açın.';
+  String get speedtestPageFailed => 'Səhifəni yükləmək mümkün olmadı';
 
   @override
-  String get speedtestExternalFailed => 'Sistem brauzeri aça bilmədi. Yenidən cəhd edin.';
+  String get speedtestExternalFailed => 'Sistem brauzeri aça bilmədi';
 
   @override
   String get modes => 'Rejimlər';
@@ -752,44 +691,28 @@ class SAz extends S {
   String get updateNoNotes => 'Buraxılışda qeydlər yoxdur.';
 
   @override
-  String get updateDropWarning =>
-      'Sora və onun əsas yeniləməsi zamanı VPN bağlantısı bir neçə saniyə kəsiləcək. Davam edilsin?';
+  String get updateDropWarning => 'Yeniləmək üçün bağlantını kəsmək?';
 
   @override
-  String get updateWaitConnection => 'VPN bağlantısı və nüvənin hazır olmasını gözləyin.';
+  String get updateWaitConnection => 'Bağlantı hazır deyil';
 
   @override
-  String get updateDownloading => 'Fayllar endirilir və təsdiqlənir...';
-
-  @override
-  String get updateInstalling => 'Güncəlləmə hazırlanır və ya administrator autentifikasiyası gözlənilir...';
-
-  @override
-  String get updateNetworkError => 'Güncəlləməni endirmək mümkün olmadı. Yenidən cəhd edin.';
+  String get updateNetworkError => 'Güncəlləməni endirmək mümkün olmadı';
 
   @override
   String get updateReleaseError => 'Buraxılış məlumatları və ya tələb olunan fayllar yoxdur və ya etibarsızdır.';
 
   @override
-  String get updateChecksumError => 'Endirmə SHA256SUMS ilə uyğun gəlmir. Heç nə quraşdırılmayıb.';
+  String get updateChecksumError => 'Endirmə SHA256SUMS ilə uyğun gəlmir';
 
   @override
-  String get updateInstallError => 'Yeniləmə tamamlanmadı. Doğrulama ləğv edilmiş ola bilər.';
+  String get updateInstallError => 'Yeniləmə tamamlanmadı';
 
   @override
-  String get updateUnsupported =>
-      'Bu icra olunan fayl dəstəklənən Sora paket cütlüyünə məxsus deyil. Buraxılış quraşdırma təlimatlarından istifadə edin.';
+  String get updateUnsupported => 'Bu icra olunan fayl dəstəklənən Sora paket cütlüyünə məxsus deyil';
 
   @override
-  String get updateManual =>
-      'Hər iki təsdiqlənmiş paketi quraşdırmaq üçün bu əmri terminalda işə salın, sonra Sora-i yenidən açın. Fayllar yükləmə qovluğunda qalır. VPN bağlantısı kəsiləcək.';
-
-  @override
-  String get updateVersionRevoked =>
-      'Tərtibatçı bu versiyanı geri götürdü. Lütfən, düzəliş edilmiş buraxılışı gözləyin.';
-
-  @override
-  String get updateRolloutPending => 'Daha yeni versiya tədricən yayılır və avtomatik olaraq sizə təklif olunacaq.';
+  String get updateVersionRevoked => 'Tərtibatçı bu versiyanı geri götürdü';
 
   @override
   String updateRollbacking(String version) {
@@ -802,8 +725,7 @@ class SAz extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Avtomatik geri qaytarma uğursuz oldu. Yeni versiya işləmirsə, əvvəlki buraxılışı əl ilə yenidən quraşdırın.';
+  String get updateRollbackError => 'Avtomatik geri qaytarma uğursuz oldu';
 
   @override
   String get updateRollbackCacheError =>
@@ -813,10 +735,7 @@ class SAz extends S {
   String get updateCopyCommand => 'Kopyalama əmri';
 
   @override
-  String get updateChecksDisabled => 'Avtomatik yoxlamalar Parametrlərdə deaktiv edilib.';
-
-  @override
-  String get updateInstalled => 'Yeniləmə quraşdırılıb. Sora-ni yenidən açın.';
+  String get updateInstalled => 'Yeniləmə quraşdırılıb';
 
   @override
   String get projectLinks => 'Layihə';
@@ -846,15 +765,13 @@ class SAz extends S {
   String get showDescription => 'Təsviri göstərin';
 
   @override
-  String get errEngineUnsupported =>
-      'Seçilmiş mühərrik bu profili və ya parametrləri dəstəkləmir. Avtomatik və ya uyğun mühərriki seçin.';
+  String get errEngineUnsupported => 'Seçilmiş mühərrik bu profili və ya parametrləri dəstəkləmir';
 
   @override
-  String get errRestore =>
-      'Bağlantının təmizlənməsi tamamlanmadı. Bağlantını kəsməyə yenidən cəhd edin; təfərrüatlar üçün jurnala baxın.';
+  String get errRestore => 'Bağlantının təmizlənməsi tamamlanmadı';
 
   @override
-  String get errSessionEnded => 'Bu sessiya artıq başa çatıb. Bağlantı vəziyyətini yeniləyin.';
+  String get errSessionEnded => 'Bu sessiya artıq başa çatıb';
 
   @override
   String get retryDisconnect => 'Bağlantını kəsməyə yenidən cəhd edin';
@@ -897,13 +814,10 @@ class SAz extends S {
   String get extInstallOne => '1 quraşdırma';
 
   @override
-  String get extSideloadWarning => 'Yalnız müəllifin özünün imzaladığı açara etibar edirsinizsə quraşdırın.';
+  String get extSideloadWarning => 'Özü imzalanmış açar';
 
   @override
   String get extPermissionsWidened => 'Yeniləmə yeni icazələr tələb edir:';
-
-  @override
-  String get extDangerousAck => 'Mən başa düşürəm ki, bu icazələr ciddidir';
 
   @override
   String get extInstall => 'Quraşdırın';
@@ -916,9 +830,6 @@ class SAz extends S {
 
   @override
   String get extConfirm => 'Təsdiq edin';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Kataloq';
@@ -969,16 +880,13 @@ class SAz extends S {
   String get extEmptySearch => 'Heç nə tapılmadı';
 
   @override
-  String get extEmptyInstalled => 'Hələlik əlavələr quraşdırılmayıb.\nKataloqda birini tapın və ya fayldan quraşdırın.';
+  String get extEmptyInstalled => 'Hələlik əlavələr quraşdırılmayıb';
 
   @override
   String get extInstallFromFile => 'Fayldan quraşdırın';
 
   @override
   String get extInstallFromUrl => 'URL-dan quraşdırın';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Yüklə';
@@ -993,19 +901,16 @@ class SAz extends S {
   String get extInstalling => 'Quraşdırılır...';
 
   @override
-  String get extInstallFailed => 'Quraşdırma uğursuz oldu';
-
-  @override
-  String get extErrSignature => 'İmza yoxlaması uğursuz oldu. Fayl zədələnmiş və ya dəyişdirilmiş ola bilər.';
+  String get extErrSignature => 'İmza yoxlaması uğursuz oldu';
 
   @override
   String get extErrManifest => 'Genişləndirici manifesti etibarsızdır.';
 
   @override
-  String get extErrNetwork => 'Şəbəkə xətası. Bağlantınızı yoxlayın və yenidən cəhd edin.';
+  String get extErrNetwork => 'Şəbəkə xətası';
 
   @override
-  String get extErrHash => 'Yükləmə kataloqa uyğun gəlmir. Ola bilsin ki, ona müdaxilə edilib.';
+  String get extErrHash => 'Yükləmə kataloqa uyğun gəlmir';
 
   @override
   String extErrMinApp(String version) {
@@ -1016,11 +921,11 @@ class SAz extends S {
   String get extErrHttpsOnly => 'Yalnız https:// keçidlərə icazə verilir';
 
   @override
-  String get extErrGeneric => 'Nəsə xəta baş verdi. Yenidən cəhd edin.';
+  String get extErrGeneric => 'Nəsə xəta baş verdi';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Bu yeniləmə quraşdırılmış versiyadan fərqli müəllif açarı ilə imzalanıb, ona görə də bloklanıb. Yeni açara güvənirsinizsə, genişləndiricini silin və açıq şəkildə yenidən quraşdırın.';
+      'Bu yeniləmə quraşdırılmış versiyadan fərqli müəllif açarı ilə imzalanıb, ona görə də bloklanıb';
 
   @override
   String get extDisabled => 'Söndürülüb';
@@ -1077,7 +982,7 @@ class SAz extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count münaqişələr sizin qərarınıza ehtiyac duyur';
+    return 'Genişləndirici münaqişələri: $count';
   }
 
   @override
@@ -1154,10 +1059,10 @@ class SAz extends S {
   String get extPermThemeApply => 'Mövzuları tətbiq edin';
 
   @override
-  String get extPermRoutingRules => 'Marşrutlaşdırma qaydaları əlavə edin (şəbəkə trafikinin getdiyi yerə təsir edir)';
+  String get extPermRoutingRules => 'Marşrutlaşdırma qaydaları əlavə edin';
 
   @override
-  String get extPermNetHooks => 'Şəbəkə yoluna inteqrasiya edin (DPI bypass modulları)';
+  String get extPermNetHooks => 'Şəbəkə yoluna inteqrasiya edin';
 
   @override
   String get extPermNetFetch => 'İcazə verilən siyahıdan URL tələb edin';
@@ -1166,7 +1071,7 @@ class SAz extends S {
   String get extPermBackground => 'Fon tapşırıqlarını yerinə yetirin';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Söndürülüb';
 
   @override
   String get extCapBackground => 'Arxa fonda çalışır';
@@ -1204,9 +1109,6 @@ class SAz extends S {
   String get extSortRelevance => 'Uyğunluq';
 
   @override
-  String get extPermNetworkDetail => 'VPN sorğularına yalnız aşağıdakı hostlar üçün icazə verilir.';
-
-  @override
   String get extBgTitle => 'Fon tapşırığı';
 
   @override
@@ -1228,9 +1130,6 @@ class SAz extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Fon tapşırığını idarə etmək üçün genişləndiricini aktivləşdirin.';
-
-  @override
   String get extCapNetwork => 'Şəbəkəyə giriş';
 
   @override
@@ -1247,7 +1146,7 @@ class SAz extends S {
   String get diagnosticHttp => 'HTTP diaqnostikası';
 
   @override
-  String get diagnosticNoData => 'Hələ qeydə alınmış sorğu yoxdur. Əvvəlcə sürət testi veb saytını açın.';
+  String get diagnosticNoData => 'Hələ qeydə alınmış sorğu yoxdur';
 
   @override
   String get qrShareTitle => 'QR kodunu paylaşın';
@@ -1257,12 +1156,6 @@ class SAz extends S {
 
   @override
   String get qrCopyLink => 'Linki kopyalayın';
-
-  @override
-  String get qrWarning => 'Kodu yalnız etibar etdiyiniz şəxslərlə paylaşın.';
-
-  @override
-  String get qrScanHint => 'QR kodlu ekran görüntüsü və ya foto seçin, ya da keçid yapışdırın';
 
   @override
   String get qrFromClipboard => 'Buferdən yapışdırın';
@@ -1343,31 +1236,10 @@ class SAz extends S {
   String get dnsLeakCheckKillSwitchDns => 'Şəbəkə kilidinin DNS qoruması';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Yuxarıdakı DNS parametrlərində tunel üçün DNS konfiqurasiya edin.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Sisteminizin tuneldən kənarda hansı həlledicilərdən istifadə edəcəyini yoxlayın.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS trafikinin tuneldə qalması üçün şəbəkə kilidini aktivləşdirin.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Əməliyyat sisteminin şifrələnmiş DNS-i';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Saxta DNS cavablar';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Sisteminizin tuneldən kənarda hansı şifrələnmiş DNS son nöqtələrindən istifadə etdiyini yoxlayın.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Tunel üçün şifrələnmiş DNS (DoT və ya DoH) istifadə edin ki, həlledicilər cavabları saxtalaşdırmasın.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Əvvəlcə VPN-ə qoşulun, sonra sızma olub olmadığını yoxlayın.';
 
   @override
   String get dnsExpected => 'Gözlənilir';
@@ -1394,7 +1266,7 @@ class SAz extends S {
   String get autoSelectSmart => 'Ağıllı seçim';
 
   @override
-  String get coreWatchUnstable => 'Nüvə ilə əlaqə qeyri-sabitdir. Bir az gözləyib yenidən qoşulmağa cəhd edin.';
+  String get coreWatchUnstable => 'Nüvə ilə əlaqə qeyri-sabitdir';
 
   @override
   String get watchReconnect => 'Yenidən qoşun';
@@ -1433,7 +1305,7 @@ class SAz extends S {
   String get overrideCustomRules => 'Öz qaydaları';
 
   @override
-  String get errBenchmarkUnsupported => 'Sürəti ölçmək üçün daha yeni nüvə lazımdır. Sora-nı yeniləyin.';
+  String get errBenchmarkUnsupported => 'Sürəti ölçmək üçün daha yeni nüvə lazımdır';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1444,8 +1316,7 @@ class SAz extends S {
   String get profiles => 'Şəbəkə profilləri';
 
   @override
-  String get profilesEmpty =>
-      'Hələ profil yoxdur. Məlum şəbəkələrdə parametrləri avtomatik tətbiq etmək üçün birini yaradın.';
+  String get profilesEmpty => 'Hələ profil yoxdur';
 
   @override
   String get profileAdd => 'Profil əlavə edin';
@@ -1457,9 +1328,6 @@ class SAz extends S {
   String get profileSsids => 'Wi-Fi şəbəkələri (SSID)';
 
   @override
-  String get profileSsidsHint => 'Ev, Ofis vergüllə ayrılmışdır';
-
-  @override
   String get profileGateways => 'Şəbəkə şlüzləri';
 
   @override
@@ -1467,9 +1335,6 @@ class SAz extends S {
 
   @override
   String get profileAutoApply => 'Avtomatik tətbiq et';
-
-  @override
-  String get profileAutoApplyHint => 'Söndürülübsə, profil tətbiq edilməzdən əvvəl təsdiq istənilir.';
 
   @override
   String get profileSnapshot => 'Cari parametrləri yadda saxla';
@@ -1513,13 +1378,13 @@ class SAz extends S {
   String get networkUnknown => 'Şəbəkə məlumatı mövcud deyil';
 
   @override
-  String get profileNoTriggers => 'Ən azı bir tətik əlavə edin: SSID, şlüz və ya ASN';
+  String get profileNoTriggers => 'Profil şərtləri yoxdur';
 
   @override
   String get chains => 'Proksi zəncirləri';
 
   @override
-  String get chainsEmpty => 'Hələ zəncir yoxdur. 2-3 serveri birləşdirin ki, trafik onların hər birindən keçsin.';
+  String get chainsEmpty => 'Hələ zəncir yoxdur';
 
   @override
   String get chainAdd => 'Yeni zəncir';
@@ -1528,16 +1393,10 @@ class SAz extends S {
   String get chainName => 'Zəncir adı';
 
   @override
-  String get chainPickServers => '2-3 server seçin';
+  String get chainTooFew => 'Zəncir üçün ən azı iki server lazımdır';
 
   @override
-  String get chainOrderHint => 'Yenidən sıralamaq üçün sürükləyin: trafik yuxarıdan daxil olur və aşağıdan çıxır.';
-
-  @override
-  String get chainTooFew => 'Zəncir üçün ən azı iki server lazımdır. Daha bir server əlavə edin.';
-
-  @override
-  String get chainTooMany => 'Zəncirdə ən çox üç server ola bilər. Artıq serverləri çıxarın.';
+  String get chainTooMany => 'Zəncirdə ən çox üç server ola bilər';
 
   @override
   String get chainEstimate => 'Təxmini gecikmə';
@@ -1554,11 +1413,10 @@ class SAz extends S {
   }
 
   @override
-  String get chainUnsupported => 'Seçilmiş mühərrik zəncirləri dəstəkləmir. Uyğun mühərrik seçin.';
+  String get chainUnsupported => 'Seçilmiş mühərrik zəncirləri dəstəkləmir';
 
   @override
-  String get chainHopMissing =>
-      'Zəncirdəki serverlərdən biri artıq əlçatan deyil. Həmin mərhələ üçün başqa server seçin.';
+  String get chainHopMissing => 'Zəncirdəki serverlərdən biri artıq əlçatan deyil';
 
   @override
   String chainHop(Object n) {
@@ -1578,7 +1436,7 @@ class SAz extends S {
   String get syncDevices => 'Cihazlarım';
 
   @override
-  String get syncEmpty => 'Qoşalaşdırılmış cihazlar yoxdur. Yerli şəbəkə üzərindən başqa cihazı cütləşdirin.';
+  String get syncEmpty => 'Qoşalaşdırılmış cihazlar yoxdur';
 
   @override
   String get syncPair => 'Cihazı cütləşdirin';
@@ -1606,9 +1464,6 @@ class SAz extends S {
   String get syncNever => 'Heç vaxt';
 
   @override
-  String get syncNoLan => 'Cihazlar eyni lokal şəbəkədə olmalıdır';
-
-  @override
   String get syncPaired => 'Cihaz qoşalaşdırıldı';
 
   @override
@@ -1618,13 +1473,10 @@ class SAz extends S {
   String get syncWaiting => 'Digər cihaz gözlənilir...';
 
   @override
-  String get syncSecureNote => 'Uçdan uca şifrələnmiş kanal. Hesab yoxdur, bulud serverləri yoxdur.';
-
-  @override
   String get zapretWithVpn => 'Birbaşa şəbəkə trafiki üçün DPI filtrindən keçin';
 
   @override
-  String get chainDuplicate => 'Zəncirdə eyni server təkrarlanır. Hər mərhələ üçün fərqli server seçin.';
+  String get chainDuplicate => 'Zəncirdə eyni server təkrarlanır';
 
   @override
   String get edit => 'Redaktə et';
@@ -1634,10 +1486,6 @@ class SAz extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Deqradasiyaya avtomatik keçid';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Seçilmiş server xeyli yavaşlayarsa və ya cavab verməzsə, Sora ölçmələrə görə ən yaxşı serverə keçir, lakin 10 dəqiqədə bir dəfədən çox olmayaraq.';
 
   @override
   String get tunStackMixed => 'Qarışıq';
@@ -1655,19 +1503,13 @@ class SAz extends S {
   String get customServerName => 'Adı';
 
   @override
-  String get customServerNameHint => 'Məsələn: mənim VPS';
-
-  @override
-  String get customServerNameRequired => 'Adı daxil edin';
+  String get customServerNameRequired => 'Ad göstərilməyib';
 
   @override
   String get customServerAddress => 'Ünvan';
 
   @override
-  String get customServerAddressHint => 'example.com və ya 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Server ünvanını daxil edin';
+  String get customServerAddressRequired => 'Ünvan göstərilməyib';
 
   @override
   String get customServerAddressInvalid => 'Yanlış ünvan';
@@ -1676,19 +1518,13 @@ class SAz extends S {
   String get customServerPort => 'Port';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Port 1-dən 65535-ə qədər rəqəm olmalıdır';
+  String get customServerPortInvalid => 'Yanlış port';
 
   @override
   String get customServerProtocol => 'Protokol';
 
   @override
   String get customServerCredentials => 'Giriş məlumatı';
-
-  @override
-  String get customServerOptional => 'Könüllü';
 
   @override
   String get customServerShowSecret => 'Sirri göstərin';
@@ -1702,9 +1538,6 @@ class SAz extends S {
   }
 
   @override
-  String get customServerTest => 'Test';
-
-  @override
   String get leakTestTitle => 'Məlumat sızması üçün test edin';
 
   @override
@@ -1712,9 +1545,6 @@ class SAz extends S {
 
   @override
   String get leakTestCancel => 'Ləğv et';
-
-  @override
-  String get leakTestNeedsConnection => 'Məlumat sızmasını yoxlamaq üçün VPN-ə qoşulun.';
 
   @override
   String leakTestProgress(int count) {
@@ -1740,9 +1570,6 @@ class SAz extends S {
 
   @override
   String get leakTestFix => 'Düzəlt';
-
-  @override
-  String get leakTestFixedNote => 'Şəbəkə kilidi aktivdir. Yoxlamaq üçün testi yenidən başladın.';
 
   @override
   String get leakTestCheckDirectDns => 'Birbaşa DNS';
@@ -1775,15 +1602,13 @@ class SAz extends S {
   String get syncDaemonFailed => 'Sinxronizasiya xidmətini başlatmaq mümkün olmadı';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync komponenti tapılmadı. Cihaz sinxronizasiyasını aktivləşdirmək üçün proqramı yenidən quraşdırın.';
+  String get syncDaemonMissing => 'sora-sync komponenti tapılmadı';
 
   @override
   String get syncDaemonStarting => 'Sinxronizasiya xidmətinə start verilir...';
 
   @override
-  String get syncErrAuth =>
-      'Sinxronizasiya xidməti giriş nişanını rədd etdi. Proqramı yenidən başladın və yenidən cəhd edin.';
+  String get syncErrAuth => 'Sinxronizasiya xidməti giriş nişanını rədd etdi';
 
   @override
   String get syncErrNotFound => 'Cihaz artıq qoşalaşdırılmayıb';
@@ -1792,8 +1617,7 @@ class SAz extends S {
   String get syncErrPairingActive => 'Cütləşdirmə sessiyası artıq açıqdır';
 
   @override
-  String get syncErrUnreachable =>
-      'Digər cihaz cavab vermədi. Onun eyni şəbəkədə olduğuna və kodunu göstərdiyinə əmin olun.';
+  String get syncErrUnreachable => 'Digər cihaz cavab vermədi';
 
   @override
   String get syncError => 'Sinxronizasiya xətası';
@@ -1805,10 +1629,6 @@ class SAz extends S {
 
   @override
   String get syncJoining => 'Cihazla qoşalaşır...';
-
-  @override
-  String get syncLegacyCleared =>
-      'Köhnə cihaz siyahısı heç vaxt faktiki olaraq qoşalaşdırılmamışdı, ona görə də təmizləndi. Bu dəfə real olaraq cihazlarınızı yenidən cütləşdirin.';
 
   @override
   String get syncNewCode => 'Yeni kod';
@@ -1868,8 +1688,7 @@ class SAz extends S {
   String get syncThisDevice => 'Bu cihaz';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Sinxronizasiya Android-də əlçatan deyil';
 
   @override
   String get diagnosticPackets => 'Paket tutma';
@@ -1917,27 +1736,25 @@ class SAz extends S {
   String get customServerWgKeepalive => 'Keepalive, saniyə';
 
   @override
-  String get customServerWgKeyInvalid => 'Açar wg genkey çıxardığı kimi base64-də 32 bayt olmalıdır.';
+  String get customServerWgKeyInvalid => 'Yanlış WireGuard açarı';
 
   @override
-  String get customServerWgCidrInvalid => 'Vergüllə ayrılmış prefikslər daxil edin, məsələn 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Yanlış CIDR prefiksi';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0-dan 65535-ə qədər saniyə sayı daxil edin.';
+  String get customServerWgKeepaliveInvalid => 'Yanlış keepalive intervalı';
 
   @override
   String get strictKillSwitch => 'Sərt şəbəkə kilidi';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Qoşulduqdan sonra əlaqəni kəsənədək tətbiqdən çıxsanız da VPN xaricindəki trafik bloklanır.';
+  String get strictKillSwitchWarning => 'Çıxışdan sonra VPN xaricində trafiki bloklamaq?';
 
   @override
-  String get extWorkerFailed => 'Əlavənin fon tapşırığı uğursuz oldu. Əlavənin jurnalını yoxlayın.';
+  String get extWorkerFailed => 'Əlavənin fon tapşırığı uğursuz oldu';
 
   @override
-  String get extAssetRejected =>
-      'Genişlənmə faylında oxunmayan rənglər və ya yanlış qaydalar var. Müəllifdən faylı düzəltməsini istəyin.';
+  String get extAssetRejected => 'Genişlənmə faylında oxunmayan rənglər və ya yanlış qaydalar var';
 
   @override
   String get extVerifiedSora => 'Sora tərəfindən təsdiqlənib';
@@ -1963,31 +1780,25 @@ class SAz extends S {
   String get customServerPassword => 'Parol';
 
   @override
-  String get customServerSecretRequired => 'Dəyər daxil edin';
+  String get customServerSecretRequired => 'Dəyər göstərilməyib';
 
   @override
   String get customServerLinkInvalid => 'Server keçidi yanlışdır';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora daxili xətası';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Server sertifikatı rədd edildi';
 
   @override
-  String get errInternal => 'Sora daxili xətası. Jurnalı saxlayın və problemi bildirin.';
+  String get errFileAccess => 'Fayla giriş yoxdur';
 
   @override
-  String get errTls => 'Server sertifikatı rədd edildi. Saatı yoxlayın və ya provayderlə əlaqə saxlayın.';
+  String get errDataLimit => 'Həddindən çox məlumat';
 
   @override
-  String get errFileAccess => 'Fayla giriş yoxdur. İcazələri və boş yeri yoxlayın.';
-
-  @override
-  String get errDataLimit => 'Həddindən çox məlumat. Daha az element seçib yenidən cəhd edin.';
-
-  @override
-  String get errCredentials => 'Saxlanmış giriş məlumatları yoxdur. Serveri yenidən idxal edin.';
+  String get errCredentials => 'Saxlanmış giriş məlumatları yoxdur';
 
   @override
   String subscriptionStale(String time) {
@@ -1995,56 +1806,54 @@ class SAz extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Hələ yenilənməyib. Yenidən cəhd edin.';
+  String get subscriptionNeverUpdated => 'Hələ yenilənməyib';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Server HTTP $status kodunu qaytardı. Keçidi yoxlayın və ya provayderinizə müraciət edin.',
-      zero: 'Server sorğunu rədd etdi. Keçidi yoxlayın və ya provayderinizə müraciət edin.',
+      other: 'Server HTTP $status kodunu qaytardı',
+      zero: 'Server sorğunu rədd etdi',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Server ayarları natamamdır və ya dəstəklənmir. Abunəliyi yeniləyin.';
+  String get errInvalidServer => 'Server ayarları natamamdır və ya dəstəklənmir';
 
   @override
-  String get errServerIds => 'İki server eyni identifikatordan istifadə edir. Onları yenidən idxal edin.';
+  String get errServerIds => 'İki server eyni identifikatordan istifadə edir';
 
   @override
-  String get errRoutingGroup =>
-      'Marşrut mövcud olmayan serverlərə və ya zədələnmiş qrupa istinad edir. Abunəliyi yeniləyin.';
+  String get errRoutingGroup => 'Marşrut mövcud olmayan serverlərə və ya zədələnmiş qrupa istinad edir';
 
   @override
-  String get errConnections => 'Bağlantı siyahısı əlçatan deyil. Qoşulun və ya başqa mühərrik seçin.';
+  String get errConnections => 'Bağlantı siyahısı əlçatan deyil';
 
   @override
-  String get errLogs => 'Bu xidmət jurnal saxlamır. Sora-nı yeniləyin.';
+  String get errLogs => 'Bu xidmət jurnal saxlamır';
 
   @override
-  String get errDiagnostics => 'Diaqnostika toplana bilmədi. Yenidən cəhd edin və ya jurnalı saxlayın.';
+  String get errDiagnostics => 'Diaqnostika toplana bilmədi';
 
   @override
-  String get errMissingItem => 'Sorğulanan element artıq mövcud deyil. Siyahını yeniləyin.';
+  String get errMissingItem => 'Sorğulanan element artıq mövcud deyil';
 
   @override
-  String get errInvalidRequest => 'Sorğuda etibarsız dəyərlər var. Daxil etdiklərinizi yoxlayıb yenidən cəhd edin.';
+  String get errInvalidRequest => 'Sorğuda etibarsız dəyərlər var';
 
   @override
-  String get errProxyLogin =>
-      'Sistem proksisi bu girişi dəstəkləmir. Yerli proksinin istifadəçi adını və parolunu silin.';
+  String get errProxyLogin => 'Sistem proksisi bu girişi dəstəkləmir';
 
   @override
-  String get errLogFilter => 'Jurnal filtri etibarsızdır. Axtarışı təmizləyib yenidən cəhd edin.';
+  String get errLogFilter => 'Jurnal filtri etibarsızdır';
 
   @override
-  String get errSubRedirect => 'Server təhlükəli ünvana yönləndirdi. Provayderdən yeni keçid istəyin.';
+  String get errSubRedirect => 'Server təhlükəli ünvana yönləndirdi';
 
   @override
-  String get errProxySetup => 'Sistem proksisi qurula bilmədi. Yenidən qoşulun və ya jurnalı açın.';
+  String get errProxySetup => 'Sistem proksisi qurula bilmədi';
 
   @override
   String get notificationsToday => 'Bu gün';
@@ -2070,19 +1879,19 @@ class SAz extends S {
   }
 
   @override
-  String get errSubInterval => 'Abunəliyin yenilənmə intervalı yanlışdır. Provayderin tövsiyə etdiyi intervalı seçin.';
+  String get errSubInterval => 'Abunəliyin yenilənmə intervalı yanlışdır';
 
   @override
-  String get errRule => 'Marşrutlaşdırma qaydası yanlışdır. Qaydadakı domeni, IP ünvanını və ya tətbiqi yoxlayın.';
+  String get errRule => 'Marşrutlaşdırma qaydası yanlışdır';
 
   @override
-  String get errDns => 'DNS parametrləri yanlışdır. DNS serverinin ünvanını yoxlayın.';
+  String get errDns => 'DNS parametrləri yanlışdır';
 
   @override
-  String get errEndpoint => 'Yoxlanacaq serverin ünvanı yanlışdır. Host adını və portu yoxlayın.';
+  String get errEndpoint => 'Yoxlanacaq serverin ünvanı yanlışdır';
 
   @override
-  String get errCancelled => 'Sorğu ləğv edildi. Lazım gələrsə, əməliyyatı təkrarlayın.';
+  String get errCancelled => 'Sorğu ləğv edildi';
 
   @override
   String get customServerOptions => 'Bağlantı parametrləri';
@@ -2103,19 +1912,13 @@ class SAz extends S {
   String get customServerWgPeer => 'Qarşı tərəf';
 
   @override
-  String get customServerOptionsInfo =>
-      'Provayderin verdiyi nəqliyyat və TLS parametrlərini daxil edin və ya server keçidini yapışdırın.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'Bu platformalarda mövcuddur: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret bütün Windows tətbiqləri üçün 80 və 443 portlarında TCP trafikini dəyişir. Bu, VPN deyil. WinDivert drayveri Windows yenidən başladılana qədər yüklənmiş qala bilər.';
+  String get winwsScopeWarning => 'Bütün tətbiqlərin TCP trafikini dəyişmək?';
 
   @override
-  String get winwsRequirements =>
-      'Emulyasiyasız Windows x64, WLANAPI və yoxlanmış WinDivert paketi tələb olunur. Windows drayveri bloklayarsa, bu rejim əlçatan deyil.';
+  String get winwsRequirements => 'Bu VPN rejimi əlçatan deyil';
 }

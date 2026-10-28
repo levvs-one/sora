@@ -121,10 +121,6 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                           _header(context, m, entry),
                           const SizedBox(height: 24),
                           _actions(context, store, m, live, entry),
-                          if (m.description.isNotEmpty) ...[
-                            const SizedBox(height: 24),
-                            Text(m.description, style: Styles.body.copyWith(fontSize: 14, color: palette.ink)),
-                          ],
                           _SectionHeading(s.extPermissionsTitle),
                           Group(
                             children: [
@@ -209,7 +205,6 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                 for (final r in store.routingRules.where((r) => r.extensionId == live.id))
                                   Tile(
                                     title: r.rule.shown,
-                                    detail: r.comment.isEmpty ? null : r.comment,
                                     trailing: Text(switch (r.rule.target) {
                                       RuleTarget.direct => s.ruleDirect,
                                       RuleTarget.proxy => s.ruleProxy,
@@ -692,7 +687,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context), palette = Palette.of(context);
+    final s = S.of(context);
     final config = _config;
     final editable = widget.interactive && !_busy;
     return Column(
@@ -711,11 +706,6 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
                 : null,
           ),
           _intervalTile(config, editable),
-          if (!widget.interactive)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-              child: Text(s.extBgDisabledNote, style: Styles.caption.copyWith(color: palette.ink)),
-            ),
         ],
       ],
     );

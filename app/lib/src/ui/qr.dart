@@ -104,12 +104,6 @@ class _QrShareScreenState extends State<QrShareScreen> {
                               ),
                               const SizedBox(height: 32),
                               PrimaryButton(label: _copied ? s.copied : s.qrCopyLink, onTap: _copy),
-                              const SizedBox(height: 12),
-                              Text(
-                                s.qrWarning,
-                                textAlign: TextAlign.center,
-                                style: Styles.secondary.copyWith(color: palette.ink),
-                              ),
                             ],
                           ),
                         ),
@@ -263,7 +257,10 @@ class _QrScanScreenState extends State<QrScanScreen> {
         final ctx = navigator.context;
         if (ctx.mounted) {
           final s = S.of(ctx);
-          await confirm(ctx, question: s.importSealed, action: s.understood, destructive: false, cancellable: false);
+          unawaited(
+            SoraScope.read(ctx)
+                .recordNotification(AppNotification(time: DateTime.now(), title: s.importSealed, body: '')),
+          );
         }
     }
   }
@@ -277,12 +274,6 @@ class _QrScanScreenState extends State<QrScanScreen> {
       children: [
         const SizedBox(height: 24),
         Center(child: Icon(Symbols.qr_code_scanner_rounded, size: 64, color: palette.ink3)),
-        const SizedBox(height: 16),
-        Text(
-          s.qrScanHint,
-          textAlign: TextAlign.center,
-          style: Styles.body.copyWith(color: palette.ink),
-        ),
         const SizedBox(height: 24),
         PrimaryButton(label: s.qrFromImage, busy: _busy, onTap: _busy ? null : _fromImage),
         const SizedBox(height: 8),

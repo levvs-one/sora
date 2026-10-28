@@ -92,7 +92,7 @@ void main() {
 
   testWidgets('mode panel exposes an opt-in strict switch and its warning', (tester) async {
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings.animations = false;
     final sora = Sora(settings);
     addTearDown(sora.dispose);

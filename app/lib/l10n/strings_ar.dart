@@ -205,62 +205,58 @@ class SAr extends S {
   String get errGeneric => 'حدث خطأ ما';
 
   @override
-  String get errCore => 'خدمة Sora لا تستجيب. انتظر قليلًا ثم حاول مجددًا.';
+  String get errCore => 'خدمة Sora لا تستجيب';
 
   @override
-  String get errAuth => 'رُفض الوصول إلى خدمة Sora. أعد تشغيل التطبيق ثم حاول مجددًا.';
+  String get errAuth => 'رُفض الوصول إلى خدمة Sora';
 
   @override
-  String get errVersion => 'إصدار تطبيق Sora يختلف عن إصدار الخدمة. حدّث Sora.';
+  String get errVersion => 'إصدار تطبيق Sora يختلف عن إصدار الخدمة';
 
   @override
-  String get errBusy => 'لا يزال الأمر السابق قيد التنفيذ. انتظر حتى ينتهي.';
+  String get errBusy => 'لا يزال الأمر السابق قيد التنفيذ';
 
   @override
-  String get errEngineMissing => 'لم يُعثر على المحرك المطلوب لهذا الخادم. تحقق من تحديثات Sora.';
+  String get errEngineMissing => 'لم يُعثر على المحرك المطلوب لهذا الخادم';
 
   @override
-  String get errEngineStart => 'تعذّر تشغيل المحرك. راجع سجل الاتصال لمعرفة السبب.';
+  String get errEngineStart => 'تعذّر تشغيل المحرك';
 
   @override
-  String get errEngineStopped => 'توقف المحرك. حاول الاتصال مجددًا.';
+  String get errEngineStopped => 'توقف المحرك';
 
   @override
-  String get errTunnel => 'وضع VPN هذا غير متاح. اختر وضعًا آخر أو تحقق من أذونات الخدمة.';
+  String get errTunnel => 'وضع VPN هذا غير متاح';
 
   @override
-  String get errNetwork => 'لا يمكن الوصول إلى الخادم';
+  String get errTimeout => 'لم يستجب الخادم في الوقت المحدد';
 
   @override
-  String get errTimeout => 'لم يستجب الخادم في الوقت المحدد. حاول مجددًا بعد دقيقة.';
+  String get errFirewall => 'تعذّر حظر الوصول إلى الإنترنت خارج VPN';
 
   @override
-  String get errFirewall => 'تعذّر حظر الوصول إلى الإنترنت خارج VPN. راجع سجل الاتصال لمعرفة السبب.';
+  String get errSubFetch => 'تعذّر تنزيل الاشتراك';
 
   @override
-  String get errSubFetch => 'تعذّر تنزيل الاشتراك. تحقق من اتصالك بالإنترنت وحاول مجددًا بعد دقيقة.';
+  String get errSubFormat => 'تعذّر التعرّف على تنسيق الاشتراك';
 
   @override
-  String get errSubFormat => 'تعذّر التعرّف على تنسيق الاشتراك. اطلب من المزوّد رابط اشتراك متوافقًا.';
+  String get errSubEmpty => 'لا يحتوي الاشتراك على خوادم';
 
   @override
-  String get errSubEmpty => 'لا يحتوي الاشتراك على خوادم. تواصل مع مزوّد الاشتراك.';
+  String get errSubDuplicate => 'أُضيف هذا الاشتراك من قبل';
 
   @override
-  String get errSubDuplicate => 'أُضيف هذا الاشتراك من قبل. حدّثه للحصول على أحدث قائمة بالخوادم.';
+  String get errSubLimit => 'بلغت الحد الأقصى للاشتراكات';
 
   @override
-  String get errSubLimit => 'بلغت الحد الأقصى للاشتراكات. احذف اشتراكًا لا تستخدمه قبل إضافة آخر.';
+  String get errSubScheme => 'مخطط رابط الاشتراك غير مدعوم';
 
   @override
-  String get errSubScheme => 'يجب أن يبدأ رابط الاشتراك بـ https://. اطلب رابطًا آمنًا من المزوّد.';
+  String get errSecretStore => 'مساحة تخزين Sora تالفة أو يتعذّر الوصول إليها';
 
   @override
-  String get errSecretStore =>
-      'مساحة تخزين Sora تالفة أو يتعذّر الوصول إليها. تحقق من أذونات الوصول وراجع التفاصيل في السجل.';
-
-  @override
-  String get errNoServers => 'لا توجد خوادم للاتصال بها. أضف اشتراكًا أو خادمك الخاص.';
+  String get errNoServers => 'لا توجد خوادم للاتصال بها';
 
   @override
   String get connections => 'اتصالات';
@@ -314,9 +310,6 @@ class SAr extends S {
   String get dnsAuto => 'آلي';
 
   @override
-  String get dnsHint => 'العناوين مفصولة بفواصل';
-
-  @override
   String get fragment => 'تجزئة TLS';
 
   @override
@@ -332,13 +325,7 @@ class SAr extends S {
   String get byDefault => 'تقصير';
 
   @override
-  String get rangeHint => 'على سبيل المثال، 100-200';
-
-  @override
   String get splitPos => 'تقسيم المواقف';
-
-  @override
-  String get splitPosHint => 'على سبيل المثال، 1، ميدسلد';
 
   @override
   String get disorder => 'إعادة ترتيب القطع';
@@ -447,11 +434,6 @@ class SAr extends S {
   String get support => 'يدعم';
 
   @override
-  String controlPortQuestion(String engine) {
-    return 'يتم التحكم في $engine من خلال منفذ موجود على هذا الكمبيوتر. ستكون البرامج الأخرى قادرة على معرفة أن VPN قيد التشغيل.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'اختر $engine';
   }
@@ -527,9 +509,6 @@ class SAr extends S {
   String get launchAtLogin => 'ابدأ بالنظام';
 
   @override
-  String get launchAtLoginDetail => 'سيبدأ Sora تلقائيًا عند تسجيل الدخول ويبقى في علبة النظام.';
-
-  @override
   String get closeToTray => 'احتفظ بها في الدرج عند إغلاقها';
 
   @override
@@ -564,9 +543,6 @@ class SAr extends S {
   String get noticeInTray => 'Sora لا يزال في الدرج';
 
   @override
-  String get noticeInTrayBody => 'قم بالخروج من قائمة الأيقونة الخاصة به';
-
-  @override
   String get noticeLost => 'تم فقدان الاتصال';
 
   @override
@@ -594,11 +570,7 @@ class SAr extends S {
   String get importTitle => 'إضافة هذا الاشتراك؟';
 
   @override
-  String get importSealed =>
-      'هذا الرابط مشفر لـ Happ، ولا يمكن قراءته إلا لـ Happ. اطلب من مزود الخدمة الخاص بك رابط الاشتراك العادي.';
-
-  @override
-  String get understood => 'نعم';
+  String get importSealed => 'هذا الرابط مشفر لـ Happ، ولا يمكن قراءته إلا لـ Happ';
 
   @override
   String get noAnswer => 'لا إجابة';
@@ -637,39 +609,10 @@ class SAr extends S {
   String get openLogs => 'فتح السجلات';
 
   @override
-  String get tourReplay => 'أظهر الدليل مرة أخرى';
-
-  @override
-  String tourStep(int step) {
-    return 'الخطوة $step من 5';
-  }
-
-  @override
   String get tourBack => 'خلف';
 
   @override
   String get tourNext => 'التالي';
-
-  @override
-  String get tourSkip => 'يتخطى';
-
-  @override
-  String get tourFinish => 'منتهي';
-
-  @override
-  String get tourAdd => 'أضف رابط اشتراك المزود الخاص بك.';
-
-  @override
-  String get tourServer => 'اختر خادمًا. \"الأسرع\" يختار واحدًا لك.';
-
-  @override
-  String get tourConnect => 'انقر هنا للاتصال أو قطع الاتصال.';
-
-  @override
-  String get tourMode => 'اختر الوضع. يقوم Kill Switch بحظر الإنترنت في حالة انقطاع VPN.';
-
-  @override
-  String get tourSettings => 'افتح الإعدادات. يمكنك إعادة تشغيل هذا الدليل هناك.';
 
   @override
   String get chooseProgram => 'اختر برنامجا';
@@ -681,7 +624,7 @@ class SAr extends S {
   String get runningProcesses => 'العمليات الجارية';
 
   @override
-  String get programsEmpty => 'لم يتم العثور على أي تطبيقات. حاول اسم آخر.';
+  String get programsEmpty => 'لم يتم العثور على أي تطبيقات';
 
   @override
   String get selectExe => 'اختر ملف .exe';
@@ -693,7 +636,7 @@ class SAr extends S {
   String get speedtestSearch => 'ابحث عن خدمة';
 
   @override
-  String get speedtestEmpty => 'لا توجد مباريات. تغيير البحث.';
+  String get speedtestEmpty => 'لا توجد مباريات';
 
   @override
   String get speedtestBackToList => 'العودة إلى الخدمات';
@@ -702,13 +645,13 @@ class SAr extends S {
   String get speedtestOpenBrowser => 'فتح في المتصفح';
 
   @override
-  String get speedtestUnavailable => 'تعذر بدء تشغيل المتصفح المضمن. افتح الخدمة في متصفح النظام الخاص بك.';
+  String get speedtestUnavailable => 'تعذر بدء تشغيل المتصفح المضمن';
 
   @override
-  String get speedtestPageFailed => 'تعذر تحميل الصفحة. أعد تحميله أو افتح الخدمة في متصفح النظام لديك.';
+  String get speedtestPageFailed => 'تعذر تحميل الصفحة';
 
   @override
-  String get speedtestExternalFailed => 'تعذر فتح متصفح النظام. حاول ثانية.';
+  String get speedtestExternalFailed => 'تعذر فتح متصفح النظام';
 
   @override
   String get modes => 'وسائط';
@@ -748,42 +691,28 @@ class SAr extends S {
   String get updateNoNotes => 'الإصدار ليس لديه ملاحظات.';
 
   @override
-  String get updateDropWarning => 'سوف ينقطع اتصال VPN لبضع ثوان أثناء Sora وتحديثه الأساسي. يكمل؟';
+  String get updateDropWarning => 'قطع الاتصال للتحديث؟';
 
   @override
-  String get updateWaitConnection => 'انتظر حتى يصبح اتصال VPN والمركز جاهزًا.';
+  String get updateWaitConnection => 'الاتصال غير جاهز';
 
   @override
-  String get updateDownloading => 'جارٍ تنزيل الملفات والتحقق منها...';
-
-  @override
-  String get updateInstalling => 'جارٍ تحضير التحديث أو انتظار مصادقة المسؤول...';
-
-  @override
-  String get updateNetworkError => 'تعذر تنزيل التحديث. حاول ثانية.';
+  String get updateNetworkError => 'تعذر تنزيل التحديث';
 
   @override
   String get updateReleaseError => 'بيانات الإصدار أو الملفات المطلوبة مفقودة أو غير صالحة.';
 
   @override
-  String get updateChecksumError => 'التنزيل لا يتطابق مع SHA256SUMS. لم يتم تثبيت أي شيء.';
+  String get updateChecksumError => 'التنزيل لا يتطابق مع SHA256SUMS';
 
   @override
-  String get updateInstallError => 'التحديث لم ينته. ربما تم إلغاء المصادقة.';
+  String get updateInstallError => 'التحديث لم ينته';
 
   @override
-  String get updateUnsupported =>
-      'هذا الملف القابل للتنفيذ ليس مملوكًا لزوج حزمة Sora المدعوم. استخدم تعليمات تثبيت الإصدار.';
+  String get updateUnsupported => 'هذا الملف القابل للتنفيذ ليس مملوكًا لزوج حزمة Sora المدعوم';
 
   @override
-  String get updateManual =>
-      'قم بتشغيل هذا الأمر في الوحدة الطرفية لتثبيت الحزمتين اللتين تم التحقق منهما، ثم أعد فتح Sora. تبقى الملفات في دليل التنزيل. سينقطع اتصال VPN.';
-
-  @override
-  String get updateVersionRevoked => 'قام المطور بسحب هذا الإصدار. يرجى الانتظار لإصدار مصحح.';
-
-  @override
-  String get updateRolloutPending => 'يتم طرح إصدار أحدث تدريجيًا وسيتم تقديمه لك تلقائيًا.';
+  String get updateVersionRevoked => 'قام المطور بسحب هذا الإصدار';
 
   @override
   String updateRollbacking(String version) {
@@ -796,8 +725,7 @@ class SAr extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'فشل التراجع التلقائي. إذا لم يعمل الإصدار الجديد، فأعد تثبيت الإصدار السابق يدويًا.';
+  String get updateRollbackError => 'فشل التراجع التلقائي';
 
   @override
   String get updateRollbackCacheError =>
@@ -807,10 +735,7 @@ class SAr extends S {
   String get updateCopyCommand => 'أمر النسخ';
 
   @override
-  String get updateChecksDisabled => 'تم تعطيل عمليات التحقق التلقائية في الإعدادات.';
-
-  @override
-  String get updateInstalled => 'تم تثبيت التحديث. أعد فتح Sora.';
+  String get updateInstalled => 'تم تثبيت التحديث';
 
   @override
   String get projectLinks => 'مشروع';
@@ -840,13 +765,13 @@ class SAr extends S {
   String get showDescription => 'إظهار الوصف';
 
   @override
-  String get errEngineUnsupported => 'المحرك المحدد لا يدعم ملف التعريف هذا أو الإعدادات. اختر تلقائي أو محرك متوافق.';
+  String get errEngineUnsupported => 'المحرك المحدد لا يدعم ملف التعريف هذا أو الإعدادات';
 
   @override
-  String get errRestore => 'لم تكن عملية تنظيف الاتصال كاملة. أعد محاولة قطع الاتصال؛ راجع السجل للحصول على التفاصيل.';
+  String get errRestore => 'لم تكن عملية تنظيف الاتصال كاملة';
 
   @override
-  String get errSessionEnded => 'لقد انتهت هذه الجلسة بالفعل. قم بتحديث حالة الاتصال.';
+  String get errSessionEnded => 'لقد انتهت هذه الجلسة بالفعل';
 
   @override
   String get retryDisconnect => 'أعد محاولة قطع الاتصال';
@@ -889,13 +814,10 @@ class SAr extends S {
   String get extInstallOne => 'تثبيت واحد';
 
   @override
-  String get extSideloadWarning => 'ثبّت فقط إذا كنت تثق بمفتاح المؤلف الموقّع ذاتيًا.';
+  String get extSideloadWarning => 'مفتاح موقّع ذاتيًا';
 
   @override
   String get extPermissionsWidened => 'التحديث يطلب أذونات جديدة:';
-
-  @override
-  String get extDangerousAck => 'أدرك أن هذه الأذونات خطيرة';
 
   @override
   String get extInstall => 'تثبيت';
@@ -908,9 +830,6 @@ class SAr extends S {
 
   @override
   String get extConfirm => 'تأكيد';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'الكتالوج';
@@ -961,16 +880,13 @@ class SAr extends S {
   String get extEmptySearch => 'لم يتم العثور على شيء';
 
   @override
-  String get extEmptyInstalled => 'لم يتم تثبيت أي ملحقات بعد.\nابحث عن واحد في الكتالوج أو قم بتثبيته من ملف.';
+  String get extEmptyInstalled => 'لم يتم تثبيت أي ملحقات بعد';
 
   @override
   String get extInstallFromFile => 'التثبيت من الملف';
 
   @override
   String get extInstallFromUrl => 'التثبيت من URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'تحميل';
@@ -985,19 +901,16 @@ class SAr extends S {
   String get extInstalling => 'التثبيت...';
 
   @override
-  String get extInstallFailed => 'فشل التثبيت';
-
-  @override
-  String get extErrSignature => 'فشل فحص التوقيع. قد يكون الملف تالفًا أو تم العبث به.';
+  String get extErrSignature => 'فشل فحص التوقيع';
 
   @override
   String get extErrManifest => 'ملف تعريف الملحق غير صالح.';
 
   @override
-  String get extErrNetwork => 'خطأ في الشبكة. تحقق من اتصالك وحاول مرة أخرى.';
+  String get extErrNetwork => 'خطأ في الشبكة';
 
   @override
-  String get extErrHash => 'التنزيل لا يطابق الكتالوج. ربما تم العبث بها.';
+  String get extErrHash => 'التنزيل لا يطابق الكتالوج';
 
   @override
   String extErrMinApp(String version) {
@@ -1008,11 +921,10 @@ class SAr extends S {
   String get extErrHttpsOnly => 'يُسمح فقط بروابط https://';
 
   @override
-  String get extErrGeneric => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+  String get extErrGeneric => 'حدث خطأ ما';
 
   @override
-  String get extErrAuthorKeyChanged =>
-      'تم توقيع هذا التحديث باستخدام مفتاح مؤلف مختلف عن الإصدار المثبت، لذلك تم حظره. إذا كنت تثق في المفتاح الجديد، فقم بإلغاء تثبيت الملحق وتثبيته مرة أخرى بشكل صريح.';
+  String get extErrAuthorKeyChanged => 'تم توقيع هذا التحديث باستخدام مفتاح مؤلف مختلف عن الإصدار المثبت، لذلك تم حظره';
 
   @override
   String get extDisabled => 'معطل';
@@ -1069,7 +981,7 @@ class SAr extends S {
 
   @override
   String extConflictsCount(int count) {
-    return 'تعارضات تتطلب قرارك: $count';
+    return 'تعارضات الملحق: $count';
   }
 
   @override
@@ -1146,10 +1058,10 @@ class SAr extends S {
   String get extPermThemeApply => 'تطبيق السمات';
 
   @override
-  String get extPermRoutingRules => 'إضافة قواعد التوجيه (تؤثر على المكان الذي تنتقل إليه حركة مرور الشبكة)';
+  String get extPermRoutingRules => 'إضافة قواعد التوجيه';
 
   @override
-  String get extPermNetHooks => 'التدخل في مسار الشبكة (وحدات تجاوز DPI)';
+  String get extPermNetHooks => 'التدخل في مسار الشبكة';
 
   @override
   String get extPermNetFetch => 'اطلب URL من القائمة المسموح بها';
@@ -1158,7 +1070,7 @@ class SAr extends S {
   String get extPermBackground => 'تشغيل المهام الخلفية';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'معطل';
 
   @override
   String get extCapBackground => 'يعمل في الخلفية';
@@ -1194,9 +1106,6 @@ class SAr extends S {
 
   @override
   String get extSortRelevance => 'الصلة';
-
-  @override
-  String get extPermNetworkDetail => 'تُسمح طلبات VPN إلى المضيفين أدناه فقط.';
 
   @override
   String get extBgTitle => 'مهمة في الخلفية';
@@ -1238,9 +1147,6 @@ class SAr extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'قم بتمكين الملحق لإدارة مهمة الخلفية الخاصة به.';
-
-  @override
   String get extCapNetwork => 'الوصول إلى الشبكة';
 
   @override
@@ -1257,7 +1163,7 @@ class SAr extends S {
   String get diagnosticHttp => 'تشخيصات HTTP';
 
   @override
-  String get diagnosticNoData => 'لا توجد طلبات مسجلة حتى الآن. افتح موقع اختبار السرعة أولاً.';
+  String get diagnosticNoData => 'لا توجد طلبات مسجلة حتى الآن';
 
   @override
   String get qrShareTitle => 'شارك كود QR';
@@ -1267,12 +1173,6 @@ class SAr extends S {
 
   @override
   String get qrCopyLink => 'نسخ الرابط';
-
-  @override
-  String get qrWarning => 'لا تشارك الرمز إلا مع من تثق بهم.';
-
-  @override
-  String get qrScanHint => 'اختر لقطة شاشة أو صورة تحتوي على رمز QR، أو الصق رابطًا';
 
   @override
   String get qrFromClipboard => 'لصق من الحافظة';
@@ -1362,29 +1262,10 @@ class SAr extends S {
   String get dnsLeakCheckKillSwitchDns => 'حماية DNS بمفتاح الإيقاف';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'قم بتكوين DNS للنفق في إعدادات DNS أعلاه.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'تحقق من وحدات الحل التي سيستخدمها نظامك خارج النفق.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'فعّل مفتاح الإيقاف لإبقاء حركة DNS داخل النفق.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'DNS المشفّر في نظام التشغيل';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'ردود DNS مزورة';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns => 'تحقق من نقاط النهاية المشفرة DNS التي يستخدمها نظامك خارج النفق.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'استخدم DNS (DoT أو DoH) المشفر للنفق حتى لا تتمكن أدوات الحل من تزوير الإجابات.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'اتصل بـ VPN أولاً، ثم تحقق من عدم وجود تسربات.';
 
   @override
   String get dnsExpected => 'المنتظر';
@@ -1411,7 +1292,7 @@ class SAr extends S {
   String get autoSelectSmart => 'الاختيار الذكي';
 
   @override
-  String get coreWatchUnstable => 'الاتصال بالنواة غير مستقر. انتظر قليلًا ثم حاول الاتصال مجددًا.';
+  String get coreWatchUnstable => 'الاتصال بالنواة غير مستقر';
 
   @override
   String get watchReconnect => 'أعد الاتصال';
@@ -1450,7 +1331,7 @@ class SAr extends S {
   String get overrideCustomRules => 'القواعد الخاصة';
 
   @override
-  String get errBenchmarkUnsupported => 'يتطلب قياس السرعة إصدارًا أحدث من النواة. حدّث Sora.';
+  String get errBenchmarkUnsupported => 'يتطلب قياس السرعة إصدارًا أحدث من النواة';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1461,8 +1342,7 @@ class SAr extends S {
   String get profiles => 'ملفات تعريف الشبكة';
 
   @override
-  String get profilesEmpty =>
-      'لا توجد ملفات شخصية بعد. قم بإنشاء واحدة لتطبيق الإعدادات تلقائيًا على الشبكات المعروفة.';
+  String get profilesEmpty => 'لا توجد ملفات شخصية بعد';
 
   @override
   String get profileAdd => 'إضافة ملف شخصي';
@@ -1474,9 +1354,6 @@ class SAr extends S {
   String get profileSsids => 'شبكات Wi-Fi (SSID)';
 
   @override
-  String get profileSsidsHint => 'المنزل، المكتب مفصولة بفواصل';
-
-  @override
   String get profileGateways => 'بوابات الشبكة';
 
   @override
@@ -1484,9 +1361,6 @@ class SAr extends S {
 
   @override
   String get profileAutoApply => 'التطبيق تلقائيًا';
-
-  @override
-  String get profileAutoApplyHint => 'عند إيقاف هذا الخيار، يُطلب التأكيد قبل تطبيق ملف التعريف.';
 
   @override
   String get profileSnapshot => 'تذكر الإعدادات الحالية تم تطبيق الملف الشخصي';
@@ -1530,13 +1404,13 @@ class SAr extends S {
   String get networkUnknown => 'معلومات الشبكة غير متاحة';
 
   @override
-  String get profileNoTriggers => 'أضف مشغلًا واحدًا على الأقل: SSID أو البوابة أو ASN';
+  String get profileNoTriggers => 'لا توجد شروط للملف';
 
   @override
   String get chains => 'سلاسل الوكيل';
 
   @override
-  String get chainsEmpty => 'لا توجد سلاسل بعد. قم بربط 2-3 خوادم بحيث تنتقل حركة المرور عبر كل منها.';
+  String get chainsEmpty => 'لا توجد سلاسل بعد';
 
   @override
   String get chainAdd => 'السلسلة الجديدة';
@@ -1545,16 +1419,10 @@ class SAr extends S {
   String get chainName => 'اسم السلسلة';
 
   @override
-  String get chainPickServers => 'اختر 2-3 خوادم';
+  String get chainTooFew => 'تحتاج السلسلة إلى خادمين على الأقل';
 
   @override
-  String get chainOrderHint => 'اسحب لإعادة الترتيب: تدخل حركة المرور من الأعلى وتخرج من الأسفل.';
-
-  @override
-  String get chainTooFew => 'تحتاج السلسلة إلى خادمين على الأقل. أضف خادمًا آخر.';
-
-  @override
-  String get chainTooMany => 'لا يمكن أن تتجاوز السلسلة ثلاثة خوادم. أزل الخوادم الزائدة.';
+  String get chainTooMany => 'لا يمكن أن تتجاوز السلسلة ثلاثة خوادم';
 
   @override
   String get chainEstimate => 'الكمون المقدر';
@@ -1571,10 +1439,10 @@ class SAr extends S {
   }
 
   @override
-  String get chainUnsupported => 'المحرك المحدد لا يدعم سلاسل الخوادم. اختر محركًا متوافقًا.';
+  String get chainUnsupported => 'المحرك المحدد لا يدعم سلاسل الخوادم';
 
   @override
-  String get chainHopMissing => 'أحد خوادم السلسلة لم يعد متاحًا. اختر خادمًا آخر لهذه الحلقة.';
+  String get chainHopMissing => 'أحد خوادم السلسلة لم يعد متاحًا';
 
   @override
   String chainHop(Object n) {
@@ -1594,7 +1462,7 @@ class SAr extends S {
   String get syncDevices => 'أجهزتي';
 
   @override
-  String get syncEmpty => 'لا توجد أجهزة مقترنة. قم بإقران جهاز آخر عبر الشبكة المحلية.';
+  String get syncEmpty => 'لا توجد أجهزة مقترنة';
 
   @override
   String get syncPair => 'إقران الجهاز';
@@ -1622,9 +1490,6 @@ class SAr extends S {
   String get syncNever => 'أبدًا';
 
   @override
-  String get syncNoLan => 'يجب أن تكون الأجهزة على نفس الشبكة المحلية';
-
-  @override
   String get syncPaired => 'تم إقران الجهاز';
 
   @override
@@ -1634,13 +1499,10 @@ class SAr extends S {
   String get syncWaiting => 'في انتظار الجهاز الآخر...';
 
   @override
-  String get syncSecureNote => 'قناة مشفرة من طرف إلى طرف. لا حسابات ولا خوادم سحابية.';
-
-  @override
   String get zapretWithVpn => 'تجاوز تصفية DPI لحركة مرور الشبكة المباشرة';
 
   @override
-  String get chainDuplicate => 'يتكرر أحد الخوادم في السلسلة. اختر خادمًا مختلفًا لكل حلقة.';
+  String get chainDuplicate => 'يتكرر أحد الخوادم في السلسلة';
 
   @override
   String get edit => 'تحرير';
@@ -1650,10 +1512,6 @@ class SAr extends S {
 
   @override
   String get autoSwitchOnDegrade => 'التبديل التلقائي عند التدهور';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'إذا تباطأ الخادم المحدد كثيرًا أو توقف عن الاستجابة، ينتقل Sora إلى أفضل خادم حسب القياسات، بما لا يزيد عن مرة واحدة كل 10 دقائق.';
 
   @override
   String get tunStackMixed => 'مختلط';
@@ -1671,19 +1529,13 @@ class SAr extends S {
   String get customServerName => 'الاسم';
 
   @override
-  String get customServerNameHint => 'على سبيل المثال: خادم VPS الخاص بي';
-
-  @override
-  String get customServerNameRequired => 'أدخل الاسم';
+  String get customServerNameRequired => 'الاسم مفقود';
 
   @override
   String get customServerAddress => 'العنوان';
 
   @override
-  String get customServerAddressHint => 'example.com أو 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'أدخل عنوان الخادم';
+  String get customServerAddressRequired => 'العنوان مفقود';
 
   @override
   String get customServerAddressInvalid => 'عنوان غير صالح';
@@ -1692,19 +1544,13 @@ class SAr extends S {
   String get customServerPort => 'المنفذ';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'يجب أن يكون المنفذ رقمًا من 1 إلى 65535';
+  String get customServerPortInvalid => 'منفذ غير صالح';
 
   @override
   String get customServerProtocol => 'البروتوكول';
 
   @override
   String get customServerCredentials => 'معلومات تسجيل الدخول';
-
-  @override
-  String get customServerOptional => 'اختياري';
 
   @override
   String get customServerShowSecret => 'إظهار السر';
@@ -1718,9 +1564,6 @@ class SAr extends S {
   }
 
   @override
-  String get customServerTest => 'الاختبار';
-
-  @override
   String get leakTestTitle => 'اختبار تسرب البيانات';
 
   @override
@@ -1728,9 +1571,6 @@ class SAr extends S {
 
   @override
   String get leakTestCancel => 'إلغاء';
-
-  @override
-  String get leakTestNeedsConnection => 'اتصل بـ VPN لاختبار تسرب البيانات.';
 
   @override
   String leakTestProgress(int count) {
@@ -1760,9 +1600,6 @@ class SAr extends S {
 
   @override
   String get leakTestFix => 'الإصلاح';
-
-  @override
-  String get leakTestFixedNote => 'مفتاح الإيقاف مفعّل. أعد الاختبار للتحقق.';
 
   @override
   String get leakTestCheckDirectDns => 'مباشر DNS';
@@ -1795,13 +1632,13 @@ class SAr extends S {
   String get syncDaemonFailed => 'لا يمكن بدء خدمة المزامنة';
 
   @override
-  String get syncDaemonMissing => 'لم يتم العثور على المكون sora-sync. أعد تثبيت التطبيق لتمكين مزامنة الجهاز.';
+  String get syncDaemonMissing => 'لم يتم العثور على المكون sora-sync';
 
   @override
   String get syncDaemonStarting => 'بدء خدمة المزامنة...';
 
   @override
-  String get syncErrAuth => 'رفضت خدمة المزامنة رمز الوصول. أعد تشغيل التطبيق وحاول مرة أخرى.';
+  String get syncErrAuth => 'رفضت خدمة المزامنة رمز الوصول';
 
   @override
   String get syncErrNotFound => 'لم يعد الجهاز مقترنًا';
@@ -1810,7 +1647,7 @@ class SAr extends S {
   String get syncErrPairingActive => 'جلسة الاقتران مفتوحة بالفعل';
 
   @override
-  String get syncErrUnreachable => 'الجهاز الآخر لم يرد. تأكد من وجوده على نفس الشبكة وإظهار الكود الخاص به.';
+  String get syncErrUnreachable => 'الجهاز الآخر لم يرد';
 
   @override
   String get syncError => 'خطأ في المزامنة';
@@ -1822,10 +1659,6 @@ class SAr extends S {
 
   @override
   String get syncJoining => 'الاقتران بالجهاز...';
-
-  @override
-  String get syncLegacyCleared =>
-      'لم يتم إقران قائمة الأجهزة القديمة مطلقًا، لذلك تمت محوها. قم بإقران أجهزتك مرة أخرى، بشكل حقيقي هذه المرة.';
 
   @override
   String get syncNewCode => 'كود جديد';
@@ -1885,8 +1718,7 @@ class SAr extends S {
   String get syncThisDevice => 'هذا الجهاز';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'المزامنة غير متاحة على Android';
 
   @override
   String get diagnosticPackets => 'التقاط الحزمة';
@@ -1933,27 +1765,25 @@ class SAr extends S {
   String get customServerWgKeepalive => 'Keepalive بالثواني';
 
   @override
-  String get customServerWgKeyInvalid => 'يجب أن يكون المفتاح 32 بايت بترميز base64 كما يطبعه wg genkey.';
+  String get customServerWgKeyInvalid => 'مفتاح WireGuard غير صالح';
 
   @override
-  String get customServerWgCidrInvalid => 'أدخل بادئات مفصولة بفواصل مثل 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'بادئة CIDR غير صالحة';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'أدخل عدد ثوانٍ من 0 إلى 65535.';
+  String get customServerWgKeepaliveInvalid => 'فاصل keepalive غير صالح';
 
   @override
   String get strictKillSwitch => 'مفتاح إيقاف صارم';
 
   @override
-  String get strictKillSwitchWarning =>
-      'بعد الاتصال، تبقى حركة البيانات خارج VPN محظورة حتى بعد إغلاق التطبيق إلى أن تقطع الاتصال.';
+  String get strictKillSwitchWarning => 'حظر الحركة خارج VPN بعد الخروج؟';
 
   @override
-  String get extWorkerFailed => 'فشلت المهمة الخلفية للإضافة. راجع سجل الإضافة.';
+  String get extWorkerFailed => 'فشلت المهمة الخلفية للإضافة';
 
   @override
-  String get extAssetRejected =>
-      'يحتوي ملف الإضافة على ألوان غير مقروءة أو قواعد غير صالحة. اطلب من مؤلف الإضافة تصحيح الملف.';
+  String get extAssetRejected => 'يحتوي ملف الإضافة على ألوان غير مقروءة أو قواعد غير صالحة';
 
   @override
   String get extVerifiedSora => 'تم التحقق بواسطة Sora';
@@ -1979,31 +1809,25 @@ class SAr extends S {
   String get customServerPassword => 'كلمة المرور';
 
   @override
-  String get customServerSecretRequired => 'أدخل قيمة';
+  String get customServerSecretRequired => 'القيمة مفقودة';
 
   @override
   String get customServerLinkInvalid => 'رابط الخادم غير صالح';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'خطأ داخلي في Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'رُفضت شهادة الخادم';
 
   @override
-  String get errInternal => 'خطأ داخلي في Sora. احفظ السجل وأبلغ عن المشكلة.';
+  String get errFileAccess => 'تعذر الوصول إلى الملف';
 
   @override
-  String get errTls => 'رُفضت شهادة الخادم. تحقق من الساعة أو اتصل بالمزود.';
+  String get errDataLimit => 'بيانات كثيرة جدًا';
 
   @override
-  String get errFileAccess => 'تعذر الوصول إلى الملف. تحقق من الأذونات والمساحة الحرة.';
-
-  @override
-  String get errDataLimit => 'بيانات كثيرة جدًا. حدد عناصر أقل وحاول مجددًا.';
-
-  @override
-  String get errCredentials => 'بيانات الدخول المحفوظة مفقودة. استورد الخادم مجددًا.';
+  String get errCredentials => 'بيانات الدخول المحفوظة مفقودة';
 
   @override
   String subscriptionStale(String time) {
@@ -2011,54 +1835,54 @@ class SAr extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'لم يتم التحديث بعد. حاول مجددًا.';
+  String get subscriptionNeverUpdated => 'لم يتم التحديث بعد';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'أعاد الخادم رمز HTTP $status. تحقق من الرابط أو تواصل مع المزوّد.',
-      zero: 'رفض الخادم الطلب. تحقق من الرابط أو تواصل مع المزوّد.',
+      other: 'أعاد الخادم رمز HTTP $status',
+      zero: 'رفض الخادم الطلب',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'إعدادات الخادم ناقصة أو غير مدعومة. حدّث الاشتراك.';
+  String get errInvalidServer => 'إعدادات الخادم ناقصة أو غير مدعومة';
 
   @override
-  String get errServerIds => 'خادمان لهما المعرّف نفسه. استوردهما مجددًا.';
+  String get errServerIds => 'خادمان لهما المعرّف نفسه';
 
   @override
-  String get errRoutingGroup => 'يشير المسار إلى خوادم مفقودة أو مجموعة تالفة. حدّث الاشتراك.';
+  String get errRoutingGroup => 'يشير المسار إلى خوادم مفقودة أو مجموعة تالفة';
 
   @override
-  String get errConnections => 'قائمة الاتصالات غير متاحة. اتصل أو اختر محركًا آخر.';
+  String get errConnections => 'قائمة الاتصالات غير متاحة';
 
   @override
-  String get errLogs => 'هذه الخدمة لا تحتفظ بسجل. حدّث Sora.';
+  String get errLogs => 'هذه الخدمة لا تحتفظ بسجل';
 
   @override
-  String get errDiagnostics => 'تعذر جمع التشخيص. حاول مجددًا أو احفظ السجل.';
+  String get errDiagnostics => 'تعذر جمع التشخيص';
 
   @override
-  String get errMissingItem => 'العنصر المطلوب لم يعد موجودًا. حدّث القائمة.';
+  String get errMissingItem => 'العنصر المطلوب لم يعد موجودًا';
 
   @override
-  String get errInvalidRequest => 'يحتوي الطلب على قيم غير صالحة. تحقق مما أدخلته وحاول مجددًا.';
+  String get errInvalidRequest => 'يحتوي الطلب على قيم غير صالحة';
 
   @override
-  String get errProxyLogin => 'وكيل النظام لا يدعم هذا الدخول. أزل اسم مستخدم الوكيل المحلي وكلمة مروره.';
+  String get errProxyLogin => 'وكيل النظام لا يدعم هذا الدخول';
 
   @override
-  String get errLogFilter => 'مرشح السجل غير صالح. امسح البحث وحاول مجددًا.';
+  String get errLogFilter => 'مرشح السجل غير صالح';
 
   @override
-  String get errSubRedirect => 'أعاد الخادم التوجيه إلى عنوان غير آمن. اطلب رابطًا جديدًا من المزود.';
+  String get errSubRedirect => 'أعاد الخادم التوجيه إلى عنوان غير آمن';
 
   @override
-  String get errProxySetup => 'تعذر إعداد وكيل النظام. أعد الاتصال أو افتح السجل.';
+  String get errProxySetup => 'تعذر إعداد وكيل النظام';
 
   @override
   String get notificationsToday => 'اليوم';
@@ -2084,19 +1908,19 @@ class SAr extends S {
   }
 
   @override
-  String get errSubInterval => 'الفاصل الزمني لتحديث الاشتراك غير صالح. اختر الفاصل الذي يوصي به المزوّد.';
+  String get errSubInterval => 'الفاصل الزمني لتحديث الاشتراك غير صالح';
 
   @override
-  String get errRule => 'إحدى قواعد التوجيه غير صالحة. تحقق من النطاق أو عنوان IP أو التطبيق المحدد فيها.';
+  String get errRule => 'إحدى قواعد التوجيه غير صالحة';
 
   @override
-  String get errDns => 'إعدادات DNS غير صالحة. تحقق من عنوان خادم DNS.';
+  String get errDns => 'إعدادات DNS غير صالحة';
 
   @override
-  String get errEndpoint => 'عنوان الخادم المراد اختباره غير صالح. تحقق من اسم المضيف والمنفذ.';
+  String get errEndpoint => 'عنوان الخادم المراد اختباره غير صالح';
 
   @override
-  String get errCancelled => 'أُلغي الطلب. كرّر الإجراء عند الحاجة.';
+  String get errCancelled => 'أُلغي الطلب';
 
   @override
   String get customServerOptions => 'إعدادات الاتصال';
@@ -2117,18 +1941,13 @@ class SAr extends S {
   String get customServerWgPeer => 'النظير';
 
   @override
-  String get customServerOptionsInfo => 'استخدم إعدادات النقل وTLS التي يوفرها مزود الخدمة، أو ألصق رابط الخادم.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'متاح على: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'يغيّر Zapret حركة TCP عبر المنفذين 80 و 443 لجميع تطبيقات Windows. ليس VPN. قد يبقى برنامج تشغيل WinDivert محمّلًا حتى إعادة تشغيل Windows.';
+  String get winwsScopeWarning => 'تغيير حركة TCP لكل التطبيقات؟';
 
   @override
-  String get winwsRequirements =>
-      'يلزم Windows x64 أصلي وWLANAPI وحزمة WinDivert موثّقة. إذا حظر Windows برنامج التشغيل، فلن يتوفر هذا الوضع.';
+  String get winwsRequirements => 'وضع VPN هذا غير متاح';
 }

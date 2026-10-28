@@ -205,64 +205,58 @@ class SKy extends S {
   String get errGeneric => 'Бир жерден ката кетти';
 
   @override
-  String get errCore => 'Sora кызматы жооп бербей жатат. Бир аз күтүп, кайра аракет кылыңыз.';
+  String get errCore => 'Sora кызматы жооп бербей жатат';
 
   @override
-  String get errAuth => 'Sora кызматына кирүүгө уруксат жок. Колдонмону кайра иштетип, дагы бир жолу аракет кылыңыз.';
+  String get errAuth => 'Sora кызматына кирүүгө уруксат жок';
 
   @override
-  String get errVersion => 'Sora колдонмосу менен кызматынын версиялары ар башка. Sora\'ны жаңыртыңыз.';
+  String get errVersion => 'Sora колдонмосу менен кызматынын версиялары ар башка';
 
   @override
-  String get errBusy => 'Мурунку буйрук дагы эле аткарылып жатат. Аяктаганча күтүңүз.';
+  String get errBusy => 'Мурунку буйрук дагы эле аткарылып жатат';
 
   @override
-  String get errEngineMissing => 'Бул серверге керектүү өзөк табылган жок. Sora жаңыртууларын текшериңиз.';
+  String get errEngineMissing => 'Бул серверге керектүү өзөк табылган жок';
 
   @override
-  String get errEngineStart => 'Өзөк ишке кирген жок. Себебин туташуу журналынан караңыз.';
+  String get errEngineStart => 'Өзөк ишке кирген жок';
 
   @override
-  String get errEngineStopped => 'Өзөк токтоду. Кайра туташып көрүңүз.';
+  String get errEngineStopped => 'Өзөк токтоду';
 
   @override
-  String get errTunnel => 'Бул VPN режими жеткиликсиз. Башка режимди тандаңыз же кызматтын уруксаттарын текшериңиз.';
+  String get errTunnel => 'Бул VPN режими жеткиликсиз';
 
   @override
-  String get errNetwork => 'Серверге жете албай жатат';
+  String get errTimeout => 'Сервер өз убагында жооп берген жок';
 
   @override
-  String get errTimeout => 'Сервер өз убагында жооп берген жок. Бир мүнөттөн кийин кайра аракет кылыңыз.';
+  String get errFirewall => 'VPN тышындагы интернетке кирүүнү бөгөттөө мүмкүн болгон жок';
 
   @override
-  String get errFirewall =>
-      'VPN тышындагы интернетке кирүүнү бөгөттөө мүмкүн болгон жок. Себебин туташуу журналынан караңыз.';
+  String get errSubFetch => 'Жазылууну жүктөө мүмкүн болгон жок';
 
   @override
-  String get errSubFetch =>
-      'Жазылууну жүктөө мүмкүн болгон жок. Интернетти текшерип, бир мүнөттөн кийин кайра аракет кылыңыз.';
+  String get errSubFormat => 'Жазылуунун форматы таанылган жок';
 
   @override
-  String get errSubFormat => 'Жазылуунун форматы таанылган жок. Провайдерден шайкеш жазылуу шилтемесин сураңыз.';
+  String get errSubEmpty => 'Жазылууда серверлер жок';
 
   @override
-  String get errSubEmpty => 'Жазылууда серверлер жок. Жазылуу провайдерине кайрылыңыз.';
+  String get errSubDuplicate => 'Бул жазылуу мурун эле кошулган';
 
   @override
-  String get errSubDuplicate => 'Бул жазылуу мурун эле кошулган. Учурдагы серверлерди алуу үчүн аны жаңыртыңыз.';
+  String get errSubLimit => 'Жазылуулардын саны чегине жетти';
 
   @override
-  String get errSubLimit => 'Жазылуулардын саны чегине жетти. Жаңысын кошуудан мурун колдонулбаган жазылууну өчүрүңүз.';
+  String get errSubScheme => 'Жазылуу шилтемесинин схемасы колдоого алынбайт';
 
   @override
-  String get errSubScheme => 'Жазылуу шилтемеси https:// менен башталышы керек. Провайдерден коопсуз шилтеме сураңыз.';
+  String get errSecretStore => 'Sora сактагычы бузулган же жеткиликсиз';
 
   @override
-  String get errSecretStore =>
-      'Sora сактагычы бузулган же жеткиликсиз. Кирүү уруксаттарын жана журналдагы маалыматты текшериңиз.';
-
-  @override
-  String get errNoServers => 'Туташуу үчүн серверлер жок. Жазылуу же өз сервериңизди кошуңуз.';
+  String get errNoServers => 'Туташуу үчүн серверлер жок';
 
   @override
   String get connections => 'Байланыштар';
@@ -316,9 +310,6 @@ class SKy extends S {
   String get dnsAuto => 'Авто';
 
   @override
-  String get dnsHint => 'Даректер, үтүр менен бөлүнгөн';
-
-  @override
   String get fragment => 'TLS фрагментациясы';
 
   @override
@@ -334,13 +325,7 @@ class SKy extends S {
   String get byDefault => 'Демейки';
 
   @override
-  String get rangeHint => 'Мисалы, 100-200';
-
-  @override
   String get splitPos => 'Позицияларды бөлүү';
-
-  @override
-  String get splitPosHint => 'Мисалы, 1, midsld';
 
   @override
   String get disorder => 'Бөлүмдөрдү кайра иреттөө';
@@ -449,11 +434,6 @@ class SKy extends S {
   String get support => 'Колдоо';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine бул компьютердеги порт аркылуу башкарылат. Башка программалар VPN күйгүзүлгөнүн айта алышат.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine тандаңыз';
   }
@@ -529,9 +509,6 @@ class SKy extends S {
   String get launchAtLogin => 'Системадан баштаңыз';
 
   @override
-  String get launchAtLoginDetail => 'Системага киргенде Sora автоматтык түрдө ишке кирип, лотокто калат.';
-
-  @override
   String get closeToTray => 'Жабык болгондо лотокто сактаңыз';
 
   @override
@@ -566,9 +543,6 @@ class SKy extends S {
   String get noticeInTray => 'Sora дагы эле лотокто';
 
   @override
-  String get noticeInTrayBody => 'Анын сөлөкөтүнүн менюсунан чык';
-
-  @override
   String get noticeLost => 'Туташуу үзүлдү';
 
   @override
@@ -596,11 +570,7 @@ class SKy extends S {
   String get importTitle => 'Бул жазылууну кошосузбу?';
 
   @override
-  String get importSealed =>
-      'Бул шилтеме Happ үчүн шифрленген жана аны Happ гана окуй алат. Провайдериңизден жөнөкөй жазылуу шилтемесин сураңыз.';
-
-  @override
-  String get understood => 'макул';
+  String get importSealed => 'Бул шилтеме Happ үчүн шифрленген жана аны Happ гана окуй алат';
 
   @override
   String get noAnswer => 'жооп жок';
@@ -639,39 +609,10 @@ class SKy extends S {
   String get openLogs => 'Ачык журналдар';
 
   @override
-  String get tourReplay => 'Жолду кайра көрсөтүү';
-
-  @override
-  String tourStep(int step) {
-    return '5тин ичинен $step кадамы';
-  }
-
-  @override
   String get tourBack => 'Артка';
 
   @override
   String get tourNext => 'Кийинки';
-
-  @override
-  String get tourSkip => 'Өткөрүп жибер';
-
-  @override
-  String get tourFinish => 'Бүттү';
-
-  @override
-  String get tourAdd => 'Провайдериңиздин жазылуу шилтемесин кошуңуз.';
-
-  @override
-  String get tourServer => 'Серверди тандаңыз. \"Эң ылдам\" сиз үчүн бирин тандайт.';
-
-  @override
-  String get tourConnect => 'Туташуу же ажыратуу үчүн бул жерди басыңыз.';
-
-  @override
-  String get tourMode => 'Режимди тандаңыз. VPN түшүп калса, өчүрүү блокторун өлтүрүңүз.';
-
-  @override
-  String get tourSettings => 'Жөндөөлөрдү ачыңыз. Бул колдонмону ошол жерден кайталай аласыз.';
 
   @override
   String get chooseProgram => 'Программаны тандаңыз';
@@ -683,7 +624,7 @@ class SKy extends S {
   String get runningProcesses => 'Иштеп жаткан процесстер';
 
   @override
-  String get programsEmpty => 'Тиркемелер табылган жок. Башка ат колдонуп көрүңүз.';
+  String get programsEmpty => 'Тиркемелер табылган жок';
 
   @override
   String get selectExe => '.exe файлын тандаңыз';
@@ -695,7 +636,7 @@ class SKy extends S {
   String get speedtestSearch => 'Кызматты табыңыз';
 
   @override
-  String get speedtestEmpty => 'Дал келгендер жок. Издөөнү өзгөртүү.';
+  String get speedtestEmpty => 'Дал келгендер жок';
 
   @override
   String get speedtestBackToList => 'Кызматтарга кайтуу';
@@ -704,14 +645,13 @@ class SKy extends S {
   String get speedtestOpenBrowser => 'Браузерде ачуу';
 
   @override
-  String get speedtestUnavailable => 'Кыстарылган браузер башталбай койду. Кызматты системаңыздын браузеринде ачыңыз.';
+  String get speedtestUnavailable => 'Кыстарылган браузер башталбай койду';
 
   @override
-  String get speedtestPageFailed =>
-      'Барак жүктөлбөй койду. Аны кайра жүктөңүз же системаңыздын браузеринде кызматты ачыңыз.';
+  String get speedtestPageFailed => 'Барак жүктөлбөй койду';
 
   @override
-  String get speedtestExternalFailed => 'Системанын браузери ачылбай койду. Кайра аракет кыл.';
+  String get speedtestExternalFailed => 'Системанын браузери ачылбай койду';
 
   @override
   String get modes => 'Режимдер';
@@ -751,44 +691,28 @@ class SKy extends S {
   String get updateNoNotes => 'Чыгармада эскертүүлөр жок.';
 
   @override
-  String get updateDropWarning =>
-      'Sora жана анын негизги жаңыртылышы учурунда VPN туташуусу бир нече секундага үзүлөт. Улантасызбы?';
+  String get updateDropWarning => 'Жаңыртуу үчүн туташууну үзөлүбү?';
 
   @override
-  String get updateWaitConnection => 'VPN туташуусу жана өзөгү даяр болгуча күтө туруңуз.';
+  String get updateWaitConnection => 'Туташуу даяр эмес';
 
   @override
-  String get updateDownloading => 'Файлдар жүктөлүп алынууда жана текшерилүүдө...';
-
-  @override
-  String get updateInstalling => 'Жаңыртуу даярдалууда же администратордун аутентификациясын күтүүдө...';
-
-  @override
-  String get updateNetworkError => 'Жаңыртуу жүктөлүп алынбай койду. Кайра аракет кыл.';
+  String get updateNetworkError => 'Жаңыртуу жүктөлүп алынбай койду';
 
   @override
   String get updateReleaseError => 'Чыгарылган маалыматтар же талап кылынган файлдар жок же жараксыз.';
 
   @override
-  String get updateChecksumError => 'Жүктөп алуу SHA256SUMS менен дал келбейт. Эч нерсе орнотулган эмес.';
+  String get updateChecksumError => 'Жүктөп алуу SHA256SUMS менен дал келбейт';
 
   @override
-  String get updateInstallError => 'Жаңыртуу аягына чыккан жок. Аутентификация жокко чыгарылган болушу мүмкүн.';
+  String get updateInstallError => 'Жаңыртуу аягына чыккан жок';
 
   @override
-  String get updateUnsupported =>
-      'Бул аткарылуучу файл колдоого алынган Sora пакет жупуна таандык эмес. Чыгарууну орнотуу нускамаларын колдонуңуз.';
+  String get updateUnsupported => 'Бул аткарылуучу файл колдоого алынган Sora пакет жупуна таандык эмес';
 
   @override
-  String get updateManual =>
-      'Текшерилген эки пакетти тең орнотуу үчүн бул буйрукту терминалда иштетиңиз, андан кийин Soraди кайра ачыңыз. Файлдар жүктөө каталогунда калат. VPN байланышы үзүлөт.';
-
-  @override
-  String get updateVersionRevoked => 'Иштеп чыгуучу бул версияны алып салды. Сураныч, оңдолгон чыгарууну күтүңүз.';
-
-  @override
-  String get updateRolloutPending =>
-      'Жаңыраак версия акырындык менен чыгарылып жатат жана сизге автоматтык түрдө сунушталат.';
+  String get updateVersionRevoked => 'Иштеп чыгуучу бул версияны алып салды';
 
   @override
   String updateRollbacking(String version) {
@@ -801,8 +725,7 @@ class SKy extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Автоматтык артка кайтаруу ишке ашкан жок. Жаңы версия иштебесе, мурунку версияны кол менен кайра орнотуңуз.';
+  String get updateRollbackError => 'Автоматтык артка кайтаруу ишке ашкан жок';
 
   @override
   String get updateRollbackCacheError =>
@@ -812,10 +735,7 @@ class SKy extends S {
   String get updateCopyCommand => 'Көчүрүү буйругу';
 
   @override
-  String get updateChecksDisabled => 'Автоматтык текшерүүлөр Жөндөөлөрдөн өчүрүлгөн.';
-
-  @override
-  String get updateInstalled => 'Жаңыртуу орнотулду. Sora кайра ачыңыз.';
+  String get updateInstalled => 'Жаңыртуу орнотулду';
 
   @override
   String get projectLinks => 'Долбоор';
@@ -845,14 +765,13 @@ class SKy extends S {
   String get showDescription => 'Сүрөттөмөлөрдү көрсөтүү';
 
   @override
-  String get errEngineUnsupported =>
-      'Тандалган кыймылдаткыч бул профилди же жөндөөлөрдү колдоого албайт. Авто же туура келген кыймылдаткычты тандаңыз.';
+  String get errEngineUnsupported => 'Тандалган кыймылдаткыч бул профилди же жөндөөлөрдү колдоого албайт';
 
   @override
-  String get errRestore => 'Туташуу тазаланбай калды. Кайра ажыратып көрүңүз; чоо-жайын билүү үчүн журналды карагыла.';
+  String get errRestore => 'Туташуу тазаланбай калды';
 
   @override
-  String get errSessionEnded => 'Бул сессия эбак эле аяктаган. Туташуу абалын жаңыртуу.';
+  String get errSessionEnded => 'Бул сессия эбак эле аяктаган';
 
   @override
   String get retryDisconnect => 'Ажыратып көрүңүз';
@@ -895,13 +814,10 @@ class SKy extends S {
   String get extInstallOne => '1 орнотуу';
 
   @override
-  String get extSideloadWarning => 'Автор өзү кол койгон ачкычка ишенсеңиз гана орнотуңуз.';
+  String get extSideloadWarning => 'Өзү кол койгон ачкыч';
 
   @override
   String get extPermissionsWidened => 'Жаңыртуу жаңы уруксаттарды сурайт:';
-
-  @override
-  String get extDangerousAck => 'Бул уруксаттар олуттуу экенин түшүнөм';
 
   @override
   String get extInstall => 'Орнотуу';
@@ -914,9 +830,6 @@ class SKy extends S {
 
   @override
   String get extConfirm => 'Ырастоо';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Каталог';
@@ -967,17 +880,13 @@ class SKy extends S {
   String get extEmptySearch => 'Эч нерсе табылган жок';
 
   @override
-  String get extEmptyInstalled =>
-      'Азырынча кеңейтүүлөр орнотулган эмес.\nКаталогдон бирөөнү табыңыз же файлдан орнотуңуз.';
+  String get extEmptyInstalled => 'Азырынча кеңейтүүлөр орнотулган эмес';
 
   @override
   String get extInstallFromFile => 'Файлдан орнотуу';
 
   @override
   String get extInstallFromUrl => 'URL баштап орнотуу';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Жүктөп алуу';
@@ -992,19 +901,16 @@ class SKy extends S {
   String get extInstalling => 'Орнотулууда…';
 
   @override
-  String get extInstallFailed => 'Орнотуу ишке ашкан жок';
-
-  @override
-  String get extErrSignature => 'Кол коюу текшерилбей калды. Файл бузулган же бурмаланган болушу мүмкүн.';
+  String get extErrSignature => 'Кол коюу текшерилбей калды';
 
   @override
   String get extErrManifest => 'Кеңейтүү манифести жараксыз.';
 
   @override
-  String get extErrNetwork => 'Тармак катасы. Туташууңузду текшерип, кайра аракет кылыңыз.';
+  String get extErrNetwork => 'Тармак катасы';
 
   @override
-  String get extErrHash => 'Жүктөө каталогго дал келбейт. Ал бурмаланган болушу мүмкүн.';
+  String get extErrHash => 'Жүктөө каталогго дал келбейт';
 
   @override
   String extErrMinApp(String version) {
@@ -1015,11 +921,11 @@ class SKy extends S {
   String get extErrHttpsOnly => 'https:// шилтемелерге гана уруксат берилет';
 
   @override
-  String get extErrGeneric => 'Бир жерден ката кетти. Сураныч, кайра аракет кылыңыз.';
+  String get extErrGeneric => 'Бир жерден ката кетти';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Бул жаңыртууга орнотулган версияга караганда башка автор ачкычы менен кол коюлган, андыктан ал бөгөттөлгөн. Эгер жаңы ачкычка ишенсеңиз, кеңейтүүнү чыгарып салып, аны кайра орнотуңуз.';
+      'Бул жаңыртууга орнотулган версияга караганда башка автор ачкычы менен кол коюлган, андыктан ал бөгөттөлгөн';
 
   @override
   String get extDisabled => 'Өчүк';
@@ -1076,7 +982,7 @@ class SKy extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count чыр-чатактар сиздин чечимиңизди талап кылат';
+    return 'Кеңейтүү боюнча карама-каршылыктар: $count';
   }
 
   @override
@@ -1153,10 +1059,10 @@ class SKy extends S {
   String get extPermThemeApply => 'Темаларды колдонуңуз';
 
   @override
-  String get extPermRoutingRules => 'Маршрутизация эрежелерин кошуу (тармак трафигинин кеткен жерине таасир этет)';
+  String get extPermRoutingRules => 'Маршрутизация эрежелерин кошуу';
 
   @override
-  String get extPermNetHooks => 'Тармак жолуна интеграциялоо (DPI айланып өтүү модулдары)';
+  String get extPermNetHooks => 'Тармак жолуна интеграциялоо';
 
   @override
   String get extPermNetFetch => 'Уруксат берилген тизмеден URL сураңыз';
@@ -1165,7 +1071,7 @@ class SKy extends S {
   String get extPermBackground => 'Фондук тапшырмаларды иштетүү';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Өчүк';
 
   @override
   String get extCapBackground => 'Фондо иштейт';
@@ -1203,9 +1109,6 @@ class SKy extends S {
   String get extSortRelevance => 'актуалдуулугу';
 
   @override
-  String get extPermNetworkDetail => 'VPN сурамдарына төмөнкү хостторго гана уруксат берилет.';
-
-  @override
   String get extBgTitle => 'Фондук тапшырма';
 
   @override
@@ -1227,9 +1130,6 @@ class SKy extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Фондук тапшырманы башкаруу үчүн кеңейтүүнү иштетиңиз.';
-
-  @override
   String get extCapNetwork => 'Тармакка кирүү';
 
   @override
@@ -1246,7 +1146,7 @@ class SKy extends S {
   String get diagnosticHttp => 'HTTP диагностикасы';
 
   @override
-  String get diagnosticNoData => 'Жазылган сурамдар азырынча жок. Адегенде ылдамдыкты текшерүү вебсайтын ачыңыз.';
+  String get diagnosticNoData => 'Жазылган сурамдар азырынча жок';
 
   @override
   String get qrShareTitle => 'QR кодун бөлүшүү';
@@ -1256,12 +1156,6 @@ class SKy extends S {
 
   @override
   String get qrCopyLink => 'Шилтемени көчүрүү';
-
-  @override
-  String get qrWarning => 'Кодду ишенген адамдарга гана көрсөтүңүз.';
-
-  @override
-  String get qrScanHint => 'QR коду бар скриншотту же сүрөттү тандаңыз, же шилтемени коюңуз';
 
   @override
   String get qrFromClipboard => 'Алмашуу буферинен чаптоо';
@@ -1342,31 +1236,10 @@ class SKy extends S {
   String get dnsLeakCheckKillSwitchDns => 'Тармак бөгөтүнүн DNS коргоосу';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Туннелдин DNS конфигурациясын жогорудагы DNS жөндөөлөрүндө.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Туннелдин сыртында тутумуңуз кайсы чечүүчүлөрдү колдоноорун текшериңиз.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS трафиги туннелде калышы үчүн тармак бөгөтүн күйгүзүңүз.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Системанын шифрленген DNS кызматы';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Жасалма DNS жооптор';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Туннелдин сыртында тутумуңуз кайсы шифрленген DNS акыркы чекиттерин колдоноорун текшериңиз.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Резолверлер жоопторду жасалмалай албашы үчүн туннелде шифрленген DNS (DoT же DoH) колдонуңуз.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Адегенде VPN менен туташып, андан кийин агып кеткендигин текшериңиз.';
 
   @override
   String get dnsExpected => 'Күтүлгөн';
@@ -1393,7 +1266,7 @@ class SKy extends S {
   String get autoSelectSmart => 'Акылдуу тандоо';
 
   @override
-  String get coreWatchUnstable => 'Өзөк менен байланыш туруксуз. Бир аз күтүп, кайра туташып көрүңүз.';
+  String get coreWatchUnstable => 'Өзөк менен байланыш туруксуз';
 
   @override
   String get watchReconnect => 'Кайра туташтыруу';
@@ -1432,7 +1305,7 @@ class SKy extends S {
   String get overrideCustomRules => 'Өз эрежелери';
 
   @override
-  String get errBenchmarkUnsupported => 'Ылдамдыкты өлчөө үчүн өзөктүн жаңыраак версиясы керек. Sora\'ны жаңыртыңыз.';
+  String get errBenchmarkUnsupported => 'Ылдамдыкты өлчөө үчүн өзөктүн жаңыраак версиясы керек';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1443,8 +1316,7 @@ class SKy extends S {
   String get profiles => 'Тармак профилдери';
 
   @override
-  String get profilesEmpty =>
-      'Азырынча профилдер жок. Белгилүү тармактарда автоматтык түрдө орнотууларды колдонуу үчүн бирөөсүн түзүңүз.';
+  String get profilesEmpty => 'Азырынча профилдер жок';
 
   @override
   String get profileAdd => 'Профиль кошуу';
@@ -1456,9 +1328,6 @@ class SKy extends S {
   String get profileSsids => 'Wi-Fi тармактар (SSID)';
 
   @override
-  String get profileSsidsHint => 'Үй, Кеңсе үтүр менен бөлүнгөн';
-
-  @override
   String get profileGateways => 'Тармак шлюздары';
 
   @override
@@ -1466,9 +1335,6 @@ class SKy extends S {
 
   @override
   String get profileAutoApply => 'Автоматтык түрдө колдонуу';
-
-  @override
-  String get profileAutoApplyHint => 'Өчүк болсо, профилди колдонуудан мурун ырастоо суралат.';
 
   @override
   String get profileSnapshot => 'Учурдагы орнотууларды эстеп көрүңүз';
@@ -1512,14 +1378,13 @@ class SKy extends S {
   String get networkUnknown => 'Тармак маалыматы жеткиликсиз';
 
   @override
-  String get profileNoTriggers => 'Кеминде бир триггерди кошуңуз: SSID, шлюз же ASN';
+  String get profileNoTriggers => 'Профилдин шарттары жок';
 
   @override
   String get chains => 'Прокси чынжырлар';
 
   @override
-  String get chainsEmpty =>
-      'Азырынча чынжыр жок. Трафик алардын ар бири аркылуу өтүшү үчүн 2–3 серверди байланыштырыңыз.';
+  String get chainsEmpty => 'Азырынча чынжыр жок';
 
   @override
   String get chainAdd => 'Жаңы чынжыр';
@@ -1528,16 +1393,10 @@ class SKy extends S {
   String get chainName => 'чынжырдын аталышы';
 
   @override
-  String get chainPickServers => '2–3 серверди тандаңыз';
+  String get chainTooFew => 'Чынжырга кеминде эки сервер керек';
 
   @override
-  String get chainOrderHint => 'Кайра иреттөө үчүн сүйрөңүз: трафик жогору жактан кирип, ылдый жактан чыгат.';
-
-  @override
-  String get chainTooFew => 'Чынжырга кеминде эки сервер керек. Дагы бир сервер кошуңуз.';
-
-  @override
-  String get chainTooMany => 'Чынжырда эң көп үч сервер болушу мүмкүн. Ашыкча серверлерди алып салыңыз.';
+  String get chainTooMany => 'Чынжырда эң көп үч сервер болушу мүмкүн';
 
   @override
   String get chainEstimate => 'Болжолдуу кечигүү';
@@ -1554,10 +1413,10 @@ class SKy extends S {
   }
 
   @override
-  String get chainUnsupported => 'Тандалган өзөк чынжырларды колдобойт. Шайкеш өзөктү тандаңыз.';
+  String get chainUnsupported => 'Тандалган өзөк чынжырларды колдобойт';
 
   @override
-  String get chainHopMissing => 'Чынжырдагы серверлердин бири эми жеткиликсиз. Ошол баскыч үчүн башка сервер тандаңыз.';
+  String get chainHopMissing => 'Чынжырдагы серверлердин бири эми жеткиликсиз';
 
   @override
   String chainHop(Object n) {
@@ -1577,7 +1436,7 @@ class SKy extends S {
   String get syncDevices => 'Менин түзмөктөрүм';
 
   @override
-  String get syncEmpty => 'Жупташтырылган түзмөктөр жок. Жергиликтүү тармак аркылуу башка түзмөктү жупташтырыңыз.';
+  String get syncEmpty => 'Жупташтырылган түзмөктөр жок';
 
   @override
   String get syncPair => 'Түзмөктү жуптаңыз';
@@ -1605,9 +1464,6 @@ class SKy extends S {
   String get syncNever => 'Эч качан';
 
   @override
-  String get syncNoLan => 'Түзмөктөр бир локалдык тармакта болушу керек';
-
-  @override
   String get syncPaired => 'Түзмөк жупташтырылган';
 
   @override
@@ -1617,13 +1473,10 @@ class SKy extends S {
   String get syncWaiting => 'Башка түзмөк күтүлүүдө…';
 
   @override
-  String get syncSecureNote => 'Ичтен аягына чейин шифрленген канал. Эч кандай аккаунттар, булут серверлери жок.';
-
-  @override
   String get zapretWithVpn => 'Түз тармак трафиги үчүн DPI чыпкалоодон өтүңүз';
 
   @override
-  String get chainDuplicate => 'Чынжырда бир сервер кайталанып жатат. Ар бир баскыч үчүн башка сервер тандаңыз.';
+  String get chainDuplicate => 'Чынжырда бир сервер кайталанып жатат';
 
   @override
   String get edit => 'Түзөтүү';
@@ -1633,10 +1486,6 @@ class SKy extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Деградацияны автоматтык түрдө которуу';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Тандалган сервер катуу жайласа же жооп бербей калса, Sora өлчөө жыйынтыгы эң жакшы серверге которулат, бирок 10 мүнөттө бир жолудан көп эмес.';
 
   @override
   String get tunStackMixed => 'Аралаш';
@@ -1654,19 +1503,13 @@ class SKy extends S {
   String get customServerName => 'Аты-жөнү';
 
   @override
-  String get customServerNameHint => 'Мисалы: менин VPS';
-
-  @override
-  String get customServerNameRequired => 'Атын киргизиңиз';
+  String get customServerNameRequired => 'Аталыш көрсөтүлгөн эмес';
 
   @override
   String get customServerAddress => 'Дарек';
 
   @override
-  String get customServerAddressHint => 'example.com же 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Сервердин дарегин киргизиңиз';
+  String get customServerAddressRequired => 'Дарек көрсөтүлгөн эмес';
 
   @override
   String get customServerAddressInvalid => 'Дарек жараксыз';
@@ -1675,19 +1518,13 @@ class SKy extends S {
   String get customServerPort => 'Порт';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Порт 1ден 65535ке чейинки сан болушу керек';
+  String get customServerPortInvalid => 'Порт жараксыз';
 
   @override
   String get customServerProtocol => 'Протокол';
 
   @override
   String get customServerCredentials => 'Кирүү маалыматы';
-
-  @override
-  String get customServerOptional => 'Кошумча';
 
   @override
   String get customServerShowSecret => 'Сырды көрсөтүү';
@@ -1701,9 +1538,6 @@ class SKy extends S {
   }
 
   @override
-  String get customServerTest => 'Сыноо';
-
-  @override
   String get leakTestTitle => 'Маалыматтын агып кетишин текшерүү';
 
   @override
@@ -1711,9 +1545,6 @@ class SKy extends S {
 
   @override
   String get leakTestCancel => 'Жокко чыгаруу';
-
-  @override
-  String get leakTestNeedsConnection => 'Дайындардын агып кетишин текшерүү үчүн VPN менен туташыңыз.';
 
   @override
   String leakTestProgress(int count) {
@@ -1739,9 +1570,6 @@ class SKy extends S {
 
   @override
   String get leakTestFix => 'Оңдоо';
-
-  @override
-  String get leakTestFixedNote => 'Тармак бөгөтү күйүк. Текшерүү үчүн сыноону кайра иштетиңиз.';
 
   @override
   String get leakTestCheckDirectDns => 'Түз DNS';
@@ -1774,15 +1602,13 @@ class SKy extends S {
   String get syncDaemonFailed => 'Шайкештештирүү кызматы башталбай койду';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync компоненти табылган жок. Түзмөктү синхрондоштурууну иштетүү үчүн колдонмону кайра орнотуңуз.';
+  String get syncDaemonMissing => 'sora-sync компоненти табылган жок';
 
   @override
   String get syncDaemonStarting => 'Шайкештештирүү кызматы башталууда…';
 
   @override
-  String get syncErrAuth =>
-      'Шайкештештирүү кызматы кирүү белгисин четке какты. Колдонмону өчүрүп күйгүзүп, кайра аракет кылыңыз.';
+  String get syncErrAuth => 'Шайкештештирүү кызматы кирүү белгисин четке какты';
 
   @override
   String get syncErrNotFound => 'Түзмөк мындан ары жупташкан жок';
@@ -1791,8 +1617,7 @@ class SKy extends S {
   String get syncErrPairingActive => 'Жупташуу сеансы мурунтан эле ачык';
 
   @override
-  String get syncErrUnreachable =>
-      'Башка түзмөк жооп берген жок. Анын бир тармакта экенин жана анын кодун көрсөтүп жатканын текшериңиз.';
+  String get syncErrUnreachable => 'Башка түзмөк жооп берген жок';
 
   @override
   String get syncError => 'Синхрондоштуруу катасы';
@@ -1804,10 +1629,6 @@ class SKy extends S {
 
   @override
   String get syncJoining => 'Түзмөк менен жупташуу…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Эски түзмөк тизмеси эч качан жупташкан эмес, андыктан ал тазаланган. Түзмөктөрүңүздү бул жолу чындап кайра жупташтырыңыз.';
 
   @override
   String get syncNewCode => 'Жаңы код';
@@ -1867,8 +1688,7 @@ class SKy extends S {
   String get syncThisDevice => 'Бул аппарат';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android тутумунда шайкештештирүү жеткиликсиз';
 
   @override
   String get diagnosticPackets => 'Пакетти басып алуу';
@@ -1915,27 +1735,25 @@ class SKy extends S {
   String get customServerWgKeepalive => 'Keepalive, секунд';
 
   @override
-  String get customServerWgKeyInvalid => 'Ачкыч wg genkey чыгаргандай base64 түрүндөгү 32 байт болушу керек.';
+  String get customServerWgKeyInvalid => 'WireGuard ачкычы жараксыз';
 
   @override
-  String get customServerWgCidrInvalid => 'Үтүр менен бөлүнгөн префикстерди киргизиңиз, мисалы 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'CIDR префикси жараксыз';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0дөн 65535ке чейинки секунд санын киргизиңиз.';
+  String get customServerWgKeepaliveInvalid => 'Keepalive аралыгы жараксыз';
 
   @override
   String get strictKillSwitch => 'Катуу тармак бөгөтү';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Туташкандан кийин VPN тышындагы трафик колдонмодон чыкканда да байланыш үзүлгөнчө бөгөттөлөт.';
+  String get strictKillSwitchWarning => 'Чыккандан кийин VPN тышындагы трафик бөгөттөлсүнбү?';
 
   @override
-  String get extWorkerFailed => 'Кеңейтменин фондогу тапшырмасы аткарылган жок. Кеңейтменин журналын текшериңиз.';
+  String get extWorkerFailed => 'Кеңейтменин фондогу тапшырмасы аткарылган жок';
 
   @override
-  String get extAssetRejected =>
-      'Кеңейтменин файлында окууга кыйын түстөр же жараксыз эрежелер бар. Кеңейтменин авторунан файлды оңдоону сураныңыз.';
+  String get extAssetRejected => 'Кеңейтменин файлында окууга кыйын түстөр же жараксыз эрежелер бар';
 
   @override
   String get extVerifiedSora => 'Sora тарабынан текшерилген';
@@ -1961,31 +1779,25 @@ class SKy extends S {
   String get customServerPassword => 'Сырсөз';
 
   @override
-  String get customServerSecretRequired => 'Маани киргизиңиз';
+  String get customServerSecretRequired => 'Маани көрсөтүлгөн эмес';
 
   @override
   String get customServerLinkInvalid => 'Сервердин шилтемеси туура эмес';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora ички катасы';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Сервердин сертификаты кабыл алынган жок';
 
   @override
-  String get errInternal => 'Sora ички катасы. Журналды сактап, көйгөйдү кабарлаңыз.';
+  String get errFileAccess => 'Файлга кирүү мүмкүн эмес';
 
   @override
-  String get errTls => 'Сервердин сертификаты кабыл алынган жок. Саатты текшериңиз же провайдерге кайрылыңыз.';
+  String get errDataLimit => 'Маалымат өтө көп';
 
   @override
-  String get errFileAccess => 'Файлга кирүү мүмкүн эмес. Уруксаттарды жана бош орунду текшериңиз.';
-
-  @override
-  String get errDataLimit => 'Маалымат өтө көп. Азыраак нерсе тандап, кайра аракет кылыңыз.';
-
-  @override
-  String get errCredentials => 'Сакталган кирүү маалыматтары жок. Серверди кайра импорттоңуз.';
+  String get errCredentials => 'Сакталган кирүү маалыматтары жок';
 
   @override
   String subscriptionStale(String time) {
@@ -1993,55 +1805,54 @@ class SKy extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Азырынча жаңыртылган жок. Кайра аракет кылыңыз.';
+  String get subscriptionNeverUpdated => 'Азырынча жаңыртылган жок';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Сервер HTTP $status кодун кайтарды. Шилтемени текшериңиз же провайдерге кайрылыңыз.',
-      zero: 'Сервер сурамды четке какты. Шилтемени текшериңиз же провайдерге кайрылыңыз.',
+      other: 'Сервер HTTP $status кодун кайтарды',
+      zero: 'Сервер сурамды четке какты',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Сервер жөндөөлөрү толук эмес же колдоого алынбайт. Жазылууну жаңыртыңыз.';
+  String get errInvalidServer => 'Сервер жөндөөлөрү толук эмес же колдоого алынбайт';
 
   @override
-  String get errServerIds => 'Эки сервердин идентификатору бирдей. Аларды кайра импорттоңуз.';
+  String get errServerIds => 'Эки сервердин идентификатору бирдей';
 
   @override
-  String get errRoutingGroup => 'Маршрут жок серверлерге же бузулган топко шилтейт. Жазылууну жаңыртыңыз.';
+  String get errRoutingGroup => 'Маршрут жок серверлерге же бузулган топко шилтейт';
 
   @override
-  String get errConnections => 'Туташуулар тизмеси жеткиликсиз. Туташыңыз же башка кыймылдаткыч тандаңыз.';
+  String get errConnections => 'Туташуулар тизмеси жеткиликсиз';
 
   @override
-  String get errLogs => 'Бул кызмат журнал жүргүзбөйт. Sora-ны жаңыртыңыз.';
+  String get errLogs => 'Бул кызмат журнал жүргүзбөйт';
 
   @override
-  String get errDiagnostics => 'Диагностика чогултулган жок. Кайталаңыз же журналды сактаңыз.';
+  String get errDiagnostics => 'Диагностика чогултулган жок';
 
   @override
-  String get errMissingItem => 'Суралган нерсе мындан ары жок. Тизмени жаңыртыңыз.';
+  String get errMissingItem => 'Суралган нерсе мындан ары жок';
 
   @override
-  String get errInvalidRequest => 'Сурамда жараксыз маанилер бар. Киргизилген маалыматтарды текшерип, кайталаңыз.';
+  String get errInvalidRequest => 'Сурамда жараксыз маанилер бар';
 
   @override
-  String get errProxyLogin =>
-      'Системалык прокси бул кирүүнү колдобойт. Жергиликтүү проксинин колдонуучу атын жана сырсөзүн алып салыңыз.';
+  String get errProxyLogin => 'Системалык прокси бул кирүүнү колдобойт';
 
   @override
-  String get errLogFilter => 'Журнал чыпкасы жараксыз. Издөөнү тазалап, кайталаңыз.';
+  String get errLogFilter => 'Журнал чыпкасы жараксыз';
 
   @override
-  String get errSubRedirect => 'Сервер кооптуу дарекке багыттады. Провайдерден жаңы шилтеме сураңыз.';
+  String get errSubRedirect => 'Сервер кооптуу дарекке багыттады';
 
   @override
-  String get errProxySetup => 'Системалык прокси жөндөлгөн жок. Кайра туташыңыз же журналды ачыңыз.';
+  String get errProxySetup => 'Системалык прокси жөндөлгөн жок';
 
   @override
   String get notificationsToday => 'Бүгүн';
@@ -2067,19 +1878,19 @@ class SKy extends S {
   }
 
   @override
-  String get errSubInterval => 'Жазылууну жаңыртуу аралыгы жараксыз. Провайдер сунуштаган аралыкты тандаңыз.';
+  String get errSubInterval => 'Жазылууну жаңыртуу аралыгы жараксыз';
 
   @override
-  String get errRule => 'Багыттоо эрежеси жараксыз. Эрежедеги доменди, IP дарегин же колдонмону текшериңиз.';
+  String get errRule => 'Багыттоо эрежеси жараксыз';
 
   @override
-  String get errDns => 'DNS жөндөөлөрү жараксыз. DNS серверинин дарегин текшериңиз.';
+  String get errDns => 'DNS жөндөөлөрү жараксыз';
 
   @override
-  String get errEndpoint => 'Текшерилүүчү сервердин дареги жараксыз. Хосттун атын жана портун текшериңиз.';
+  String get errEndpoint => 'Текшерилүүчү сервердин дареги жараксыз';
 
   @override
-  String get errCancelled => 'Сурам жокко чыгарылды. Керек болсо, аракетти кайталаңыз.';
+  String get errCancelled => 'Сурам жокко чыгарылды';
 
   @override
   String get customServerOptions => 'Туташуу параметрлери';
@@ -2100,19 +1911,13 @@ class SKy extends S {
   String get customServerWgPeer => 'Пир';
 
   @override
-  String get customServerOptionsInfo =>
-      'Провайдердин транспорт жана TLS параметрлерин киргизиңиз же сервердин шилтемесин чаптаңыз.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'Жеткиликтүү платформалар: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret бардык Windows колдонмолору үчүн 80 жана 443 портторундагы TCP трафигин өзгөртөт. Бул VPN эмес. WinDivert драйвери Windows кайра иштетилгенге чейин жүктөлгөн бойдон калышы мүмкүн.';
+  String get winwsScopeWarning => 'Бардык колдонмолордун TCP трафиги өзгөртүлсүнбү?';
 
   @override
-  String get winwsRequirements =>
-      'Эмуляциясыз Windows x64, WLANAPI жана текшерилген WinDivert топтому керек. Windows драйверди бөгөттөсө, бул режим жеткиликсиз.';
+  String get winwsRequirements => 'Бул VPN режими жеткиликсиз';
 }

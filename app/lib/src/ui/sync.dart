@@ -451,10 +451,6 @@ class _SyncScreenState extends State<SyncScreen> {
           ],
         ),
       ],
-      const SizedBox(height: 16),
-      Group(
-        children: [Tile(title: s.sync, info: '${s.syncSecureNote}\n\n${s.syncNoLan}')],
-      ),
     ];
   }
 }
@@ -806,10 +802,6 @@ class _PairingCodeScreenState extends State<_PairingCodeScreen> {
           ),
           const SizedBox(height: 16),
           PrimaryButton(label: s.syncStopShowing, busy: _stopping, onTap: _stopping ? null : () => unawaited(_stop())),
-          const SizedBox(height: 16),
-          Group(
-            children: [Tile(title: s.syncPairingTitle, info: s.syncSecureNote)],
-          ),
         ],
       ],
     );

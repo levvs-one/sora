@@ -241,7 +241,6 @@ void main() {
     testWidgets('exports carry the selected category, search and format; old cores cannot mislabel data', (
       tester,
     ) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       final saves = <String>[];
       const chooser = MethodChannel('plugins.flutter.io/file_selector');
@@ -345,7 +344,6 @@ void main() {
     });
 
     testWidgets('packet capture requires TUN; cancel and leaving logs suppress late replies', (tester) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       core.diagnosticGate = Completer<void>();
       Future<void> packetMenu() async {
@@ -413,7 +411,6 @@ void main() {
       testWidgets(
         'connect orb remains clickable after reset while ${initiallyConnected ? "connected" : "disconnected"}',
         (tester) async {
-          await sora.settings.completeTour();
           sora.settings.animations = false;
           if (initiallyConnected) await tester.runAsync(sora.connect);
           try {
@@ -430,7 +427,7 @@ void main() {
             }
             await tester.pump(const Duration(milliseconds: 250));
             expect(sora.phase, initiallyConnected ? Phase.off : Phase.connected);
-            expect(sora.settings.tourDone, isTrue);
+
             if (initiallyConnected) {
               await tester.runAsync(() => tester.tap(connect));
               for (var i = 0; i < 50 && sora.phase != Phase.connected; i++) {
@@ -452,7 +449,6 @@ void main() {
     }
 
     testWidgets('log sections combine with severity and search in both history and stream', (tester) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
@@ -509,7 +505,6 @@ void main() {
     });
 
     testWidgets('manual log retry does not turn later tail failures into action errors', (tester) async {
-      await sora.settings.completeTour();
       sora.settings.animations = false;
       Future<void> waitForTail() async {
         for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
@@ -551,7 +546,7 @@ void main() {
 
     testWidgets('logs opened before the service link arrives load and continue streaming', (tester) async {
       final waiting = Sora(sora.settings);
-      await waiting.settings.completeTour();
+
       waiting.settings.animations = false;
       Future<void>? waitingWork;
       try {
@@ -589,7 +584,7 @@ void main() {
 
     testWidgets('new log entries preserve the visible text until the reader returns to the top', (tester) async {
       core.logPage = List.generate(80, (i) => LogEntry(sequence: Int64(80 - i), source: 'core', message: 'History $i'));
-      await sora.settings.completeTour();
+
       sora.settings.animations = false;
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
@@ -654,7 +649,7 @@ void main() {
         700,
         (i) => LogEntry(sequence: Int64(700 - i), source: 'core', message: 'History $i'),
       );
-      await sora.settings.completeTour();
+
       sora.settings.animations = false;
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
@@ -760,7 +755,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(1440, 1000);
       addTearDown(tester.view.reset);
-      await sora.settings.completeTour();
+
       sora.settings.animations = false;
       sora.settings.language = 'ru';
       await tester.runAsync(() async {

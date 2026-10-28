@@ -19,7 +19,6 @@ import 'kit.dart';
 import 'qr.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
-import 'tour.dart';
 import 'announcement.dart';
 
 /// Keeps subscription order while building only visible server rows.
@@ -87,10 +86,7 @@ class _ServersScreenState extends State<ServersScreen> {
           label: s.measureSpeed,
           onTap: sora.canBenchmark ? () => push<void>(context, const BenchmarkScreen()) : null,
         ),
-      _tourTarget(
-        0,
-        RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
-      ),
+      RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
       if (sora.customServers.isEmpty) const _OwnServerAction(),
       RoundButton(
         icon: Symbols.qr_code_scanner_rounded,
@@ -118,14 +114,11 @@ class _ServersScreenState extends State<ServersScreen> {
     );
     final automatic = Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: _tourTarget(
-        1,
-        DecoratedBox(
-          decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: _ServerRow(id: 'auto', name: s.serverAuto),
-          ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: _ServerRow(id: 'auto', name: s.serverAuto),
         ),
       ),
     );
@@ -230,10 +223,6 @@ class _ServersScreenState extends State<ServersScreen> {
     );
     return widget.embedded ? list : Scaffold(backgroundColor: palette.background, body: list);
   }
-
-  Widget _tourTarget(int step, Widget child) => widget.embedded && SoraScope.of(context).subscriptions.isNotEmpty
-      ? TourTarget(step: step, radius: step == 0 ? 18 : 12, child: child)
-      : child;
 }
 
 List<Entry> _matching(List<Entry> entries, String query) => query.isEmpty

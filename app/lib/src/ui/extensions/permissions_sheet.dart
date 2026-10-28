@@ -52,19 +52,6 @@ String permissionBlurb(BuildContext context, String id) {
   }
 }
 
-/// Longer explanation shown under the short blurb on the install prompt,
-/// for the permissions whose one-liner does not say enough. Null for
-/// permissions whose blurb says it all.
-String? permissionDetail(BuildContext context, String id) {
-  final s = S.of(context);
-  switch (id) {
-    case 'net.fetch':
-      return s.extPermNetworkDetail;
-    default:
-      return null;
-  }
-}
-
 class InstallPermissionPrompt extends StatefulWidget {
   const InstallPermissionPrompt({
     super.key,
@@ -202,7 +189,7 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Text(s.extDangerousAck, style: Styles.body.copyWith(color: palette.ink)),
+                            child: Text(s.extConfirm, style: Styles.body.copyWith(color: palette.ink)),
                           ),
                         ],
                       ),
@@ -243,10 +230,9 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
   /// Network hooks also need a profile entry in the verified manifest.
   /// Empty when the blurb says it all.
   Widget _permissionExtra(BuildContext context, ExtManifest m, String permission) {
-    final detail = permissionDetail(context, permission);
     final hosts = isNetworkPermission(permission) ? m.networkHosts : const <String>[];
     final notYetActive = isNotYetActive(permission) || (permission == 'net.hooks' && m.networkHookEntry == null);
-    if (detail == null && hosts.isEmpty && !notYetActive) {
+    if (hosts.isEmpty && !notYetActive) {
       return const SizedBox.shrink();
     }
     final s = S.of(context);
@@ -256,11 +242,7 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (detail != null) Text(detail, style: Styles.caption.copyWith(color: palette.ink)),
-          if (notYetActive) ...[
-            if (detail != null) const SizedBox(height: 2),
-            Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink)),
-          ],
+          if (notYetActive) ...[Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink))],
           if (hosts.isNotEmpty) ...[const SizedBox(height: 4), NetworkHostsList(hosts: hosts)],
         ],
       ),

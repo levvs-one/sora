@@ -205,65 +205,58 @@ class SBn extends S {
   String get errGeneric => 'কিছু ভুল হয়েছে';
 
   @override
-  String get errCore => 'Sora পরিষেবা সাড়া দিচ্ছে না। একটু অপেক্ষা করে আবার চেষ্টা করুন।';
+  String get errCore => 'Sora পরিষেবা সাড়া দিচ্ছে না';
 
   @override
-  String get errAuth => 'Sora পরিষেবায় প্রবেশের অনুমতি মেলেনি। অ্যাপ আবার চালু করে চেষ্টা করুন।';
+  String get errAuth => 'Sora পরিষেবায় প্রবেশের অনুমতি মেলেনি';
 
   @override
-  String get errVersion => 'Sora অ্যাপ ও পরিষেবার সংস্করণ আলাদা। Sora আপডেট করুন।';
+  String get errVersion => 'Sora অ্যাপ ও পরিষেবার সংস্করণ আলাদা';
 
   @override
-  String get errBusy => 'আগের নির্দেশটি এখনও চলছে। সেটি শেষ হওয়া পর্যন্ত অপেক্ষা করুন।';
+  String get errBusy => 'আগের নির্দেশটি এখনও চলছে';
 
   @override
-  String get errEngineMissing => 'এই সার্ভারের জন্য প্রয়োজনীয় ইঞ্জিন পাওয়া যায়নি। Sora-এর আপডেট আছে কি না দেখুন।';
+  String get errEngineMissing => 'এই সার্ভারের জন্য প্রয়োজনীয় ইঞ্জিন পাওয়া যায়নি';
 
   @override
-  String get errEngineStart => 'ইঞ্জিন চালু করা যায়নি। কারণ জানতে সংযোগের লগ দেখুন।';
+  String get errEngineStart => 'ইঞ্জিন চালু করা যায়নি';
 
   @override
-  String get errEngineStopped => 'ইঞ্জিন বন্ধ হয়ে গেছে। আবার সংযোগ করার চেষ্টা করুন।';
+  String get errEngineStopped => 'ইঞ্জিন বন্ধ হয়ে গেছে';
 
   @override
-  String get errTunnel => 'এই VPN মোড উপলব্ধ নয়। অন্য মোড বেছে নিন বা পরিষেবার অনুমতি পরীক্ষা করুন।';
+  String get errTunnel => 'এই VPN মোড উপলব্ধ নয়';
 
   @override
-  String get errNetwork => 'সার্ভারে পৌঁছানো যাচ্ছে না';
+  String get errTimeout => 'সার্ভার সময়মতো সাড়া দেয়নি';
 
   @override
-  String get errTimeout => 'সার্ভার সময়মতো সাড়া দেয়নি। এক মিনিট পরে আবার চেষ্টা করুন।';
+  String get errFirewall => 'VPN-এর বাইরে ইন্টারনেট ব্যবহার বন্ধ করা যায়নি';
 
   @override
-  String get errFirewall => 'VPN-এর বাইরে ইন্টারনেট ব্যবহার বন্ধ করা যায়নি। কারণ জানতে সংযোগের লগ দেখুন।';
+  String get errSubFetch => 'সাবস্ক্রিপশন ডাউনলোড করা যায়নি';
 
   @override
-  String get errSubFetch =>
-      'সাবস্ক্রিপশন ডাউনলোড করা যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করে এক মিনিট পরে আবার চেষ্টা করুন।';
+  String get errSubFormat => 'সাবস্ক্রিপশনের ফরম্যাট চেনা যায়নি';
 
   @override
-  String get errSubFormat =>
-      'সাবস্ক্রিপশনের ফরম্যাট চেনা যায়নি। প্রদানকারীর কাছে সামঞ্জস্যপূর্ণ সাবস্ক্রিপশন লিঙ্ক চান।';
+  String get errSubEmpty => 'সাবস্ক্রিপশনে কোনো সার্ভার নেই';
 
   @override
-  String get errSubEmpty => 'সাবস্ক্রিপশনে কোনো সার্ভার নেই। সাবস্ক্রিপশন প্রদানকারীর সঙ্গে যোগাযোগ করুন।';
+  String get errSubDuplicate => 'এই সাবস্ক্রিপশন আগে থেকেই যোগ করা আছে';
 
   @override
-  String get errSubDuplicate => 'এই সাবস্ক্রিপশন আগে থেকেই যোগ করা আছে। সার্ভারের হালনাগাদ তালিকা পেতে এটি আপডেট করুন।';
+  String get errSubLimit => 'সাবস্ক্রিপশনের সংখ্যার সীমায় পৌঁছেছেন';
 
   @override
-  String get errSubLimit =>
-      'সাবস্ক্রিপশনের সংখ্যার সীমায় পৌঁছেছেন। নতুনটি যোগ করার আগে অব্যবহৃত কোনো সাবস্ক্রিপশন সরিয়ে দিন।';
+  String get errSubScheme => 'সাবস্ক্রিপশন লিঙ্কের স্কিম সমর্থিত নয়';
 
   @override
-  String get errSubScheme => 'সাবস্ক্রিপশন লিঙ্ক https:// দিয়ে শুরু হতে হবে। প্রদানকারীর কাছে নিরাপদ লিঙ্ক চান।';
+  String get errSecretStore => 'Sora-এর স্টোরেজ ক্ষতিগ্রস্ত বা ব্যবহার করা যাচ্ছে না';
 
   @override
-  String get errSecretStore =>
-      'Sora-এর স্টোরেজ ক্ষতিগ্রস্ত বা ব্যবহার করা যাচ্ছে না। প্রবেশের অনুমতি এবং লগের বিস্তারিত দেখুন।';
-
-  @override
-  String get errNoServers => 'সংযোগ করার মতো কোনো সার্ভার নেই। সাবস্ক্রিপশন বা নিজের সার্ভার যোগ করুন।';
+  String get errNoServers => 'সংযোগ করার মতো কোনো সার্ভার নেই';
 
   @override
   String get connections => 'সংযোগ';
@@ -317,9 +310,6 @@ class SBn extends S {
   String get dnsAuto => 'অটো';
 
   @override
-  String get dnsHint => 'ঠিকানা, কমা পৃথক';
-
-  @override
   String get fragment => 'TLS ফ্র্যাগমেন্টেশন';
 
   @override
@@ -335,13 +325,7 @@ class SBn extends S {
   String get byDefault => 'ডিফল্ট';
 
   @override
-  String get rangeHint => 'উদাহরণস্বরূপ, 100-200';
-
-  @override
   String get splitPos => 'বিভক্ত অবস্থান';
-
-  @override
-  String get splitPosHint => 'উদাহরণস্বরূপ, 1, midsld';
 
   @override
   String get disorder => 'টুকরা পুনর্বিন্যাস';
@@ -450,11 +434,6 @@ class SBn extends S {
   String get support => 'সমর্থন';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine এই কম্পিউটারে একটি পোর্টের মাধ্যমে নিয়ন্ত্রিত হয়। অন্যান্য প্রোগ্রাম বলতে সক্ষম হবে যে একটি VPN চালু আছে।';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return '$engine বেছে নিন';
   }
@@ -530,9 +509,6 @@ class SBn extends S {
   String get launchAtLogin => 'সিস্টেম দিয়ে শুরু করুন';
 
   @override
-  String get launchAtLoginDetail => 'সাইন ইন করলে Sora স্বয়ংক্রিয়ভাবে চালু হবে এবং ট্রেতে থাকবে।';
-
-  @override
   String get closeToTray => 'বন্ধ হয়ে গেলে ট্রেতে রাখুন';
 
   @override
@@ -567,9 +543,6 @@ class SBn extends S {
   String get noticeInTray => 'Sora এখনও ট্রেতে আছে';
 
   @override
-  String get noticeInTrayBody => 'এর আইকনের মেনু থেকে প্রস্থান করুন';
-
-  @override
   String get noticeLost => 'সংযোগ বিচ্ছিন্ন';
 
   @override
@@ -598,10 +571,7 @@ class SBn extends S {
 
   @override
   String get importSealed =>
-      'এই লিঙ্কটি Happ এর জন্য এনক্রিপ্ট করা হয়েছে এবং শুধুমাত্র Happ এটি পড়তে পারে৷ প্লেইন সাবস্ক্রিপশন লিঙ্কের জন্য আপনার প্রদানকারীকে জিজ্ঞাসা করুন।';
-
-  @override
-  String get understood => 'ঠিক আছে';
+      'এই লিঙ্কটি Happ এর জন্য এনক্রিপ্ট করা হয়েছে এবং শুধুমাত্র Happ এটি পড়তে পারে৷ প্লেইন সাবস্ক্রিপশন লিঙ্কের জন্য আপনার প্রদানকারীকে জিজ্ঞাসা করুন';
 
   @override
   String get noAnswer => 'কোন উত্তর নেই';
@@ -640,39 +610,10 @@ class SBn extends S {
   String get openLogs => 'লগ খুলুন';
 
   @override
-  String get tourReplay => 'আবার গাইড দেখান';
-
-  @override
-  String tourStep(int step) {
-    return '5 এর মধ্যে $step ধাপ';
-  }
-
-  @override
   String get tourBack => 'ব্যাক';
 
   @override
   String get tourNext => 'পরবর্তী';
-
-  @override
-  String get tourSkip => 'এড়িয়ে যান';
-
-  @override
-  String get tourFinish => 'সম্পন্ন';
-
-  @override
-  String get tourAdd => 'আপনার প্রদানকারীর সদস্যতা লিঙ্ক যোগ করুন.';
-
-  @override
-  String get tourServer => 'একটি সার্ভার চয়ন করুন। \"দ্রুততম\" আপনার জন্য একটি নির্বাচন করে।';
-
-  @override
-  String get tourConnect => 'সংযোগ বা সংযোগ বিচ্ছিন্ন করতে এখানে ক্লিক করুন.';
-
-  @override
-  String get tourMode => 'একটি মোড চয়ন করুন. VPN কমে গেলে কিল সুইচ ইন্টারনেট ব্লক করে।';
-
-  @override
-  String get tourSettings => 'সেটিংস খুলুন। আপনি সেখানে এই নির্দেশিকা পুনরায় চালাতে পারেন।';
 
   @override
   String get chooseProgram => 'একটি প্রোগ্রাম চয়ন করুন';
@@ -684,7 +625,7 @@ class SBn extends S {
   String get runningProcesses => 'চলমান প্রক্রিয়া';
 
   @override
-  String get programsEmpty => 'কোন অ্যাপ্লিকেশন পাওয়া যায়নি. অন্য নাম চেষ্টা করুন.';
+  String get programsEmpty => 'কোন অ্যাপ্লিকেশন পাওয়া যায়নি';
 
   @override
   String get selectExe => 'একটি .exe ফাইল নির্বাচন করুন';
@@ -696,7 +637,7 @@ class SBn extends S {
   String get speedtestSearch => 'একটি পরিষেবা খুঁজুন';
 
   @override
-  String get speedtestEmpty => 'কোন মিল নেই। অনুসন্ধান পরিবর্তন করুন.';
+  String get speedtestEmpty => 'কোন মিল নেই';
 
   @override
   String get speedtestBackToList => 'পরিষেবাগুলিতে ফিরে যান';
@@ -705,14 +646,13 @@ class SBn extends S {
   String get speedtestOpenBrowser => 'ব্রাউজারে খুলুন';
 
   @override
-  String get speedtestUnavailable => 'এমবেড করা ব্রাউজারটি শুরু করা যায়নি। আপনার সিস্টেম ব্রাউজারে পরিষেবাটি খুলুন।';
+  String get speedtestUnavailable => 'এমবেড করা ব্রাউজারটি শুরু করা যায়নি';
 
   @override
-  String get speedtestPageFailed =>
-      'পৃষ্ঠাটি লোড করা যায়নি। এটি পুনরায় লোড করুন বা আপনার সিস্টেম ব্রাউজারে পরিষেবাটি খুলুন।';
+  String get speedtestPageFailed => 'পৃষ্ঠাটি লোড করা যায়নি';
 
   @override
-  String get speedtestExternalFailed => 'সিস্টেম ব্রাউজার খুলতে পারেনি. আবার চেষ্টা করুন';
+  String get speedtestExternalFailed => 'সিস্টেম ব্রাউজার খুলতে পারেনি';
 
   @override
   String get modes => 'মোড';
@@ -752,43 +692,28 @@ class SBn extends S {
   String get updateNoNotes => 'রিলিজ কোন নোট আছে.';
 
   @override
-  String get updateDropWarning =>
-      'Sora এবং এর মূল আপডেটের সময় VPN সংযোগটি কয়েক সেকেন্ডের জন্য নেমে যাবে। চালিয়ে যান?';
+  String get updateDropWarning => 'আপডেটের জন্য সংযোগ বিচ্ছিন্ন করবেন?';
 
   @override
-  String get updateWaitConnection => 'ভিপিএন সংযোগ এবং কোর প্রস্তুত হওয়ার জন্য অপেক্ষা করুন।';
+  String get updateWaitConnection => 'সংযোগ প্রস্তুত নয়';
 
   @override
-  String get updateDownloading => 'ফাইল ডাউনলোড এবং যাচাই করা হচ্ছে...';
-
-  @override
-  String get updateInstalling => 'আপডেট প্রস্তুত করা হচ্ছে বা প্রশাসকের প্রমাণীকরণের জন্য অপেক্ষা করা হচ্ছে...';
-
-  @override
-  String get updateNetworkError => 'আপডেট ডাউনলোড করা যায়নি. আবার চেষ্টা করুন';
+  String get updateNetworkError => 'আপডেট ডাউনলোড করা যায়নি';
 
   @override
   String get updateReleaseError => 'রিলিজ ডেটা বা প্রয়োজনীয় ফাইলগুলি অনুপস্থিত বা অবৈধ৷';
 
   @override
-  String get updateChecksumError => 'ডাউনলোডটি SHA256SUMS-এর সাথে মেলে না৷ কিছুই ইনস্টল করা হয়নি।';
+  String get updateChecksumError => 'ডাউনলোডটি SHA256SUMS-এর সাথে মেলে না৷ কিছুই ইনস্টল করা হয়নি';
 
   @override
-  String get updateInstallError => 'আপডেট শেষ হয়নি। প্রমাণীকরণ বাতিল করা হতে পারে.';
+  String get updateInstallError => 'আপডেট শেষ হয়নি';
 
   @override
-  String get updateUnsupported =>
-      'এই এক্সিকিউটেবল একটি সমর্থিত Sora প্যাকেজ জোড়ার মালিকানাধীন নয়। রিলিজ ইনস্টলেশন নির্দেশাবলী ব্যবহার করুন.';
+  String get updateUnsupported => 'এই এক্সিকিউটেবল একটি সমর্থিত Sora প্যাকেজ জোড়ার মালিকানাধীন নয়';
 
   @override
-  String get updateManual =>
-      'উভয় যাচাইকৃত প্যাকেজ ইনস্টল করতে একটি টার্মিনালে এই কমান্ডটি চালান, তারপর Sora পুনরায় খুলুন। ফাইলগুলি ডাউনলোড ডিরেক্টরিতে থাকে। ভিপিএন কানেকশন বন্ধ হয়ে যাবে।';
-
-  @override
-  String get updateVersionRevoked => 'বিকাশকারী এই সংস্করণটি প্রত্যাহার করেছে। একটি সংশোধন রিলিজ জন্য অপেক্ষা করুন.';
-
-  @override
-  String get updateRolloutPending => 'একটি নতুন সংস্করণ ধীরে ধীরে চালু হচ্ছে এবং স্বয়ংক্রিয়ভাবে আপনাকে অফার করা হবে।';
+  String get updateVersionRevoked => 'বিকাশকারী এই সংস্করণটি প্রত্যাহার করেছে';
 
   @override
   String updateRollbacking(String version) {
@@ -801,8 +726,7 @@ class SBn extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'স্বয়ংক্রিয় রোলব্যাক ব্যর্থ হয়েছে. যদি নতুন সংস্করণটি কাজ না করে তবে পূর্ববর্তী রিলিজটি ম্যানুয়ালি পুনরায় ইনস্টল করুন।';
+  String get updateRollbackError => 'স্বয়ংক্রিয় রোলব্যাক ব্যর্থ হয়েছে';
 
   @override
   String get updateRollbackCacheError =>
@@ -812,10 +736,7 @@ class SBn extends S {
   String get updateCopyCommand => 'কমান্ড অনুলিপি করুন';
 
   @override
-  String get updateChecksDisabled => 'সেটিংসে স্বয়ংক্রিয় চেক অক্ষম করা হয়েছে৷';
-
-  @override
-  String get updateInstalled => 'আপডেট ইনস্টল করা হয়েছে। Sora আবার খুলুন।';
+  String get updateInstalled => 'আপডেট ইনস্টল করা হয়েছে';
 
   @override
   String get projectLinks => 'প্রকল্প';
@@ -845,15 +766,13 @@ class SBn extends S {
   String get showDescription => 'বর্ণনা দেখান';
 
   @override
-  String get errEngineUnsupported =>
-      'নির্বাচিত ইঞ্জিন এই প্রোফাইল বা সেটিংস সমর্থন করে না। অটো বা একটি সামঞ্জস্যপূর্ণ ইঞ্জিন চয়ন করুন.';
+  String get errEngineUnsupported => 'নির্বাচিত ইঞ্জিন এই প্রোফাইল বা সেটিংস সমর্থন করে না';
 
   @override
-  String get errRestore =>
-      'সংযোগ পরিষ্কার অসম্পূর্ণ ছিল. সংযোগ বিচ্ছিন্ন করার পুনরায় চেষ্টা করুন; বিস্তারিত জানার জন্য লগ দেখুন।';
+  String get errRestore => 'সংযোগ পরিষ্কার অসম্পূর্ণ ছিল';
 
   @override
-  String get errSessionEnded => 'এই অধিবেশন ইতিমধ্যে শেষ হয়েছে. সংযোগের অবস্থা রিফ্রেশ করুন।';
+  String get errSessionEnded => 'এই অধিবেশন ইতিমধ্যে শেষ হয়েছে';
 
   @override
   String get retryDisconnect => 'সংযোগ বিচ্ছিন্ন করার পুনরায় চেষ্টা করুন';
@@ -896,13 +815,10 @@ class SBn extends S {
   String get extInstallOne => '1 ইনস্টল করুন';
 
   @override
-  String get extSideloadWarning => 'লেখকের স্বস্বাক্ষরিত কী বিশ্বাস করলেই ইনস্টল করুন।';
+  String get extSideloadWarning => 'স্বাক্ষরিত নিজস্ব কী';
 
   @override
   String get extPermissionsWidened => 'আপডেটটি নতুন অনুমতির জন্য জিজ্ঞাসা করে:';
-
-  @override
-  String get extDangerousAck => 'আমি বুঝি যে এই অনুমতিগুলি গুরুতর৷';
 
   @override
   String get extInstall => 'ইনস্টল করুন';
@@ -915,9 +831,6 @@ class SBn extends S {
 
   @override
   String get extConfirm => 'নিশ্চিত করুন';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'ক্যাটালগ';
@@ -968,17 +881,13 @@ class SBn extends S {
   String get extEmptySearch => 'কিছুই পাওয়া যায়নি';
 
   @override
-  String get extEmptyInstalled =>
-      'কোনো এক্সটেনশন এখনো ইনস্টল করা হয়নি.\nক্যাটালগে একটি খুঁজুন বা একটি ফাইল থেকে ইনস্টল করুন।';
+  String get extEmptyInstalled => 'কোনো এক্সটেনশন এখনো ইনস্টল করা হয়নি';
 
   @override
   String get extInstallFromFile => 'ফাইল থেকে ইনস্টল করুন';
 
   @override
   String get extInstallFromUrl => 'URL থেকে ইনস্টল করুন';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'ডাউনলোড করুন';
@@ -993,19 +902,16 @@ class SBn extends S {
   String get extInstalling => 'ইনস্টল করা হচ্ছে...';
 
   @override
-  String get extInstallFailed => 'ইনস্টল ব্যর্থ হয়েছে';
-
-  @override
-  String get extErrSignature => 'স্বাক্ষর চেক ব্যর্থ হয়েছে. ফাইলটি ক্ষতিগ্রস্ত বা টেম্পারড হতে পারে।';
+  String get extErrSignature => 'স্বাক্ষর চেক ব্যর্থ হয়েছে';
 
   @override
   String get extErrManifest => 'এক্সটেনশন ম্যানিফেস্ট অবৈধ.';
 
   @override
-  String get extErrNetwork => 'নেটওয়ার্ক ত্রুটি. আপনার সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন.';
+  String get extErrNetwork => 'নেটওয়ার্ক ত্রুটি';
 
   @override
-  String get extErrHash => 'ডাউনলোড ক্যাটালগের সাথে মেলে না। এর সাথে কারসাজি করা হতে পারে।';
+  String get extErrHash => 'ডাউনলোড ক্যাটালগের সাথে মেলে না';
 
   @override
   String extErrMinApp(String version) {
@@ -1016,11 +922,11 @@ class SBn extends S {
   String get extErrHttpsOnly => 'শুধুমাত্র https:// লিঙ্ক অনুমোদিত';
 
   @override
-  String get extErrGeneric => 'কিছু ভুল হয়েছে. আবার চেষ্টা করুন.';
+  String get extErrGeneric => 'কিছু ভুল হয়েছে';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'এই আপডেটটি ইনস্টল করা সংস্করণের চেয়ে একটি ভিন্ন লেখক কী দিয়ে স্বাক্ষরিত, তাই এটি ব্লক করা হয়েছে। আপনি যদি নতুন কী বিশ্বাস করেন তবে এক্সটেনশনটি আনইনস্টল করুন এবং স্পষ্টভাবে আবার ইনস্টল করুন।';
+      'এই আপডেটটি ইনস্টল করা সংস্করণের চেয়ে একটি ভিন্ন লেখক কী দিয়ে স্বাক্ষরিত, তাই এটি ব্লক করা হয়েছে';
 
   @override
   String get extDisabled => 'বন্ধ';
@@ -1077,7 +983,7 @@ class SBn extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count দ্বন্দ্ব আপনার সিদ্ধান্ত প্রয়োজন';
+    return 'এক্সটেনশন দ্বন্দ্ব: $count';
   }
 
   @override
@@ -1154,10 +1060,10 @@ class SBn extends S {
   String get extPermThemeApply => 'থিম প্রয়োগ করুন অনুমোদিত তালিকা থেকে';
 
   @override
-  String get extPermRoutingRules => 'রাউটিং নিয়ম যোগ করুন (নেটওয়ার্ক ট্রাফিক যেখানে যায় সেখানে প্রভাবিত করে)';
+  String get extPermRoutingRules => 'রাউটিং নিয়ম যোগ করুন';
 
   @override
-  String get extPermNetHooks => 'নেটওয়ার্ক পাথে একীভূত করুন (DPI বাইপাস মডিউল)';
+  String get extPermNetHooks => 'নেটওয়ার্ক পাথে একীভূত করুন';
 
   @override
   String get extPermNetFetch => 'অনুরোধ URL';
@@ -1166,7 +1072,7 @@ class SBn extends S {
   String get extPermBackground => 'ব্যাকগ্রাউন্ড কাজ চালান';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'বন্ধ';
 
   @override
   String get extCapBackground => 'ব্যাকগ্রাউন্ডে রান';
@@ -1204,9 +1110,6 @@ class SBn extends S {
   String get extSortRelevance => 'প্রাসঙ্গিকতা';
 
   @override
-  String get extPermNetworkDetail => 'VPN অনুরোধ শুধু নিচের হোস্টগুলিতে অনুমোদিত।';
-
-  @override
   String get extBgTitle => 'পটভূমির কাজ';
 
   @override
@@ -1228,9 +1131,6 @@ class SBn extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'এর ব্যাকগ্রাউন্ড টাস্ক পরিচালনা করতে এক্সটেনশন সক্রিয় করুন।';
-
-  @override
   String get extCapNetwork => 'নেটওয়ার্ক অ্যাক্সেস';
 
   @override
@@ -1247,7 +1147,7 @@ class SBn extends S {
   String get diagnosticHttp => 'HTTP ডায়াগনস্টিকস';
 
   @override
-  String get diagnosticNoData => 'এখনও কোন রেকর্ড করা অনুরোধ. প্রথমে একটি গতি পরীক্ষার ওয়েবসাইট খুলুন।';
+  String get diagnosticNoData => 'এখনও কোন রেকর্ড করা অনুরোধ';
 
   @override
   String get qrShareTitle => 'শেয়ার করুন QR কোড';
@@ -1257,12 +1157,6 @@ class SBn extends S {
 
   @override
   String get qrCopyLink => 'কপি লিঙ্ক';
-
-  @override
-  String get qrWarning => 'শুধু বিশ্বস্ত ব্যক্তিদের কোডটি দেখান।';
-
-  @override
-  String get qrScanHint => 'QR কোডসহ একটি স্ক্রিনশট বা ছবি বেছে নিন, অথবা একটি লিংক পেস্ট করুন';
 
   @override
   String get qrFromClipboard => 'ক্লিপবোর্ড থেকে পেস্ট করুন';
@@ -1343,30 +1237,10 @@ class SBn extends S {
   String get dnsLeakCheckKillSwitchDns => 'নেটওয়ার্ক অবরোধের DNS সুরক্ষা';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'উপরের DNS সেটিংসে টানেলের জন্য DNS কনফিগার করুন।';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers => 'আপনার সিস্টেম টানেলের বাইরে ব্যবহার করবে কোন সমাধানকারী পরীক্ষা করুন.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'DNS ট্রাফিক টানেলের ভেতরে রাখতে নেটওয়ার্ক অবরোধ চালু করুন।';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'সিস্টেমের এনক্রিপ্ট করা DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'নকল DNS প্রতিক্রিয়া';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'আপনার সিস্টেম টানেলের বাইরে কোন এনক্রিপ্টেড DNS এন্ডপয়েন্ট ব্যবহার করে তা পরীক্ষা করে দেখুন।';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'টানেলের জন্য এনক্রিপ্ট করা DNS (DoT বা DoH) ব্যবহার করুন যাতে সমাধানকারীরা উত্তর জাল করতে না পারে।';
-
-  @override
-  String get dnsCheckNeedsConnection => 'প্রথমে VPN এর সাথে সংযোগ করুন, তারপরে ফাঁস পরীক্ষা করুন।';
 
   @override
   String get dnsExpected => 'প্রত্যাশিত';
@@ -1393,7 +1267,7 @@ class SBn extends S {
   String get autoSelectSmart => 'স্মার্ট পছন্দ';
 
   @override
-  String get coreWatchUnstable => 'কোরের সঙ্গে সংযোগ অস্থির। একটু অপেক্ষা করে আবার সংযোগ করার চেষ্টা করুন।';
+  String get coreWatchUnstable => 'কোরের সঙ্গে সংযোগ অস্থির';
 
   @override
   String get watchReconnect => 'পুনরায় সংযোগ করুন';
@@ -1432,7 +1306,7 @@ class SBn extends S {
   String get overrideCustomRules => 'নিজস্ব নিয়ম';
 
   @override
-  String get errBenchmarkUnsupported => 'গতি মাপার জন্য কোরের নতুন সংস্করণ প্রয়োজন। Sora আপডেট করুন।';
+  String get errBenchmarkUnsupported => 'গতি মাপার জন্য কোরের নতুন সংস্করণ প্রয়োজন';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1443,8 +1317,7 @@ class SBn extends S {
   String get profiles => 'নেটওয়ার্ক প্রোফাইল';
 
   @override
-  String get profilesEmpty =>
-      'এখনও কোন প্রোফাইল. পরিচিত নেটওয়ার্কগুলিতে স্বয়ংক্রিয়ভাবে সেটিংস প্রয়োগ করতে একটি তৈরি করুন৷';
+  String get profilesEmpty => 'এখনও কোন প্রোফাইল';
 
   @override
   String get profileAdd => 'প্রোফাইল যোগ করুন';
@@ -1456,9 +1329,6 @@ class SBn extends S {
   String get profileSsids => 'Wi-Fi নেটওয়ার্ক (SSID)';
 
   @override
-  String get profileSsidsHint => 'বাড়ি, অফিস কমা দ্বারা পৃথক করা হয়েছে';
-
-  @override
   String get profileGateways => 'নেটওয়ার্ক গেটওয়ে';
 
   @override
@@ -1466,9 +1336,6 @@ class SBn extends S {
 
   @override
   String get profileAutoApply => 'স্বয়ংক্রিয়ভাবে প্রয়োগ করুন';
-
-  @override
-  String get profileAutoApplyHint => 'বন্ধ থাকলে প্রোফাইল প্রয়োগের আগে অনুমতি চাওয়া হবে।';
 
   @override
   String get profileSnapshot => 'বর্তমান সেটিংস মনে রাখবেন';
@@ -1512,14 +1379,13 @@ class SBn extends S {
   String get networkUnknown => 'নেটওয়ার্ক তথ্য অনুপলব্ধ';
 
   @override
-  String get profileNoTriggers => 'অন্তত একটি ট্রিগার যোগ করুন: SSID, গেটওয়ে বা ASN';
+  String get profileNoTriggers => 'প্রোফাইলের কোনো শর্ত নেই';
 
   @override
   String get chains => 'প্রক্সি চেইন';
 
   @override
-  String get chainsEmpty =>
-      'এখনও কোন চেইন. 2-3 সার্ভারগুলিকে লিঙ্ক করুন যাতে তাদের প্রতিটির মধ্য দিয়ে ট্র্যাফিক চলে যায়।';
+  String get chainsEmpty => 'এখনও কোন চেইন';
 
   @override
   String get chainAdd => 'নতুন চেইন';
@@ -1528,16 +1394,10 @@ class SBn extends S {
   String get chainName => 'চেইন নাম';
 
   @override
-  String get chainPickServers => '2-3 সার্ভার বাছাই করুন';
+  String get chainTooFew => 'চেইনের জন্য অন্তত দুটি সার্ভার প্রয়োজন';
 
   @override
-  String get chainOrderHint => 'পুনরায় সাজাতে টেনে আনুন: ট্র্যাফিক উপরে প্রবেশ করে এবং নীচে প্রস্থান করে।';
-
-  @override
-  String get chainTooFew => 'চেইনের জন্য অন্তত দুটি সার্ভার প্রয়োজন। আরও একটি সার্ভার যোগ করুন।';
-
-  @override
-  String get chainTooMany => 'চেইনে সর্বোচ্চ তিনটি সার্ভার থাকতে পারে। অতিরিক্ত সার্ভার সরিয়ে দিন।';
+  String get chainTooMany => 'চেইনে সর্বোচ্চ তিনটি সার্ভার থাকতে পারে';
 
   @override
   String get chainEstimate => 'আনুমানিক লেটেন্সি';
@@ -1554,10 +1414,10 @@ class SBn extends S {
   }
 
   @override
-  String get chainUnsupported => 'বেছে নেওয়া ইঞ্জিন সার্ভার চেইন সমর্থন করে না। সামঞ্জস্যপূর্ণ ইঞ্জিন বেছে নিন।';
+  String get chainUnsupported => 'বেছে নেওয়া ইঞ্জিন সার্ভার চেইন সমর্থন করে না';
 
   @override
-  String get chainHopMissing => 'চেইনের কোনো সার্ভার আর উপলব্ধ নেই। সেই ধাপের জন্য অন্য সার্ভার বেছে নিন।';
+  String get chainHopMissing => 'চেইনের কোনো সার্ভার আর উপলব্ধ নেই';
 
   @override
   String chainHop(Object n) {
@@ -1577,7 +1437,7 @@ class SBn extends S {
   String get syncDevices => 'আমার ডিভাইস';
 
   @override
-  String get syncEmpty => 'কোন জোড়া ডিভাইস. স্থানীয় নেটওয়ার্কে অন্য ডিভাইস যুক্ত করুন।';
+  String get syncEmpty => 'কোন জোড়া ডিভাইস';
 
   @override
   String get syncPair => 'ডিভাইস জোড়া লাগান';
@@ -1605,9 +1465,6 @@ class SBn extends S {
   String get syncNever => 'কখনোই না';
 
   @override
-  String get syncNoLan => 'ডিভাইসগুলি অবশ্যই একই স্থানীয় নেটওয়ার্কে থাকতে হবে';
-
-  @override
   String get syncPaired => 'ডিভাইস পেয়ার করা হয়েছে';
 
   @override
@@ -1617,13 +1474,10 @@ class SBn extends S {
   String get syncWaiting => 'অন্য ডিভাইসের জন্য অপেক্ষা করা হচ্ছে...';
 
   @override
-  String get syncSecureNote => 'এন্ড-টু-এন্ড এনক্রিপ্ট করা চ্যানেল। কোনো অ্যাকাউন্ট নেই, কোনো ক্লাউড সার্ভার নেই।';
-
-  @override
   String get zapretWithVpn => 'সরাসরি নেটওয়ার্ক ট্রাফিকের জন্য বাইপাস DPI ফিল্টারিং';
 
   @override
-  String get chainDuplicate => 'চেইনে একই সার্ভার একাধিকবার আছে। প্রতিটি ধাপের জন্য আলাদা সার্ভার বেছে নিন।';
+  String get chainDuplicate => 'চেইনে একই সার্ভার একাধিকবার আছে';
 
   @override
   String get edit => 'সম্পাদনা';
@@ -1633,10 +1487,6 @@ class SBn extends S {
 
   @override
   String get autoSwitchOnDegrade => 'অটো-সুইচ অন ডিগ্রেডেশন';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'নির্বাচিত সার্ভার খুব ধীর হয়ে গেলে বা সাড়া না দিলে, Sora মাপা সার্ভারগুলোর মধ্যে সেরাটিতে বদলে যায়, তবে প্রতি 10 মিনিটে একবারের বেশি নয়।';
 
   @override
   String get tunStackMixed => 'মিশ্র';
@@ -1654,19 +1504,13 @@ class SBn extends S {
   String get customServerName => 'নাম';
 
   @override
-  String get customServerNameHint => 'যেমন: আমার VPS';
-
-  @override
-  String get customServerNameRequired => 'নাম লিখুন';
+  String get customServerNameRequired => 'নাম দেওয়া নেই';
 
   @override
   String get customServerAddress => 'ঠিকানা';
 
   @override
-  String get customServerAddressHint => 'example.com বা 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'সার্ভার ঠিকানা লিখুন';
+  String get customServerAddressRequired => 'ঠিকানা দেওয়া নেই';
 
   @override
   String get customServerAddressInvalid => 'অবৈধ ঠিকানা';
@@ -1675,19 +1519,13 @@ class SBn extends S {
   String get customServerPort => 'পোর্ট';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'পোর্ট 1 থেকে 65535 পর্যন্ত একটি সংখ্যা হতে হবে';
+  String get customServerPortInvalid => 'অবৈধ পোর্ট';
 
   @override
   String get customServerProtocol => 'প্রোটোকল';
 
   @override
   String get customServerCredentials => 'লগইন তথ্য';
-
-  @override
-  String get customServerOptional => 'ঐচ্ছিক';
 
   @override
   String get customServerShowSecret => 'গোপন দেখান';
@@ -1701,9 +1539,6 @@ class SBn extends S {
   }
 
   @override
-  String get customServerTest => 'পরীক্ষা';
-
-  @override
   String get leakTestTitle => 'তথ্য ফাঁস জন্য পরীক্ষা';
 
   @override
@@ -1711,9 +1546,6 @@ class SBn extends S {
 
   @override
   String get leakTestCancel => 'বাতিল';
-
-  @override
-  String get leakTestNeedsConnection => 'ডেটা ফাঁস পরীক্ষা করতে VPN-এর সাথে সংযোগ করুন।';
 
   @override
   String leakTestProgress(int count) {
@@ -1739,9 +1571,6 @@ class SBn extends S {
 
   @override
   String get leakTestFix => 'ফিক্স';
-
-  @override
-  String get leakTestFixedNote => 'নেটওয়ার্ক অবরোধ চালু আছে। যাচাই করতে আবার পরীক্ষা চালান।';
 
   @override
   String get leakTestCheckDirectDns => 'সরাসরি DNS';
@@ -1774,15 +1603,13 @@ class SBn extends S {
   String get syncDaemonFailed => 'সিঙ্ক পরিষেবা শুরু করতে পারেনি';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync উপাদানটি পাওয়া যায়নি। ডিভাইস সিঙ্ক সক্ষম করতে অ্যাপটি পুনরায় ইনস্টল করুন।';
+  String get syncDaemonMissing => 'sora-sync উপাদানটি পাওয়া যায়নি';
 
   @override
   String get syncDaemonStarting => 'সিঙ্ক পরিষেবা শুরু হচ্ছে...';
 
   @override
-  String get syncErrAuth =>
-      'সিঙ্ক পরিষেবা অ্যাক্সেস টোকেন প্রত্যাখ্যান করেছে। অ্যাপটি পুনরায় চালু করুন এবং আবার চেষ্টা করুন।';
+  String get syncErrAuth => 'সিঙ্ক পরিষেবা অ্যাক্সেস টোকেন প্রত্যাখ্যান করেছে';
 
   @override
   String get syncErrNotFound => 'ডিভাইসটি আর জোড়া লাগানো নেই';
@@ -1791,8 +1618,7 @@ class SBn extends S {
   String get syncErrPairingActive => 'একটি জোড়া সেশন ইতিমধ্যে খোলা আছে';
 
   @override
-  String get syncErrUnreachable =>
-      'অন্য ডিভাইস উত্তর দেয়নি. নিশ্চিত করুন যে এটি একই নেটওয়ার্কে রয়েছে এবং এর কোড দেখাচ্ছে৷';
+  String get syncErrUnreachable => 'অন্য ডিভাইস উত্তর দেয়নি';
 
   @override
   String get syncError => 'সিঙ্ক্রোনাইজেশন ত্রুটি';
@@ -1804,10 +1630,6 @@ class SBn extends S {
 
   @override
   String get syncJoining => 'ডিভাইসের সাথে পেয়ার করা হচ্ছে...';
-
-  @override
-  String get syncLegacyCleared =>
-      'পুরানো ডিভাইস তালিকা আসলে জোড়া ছিল না, তাই এটি সাফ করা হয়েছে. আপনার ডিভাইসগুলিকে আবার যুক্ত করুন, এইবার বাস্তবে৷';
 
   @override
   String get syncNewCode => 'নতুন কোড';
@@ -1867,8 +1689,7 @@ class SBn extends S {
   String get syncThisDevice => 'এই ডিভাইস';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Android-এ সিঙ্ক উপলব্ধ নয়';
 
   @override
   String get diagnosticPackets => 'প্যাকেট ক্যাপচার';
@@ -1915,27 +1736,25 @@ class SBn extends S {
   String get customServerWgKeepalive => 'Keepalive, সেকেন্ড';
 
   @override
-  String get customServerWgKeyInvalid => 'কী-টি wg genkey-এর মতো base64-এ 32 বাইট হতে হবে।';
+  String get customServerWgKeyInvalid => 'অবৈধ WireGuard কী';
 
   @override
-  String get customServerWgCidrInvalid => 'কমা দিয়ে আলাদা প্রিফিক্স দিন, যেমন 10.0.0.2/32।';
+  String get customServerWgCidrInvalid => 'অবৈধ CIDR প্রিফিক্স';
 
   @override
-  String get customServerWgKeepaliveInvalid => '0 থেকে 65535 সেকেন্ডের মধ্যে একটি সংখ্যা দিন।';
+  String get customServerWgKeepaliveInvalid => 'অবৈধ keepalive ব্যবধান';
 
   @override
   String get strictKillSwitch => 'কঠোর নেটওয়ার্ক অবরোধ';
 
   @override
-  String get strictKillSwitchWarning =>
-      'সংযোগের পর, অ্যাপ বন্ধ করলেও সংযোগ বিচ্ছিন্ন না করা পর্যন্ত VPN-এর বাইরের ট্র্যাফিক অবরুদ্ধ থাকে।';
+  String get strictKillSwitchWarning => 'অ্যাপ বন্ধের পরও VPN-এর বাইরের ট্রাফিক বন্ধ রাখবেন?';
 
   @override
-  String get extWorkerFailed => 'এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে। এক্সটেনশনের লগ দেখুন।';
+  String get extWorkerFailed => 'এক্সটেনশনের পটভূমির কাজ ব্যর্থ হয়েছে';
 
   @override
-  String get extAssetRejected =>
-      'এক্সটেনশনের ফাইলে অপাঠ্য রং বা ভুল নিয়ম রয়েছে। ফাইলটি ঠিক করতে এক্সটেনশনের লেখককে বলুন।';
+  String get extAssetRejected => 'এক্সটেনশনের ফাইলে অপাঠ্য রং বা ভুল নিয়ম রয়েছে';
 
   @override
   String get extVerifiedSora => 'Sora দ্বারা যাচাইকৃত';
@@ -1961,31 +1780,25 @@ class SBn extends S {
   String get customServerPassword => 'পাসওয়ার্ড';
 
   @override
-  String get customServerSecretRequired => 'একটি মান লিখুন';
+  String get customServerSecretRequired => 'মান দেওয়া নেই';
 
   @override
   String get customServerLinkInvalid => 'সার্ভারের লিংকটি সঠিক নয়';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora-তে অভ্যন্তরীণ ত্রুটি';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'সার্ভারের সার্টিফিকেট প্রত্যাখ্যাত';
 
   @override
-  String get errInternal => 'Sora-তে অভ্যন্তরীণ ত্রুটি। লগ সংরক্ষণ করে সমস্যাটি জানান।';
+  String get errFileAccess => 'ফাইল অ্যাক্সেস করা যাচ্ছে না';
 
   @override
-  String get errTls => 'সার্ভারের সার্টিফিকেট প্রত্যাখ্যাত। ঘড়ি পরীক্ষা করুন বা প্রদানকারীর সাথে যোগাযোগ করুন।';
+  String get errDataLimit => 'ডেটা অনেক বেশি';
 
   @override
-  String get errFileAccess => 'ফাইল অ্যাক্সেস করা যাচ্ছে না। অনুমতি ও খালি জায়গা পরীক্ষা করুন।';
-
-  @override
-  String get errDataLimit => 'ডেটা অনেক বেশি। কম আইটেম বেছে নিয়ে আবার চেষ্টা করুন।';
-
-  @override
-  String get errCredentials => 'সংরক্ষিত লগইন তথ্য নেই। সার্ভারটি আবার আমদানি করুন।';
+  String get errCredentials => 'সংরক্ষিত লগইন তথ্য নেই';
 
   @override
   String subscriptionStale(String time) {
@@ -1993,55 +1806,54 @@ class SBn extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'এখনও আপডেট হয়নি। আবার চেষ্টা করুন।';
+  String get subscriptionNeverUpdated => 'এখনও আপডেট হয়নি';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'সার্ভার HTTP $status কোড দিয়েছে। লিঙ্ক পরীক্ষা করুন বা প্রদানকারীর সঙ্গে যোগাযোগ করুন।',
-      zero: 'সার্ভার অনুরোধ প্রত্যাখ্যান করেছে। লিঙ্ক পরীক্ষা করুন বা প্রদানকারীর সঙ্গে যোগাযোগ করুন।',
+      other: 'সার্ভার HTTP $status কোড দিয়েছে',
+      zero: 'সার্ভার অনুরোধ প্রত্যাখ্যান করেছে',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'সার্ভারের সেটিংস অসম্পূর্ণ বা সমর্থিত নয়। সাবস্ক্রিপশন আপডেট করুন।';
+  String get errInvalidServer => 'সার্ভারের সেটিংস অসম্পূর্ণ বা সমর্থিত নয়';
 
   @override
-  String get errServerIds => 'দুটি সার্ভারের শনাক্তকারী একই। সেগুলো আবার আমদানি করুন।';
+  String get errServerIds => 'দুটি সার্ভারের শনাক্তকারী একই';
 
   @override
-  String get errRoutingGroup => 'রুটটি অনুপস্থিত সার্ভার বা ক্ষতিগ্রস্ত গ্রুপে নির্দেশ করে। সাবস্ক্রিপশন আপডেট করুন।';
+  String get errRoutingGroup => 'রুটটি অনুপস্থিত সার্ভার বা ক্ষতিগ্রস্ত গ্রুপে নির্দেশ করে';
 
   @override
-  String get errConnections => 'সংযোগের তালিকা পাওয়া যাচ্ছে না। সংযোগ করুন বা অন্য ইঞ্জিন বেছে নিন।';
+  String get errConnections => 'সংযোগের তালিকা পাওয়া যাচ্ছে না';
 
   @override
-  String get errLogs => 'এই পরিষেবা লগ রাখে না। Sora আপডেট করুন।';
+  String get errLogs => 'এই পরিষেবা লগ রাখে না';
 
   @override
-  String get errDiagnostics => 'ডায়াগনস্টিক সংগ্রহ করা যায়নি। আবার চেষ্টা করুন বা লগ সংরক্ষণ করুন।';
+  String get errDiagnostics => 'ডায়াগনস্টিক সংগ্রহ করা যায়নি';
 
   @override
-  String get errMissingItem => 'অনুরোধ করা আইটেম আর নেই। তালিকা রিফ্রেশ করুন।';
+  String get errMissingItem => 'অনুরোধ করা আইটেম আর নেই';
 
   @override
-  String get errInvalidRequest => 'অনুরোধে অবৈধ মান রয়েছে। ইনপুট পরীক্ষা করে আবার চেষ্টা করুন।';
+  String get errInvalidRequest => 'অনুরোধে অবৈধ মান রয়েছে';
 
   @override
-  String get errProxyLogin =>
-      'সিস্টেম প্রক্সি এই লগইন সমর্থন করে না। স্থানীয় প্রক্সির ব্যবহারকারীর নাম ও পাসওয়ার্ড সরান।';
+  String get errProxyLogin => 'সিস্টেম প্রক্সি এই লগইন সমর্থন করে না';
 
   @override
-  String get errLogFilter => 'লগ ফিল্টার অবৈধ। অনুসন্ধান মুছে আবার চেষ্টা করুন।';
+  String get errLogFilter => 'লগ ফিল্টার অবৈধ';
 
   @override
-  String get errSubRedirect => 'সার্ভার একটি অনিরাপদ ঠিকানায় পাঠিয়েছে। প্রদানকারীর কাছে নতুন লিংক চান।';
+  String get errSubRedirect => 'সার্ভার একটি অনিরাপদ ঠিকানায় পাঠিয়েছে';
 
   @override
-  String get errProxySetup => 'সিস্টেম প্রক্সি সেট করা যায়নি। আবার সংযোগ করুন বা লগ খুলুন।';
+  String get errProxySetup => 'সিস্টেম প্রক্সি সেট করা যায়নি';
 
   @override
   String get notificationsToday => 'আজ';
@@ -2067,19 +1879,19 @@ class SBn extends S {
   }
 
   @override
-  String get errSubInterval => 'সাবস্ক্রিপশন আপডেটের ব্যবধান সঠিক নয়। প্রদানকারীর প্রস্তাবিত ব্যবধান বেছে নিন।';
+  String get errSubInterval => 'সাবস্ক্রিপশন আপডেটের ব্যবধান সঠিক নয়';
 
   @override
-  String get errRule => 'রাউটিংয়ের কোনো নিয়ম সঠিক নয়। নিয়মের ডোমেন, IP ঠিকানা বা অ্যাপ পরীক্ষা করুন।';
+  String get errRule => 'রাউটিংয়ের কোনো নিয়ম সঠিক নয়';
 
   @override
-  String get errDns => 'DNS সেটিংস সঠিক নয়। DNS সার্ভারের ঠিকানা পরীক্ষা করুন।';
+  String get errDns => 'DNS সেটিংস সঠিক নয়';
 
   @override
-  String get errEndpoint => 'পরীক্ষার জন্য সার্ভারের ঠিকানা সঠিক নয়। হোস্টের নাম ও পোর্ট পরীক্ষা করুন।';
+  String get errEndpoint => 'পরীক্ষার জন্য সার্ভারের ঠিকানা সঠিক নয়';
 
   @override
-  String get errCancelled => 'অনুরোধ বাতিল হয়েছে। প্রয়োজন হলে কাজটি আবার করুন।';
+  String get errCancelled => 'অনুরোধ বাতিল হয়েছে';
 
   @override
   String get customServerOptions => 'সংযোগ সেটিংস';
@@ -2100,19 +1912,13 @@ class SBn extends S {
   String get customServerWgPeer => 'পিয়ার';
 
   @override
-  String get customServerOptionsInfo =>
-      'প্রদানকারীর দেওয়া ট্রান্সপোর্ট ও TLS সেটিংস ব্যবহার করুন অথবা সার্ভারের লিংক পেস্ট করুন।';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'এগুলিতে উপলব্ধ: $platforms।';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret সব Windows অ্যাপের জন্য পোর্ট 80 ও 443-এ TCP ট্রাফিক বদলায়। এটি VPN নয়। Windows পুনরায় চালু না হওয়া পর্যন্ত WinDivert ড্রাইভার লোড থাকতে পারে।';
+  String get winwsScopeWarning => 'সব অ্যাপের TCP ট্রাফিক পরিবর্তন করবেন?';
 
   @override
-  String get winwsRequirements =>
-      'নেটিভ Windows x64, WLANAPI এবং যাচাইকৃত WinDivert প্যাকেজ প্রয়োজন। Windows ড্রাইভারটি আটকালে এই মোড উপলভ্য হবে না।';
+  String get winwsRequirements => 'এই VPN মোড উপলব্ধ নয়';
 }

@@ -42,16 +42,6 @@ String _checkLabel(S s, String key) => switch (key) {
   _ => key,
 };
 
-/// Resolves a core-provided fix hint key such as "dnsLeak.fix.enableKillSwitch".
-String _checkHint(S s, String key) => switch (key) {
-  'dnsLeak.fix.configureTunnelDns' => s.dnsLeakFixConfigureTunnelDns,
-  'dnsLeak.fix.reviewSystemResolvers' => s.dnsLeakFixReviewSystemResolvers,
-  'dnsLeak.fix.reviewEncryptedDns' => s.dnsLeakFixReviewEncryptedDns,
-  'dnsLeak.fix.enableKillSwitch' => s.dnsLeakFixEnableKillSwitch,
-  'dnsLeak.fix.useEncryptedDns' => s.dnsLeakFixUseEncryptedDns,
-  _ => key,
-};
-
 /// DNS manager: resolver presets, custom list and leak checking.
 class DnsScreen extends StatefulWidget {
   const DnsScreen({super.key});
@@ -87,7 +77,7 @@ class _DnsScreenState extends State<DnsScreen> {
       showFieldSheet(
         context,
         title: s.dns,
-        hint: s.dnsHint,
+        hint: s.dns,
         action: s.save,
         initial: sora.settings.dns.join(', '),
         allowEmpty: true,
@@ -199,7 +189,7 @@ class _DnsScreenState extends State<DnsScreen> {
             ),
           )
         else if (_needsConnection)
-          _note(context, Symbols.info_rounded, s.dnsCheckNeedsConnection)
+          _note(context, Symbols.info_rounded, s.stateOff)
         else if (_failure != null)
           _note(context, Symbols.info_rounded, describe(s, _failure!))
         else if (_checks != null)
@@ -258,8 +248,7 @@ class _DnsScreenState extends State<DnsScreen> {
     );
   }
 
-  /// One check: label, observed values, and the fix hint. A hint on a
-  /// non-leaking check is a warning (warning icon, calm ink), never an error.
+  /// Observed resolver values retain their warning status from the core.
   Widget _checkRow(BuildContext context, DnsLeakCheck check) {
     final s = S.of(context);
     final palette = Palette.of(context);
@@ -291,20 +280,6 @@ class _DnsScreenState extends State<DnsScreen> {
             Padding(
               padding: const EdgeInsetsDirectional.only(start: 24, top: 2),
               child: Text('${s.dnsActual}: ${check.actual}', style: Styles.caption.copyWith(color: palette.ink2)),
-            ),
-          if (hasHint)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(start: 24, top: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Symbols.info_rounded, size: 14, color: palette.ink2),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(_checkHint(s, check.fixHint), style: Styles.caption.copyWith(color: palette.ink)),
-                  ),
-                ],
-              ),
             ),
         ],
       ),

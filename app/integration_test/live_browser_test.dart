@@ -28,7 +28,7 @@ void main() {
 
     final baseline = Platform.isWindows ? await browserProcesses() : <int>{};
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings.animations = false;
     settings.language = 'ru';
     final sora = Sora(settings);

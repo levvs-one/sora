@@ -989,7 +989,7 @@ void main() {
     size(tester, width, 900);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings
       ..language = 'ru'
       ..animations = false;

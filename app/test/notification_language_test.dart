@@ -82,7 +82,7 @@ void main() {
         (
           AppNotification(time: at, title: old.updateAvailable('1.2.3'), body: old.updateOpenAbout, action: 'update'),
           ru.updateAvailable('1.2.3'),
-          ru.updateOpenAbout,
+          '',
         ),
         (
           AppNotification(time: at, title: old.profileApplyAsk(name), body: '', action: 'apply-profile'),
@@ -95,9 +95,9 @@ void main() {
           '',
         ),
         (
-          AppNotification(time: at, title: old.noticeInTray, body: old.noticeInTrayBody),
+          AppNotification(time: at, title: old.noticeInTray, body: 'Quit from the menu of its icon'),
           ru.noticeInTray,
-          ru.noticeInTrayBody,
+          '',
         ),
         for (var days = 0; days < 3; days++)
           (
@@ -184,7 +184,7 @@ void main() {
       ..physicalSize = const Size(1000, 900);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-    await settings.completeTour();
+
     settings
       ..language = 'en'
       ..animations = false;

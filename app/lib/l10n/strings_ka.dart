@@ -205,62 +205,58 @@ class SKa extends S {
   String get errGeneric => 'რაღაც შეფერხდა';
 
   @override
-  String get errCore => 'Sora-ს სერვისი არ პასუხობს. ცოტა ხანს მოიცადეთ და ხელახლა სცადეთ.';
+  String get errCore => 'Sora-ს სერვისი არ პასუხობს';
 
   @override
-  String get errAuth => 'Sora-ს სერვისზე წვდომა უარყოფილია. გადატვირთეთ აპი და ხელახლა სცადეთ.';
+  String get errAuth => 'Sora-ს სერვისზე წვდომა უარყოფილია';
 
   @override
-  String get errVersion => 'Sora-ს აპსა და სერვისს სხვადასხვა ვერსია აქვს. განაახლეთ Sora.';
+  String get errVersion => 'Sora-ს აპსა და სერვისს სხვადასხვა ვერსია აქვს';
 
   @override
-  String get errBusy => 'წინა ბრძანება ჯერ კიდევ სრულდება. დაელოდეთ მის დასრულებას.';
+  String get errBusy => 'წინა ბრძანება ჯერ კიდევ სრულდება';
 
   @override
-  String get errEngineMissing => 'ამ სერვერისთვის საჭირო ძრავა ვერ მოიძებნა. შეამოწმეთ Sora-ს განახლებები.';
+  String get errEngineMissing => 'ამ სერვერისთვის საჭირო ძრავა ვერ მოიძებნა';
 
   @override
-  String get errEngineStart => 'ძრავა ვერ გაეშვა. მიზეზი ნახეთ კავშირის ჟურნალში.';
+  String get errEngineStart => 'ძრავა ვერ გაეშვა';
 
   @override
-  String get errEngineStopped => 'ძრავა გაჩერდა. სცადეთ ხელახლა დაკავშირება.';
+  String get errEngineStopped => 'ძრავა გაჩერდა';
 
   @override
-  String get errTunnel => 'VPN-ის ეს რეჟიმი მიუწვდომელია. აირჩიეთ სხვა რეჟიმი ან შეამოწმეთ სერვისის ნებართვები.';
+  String get errTunnel => 'VPN-ის ეს რეჟიმი მიუწვდომელია';
 
   @override
-  String get errNetwork => 'სერვერთან დაკავშირება შეუძლებელია';
+  String get errTimeout => 'სერვერმა დროულად არ უპასუხა';
 
   @override
-  String get errTimeout => 'სერვერმა დროულად არ უპასუხა. ერთ წუთში ხელახლა სცადეთ.';
+  String get errFirewall => 'VPN-ის გარეთ ინტერნეტზე წვდომა ვერ დაიბლოკა';
 
   @override
-  String get errFirewall => 'VPN-ის გარეთ ინტერნეტზე წვდომა ვერ დაიბლოკა. მიზეზი ნახეთ კავშირის ჟურნალში.';
+  String get errSubFetch => 'გამოწერა ვერ ჩამოიტვირთა';
 
   @override
-  String get errSubFetch => 'გამოწერა ვერ ჩამოიტვირთა. შეამოწმეთ ინტერნეტკავშირი და ერთ წუთში ხელახლა სცადეთ.';
+  String get errSubFormat => 'გამოწერის ფორმატი ვერ ამოიცნო';
 
   @override
-  String get errSubFormat => 'გამოწერის ფორმატი ვერ ამოიცნო. მომწოდებელს სთხოვეთ თავსებადი გამოწერის ბმული.';
+  String get errSubEmpty => 'გამოწერაში სერვერები არ არის';
 
   @override
-  String get errSubEmpty => 'გამოწერაში სერვერები არ არის. დაუკავშირდით გამოწერის მომწოდებელს.';
+  String get errSubDuplicate => 'ეს გამოწერა უკვე დამატებულია';
 
   @override
-  String get errSubDuplicate => 'ეს გამოწერა უკვე დამატებულია. სერვერების მიმდინარე სიის მისაღებად განაახლეთ ის.';
+  String get errSubLimit => 'გამოწერების რაოდენობამ ზღვარს მიაღწია';
 
   @override
-  String get errSubLimit => 'გამოწერების რაოდენობამ ზღვარს მიაღწია. ახლის დამატებამდე წაშალეთ გამოუყენებელი გამოწერა.';
+  String get errSubScheme => 'გამოწერის ბმულის სქემა მხარდაჭერილი არ არის';
 
   @override
-  String get errSubScheme => 'გამოწერის ბმული უნდა იწყებოდეს https://-ით. მომწოდებელს სთხოვეთ უსაფრთხო ბმული.';
+  String get errSecretStore => 'Sora-ს საცავი დაზიანებულია ან მიუწვდომელია';
 
   @override
-  String get errSecretStore =>
-      'Sora-ს საცავი დაზიანებულია ან მიუწვდომელია. შეამოწმეთ წვდომის ნებართვები და ჟურნალის დეტალები.';
-
-  @override
-  String get errNoServers => 'დასაკავშირებელი სერვერები არ არის. დაამატეთ გამოწერა ან საკუთარი სერვერი.';
+  String get errNoServers => 'დასაკავშირებელი სერვერები არ არის';
 
   @override
   String get connections => 'კავშირები';
@@ -314,9 +310,6 @@ class SKa extends S {
   String get dnsAuto => 'ავტო';
 
   @override
-  String get dnsHint => 'მისამართები, მძიმით გამოყოფილი';
-
-  @override
   String get fragment => 'TLS ფრაგმენტაცია';
 
   @override
@@ -332,13 +325,7 @@ class SKa extends S {
   String get byDefault => 'ნაგულისხმევი';
 
   @override
-  String get rangeHint => 'მაგალითად 100-200';
-
-  @override
   String get splitPos => 'პოზიციების გაყოფა';
-
-  @override
-  String get splitPosHint => 'მაგალითად, 1, midsld';
 
   @override
   String get disorder => 'ხელახლა შეკვეთა ცალი';
@@ -447,11 +434,6 @@ class SKa extends S {
   String get support => 'მხარდაჭერა';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine კონტროლდება ამ კომპიუტერის პორტის მეშვეობით. სხვა პროგრამებს შეეძლებათ თქვან, რომ VPN ჩართულია.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'აირჩიეთ $engine';
   }
@@ -527,9 +509,6 @@ class SKa extends S {
   String get launchAtLogin => 'დაიწყეთ სისტემით';
 
   @override
-  String get launchAtLoginDetail => 'შესვლისას Sora ავტომატურად გაეშვება და დარჩება სისტემურ უჯრაში.';
-
-  @override
   String get closeToTray => 'შეინახეთ უჯრაში დახურვისას';
 
   @override
@@ -564,9 +543,6 @@ class SKa extends S {
   String get noticeInTray => 'Sora ჯერ კიდევ უჯრაშია';
 
   @override
-  String get noticeInTrayBody => 'გამოდით მისი ხატის მენიუდან';
-
-  @override
   String get noticeLost => 'კავშირი დაიკარგა';
 
   @override
@@ -594,11 +570,7 @@ class SKa extends S {
   String get importTitle => 'დაამატეთ ეს გამოწერა?';
 
   @override
-  String get importSealed =>
-      'ეს ბმული დაშიფრულია Happ-სთვის და მხოლოდ Happ-ს შეუძლია მისი წაკითხვა. სთხოვეთ თქვენს პროვაიდერს უბრალო გამოწერის ბმული.';
-
-  @override
-  String get understood => 'OK';
+  String get importSealed => 'ეს ბმული დაშიფრულია Happ-სთვის და მხოლოდ Happ-ს შეუძლია მისი წაკითხვა';
 
   @override
   String get noAnswer => 'პასუხი არ არის';
@@ -637,39 +609,10 @@ class SKa extends S {
   String get openLogs => 'გახსენით ჟურნალები';
 
   @override
-  String get tourReplay => 'ხელახლა აჩვენე სახელმძღვანელო';
-
-  @override
-  String tourStep(int step) {
-    return 'ნაბიჯი $step 5-დან';
-  }
-
-  @override
   String get tourBack => 'უკან';
 
   @override
   String get tourNext => 'შემდეგი';
-
-  @override
-  String get tourSkip => 'გამოტოვება';
-
-  @override
-  String get tourFinish => 'შესრულებულია';
-
-  @override
-  String get tourAdd => 'დაამატეთ თქვენი პროვაიდერის გამოწერის ბმული.';
-
-  @override
-  String get tourServer => 'აირჩიეთ სერვერი. „უსწრაფესი“ ირჩევს ერთს თქვენთვის.';
-
-  @override
-  String get tourConnect => 'დააწკაპუნეთ აქ დასაკავშირებლად ან გასათიშად.';
-
-  @override
-  String get tourMode => 'აირჩიეთ რეჟიმი. Kill switch ბლოკავს ინტერნეტს, თუ VPN ჩამოვარდება.';
-
-  @override
-  String get tourSettings => 'გახსენით პარამეტრები. თქვენ შეგიძლიათ გაიმეოროთ ეს სახელმძღვანელო იქ.';
 
   @override
   String get chooseProgram => 'აირჩიეთ პროგრამა';
@@ -681,7 +624,7 @@ class SKa extends S {
   String get runningProcesses => 'მიმდინარე პროცესები';
 
   @override
-  String get programsEmpty => 'აპლიკაციები ვერ მოიძებნა. სცადეთ სხვა სახელი.';
+  String get programsEmpty => 'აპლიკაციები ვერ მოიძებნა';
 
   @override
   String get selectExe => 'აირჩიეთ .exe ფაილი';
@@ -693,7 +636,7 @@ class SKa extends S {
   String get speedtestSearch => 'მოძებნეთ სერვისი';
 
   @override
-  String get speedtestEmpty => 'არანაირი მატჩი. შეცვალეთ ძებნა.';
+  String get speedtestEmpty => 'არანაირი მატჩი';
 
   @override
   String get speedtestBackToList => 'დაუბრუნდით სერვისებს';
@@ -702,15 +645,13 @@ class SKa extends S {
   String get speedtestOpenBrowser => 'გახსენით ბრაუზერში';
 
   @override
-  String get speedtestUnavailable =>
-      'ჩაშენებული ბრაუზერის გაშვება ვერ მოხერხდა. გახსენით სერვისი თქვენი სისტემის ბრაუზერში.';
+  String get speedtestUnavailable => 'ჩაშენებული ბრაუზერის გაშვება ვერ მოხერხდა';
 
   @override
-  String get speedtestPageFailed =>
-      'გვერდი ვერ ჩაიტვირთა. გადატვირთეთ იგი ან გახსენით სერვისი თქვენი სისტემის ბრაუზერში.';
+  String get speedtestPageFailed => 'გვერდი ვერ ჩაიტვირთა';
 
   @override
-  String get speedtestExternalFailed => 'სისტემის ბრაუზერი ვერ გაიხსნა. სცადეთ ხელახლა.';
+  String get speedtestExternalFailed => 'სისტემის ბრაუზერი ვერ გაიხსნა';
 
   @override
   String get modes => 'რეჟიმები';
@@ -750,43 +691,28 @@ class SKa extends S {
   String get updateNoNotes => 'გამოცემას არ აქვს შენიშვნები.';
 
   @override
-  String get updateDropWarning =>
-      'VPN კავშირი შეწყდება რამდენიმე წამით, ხოლო Sora და მისი ძირითადი განახლება. გაგრძელება?';
+  String get updateDropWarning => 'გაითიშოს კავშირი განახლებისთვის?';
 
   @override
-  String get updateWaitConnection => 'დაელოდეთ სანამ VPN კავშირი და ბირთვი მზად იქნება.';
+  String get updateWaitConnection => 'კავშირი მზად არ არის';
 
   @override
-  String get updateDownloading => 'მიმდინარეობს ფაილების ჩამოტვირთვა და დადასტურება...';
-
-  @override
-  String get updateInstalling => 'განახლების მომზადება ან ადმინისტრატორის ავტორიზაციის მოლოდინში...';
-
-  @override
-  String get updateNetworkError => 'განახლების ჩამოტვირთვა ვერ მოხერხდა. სცადეთ ხელახლა.';
+  String get updateNetworkError => 'განახლების ჩამოტვირთვა ვერ მოხერხდა';
 
   @override
   String get updateReleaseError => 'გამოშვების მონაცემები ან საჭირო ფაილები აკლია ან არასწორია.';
 
   @override
-  String get updateChecksumError => 'ჩამოტვირთვა არ ემთხვევა SHA256SUMS. არაფერი არ იყო დაინსტალირებული.';
+  String get updateChecksumError => 'ჩამოტვირთვა არ ემთხვევა SHA256SUMS';
 
   @override
-  String get updateInstallError => 'განახლება არ დასრულებულა. ავთენტიფიკაცია შეიძლება გაუქმდა.';
+  String get updateInstallError => 'განახლება არ დასრულებულა';
 
   @override
-  String get updateUnsupported =>
-      'ეს შესრულებადი არ ეკუთვნის მხარდაჭერილ Sora პაკეტის წყვილს. გამოიყენეთ გამოშვების ინსტალაციის ინსტრუქციები.';
+  String get updateUnsupported => 'ეს შესრულებადი არ ეკუთვნის მხარდაჭერილ Sora პაკეტის წყვილს';
 
   @override
-  String get updateManual =>
-      'გაუშვით ეს ბრძანება ტერმინალში ორივე დამოწმებული პაკეტის დასაყენებლად, შემდეგ ხელახლა გახსენით Sora. ფაილები რჩება ჩამოტვირთვის დირექტორიაში. VPN კავშირი შეწყდება.';
-
-  @override
-  String get updateVersionRevoked => 'დეველოპერმა გააუქმა ეს ვერსია. გთხოვთ, დაელოდოთ შესწორებულ გამოცემას.';
-
-  @override
-  String get updateRolloutPending => 'უფრო ახალი ვერსია გამოდის თანდათანობით და შემოგთავაზებთ ავტომატურად.';
+  String get updateVersionRevoked => 'დეველოპერმა გააუქმა ეს ვერსია';
 
   @override
   String updateRollbacking(String version) {
@@ -799,8 +725,7 @@ class SKa extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'ავტომატური დაბრუნება ვერ მოხერხდა. თუ ახალი ვერსია არ მუშაობს, ხელახლა დააინსტალირეთ წინა ვერსია ხელით.';
+  String get updateRollbackError => 'ავტომატური დაბრუნება ვერ მოხერხდა';
 
   @override
   String get updateRollbackCacheError =>
@@ -810,10 +735,7 @@ class SKa extends S {
   String get updateCopyCommand => 'დააკოპირეთ ბრძანება';
 
   @override
-  String get updateChecksDisabled => 'ავტომატური შემოწმება გამორთულია პარამეტრებში.';
-
-  @override
-  String get updateInstalled => 'დაინსტალირებულია განახლება. ხელახლა გახსენით Sora.';
+  String get updateInstalled => 'დაინსტალირებულია განახლება';
 
   @override
   String get projectLinks => 'პროექტი';
@@ -843,14 +765,13 @@ class SKa extends S {
   String get showDescription => 'აღწერილობის ჩვენება';
 
   @override
-  String get errEngineUnsupported =>
-      'არჩეული ძრავა არ უჭერს მხარს ამ პროფილს ან პარამეტრებს. აირჩიეთ ავტო ან თავსებადი ძრავა.';
+  String get errEngineUnsupported => 'არჩეული ძრავა არ უჭერს მხარს ამ პროფილს ან პარამეტრებს';
 
   @override
-  String get errRestore => 'კავშირის გასუფთავება არასრული იყო. ხელახლა სცადეთ გათიშვა; იხილეთ ჟურნალი დეტალებისთვის.';
+  String get errRestore => 'კავშირის გასუფთავება არასრული იყო';
 
   @override
-  String get errSessionEnded => 'ეს სესია უკვე დასრულდა. განაახლეთ კავშირის მდგომარეობა.';
+  String get errSessionEnded => 'ეს სესია უკვე დასრულდა';
 
   @override
   String get retryDisconnect => 'ხელახლა სცადეთ გათიშვა';
@@ -893,13 +814,10 @@ class SKa extends S {
   String get extInstallOne => '1 ინსტალაცია';
 
   @override
-  String get extSideloadWarning => 'დააყენეთ მხოლოდ მაშინ, თუ ენდობით ავტორის თვითხელმოწერილ გასაღებს.';
+  String get extSideloadWarning => 'თვითხელმოწერილი გასაღები';
 
   @override
   String get extPermissionsWidened => 'განახლება ითხოვს ახალ ნებართვებს:';
-
-  @override
-  String get extDangerousAck => 'მესმის, რომ ეს ნებართვები სერიოზულია';
 
   @override
   String get extInstall => 'დააინსტალირეთ';
@@ -912,9 +830,6 @@ class SKa extends S {
 
   @override
   String get extConfirm => 'დაადასტურეთ';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'კატალოგი';
@@ -965,17 +880,13 @@ class SKa extends S {
   String get extEmptySearch => 'ვერაფერი მოიძებნა';
 
   @override
-  String get extEmptyInstalled =>
-      'გაფართოებები ჯერ არ არის დაინსტალირებული.\nიპოვეთ ერთი კატალოგში ან დააინსტალირეთ ფაილიდან.';
+  String get extEmptyInstalled => 'გაფართოებები ჯერ არ არის დაინსტალირებული';
 
   @override
   String get extInstallFromFile => 'ინსტალაცია ფაილიდან';
 
   @override
   String get extInstallFromUrl => 'ინსტალაცია URL-დან';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'ჩამოტვირთვა';
@@ -990,19 +901,16 @@ class SKa extends S {
   String get extInstalling => 'ინსტალაცია…';
 
   @override
-  String get extInstallFailed => 'ინსტალაცია ვერ მოხერხდა';
-
-  @override
-  String get extErrSignature => 'ხელმოწერის შემოწმება ვერ მოხერხდა. ფაილი შეიძლება იყოს დაზიანებული ან დაზიანებული.';
+  String get extErrSignature => 'ხელმოწერის შემოწმება ვერ მოხერხდა';
 
   @override
   String get extErrManifest => 'გაფართოების manifest არასწორია.';
 
   @override
-  String get extErrNetwork => 'ქსელის შეცდომა. შეამოწმეთ თქვენი კავშირი და სცადეთ ხელახლა.';
+  String get extErrNetwork => 'ქსელის შეცდომა';
 
   @override
-  String get extErrHash => 'ჩამოტვირთვა არ ემთხვევა კატალოგს. შესაძლოა, ის გატეხილი იყო.';
+  String get extErrHash => 'ჩამოტვირთვა არ ემთხვევა კატალოგს';
 
   @override
   String extErrMinApp(String version) {
@@ -1013,11 +921,11 @@ class SKa extends S {
   String get extErrHttpsOnly => 'დასაშვებია მხოლოდ https:// ბმული';
 
   @override
-  String get extErrGeneric => 'რაღაც შეფერხდა. გთხოვთ, სცადოთ ხელახლა.';
+  String get extErrGeneric => 'რაღაც შეფერხდა';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'ეს განახლება ხელმოწერილია სხვა ავტორის გასაღებით, ვიდრე დაინსტალირებული ვერსია, ამიტომ დაბლოკილია. თუ ენდობით ახალ გასაღებს, წაშალეთ გაფართოება და ხელახლა დააინსტალირეთ იგი აშკარად.';
+      'ეს განახლება ხელმოწერილია სხვა ავტორის გასაღებით, ვიდრე დაინსტალირებული ვერსია, ამიტომ დაბლოკილია';
 
   @override
   String get extDisabled => 'გამორთულია';
@@ -1074,7 +982,7 @@ class SKa extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count კონფლიქტებს თქვენი გადაწყვეტილება სჭირდება';
+    return 'გაფართოების კონფლიქტები: $count';
   }
 
   @override
@@ -1151,10 +1059,10 @@ class SKa extends S {
   String get extPermThemeApply => 'თემების გამოყენება';
 
   @override
-  String get extPermRoutingRules => 'მარშრუტიზაციის წესების დამატება (იმოქმედებს სად მიდის ქსელის ტრაფიკი)';
+  String get extPermRoutingRules => 'მარშრუტიზაციის წესების დამატება';
 
   @override
-  String get extPermNetHooks => 'ინტეგრირება ქსელის გზაზე (DPI შემოვლითი მოდულები)';
+  String get extPermNetHooks => 'ინტეგრირება ქსელის გზაზე';
 
   @override
   String get extPermNetFetch => 'მოითხოვეთ URL დაშვებული სიიდან';
@@ -1163,7 +1071,7 @@ class SKa extends S {
   String get extPermBackground => 'გაუშვით ფონური ამოცანები';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'გამორთულია';
 
   @override
   String get extCapBackground => 'გადის ფონზე';
@@ -1201,9 +1109,6 @@ class SKa extends S {
   String get extSortRelevance => 'აქტუალობა';
 
   @override
-  String get extPermNetworkDetail => 'VPN მოთხოვნები მხოლოდ ქვემოთ ჩამოთვლილ ჰოსტებზეა დაშვებული.';
-
-  @override
   String get extBgTitle => 'ფონური ამოცანა';
 
   @override
@@ -1225,9 +1130,6 @@ class SKa extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'ჩართეთ გაფართოება მისი ფონის ამოცანის მართვისთვის.';
-
-  @override
   String get extCapNetwork => 'ქსელის წვდომა';
 
   @override
@@ -1244,7 +1146,7 @@ class SKa extends S {
   String get diagnosticHttp => 'HTTP დიაგნოსტიკა';
 
   @override
-  String get diagnosticNoData => 'ჯერ არ არის ჩაწერილი მოთხოვნა. ჯერ გახსენით სიჩქარის ტესტის ვებსაიტი.';
+  String get diagnosticNoData => 'ჯერ არ არის ჩაწერილი მოთხოვნა';
 
   @override
   String get qrShareTitle => 'გააზიარეთ QR კოდი';
@@ -1254,12 +1156,6 @@ class SKa extends S {
 
   @override
   String get qrCopyLink => 'დააკოპირეთ ბმული';
-
-  @override
-  String get qrWarning => 'კოდი მხოლოდ სანდო ადამიანებს გაუზიარეთ.';
-
-  @override
-  String get qrScanHint => 'აირჩიეთ ეკრანის სურათი ან ფოტო QR კოდით, ან ჩასვით ბმული';
 
   @override
   String get qrFromClipboard => 'ჩასმა ბუფერიდან';
@@ -1340,31 +1236,10 @@ class SKa extends S {
   String get dnsLeakCheckKillSwitchDns => 'DNS-ის დაცვა ქსელის ბლოკირებით';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'დააკონფიგურირეთ DNS გვირაბისთვის ზემოთ DNS პარამეტრებში.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'შეამოწმეთ, რომელ გადამწყვეტებს გამოიყენებდა თქვენი სისტემა გვირაბის გარეთ.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'ჩართეთ ქსელის ბლოკირება, რათა DNS ტრაფიკი გვირაბში დარჩეს.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'სისტემის დაშიფრული DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'ყალბი DNS პასუხი';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'შეამოწმეთ, რომელ დაშიფრულ DNS ბოლო წერტილებს იყენებს თქვენი სისტემა გვირაბის გარეთ.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'გვირაბისთვის გამოიყენეთ დაშიფრული DNS (DoT ან DoH), რათა რეზოლვერებმა პასუხები ვერ გააყალბონ.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'ჯერ დაუკავშირდით VPN-ს, შემდეგ შეამოწმეთ გაჟონვა.';
 
   @override
   String get dnsExpected => 'მოსალოდნელია';
@@ -1391,7 +1266,7 @@ class SKa extends S {
   String get autoSelectSmart => 'ჭკვიანი არჩევანი';
 
   @override
-  String get coreWatchUnstable => 'ბირთვთან კავშირი არასტაბილურია. ცოტა ხანს მოიცადეთ და ხელახლა დაკავშირება სცადეთ.';
+  String get coreWatchUnstable => 'ბირთვთან კავშირი არასტაბილურია';
 
   @override
   String get watchReconnect => 'ხელახლა დაკავშირება';
@@ -1430,7 +1305,7 @@ class SKa extends S {
   String get overrideCustomRules => 'საკუთარი წესები';
 
   @override
-  String get errBenchmarkUnsupported => 'სიჩქარის გასაზომად ბირთვის უფრო ახალი ვერსიაა საჭირო. განაახლეთ Sora.';
+  String get errBenchmarkUnsupported => 'სიჩქარის გასაზომად ბირთვის უფრო ახალი ვერსიაა საჭირო';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1441,8 +1316,7 @@ class SKa extends S {
   String get profiles => 'ქსელის პროფილები';
 
   @override
-  String get profilesEmpty =>
-      'ჯერ არ არის პროფილები. შექმენით ერთი, რომ ავტომატურად გამოიყენოს პარამეტრები ცნობილ ქსელებში.';
+  String get profilesEmpty => 'ჯერ არ არის პროფილები';
 
   @override
   String get profileAdd => 'პროფილის დამატება';
@@ -1454,9 +1328,6 @@ class SKa extends S {
   String get profileSsids => 'Wi-Fi ქსელები (SSID)';
 
   @override
-  String get profileSsidsHint => 'სახლი, ოფისი გამოყოფილია მძიმეებით';
-
-  @override
   String get profileGateways => 'ქსელის კარიბჭეები';
 
   @override
@@ -1464,9 +1335,6 @@ class SKa extends S {
 
   @override
   String get profileAutoApply => 'ავტომატურად გამოყენება';
-
-  @override
-  String get profileAutoApplyHint => 'თუ გამორთულია, პროფილის გამოყენებამდე დადასტურებას მოგთხოვთ.';
 
   @override
   String get profileSnapshot => 'დაიმახსოვრე მიმდინარე პარამეტრები';
@@ -1510,13 +1378,13 @@ class SKa extends S {
   String get networkUnknown => 'ქსელის ინფორმაცია მიუწვდომელია';
 
   @override
-  String get profileNoTriggers => 'დაამატეთ მინიმუმ ერთი ტრიგერი: SSID, კარიბჭე ან ASN';
+  String get profileNoTriggers => 'პროფილის პირობები არ არის';
 
   @override
   String get chains => 'პროქსი ჯაჭვები';
 
   @override
-  String get chainsEmpty => 'ჯაჭვები ჯერ არ არის. დააკავშირეთ 2–3 სერვერი, რათა ტრეფიკი გადაიტანოს თითოეულ მათგანში.';
+  String get chainsEmpty => 'ჯაჭვები ჯერ არ არის';
 
   @override
   String get chainAdd => 'ახალი ჯაჭვი';
@@ -1525,16 +1393,10 @@ class SKa extends S {
   String get chainName => 'ჯაჭვის სახელწოდება';
 
   @override
-  String get chainPickServers => 'აირჩიეთ 2–3 სერვერი';
+  String get chainTooFew => 'ჯაჭვს სულ მცირე ორი სერვერი სჭირდება';
 
   @override
-  String get chainOrderHint => 'გადაათრიეთ ხელახლა შეკვეთისთვის: ტრაფიკი შედის ზევით და გამოდის ქვემოდან.';
-
-  @override
-  String get chainTooFew => 'ჯაჭვს სულ მცირე ორი სერვერი სჭირდება. დაამატეთ კიდევ ერთი სერვერი.';
-
-  @override
-  String get chainTooMany => 'ჯაჭვში მაქსიმუმ სამი სერვერი შეიძლება იყოს. ამოიღეთ ზედმეტი სერვერები.';
+  String get chainTooMany => 'ჯაჭვში მაქსიმუმ სამი სერვერი შეიძლება იყოს';
 
   @override
   String get chainEstimate => 'სავარაუდო შეყოვნება';
@@ -1551,10 +1413,10 @@ class SKa extends S {
   }
 
   @override
-  String get chainUnsupported => 'არჩეული ძრავა ჯაჭვებს არ უჭერს მხარს. აირჩიეთ თავსებადი ძრავა.';
+  String get chainUnsupported => 'არჩეული ძრავა ჯაჭვებს არ უჭერს მხარს';
 
   @override
-  String get chainHopMissing => 'ჯაჭვის ერთ-ერთი სერვერი აღარ არის ხელმისაწვდომი. ამ რგოლისთვის სხვა სერვერი აირჩიეთ.';
+  String get chainHopMissing => 'ჯაჭვის ერთ-ერთი სერვერი აღარ არის ხელმისაწვდომი';
 
   @override
   String chainHop(Object n) {
@@ -1574,7 +1436,7 @@ class SKa extends S {
   String get syncDevices => 'ჩემი მოწყობილობები';
 
   @override
-  String get syncEmpty => 'არ არის დაწყვილებული მოწყობილობები. სხვა მოწყობილობის დაწყვილება ლოკალურ ქსელში.';
+  String get syncEmpty => 'არ არის დაწყვილებული მოწყობილობები';
 
   @override
   String get syncPair => 'მოწყობილობის დაწყვილება';
@@ -1602,9 +1464,6 @@ class SKa extends S {
   String get syncNever => 'არასოდეს';
 
   @override
-  String get syncNoLan => 'მოწყობილობები უნდა იყოს იმავე ლოკალურ ქსელში';
-
-  @override
   String get syncPaired => 'მოწყობილობა დაწყვილებულია';
 
   @override
@@ -1614,13 +1473,10 @@ class SKa extends S {
   String get syncWaiting => 'ელოდება სხვა მოწყობილობას…';
 
   @override
-  String get syncSecureNote => 'ბოლოდან ბოლომდე დაშიფრული არხი. არც ანგარიშები, არც ღრუბლოვანი სერვერები.';
-
-  @override
   String get zapretWithVpn => 'გვერდის ავლით DPI ფილტრაცია პირდაპირი ქსელის ტრაფიკისთვის';
 
   @override
-  String get chainDuplicate => 'ჯაჭვში ერთი სერვერი მეორდება. თითოეული რგოლისთვის განსხვავებული სერვერი აირჩიეთ.';
+  String get chainDuplicate => 'ჯაჭვში ერთი სერვერი მეორდება';
 
   @override
   String get edit => 'რედაქტირება';
@@ -1630,10 +1486,6 @@ class SKa extends S {
 
   @override
   String get autoSwitchOnDegrade => 'ავტომატური ჩართვა დეგრადაციაზე';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'თუ არჩეული სერვერი მნიშვნელოვნად შენელდება ან პასუხს შეწყვეტს, Sora გაზომვის შედეგებით საუკეთესო სერვერზე გადაერთვება, მაგრამ არა უმეტეს ერთხელ ყოველ 10 წუთში.';
 
   @override
   String get tunStackMixed => 'შერეული';
@@ -1651,19 +1503,13 @@ class SKa extends S {
   String get customServerName => 'სახელი';
 
   @override
-  String get customServerNameHint => 'მაგალითად: ჩემი VPS';
-
-  @override
-  String get customServerNameRequired => 'შეიყვანეთ სახელი';
+  String get customServerNameRequired => 'სახელი მითითებული არ არის';
 
   @override
   String get customServerAddress => 'მისამართი';
 
   @override
-  String get customServerAddressHint => 'example.com ან 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'შეიყვანეთ სერვერის მისამართი';
+  String get customServerAddressRequired => 'მისამართი მითითებული არ არის';
 
   @override
   String get customServerAddressInvalid => 'არასწორი მისამართი';
@@ -1672,19 +1518,13 @@ class SKa extends S {
   String get customServerPort => 'პორტი';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'პორტი უნდა იყოს რიცხვი 1-დან 65535-მდე';
+  String get customServerPortInvalid => 'არასწორი პორტი';
 
   @override
   String get customServerProtocol => 'ოქმი';
 
   @override
   String get customServerCredentials => 'შესვლის ინფორმაცია';
-
-  @override
-  String get customServerOptional => 'სურვილისამებრ';
 
   @override
   String get customServerShowSecret => 'საიდუმლოს ჩვენება';
@@ -1698,9 +1538,6 @@ class SKa extends S {
   }
 
   @override
-  String get customServerTest => 'ტესტი';
-
-  @override
   String get leakTestTitle => 'ტესტი მონაცემთა გაჟონვისთვის';
 
   @override
@@ -1708,9 +1545,6 @@ class SKa extends S {
 
   @override
   String get leakTestCancel => 'გაუქმება';
-
-  @override
-  String get leakTestNeedsConnection => 'დაუკავშირდით VPN-ს მონაცემთა გაჟონვის შესამოწმებლად.';
 
   @override
   String leakTestProgress(int count) {
@@ -1736,9 +1570,6 @@ class SKa extends S {
 
   @override
   String get leakTestFix => 'დაფიქსირება';
-
-  @override
-  String get leakTestFixedNote => 'ქსელის ბლოკირება ჩართულია. შესამოწმებლად ტესტი ხელახლა გაუშვით.';
 
   @override
   String get leakTestCheckDirectDns => 'პირდაპირი DNS';
@@ -1771,14 +1602,13 @@ class SKa extends S {
   String get syncDaemonFailed => 'სინქრონიზაციის სერვისის დაწყება ვერ მოხერხდა';
 
   @override
-  String get syncDaemonMissing =>
-      'sora-sync კომპონენტი ვერ მოიძებნა. ხელახლა დააინსტალირეთ აპი მოწყობილობის სინქრონიზაციის გასააქტიურებლად.';
+  String get syncDaemonMissing => 'sora-sync კომპონენტი ვერ მოიძებნა';
 
   @override
   String get syncDaemonStarting => 'სინქრონიზაციის სერვისის დაწყება…';
 
   @override
-  String get syncErrAuth => 'სინქრონიზაციის სერვისმა უარყო წვდომის ჟეტონი. გადატვირთეთ აპი და სცადეთ ხელახლა.';
+  String get syncErrAuth => 'სინქრონიზაციის სერვისმა უარყო წვდომის ჟეტონი';
 
   @override
   String get syncErrNotFound => 'მოწყობილობა აღარ არის დაწყვილებული';
@@ -1787,8 +1617,7 @@ class SKa extends S {
   String get syncErrPairingActive => 'დაწყვილების სესია უკვე ღიაა';
 
   @override
-  String get syncErrUnreachable =>
-      'მეორე მოწყობილობამ არ უპასუხა. დარწმუნდით, რომ ის იმავე ქსელშია და აჩვენებს მის კოდს.';
+  String get syncErrUnreachable => 'მეორე მოწყობილობამ არ უპასუხა';
 
   @override
   String get syncError => 'სინქრონიზაციის შეცდომა';
@@ -1800,10 +1629,6 @@ class SKa extends S {
 
   @override
   String get syncJoining => 'მოწყობილობასთან დაწყვილება…';
-
-  @override
-  String get syncLegacyCleared =>
-      'ძველი მოწყობილობების სია ფაქტობრივად არასოდეს ყოფილა დაწყვილებული, ამიტომ ის გასუფთავდა. ხელახლა დააწყვილეთ თქვენი მოწყობილობები, ამჯერად რეალურად.';
 
   @override
   String get syncNewCode => 'ახალი კოდი';
@@ -1863,8 +1688,7 @@ class SKa extends S {
   String get syncThisDevice => 'ეს მოწყობილობა';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'სინქრონიზაცია Android-ზე მიუწვდომელია';
 
   @override
   String get diagnosticPackets => 'პაკეტის დაჭერა';
@@ -1911,27 +1735,25 @@ class SKa extends S {
   String get customServerWgKeepalive => 'Keepalive, წამი';
 
   @override
-  String get customServerWgKeyInvalid => 'გასაღები უნდა იყოს 32 ბაიტი base64-ში, როგორც wg genkey ბეჭდავს.';
+  String get customServerWgKeyInvalid => 'არასწორი WireGuard გასაღები';
 
   @override
-  String get customServerWgCidrInvalid => 'შეიყვანეთ მძიმით გამოყოფილი პრეფიქსები, მაგალითად 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'არასწორი CIDR პრეფიქსი';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'შეიყვანეთ წამების რაოდენობა 0-დან 65535-მდე.';
+  String get customServerWgKeepaliveInvalid => 'არასწორი keepalive ინტერვალი';
 
   @override
   String get strictKillSwitch => 'ქსელის მკაცრი ბლოკირება';
 
   @override
-  String get strictKillSwitchWarning =>
-      'დაკავშირების შემდეგ VPN-ის გარეთ ტრაფიკი აპიდან გასვლის შემდეგაც დაბლოკილი რჩება კავშირის გაწყვეტამდე.';
+  String get strictKillSwitchWarning => 'გასვლის შემდეგ დაიბლოკოს ტრაფიკი VPN-ის გარეთ?';
 
   @override
-  String get extWorkerFailed => 'გაფართოების ფონური დავალება ვერ შესრულდა. შეამოწმეთ გაფართოების ჟურნალი.';
+  String get extWorkerFailed => 'გაფართოების ფონური დავალება ვერ შესრულდა';
 
   @override
-  String get extAssetRejected =>
-      'გაფართოების ფაილი შეიცავს ძნელად წასაკითხ ფერებს ან არასწორ წესებს. სთხოვეთ გაფართოების ავტორს ფაილის გასწორება.';
+  String get extAssetRejected => 'გაფართოების ფაილი შეიცავს ძნელად წასაკითხ ფერებს ან არასწორ წესებს';
 
   @override
   String get extVerifiedSora => 'დამოწმებულია Sora-ს მიერ';
@@ -1957,31 +1779,25 @@ class SKa extends S {
   String get customServerPassword => 'პაროლი';
 
   @override
-  String get customServerSecretRequired => 'შეიყვანეთ მნიშვნელობა';
+  String get customServerSecretRequired => 'მნიშვნელობა მითითებული არ არის';
 
   @override
   String get customServerLinkInvalid => 'სერვერის ბმული არასწორია';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Sora-ს შიდა შეცდომა';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'სერვერის სერტიფიკატი უარყოფილია';
 
   @override
-  String get errInternal => 'Sora-ს შიდა შეცდომა. შეინახეთ ჟურნალი და შეატყობინეთ პრობლემის შესახებ.';
+  String get errFileAccess => 'ფაილი მიუწვდომელია';
 
   @override
-  String get errTls => 'სერვერის სერტიფიკატი უარყოფილია. შეამოწმეთ საათი ან დაუკავშირდით პროვაიდერს.';
+  String get errDataLimit => 'მონაცემები ძალიან ბევრია';
 
   @override
-  String get errFileAccess => 'ფაილი მიუწვდომელია. შეამოწმეთ ნებართვები და თავისუფალი ადგილი.';
-
-  @override
-  String get errDataLimit => 'მონაცემები ძალიან ბევრია. აირჩიეთ ნაკლები ელემენტი და სცადეთ ხელახლა.';
-
-  @override
-  String get errCredentials => 'შენახული წვდომის მონაცემები აკლია. სერვერი ხელახლა შემოიტანეთ.';
+  String get errCredentials => 'შენახული წვდომის მონაცემები აკლია';
 
   @override
   String subscriptionStale(String time) {
@@ -1989,56 +1805,54 @@ class SKa extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'ჯერ არ განახლებულა. სცადეთ ხელახლა.';
+  String get subscriptionNeverUpdated => 'ჯერ არ განახლებულა';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'სერვერმა დააბრუნა HTTP $status კოდი. შეამოწმეთ ბმული ან დაუკავშირდით მომწოდებელს.',
-      zero: 'სერვერმა მოთხოვნა უარყო. შეამოწმეთ ბმული ან დაუკავშირდით მომწოდებელს.',
+      other: 'სერვერმა დააბრუნა HTTP $status კოდი',
+      zero: 'სერვერმა მოთხოვნა უარყო',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'სერვერის პარამეტრები არასრულია ან არ არის მხარდაჭერილი. განაახლეთ გამოწერა.';
+  String get errInvalidServer => 'სერვერის პარამეტრები არასრულია ან არ არის მხარდაჭერილი';
 
   @override
-  String get errServerIds => 'ორ სერვერს ერთნაირი იდენტიფიკატორი აქვს. ხელახლა შემოიტანეთ ისინი.';
+  String get errServerIds => 'ორ სერვერს ერთნაირი იდენტიფიკატორი აქვს';
 
   @override
-  String get errRoutingGroup => 'მარშრუტი მიუთითებს დაკარგულ სერვერებზე ან დაზიანებულ ჯგუფზე. განაახლეთ გამოწერა.';
+  String get errRoutingGroup => 'მარშრუტი მიუთითებს დაკარგულ სერვერებზე ან დაზიანებულ ჯგუფზე';
 
   @override
-  String get errConnections => 'კავშირების სია მიუწვდომელია. დაუკავშირდით ან აირჩიეთ სხვა ძრავა.';
+  String get errConnections => 'კავშირების სია მიუწვდომელია';
 
   @override
-  String get errLogs => 'ეს სერვისი ჟურნალს არ ინახავს. განაახლეთ Sora.';
+  String get errLogs => 'ეს სერვისი ჟურნალს არ ინახავს';
 
   @override
-  String get errDiagnostics => 'დიაგნოსტიკის შეგროვება ვერ მოხერხდა. სცადეთ ხელახლა ან შეინახეთ ჟურნალი.';
+  String get errDiagnostics => 'დიაგნოსტიკის შეგროვება ვერ მოხერხდა';
 
   @override
-  String get errMissingItem => 'მოთხოვნილი ელემენტი აღარ არსებობს. განაახლეთ სია.';
+  String get errMissingItem => 'მოთხოვნილი ელემენტი აღარ არსებობს';
 
   @override
-  String get errInvalidRequest =>
-      'მოთხოვნა არასწორ მნიშვნელობებს შეიცავს. შეამოწმეთ შეყვანილი მონაცემები და გაიმეორეთ.';
+  String get errInvalidRequest => 'მოთხოვნა არასწორ მნიშვნელობებს შეიცავს';
 
   @override
-  String get errProxyLogin =>
-      'სისტემის პროქსი ამ შესვლას არ უჭერს მხარს. წაშალეთ ადგილობრივი პროქსის მომხმარებლის სახელი და პაროლი.';
+  String get errProxyLogin => 'სისტემის პროქსი ამ შესვლას არ უჭერს მხარს';
 
   @override
-  String get errLogFilter => 'ჟურნალის ფილტრი არასწორია. გაასუფთავეთ ძიება და გაიმეორეთ.';
+  String get errLogFilter => 'ჟურნალის ფილტრი არასწორია';
 
   @override
-  String get errSubRedirect => 'სერვერმა სახიფათო მისამართზე გადაგამისამართათ. პროვაიდერს ახალი ბმული სთხოვეთ.';
+  String get errSubRedirect => 'სერვერმა სახიფათო მისამართზე გადაგამისამართათ';
 
   @override
-  String get errProxySetup => 'სისტემის პროქსი ვერ დაყენდა. ხელახლა დაუკავშირდით ან გახსენით ჟურნალი.';
+  String get errProxySetup => 'სისტემის პროქსი ვერ დაყენდა';
 
   @override
   String get notificationsToday => 'დღეს';
@@ -2064,20 +1878,19 @@ class SKa extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'გამოწერის განახლების ინტერვალი არასწორია. აირჩიეთ მომწოდებლის მიერ რეკომენდებული ინტერვალი.';
+  String get errSubInterval => 'გამოწერის განახლების ინტერვალი არასწორია';
 
   @override
-  String get errRule => 'მარშრუტიზაციის წესი არასწორია. შეამოწმეთ წესში მითითებული დომენი, IP მისამართი ან აპი.';
+  String get errRule => 'მარშრუტიზაციის წესი არასწორია';
 
   @override
-  String get errDns => 'DNS-ის პარამეტრები არასწორია. შეამოწმეთ DNS სერვერის მისამართი.';
+  String get errDns => 'DNS-ის პარამეტრები არასწორია';
 
   @override
-  String get errEndpoint => 'შესამოწმებელი სერვერის მისამართი არასწორია. შეამოწმეთ ჰოსტის სახელი და პორტი.';
+  String get errEndpoint => 'შესამოწმებელი სერვერის მისამართი არასწორია';
 
   @override
-  String get errCancelled => 'მოთხოვნა გაუქმდა. საჭიროების შემთხვევაში გაიმეორეთ მოქმედება.';
+  String get errCancelled => 'მოთხოვნა გაუქმდა';
 
   @override
   String get customServerOptions => 'კავშირის პარამეტრები';
@@ -2098,19 +1911,13 @@ class SKa extends S {
   String get customServerWgPeer => 'პირი';
 
   @override
-  String get customServerOptionsInfo =>
-      'გამოიყენეთ პროვაიდერის გადაცემისა და TLS პარამეტრები ან ჩასვით სერვერის ბმული.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'ხელმისაწვდომია: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret ცვლის TCP ტრაფიკს 80 და 443 პორტებზე Windows-ის ყველა აპისთვის. ეს VPN არ არის. WinDivert-ის დრაივერი შეიძლება Windows-ის გადატვირთვამდე ჩატვირთული დარჩეს.';
+  String get winwsScopeWarning => 'შეიცვალოს ყველა აპის TCP ტრაფიკი?';
 
   @override
-  String get winwsRequirements =>
-      'საჭიროა Windows x64 ემულაციის გარეშე, WLANAPI და შემოწმებული WinDivert პაკეტი. თუ Windows დრაივერს ბლოკავს, ეს რეჟიმი მიუწვდომელია.';
+  String get winwsRequirements => 'VPN-ის ეს რეჟიმი მიუწვდომელია';
 }

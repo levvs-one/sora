@@ -274,7 +274,7 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
               value: _draft.ssids.isEmpty ? null : _draft.ssids.join(', '),
               onTap: () => _editList(
                 title: s.profileSsids,
-                hint: s.profileSsidsHint,
+                hint: s.profileSsids,
                 initial: _draft.ssids,
                 apply: (v) => _draft.ssids = v,
               ),
@@ -301,7 +301,6 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
             ),
             SwitchTile(
               title: s.profileAutoApply,
-              info: s.profileAutoApplyHint,
               value: _draft.autoApply,
               onChanged: (v) => setState(() => _draft.autoApply = v),
             ),

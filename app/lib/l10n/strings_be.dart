@@ -205,64 +205,58 @@ class SBe extends S {
   String get errGeneric => 'Нешта пайшло не так';
 
   @override
-  String get errCore => 'Служба Sora не адказвае. Крыху пачакайце і паспрабуйце зноў.';
+  String get errCore => 'Служба Sora не адказвае';
 
   @override
-  String get errAuth => 'Няма доступу да службы Sora. Перазапусціце праграму і паспрабуйце зноў.';
+  String get errAuth => 'Няма доступу да службы Sora';
 
   @override
-  String get errVersion => 'Праграма і служба Sora маюць розныя версіі. Абнавіце Sora.';
+  String get errVersion => 'Праграма і служба Sora маюць розныя версіі';
 
   @override
-  String get errBusy => 'Папярэдняя каманда яшчэ выконваецца. Дачакайцеся яе завяршэння.';
+  String get errBusy => 'Папярэдняя каманда яшчэ выконваецца';
 
   @override
-  String get errEngineMissing => 'Не знойдзена ядро для гэтага сервера. Праверце наяўнасць абнаўленняў Sora.';
+  String get errEngineMissing => 'Не знойдзена ядро для гэтага сервера';
 
   @override
-  String get errEngineStart => 'Ядро не запусцілася. Паглядзіце прычыну ў журнале злучэння.';
+  String get errEngineStart => 'Ядро не запусцілася';
 
   @override
-  String get errEngineStopped => 'Ядро спынілася. Паспрабуйце злучыцца зноў.';
+  String get errEngineStopped => 'Ядро спынілася';
 
   @override
-  String get errTunnel => 'Гэты рэжым VPN недаступны. Выберыце іншы рэжым або праверце правы службы.';
+  String get errTunnel => 'Гэты рэжым VPN недаступны';
 
   @override
-  String get errNetwork => 'Немагчыма падключыцца да сервера';
+  String get errTimeout => 'Сервер не адказаў своечасова';
 
   @override
-  String get errTimeout => 'Сервер не адказаў своечасова. Паспрабуйце яшчэ раз праз хвіліну.';
+  String get errFirewall => 'Не ўдалося заблакаваць доступ да інтэрнэту па-за VPN';
 
   @override
-  String get errFirewall =>
-      'Не ўдалося заблакаваць доступ да інтэрнэту па-за VPN. Паглядзіце прычыну ў журнале злучэння.';
+  String get errSubFetch => 'Не ўдалося спампаваць падпіску';
 
   @override
-  String get errSubFetch => 'Не ўдалося спампаваць падпіску. Праверце інтэрнэт і паспрабуйце яшчэ раз праз хвіліну.';
+  String get errSubFormat => 'Фармат падпіскі не распазнаны';
 
   @override
-  String get errSubFormat => 'Фармат падпіскі не распазнаны. Папрасіце сумяшчальную спасылку ў пастаўшчыка падпіскі.';
+  String get errSubEmpty => 'У падпісцы няма сервераў';
 
   @override
-  String get errSubEmpty => 'У падпісцы няма сервераў. Звярніцеся да пастаўшчыка падпіскі.';
+  String get errSubDuplicate => 'Гэтая падпіска ўжо дададзеная';
 
   @override
-  String get errSubDuplicate => 'Гэтая падпіска ўжо дададзеная. Абнавіце яе, каб атрымаць актуальныя серверы.';
+  String get errSubLimit => 'Дасягнута мяжа колькасці падпісак';
 
   @override
-  String get errSubLimit => 'Дасягнута мяжа колькасці падпісак. Выдаліце непатрэбную падпіску перад даданнем новай.';
+  String get errSubScheme => 'Схема спасылкі на падпіску не падтрымліваецца';
 
   @override
-  String get errSubScheme =>
-      'Спасылка на падпіску мусіць пачынацца з https://. Папрасіце бяспечную спасылку ў пастаўшчыка.';
+  String get errSecretStore => 'Сховішча Sora пашкоджанае або недаступнае';
 
   @override
-  String get errSecretStore =>
-      'Сховішча Sora пашкоджанае або недаступнае. Праверце правы доступу і падрабязнасці ў журнале.';
-
-  @override
-  String get errNoServers => 'Няма сервераў для злучэння. Дадайце падпіску або ўласны сервер.';
+  String get errNoServers => 'Няма сервераў для злучэння';
 
   @override
   String get connections => 'Сувязі';
@@ -316,9 +310,6 @@ class SBe extends S {
   String get dnsAuto => 'Аўто';
 
   @override
-  String get dnsHint => 'Адрасы праз коску';
-
-  @override
   String get fragment => 'Фрагментацыя TLS';
 
   @override
@@ -334,13 +325,7 @@ class SBe extends S {
   String get byDefault => 'Па змаўчанні';
 
   @override
-  String get rangeHint => 'Напрыклад, 100-200';
-
-  @override
   String get splitPos => 'Раздзяленне пазіцый';
-
-  @override
-  String get splitPosHint => 'Напрыклад, 1, midsld';
 
   @override
   String get disorder => 'Змяніць парадак частак';
@@ -449,11 +434,6 @@ class SBe extends S {
   String get support => 'Падтрымка';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine кіруецца праз порт на гэтым кампутары. Іншыя праграмы змогуць вызначыць, што VPN уключаны.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'Выберыце $engine';
   }
@@ -529,9 +509,6 @@ class SBe extends S {
   String get launchAtLogin => 'Пачніце з сістэмы';
 
   @override
-  String get launchAtLoginDetail => 'Sora аўтаматычна запускаецца пры ўваходзе ў сістэму і застаецца ў трэі.';
-
-  @override
   String get closeToTray => 'Захоўваць у латку ў закрытым выглядзе';
 
   @override
@@ -566,9 +543,6 @@ class SBe extends S {
   String get noticeInTray => 'Sora усё яшчэ ў трэі';
 
   @override
-  String get noticeInTrayBody => 'Выйдзіце з меню яго значка';
-
-  @override
   String get noticeLost => 'Злучэнне страчана';
 
   @override
@@ -596,11 +570,7 @@ class SBe extends S {
   String get importTitle => 'Дадаць гэту падпіску?';
 
   @override
-  String get importSealed =>
-      'Гэта спасылка зашыфравана для Happ, і толькі Happ можа яе прачытаць. Спытайце ў свайго пастаўшчыка простую спасылку для падпіскі.';
-
-  @override
-  String get understood => 'добра';
+  String get importSealed => 'Гэта спасылка зашыфравана для Happ, і толькі Happ можа яе прачытаць';
 
   @override
   String get noAnswer => 'няма адказу';
@@ -639,39 +609,10 @@ class SBe extends S {
   String get openLogs => 'Адкрытыя лагі';
 
   @override
-  String get tourReplay => 'Зноў паказаць кіраўніцтва';
-
-  @override
-  String tourStep(int step) {
-    return 'Крок $step з 5';
-  }
-
-  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далей';
-
-  @override
-  String get tourSkip => 'Прапусціць';
-
-  @override
-  String get tourFinish => 'Гатова';
-
-  @override
-  String get tourAdd => 'Дадайце спасылку на падпіску вашага правайдэра.';
-
-  @override
-  String get tourServer => 'Выберыце сервер. «Самы хуткі» выбірае для вас адзін.';
-
-  @override
-  String get tourConnect => 'Націсніце тут, каб падключыцца або адключыцца.';
-
-  @override
-  String get tourMode => 'Выберыце рэжым. Kill Switch блакуе Інтэрнэт, калі VPN падае.';
-
-  @override
-  String get tourSettings => 'Адкрыйце налады. Вы можаце паўтарыць гэта кіраўніцтва там.';
 
   @override
   String get chooseProgram => 'Выберыце праграму';
@@ -683,7 +624,7 @@ class SBe extends S {
   String get runningProcesses => 'Запушчаныя працэсы';
 
   @override
-  String get programsEmpty => 'Праграмы не знойдзены. Паспрабуйце іншую назву.';
+  String get programsEmpty => 'Праграмы не знойдзены';
 
   @override
   String get selectExe => 'Выберыце файл .exe';
@@ -695,7 +636,7 @@ class SBe extends S {
   String get speedtestSearch => 'Знайдзіце паслугу';
 
   @override
-  String get speedtestEmpty => 'Супадзенняў няма. Змяніць пошук.';
+  String get speedtestEmpty => 'Супадзенняў няма';
 
   @override
   String get speedtestBackToList => 'Вярнуцца да паслуг';
@@ -704,14 +645,13 @@ class SBe extends S {
   String get speedtestOpenBrowser => 'Адкрыць у браўзеры';
 
   @override
-  String get speedtestUnavailable => 'Не атрымалася запусціць убудаваны браўзер. Адкрыйце службу ў сістэмным браўзеры.';
+  String get speedtestUnavailable => 'Не атрымалася запусціць убудаваны браўзер';
 
   @override
-  String get speedtestPageFailed =>
-      'Не атрымалася загрузіць старонку. Перазагрузіце яго або адкрыйце службу ў сістэмным браўзеры.';
+  String get speedtestPageFailed => 'Не атрымалася загрузіць старонку';
 
   @override
-  String get speedtestExternalFailed => 'Не ўдалося адкрыць сістэмны браўзер. Паспрабуйце яшчэ раз.';
+  String get speedtestExternalFailed => 'Не ўдалося адкрыць сістэмны браўзер';
 
   @override
   String get modes => 'Рэжымы';
@@ -751,43 +691,28 @@ class SBe extends S {
   String get updateNoNotes => 'Рэліз не мае заўваг.';
 
   @override
-  String get updateDropWarning =>
-      'VPN-злучэнне абарвецца на некалькі секунд, пакуль Sora і яго асноўнае абнаўленне. Працягнуць?';
+  String get updateDropWarning => 'Перапыніць злучэнне для абнаўлення?';
 
   @override
-  String get updateWaitConnection => 'Пачакайце, пакуль VPN-злучэнне і ядро ​​будуць гатовыя.';
+  String get updateWaitConnection => 'Злучэнне не гатова';
 
   @override
-  String get updateDownloading => 'Ідзе загрузка і праверка файлаў...';
-
-  @override
-  String get updateInstalling => 'Падрыхтоўка абнаўлення або чаканне аўтэнтыфікацыі адміністратара...';
-
-  @override
-  String get updateNetworkError => 'Не атрымалася спампаваць абнаўленне. Паспрабуйце яшчэ раз.';
+  String get updateNetworkError => 'Не атрымалася спампаваць абнаўленне';
 
   @override
   String get updateReleaseError => 'Даныя выпуску або неабходныя файлы адсутнічаюць або несапраўдныя.';
 
   @override
-  String get updateChecksumError => 'Загрузка не адпавядае SHA256SUMS. Нічога не было ўстаноўлена.';
+  String get updateChecksumError => 'Загрузка не адпавядае SHA256SUMS';
 
   @override
-  String get updateInstallError => 'Абнаўленне не завершана. Магчыма, аўтэнтыфікацыя была адменена.';
+  String get updateInstallError => 'Абнаўленне не завершана';
 
   @override
-  String get updateUnsupported =>
-      'Гэты выкананы файл не належыць падтрымоўванай пары пакетаў Sora. Выкарыстоўвайце інструкцыі па ўсталёўцы выпуску.';
+  String get updateUnsupported => 'Гэты выкананы файл не належыць падтрымоўванай пары пакетаў Sora';
 
   @override
-  String get updateManual =>
-      'Запусціце гэту каманду ў тэрмінале, каб усталяваць абодва правераныя пакеты, затым зноў адкрыйце Sora. Файлы застаюцца ў каталогу загрузкі. VPN-злучэнне абарвецца.';
-
-  @override
-  String get updateVersionRevoked => 'Распрацоўшчык адклікаў гэтую версію. Дачакайцеся выпраўленага выпуску.';
-
-  @override
-  String get updateRolloutPending => 'Новая версія разгортваецца паступова і будзе прапанавана вам аўтаматычна.';
+  String get updateVersionRevoked => 'Распрацоўшчык адклікаў гэтую версію';
 
   @override
   String updateRollbacking(String version) {
@@ -800,8 +725,7 @@ class SBe extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Збой аўтаматычнага адкату. Калі новая версія не працуе, пераўсталюйце папярэднюю версію ўручную.';
+  String get updateRollbackError => 'Збой аўтаматычнага адкату';
 
   @override
   String get updateRollbackCacheError =>
@@ -811,10 +735,7 @@ class SBe extends S {
   String get updateCopyCommand => 'Капіяваць каманду';
 
   @override
-  String get updateChecksDisabled => 'Аўтаматычныя праверкі адключаны ў наладах.';
-
-  @override
-  String get updateInstalled => 'Абнаўленне ўстаноўлена. Паўторна адкрыць Sora.';
+  String get updateInstalled => 'Абнаўленне ўстаноўлена';
 
   @override
   String get projectLinks => 'Праект';
@@ -844,14 +765,13 @@ class SBe extends S {
   String get showDescription => 'Паказаць апісанне';
 
   @override
-  String get errEngineUnsupported =>
-      'Абраны механізм не падтрымлівае гэты профіль або налады. Выберыце Аўто або сумяшчальны рухавік.';
+  String get errEngineUnsupported => 'Абраны механізм не падтрымлівае гэты профіль або налады';
 
   @override
-  String get errRestore => 'Ачыстка злучэння была няпоўная. Паўтарыць адключэнне; падрабязнасці глядзіце ў журнале.';
+  String get errRestore => 'Ачыстка злучэння была няпоўная';
 
   @override
-  String get errSessionEnded => 'Гэты сеанс ужо скончыўся. Абнавіць стан злучэння.';
+  String get errSessionEnded => 'Гэты сеанс ужо скончыўся';
 
   @override
   String get retryDisconnect => 'Паўтарыце спробу адключэння';
@@ -894,13 +814,10 @@ class SBe extends S {
   String get extInstallOne => '1 усталяванне';
 
   @override
-  String get extSideloadWarning => 'Усталёўвайце, толькі калі давяраеце самападпісанаму ключу аўтара.';
+  String get extSideloadWarning => 'Самападпісаны ключ';
 
   @override
   String get extPermissionsWidened => 'Абнаўленне запытвае новыя дазволы:';
-
-  @override
-  String get extDangerousAck => 'Я разумею, што гэтыя дазволы сур\'ёзныя';
 
   @override
   String get extInstall => 'Усталяваць';
@@ -913,9 +830,6 @@ class SBe extends S {
 
   @override
   String get extConfirm => 'Пацвердзіць';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Каталог';
@@ -966,16 +880,13 @@ class SBe extends S {
   String get extEmptySearch => 'Нічога не знойдзена';
 
   @override
-  String get extEmptyInstalled => 'Пашырэнні пакуль не ўсталяваны.\nЗнайдзіце ў каталогу або ўсталюйце з файла.';
+  String get extEmptyInstalled => 'Пашырэнні пакуль не ўсталяваны';
 
   @override
   String get extInstallFromFile => 'Усталяваць з файла';
 
   @override
   String get extInstallFromUrl => 'Усталяваць з URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Спампаваць';
@@ -990,19 +901,16 @@ class SBe extends S {
   String get extInstalling => 'Усталяванне…';
 
   @override
-  String get extInstallFailed => 'Збой усталявання';
-
-  @override
-  String get extErrSignature => 'Праверка подпісу не атрымалася. Файл можа быць пашкоджаны або падроблены.';
+  String get extErrSignature => 'Праверка подпісу не атрымалася';
 
   @override
   String get extErrManifest => 'Маніфест пашырэння несапраўдны.';
 
   @override
-  String get extErrNetwork => 'Памылка сеткі. Праверце падключэнне і паўтарыце спробу.';
+  String get extErrNetwork => 'Памылка сеткі';
 
   @override
-  String get extErrHash => 'Загрузка не адпавядае каталогу. Магчыма, яго падрабілі.';
+  String get extErrHash => 'Загрузка не адпавядае каталогу';
 
   @override
   String extErrMinApp(String version) {
@@ -1013,11 +921,11 @@ class SBe extends S {
   String get extErrHttpsOnly => 'Дазваляюцца толькі спасылкі https://';
 
   @override
-  String get extErrGeneric => 'Нешта пайшло не так. Калі ласка, паспрабуйце яшчэ раз.';
+  String get extErrGeneric => 'Нешта пайшло не так';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Гэта абнаўленне падпісана іншым ключом аўтара, чым усталяваная версія, таму яно было заблакіравана. Калі вы давяраеце новаму ключу, выдаліце ​​пашырэнне і ўсталюйце яго зноў відавочна.';
+      'Гэта абнаўленне падпісана іншым ключом аўтара, чым усталяваная версія, таму яно было заблакіравана';
 
   @override
   String get extDisabled => 'Выключана';
@@ -1074,7 +982,7 @@ class SBe extends S {
 
   @override
   String extConflictsCount(int count) {
-    return 'Канфлікты $count патрабуюць вашага рашэння';
+    return 'Канфлікты пашырэнняў: $count';
   }
 
   @override
@@ -1151,10 +1059,10 @@ class SBe extends S {
   String get extPermThemeApply => 'Ужываць тэмы афармлення';
 
   @override
-  String get extPermRoutingRules => 'Дадаць правілы маршрутызацыі (уплываюць на тое, куды ідзе сеткавы трафік)';
+  String get extPermRoutingRules => 'Дадаць правілы маршрутызацыі';
 
   @override
-  String get extPermNetHooks => 'Інтэграцыя ў сеткавы шлях (модулі абыходу DPI)';
+  String get extPermNetHooks => 'Інтэграцыя ў сеткавы шлях';
 
   @override
   String get extPermNetFetch => 'Запытваць URL з дазволенага спісу';
@@ -1163,7 +1071,7 @@ class SBe extends S {
   String get extPermBackground => 'Запуск фонавых задач';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Выключана';
 
   @override
   String get extCapBackground => 'Працуе ў фонавым рэжыме';
@@ -1201,9 +1109,6 @@ class SBe extends S {
   String get extSortRelevance => 'Актуальнасць';
 
   @override
-  String get extPermNetworkDetail => 'Запыты праз VPN дазволены толькі да гэтых хостаў.';
-
-  @override
   String get extBgTitle => 'Фонавая задача';
 
   @override
@@ -1239,9 +1144,6 @@ class SBe extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Уключыце пашырэнне для кіравання фонавымі задачамі.';
-
-  @override
   String get extCapNetwork => 'Доступ да сеткі';
 
   @override
@@ -1258,7 +1160,7 @@ class SBe extends S {
   String get diagnosticHttp => 'HTTP дыягностыка';
 
   @override
-  String get diagnosticNoData => 'Пакуль няма запісаных запытаў. Спачатку адкрыйце вэб-сайт для праверкі хуткасці.';
+  String get diagnosticNoData => 'Пакуль няма запісаных запытаў';
 
   @override
   String get qrShareTitle => 'Падзяліцца QR-кодам';
@@ -1268,12 +1170,6 @@ class SBe extends S {
 
   @override
   String get qrCopyLink => 'Скапіраваць спасылку';
-
-  @override
-  String get qrWarning => 'Паказвайце код толькі тым, каму давяраеце.';
-
-  @override
-  String get qrScanHint => 'Выберыце здымак экрана або фота з QR-кодам ці ўстаўце спасылку';
 
   @override
   String get qrFromClipboard => 'Уставіць з буфера абмену';
@@ -1361,31 +1257,10 @@ class SBe extends S {
   String get dnsLeakCheckKillSwitchDns => 'Абарона DNS праз kill switch';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Наладзьце DNS для тунэля ў наладах DNS вышэй.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Праверце, якія рэзолверы ваша сістэма будзе выкарыстоўваць па-за тунэлем.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Уключыце kill switch, каб трафік DNS заставаўся ў тунэлі.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Зашыфраваны DNS сістэмы';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Падробленыя адказы DNS';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Праверце, якія зашыфраваныя канечныя кропкі DNS выкарыстоўвае ваша сістэма па-за тунэлем.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Выкарыстоўвайце зашыфраваны DNS (DoT або DoH) у тунэлі, каб рэзолверы не маглі падрабляць адказы.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Спачатку падключыцеся да VPN, потым праверце на ўцечкі.';
 
   @override
   String get dnsExpected => 'Чакаецца';
@@ -1412,7 +1287,7 @@ class SBe extends S {
   String get autoSelectSmart => 'Разумны выбар';
 
   @override
-  String get coreWatchUnstable => 'Сувязь з ядром нестабільная. Крыху пачакайце і паспрабуйце злучыцца зноў.';
+  String get coreWatchUnstable => 'Сувязь з ядром нестабільная';
 
   @override
   String get watchReconnect => 'Перападключыць';
@@ -1451,7 +1326,7 @@ class SBe extends S {
   String get overrideCustomRules => 'Свае правілы';
 
   @override
-  String get errBenchmarkUnsupported => 'Для вымярэння хуткасці патрэбная навейшая версія ядра. Абнавіце Sora.';
+  String get errBenchmarkUnsupported => 'Для вымярэння хуткасці патрэбная навейшая версія ядра';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1462,7 +1337,7 @@ class SBe extends S {
   String get profiles => 'Сеткавыя профілі';
 
   @override
-  String get profilesEmpty => 'Профіляў пакуль няма. Стварыце яго для аўтаматычнага прымянення налад у вядомых сетках.';
+  String get profilesEmpty => 'Профіляў пакуль няма';
 
   @override
   String get profileAdd => 'Дадаць профіль';
@@ -1474,9 +1349,6 @@ class SBe extends S {
   String get profileSsids => 'Wi-Fi сеткі (SSID)';
 
   @override
-  String get profileSsidsHint => 'Дом, Офіс праз коску';
-
-  @override
   String get profileGateways => 'Сеткавыя шлюзы';
 
   @override
@@ -1484,9 +1356,6 @@ class SBe extends S {
 
   @override
   String get profileAutoApply => 'Ужыць аўтаматычна';
-
-  @override
-  String get profileAutoApplyHint => 'Калі выключана, пытацца перад ужываннем профілю.';
 
   @override
   String get profileSnapshot => 'Запомніць бягучыя наладкі';
@@ -1530,13 +1399,13 @@ class SBe extends S {
   String get networkUnknown => 'Інфармацыя пра сетку недаступная';
 
   @override
-  String get profileNoTriggers => 'Дадайце хаця б адзін трыгер: SSID, шлюз або ASN';
+  String get profileNoTriggers => 'Няма ўмоў профілю';
 
   @override
   String get chains => 'Ланцужкі проксі';
 
   @override
-  String get chainsEmpty => 'Ланцугоў пакуль няма. Звяжыце 2–3 серверы, каб трафік скакаў праз кожны з іх.';
+  String get chainsEmpty => 'Ланцугоў пакуль няма';
 
   @override
   String get chainAdd => 'Новы ланцуг';
@@ -1545,16 +1414,10 @@ class SBe extends S {
   String get chainName => 'Назва ланцуга';
 
   @override
-  String get chainPickServers => 'Выберыце 2–3 серверы';
+  String get chainTooFew => 'Для ланцужка патрэбныя прынамсі два серверы';
 
   @override
-  String get chainOrderHint => 'Перацягніце, каб змяніць парадак: трафік уваходзіць зверху і выходзіць знізу.';
-
-  @override
-  String get chainTooFew => 'Для ланцужка патрэбныя прынамсі два серверы. Дадайце яшчэ адзін сервер.';
-
-  @override
-  String get chainTooMany => 'У ланцужку можа быць не больш за тры серверы. Прыбярыце лішнія серверы.';
+  String get chainTooMany => 'У ланцужку можа быць не больш за тры серверы';
 
   @override
   String get chainEstimate => 'Разліковая затрымка';
@@ -1571,10 +1434,10 @@ class SBe extends S {
   }
 
   @override
-  String get chainUnsupported => 'Выбранае ядро не падтрымлівае ланцужкі. Выберыце сумяшчальнае ядро.';
+  String get chainUnsupported => 'Выбранае ядро не падтрымлівае ланцужкі';
 
   @override
-  String get chainHopMissing => 'Адзін з сервераў ланцужка больш недаступны. Выберыце іншы сервер для гэтага звяна.';
+  String get chainHopMissing => 'Адзін з сервераў ланцужка больш недаступны';
 
   @override
   String chainHop(Object n) {
@@ -1594,7 +1457,7 @@ class SBe extends S {
   String get syncDevices => 'Мае прылады';
 
   @override
-  String get syncEmpty => 'Няма спалучаных прылад. Спалучэнне іншай прылады праз лакальную сетку.';
+  String get syncEmpty => 'Няма спалучаных прылад';
 
   @override
   String get syncPair => 'Спалучыць прыладу';
@@ -1622,9 +1485,6 @@ class SBe extends S {
   String get syncNever => 'Ніколі';
 
   @override
-  String get syncNoLan => 'Прылады павінны знаходзіцца ў адной лакальнай сетцы';
-
-  @override
   String get syncPaired => 'Прылада спаранае';
 
   @override
@@ -1634,13 +1494,10 @@ class SBe extends S {
   String get syncWaiting => 'Чаканне іншай прылады…';
 
   @override
-  String get syncSecureNote => 'Канал са скразным шыфраваннем. Ні ўліковых запісаў, ні хмарных сервераў.';
-
-  @override
   String get zapretWithVpn => 'Абыход фільтрацыі DPI для прамога сеткавага трафіку';
 
   @override
-  String get chainDuplicate => 'У ланцужку паўтараецца сервер. Выберыце розныя серверы для кожнага звяна.';
+  String get chainDuplicate => 'У ланцужку паўтараецца сервер';
 
   @override
   String get edit => 'Рэдагаваць';
@@ -1650,10 +1507,6 @@ class SBe extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Аўтаматычнае пераключэнне пры дэградацыі';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Калі выбраны сервер моцна запавольваецца або перастае адказваць, Sora пераключаецца на найлепшы паводле вымярэнняў, але не часцей за раз на 10 хвілін.';
 
   @override
   String get tunStackMixed => 'Змешаны';
@@ -1671,19 +1524,13 @@ class SBe extends S {
   String get customServerName => 'Назва';
 
   @override
-  String get customServerNameHint => 'Напрыклад: мой VPS';
-
-  @override
-  String get customServerNameRequired => 'Увядзіце назву';
+  String get customServerNameRequired => 'Назва не ўказана';
 
   @override
   String get customServerAddress => 'Адрас';
 
   @override
-  String get customServerAddressHint => 'example.com або 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Увядзіце адрас сервера';
+  String get customServerAddressRequired => 'Адрас не ўказаны';
 
   @override
   String get customServerAddressInvalid => 'Няправільны адрас';
@@ -1692,19 +1539,13 @@ class SBe extends S {
   String get customServerPort => 'Порт';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Порт павінен быць лікам ад 1 да 65535';
+  String get customServerPortInvalid => 'Няправільны порт';
 
   @override
   String get customServerProtocol => 'Пратакол';
 
   @override
   String get customServerCredentials => 'Даныя для ўваходу';
-
-  @override
-  String get customServerOptional => 'Неабавязкова';
 
   @override
   String get customServerShowSecret => 'Паказаць сакрэт';
@@ -1718,9 +1559,6 @@ class SBe extends S {
   }
 
   @override
-  String get customServerTest => 'Тэст';
-
-  @override
   String get leakTestTitle => 'Тэст на ўцечку даных';
 
   @override
@@ -1728,9 +1566,6 @@ class SBe extends S {
 
   @override
   String get leakTestCancel => 'Адмена';
-
-  @override
-  String get leakTestNeedsConnection => 'Падключыцеся да VPN, каб праверыць наяўнасць уцечак дадзеных.';
 
   @override
   String leakTestProgress(int count) {
@@ -1758,9 +1593,6 @@ class SBe extends S {
 
   @override
   String get leakTestFix => 'Выправіць';
-
-  @override
-  String get leakTestFixedNote => 'Kill switch уключаны. Паўтарыце праверку.';
 
   @override
   String get leakTestCheckDirectDns => 'Прамы DNS';
@@ -1793,14 +1625,13 @@ class SBe extends S {
   String get syncDaemonFailed => 'Не атрымалася запусціць службу сінхранізацыі';
 
   @override
-  String get syncDaemonMissing =>
-      'Кампанент sora-sync не знойдзены. Пераўсталюйце праграму, каб уключыць сінхранізацыю прылады.';
+  String get syncDaemonMissing => 'Кампанент sora-sync не знойдзены';
 
   @override
   String get syncDaemonStarting => 'Запуск службы сінхранізацыі…';
 
   @override
-  String get syncErrAuth => 'Служба сінхранізацыі адхіліла маркер доступу. Перазапусціце праграму і паўтарыце спробу.';
+  String get syncErrAuth => 'Служба сінхранізацыі адхіліла маркер доступу';
 
   @override
   String get syncErrNotFound => 'Прылада больш не спалучана';
@@ -1809,8 +1640,7 @@ class SBe extends S {
   String get syncErrPairingActive => 'Сеанс спалучэння ўжо адкрыты';
 
   @override
-  String get syncErrUnreachable =>
-      'Іншая прылада не адказвала. Пераканайцеся, што ён знаходзіцца ў той жа сетцы і паказвае яго код.';
+  String get syncErrUnreachable => 'Іншая прылада не адказвала';
 
   @override
   String get syncError => 'Памылка сінхранізацыі';
@@ -1822,10 +1652,6 @@ class SBe extends S {
 
   @override
   String get syncJoining => 'Спалучэнне з прыладай…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Стары спіс прылад ніколі не спалучаўся, таму ён быў ачышчаны. Зноў спалучыце прылады, на гэты раз па-сапраўднаму.';
 
   @override
   String get syncNewCode => 'Новы код';
@@ -1885,8 +1711,7 @@ class SBe extends S {
   String get syncThisDevice => 'Гэтая прылада';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Сінхранізацыя недаступная на Android';
 
   @override
   String get diagnosticPackets => 'Захоп пакета';
@@ -1933,27 +1758,25 @@ class SBe extends S {
   String get customServerWgKeepalive => 'Keepalive, секунд';
 
   @override
-  String get customServerWgKeyInvalid => 'Ключ павінен быць 32 байтамі ў base64, як выводзіць wg genkey.';
+  String get customServerWgKeyInvalid => 'Няправільны ключ WireGuard';
 
   @override
-  String get customServerWgCidrInvalid => 'Пакажыце адрасы праз коску ў выглядзе 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Няправільны прэфікс CIDR';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'Пакажыце колькасць секунд ад 0 да 65535.';
+  String get customServerWgKeepaliveInvalid => 'Няправільны інтэрвал keepalive';
 
   @override
   String get strictKillSwitch => 'Строгі kill switch';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Пасля падключэння трафік па-за VPN застаецца заблакаваным нават пасля выхаду з праграмы да яўнага адключэння.';
+  String get strictKillSwitchWarning => 'Блакаваць трафік па-за VPN пасля выхаду?';
 
   @override
-  String get extWorkerFailed => 'Фонавае заданне пашырэння не выканана. Праверце журнал пашырэння.';
+  String get extWorkerFailed => 'Фонавае заданне пашырэння не выканана';
 
   @override
-  String get extAssetRejected =>
-      'Файл пашырэння змяшчае нечытэльныя колеры або няправільныя правілы. Папрасіце аўтара пашырэння выправіць файл.';
+  String get extAssetRejected => 'Файл пашырэння змяшчае нечытэльныя колеры або няправільныя правілы';
 
   @override
   String get extVerifiedSora => 'Праверана Sora';
@@ -1979,31 +1802,25 @@ class SBe extends S {
   String get customServerPassword => 'Пароль';
 
   @override
-  String get customServerSecretRequired => 'Увядзіце значэнне';
+  String get customServerSecretRequired => 'Значэнне не ўказана';
 
   @override
   String get customServerLinkInvalid => 'Няправільная спасылка на сервер';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Унутраная памылка Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Сертыфікат сервера адхілены';
 
   @override
-  String get errInternal => 'Унутраная памылка Sora. Захавайце журнал і паведаміце пра збой.';
+  String get errFileAccess => 'Няма доступу да файла';
 
   @override
-  String get errTls => 'Сертыфікат сервера адхілены. Праверце гадзіннік або звярніцеся да правайдара.';
+  String get errDataLimit => 'Занадта шмат даных';
 
   @override
-  String get errFileAccess => 'Няма доступу да файла. Праверце правы і вольнае месца.';
-
-  @override
-  String get errDataLimit => 'Занадта шмат даных. Выберыце менш элементаў і паўтарыце.';
-
-  @override
-  String get errCredentials => 'Захаваныя даныя доступу страчаныя. Імпартуйце сервер зноў.';
+  String get errCredentials => 'Захаваныя даныя доступу страчаныя';
 
   @override
   String subscriptionStale(String time) {
@@ -2011,55 +1828,54 @@ class SBe extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Яшчэ не абнаўлялася. Паўтарыце.';
+  String get subscriptionNeverUpdated => 'Яшчэ не абнаўлялася';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Сервер вярнуў код HTTP $status. Праверце спасылку або звярніцеся да пастаўшчыка.',
-      zero: 'Сервер адхіліў запыт. Праверце спасылку або звярніцеся да пастаўшчыка.',
+      other: 'Сервер вярнуў код HTTP $status',
+      zero: 'Сервер адхіліў запыт',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Налады сервера няпоўныя або не падтрымліваюцца. Абнавіце падпіску.';
+  String get errInvalidServer => 'Налады сервера няпоўныя або не падтрымліваюцца';
 
   @override
-  String get errServerIds => 'Два серверы маюць аднолькавы ідэнтыфікатар. Імпартуйце іх зноў.';
+  String get errServerIds => 'Два серверы маюць аднолькавы ідэнтыфікатар';
 
   @override
-  String get errRoutingGroup => 'Маршрут спасылаецца на выдаленыя серверы або пашкоджаную групу. Абнавіце падпіску.';
+  String get errRoutingGroup => 'Маршрут спасылаецца на выдаленыя серверы або пашкоджаную групу';
 
   @override
-  String get errConnections => 'Спіс падключэнняў недаступны. Падключыцеся або выберыце іншае ядро.';
+  String get errConnections => 'Спіс падключэнняў недаступны';
 
   @override
-  String get errLogs => 'Гэта служба не вядзе журнал. Абнавіце Sora.';
+  String get errLogs => 'Гэта служба не вядзе журнал';
 
   @override
-  String get errDiagnostics => 'Не ўдалося сабраць дыягностыку. Паўтарыце або захавайце журнал.';
+  String get errDiagnostics => 'Не ўдалося сабраць дыягностыку';
 
   @override
-  String get errMissingItem => 'Запытаны элемент больш не існуе. Абнавіце спіс.';
+  String get errMissingItem => 'Запытаны элемент больш не існуе';
 
   @override
-  String get errInvalidRequest => 'У запыце няправільныя значэнні. Праверце ўведзеныя даныя і паўтарыце.';
+  String get errInvalidRequest => 'У запыце няправільныя значэнні';
 
   @override
-  String get errProxyLogin =>
-      'Сістэмны проксі не падтрымлівае гэты ўваход. Прыбярыце лагін і пароль лакальнага проксі.';
+  String get errProxyLogin => 'Сістэмны проксі не падтрымлівае гэты ўваход';
 
   @override
-  String get errLogFilter => 'Няправільны фільтр журнала. Ачысціце пошук і паўтарыце.';
+  String get errLogFilter => 'Няправільны фільтр журнала';
 
   @override
-  String get errSubRedirect => 'Сервер перанакіраваў на небяспечны адрас. Запытайце новую спасылку ў правайдара.';
+  String get errSubRedirect => 'Сервер перанакіраваў на небяспечны адрас';
 
   @override
-  String get errProxySetup => 'Не ўдалося наладзіць сістэмны проксі. Перападключыцеся або адкрыйце журнал.';
+  String get errProxySetup => 'Не ўдалося наладзіць сістэмны проксі';
 
   @override
   String get notificationsToday => 'Сёння';
@@ -2085,20 +1901,19 @@ class SBe extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'Недапушчальны інтэрвал абнаўлення падпіскі. Выберыце інтэрвал, рэкамендаваны пастаўшчыком.';
+  String get errSubInterval => 'Недапушчальны інтэрвал абнаўлення падпіскі';
 
   @override
-  String get errRule => 'У правіле маршрутызацыі ёсць памылка. Праверце пазначаны дамен, IP-адрас або праграму.';
+  String get errRule => 'У правіле маршрутызацыі ёсць памылка';
 
   @override
-  String get errDns => 'Няправільныя налады DNS. Праверце адрас DNS-сервера.';
+  String get errDns => 'Няправільныя налады DNS';
 
   @override
-  String get errEndpoint => 'Няправільны адрас сервера для праверкі. Праверце імя хоста і порт.';
+  String get errEndpoint => 'Няправільны адрас сервера для праверкі';
 
   @override
-  String get errCancelled => 'Запыт скасаваны. Пры патрэбе выканайце дзеянне зноў.';
+  String get errCancelled => 'Запыт скасаваны';
 
   @override
   String get customServerOptions => 'Параметры падключэння';
@@ -2119,19 +1934,13 @@ class SBe extends S {
   String get customServerWgPeer => 'Пір';
 
   @override
-  String get customServerOptionsInfo =>
-      'Укажыце параметры транспарту і TLS з налад правайдара або ўстаўце спасылку на сервер.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'Даступна на: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret змяняе TCP-трафік на партах 80 і 443 для ўсіх праграм Windows. Гэта не VPN. Драйвер WinDivert можа заставацца загружаным да перазапуску Windows.';
+  String get winwsScopeWarning => 'Змяніць TCP-трафік усіх праграм?';
 
   @override
-  String get winwsRequirements =>
-      'Патрэбныя Windows x64 без эмуляцыі, WLANAPI і правераны камплект WinDivert. Калі Windows блакуе драйвер, гэты рэжым недаступны.';
+  String get winwsRequirements => 'Гэты рэжым VPN недаступны';
 }

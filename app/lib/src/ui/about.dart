@@ -155,14 +155,6 @@ class _AboutScreenState extends State<AboutScreen> {
                       ),
               ),
             ),
-            // A newer release exists but this install's cohort is not
-            // included in the staged rollout yet: say so instead
-            // of silently showing nothing.
-            if (updates.rolloutPending && !updates.hasUpdate)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(s.updateRolloutPending, style: Styles.secondary.copyWith(color: palette.ink)),
-              ),
             if (release != null) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
@@ -246,8 +238,8 @@ class _AboutScreenState extends State<AboutScreen> {
                           Expanded(
                             child: Text(switch (updates.stage) {
                               UpdateStage.checking => s.updateChecking,
-                              UpdateStage.installing => s.updateInstalling,
-                              _ => s.updateDownloading,
+                              UpdateStage.installing => s.extInstalling,
+                              _ => s.extDownloading,
                             }, style: Styles.caption.copyWith(color: palette.ink)),
                           ),
                           if (updates.stage == UpdateStage.downloading || updates.stage == UpdateStage.checking)
@@ -306,8 +298,6 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Tile(title: s.updateManual),
-                    const SizedBox(height: 8),
                     SelectableText(
                       command,
                       key: const ValueKey('update-command'),
@@ -322,8 +312,6 @@ class _AboutScreenState extends State<AboutScreen> {
                   ],
                 ),
               ),
-            if (!updates.checking && release == null && !sora.settings.checkUpdates)
-              Tile(title: s.updateChecksDisabled),
           ],
         ),
         BackgroundFailureState(
@@ -418,7 +406,7 @@ class _LicensesScreenState extends State<_LicensesScreen> {
               child: TextButton.icon(
                 onPressed: () => setState(() => _licenses = _load()),
                 icon: const Icon(Symbols.refresh_rounded),
-                label: Text('${s.errGeneric}. ${s.refresh}'),
+                label: Text(s.errGeneric),
               ),
             );
           }

@@ -20,7 +20,6 @@ import '../groups.dart';
 import '../notifications.dart';
 import '../sora.dart';
 import '../updates.dart';
-import '../ui/kit.dart';
 import '../ui/servers.dart';
 import '../ui/subscription_sheet.dart';
 import 'links.dart';
@@ -138,15 +137,7 @@ class Desktop with WindowListener {
     if (!sora.settings.trayHintShown) {
       sora.settings.trayHintShown = true;
       unawaited(
-        _tell(
-          AppNotification(
-            time: DateTime.now(),
-            title: _s.noticeInTray,
-            body: _s.noticeInTrayBody,
-            messageKey: 'notice.tray',
-          ),
-          always: true,
-        ),
+        _tell(AppNotification(time: DateTime.now(), title: _s.noticeInTray, body: '', messageKey: 'notice.tray'), always: true),
       );
     }
   }
@@ -596,7 +587,7 @@ class Desktop with WindowListener {
         await showSubscriptionSheet(context, link: url.toString(), name: name);
       case SealedForHapp():
         final s = S.of(context);
-        await confirm(context, question: s.importSealed, action: s.understood, destructive: false, cancellable: false);
+        await sora.recordNotification(AppNotification(time: DateTime.now(), title: s.importSealed, body: ''));
     }
   }
 }

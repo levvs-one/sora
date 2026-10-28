@@ -277,18 +277,15 @@ void main() {
     expect(values['host_header'], 'web.example.com');
     expect(tester.takeException(), isNull);
   });
-  testWidgets('connection help opens independently and does not expand unrelated fields', (tester) async {
+  testWidgets('connection settings expose fields without help', (tester) async {
     await mount(tester);
     final group = find.byKey(const ValueKey('custom-options-vless'));
     await tester.ensureVisible(group);
-    await tester.pumpAndSettle();
-    await tester.tap(find.descendant(of: group, matching: find.byType(InfoButton)));
-    await tester.pumpAndSettle();
-    expect(find.text(lookupS(const Locale('ru')).customServerOptionsInfo), findsOneWidget);
+    expect(find.byType(InfoButton), findsNothing);
     expect(find.byKey(const ValueKey('custom-server_name')), findsNothing);
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.tap(group);
     await tester.pumpAndSettle();
-    expect(find.byType(AddServerScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('custom-server_name')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

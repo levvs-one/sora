@@ -52,7 +52,6 @@ class Settings {
     'proxySnapshot',
     'trayHintShown',
     'sidebarExpanded',
-    'tourDone',
     'notificationHistory',
     'subscriptionFailures',
     'speedtestService',
@@ -85,11 +84,6 @@ class Settings {
   }
 
   Future<void> _migrate() async {
-    if (!_store.containsKey('tourDone')) {
-      // Detect upgrades before migration writes its own defaults.
-      final existing = _keys.where((key) => key != 'tourDone').any(_store.containsKey);
-      await _store.setBool('tourDone', existing);
-    }
     if (!_store.containsKey('installUuid')) {
       // Stable per-install identifier for the staged-rollout cohort (S11a).
       // Generated once; the cohort (SHA-256(uuid) mod 100) never changes
@@ -345,9 +339,6 @@ class Settings {
   String get speedtestService => _store.getString('speedtestService') ?? '';
   Future<void> saveSpeedtestService(String value) => _store.setString('speedtestService', value);
 
-  bool get tourDone => _store.getBool('tourDone') ?? false;
-  Future<void> completeTour() => _store.setBool('tourDone', true);
-
   /// Failure timestamps and keys only, never provider links or error details.
   String get subscriptionFailures => _store.getString('subscriptionFailures') ?? '{}';
   set subscriptionFailures(String value) => _store.setString('subscriptionFailures', value);
@@ -368,7 +359,7 @@ class Settings {
   /// `pendingUpdate`, `lastRollback`), the rollout `installUuid`, the
   /// crash-recovery marker `sessionIntent`, the system-proxy snapshot
   /// `proxySnapshot`, `benchmarkHistory`, `notificationHistory`, and UI
-  /// chrome (`trayHintShown`, `sidebarExpanded`, `tourDone`,
+  /// chrome (`trayHintShown`, `sidebarExpanded`,
   /// `speedtestService`, `dnsLeakLastCheck`). The JSON-backed
   /// stores (`subscriptionOverrides`, `networkProfiles`, `proxyChains`) sync as their own document
   /// kinds so their stores can reload after an import.
@@ -475,7 +466,7 @@ class Settings {
     final pending = pendingUpdate;
     final rolledBack = lastRollback;
     await _store.clear();
-    await completeTour();
+
     await saveNotificationHistory(history);
     subscriptionFailures = failures;
     if (notified.isNotEmpty) await saveNotifiedUpdate(notified);

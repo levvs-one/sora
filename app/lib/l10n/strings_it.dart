@@ -205,70 +205,58 @@ class SIt extends S {
   String get errGeneric => 'Qualcosa è andato storto';
 
   @override
-  String get errCore => 'Il servizio Sora non risponde. Attendi un momento e riprova.';
+  String get errCore => 'Il servizio Sora non risponde';
 
   @override
-  String get errAuth => 'L’accesso al servizio Sora è stato negato. Riavvia l’app e riprova.';
+  String get errAuth => 'L’accesso al servizio Sora è stato negato';
 
   @override
-  String get errVersion => 'L’app Sora e il servizio hanno versioni diverse. Aggiorna Sora.';
+  String get errVersion => 'L’app Sora e il servizio hanno versioni diverse';
 
   @override
-  String get errBusy => 'Il comando precedente è ancora in esecuzione. Attendi che termini.';
+  String get errBusy => 'Il comando precedente è ancora in esecuzione';
 
   @override
-  String get errEngineMissing =>
-      'Manca il motore necessario per questo server. Controlla se ci sono aggiornamenti di Sora.';
+  String get errEngineMissing => 'Manca il motore necessario per questo server';
 
   @override
-  String get errEngineStart =>
-      'Il motore non si è avviato. Consulta il registro della connessione per conoscerne la causa.';
+  String get errEngineStart => 'Il motore non si è avviato';
 
   @override
-  String get errEngineStopped => 'Il motore si è arrestato. Prova a connetterti di nuovo.';
+  String get errEngineStopped => 'Il motore si è arrestato';
 
   @override
-  String get errTunnel =>
-      'Questa modalità VPN non è disponibile. Scegli un’altra modalità o controlla i permessi del servizio.';
+  String get errTunnel => 'Questa modalità VPN non è disponibile';
 
   @override
-  String get errNetwork => 'Impossibile raggiungere il server';
+  String get errTimeout => 'Il server non ha risposto in tempo';
 
   @override
-  String get errTimeout => 'Il server non ha risposto in tempo. Riprova tra un minuto.';
+  String get errFirewall => 'Non è stato possibile bloccare l’accesso a Internet al di fuori della VPN';
 
   @override
-  String get errFirewall =>
-      'Non è stato possibile bloccare l’accesso a Internet al di fuori della VPN. Consulta il registro della connessione per conoscerne la causa.';
+  String get errSubFetch => 'Non è stato possibile scaricare l’abbonamento';
 
   @override
-  String get errSubFetch =>
-      'Non è stato possibile scaricare l’abbonamento. Controlla la connessione Internet e riprova tra un minuto.';
+  String get errSubFormat => 'Il formato dell’abbonamento non è riconosciuto';
 
   @override
-  String get errSubFormat =>
-      'Il formato dell’abbonamento non è riconosciuto. Chiedi al fornitore un link di abbonamento compatibile.';
+  String get errSubEmpty => 'L’abbonamento non contiene server';
 
   @override
-  String get errSubEmpty => 'L’abbonamento non contiene server. Contatta il fornitore dell’abbonamento.';
+  String get errSubDuplicate => 'Questo abbonamento è già stato aggiunto';
 
   @override
-  String get errSubDuplicate =>
-      'Questo abbonamento è già stato aggiunto. Aggiornalo per ottenere l’elenco dei server più recente.';
+  String get errSubLimit => 'È stato raggiunto il limite di abbonamenti';
 
   @override
-  String get errSubLimit =>
-      'È stato raggiunto il limite di abbonamenti. Elimina un abbonamento inutilizzato prima di aggiungerne un altro.';
+  String get errSubScheme => 'Schema del link di abbonamento non supportato';
 
   @override
-  String get errSubScheme => 'Il link dell’abbonamento deve iniziare con https://. Chiedi al fornitore un link sicuro.';
+  String get errSecretStore => 'L’archivio di Sora è danneggiato o inaccessibile';
 
   @override
-  String get errSecretStore =>
-      'L’archivio di Sora è danneggiato o inaccessibile. Controlla i permessi di accesso e consulta il registro.';
-
-  @override
-  String get errNoServers => 'Non ci sono server a cui connettersi. Aggiungi un abbonamento o un tuo server.';
+  String get errNoServers => 'Non ci sono server a cui connettersi';
 
   @override
   String get connections => 'Connessioni';
@@ -322,9 +310,6 @@ class SIt extends S {
   String get dnsAuto => 'Auto';
 
   @override
-  String get dnsHint => 'Indirizzi separati da virgole';
-
-  @override
   String get fragment => 'Frammentazione TLS';
 
   @override
@@ -340,13 +325,7 @@ class SIt extends S {
   String get byDefault => 'Predefinita';
 
   @override
-  String get rangeHint => 'Ad esempio, 100-200';
-
-  @override
   String get splitPos => 'Posizioni divise';
-
-  @override
-  String get splitPosHint => 'Ad esempio, 1, midsld';
 
   @override
   String get disorder => 'Riordina i pezzi';
@@ -455,11 +434,6 @@ class SIt extends S {
   String get support => 'Supporto';
 
   @override
-  String controlPortQuestion(String engine) {
-    return '$engine è controllato tramite una porta su questo computer. Altri programmi saranno in grado di dire che una VPN è attiva.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'Scegli $engine';
   }
@@ -535,9 +509,6 @@ class SIt extends S {
   String get launchAtLogin => 'Cominciamo dal sistema';
 
   @override
-  String get launchAtLoginDetail => 'Sora si avvierà automaticamente all\'accesso e resterà nell\'area di notifica.';
-
-  @override
   String get closeToTray => 'Conservare nella vaschetta quando è chiuso';
 
   @override
@@ -572,9 +543,6 @@ class SIt extends S {
   String get noticeInTray => 'Sora è ancora nel vassoio';
 
   @override
-  String get noticeInTrayBody => 'Esci dal menu della sua icona';
-
-  @override
   String get noticeLost => 'Connessione persa';
 
   @override
@@ -602,11 +570,7 @@ class SIt extends S {
   String get importTitle => 'Aggiungere questo abbonamento?';
 
   @override
-  String get importSealed =>
-      'Questo collegamento è crittografato per Happ e solo Happ può leggerlo. Chiedi al tuo provider il semplice collegamento di abbonamento.';
-
-  @override
-  String get understood => 'OK';
+  String get importSealed => 'Questo collegamento è crittografato per Happ e solo Happ può leggerlo';
 
   @override
   String get noAnswer => 'nessuna risposta';
@@ -645,39 +609,10 @@ class SIt extends S {
   String get openLogs => 'Apri i log';
 
   @override
-  String get tourReplay => 'Mostra di nuovo la guida';
-
-  @override
-  String tourStep(int step) {
-    return 'Passaggio $step di 5';
-  }
-
-  @override
   String get tourBack => 'Indietro';
 
   @override
   String get tourNext => 'Prossima';
-
-  @override
-  String get tourSkip => 'Saltare';
-
-  @override
-  String get tourFinish => 'Fatto';
-
-  @override
-  String get tourAdd => 'Aggiungi il link di abbonamento del tuo provider.';
-
-  @override
-  String get tourServer => 'Scegli un server. \"Il più veloce\" ne seleziona uno per te.';
-
-  @override
-  String get tourConnect => 'Clicca qui per connetterti o disconnetterti.';
-
-  @override
-  String get tourMode => 'Scegli una modalità. Il kill switch blocca Internet se la VPN si interrompe.';
-
-  @override
-  String get tourSettings => 'Apri le impostazioni. Puoi riprodurre questa guida lì.';
 
   @override
   String get chooseProgram => 'Scegli un programma';
@@ -689,7 +624,7 @@ class SIt extends S {
   String get runningProcesses => 'Processi in esecuzione';
 
   @override
-  String get programsEmpty => 'Nessuna applicazione trovata. Prova un altro nome.';
+  String get programsEmpty => 'Nessuna applicazione trovata';
 
   @override
   String get selectExe => 'Scegli un file .exe';
@@ -701,7 +636,7 @@ class SIt extends S {
   String get speedtestSearch => 'Trova un servizio';
 
   @override
-  String get speedtestEmpty => 'Nessuna corrispondenza. Cambia la ricerca.';
+  String get speedtestEmpty => 'Nessuna corrispondenza';
 
   @override
   String get speedtestBackToList => 'Torniamo ai servizi';
@@ -710,15 +645,13 @@ class SIt extends S {
   String get speedtestOpenBrowser => 'Apri nel browser';
 
   @override
-  String get speedtestUnavailable =>
-      'Impossibile avviare il browser incorporato. Apri il servizio nel browser di sistema.';
+  String get speedtestUnavailable => 'Impossibile avviare il browser incorporato';
 
   @override
-  String get speedtestPageFailed =>
-      'Impossibile caricare la pagina. Ricaricalo o apri il servizio nel browser di sistema.';
+  String get speedtestPageFailed => 'Impossibile caricare la pagina';
 
   @override
-  String get speedtestExternalFailed => 'Impossibile aprire il browser di sistema. Riprova.';
+  String get speedtestExternalFailed => 'Impossibile aprire il browser di sistema';
 
   @override
   String get modes => 'Modalità';
@@ -758,47 +691,28 @@ class SIt extends S {
   String get updateNoNotes => 'Il comunicato non ha note.';
 
   @override
-  String get updateDropWarning =>
-      'La connessione VPN verrà interrotta per alcuni secondi durante l\'aggiornamento di Sora e del suo core. Continuare?';
+  String get updateDropWarning => 'Disconnettere per aggiornare?';
 
   @override
-  String get updateWaitConnection => 'Attendi che la connessione VPN e il core siano pronti.';
+  String get updateWaitConnection => 'La connessione non è pronta';
 
   @override
-  String get updateDownloading => 'Download e verifica dei file...';
-
-  @override
-  String get updateInstalling =>
-      'Preparazione dell\'aggiornamento o attesa dell\'autenticazione dell\'amministratore...';
-
-  @override
-  String get updateNetworkError => 'Impossibile scaricare l\'aggiornamento. Riprova.';
+  String get updateNetworkError => 'Impossibile scaricare l\'aggiornamento';
 
   @override
   String get updateReleaseError => 'I dati di rilascio o i file richiesti mancano o non sono validi.';
 
   @override
-  String get updateChecksumError => 'Il download non corrisponde a SHA256SUMS. Non è stato installato nulla.';
+  String get updateChecksumError => 'Il download non corrisponde a SHA256SUMS';
 
   @override
-  String get updateInstallError =>
-      'L\'aggiornamento non è terminato. L\'autenticazione potrebbe essere stata annullata.';
+  String get updateInstallError => 'L\'aggiornamento non è terminato';
 
   @override
-  String get updateUnsupported =>
-      'Questo eseguibile non è di proprietà di una coppia di pacchetti Sora supportata. Utilizzare le istruzioni di installazione della versione.';
+  String get updateUnsupported => 'Questo eseguibile non è di proprietà di una coppia di pacchetti Sora supportata';
 
   @override
-  String get updateManual =>
-      'Esegui questo comando in un terminale per installare entrambi i pacchetti verificati, quindi riapri Sora. I file rimangono nella directory di download. La connessione VPN verrà interrotta.';
-
-  @override
-  String get updateVersionRevoked =>
-      'Lo sviluppatore ha ritirato questa versione. Please wait for a corrected release.';
-
-  @override
-  String get updateRolloutPending =>
-      'Una versione più recente verrà lanciata gradualmente e ti verrà offerta automaticamente.';
+  String get updateVersionRevoked => 'Lo sviluppatore ha ritirato questa versione';
 
   @override
   String updateRollbacking(String version) {
@@ -811,8 +725,7 @@ class SIt extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Rollback automatico non riuscito. Se la nuova versione non funziona, reinstallare manualmente la versione precedente.';
+  String get updateRollbackError => 'Rollback automatico non riuscito';
 
   @override
   String get updateRollbackCacheError =>
@@ -822,10 +735,7 @@ class SIt extends S {
   String get updateCopyCommand => 'Copia comando';
 
   @override
-  String get updateChecksDisabled => 'I controlli automatici sono disabilitati nelle Impostazioni.';
-
-  @override
-  String get updateInstalled => 'Aggiornamento installato. Riapri Sora.';
+  String get updateInstalled => 'Aggiornamento installato';
 
   @override
   String get projectLinks => 'Progetto';
@@ -855,15 +765,13 @@ class SIt extends S {
   String get showDescription => 'Mostra descrizione';
 
   @override
-  String get errEngineUnsupported =>
-      'Il motore selezionato non supporta questo profilo o impostazioni. Scegli Auto o un motore compatibile.';
+  String get errEngineUnsupported => 'Il motore selezionato non supporta questo profilo o impostazioni';
 
   @override
-  String get errRestore =>
-      'La pulizia della connessione era incompleta. Riprovare a disconnettersi; vedere il registro per i dettagli.';
+  String get errRestore => 'La pulizia della connessione era incompleta';
 
   @override
-  String get errSessionEnded => 'Questa sessione è già terminata. Aggiorna lo stato della connessione.';
+  String get errSessionEnded => 'Questa sessione è già terminata';
 
   @override
   String get retryDisconnect => 'Riprovare a disconnettersi';
@@ -906,13 +814,10 @@ class SIt extends S {
   String get extInstallOne => '1 installazione';
 
   @override
-  String get extSideloadWarning => 'Installa solo se ti fidi della chiave autofirmata dell’autore.';
+  String get extSideloadWarning => 'Chiave autofirmata';
 
   @override
   String get extPermissionsWidened => 'L\'aggiornamento richiede nuove autorizzazioni:';
-
-  @override
-  String get extDangerousAck => 'Capisco che questi permessi sono seri';
 
   @override
   String get extInstall => 'Installa';
@@ -925,9 +830,6 @@ class SIt extends S {
 
   @override
   String get extConfirm => 'Conferma';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Catalogo';
@@ -978,17 +880,13 @@ class SIt extends S {
   String get extEmptySearch => 'Non è stato trovato nulla';
 
   @override
-  String get extEmptyInstalled =>
-      'Nessuna estensione ancora installata.\nTrovane uno nel catalogo o installalo da un file.';
+  String get extEmptyInstalled => 'Nessuna estensione ancora installata';
 
   @override
   String get extInstallFromFile => 'Installa da file';
 
   @override
   String get extInstallFromUrl => 'Installa da URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Scarica';
@@ -1003,20 +901,16 @@ class SIt extends S {
   String get extInstalling => 'Installazione…';
 
   @override
-  String get extInstallFailed => 'Installazione non riuscita';
-
-  @override
-  String get extErrSignature =>
-      'Il controllo della firma non è riuscito. Il file potrebbe essere danneggiato o manomesso.';
+  String get extErrSignature => 'Il controllo della firma non è riuscito';
 
   @override
   String get extErrManifest => 'Il manifest dell\'estensione non è valido.';
 
   @override
-  String get extErrNetwork => 'Errore di rete. Controlla la connessione e riprova.';
+  String get extErrNetwork => 'Errore di rete';
 
   @override
-  String get extErrHash => 'Il download non corrisponde al catalogo. Potrebbe essere stato manomesso.';
+  String get extErrHash => 'Il download non corrisponde al catalogo';
 
   @override
   String extErrMinApp(String version) {
@@ -1027,11 +921,11 @@ class SIt extends S {
   String get extErrHttpsOnly => 'Sono consentiti solo i collegamenti https://';
 
   @override
-  String get extErrGeneric => 'Qualcosa è andato storto. Per favore riprova.';
+  String get extErrGeneric => 'Qualcosa è andato storto';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Questo aggiornamento è firmato con una chiave autore diversa rispetto alla versione installata, quindi è stato bloccato. Se ti fidi della nuova chiave, disinstalla l\'estensione e installala di nuovo esplicitamente.';
+      'Questo aggiornamento è firmato con una chiave autore diversa rispetto alla versione installata, quindi è stato bloccato';
 
   @override
   String get extDisabled => 'Disattivato';
@@ -1088,7 +982,7 @@ class SIt extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count i conflitti richiedono la tua decisione';
+    return 'Conflitti di estensione: $count';
   }
 
   @override
@@ -1165,10 +1059,10 @@ class SIt extends S {
   String get extPermThemeApply => 'Applica temi';
 
   @override
-  String get extPermRoutingRules => 'Aggiungi regole di routing (influisce su dove va il traffico di rete)';
+  String get extPermRoutingRules => 'Aggiungi regole di routing';
 
   @override
-  String get extPermNetHooks => 'Integrazione nel percorso di rete (DPI moduli bypass)';
+  String get extPermNetHooks => 'Integrazione nel percorso di rete';
 
   @override
   String get extPermNetFetch => 'Richiedi URL dall\'elenco consentito';
@@ -1177,7 +1071,7 @@ class SIt extends S {
   String get extPermBackground => 'Esegui attività in background';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Disattivato';
 
   @override
   String get extCapBackground => 'Viene eseguito in background';
@@ -1215,9 +1109,6 @@ class SIt extends S {
   String get extSortRelevance => 'Rilevanza';
 
   @override
-  String get extPermNetworkDetail => 'Le richieste VPN sono limitate agli host elencati sotto.';
-
-  @override
   String get extBgTitle => 'Attività in background';
 
   @override
@@ -1239,9 +1130,6 @@ class SIt extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Abilita l\'estensione a gestire la sua attività in background.';
-
-  @override
   String get extCapNetwork => 'Accesso alla rete';
 
   @override
@@ -1258,7 +1146,7 @@ class SIt extends S {
   String get diagnosticHttp => 'Diagnostica HTTP';
 
   @override
-  String get diagnosticNoData => 'Nessuna richiesta registrata ancora. Apri prima un sito Web di test di velocità.';
+  String get diagnosticNoData => 'Nessuna richiesta registrata ancora';
 
   @override
   String get qrShareTitle => 'Condividi il codice QR';
@@ -1268,12 +1156,6 @@ class SIt extends S {
 
   @override
   String get qrCopyLink => 'Copia collegamento';
-
-  @override
-  String get qrWarning => 'Condividi il codice solo con persone fidate.';
-
-  @override
-  String get qrScanHint => 'Scegli uno screenshot o una foto con un codice QR, oppure incolla un link';
 
   @override
   String get qrFromClipboard => 'Incolla dagli appunti';
@@ -1359,31 +1241,10 @@ class SIt extends S {
   String get dnsLeakCheckKillSwitchDns => 'Protezione DNS del blocco di rete';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Configurare DNS per il tunnel nelle impostazioni DNS sopra.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Controlla quali risolutori utilizzerebbe il tuo sistema al di fuori del tunnel.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Attiva il blocco di rete per mantenere il traffico DNS nel tunnel.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'DNS cifrato del sistema operativo';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Risposte DNS contraffatte';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Controlla quali endpoint DNS crittografati utilizza il tuo sistema all\'esterno del tunnel.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Utilizzare DNS crittografato (DoT o DoH) per il tunnel in modo che i risolutori non possano falsificare le risposte.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Connettersi prima a VPN, quindi verificare eventuali perdite.';
 
   @override
   String get dnsExpected => 'Previsto';
@@ -1410,8 +1271,7 @@ class SIt extends S {
   String get autoSelectSmart => 'Scelta intelligente';
 
   @override
-  String get coreWatchUnstable =>
-      'La connessione al core è instabile. Attendi un momento e prova a connetterti di nuovo.';
+  String get coreWatchUnstable => 'La connessione al core è instabile';
 
   @override
   String get watchReconnect => 'Riconnetti';
@@ -1450,7 +1310,7 @@ class SIt extends S {
   String get overrideCustomRules => 'Regole proprie';
 
   @override
-  String get errBenchmarkUnsupported => 'La misurazione della velocità richiede un core più recente. Aggiorna Sora.';
+  String get errBenchmarkUnsupported => 'La misurazione della velocità richiede un core più recente';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1461,8 +1321,7 @@ class SIt extends S {
   String get profiles => 'Profili di rete';
 
   @override
-  String get profilesEmpty =>
-      'Nessun profilo ancora. Creane uno per applicare automaticamente le impostazioni sulle reti conosciute.';
+  String get profilesEmpty => 'Nessun profilo ancora';
 
   @override
   String get profileAdd => 'Aggiungi profilo';
@@ -1474,9 +1333,6 @@ class SIt extends S {
   String get profileSsids => 'Wi-Fi reti (SSID)';
 
   @override
-  String get profileSsidsHint => 'Casa, Ufficio separati da virgole';
-
-  @override
   String get profileGateways => 'Gateway di rete';
 
   @override
@@ -1484,9 +1340,6 @@ class SIt extends S {
 
   @override
   String get profileAutoApply => 'Applica automaticamente';
-
-  @override
-  String get profileAutoApplyHint => 'Se disattivato, chiedi conferma prima di applicare il profilo.';
 
   @override
   String get profileSnapshot => 'Ricorda le impostazioni attuali';
@@ -1530,14 +1383,13 @@ class SIt extends S {
   String get networkUnknown => 'Informazioni di rete non disponibili';
 
   @override
-  String get profileNoTriggers => 'Aggiungi almeno un trigger: SSID, gateway o ASN';
+  String get profileNoTriggers => 'Nessuna condizione del profilo';
 
   @override
   String get chains => 'Catene proxy';
 
   @override
-  String get chainsEmpty =>
-      'Ancora nessuna catena. Collega 2-3 server in modo che il traffico passi attraverso ciascuno di essi.';
+  String get chainsEmpty => 'Ancora nessuna catena';
 
   @override
   String get chainAdd => 'Nuova catena';
@@ -1546,16 +1398,10 @@ class SIt extends S {
   String get chainName => 'Nome della catena';
 
   @override
-  String get chainPickServers => 'Scegli 2-3 server';
+  String get chainTooFew => 'Una catena richiede almeno due server';
 
   @override
-  String get chainOrderHint => 'Trascina per riordinare: il traffico entra in alto ed esce in basso.';
-
-  @override
-  String get chainTooFew => 'Una catena richiede almeno due server. Aggiungi un altro server.';
-
-  @override
-  String get chainTooMany => 'Una catena può contenere al massimo tre server. Rimuovi i server in eccesso.';
+  String get chainTooMany => 'Una catena può contenere al massimo tre server';
 
   @override
   String get chainEstimate => 'Latenza stimata';
@@ -1572,11 +1418,10 @@ class SIt extends S {
   }
 
   @override
-  String get chainUnsupported => 'Il motore selezionato non supporta le catene. Scegli un motore compatibile.';
+  String get chainUnsupported => 'Il motore selezionato non supporta le catene';
 
   @override
-  String get chainHopMissing =>
-      'Un server della catena non è più disponibile. Scegli un altro server per quel passaggio.';
+  String get chainHopMissing => 'Un server della catena non è più disponibile';
 
   @override
   String chainHop(Object n) {
@@ -1596,7 +1441,7 @@ class SIt extends S {
   String get syncDevices => 'I miei dispositivi';
 
   @override
-  String get syncEmpty => 'Nessun dispositivo associato. Associa un altro dispositivo sulla rete locale.';
+  String get syncEmpty => 'Nessun dispositivo associato';
 
   @override
   String get syncPair => 'Associa il dispositivo';
@@ -1624,9 +1469,6 @@ class SIt extends S {
   String get syncNever => 'Mai';
 
   @override
-  String get syncNoLan => 'I dispositivi devono trovarsi sulla stessa rete locale';
-
-  @override
   String get syncPaired => 'Dispositivo accoppiato';
 
   @override
@@ -1636,13 +1478,10 @@ class SIt extends S {
   String get syncWaiting => 'In attesa dell\'altro dispositivo…';
 
   @override
-  String get syncSecureNote => 'Canale crittografato end-to-end. Nessun account, nessun server cloud.';
-
-  @override
   String get zapretWithVpn => 'Ignora il filtro DPI per il traffico di rete diretto';
 
   @override
-  String get chainDuplicate => 'Un server compare più volte nella catena. Scegli un server diverso per ogni passaggio.';
+  String get chainDuplicate => 'Un server compare più volte nella catena';
 
   @override
   String get edit => 'Modifica';
@@ -1652,10 +1491,6 @@ class SIt extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Degrado accensione automatica';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Se il server selezionato rallenta molto o smette di rispondere, Sora passa al migliore in base alle misurazioni, al massimo una volta ogni 10 minuti.';
 
   @override
   String get tunStackMixed => 'Misto';
@@ -1673,19 +1508,13 @@ class SIt extends S {
   String get customServerName => 'Nome';
 
   @override
-  String get customServerNameHint => 'Ad esempio: il mio VPS';
-
-  @override
-  String get customServerNameRequired => 'Inserisci il nome';
+  String get customServerNameRequired => 'Nome mancante';
 
   @override
   String get customServerAddress => 'Indirizzo';
 
   @override
-  String get customServerAddressHint => 'example.com o 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Immettere l\'indirizzo del server';
+  String get customServerAddressRequired => 'Indirizzo mancante';
 
   @override
   String get customServerAddressInvalid => 'Indirizzo non valido';
@@ -1694,19 +1523,13 @@ class SIt extends S {
   String get customServerPort => 'Porta';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'La porta deve essere un numero compreso tra 1 e 65535';
+  String get customServerPortInvalid => 'Porta non valida';
 
   @override
   String get customServerProtocol => 'Protocollo';
 
   @override
   String get customServerCredentials => 'Informazioni di accesso';
-
-  @override
-  String get customServerOptional => 'Opzionale';
 
   @override
   String get customServerShowSecret => 'Mostra segreto';
@@ -1720,9 +1543,6 @@ class SIt extends S {
   }
 
   @override
-  String get customServerTest => 'Prova';
-
-  @override
   String get leakTestTitle => 'Test per perdite di dati';
 
   @override
@@ -1730,9 +1550,6 @@ class SIt extends S {
 
   @override
   String get leakTestCancel => 'Annulla';
-
-  @override
-  String get leakTestNeedsConnection => 'Connettersi a VPN per verificare eventuali fughe di dati.';
 
   @override
   String leakTestProgress(int count) {
@@ -1758,9 +1575,6 @@ class SIt extends S {
 
   @override
   String get leakTestFix => 'Correzione';
-
-  @override
-  String get leakTestFixedNote => 'Il blocco di rete è attivo. Ripeti il test per verificare.';
 
   @override
   String get leakTestCheckDirectDns => 'Diretto DNS';
@@ -1794,15 +1608,13 @@ class SIt extends S {
   String get syncDaemonFailed => 'Impossibile avviare il servizio di sincronizzazione';
 
   @override
-  String get syncDaemonMissing =>
-      'Il componente sora-sync non è stato trovato. Reinstallare l\'app per abilitare la sincronizzazione del dispositivo.';
+  String get syncDaemonMissing => 'Il componente sora-sync non è stato trovato';
 
   @override
   String get syncDaemonStarting => 'Avvio del servizio di sincronizzazione…';
 
   @override
-  String get syncErrAuth =>
-      'Il servizio di sincronizzazione ha rifiutato il token di accesso. Riavvia l\'app e riprova.';
+  String get syncErrAuth => 'Il servizio di sincronizzazione ha rifiutato il token di accesso';
 
   @override
   String get syncErrNotFound => 'Il dispositivo non è più associato';
@@ -1811,8 +1623,7 @@ class SIt extends S {
   String get syncErrPairingActive => 'Una sessione di abbinamento è già aperta';
 
   @override
-  String get syncErrUnreachable =>
-      'L\'altro dispositivo non ha risposto. Assicurati che sia sulla stessa rete e che mostri il relativo codice.';
+  String get syncErrUnreachable => 'L\'altro dispositivo non ha risposto';
 
   @override
   String get syncError => 'Errore di sincronizzazione';
@@ -1824,10 +1635,6 @@ class SIt extends S {
 
   @override
   String get syncJoining => 'Associazione con il dispositivo…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Il vecchio elenco dei dispositivi non è mai stato effettivamente accoppiato, quindi è stato cancellato. Accoppia nuovamente i tuoi dispositivi, questa volta per davvero.';
 
   @override
   String get syncNewCode => 'Nuovo codice';
@@ -1887,8 +1694,7 @@ class SIt extends S {
   String get syncThisDevice => 'Questo dispositivo';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Sincronizzazione non disponibile su Android';
 
   @override
   String get diagnosticPackets => 'Cattura dei pacchetti';
@@ -1936,28 +1742,25 @@ class SIt extends S {
   String get customServerWgKeepalive => 'Keepalive, secondi';
 
   @override
-  String get customServerWgKeyInvalid => 'La chiave deve essere di 32 byte in base64, come la stampa wg genkey.';
+  String get customServerWgKeyInvalid => 'Chiave WireGuard non valida';
 
   @override
-  String get customServerWgCidrInvalid => 'Inserisci prefissi separati da virgole, come 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Prefisso CIDR non valido';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'Inserisci un numero di secondi da 0 a 65535.';
+  String get customServerWgKeepaliveInvalid => 'Intervallo keepalive non valido';
 
   @override
   String get strictKillSwitch => 'Blocco di rete rigoroso';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Dopo la connessione, il traffico esterno alla VPN resta bloccato anche chiudendo l’app finché non ti disconnetti.';
+  String get strictKillSwitchWarning => 'Bloccare il traffico fuori dalla VPN dopo l’uscita?';
 
   @override
-  String get extWorkerFailed =>
-      'L’attività in background dell’estensione non è riuscita. Controlla il registro dell’estensione.';
+  String get extWorkerFailed => 'L’attività in background dell’estensione non è riuscita';
 
   @override
-  String get extAssetRejected =>
-      'Il file dell’estensione contiene colori illeggibili o regole non valide. Chiedi all’autore dell’estensione di correggerlo.';
+  String get extAssetRejected => 'Il file dell’estensione contiene colori illeggibili o regole non valide';
 
   @override
   String get extVerifiedSora => 'Verificato da Sora';
@@ -1983,31 +1786,25 @@ class SIt extends S {
   String get customServerPassword => 'Password';
 
   @override
-  String get customServerSecretRequired => 'Inserisci un valore';
+  String get customServerSecretRequired => 'Valore mancante';
 
   @override
   String get customServerLinkInvalid => 'Link del server non valido';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Errore interno di Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Certificato del server rifiutato';
 
   @override
-  String get errInternal => 'Errore interno di Sora. Salva il registro e segnala il problema.';
+  String get errFileAccess => 'Impossibile accedere al file';
 
   @override
-  String get errTls => 'Certificato del server rifiutato. Controlla l’orologio o contatta il fornitore.';
+  String get errDataLimit => 'Troppi dati';
 
   @override
-  String get errFileAccess => 'Impossibile accedere al file. Controlla i permessi e lo spazio libero.';
-
-  @override
-  String get errDataLimit => 'Troppi dati. Seleziona meno elementi e riprova.';
-
-  @override
-  String get errCredentials => 'Credenziali salvate mancanti. Importa di nuovo il server.';
+  String get errCredentials => 'Credenziali salvate mancanti';
 
   @override
   String subscriptionStale(String time) {
@@ -2015,56 +1812,54 @@ class SIt extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Non ancora aggiornato. Riprova.';
+  String get subscriptionNeverUpdated => 'Non ancora aggiornato';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Il server ha restituito il codice HTTP $status. Controlla il link o contatta il fornitore.',
-      zero: 'Il server ha rifiutato la richiesta. Controlla il link o contatta il fornitore.',
+      other: 'Il server ha restituito il codice HTTP $status',
+      zero: 'Il server ha rifiutato la richiesta',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Impostazioni del server incomplete o non supportate. Aggiorna l’abbonamento.';
+  String get errInvalidServer => 'Impostazioni del server incomplete o non supportate';
 
   @override
-  String get errServerIds => 'Due server hanno lo stesso identificatore. Importali di nuovo.';
+  String get errServerIds => 'Due server hanno lo stesso identificatore';
 
   @override
-  String get errRoutingGroup => 'La rotta punta a server mancanti o a un gruppo danneggiato. Aggiorna l’abbonamento.';
+  String get errRoutingGroup => 'La rotta punta a server mancanti o a un gruppo danneggiato';
 
   @override
-  String get errConnections => 'Elenco connessioni non disponibile. Connettiti o scegli un altro motore.';
+  String get errConnections => 'Elenco connessioni non disponibile';
 
   @override
-  String get errLogs => 'Questo servizio non conserva un registro. Aggiorna Sora.';
+  String get errLogs => 'Questo servizio non conserva un registro';
 
   @override
-  String get errDiagnostics => 'Impossibile raccogliere la diagnostica. Riprova o salva il registro.';
+  String get errDiagnostics => 'Impossibile raccogliere la diagnostica';
 
   @override
-  String get errMissingItem => 'L’elemento richiesto non esiste più. Aggiorna l’elenco.';
+  String get errMissingItem => 'L’elemento richiesto non esiste più';
 
   @override
-  String get errInvalidRequest => 'La richiesta contiene valori non validi. Controlla i dati e riprova.';
+  String get errInvalidRequest => 'La richiesta contiene valori non validi';
 
   @override
-  String get errProxyLogin =>
-      'Il proxy di sistema non supporta questo accesso. Rimuovi utente e password del proxy locale.';
+  String get errProxyLogin => 'Il proxy di sistema non supporta questo accesso';
 
   @override
-  String get errLogFilter => 'Filtro del registro non valido. Cancella la ricerca e riprova.';
+  String get errLogFilter => 'Filtro del registro non valido';
 
   @override
-  String get errSubRedirect =>
-      'Il server ha reindirizzato a un indirizzo non sicuro. Chiedi un nuovo link al fornitore.';
+  String get errSubRedirect => 'Il server ha reindirizzato a un indirizzo non sicuro';
 
   @override
-  String get errProxySetup => 'Impossibile configurare il proxy di sistema. Riconnettiti o apri il registro.';
+  String get errProxySetup => 'Impossibile configurare il proxy di sistema';
 
   @override
   String get notificationsToday => 'Oggi';
@@ -2090,21 +1885,19 @@ class SIt extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'L’intervallo di aggiornamento dell’abbonamento non è valido. Scegli quello consigliato dal fornitore.';
+  String get errSubInterval => 'L’intervallo di aggiornamento dell’abbonamento non è valido';
 
   @override
-  String get errRule =>
-      'Una regola di instradamento non è valida. Controlla il dominio, l’indirizzo IP o l’applicazione nella regola.';
+  String get errRule => 'Una regola di instradamento non è valida';
 
   @override
-  String get errDns => 'Le impostazioni DNS non sono valide. Controlla l’indirizzo del server DNS.';
+  String get errDns => 'Le impostazioni DNS non sono valide';
 
   @override
-  String get errEndpoint => 'L’indirizzo del server da verificare non è valido. Controlla il nome host e la porta.';
+  String get errEndpoint => 'L’indirizzo del server da verificare non è valido';
 
   @override
-  String get errCancelled => 'La richiesta è stata annullata. Ripeti l’azione se necessario.';
+  String get errCancelled => 'La richiesta è stata annullata';
 
   @override
   String get customServerOptions => 'Impostazioni di connessione';
@@ -2125,19 +1918,13 @@ class SIt extends S {
   String get customServerWgPeer => 'Peer';
 
   @override
-  String get customServerOptionsInfo =>
-      'Usa le impostazioni di trasporto e TLS del fornitore o incolla un link del server.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'Disponibile su: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret modifica il traffico TCP sulle porte 80 e 443 per tutte le app Windows. Non è una VPN. Il driver WinDivert può rimanere caricato fino al riavvio di Windows.';
+  String get winwsScopeWarning => 'Modificare il traffico TCP di tutte le app?';
 
   @override
-  String get winwsRequirements =>
-      'Richiede Windows x64 nativo, WLANAPI e il pacchetto WinDivert verificato. Se Windows blocca il driver, questa modalità non è disponibile.';
+  String get winwsRequirements => 'Questa modalità VPN non è disponibile';
 }

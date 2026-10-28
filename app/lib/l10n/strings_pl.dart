@@ -205,64 +205,58 @@ class SPl extends S {
   String get errGeneric => 'Coś poszło nie tak';
 
   @override
-  String get errCore => 'Usługa Sora nie odpowiada. Poczekaj chwilę i spróbuj ponownie.';
+  String get errCore => 'Usługa Sora nie odpowiada';
 
   @override
-  String get errAuth => 'Odmówiono dostępu do usługi Sora. Uruchom aplikację ponownie i spróbuj jeszcze raz.';
+  String get errAuth => 'Odmówiono dostępu do usługi Sora';
 
   @override
-  String get errVersion => 'Aplikacja i usługa Sora mają różne wersje. Zaktualizuj Sora.';
+  String get errVersion => 'Aplikacja i usługa Sora mają różne wersje';
 
   @override
-  String get errBusy => 'Poprzednie polecenie jest nadal wykonywane. Poczekaj, aż się zakończy.';
+  String get errBusy => 'Poprzednie polecenie jest nadal wykonywane';
 
   @override
-  String get errEngineMissing => 'Brakuje silnika wymaganego przez ten serwer. Sprawdź dostępność aktualizacji Sora.';
+  String get errEngineMissing => 'Brakuje silnika wymaganego przez ten serwer';
 
   @override
-  String get errEngineStart => 'Nie udało się uruchomić silnika. Sprawdź przyczynę w dzienniku połączenia.';
+  String get errEngineStart => 'Nie udało się uruchomić silnika';
 
   @override
-  String get errEngineStopped => 'Silnik został zatrzymany. Spróbuj połączyć się ponownie.';
+  String get errEngineStopped => 'Silnik został zatrzymany';
 
   @override
-  String get errTunnel => 'Ten tryb VPN jest niedostępny. Wybierz inny tryb lub sprawdź uprawnienia usługi.';
+  String get errTunnel => 'Ten tryb VPN jest niedostępny';
 
   @override
-  String get errNetwork => 'Nie można połączyć się z serwerem';
+  String get errTimeout => 'Serwer nie odpowiedział na czas';
 
   @override
-  String get errTimeout => 'Serwer nie odpowiedział na czas. Spróbuj ponownie za minutę.';
+  String get errFirewall => 'Nie udało się zablokować dostępu do Internetu poza VPN';
 
   @override
-  String get errFirewall =>
-      'Nie udało się zablokować dostępu do Internetu poza VPN. Sprawdź przyczynę w dzienniku połączenia.';
+  String get errSubFetch => 'Nie udało się pobrać subskrypcji';
 
   @override
-  String get errSubFetch =>
-      'Nie udało się pobrać subskrypcji. Sprawdź połączenie z Internetem i spróbuj ponownie za minutę.';
+  String get errSubFormat => 'Nie rozpoznano formatu subskrypcji';
 
   @override
-  String get errSubFormat => 'Nie rozpoznano formatu subskrypcji. Poproś dostawcę o zgodny link do subskrypcji.';
+  String get errSubEmpty => 'Subskrypcja nie zawiera serwerów';
 
   @override
-  String get errSubEmpty => 'Subskrypcja nie zawiera serwerów. Skontaktuj się z jej dostawcą.';
+  String get errSubDuplicate => 'Ta subskrypcja została już dodana';
 
   @override
-  String get errSubDuplicate => 'Ta subskrypcja została już dodana. Odśwież ją, aby pobrać aktualną listę serwerów.';
+  String get errSubLimit => 'Osiągnięto limit subskrypcji';
 
   @override
-  String get errSubLimit => 'Osiągnięto limit subskrypcji. Usuń nieużywaną subskrypcję, zanim dodasz kolejną.';
+  String get errSubScheme => 'Nieobsługiwany schemat linku subskrypcji';
 
   @override
-  String get errSubScheme => 'Link do subskrypcji musi zaczynać się od https://. Poproś dostawcę o bezpieczny link.';
+  String get errSecretStore => 'Magazyn danych Sora jest uszkodzony lub niedostępny';
 
   @override
-  String get errSecretStore =>
-      'Magazyn danych Sora jest uszkodzony lub niedostępny. Sprawdź uprawnienia dostępu i szczegóły w dzienniku.';
-
-  @override
-  String get errNoServers => 'Brak serwerów, z którymi można się połączyć. Dodaj subskrypcję lub własny serwer.';
+  String get errNoServers => 'Brak serwerów, z którymi można się połączyć';
 
   @override
   String get connections => 'Znajomości';
@@ -316,9 +310,6 @@ class SPl extends S {
   String get dnsAuto => 'Automatyczny';
 
   @override
-  String get dnsHint => 'Adresy, oddzielone przecinkami';
-
-  @override
   String get fragment => 'Fragmentacja TLS';
 
   @override
@@ -334,13 +325,7 @@ class SPl extends S {
   String get byDefault => 'Domyślny';
 
   @override
-  String get rangeHint => 'Na przykład 100-200';
-
-  @override
   String get splitPos => 'Podzielone pozycje';
-
-  @override
-  String get splitPosHint => 'Na przykład 1, midsld';
 
   @override
   String get disorder => 'Zmień kolejność sztuk';
@@ -449,11 +434,6 @@ class SPl extends S {
   String get support => 'Wsparcie';
 
   @override
-  String controlPortQuestion(String engine) {
-    return 'Sterowanie $engine odbywa się poprzez port tego komputera. Inne programy będą w stanie stwierdzić, że VPN jest włączony.';
-  }
-
-  @override
   String chooseEngine(String engine) {
     return 'Wybierz $engine';
   }
@@ -529,10 +509,6 @@ class SPl extends S {
   String get launchAtLogin => 'Zacznij od systemu';
 
   @override
-  String get launchAtLoginDetail =>
-      'Sora będzie automatycznie uruchamiana przy logowaniu i pozostanie w zasobniku systemowym.';
-
-  @override
   String get closeToTray => 'Przechowywać na tacy po zamknięciu';
 
   @override
@@ -567,9 +543,6 @@ class SPl extends S {
   String get noticeInTray => 'Sora nadal znajduje się na tacy';
 
   @override
-  String get noticeInTrayBody => 'Wyjdź z menu jego ikony';
-
-  @override
   String get noticeLost => 'Połączenie utracone';
 
   @override
@@ -597,11 +570,7 @@ class SPl extends S {
   String get importTitle => 'Dodać tę subskrypcję?';
 
   @override
-  String get importSealed =>
-      'To łącze jest zaszyfrowane dla Happ i tylko Happ może je odczytać. Poproś swojego dostawcę o zwykły link do subskrypcji.';
-
-  @override
-  String get understood => 'OK';
+  String get importSealed => 'To łącze jest zaszyfrowane dla Happ i tylko Happ może je odczytać';
 
   @override
   String get noAnswer => 'brak odpowiedzi';
@@ -640,39 +609,10 @@ class SPl extends S {
   String get openLogs => 'Otwórz logi';
 
   @override
-  String get tourReplay => 'Pokaż przewodnik ponownie';
-
-  @override
-  String tourStep(int step) {
-    return 'Krok $step z 5';
-  }
-
-  @override
   String get tourBack => 'Z powrotem';
 
   @override
   String get tourNext => 'Następny';
-
-  @override
-  String get tourSkip => 'Pominąć';
-
-  @override
-  String get tourFinish => 'Zrobione';
-
-  @override
-  String get tourAdd => 'Dodaj link do subskrypcji swojego dostawcy.';
-
-  @override
-  String get tourServer => 'Wybierz serwer. „Najszybszy” wybierze jeden za Ciebie.';
-
-  @override
-  String get tourConnect => 'Kliknij tutaj, aby połączyć lub rozłączyć.';
-
-  @override
-  String get tourMode => 'Wybierz tryb. Przełącznik Kill blokuje Internet, jeśli VPN spadnie.';
-
-  @override
-  String get tourSettings => 'Otwórz ustawienia. Możesz tam odtworzyć ten przewodnik.';
 
   @override
   String get chooseProgram => 'Wybierz program';
@@ -684,7 +624,7 @@ class SPl extends S {
   String get runningProcesses => 'Uruchomione procesy';
 
   @override
-  String get programsEmpty => 'Nie znaleziono żadnych aplikacji. Spróbuj innej nazwy.';
+  String get programsEmpty => 'Nie znaleziono żadnych aplikacji';
 
   @override
   String get selectExe => 'Wybierz plik .exe';
@@ -696,7 +636,7 @@ class SPl extends S {
   String get speedtestSearch => 'Znajdź usługę';
 
   @override
-  String get speedtestEmpty => 'Brak dopasowań. Zmień wyszukiwanie.';
+  String get speedtestEmpty => 'Brak dopasowań';
 
   @override
   String get speedtestBackToList => 'Wracając do usług';
@@ -705,15 +645,13 @@ class SPl extends S {
   String get speedtestOpenBrowser => 'Otwórz w przeglądarce';
 
   @override
-  String get speedtestUnavailable =>
-      'Nie można uruchomić wbudowanej przeglądarki. Otwórz usługę w przeglądarce systemowej.';
+  String get speedtestUnavailable => 'Nie można uruchomić wbudowanej przeglądarki';
 
   @override
-  String get speedtestPageFailed =>
-      'Nie udało się załadować strony. Załaduj go ponownie lub otwórz usługę w przeglądarce systemowej.';
+  String get speedtestPageFailed => 'Nie udało się załadować strony';
 
   @override
-  String get speedtestExternalFailed => 'Nie można otworzyć przeglądarki systemowej. Spróbuj ponownie.';
+  String get speedtestExternalFailed => 'Nie można otworzyć przeglądarki systemowej';
 
   @override
   String get modes => 'Tryby';
@@ -753,43 +691,28 @@ class SPl extends S {
   String get updateNoNotes => 'Wydanie nie posiada żadnych notatek.';
 
   @override
-  String get updateDropWarning =>
-      'Połączenie VPN zostanie zerwane na kilka sekund podczas aktualizacji Sora i jego podstawowej wersji. Kontynuować?';
+  String get updateDropWarning => 'Rozłączyć, aby zaktualizować?';
 
   @override
-  String get updateWaitConnection => 'Poczekaj, aż połączenie VPN i rdzeń będą gotowe.';
+  String get updateWaitConnection => 'Połączenie nie jest gotowe';
 
   @override
-  String get updateDownloading => 'Pobieranie i weryfikacja plików...';
-
-  @override
-  String get updateInstalling => 'Przygotowywanie aktualizacji lub oczekiwanie na autoryzację administratora...';
-
-  @override
-  String get updateNetworkError => 'Nie można pobrać aktualizacji. Spróbuj ponownie.';
+  String get updateNetworkError => 'Nie można pobrać aktualizacji';
 
   @override
   String get updateReleaseError => 'Brakuje danych wersji lub wymaganych plików lub są one nieprawidłowe.';
 
   @override
-  String get updateChecksumError => 'Pobieranie nie jest zgodne z SHA256SUMS. Nic nie zostało zainstalowane.';
+  String get updateChecksumError => 'Pobieranie nie jest zgodne z SHA256SUMS';
 
   @override
-  String get updateInstallError => 'Aktualizacja nie została zakończona. Uwierzytelnianie mogło zostać anulowane.';
+  String get updateInstallError => 'Aktualizacja nie została zakończona';
 
   @override
-  String get updateUnsupported =>
-      'Ten plik wykonywalny nie jest własnością obsługiwanej pary pakietów Sora. Skorzystaj z instrukcji instalacji wersji.';
+  String get updateUnsupported => 'Ten plik wykonywalny nie jest własnością obsługiwanej pary pakietów Sora';
 
   @override
-  String get updateManual =>
-      'Uruchom to polecenie w terminalu, aby zainstalować oba zweryfikowane pakiety, a następnie otwórz ponownie Sora. Pliki pozostają w katalogu pobierania. Połączenie VPN zostanie zerwane.';
-
-  @override
-  String get updateVersionRevoked => 'Deweloper wycofał tę wersję. Proszę poczekać na poprawioną wersję.';
-
-  @override
-  String get updateRolloutPending => 'Nowsza wersja jest wprowadzana stopniowo i będzie oferowana automatycznie.';
+  String get updateVersionRevoked => 'Deweloper wycofał tę wersję';
 
   @override
   String updateRollbacking(String version) {
@@ -802,8 +725,7 @@ class SPl extends S {
   }
 
   @override
-  String get updateRollbackError =>
-      'Automatyczne przywracanie nie powiodło się. Jeśli nowa wersja nie działa, zainstaluj ponownie ręcznie poprzednią wersję.';
+  String get updateRollbackError => 'Automatyczne przywracanie nie powiodło się';
 
   @override
   String get updateRollbackCacheError =>
@@ -813,10 +735,7 @@ class SPl extends S {
   String get updateCopyCommand => 'Kopiuj polecenie';
 
   @override
-  String get updateChecksDisabled => 'Automatyczne sprawdzanie jest wyłączone w Ustawieniach.';
-
-  @override
-  String get updateInstalled => 'Aktualizacja zainstalowana. Otwórz ponownie Sora.';
+  String get updateInstalled => 'Aktualizacja zainstalowana';
 
   @override
   String get projectLinks => 'Projekt';
@@ -846,15 +765,13 @@ class SPl extends S {
   String get showDescription => 'Pokaż opis';
 
   @override
-  String get errEngineUnsupported =>
-      'Wybrany silnik nie obsługuje tego profilu lub ustawień. Wybierz opcję Auto lub kompatybilny silnik.';
+  String get errEngineUnsupported => 'Wybrany silnik nie obsługuje tego profilu lub ustawień';
 
   @override
-  String get errRestore =>
-      'Czyszczenie połączenia było niekompletne. Spróbuj ponownie rozłączyć; szczegóły znajdziesz w logu.';
+  String get errRestore => 'Czyszczenie połączenia było niekompletne';
 
   @override
-  String get errSessionEnded => 'Ta sesja już się zakończyła. Odśwież stan połączenia.';
+  String get errSessionEnded => 'Ta sesja już się zakończyła';
 
   @override
   String get retryDisconnect => 'Spróbuj ponownie rozłączyć';
@@ -897,13 +814,10 @@ class SPl extends S {
   String get extInstallOne => '1 instalacja';
 
   @override
-  String get extSideloadWarning => 'Instaluj tylko, jeśli ufasz kluczowi podpisanemu przez samego autora.';
+  String get extSideloadWarning => 'Klucz z własnym podpisem';
 
   @override
   String get extPermissionsWidened => 'Aktualizacja prosi o nowe uprawnienia:';
-
-  @override
-  String get extDangerousAck => 'Rozumiem, że te uprawnienia są poważne';
 
   @override
   String get extInstall => 'Zainstaluj';
@@ -916,9 +830,6 @@ class SPl extends S {
 
   @override
   String get extConfirm => 'Potwierdź';
-
-  @override
-  String get extOk => 'OK';
 
   @override
   String get extCatalog => 'Katalog';
@@ -969,17 +880,13 @@ class SPl extends S {
   String get extEmptySearch => 'Nic nie znaleziono';
 
   @override
-  String get extEmptyInstalled =>
-      'Nie zainstalowano jeszcze żadnych rozszerzeń.\nZnajdź taki w katalogu lub zainstaluj z pliku.';
+  String get extEmptyInstalled => 'Nie zainstalowano jeszcze żadnych rozszerzeń';
 
   @override
   String get extInstallFromFile => 'Zainstaluj z pliku';
 
   @override
   String get extInstallFromUrl => 'Zainstaluj z URL';
-
-  @override
-  String get extUrlHint => 'https://…/extension.soraext';
 
   @override
   String get extDownload => 'Pobierz';
@@ -994,19 +901,16 @@ class SPl extends S {
   String get extInstalling => 'Instalowanie…';
 
   @override
-  String get extInstallFailed => 'Instalacja nie powiodła się';
-
-  @override
-  String get extErrSignature => 'Sprawdzanie podpisu nie powiodło się. Plik może zostać uszkodzony lub naruszony.';
+  String get extErrSignature => 'Sprawdzanie podpisu nie powiodło się';
 
   @override
   String get extErrManifest => 'Manifest rozszerzenia jest nieprawidłowy.';
 
   @override
-  String get extErrNetwork => 'Błąd sieci. Sprawdź połączenie i spróbuj ponownie.';
+  String get extErrNetwork => 'Błąd sieci';
 
   @override
-  String get extErrHash => 'Pobrany plik nie jest zgodny z katalogiem. Być może zostało to zmanipulowane.';
+  String get extErrHash => 'Pobrany plik nie jest zgodny z katalogiem';
 
   @override
   String extErrMinApp(String version) {
@@ -1017,11 +921,11 @@ class SPl extends S {
   String get extErrHttpsOnly => 'Dozwolone są tylko linki https://';
 
   @override
-  String get extErrGeneric => 'Coś poszło nie tak. Spróbuj ponownie.';
+  String get extErrGeneric => 'Coś poszło nie tak';
 
   @override
   String get extErrAuthorKeyChanged =>
-      'Ta aktualizacja jest podpisana innym kluczem autora niż wersja zainstalowana, więc została zablokowana. Jeśli ufasz nowemu kluczowi, odinstaluj rozszerzenie i zainstaluj je ponownie.';
+      'Ta aktualizacja jest podpisana innym kluczem autora niż wersja zainstalowana, więc została zablokowana';
 
   @override
   String get extDisabled => 'Wyłączone';
@@ -1078,7 +982,7 @@ class SPl extends S {
 
   @override
   String extConflictsCount(int count) {
-    return '$count konflikty wymagają Twojej decyzji';
+    return 'Konflikty rozszerzeń: $count';
   }
 
   @override
@@ -1155,10 +1059,10 @@ class SPl extends S {
   String get extPermThemeApply => 'Zastosuj motywy';
 
   @override
-  String get extPermRoutingRules => 'Dodaj reguły routingu (wpływa na to, dokąd idzie ruch sieciowy)';
+  String get extPermRoutingRules => 'Dodaj reguły routingu';
 
   @override
-  String get extPermNetHooks => 'Integracja ze ścieżką sieciową (DPI moduły obejściowe)';
+  String get extPermNetHooks => 'Integracja ze ścieżką sieciową';
 
   @override
   String get extPermNetFetch => 'Żądanie URL z listy dozwolonych';
@@ -1167,7 +1071,7 @@ class SPl extends S {
   String get extPermBackground => 'Uruchom zadania w tle';
 
   @override
-  String get extPermNotYetActive => 'Not active in this version of Sora yet, granting it changes nothing today.';
+  String get extPermNotYetActive => 'Wyłączone';
 
   @override
   String get extCapBackground => 'Działa w tle';
@@ -1205,9 +1109,6 @@ class SPl extends S {
   String get extSortRelevance => 'Trafność';
 
   @override
-  String get extPermNetworkDetail => 'Żądania VPN mogą docierać tylko do hostów poniżej.';
-
-  @override
   String get extBgTitle => 'Zadanie w tle';
 
   @override
@@ -1243,9 +1144,6 @@ class SPl extends S {
   }
 
   @override
-  String get extBgDisabledNote => 'Włącz rozszerzenie, aby zarządzać zadaniami w tle.';
-
-  @override
   String get extCapNetwork => 'Dostęp do sieci';
 
   @override
@@ -1262,7 +1160,7 @@ class SPl extends S {
   String get diagnosticHttp => 'Diagnostyka HTTP';
 
   @override
-  String get diagnosticNoData => 'Nie ma jeszcze zarejestrowanych żądań. Najpierw otwórz witrynę z testami prędkości.';
+  String get diagnosticNoData => 'Nie ma jeszcze zarejestrowanych żądań';
 
   @override
   String get qrShareTitle => 'Udostępnij kod QR';
@@ -1272,12 +1170,6 @@ class SPl extends S {
 
   @override
   String get qrCopyLink => 'Skopiuj link';
-
-  @override
-  String get qrWarning => 'Udostępniaj kod tylko zaufanym osobom.';
-
-  @override
-  String get qrScanHint => 'Wybierz zrzut ekranu lub zdjęcie z kodem QR albo wklej link';
 
   @override
   String get qrFromClipboard => 'Wklej ze schowka';
@@ -1365,31 +1257,10 @@ class SPl extends S {
   String get dnsLeakCheckKillSwitchDns => 'Ochrona DNS przez blokadę sieci';
 
   @override
-  String get dnsLeakFixConfigureTunnelDns => 'Skonfiguruj DNS dla tunelu w ustawieniach DNS powyżej.';
-
-  @override
-  String get dnsLeakFixReviewSystemResolvers =>
-      'Sprawdź, jakich algorytmów rozpoznawania nazw Twój system użyłby poza tunelem.';
-
-  @override
-  String get dnsLeakFixEnableKillSwitch => 'Włącz blokadę sieci, aby ruch DNS pozostał w tunelu.';
-
-  @override
   String get dnsLeakCheckEncryptedDns => 'Szyfrowany DNS systemu';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Sfałszowane odpowiedzi DNS';
-
-  @override
-  String get dnsLeakFixReviewEncryptedDns =>
-      'Sprawdź, jakich zaszyfrowanych DNS punktów końcowych używa Twój system poza tunelem.';
-
-  @override
-  String get dnsLeakFixUseEncryptedDns =>
-      'Użyj zaszyfrowanego DNS (DoT lub DoH) dla tunelu, aby mechanizmy rozpoznawania nazw nie mogły sfałszować odpowiedzi.';
-
-  @override
-  String get dnsCheckNeedsConnection => 'Najpierw podłącz do VPN, a następnie sprawdź, czy nie ma wycieków.';
 
   @override
   String get dnsExpected => 'Oczekiwano';
@@ -1416,8 +1287,7 @@ class SPl extends S {
   String get autoSelectSmart => 'Mądry wybór';
 
   @override
-  String get coreWatchUnstable =>
-      'Połączenie z rdzeniem jest niestabilne. Poczekaj chwilę i spróbuj połączyć się ponownie.';
+  String get coreWatchUnstable => 'Połączenie z rdzeniem jest niestabilne';
 
   @override
   String get watchReconnect => 'Połącz ponownie';
@@ -1456,7 +1326,7 @@ class SPl extends S {
   String get overrideCustomRules => 'Własne zasady';
 
   @override
-  String get errBenchmarkUnsupported => 'Pomiar prędkości wymaga nowszego rdzenia. Zaktualizuj Sora.';
+  String get errBenchmarkUnsupported => 'Pomiar prędkości wymaga nowszego rdzenia';
 
   @override
   String benchmarkProgress(Object done, Object total) {
@@ -1467,8 +1337,7 @@ class SPl extends S {
   String get profiles => 'Profile sieciowe';
 
   @override
-  String get profilesEmpty =>
-      'Nie ma jeszcze profili. Utwórz taki, aby automatycznie zastosować ustawienia w znanych sieciach.';
+  String get profilesEmpty => 'Nie ma jeszcze profili';
 
   @override
   String get profileAdd => 'Dodaj profil';
@@ -1480,9 +1349,6 @@ class SPl extends S {
   String get profileSsids => 'Wi-Fi sieci (SSID)';
 
   @override
-  String get profileSsidsHint => 'Dom, Biuro oddzielone przecinkami';
-
-  @override
   String get profileGateways => 'Bramy sieciowe';
 
   @override
@@ -1490,9 +1356,6 @@ class SPl extends S {
 
   @override
   String get profileAutoApply => 'Zastosuj automatycznie';
-
-  @override
-  String get profileAutoApplyHint => 'Gdy wyłączone, pytaj przed zastosowaniem profilu.';
 
   @override
   String get profileSnapshot => 'Zapamiętaj bieżące ustawienia';
@@ -1536,13 +1399,13 @@ class SPl extends S {
   String get networkUnknown => 'Informacje o sieci są niedostępne';
 
   @override
-  String get profileNoTriggers => 'Dodaj co najmniej jeden wyzwalacz: SSID, bramka lub ASN';
+  String get profileNoTriggers => 'Brak warunków profilu';
 
   @override
   String get chains => 'Łańcuchy proxy';
 
   @override
-  String get chainsEmpty => 'Nie ma jeszcze łańcuchów. Połącz 2–3 serwery, aby ruch przepływał przez każdy z nich.';
+  String get chainsEmpty => 'Nie ma jeszcze łańcuchów';
 
   @override
   String get chainAdd => 'Nowy łańcuch';
@@ -1551,16 +1414,10 @@ class SPl extends S {
   String get chainName => 'Nazwa łańcucha';
 
   @override
-  String get chainPickServers => 'Wybierz 2–3 serwery';
+  String get chainTooFew => 'Łańcuch wymaga co najmniej dwóch serwerów';
 
   @override
-  String get chainOrderHint => 'Przeciągnij, aby zmienić kolejność: ruch wjeżdża na górze, a wychodzi na dole.';
-
-  @override
-  String get chainTooFew => 'Łańcuch wymaga co najmniej dwóch serwerów. Dodaj kolejny serwer.';
-
-  @override
-  String get chainTooMany => 'Łańcuch może zawierać najwyżej trzy serwery. Usuń nadmiarowe serwery.';
+  String get chainTooMany => 'Łańcuch może zawierać najwyżej trzy serwery';
 
   @override
   String get chainEstimate => 'Szacowane opóźnienie';
@@ -1577,10 +1434,10 @@ class SPl extends S {
   }
 
   @override
-  String get chainUnsupported => 'Wybrany silnik nie obsługuje łańcuchów. Wybierz zgodny silnik.';
+  String get chainUnsupported => 'Wybrany silnik nie obsługuje łańcuchów';
 
   @override
-  String get chainHopMissing => 'Jeden z serwerów łańcucha nie jest już dostępny. Wybierz inny serwer dla tego etapu.';
+  String get chainHopMissing => 'Jeden z serwerów łańcucha nie jest już dostępny';
 
   @override
   String chainHop(Object n) {
@@ -1600,7 +1457,7 @@ class SPl extends S {
   String get syncDevices => 'Moje urządzenia';
 
   @override
-  String get syncEmpty => 'Brak sparowanych urządzeń. Sparuj kolejne urządzenie przez sieć lokalną.';
+  String get syncEmpty => 'Brak sparowanych urządzeń';
 
   @override
   String get syncPair => 'Sparuj urządzenie';
@@ -1628,9 +1485,6 @@ class SPl extends S {
   String get syncNever => 'Nigdy';
 
   @override
-  String get syncNoLan => 'Urządzenia muszą znajdować się w tej samej sieci lokalnej';
-
-  @override
   String get syncPaired => 'Urządzenie sparowane';
 
   @override
@@ -1640,13 +1494,10 @@ class SPl extends S {
   String get syncWaiting => 'Oczekiwanie na drugie urządzenie…';
 
   @override
-  String get syncSecureNote => 'Kanał szyfrowany od końca do końca. Żadnych kont, żadnych serwerów w chmurze.';
-
-  @override
   String get zapretWithVpn => 'Pomiń filtrowanie DPI dla bezpośredniego ruchu sieciowego';
 
   @override
-  String get chainDuplicate => 'Serwer występuje w łańcuchu więcej niż raz. Wybierz inny serwer dla każdego etapu.';
+  String get chainDuplicate => 'Serwer występuje w łańcuchu więcej niż raz';
 
   @override
   String get edit => 'Edytuj';
@@ -1656,10 +1507,6 @@ class SPl extends S {
 
   @override
   String get autoSwitchOnDegrade => 'Automatyczne włączenie degradacji';
-
-  @override
-  String get autoSwitchOnDegradeDetail =>
-      'Jeśli wybrany serwer znacznie zwolni lub przestanie odpowiadać, Sora przełączy się na najlepszy według pomiarów, nie częściej niż raz na 10 minut.';
 
   @override
   String get tunStackMixed => 'Mieszane';
@@ -1677,19 +1524,13 @@ class SPl extends S {
   String get customServerName => 'Imię';
 
   @override
-  String get customServerNameHint => 'Na przykład: mój VPS';
-
-  @override
-  String get customServerNameRequired => 'Wprowadź nazwę';
+  String get customServerNameRequired => 'Brak nazwy';
 
   @override
   String get customServerAddress => 'Adres';
 
   @override
-  String get customServerAddressHint => 'example.com lub 192.0.2.1';
-
-  @override
-  String get customServerAddressRequired => 'Wprowadź adres serwera';
+  String get customServerAddressRequired => 'Brak adresu';
 
   @override
   String get customServerAddressInvalid => 'Nieprawidłowy adres';
@@ -1698,19 +1539,13 @@ class SPl extends S {
   String get customServerPort => 'Port';
 
   @override
-  String get customServerPortHint => '443';
-
-  @override
-  String get customServerPortInvalid => 'Port musi być liczbą z zakresu od 1 do 65535';
+  String get customServerPortInvalid => 'Nieprawidłowy port';
 
   @override
   String get customServerProtocol => 'Protokół';
 
   @override
   String get customServerCredentials => 'Dane logowania';
-
-  @override
-  String get customServerOptional => 'Opcjonalnie';
 
   @override
   String get customServerShowSecret => 'Pokaż sekret';
@@ -1724,9 +1559,6 @@ class SPl extends S {
   }
 
   @override
-  String get customServerTest => 'Test';
-
-  @override
   String get leakTestTitle => 'Test pod kątem wycieków danych';
 
   @override
@@ -1734,9 +1566,6 @@ class SPl extends S {
 
   @override
   String get leakTestCancel => 'Anuluj';
-
-  @override
-  String get leakTestNeedsConnection => 'Połącz się z VPN, aby przetestować wycieki danych.';
 
   @override
   String leakTestProgress(int count) {
@@ -1764,9 +1593,6 @@ class SPl extends S {
 
   @override
   String get leakTestFix => 'Poprawka';
-
-  @override
-  String get leakTestFixedNote => 'Blokada sieci jest włączona. Uruchom test ponownie, aby to sprawdzić.';
 
   @override
   String get leakTestCheckDirectDns => 'Bezpośrednio DNS';
@@ -1800,15 +1626,13 @@ class SPl extends S {
   String get syncDaemonFailed => 'Nie można uruchomić usługi synchronizacji';
 
   @override
-  String get syncDaemonMissing =>
-      'Nie znaleziono komponentu sora-sync. Zainstaluj ponownie aplikację, aby włączyć synchronizację urządzenia.';
+  String get syncDaemonMissing => 'Nie znaleziono komponentu sora-sync';
 
   @override
   String get syncDaemonStarting => 'Uruchamiam usługę synchronizacji…';
 
   @override
-  String get syncErrAuth =>
-      'Usługa synchronizacji odrzuciła token dostępu. Uruchom ponownie aplikację i spróbuj ponownie.';
+  String get syncErrAuth => 'Usługa synchronizacji odrzuciła token dostępu';
 
   @override
   String get syncErrNotFound => 'Urządzenie nie jest już sparowane';
@@ -1817,8 +1641,7 @@ class SPl extends S {
   String get syncErrPairingActive => 'Sesja parowania jest już otwarta';
 
   @override
-  String get syncErrUnreachable =>
-      'Drugie urządzenie nie odpowiedziało. Upewnij się, że znajduje się w tej samej sieci i wyświetla swój kod.';
+  String get syncErrUnreachable => 'Drugie urządzenie nie odpowiedziało';
 
   @override
   String get syncError => 'Błąd synchronizacji';
@@ -1830,10 +1653,6 @@ class SPl extends S {
 
   @override
   String get syncJoining => 'Parowanie z urządzeniem…';
-
-  @override
-  String get syncLegacyCleared =>
-      'Stara lista urządzeń nigdy nie została sparowana, więc została wyczyszczona. Sparuj swoje urządzenia ponownie, tym razem naprawdę.';
 
   @override
   String get syncNewCode => 'Nowy kod';
@@ -1893,8 +1712,7 @@ class SPl extends S {
   String get syncThisDevice => 'To urządzenie';
 
   @override
-  String get syncUnavailableAndroid =>
-      'Device sync isn\'t available on Android yet, the sync service can\'t run there.';
+  String get syncUnavailableAndroid => 'Synchronizacja niedostępna w Androidzie';
 
   @override
   String get diagnosticPackets => 'Przechwytywanie pakietów';
@@ -1941,27 +1759,25 @@ class SPl extends S {
   String get customServerWgKeepalive => 'Keepalive, sekundy';
 
   @override
-  String get customServerWgKeyInvalid => 'Klucz musi mieć 32 bajty w base64, jak wypisuje wg genkey.';
+  String get customServerWgKeyInvalid => 'Nieprawidłowy klucz WireGuard';
 
   @override
-  String get customServerWgCidrInvalid => 'Wpisz prefiksy rozdzielone przecinkami, np. 10.0.0.2/32.';
+  String get customServerWgCidrInvalid => 'Nieprawidłowy prefiks CIDR';
 
   @override
-  String get customServerWgKeepaliveInvalid => 'Wpisz liczbę sekund od 0 do 65535.';
+  String get customServerWgKeepaliveInvalid => 'Nieprawidłowy interwał keepalive';
 
   @override
   String get strictKillSwitch => 'Ścisła blokada sieci';
 
   @override
-  String get strictKillSwitchWarning =>
-      'Po połączeniu ruch poza VPN pozostaje zablokowany także po zamknięciu aplikacji aż do rozłączenia.';
+  String get strictKillSwitchWarning => 'Blokować ruch poza VPN po zamknięciu aplikacji?';
 
   @override
-  String get extWorkerFailed => 'Zadanie rozszerzenia w tle nie powiodło się. Sprawdź dziennik rozszerzenia.';
+  String get extWorkerFailed => 'Zadanie rozszerzenia w tle nie powiodło się';
 
   @override
-  String get extAssetRejected =>
-      'Plik rozszerzenia zawiera nieczytelne kolory lub nieprawidłowe reguły. Poproś autora rozszerzenia o poprawienie pliku.';
+  String get extAssetRejected => 'Plik rozszerzenia zawiera nieczytelne kolory lub nieprawidłowe reguły';
 
   @override
   String get extVerifiedSora => 'Zweryfikowano przez Sora';
@@ -1987,31 +1803,25 @@ class SPl extends S {
   String get customServerPassword => 'Hasło';
 
   @override
-  String get customServerSecretRequired => 'Wpisz wartość';
+  String get customServerSecretRequired => 'Brak wartości';
 
   @override
   String get customServerLinkInvalid => 'Nieprawidłowy link serwera';
 
   @override
-  String get customServerMethodHint => 'chacha20-ietf-poly1305';
+  String get errInternal => 'Wewnętrzny błąd Sora';
 
   @override
-  String get customServerWgAddressesHint => '10.0.0.2/32';
+  String get errTls => 'Odrzucono certyfikat serwera';
 
   @override
-  String get errInternal => 'Wewnętrzny błąd Sora. Zapisz dziennik i zgłoś problem.';
+  String get errFileAccess => 'Brak dostępu do pliku';
 
   @override
-  String get errTls => 'Odrzucono certyfikat serwera. Sprawdź zegar lub skontaktuj się z dostawcą.';
+  String get errDataLimit => 'Za dużo danych';
 
   @override
-  String get errFileAccess => 'Brak dostępu do pliku. Sprawdź uprawnienia i wolne miejsce.';
-
-  @override
-  String get errDataLimit => 'Za dużo danych. Wybierz mniej elementów i spróbuj ponownie.';
-
-  @override
-  String get errCredentials => 'Brakuje zapisanych danych logowania. Zaimportuj serwer ponownie.';
+  String get errCredentials => 'Brakuje zapisanych danych logowania';
 
   @override
   String subscriptionStale(String time) {
@@ -2019,55 +1829,54 @@ class SPl extends S {
   }
 
   @override
-  String get subscriptionNeverUpdated => 'Jeszcze nie zaktualizowano. Ponów.';
+  String get subscriptionNeverUpdated => 'Jeszcze nie zaktualizowano';
 
   @override
   String errHttpStatus(int status) {
     String _temp0 = intl.Intl.pluralLogic(
       status,
       locale: localeName,
-      other: 'Serwer zwrócił kod HTTP $status. Sprawdź link lub skontaktuj się z dostawcą.',
-      zero: 'Serwer odrzucił żądanie. Sprawdź link lub skontaktuj się z dostawcą.',
+      other: 'Serwer zwrócił kod HTTP $status',
+      zero: 'Serwer odrzucił żądanie',
     );
     return '$_temp0';
   }
 
   @override
-  String get errInvalidServer => 'Ustawienia serwera są niepełne lub nieobsługiwane. Odśwież subskrypcję.';
+  String get errInvalidServer => 'Ustawienia serwera są niepełne lub nieobsługiwane';
 
   @override
-  String get errServerIds => 'Dwa serwery mają ten sam identyfikator. Zaimportuj je ponownie.';
+  String get errServerIds => 'Dwa serwery mają ten sam identyfikator';
 
   @override
-  String get errRoutingGroup => 'Trasa wskazuje brakujące serwery lub uszkodzoną grupę. Odśwież subskrypcję.';
+  String get errRoutingGroup => 'Trasa wskazuje brakujące serwery lub uszkodzoną grupę';
 
   @override
-  String get errConnections => 'Lista połączeń jest niedostępna. Połącz się lub wybierz inny silnik.';
+  String get errConnections => 'Lista połączeń jest niedostępna';
 
   @override
-  String get errLogs => 'Ta usługa nie prowadzi dziennika. Zaktualizuj Sora.';
+  String get errLogs => 'Ta usługa nie prowadzi dziennika';
 
   @override
-  String get errDiagnostics => 'Nie udało się zebrać diagnostyki. Ponów lub zapisz dziennik.';
+  String get errDiagnostics => 'Nie udało się zebrać diagnostyki';
 
   @override
-  String get errMissingItem => 'Żądany element już nie istnieje. Odśwież listę.';
+  String get errMissingItem => 'Żądany element już nie istnieje';
 
   @override
-  String get errInvalidRequest => 'Żądanie zawiera nieprawidłowe wartości. Sprawdź dane i ponów.';
+  String get errInvalidRequest => 'Żądanie zawiera nieprawidłowe wartości';
 
   @override
-  String get errProxyLogin =>
-      'Serwer proxy systemu nie obsługuje tego logowania. Usuń użytkownika i hasło lokalnego proxy.';
+  String get errProxyLogin => 'Serwer proxy systemu nie obsługuje tego logowania';
 
   @override
-  String get errLogFilter => 'Nieprawidłowy filtr dziennika. Wyczyść wyszukiwanie i ponów.';
+  String get errLogFilter => 'Nieprawidłowy filtr dziennika';
 
   @override
-  String get errSubRedirect => 'Serwer przekierował na niebezpieczny adres. Poproś dostawcę o nowy link.';
+  String get errSubRedirect => 'Serwer przekierował na niebezpieczny adres';
 
   @override
-  String get errProxySetup => 'Nie udało się ustawić serwera proxy systemu. Połącz ponownie lub otwórz dziennik.';
+  String get errProxySetup => 'Nie udało się ustawić serwera proxy systemu';
 
   @override
   String get notificationsToday => 'Dzisiaj';
@@ -2093,20 +1902,19 @@ class SPl extends S {
   }
 
   @override
-  String get errSubInterval =>
-      'Interwał aktualizacji subskrypcji jest nieprawidłowy. Wybierz interwał zalecany przez dostawcę.';
+  String get errSubInterval => 'Interwał aktualizacji subskrypcji jest nieprawidłowy';
 
   @override
-  String get errRule => 'Reguła routingu jest nieprawidłowa. Sprawdź domenę, adres IP lub aplikację w regule.';
+  String get errRule => 'Reguła routingu jest nieprawidłowa';
 
   @override
-  String get errDns => 'Ustawienia DNS są nieprawidłowe. Sprawdź adres serwera DNS.';
+  String get errDns => 'Ustawienia DNS są nieprawidłowe';
 
   @override
-  String get errEndpoint => 'Adres sprawdzanego serwera jest nieprawidłowy. Sprawdź nazwę hosta i port.';
+  String get errEndpoint => 'Adres sprawdzanego serwera jest nieprawidłowy';
 
   @override
-  String get errCancelled => 'Żądanie zostało anulowane. W razie potrzeby wykonaj czynność ponownie.';
+  String get errCancelled => 'Żądanie zostało anulowane';
 
   @override
   String get customServerOptions => 'Ustawienia połączenia';
@@ -2127,18 +1935,13 @@ class SPl extends S {
   String get customServerWgPeer => 'Peer';
 
   @override
-  String get customServerOptionsInfo => 'Użyj ustawień transportu i TLS od dostawcy lub wklej link serwera.';
-
-  @override
   String extAvailableOn(String platforms) {
     return 'Dostępne na: $platforms.';
   }
 
   @override
-  String get winwsScopeWarning =>
-      'Zapret zmienia ruch TCP na portach 80 i 443 dla wszystkich aplikacji Windows. To nie jest VPN. Sterownik WinDivert może pozostać załadowany do ponownego uruchomienia Windows.';
+  String get winwsScopeWarning => 'Zmienić ruch TCP wszystkich aplikacji?';
 
   @override
-  String get winwsRequirements =>
-      'Wymaga natywnego Windows x64, WLANAPI i zweryfikowanego pakietu WinDivert. Jeśli Windows zablokuje sterownik, ten tryb będzie niedostępny.';
+  String get winwsRequirements => 'Ten tryb VPN jest niedostępny';
 }
