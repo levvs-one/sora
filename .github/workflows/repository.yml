@@ -183,6 +183,8 @@ jobs:
           if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
           echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
       - name: Connection and export races over an isolated RPC socket
         run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
       - name: Build for Linux
@@ -373,6 +375,10 @@ jobs:
           "SORA_COMPAT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Release-version catalog compatibility failed' }
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate-host extension catalog UI failed' }
+          flutter test --timeout=180s '--dart-define=SORA_VERSION=1.1.2' test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          if ($LASTEXITCODE -ne 0) { throw 'Published-host extension catalog UI gate failed' }
       - name: Native signed extension panel and bridge
         working-directory: app
         run: |
@@ -859,6 +865,8 @@ jobs:
           if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then exit 1; fi
           echo "SORA_COMPAT_VERSION=$version" >> "$GITHUB_ENV"
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
+          flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+          flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
       - name: Native signed extension panel on ARM64
         if: matrix.arch == 'arm64'
         working-directory: app

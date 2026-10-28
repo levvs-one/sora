@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:grpc/grpc.dart' show Server, ServiceCall;
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:sora/src/core/link.dart';
@@ -21,9 +23,14 @@ import 'package:sora/src/ext/store.dart';
 import 'package:sora/src/ext/verifier.dart';
 import 'package:sora/src/generated/sora/core/v1/core_control.pbgrpc.dart';
 import 'package:sora/src/settings.dart';
+import 'package:sora/src/updates.dart' show appVersion;
 import 'package:sora/l10n/strings.dart';
 import 'package:sora/src/design/theme.dart';
 import 'package:sora/src/ui/extensions/detail_screen.dart';
+import 'package:sora/src/ui/extensions/permissions_sheet.dart';
+import 'package:sora/src/ui/extensions/store_screen.dart';
+import 'package:sora/src/ui/extensions/widgets.dart';
+import 'package:sora/src/ui/kit.dart';
 import 'package:sora/src/ui/modes.dart';
 import 'package:sora/src/generated/sora/custom/v1/custom.pbgrpc.dart' as custom;
 import 'package:sora/src/sora.dart';
@@ -296,6 +303,148 @@ void main() {
       catalog.entries.map((e) => e.id).toSet(),
     );
   });
+
+  testWidgets('catalog UI enforces candidate host compatibility and explicit grants', (tester) async {
+    late Sora sora;
+    late bool incompatibleHost;
+    late String requiredVersion;
+    final downloads = <String, Uint8List>{};
+    final ids = <String>[];
+    await tester.runAsync(() async {
+      final team = '${fixture.path}/ui-team';
+      await command(tool, ['keygen', '-o', team]);
+      final teamKey = (await File('$team.pub').readAsLines()).last.trim();
+      final rows = <Map<String, dynamic>>[];
+      final paths = ['../extensions/sources/zapret', '../extensions/sources/byedpi', '../examples/hello-panel'];
+      for (var i = 0; i < paths.length; i++) {
+        final output = '${fixture.path}/ui-candidate-$i.soraext';
+        final candidate = await signed(sourceOverride: Directory(paths[i]), outputFile: output);
+        final result = await Process.run(tool, ['publish', '--ack-dangerous', output]);
+        expect(result.exitCode, 0, reason: '${result.stderr}');
+        final published = result.stdout as String;
+        final start = published.lastIndexOf('\n  {');
+        expect(start, greaterThanOrEqualTo(0));
+        final row = jsonDecode(published.substring(start)) as Map<String, dynamic>;
+        final id = candidate.manifest.id;
+        final url = 'https://example.invalid/$id.soraext';
+        ids.add(id);
+        downloads[url] = await File(output).readAsBytes();
+        rows.add({
+          ...row,
+          'platforms': ['linux', 'windows'],
+          'download_url': url,
+        });
+      }
+      final bytes = Uint8List.fromList(
+        utf8.encode(
+          jsonEncode({
+            'catalog_version': 1,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+            'max_age': 3600,
+            'extensions': rows,
+          }),
+        ),
+      );
+      final file = File('${fixture.path}/ui-catalog.json');
+      await file.writeAsBytes(bytes);
+      await command(tool, ['sign-file', '--key', '$team.key', '--role', 'catalog.json', file.path]);
+      final signature = await File('${file.path}.minisig').readAsString();
+      await verifyPayload(teamKey, signature, 'catalog.json', bytes);
+      final catalog = ExtensionCatalog.parse(bytes);
+      incompatibleHost = catalog.entries.every((entry) => entry.requiresNewerApp(appVersion));
+      requiredVersion = catalog.entries.first.minAppVersion;
+      // The test key is not the production root. Seed the already-verified
+      // local cache and make the simulated network refresh fail closed.
+      await store.catalogCache.store(bytes);
+      sora = Sora(await Settings.load(), extensions: store);
+      ownedBySora = true;
+    });
+    addTearDown(sora.dispose);
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 1100);
+    addTearDown(tester.view.reset);
+    final requested = <String>[];
+    final client = MockClient((request) async {
+      final bytes = downloads[request.url.toString()];
+      if (bytes == null) return http.Response('', 503);
+      requested.add(request.url.toString());
+      return http.Response.bytes(bytes, 200);
+    });
+    addTearDown(client.close);
+    await http.runWithClient(() async {
+      await tester.pumpWidget(
+        SoraScope(
+          sora: sora,
+          child: ExtScope(
+            store: store,
+            child: MotionScope(
+              enabled: false,
+              child: MaterialApp(
+                theme: buildTheme(Brightness.light),
+                locale: const Locale('en'),
+                localizationsDelegates: S.localizationsDelegates,
+                supportedLocales: S.supportedLocales,
+                home: const ExtensionsScreen(),
+              ),
+            ),
+          ),
+        ),
+      );
+      for (var i = 0; i < 1000 && find.byType(ExtensionCard).evaluate().length < ids.length; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+        await tester.pump(const Duration(milliseconds: 20));
+      }
+      expect(find.byType(ExtensionCard), findsNWidgets(3));
+      if (incompatibleHost) {
+        expect(find.text('Install'), findsNothing);
+        expect(find.byType(InfoButton), findsNWidgets(3));
+        await tester.tap(find.byType(InfoButton).first);
+        await tester.pumpAndSettle();
+        expect(find.textContaining(requiredVersion), findsWidgets);
+        expect(requested, isEmpty);
+        expect(store.installed, isEmpty);
+        await tester.pumpWidget(const SizedBox());
+        return;
+      }
+      for (final id in ids) {
+        final card = find.byKey(ValueKey(id));
+        expect(card, findsOneWidget);
+        await tester.ensureVisible(card);
+        await tester.tap(find.descendant(of: card, matching: find.text('Install')));
+        await tester.pump();
+        for (var i = 0; i < 1000 && find.byType(InstallPermissionPrompt).evaluate().isEmpty; i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+          await tester.pump(const Duration(milliseconds: 20));
+        }
+        final prompt = find.byType(InstallPermissionPrompt);
+        expect(prompt, findsOneWidget, reason: id);
+        expect(tester.widget<InstallPermissionPrompt>(prompt).manifest.id, id);
+        if (id != 'org.sora.hello-panel') {
+          final confirm = find.descendant(of: prompt, matching: find.byType(PrimaryButton));
+          expect(tester.widget<PrimaryButton>(confirm).onTap, isNull);
+          await tester.tap(find.text('I understand these permissions are powerful'));
+          await tester.pump();
+          expect(tester.widget<PrimaryButton>(confirm).onTap, isNotNull);
+        }
+        await tester.tap(find.descendant(of: prompt, matching: find.text('Install')));
+        for (var i = 0; i < 1000 && (store.get(id) == null || find.byType(Dialog).evaluate().isNotEmpty); i++) {
+          await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+          await tester.pump(const Duration(milliseconds: 20));
+        }
+        expect(store.get(id), isNotNull, reason: id);
+        expect(find.byType(Dialog), findsNothing, reason: id);
+        await tester.pumpAndSettle();
+      }
+      expect(requested.length, 3);
+      expect(store.installed.map((entry) => entry.id).toSet(), ids.toSet());
+      final conflict = findConflicts(store.installed).single;
+      expect(conflict.kind, ExtConflictKind.netHooks);
+      expect(conflict.extensionIds, ['org.sora.byedpi', 'org.sora.zapret']);
+      expect(store.bypassProfiles, isEmpty);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    }, () => client);
+  }, timeout: const Timeout(Duration(minutes: 3)));
 
   test('declared installed backend only; immutable descriptors and copied strategies', () {
     for (final backend in ['tpws', 'byedpi']) {
