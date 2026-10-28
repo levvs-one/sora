@@ -37,7 +37,9 @@ Info dialogs at 320px and text scale 1.6 are rendered with actual app/icon fonts
 Publication is separate. No new production catalog entries, signed packages,
 software releases or root-key changes are made here. Before publishing bypass
 sources, set the actual first supported host version and accurately restrict
-their OS; Windows WinDivert remains a separate unfinished runtime integration.
+their OS. The subsequent Windows Winws integration is described in
+[the bypass boundary](extension-bypass-profiles.md#windows-winws-adapter);
+this catalog preflight alone does not implement that native adapter.
 
 Validation: full Flutter 554 passed / 71 prerequisite skips, analyze 0;
 seven cases passed with SORA_VERSION=1.1.2; final catalog/UI/revocation slice
