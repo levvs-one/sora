@@ -911,6 +911,9 @@ jobs:
               done
               test -s "$1/targets.json"
               cd "$1/source/app"
+              # The copied SDK still points at the runner's inaccessible package cache.
+              # Resolve its tool first: Flutter's cache refresh ignores pub's --offline.
+              (cd "$1/flutter/packages/flutter_tools" && setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile)
               setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter pub get --offline
               setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$2" test/extension_bypass_test.dart --plain-name "signed Zapret profile connects the app to a real isolated core"
             ' bash "$private" "$version"
@@ -969,6 +972,8 @@ jobs:
               test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
               ip link set lo up
               cd "$1/source/app"
+              # Rebind the SDK's package config before Flutter can refresh it online.
+              (cd "$1/flutter/packages/flutter_tools" && setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all "$1/flutter/bin/cache/dart-sdk/bin/dart" pub get --offline --enforce-lockfile)
               setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter pub get --offline
               exec setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$2" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
             ' bash "$private" "$version"
