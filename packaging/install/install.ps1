@@ -108,7 +108,7 @@ try {
         if (Get-Command minisign -ErrorAction SilentlyContinue) {
             & minisign -Vm (Join-Path $work 'SHA256SUMS') -P $publicKey
             if ($LASTEXITCODE -ne 0) { throw 'Release signature rejected.' }
-        } elseif (Get-Command openssl -ErrorAction SilentlyContinue) {
+        } elseif ((Get-Command openssl -ErrorAction SilentlyContinue) -and ((& openssl version) -match '^OpenSSL ([3-9]|[1-9][0-9]+)[.]')) {
             $keyBytes = [Convert]::FromBase64String($publicKey)
             $sigBytes = [Convert]::FromBase64String($signatureLines[1])
             if ($sigBytes.Length -ne 74 -or [BitConverter]::ToString($keyBytes[2..9]) -cne [BitConverter]::ToString($sigBytes[2..9])) { throw 'Untrusted release key.' }

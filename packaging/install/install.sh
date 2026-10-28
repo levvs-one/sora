@@ -124,7 +124,7 @@ else
 	comment=$(sed -n '3s/^trusted comment: //p' "$work/SHA256SUMS.minisig")
 	pattern=$(printf 'timestamp:[1-9][0-9]*\tfile:release:v%s:SHA256SUMS\tsha256:%s' "$(printf '%s' "$version" | sed 's/\./[.]/g')" "$digest")
 	printf '%s\n' "$comment" | grep -Ex "$pattern" >/dev/null || die 'release signature role or digest rejected'
-	if command -v openssl >/dev/null 2>&1; then
+	if command -v openssl >/dev/null 2>&1 && openssl version | grep -Eq '^OpenSSL ([3-9]|[1-9][0-9]+)[.]'; then
 		# Only framing is decoded here; OpenSSL verifies both Ed25519 signatures.
 		printf '%s' "$public_key" | openssl base64 -d -A >"$work/key.raw"
 		sed -n '2p' "$work/SHA256SUMS.minisig" | openssl base64 -d -A >"$work/signature.raw"

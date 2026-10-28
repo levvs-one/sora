@@ -26,7 +26,7 @@ class InstallerSignatureTest(unittest.TestCase):
         prepare(cls.inputs, "1.2.3", cls.tools)
         cls.script = Path(__file__).with_name("install.ps1" if os.name == "nt" else "install.sh").resolve()
 
-    def run_installer(self, variant, shell="pwsh", architecture=None, expected_packages=None):
+    def run_installer(self, variant, shell="pwsh", architecture=None, expected_packages=None, crypto_available=True):
         bootstrap = variant.startswith("bootstrap-")
         if bootstrap:
             variant = variant.removeprefix("bootstrap-")
@@ -105,6 +105,8 @@ class InstallerSignatureTest(unittest.TestCase):
                            "--ro-bind", "/", "/", "--tmpfs", "/usr/bin", "--tmpfs", "/tmp", "--dev", "/dev",
                            "--bind", str(self.root), "/tmp/test"]
                 for name in ("sh", "id", "uname", "rm", "grep", "awk", "mktemp", "sha256sum", "readlink", "head", "wc", "openssl", "sed", "dd", "cmp", "cat"):
+                    if name == "openssl" and not crypto_available:
+                        continue
                     command += ["--ro-bind", str(Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
                 if architecture is not None:
                     machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
@@ -152,6 +154,14 @@ class InstallerSignatureTest(unittest.TestCase):
         result, reached = self.run_installer("bootstrap-modified comment signature")
         self.assertFalse(reached, result.stdout + result.stderr)
         self.assertIn("comment signature rejected", result.stdout + result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "Linux tool-availability sandbox")
+    def test_bootstrap_without_crypto_tools_reports_https_trust_and_still_checks_packages(self):
+        result, reached = self.run_installer("bootstrap-valid", crypto_available=False)
+        self.assertTrue(reached, result.stdout + result.stderr)
+        self.assertIn("first installation trusts HTTPS and checksums", result.stdout)
+        result, reached = self.run_installer("bootstrap-modified package", crypto_available=False)
+        self.assertFalse(reached, result.stdout + result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Linux package architecture selection")
     def test_linux_installs_both_native_packages(self):
