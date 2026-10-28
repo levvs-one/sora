@@ -27,6 +27,9 @@ class InstallerSignatureTest(unittest.TestCase):
         cls.script = Path(__file__).with_name("install.ps1" if os.name == "nt" else "install.sh").resolve()
 
     def run_installer(self, variant, shell="pwsh", architecture=None, expected_packages=None):
+        bootstrap = variant.startswith("bootstrap-")
+        if bootstrap:
+            variant = variant.removeprefix("bootstrap-")
         with tempfile.TemporaryDirectory(prefix="case-", dir=self.root) as directory:
             case = Path(directory)
             distribution = case / "distribution"
@@ -39,6 +42,11 @@ class InstallerSignatureTest(unittest.TestCase):
                 (distribution / "SHA256SUMS").write_text("a" * 64 + "  changed.exe\n")
             elif variant == "modified signature":
                 (distribution / "SHA256SUMS.minisig").write_text("untrusted signature\n")
+            elif variant == "modified comment signature":
+                signature = distribution / "SHA256SUMS.minisig"
+                lines = signature.read_text().splitlines()
+                lines[3] = "A" * 86 + "=="
+                signature.write_text("\n".join(lines) + "\n")
             elif variant == "wrong version":
                 version = "1.2.4"
             elif variant == "bad version":
@@ -76,11 +84,19 @@ class InstallerSignatureTest(unittest.TestCase):
                 verifier = target
             if os.name == "nt":
                 env = {**os.environ, "SORA_VERSION": version, "SORA_DIST": str(distribution), "SORA_VERIFIER": str(verifier)}
+                if bootstrap:
+                    env.pop("SORA_VERIFIER", None)
+                    env["ProgramFiles"] = str(case / "no-installed-client")
+                    public = (self.tools / "fixture-public-key.txt").read_text().strip()
+                    script = case / "install.ps1"
+                    script.write_text(self.script.read_text().replace("RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+", public))
+                else:
+                    script = self.script
                 # This intercepts only the final OS execution boundary; signature
                 # verification runs the real native verifier with the fixture root.
                 driver = case / "driver.ps1"
                 driver.write_text("function Start-Process { [IO.File]::WriteAllText($env:SORA_INSTALL_MARKER, 'reached'); throw 'INSTALL_BOUNDARY_REACHED' }\n& $env:SORA_INSTALL_SCRIPT\n")
-                env["SORA_INSTALL_SCRIPT"] = str(self.script)
+                env["SORA_INSTALL_SCRIPT"] = str(script)
                 env["SORA_INSTALL_MARKER"] = str(case / "installation")
                 result = subprocess.run([shell, "-NoProfile", "-File", str(driver)], env=env, text=True, capture_output=True, timeout=30)
                 reached = (case / "installation").exists()
@@ -88,7 +104,7 @@ class InstallerSignatureTest(unittest.TestCase):
                 command = ["bwrap", "--unshare-all", "--uid", "0", "--gid", "0", "--die-with-parent",
                            "--ro-bind", "/", "/", "--tmpfs", "/usr/bin", "--tmpfs", "/tmp", "--dev", "/dev",
                            "--bind", str(self.root), "/tmp/test"]
-                for name in ("sh", "id", "uname", "rm", "grep", "awk", "mktemp", "sha256sum", "readlink", "head", "wc"):
+                for name in ("sh", "id", "uname", "rm", "grep", "awk", "mktemp", "sha256sum", "readlink", "head", "wc", "openssl", "sed", "dd", "cmp", "cat"):
                     command += ["--ro-bind", str(Path(shutil.which(name)).resolve()), "/usr/bin/" + name]
                 if architecture is not None:
                     machine = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
@@ -102,9 +118,15 @@ class InstallerSignatureTest(unittest.TestCase):
                 command += ["--ro-bind", str(boundary), "/usr/bin/apt-get"]
                 mounted = Path("/tmp/test")
                 shutil.copyfile(self.script, case / "install.sh")
+                if bootstrap:
+                    public = (self.tools / "fixture-public-key.txt").read_text().strip()
+                    script = case / "install.sh"
+                    script.write_text(script.read_text().replace("RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+", public))
                 command += ["--setenv", "PATH", "/usr/bin", "--setenv", "TMPDIR", "/tmp",
-                            "--setenv", "SORA_VERSION", version, "--setenv", "SORA_DIST", str(mounted / distribution.relative_to(self.root)),
-                            "--setenv", "SORA_VERIFIER", str(mounted / verifier.relative_to(self.root)), "--", "/usr/bin/sh", "-c",
+                            "--setenv", "SORA_VERSION", version, "--setenv", "SORA_DIST", str(mounted / distribution.relative_to(self.root))]
+                command += (["--unsetenv", "SORA_VERIFIER"] if bootstrap else
+                            ["--setenv", "SORA_VERIFIER", str(mounted / verifier.relative_to(self.root))])
+                command += ["--", "/usr/bin/sh", "-c",
                             'printf "%s\\n" SORA_INSTALLER_SANDBOX_READY; exec /usr/bin/sh "$1"',
                             "sora-installer-test", str(mounted / case.name / "install.sh")]
                 result = subprocess.run(command, text=True, capture_output=True, timeout=30)
@@ -115,6 +137,21 @@ class InstallerSignatureTest(unittest.TestCase):
                     packages = [Path(item).name for item in arguments if item.endswith(".deb")]
                     self.assertEqual(packages, expected_packages, result.stdout + result.stderr)
             return result, reached
+
+    def test_first_install_without_a_preinstalled_verifier(self):
+        result, reached = self.run_installer("bootstrap-valid")
+        self.assertTrue(reached, result.stdout + result.stderr)
+        for variant in ("missing signature", "modified manifest", "modified signature", "wrong version",
+                        "modified package", "metadata-tamper"):
+            with self.subTest(variant=variant):
+                result, reached = self.run_installer("bootstrap-" + variant)
+                self.assertFalse(reached, result.stdout + result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "Windows without crypto tools deliberately trusts HTTPS bootstrap")
+    def test_bootstrap_authenticates_the_comment_signature(self):
+        result, reached = self.run_installer("bootstrap-modified comment signature")
+        self.assertFalse(reached, result.stdout + result.stderr)
+        self.assertIn("comment signature rejected", result.stdout + result.stderr)
 
     @unittest.skipIf(os.name == "nt", "Linux package architecture selection")
     def test_linux_installs_both_native_packages(self):

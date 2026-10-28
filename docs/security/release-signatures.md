@@ -3,7 +3,7 @@
 The native verifier, Windows/Linux install scripts, in-app updater and Linux
 rollback enforce the signature contract below. The privileged Linux helper
 repeats verification on its private snapshot before running a package manager.
-The first-install trust prerequisites below are mandatory; S2 is still open.
+First installation uses the explicit HTTPS bootstrap boundary below; installed clients require signed updates. S2 still has the owner acceptance items listed below.
 
 The Linux helper now prepares its private pair with the installed core's
 `-prepare-update` mode, authenticating metadata before bounded package copies.
@@ -33,46 +33,78 @@ sign test data here.
 
 ## Initial installation
 
-Use a previously authenticated local copy of the installer script. Both scripts
-require a previously trusted `sora-core` verifier, defaulting to
-`/usr/bin/sora-core` or `%ProgramFiles%\Sora\core\sora-core.exe`. An absolute
-`SORA_VERIFIER` path can select a separately authenticated build. It is never
-downloaded automatically and cannot come from the `SORA_DIST` directory.
-
-For a first installation, build the verifier from an independently authenticated,
-reviewed source checkout with the pinned root, or obtain it through another
-authenticated distribution channel. Compiling arbitrary freshly downloaded
-source does not establish that trust. An older installed core without this
-verification command is also rejected. For an already authenticated checkout:
+A new user can install with one command:
 
 ```sh
-(cd core && go build -trimpath -o ../trusted-verifier ./cmd/sora-core)
-SORA_VERIFIER="$PWD/trusted-verifier" sh packaging/install/install.sh
+curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
 ```
 
 ```powershell
-Push-Location core
-go build -trimpath -o ../trusted-verifier.exe ./cmd/sora-core
-if ($LASTEXITCODE -ne 0) { throw 'Verifier build failed' }
-Pop-Location
-$env:SORA_VERIFIER = (Resolve-Path ./trusted-verifier.exe).Path
-& ./packaging/install/install.ps1
+irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
 ```
 
-These are bootstrap prerequisites for reviewed distributions, not a consumer
-one-command trust solution. A signed Windows installer or trusted Linux package
-channel still needs release-owner provisioning before a general release.
+**These commands trust the HTTPS download of the script itself.** The pinned
+key inside a freshly downloaded script cannot independently authenticate that
+script. For an independently authenticated bootstrap, obtain and review the
+script and its pinned key through an independent trusted channel first.
+
+When a modern installed core is available, both scripts retain the strict
+native schema 1 verifier and signed artifact-size query. An explicit absolute
+`SORA_VERIFIER` selects a separately authenticated build: a missing, downloaded
+or rejecting explicit verifier is an error, never a bootstrap fallback.
+The default old core without `-verify-release` is treated as a first-install
+transition; a modern core rejecting metadata never falls back.
+
+Without a pre-installed verifier the scripts check the exact SHA256SUMS bytes
+with the pinned team key using a system OpenSSL (Ed25519 `pkeyutl -rawin`) or
+minisign. OpenSSL checks both the payload and global trusted-comment signatures,
+the key ID, versioned role and SHA-256 in that comment. `Ed` signs the bounded
+payload directly, matching the existing Go signer; `ED` uses the Minisign
+BLAKE2b-512 prehash. These are protocol variants, not Ed25519ph. A crypto-tool
+failure aborts; it is never retried as unsigned bootstrap. No verifier is
+downloaded or executed to authenticate itself.
+
+If neither system crypto tool exists, bootstrap explicitly reports that it
+trusts HTTPS plus the downloaded checksum table. Windows PowerShell 5.1 has no
+built-in Ed25519/BLAKE2b verifier, and no runtime or module is downloaded to add
+one. Install OpenSSL 3 or minisign through a trusted OS channel before running
+the command if independent package authentication is required at first install.
+This exception applies only to the installation script's bootstrap; in-app
+updates, rollback, privileged snapshots and explicit verifier paths stay strict.
+
+Both bootstrap paths require release.json and its matching checksum before
+package installation. Windows parses its version/target/size with the built-in
+ConvertFrom-Json and streams the selected installer within that size. Linux
+bootstrap downloads only the two native package names derived from the requested
+version and OS architecture, with a fixed 2 GiB ceiling each, then requires one
+matching checksum per package. Full canonical schema/size queries remain the
+native verifier's contract when installed. All package hashes are checked
+before UAC or a package-manager invocation. SORA_DIST uses the same private
+snapshot and verification rules without network access.
+
+The implementation reuses existing shell/coreutils, curl and .NET HttpClient,
+SHA256 and JSON APIs. The system crypto tools were compared on 28 October 2026:
+
+| Tool | Latest release | Stars / open incl. PRs | Distribution | License / runtime |
+| --- | --- | --- | --- | --- |
+| OpenSSL | 4.1.0, 2026-10-23 | 31104 / 1628 | source archive 55738000 B | Apache-2.0; native CLI, required API available since 3.0 |
+| minisign | 0.12, 2025-01-15 | 2870 / 0 | Linux archive 271043 B; Windows archive 252505 B | ISC; native standalone CLI |
+
+No dependency is downloaded by the installer. Reusing available system tools
+keeps the one-command flow; the existing Go verifier stays authoritative for
+installed clients. See the [OpenSSL Ed25519 API](https://docs.openssl.org/3.0/man1/openssl-pkeyutl/)
+and [Minisign wire format](https://jedisct1.github.io/minisign/#signature-format).
 
 The scripts first copy/download bounded manifest and detached signature files,
 and require `release.json` in the checksum table. That declaration may
-cause only a bounded metadata fetch before authentication. The trusted verifier
+cause only a bounded metadata fetch before authentication. When installed, the trusted verifier
 then checks the requested stable version, signature and declared JSON. A rejection
 stops before package download, UAC or package-manager execution. Packages are
 copied into the private working snapshot and hashed; missing or duplicate
 checksum entries are rejected. An authenticated artifact query checks the selected
 OS/architecture and returns its signed byte size before copying or streaming that
-package. An exact length check also runs before installation. No unsigned
-compatibility fallback is provided.
+package. An exact length check also runs before installation. The installed-verifier path provides no unsigned
+compatibility fallback; the explicit first-install trust boundary is described above.
 
 Network installation on Linux requires curl 8.4 or later: earlier versions do
 not enforce `--max-filesize` on chunked responses. Older curl is rejected before
@@ -184,8 +216,8 @@ publication workflow still needs to invoke it with an independently trusted
 verifier and protect the verified asset set until publication. Use an owned,
 private snapshot without concurrent writers; these checks do not make an arbitrary
 shared directory immutable. Declared OS/architecture are not independent PE/ELF
-inspection. Consumer bootstrap, release-owner approval and the signed-release
-transition remain required before any public release.
+inspection. Release-owner approval and the signed-release transition remain required;
+the explicit 1.1.3 bootstrap boundary is described above.
 
 ## Protected GitHub publication path
 
@@ -525,14 +557,17 @@ of a new signed baseline; subsequent updates can cache that baseline. Another
 requires independently authenticating historical payloads, generating complete
 schema 1 metadata and authorizing its signing/publication through a reviewed
 transition. Merely attaching a signature to an old checksum-only release is
-insufficient. This change chooses neither production action nor a bootstrap trust
-channel and does not retrofit provenance to old releases.
+insufficient. For 1.1.3, the owner selected the HTTPS installation-script bootstrap above
+to establish the first schema 1 baseline. This does not retrofit provenance
+to old releases or add signature checks to an already installed v1.1.2 updater.
 An older installed native verifier that does not understand the command also
 causes the helper to refuse installation. Publishing signatures or re-signing an
 old release is a separate release action; this change performs neither.
 
 Still required by S2: the reviewed transition, provisioning/approval of the prepared
-publication gate with its key outside CI, a consumer bootstrap channel, key rotation/revocation and the
+publication gate with its key outside CI, key rotation/revocation and the
 remaining real installation/elevation rejection matrix. Windows does not yet
-implement automatic rollback. Do not publish a release before the signed-release
-transition is ready.
+implement automatic rollback. For 1.1.3, install the new signed baseline through the bootstrap script;
+subsequent updates can cache 1.1.3 for verified Linux rollback. Do not promise
+rollback to unsigned 1.1.2. The Windows tag build also requires Authenticode
+provisioning independently of Minisign; without it the release cannot build.

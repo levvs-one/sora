@@ -1,7 +1,5 @@
-# Run a previously authenticated copy of this script, never a downloaded pipe.
-# SORA_VERIFIER must name a previously trusted sora-core; otherwise the installed
-# core is used. A downloaded verifier cannot establish its own trust.
-# Signature verification precedes package download, checksum checking and UAC.
+# One-command bootstrap trusts the HTTPS download of this script.
+# Existing verifiers stay on the strict signed-metadata path.
 #
 # $env:SORA_VERSION = '1.0.3' installs that release instead of the latest.
 # $env:SORA_DIST = '<folder>' installs an installer already in that folder,
@@ -19,9 +17,13 @@ if (-not [IO.Path]::IsPathRooted($verifier)) { throw 'SORA_VERIFIER must be an a
 $verifier = [IO.Path]::GetFullPath($verifier)
 $verifierFile = Get-Item -LiteralPath $verifier -ErrorAction SilentlyContinue
 if (-not $verifierFile -or $verifierFile.PSIsContainer -or ($verifierFile.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
-    throw 'A previously authenticated sora-core verifier is required. See docs/security/release-signatures.md.'
+    if ($env:SORA_VERIFIER) { throw 'The explicitly selected trusted verifier is unavailable.' }
+    $verifier = $null
+} elseif (-not $env:SORA_VERIFIER) {
+    $helpText = (& $verifier -h 2>&1 | Out-String)
+    if ($helpText -notmatch '-verify-release') { $verifier = $null }
 }
-if ($env:SORA_DIST) {
+if ($env:SORA_DIST -and $verifier) {
     $distribution = [IO.Path]::GetFullPath($env:SORA_DIST).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
     if ($verifier.StartsWith($distribution, [StringComparison]::OrdinalIgnoreCase)) { throw 'Do not trust a verifier supplied with the downloads.' }
 }
@@ -82,15 +84,62 @@ function Receive-ReleaseFile([string]$File, [long]$Limit) {
         $deadline.Dispose()
     }
 }
+function Get-ReleaseHash([string]$Path) {
+    $hash = [Security.Cryptography.SHA256]::Create()
+    $stream = [IO.File]::OpenRead($Path)
+    try { return [BitConverter]::ToString($hash.ComputeHash($stream)).Replace('-', '').ToLowerInvariant() }
+    finally { $stream.Dispose(); $hash.Dispose() }
+}
 try {
     Receive-ReleaseFile 'SHA256SUMS' 1048576
     Receive-ReleaseFile 'SHA256SUMS.minisig' 8192
     if (-not (Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -cmatch ' [ *]release[.]json$' })) { throw 'Schema 1 release metadata is required.' }
     Receive-ReleaseFile 'release.json' 1048576
-    & $verifier -verify-release $work -release-version $version
-    if ($LASTEXITCODE -ne 0) { throw 'The release signature or metadata was rejected; nothing was installed.' }
-    $sizeText = & $verifier -verify-release $work -release-version $version -release-artifact $name -release-target 'windows/amd64'
-    if ($LASTEXITCODE -ne 0 -or $sizeText -notmatch '^(0|[1-9][0-9]{0,9})$') { throw 'Invalid verifier size response.' }
+    if ($verifier) {
+        & $verifier -verify-release $work -release-version $version
+        if ($LASTEXITCODE -ne 0) { throw 'The release signature or metadata was rejected; nothing was installed.' }
+        $sizeText = & $verifier -verify-release $work -release-version $version -release-artifact $name -release-target 'windows/amd64'
+    } else {
+        $publicKey = 'RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+'
+        $signatureLines = [IO.File]::ReadAllLines((Join-Path $work 'SHA256SUMS.minisig'))
+        $digest = Get-ReleaseHash (Join-Path $work 'SHA256SUMS')
+        $rolePattern = '^trusted comment: timestamp:[1-9][0-9]*\tfile:release:v' + [regex]::Escape($version) + ':SHA256SUMS\tsha256:' + $digest + '$'
+        if ($signatureLines.Length -ne 4 -or $signatureLines[2] -cnotmatch $rolePattern) { throw 'Release signature role or digest rejected.' }
+        if (Get-Command minisign -ErrorAction SilentlyContinue) {
+            & minisign -Vm (Join-Path $work 'SHA256SUMS') -P $publicKey
+            if ($LASTEXITCODE -ne 0) { throw 'Release signature rejected.' }
+        } elseif (Get-Command openssl -ErrorAction SilentlyContinue) {
+            $keyBytes = [Convert]::FromBase64String($publicKey)
+            $sigBytes = [Convert]::FromBase64String($signatureLines[1])
+            if ($sigBytes.Length -ne 74 -or [BitConverter]::ToString($keyBytes[2..9]) -cne [BitConverter]::ToString($sigBytes[2..9])) { throw 'Untrusted release key.' }
+            [byte[]]$derHeader = 0x30,0x2a,0x30,0x05,0x06,0x03,0x2b,0x65,0x70,0x03,0x21,0x00
+            [IO.File]::WriteAllBytes((Join-Path $work 'key.der'), [byte[]]($derHeader + $keyBytes[10..41]))
+            [IO.File]::WriteAllBytes((Join-Path $work 'signature'), [byte[]]$sigBytes[10..73])
+            $inputFile = Join-Path $work 'SHA256SUMS'
+            $algorithm = [Text.Encoding]::ASCII.GetString($sigBytes[0..1])
+            if ($algorithm -ceq 'ED') {
+                & openssl dgst -blake2b512 -binary -out (Join-Path $work 'prehash') $inputFile
+                if ($LASTEXITCODE -ne 0) { throw 'Release prehash failed.' }
+                $inputFile = Join-Path $work 'prehash'
+            } elseif ($algorithm -cne 'Ed') { throw 'Unsupported signature algorithm.' }
+            & openssl pkeyutl -verify -pubin -keyform DER -inkey (Join-Path $work 'key.der') -rawin -in $inputFile -sigfile (Join-Path $work 'signature')
+            if ($LASTEXITCODE -ne 0) { throw 'Release signature rejected.' }
+            $comment = [Text.Encoding]::UTF8.GetBytes($signatureLines[2].Substring(17))
+            [IO.File]::WriteAllBytes((Join-Path $work 'comment'), [byte[]]($sigBytes[10..73] + $comment))
+            [IO.File]::WriteAllBytes((Join-Path $work 'comment.sig'), [Convert]::FromBase64String($signatureLines[3]))
+            & openssl pkeyutl -verify -pubin -keyform DER -inkey (Join-Path $work 'key.der') -rawin -in (Join-Path $work 'comment') -sigfile (Join-Path $work 'comment.sig')
+            if ($LASTEXITCODE -ne 0) { throw 'Release comment signature rejected.' }
+        } else {
+            Write-Warning 'First installation trusts HTTPS and checksums. Install minisign or OpenSSL 3 first for independent package signature verification.'
+        }
+        $metadataLines = @(Get-Content -LiteralPath (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -cmatch '^([0-9a-f]{64})  release[.]json$' })
+        if ($metadataLines.Count -ne 1 -or (Get-ReleaseHash (Join-Path $work 'release.json')) -cne $metadataLines[0].Substring(0,64)) { throw 'Release metadata checksum rejected.' }
+        $metadata = Get-Content -Raw -LiteralPath (Join-Path $work 'release.json') | ConvertFrom-Json
+        $artifact = @($metadata.artifacts | Where-Object { $_.name -ceq $name -and $_.os -ceq 'windows' -and $_.arch -ceq 'amd64' })
+        if ($metadata.schema -ne 1 -or $metadata.version -cne $version -or $artifact.Count -ne 1) { throw 'Release artifact metadata rejected.' }
+        $sizeText = [string]$artifact[0].size
+    }
+    if (($verifier -and $LASTEXITCODE -ne 0) -or $sizeText -notmatch '^(0|[1-9][0-9]{0,9})$') { throw 'Invalid verifier size response.' }
     [long]$signedSize = $sizeText
     if ($signedSize -lt 1 -or $signedSize -gt 2147483648) { throw 'Invalid verifier size response.' }
     Receive-ReleaseFile $name $signedSize
@@ -99,14 +148,7 @@ try {
     $lines = @(Get-Content (Join-Path $work 'SHA256SUMS') | Where-Object { $_ -match $pattern })
     if ($lines.Count -ne 1 -or $lines[0] -notmatch $pattern) { throw "$name needs exactly one entry in SHA256SUMS." }
     $expected = $Matches[1]
-    $hash = [Security.Cryptography.SHA256]::Create()
-    $package = [IO.File]::OpenRead((Join-Path $work $name))
-    try {
-        $actual = [BitConverter]::ToString($hash.ComputeHash($package)).Replace('-', '').ToLowerInvariant()
-    } finally {
-        $package.Dispose()
-        $hash.Dispose()
-    }
+    $actual = Get-ReleaseHash (Join-Path $work $name)
     if ($actual -ne $expected) { throw "$name does not match SHA256SUMS; nothing was installed." }
 
     Write-Output "sora: installing $version"
