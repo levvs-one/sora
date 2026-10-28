@@ -93,7 +93,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         key: const ValueKey('notifications-clear'),
                         onPressed: sora.history.isEmpty ? null : () => unawaited(sora.clearNotifications()),
                         style: TextButton.styleFrom(
-                          foregroundColor: palette.ink2,
+                          foregroundColor: palette.ink,
                           disabledForegroundColor: palette.ink3,
                           textStyle: Styles.secondary,
                           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -105,7 +105,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   const SizedBox(height: 16),
                   if (days.isEmpty)
-                    Text(s.notificationsEmpty, style: Styles.secondary.copyWith(color: palette.ink2))
+                    Text(s.notificationsEmpty, style: Styles.secondary.copyWith(color: palette.ink))
                   else
                     Expanded(
                       child: ListView(

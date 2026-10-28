@@ -194,7 +194,7 @@ class _DnsScreenState extends State<DnsScreen> {
               children: [
                 CupertinoActivityIndicator(color: palette.ink),
                 const SizedBox(height: 12),
-                Text(s.dnsChecking, style: Styles.secondary.copyWith(color: palette.ink2)),
+                Text(s.dnsChecking, style: Styles.secondary.copyWith(color: palette.ink)),
               ],
             ),
           )
@@ -222,7 +222,7 @@ class _DnsScreenState extends State<DnsScreen> {
               Icon(icon, size: 18, color: palette.ink2),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(text, style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(text, style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             ],
           ),
@@ -301,7 +301,7 @@ class _DnsScreenState extends State<DnsScreen> {
                   Icon(Symbols.info_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(_checkHint(s, check.fixHint), style: Styles.caption.copyWith(color: palette.ink2)),
+                    child: Text(_checkHint(s, check.fixHint), style: Styles.caption.copyWith(color: palette.ink)),
                   ),
                 ],
               ),

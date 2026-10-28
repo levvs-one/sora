@@ -108,7 +108,7 @@ class _QrShareScreenState extends State<QrShareScreen> {
                               Text(
                                 s.qrWarning,
                                 textAlign: TextAlign.center,
-                                style: Styles.secondary.copyWith(color: palette.ink2),
+                                style: Styles.secondary.copyWith(color: palette.ink),
                               ),
                             ],
                           ),

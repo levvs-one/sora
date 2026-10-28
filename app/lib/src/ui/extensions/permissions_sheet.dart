@@ -147,7 +147,7 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
                     Icon(Symbols.warning_rounded, size: 18, color: palette.danger),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(s.extSideloadWarning, style: Styles.secondary.copyWith(color: palette.ink2)),
+                      child: Text(s.extSideloadWarning, style: Styles.secondary.copyWith(color: palette.ink)),
                     ),
                   ],
                 ),
@@ -161,7 +161,7 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
                     c.version,
                     style: Styles.caption.copyWith(color: palette.ink, fontWeight: FontWeight.w600),
                   ),
-                  Text(c.notes, style: Styles.caption.copyWith(color: palette.ink2)),
+                  Text(c.notes, style: Styles.caption.copyWith(color: palette.ink)),
                   const SizedBox(height: 6),
                 ],
                 const SizedBox(height: 4),
@@ -218,7 +218,7 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => _decide(null),
-                child: Text(s.extCancel, style: TextStyle(color: palette.ink2)),
+                child: Text(s.extCancel, style: TextStyle(color: palette.ink)),
               ),
             ],
           ),
@@ -256,10 +256,10 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (detail != null) Text(detail, style: Styles.caption.copyWith(color: palette.ink2)),
+          if (detail != null) Text(detail, style: Styles.caption.copyWith(color: palette.ink)),
           if (notYetActive) ...[
             if (detail != null) const SizedBox(height: 2),
-            Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink2)),
+            Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink)),
           ],
           if (hosts.isNotEmpty) ...[const SizedBox(height: 4), NetworkHostsList(hosts: hosts)],
         ],
@@ -285,7 +285,7 @@ class _RemovedPermissionRow extends StatelessWidget {
           Icon(Symbols.remove_circle_rounded, size: 18, color: palette.ink3),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(blurb, style: Styles.body.copyWith(color: palette.ink2)),
+            child: Text(blurb, style: Styles.body.copyWith(color: palette.ink)),
           ),
         ],
       ),

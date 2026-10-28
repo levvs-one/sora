@@ -137,10 +137,6 @@ class Sora extends ChangeNotifier {
       return;
     }
     unawaited(_replan());
-    if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
-      _pendingSelection = ++_selectionRevision;
-      unawaited(_applySelection());
-    }
   }
 
   final browserDiagnostics = BrowserDiagnostics();
@@ -467,6 +463,7 @@ class Sora extends ChangeNotifier {
   int _selectionRevision = 0;
   int? _pendingSelection;
   bool needsReconnect = false;
+  Timer? _settingsReconnect;
   bool cleanupPending = false;
   bool strictBlocked = false;
 
@@ -1303,7 +1300,7 @@ class Sora extends ChangeNotifier {
 
   /// Applies a network profile's settings snapshot. Only snapshot
   /// fields the profile captured are touched; the rest stays as-is.
-  Future<void> applyProfile(NetworkProfile profile) async {
+  Future<void> applyProfile(NetworkProfile profile, {bool userInitiated = true}) async {
     await change((x) {
       if (profile.tunnel != null) x.tunnel = profile.tunnel!;
       if (profile.preset != null) x.preset = profile.preset!;
@@ -1311,11 +1308,7 @@ class Sora extends ChangeNotifier {
       if (profile.dnsPreset != null) x.dnsPreset = profile.dnsPreset!;
       if (profile.engine != null) x.engine = profile.engine!;
       if (profile.serverId != null) x.server = profile.serverId!;
-    });
-    if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
-      _pendingSelection = ++_selectionRevision;
-      await _applySelection();
-    }
+    }, userInitiated: userInitiated);
   }
 
   /// Handles a core ProfileMatched event: marks the profile active and
@@ -1326,7 +1319,7 @@ class Sora extends ChangeNotifier {
     if (profile == null) return;
     profiles.activeId = profileId;
     if (profile.autoApply) {
-      await applyProfileWithUndo(profile);
+      await applyProfileWithUndo(profile, userInitiated: false);
     } else {
       await recordNotification(
         AppNotification(
@@ -1345,7 +1338,7 @@ class Sora extends ChangeNotifier {
 
   /// Applies a profile and posts an undo snapshot so the previous settings
   /// are one tap away.
-  Future<void> applyProfileWithUndo(NetworkProfile profile) async {
+  Future<void> applyProfileWithUndo(NetworkProfile profile, {bool userInitiated = true}) async {
     final before = jsonEncode({
       'tunnel': settings.tunnel,
       'preset': settings.preset,
@@ -1354,7 +1347,7 @@ class Sora extends ChangeNotifier {
       'server': settings.server,
       'engine': settings.engine,
     });
-    await applyProfile(profile);
+    await applyProfile(profile, userInitiated: userInitiated);
     await recordNotification(
       AppNotification(
         time: DateTime.now(),
@@ -1386,10 +1379,6 @@ class Sora extends ChangeNotifier {
         final engine = before['engine'];
         if (engine is String) x.engine = engine;
       });
-      if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
-        _pendingSelection = ++_selectionRevision;
-        await _applySelection();
-      }
     } catch (_) {
       // A corrupt snapshot must not break the UI; there is nothing sane to
       // restore, so the current settings simply stay.
@@ -1462,6 +1451,7 @@ class Sora extends ChangeNotifier {
   /// remaining attempt count during profile-group failover.
   Future<void> connect({bool retry = false, ProxyChain? via, FailureMode mode = FailureMode.action}) async {
     if (_disposed || updateBlocked || busy || _stopping) return;
+    _settingsReconnect?.cancel();
     if (cleanupPending && !strictBlocked) {
       await disconnect();
       if (cleanupPending || _disposed) return;
@@ -1631,6 +1621,7 @@ class Sora extends ChangeNotifier {
   }
 
   Future<void> disconnect() async {
+    _settingsReconnect?.cancel();
     _selectionRevision++;
     _pendingSelection = null;
     final link = _link;
@@ -1685,7 +1676,7 @@ class Sora extends ChangeNotifier {
     }
   }
 
-  /// Defers connection changes until the user explicitly reconnects.
+  /// Background refreshes update the mirror without authorizing a reconnect.
   Future<void> _replan() async {
     extensions.logRoutingOverlaps(settings.rules.map(UserRule.parse).nonNulls.map((r) => r.destination).toList());
     if (phase == Phase.connected || phase == Phase.reconnecting || _connectionWork != null) {
@@ -1704,6 +1695,7 @@ class Sora extends ChangeNotifier {
     // for custom servers, so the plain card id is mapped once, here.
     final canonical = canonicalServerId(server);
     if (settings.server == canonical) return;
+    _settingsReconnect?.cancel();
     settings.server = canonical;
     if (_activeChain != null) {
       // A manual server pick ends the chain session: the next plan is
@@ -1746,14 +1738,32 @@ class Sora extends ChangeNotifier {
     });
   }
 
-  /// Applies settings and stages connection changes. Disable [replan] for
+  /// Applies user settings in one debounced replacement. Disable [replan] for
   /// appearance-only changes.
-  Future<void> change(void Function(Settings) apply, {bool replan = true}) async {
+  Future<void> change(void Function(Settings) apply, {bool replan = true, bool userInitiated = true}) async {
+    final beforePlan = replan ? currentPlan : null;
     final checks = settings.checkUpdates;
     apply(settings);
     if (checks != settings.checkUpdates) await updates.setChecking(settings.checkUpdates);
     notifyListeners();
-    if (replan) await _replan();
+    if (replan) {
+      await _replan();
+      if (userInitiated && currentPlan != beforePlan) applyConnectionChanges();
+    }
+  }
+
+  /// Only an explicit user edit authorizes replacing the active connection.
+  void applyConnectionChanges() {
+    _settingsReconnect?.cancel();
+    if (_disposed ||
+        _stopping ||
+        (phase != Phase.connected && phase != Phase.reconnecting && _connectionWork == null)) {
+      return;
+    }
+    _settingsReconnect = Timer(const Duration(milliseconds: 350), () {
+      _pendingSelection = ++_selectionRevision;
+      unawaited(_applySelection());
+    });
   }
 
   /// Resets settings to defaults and reapplies the active connection plan.
@@ -1762,6 +1772,7 @@ class Sora extends ChangeNotifier {
     await updates.setChecking(settings.checkUpdates);
     notifyListeners();
     await _replan();
+    applyConnectionChanges();
   }
 
   Future<void> setKillSwitch(bool value) {
@@ -2452,6 +2463,7 @@ class Sora extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _settingsReconnect?.cancel();
     for (final timer in _failureTimers.values) {
       timer.cancel();
     }

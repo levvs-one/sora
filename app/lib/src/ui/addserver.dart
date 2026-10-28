@@ -561,9 +561,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
                               ),
                               if (_manual) ...[
                                 Heading(
-                                  _wireGuard
-                                      ? 'WireGuard'
-                                      : '${_protocol.toUpperCase()} · ${s.customServerCredentials}',
+                                  _wireGuard ? 'WireGuard' : '${_protocol.toUpperCase()}, ${s.customServerCredentials}',
                                 ),
                                 if (_wireGuard)
                                   Padding(
@@ -724,7 +722,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                             if (key == 'mode')
                                               ChoiceTile<String>(
                                                 key: const ValueKey('custom-mode'),
-                                                title: 'XHTTP · mode',
+                                                title: 'XHTTP, mode',
                                                 value: _text('mode'),
                                                 choices: {
                                                   '': s.engineAuto,
@@ -752,17 +750,17 @@ class _AddServerScreenState extends State<AddServerScreen> {
                                                   'server_name' => 'SNI',
                                                   'fingerprint' => 'uTLS',
                                                   'alpn' => 'ALPN',
-                                                  'public_key' => 'REALITY · ${s.customServerWgPeerKey}',
-                                                  'short_id' => 'REALITY · Short ID',
-                                                  'spider_x' => 'REALITY · SpiderX',
+                                                  'public_key' => 'REALITY, ${s.customServerWgPeerKey}',
+                                                  'short_id' => 'REALITY, Short ID',
+                                                  'spider_x' => 'REALITY, SpiderX',
                                                   'path' => 'Path',
                                                   'host_header' => 'HTTP Host',
-                                                  'service_name' => 'gRPC · serviceName',
-                                                  'mode' => 'XHTTP · mode',
-                                                  'flow' => 'VLESS · flow',
-                                                  'encryption' => 'VLESS · encryption',
-                                                  'obfs_param' => 'Salamander · ${s.customServerPassword}',
-                                                  'port_range' => 'Mieru · ${s.customServerPort}',
+                                                  'service_name' => 'gRPC, serviceName',
+                                                  'mode' => 'XHTTP, mode',
+                                                  'flow' => 'VLESS, flow',
+                                                  'encryption' => 'VLESS, encryption',
+                                                  'obfs_param' => 'Salamander, ${s.customServerPassword}',
+                                                  'port_range' => 'Mieru, ${s.customServerPort}',
                                                   _ => key,
                                                 },
                                                 secret: key == 'obfs_param',

@@ -12,6 +12,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
+import '../../sora.dart';
 import '../kit.dart';
 import '../../ext/verifier.dart';
 import '../../ext/catalog.dart';
@@ -212,7 +213,7 @@ class ExtensionCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         subtitle!,
-                        style: Styles.secondary.copyWith(color: palette.ink2),
+                        style: Styles.secondary.copyWith(color: palette.ink),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -349,7 +350,7 @@ class _CapabilityLine extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: Styles.caption.copyWith(color: palette.ink2),
+              style: Styles.caption.copyWith(color: palette.ink),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -401,8 +402,10 @@ String extStoreErrorText(S s, ExtStoreError e) {
 /// Enables or disables an extension, explaining a refusal (for example a
 /// revoked version) instead of failing silently.
 Future<void> toggleExtension(BuildContext context, ExtensionStore store, String id, bool enabled) async {
+  final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
   try {
     await store.setEnabled(id, enabled);
+    sora?.applyConnectionChanges();
   } on ExtStoreError catch (e) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(extStoreErrorText(S.of(context), e))));

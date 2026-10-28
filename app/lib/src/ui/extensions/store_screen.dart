@@ -118,10 +118,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
                           ? const _ExtensionsBody()
                           : _failed
                           ? Center(
-                              child: Text(
-                                s.extErrGeneric,
-                                style: Styles.body.copyWith(color: Palette.of(context).ink2),
-                              ),
+                              child: Text(s.extErrGeneric, style: Styles.body.copyWith(color: Palette.of(context).ink)),
                             )
                           : const Center(child: CircularProgressIndicator()),
                     ),
@@ -364,7 +361,9 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       final granted = await decision.future;
       if (granted == null || !context.mounted) return false;
       progress.show(const InstallProgressWindow(stage: InstallStage.install));
+      final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
       await _store.install(pkg, source: source, granted: granted, authorKeyPin: authorKeyPin);
+      sora?.applyConnectionChanges();
       return true;
     } on ExtAssetError {
       await progress.close();
@@ -540,7 +539,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
           children: [
             Icon(Symbols.cloud_off_rounded, size: 40, color: palette.ink3),
             const SizedBox(height: 12),
-            Text(s.extCatalogError, style: Styles.body.copyWith(color: palette.ink2)),
+            Text(s.extCatalogError, style: Styles.body.copyWith(color: palette.ink)),
             const SizedBox(height: 12),
             PrimaryButton(label: s.extRetry, onTap: _refreshCatalog),
           ],
@@ -572,7 +571,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
                 ),
                 TextButton(
                   onPressed: _refreshCatalog,
-                  child: Text(s.extRetry, style: TextStyle(color: palette.ink2)),
+                  child: Text(s.extRetry, style: TextStyle(color: palette.ink)),
                 ),
               ],
             ),
@@ -644,7 +643,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               final entries = _filtered(value.text.trim().toLowerCase());
               return entries.isEmpty
                   ? Center(
-                      child: Text(s.extEmptySearch, style: Styles.body.copyWith(color: palette.ink2)),
+                      child: Text(s.extEmptySearch, style: Styles.body.copyWith(color: palette.ink)),
                     )
                   : RefreshIndicator(
                       onRefresh: _refreshCatalog,
@@ -898,7 +897,7 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             const SizedBox(height: 12),
             Text(
               q.isEmpty ? s.extEmptyInstalled : s.extEmptySearch,
-              style: Styles.body.copyWith(color: palette.ink2),
+              style: Styles.body.copyWith(color: palette.ink),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1167,7 +1166,7 @@ class _FilterPill extends StatelessWidget {
               color: selected ? palette.ink : palette.field,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Text(label, style: Styles.secondary.copyWith(color: selected ? palette.surface : palette.ink2)),
+            child: Text(label, style: Styles.secondary.copyWith(color: selected ? palette.surface : palette.ink)),
           ),
         ),
       ),

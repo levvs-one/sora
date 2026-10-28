@@ -329,9 +329,19 @@ class _Modes extends StatelessWidget {
                     SwitchTile(
                       key: const ValueKey('strict-kill-switch'),
                       title: s.strictKillSwitch,
-                      info: s.strictKillSwitchWarning,
                       value: settings.strictKillSwitch,
-                      onChanged: (v) => unawaited(sora.setStrictKillSwitch(v)),
+                      onChanged: (v) async {
+                        if (v &&
+                            !await confirm(
+                              context,
+                              question: s.strictKillSwitchWarning,
+                              action: s.strictKillSwitch,
+                              destructive: false,
+                            )) {
+                          return;
+                        }
+                        await sora.setStrictKillSwitch(v);
+                      },
                     ),
                   ],
                 ),
@@ -339,7 +349,6 @@ class _Modes extends StatelessWidget {
                 const SizedBox(height: 12),
                 SwitchTile(
                   title: s.zapretWithVpn,
-                  info: s.zapretWithVpnHint,
                   value: settings.zapretWithVpn,
                   onChanged: (v) => unawaited(sora.change((x) => x.zapretWithVpn = v)),
                 ),

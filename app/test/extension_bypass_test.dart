@@ -1305,11 +1305,15 @@ void main() {
       await until(() => core.events.hasListener, 'initial watch');
       expect(sora.settings.splitPos, ['3']);
       await store.setSettings(pkg.manifest.id, {'profile': 'HTTP'});
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(core.plans.length, 1, reason: 'background settings never reconnect');
+      sora.applyConnectionChanges();
       await until(() => core.plans.length == 2 && sora.phase == Phase.connected, 'profile update');
       expect(core.plans.last.outbounds.single.bypass.hostCase, true);
       await until(() => core.events.hasListener, 'replacement watch');
       core.reject = true;
       await store.setSettings(pkg.manifest.id, {'profile': 'TLS'});
+      sora.applyConnectionChanges();
       await until(() => core.plans.length == 3 && sora.failure != null && sora.phase == Phase.connected, 'rejection');
       expect(sora.phase, Phase.connected);
       expect(core.disconnects, 0);

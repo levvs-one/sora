@@ -12,6 +12,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
+import '../../sora.dart';
 import '../kit.dart';
 import '../../ext/conflicts.dart';
 import '../../ext/store.dart';
@@ -65,6 +66,7 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
   bool get _complete => widget.conflicts.every((c) => _winners.containsKey(c.key));
 
   Future<void> _save() async {
+    final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
     setState(() {
       _saving = true;
     });
@@ -83,6 +85,7 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
       }
       return;
     }
+    sora?.applyConnectionChanges();
     if (mounted) Navigator.pop(context, true);
   }
 
@@ -125,7 +128,7 @@ class _ConflictsSheetState extends State<_ConflictsSheet> {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: _saving ? null : () => Navigator.pop(context, false),
-                child: Text(s.extCancel, style: TextStyle(color: palette.ink2)),
+                child: Text(s.extCancel, style: TextStyle(color: palette.ink)),
               ),
             ],
           ),
@@ -218,7 +221,7 @@ class _ContenderRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (notYetActive) Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink2)),
+                    if (notYetActive) Text(s.extPermNotYetActive, style: Styles.caption.copyWith(color: palette.ink)),
                   ],
                 ),
               ),

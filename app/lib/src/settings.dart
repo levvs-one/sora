@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'notifications.dart';
 
 /// Random UUID v4 for the staged-rollout install cohort (S11a). Not a
-/// security token — only a stable, uniformly distributed install identity.
+/// security token - only a stable, uniformly distributed install identity.
 String _newInstallUuid() {
   final random = Random.secure();
   final bytes = List<int>.generate(16, (_) => random.nextInt(256));
@@ -295,7 +295,7 @@ class Settings {
   set autoSelectMode(String value) => _store.setString('autoSelectMode', value);
 
   /// Switches the pinned server to the best measured alternative when it
-  /// degrades (stops answering or gets clearly slower) — at most once every
+  /// degrades (stops answering or gets clearly slower) - at most once every
   /// 10 minutes. Never touches 'auto', groups, profiles or bypass.
   bool get autoSwitchOnDegrade => _store.getBool('autoSwitchOnDegrade') ?? false;
   set autoSwitchOnDegrade(bool value) => _store.setBool('autoSwitchOnDegrade', value);
@@ -485,7 +485,7 @@ class Settings {
     // The post-update health marker is a safety mechanism, not a preference:
     // a reset must not silently disarm the rollback of an update that is
     // still inside its health window. The rollback notice is kept for the
-    // same reason — the user should still learn that a rollback happened.
+    // same reason - the user should still learn that a rollback happened.
     if (pending.isNotEmpty) await savePendingUpdate(pending);
     if (rolledBack.isNotEmpty) await _store.setString('lastRollback', rolledBack);
     if (snapshot.isNotEmpty) await saveProxySnapshot(snapshot);

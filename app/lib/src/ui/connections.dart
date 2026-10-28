@@ -267,7 +267,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
         children: [
           Expanded(
             child: Text(
-              up == null || down == null ? '—' : '↑ ${_speed(s, up, locale)}  ↓ ${_speed(s, down, locale)}',
+              up == null || down == null ? '-' : '↑ ${_speed(s, up, locale)}  ↓ ${_speed(s, down, locale)}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Styles.figures(Styles.body).copyWith(color: palette.ink),
@@ -285,7 +285,7 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
   Widget _groupedList(List<Connection> shown) {
     final groups = <String, List<Connection>>{};
     for (final c in shown) {
-      groups.putIfAbsent(c.process.isEmpty ? '—' : c.process, () => []).add(c);
+      groups.putIfAbsent(c.process.isEmpty ? '-' : c.process, () => []).add(c);
     }
     // Traffic totals are the sort keys: compute them once per build pass,
     // not per comparison: _traffic sums every connection in the group, so

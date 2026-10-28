@@ -771,12 +771,6 @@ class SZh extends S {
   String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
 
   @override
-  String get updateSignaturePending => '更新文件会与随版本发布的校验和比对。';
-
-  @override
-  String get updateManualSigWarning => '下面的文件与版本的校验和一致。如果是从官方版本下载的，请运行该命令。';
-
-  @override
   String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版。';
 
   @override
@@ -857,7 +851,7 @@ class SZh extends S {
 
   @override
   String get modesGuide =>
-      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。\n\n## 应用设置\n\n选择服务器会自动重新连接。模式、引擎、DNS 和规则的更改会自动保存，并在下次连接时使用。重新启动引擎可能会中断下载和通话。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
+      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。\n\n## 应用设置\n\n选择服务器会自动重新连接。 您对模式、引擎、DNS 或规则所作的更改会在短暂停顿后自动重新连接并应用一次；后台刷新不会重新连接 VPN。 重新启动引擎可能会中断下载和通话。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
 
   @override
   String get probeServers => '平';
@@ -1605,9 +1599,6 @@ class SZh extends S {
   String get zapretWithVpn => '直接连接流量的 DPI 绕过';
 
   @override
-  String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
-
-  @override
   String get chainDuplicate => '连接链中有重复的服务器。请为每个节点选择不同的服务器。';
 
   @override
@@ -1689,9 +1680,6 @@ class SZh extends S {
 
   @override
   String get leakTestTitle => '泄漏测试';
-
-  @override
-  String get leakTestIntro => '检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。';
 
   @override
   String get leakTestRun => '执行测试';
@@ -1905,7 +1893,7 @@ class SZh extends S {
   String get strictKillSwitch => '严格网络锁定';
 
   @override
-  String get strictKillSwitchWarning => '连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。';
+  String get strictKillSwitchWarning => '连接后，即使退出应用，VPN 之外的流量也会保持阻止，直到您断开连接。';
 
   @override
   String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
@@ -2856,12 +2844,6 @@ class SZhHans extends SZh {
   String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
 
   @override
-  String get updateSignaturePending => '更新文件会与随版本发布的校验和比对。';
-
-  @override
-  String get updateManualSigWarning => '下面的文件与版本的校验和一致。如果是从官方版本下载的，请运行该命令。';
-
-  @override
   String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版。';
 
   @override
@@ -2942,7 +2924,7 @@ class SZhHans extends SZh {
 
   @override
   String get modesGuide =>
-      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。\n\n## 应用设置\n\n选择服务器会自动重新连接。模式、引擎、DNS 和规则的更改会自动保存，并在下次连接时使用。重新启动引擎可能会中断下载和通话。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
+      '如果您不确定您的服务器需要哪个引擎，请选择自动。 Sora 在连接前检查配置文件和设置。 引擎无法增加计划的带宽：性能取决于服务器、路由、协议和网络。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 创建虚拟网络接口并通过它路由应用程序流量，包括 TCP 和 UDP。 Telegram、游戏和Discord语音使用此模式。 规则可以直接发送或阻止特定站点或程序。 网络服务需要权限和支持所需协议的服务器。\n\n### System 代理\n\nSora 配置本地 HTTP/SOCKS 代理。 尊重系统代理设置的应用程序使用它。 拥有自己的网络堆栈的应用程序可以直接连接； UDP和语音通话一般需要TUN。 此模式适合具有代理支持的浏览器和应用程序。\n\n### 没有服务器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 来拆分和重塑 HTTP/TLS 请求并绕过一些 DPI 检查。 您的 IP 保持不变，连接直接进入网站。 结果取决于您的提供商和阻止方法。\n\n当前集成使用 tpws 进行 HTTP 和 TCP 上的 TLS。 它不绕过IP阻塞或中继UDP，并且不能保证Telegram的MTProto连接。 使用具有 TUN 的 VPN 服务器进行 Discord 语音、Telegram 呼叫和此类限制。\n\n## 引擎\n\n＃＃＃ 汽车\n\nSora 选择支持整个连接计划的已安装引擎：服务器协议、传输、组、分段和模式。 在停止当前连接之前，不兼容的手动选择将被拒绝。 选择自动或其他引擎并再次应用设置。\n\n### sing-box\n\n新的 Sora 软件包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，添加了客户端 XHTTP 和 VLESS Encryption。 Sora 认可该构建及其功能。 没有 XHTTP 的上游版本无法仅从其名称中获得此功能。\n\n支持的协议包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可导入的 AmneziaWG 1.x/2.x 参数。完整的 Xray JSON 配置需要 Xray。目前尚不能导入新的 AWG 3.x 字段。sing-box 使用受密码保护的本地控制端口，计算机上的其他应用可以检测到该端口。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支持 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它还运行完整的提供商 Xray 配置文件，同时保留其路由和组。 此类配置文件无法在不改变其行为的情况下自动转换为另一个引擎。\n\n捆绑的 Xray 删除了禁用 TLS 证书验证的设置（“allowInsecure”）。 对于需要此设置的普通服务器，自动选择sing-box或mihomo。 在停止当前连接之前选择 Xray 手动报告不兼容性。 较旧的完整 JSON 配置文件需要更新的提供者配置文件以及可验证的证书或证书 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支持有序回退和负载均衡组 XHTTP 和 AmneziaWG。 当自动故障转移到备份服务器很重要时选择它。 Sora 的 TLS 碎片设置在此引擎上不可用。\n\n## Sora 的兼容性\n\n| 特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux / Windows TUN 和 TCP/UDP | 是的 | 是的 | 是的 |\n| XHTTP | 是的 | 是的 | 是的 |\n| VLESS Encryption | 是的 | 是的 | 是的 |\n| Xray 完整简介 | 没有 | 是的 | 没有 |\n| TUIC / AnyTLS | 两者 | 没有 | TUIC |\n| mieru | 没有 | 没有 | 是的 |\n| NaiveProxy | 是的 | 没有 | 没有 |\n| TLS 碎片 | 是的 | 是的 | 没有 |\n| AmneziaWG 1.x/2.x | 是的 1 | 没有 | 是的 |\n| 有序后备组 | 没有 | 没有² | 是的 |\n\n1 带 J1/J2/J3/Itime 的型材使用 mihomo； 这些字段绝不能被默默地丢弃。 ² 对于一组完整的 Xray 配置文件，应用程序会选择一个备份配置文件。 支持取决于安装的版本； 在“关于”中检查其版本。\n\n## TUN 堆栈\n\n该堆栈在虚拟接口内处理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每个引擎都会保存自己的首选项。 System 代理和无服务器模式不使用此首选项。\n\n- **Mixed**: TCP 使用系统堆栈，而 gVisor 处理 UDP。 这是 Linux 上 mihomo 的默认设置。在 Windows 上，Xray 和 mihomo 默认使用 MIPS。\n- **System**: 使用系统堆栈。 如果网络应用程序遇到问题，请尝试其他选项。\n- **gVisor**: 处理用户空间中的流量。\n- **MIPS**: mihomo 自己的 IP 堆栈，在捆绑版本 1.19.32 中提供。\n\n在Linux上，Xray默认使用其内置的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作为 TUN 引擎，通过经过身份验证的本地 SOCKS 链路将 TCP 和 UDP 转发到 Xray。 Xray 保留协议、提供商配置文件和路由。 这三个选项需要安装 mihomo。 在Windows 上，Xray 的四种 TUN 协议栈均使用 mihomo 1.19.32 或更高版本。协议和路由仍由 Xray 处理。此组合中的应用规则仅支持直连和阻断；在 Linux 上，这些规则需要 Xray 内置的 gVisor。\n\n桥接器运行第二个进程。 在 Linux 上的三个空闲测量中，它比本机 Xray TUN 多使用了约 32-36 MiB 的物理内存。 这不测量下载负载：CPU 和内存成本取决于连接。 sing-box没有堆栈选择器。 没有任何堆栈可以保证每个网络都有更好的性能。\n\n## 应用设置\n\n选择服务器会自动重新连接。 您对模式、引擎、DNS 或规则所作的更改会在短暂停顿后自动重新连接并应用一次；后台刷新不会重新连接 VPN。 重新启动引擎可能会中断下载和通话。\n\n当隧道断开时，仅通过 VPN 的 Internet 会阻止直接流量。 它影响整个机器。 显式断开连接会删除 Sora 的规则。 如果清理未完成，请重试断开连接并打开日志。\n\n## 项目文档\n\n- [sing-box-lx：配置和支持](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文档](https://sing-box.sagernet.org/)\n- [Xray 文档](https://xtls.github.io/)\n- [mihomo 文档](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作和限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 通过 Jitsi、Yandex Telemost 或 WB Stream 的视频通话传输 TCP。请导入 olcrtc:// 链接或二维码。它支持 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支持 UDP。两端需要兼容的 OLC2 构建版本。上游项目已归档。\n';
 
   @override
   String get probeServers => '平';
@@ -3690,9 +3672,6 @@ class SZhHans extends SZh {
   String get zapretWithVpn => '直接连接流量的 DPI 绕过';
 
   @override
-  String get zapretWithVpnHint => '与 VPN 隧道并行执行 zapret：隧道流量使用 VPN，直接连接流量则透过绕过机制。';
-
-  @override
   String get chainDuplicate => '连接链中有重复的服务器。请为每个节点选择不同的服务器。';
 
   @override
@@ -3774,9 +3753,6 @@ class SZhHans extends SZh {
 
   @override
   String get leakTestTitle => '泄漏测试';
-
-  @override
-  String get leakTestIntro => '检查流量能否不经隧道离开设备：包括直接 DNS 和 ICMP 请求、IPv6 对外流量以及系统解析器。请在连接时执行。';
 
   @override
   String get leakTestRun => '执行测试';
@@ -3990,7 +3966,7 @@ class SZhHans extends SZh {
   String get strictKillSwitch => '严格网络锁定';
 
   @override
-  String get strictKillSwitchWarning => '连接后，即使崩溃、重启或退出应用，也会阻止 VPN 之外的流量。只有断开连接或关闭此选项才会恢复访问。设备重启后，仅在启用启动时连接时恢复阻止。';
+  String get strictKillSwitchWarning => '连接后，即使退出应用，VPN 之外的流量也会保持阻止，直到您断开连接。';
 
   @override
   String get extWorkerFailed => '扩展的后台任务失败。请查看扩展日志。';
@@ -4941,12 +4917,6 @@ class SZhHant extends SZh {
   String get updateManual => '在終端機中執行此命令以安裝兩個經過驗證的軟體包，然後重新開啟 Sora。 檔案保留在下載目錄中。 VPN 連線將會中斷。';
 
   @override
-  String get updateSignaturePending => '更新檔案會與隨版本發布的檢查碼比對。';
-
-  @override
-  String get updateManualSigWarning => '下方檔案與版本的檢查碼相符。如果是從官方版本下載的，請執行該指令。';
-
-  @override
   String get updateVersionRevoked => '開發者已撤回此版本，請等待修正版。';
 
   @override
@@ -5027,7 +4997,7 @@ class SZhHant extends SZh {
 
   @override
   String get modesGuide =>
-      '如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| mieru | 沒有 | 沒有 | 是的 |\n| NaiveProxy | 是的 | 沒有 | 沒有 |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed**: TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 Linux 上 mihomo 的預設值。在 Windows 上，Xray 和 mihomo 預設使用 MIPS。\n- **System**: 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor**: 處理用戶空間中的流量。\n- **MIPS**: mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows 上，Xray 的四種 TUN 協定堆疊均使用 mihomo 1.19.32 或更新版本。協定與路由仍由 Xray 處理。此組合中的應用程式規則僅支援直連與封鎖；在 Linux 上，這些規則需要 Xray 內建的 gVisor。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。模式、引擎、DNS 和規則的變更會自動儲存，並於下次連線時使用。重新啟動引擎可能會中斷下載和通話。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 透過 Jitsi、Yandex Telemost 或 WB Stream 的視訊通話傳輸 TCP。請匯入 olcrtc:// 連結或 QR 碼。它支援 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支援 UDP。兩端需要相容的 OLC2 建置版本。上游專案已封存。\n';
+      '如果您不確定您的伺服器需要哪個引擎，請選擇自動。 Sora 在連接前檢查設定檔和設定。 引擎無法增加計劃的頻寬：效能取決於伺服器、路由、協定和網路。\n\n## 模式\n\n### 所有流量 (TUN)\n\nSora 建立虛擬網路介面並透過它路由應用程式流量，包括 TCP 和 UDP。 Telegram、遊戲和Discord語音使用此模式。 規則可以直接發送或封鎖特定網站或程式。 網路服務需要權限和支援所需協定的伺服器。\n\n### System 代理\n\nSora 設定本機 HTTP/SOCKS 代理程式。 尊重系統代理設定的應用程式使用它。 擁有自己的網路堆疊的應用程式可以直接連接； UDP和語音通話一般需要TUN。 此模式適合具有代理支援的瀏覽器和應用程式。\n\n### 沒有伺服器\n\n在 Linux 上，Sora 使用 [zapret](https://github.com/bol-van/zapret) 來拆分和重塑 HTTP/TLS 請求並繞過一些 DPI 檢查。 您的 IP 保持不變，連線直接進入網站。 結果取決於您的提供者和阻止方法。\n\n目前整合使用 tpws 進行 HTTP 和 TCP 上的 TLS。 它不繞過IP阻塞或中繼UDP，也不能保證Telegram的MTProto連線。 使用具有 TUN 的 VPN 伺服器進行 Discord 語音、Telegram 通話和此類限制。\n\n## 引擎\n\n＃＃＃ 汽車\n\nSora 選擇支援整個連線計畫的已安裝引擎：伺服器協定、傳輸、群組、分段和模式。 在停止目前連線之前，不相容的手動選擇將被拒絕。 選擇自動或其他引擎並再次套用設定。\n\n### sing-box\n\n新的 Sora 軟體包包括 [sing-box-lx](https://github.com/Leadaxe/sing-box-lx)，它是 [sing-box](https://github.com/SagerNet/sing-box) 的分支，增加了客戶端 XHTTP Sora 認可此構建及其功能。 沒有 XHTTP 的上游版本無法僅從其名稱中獲得此功能。\n\n支援的協定包括 VLESS、VMess、Trojan、Shadowsocks、Hysteria2、TUIC、AnyTLS、WireGuard，以及 Sora 可匯入的 AmneziaWG 1.x/2.x 參數。完整的 Xray JSON 設定需要 Xray。目前尚無法匯入新的 AWG 3.x 欄位。sing-box 使用受密碼保護的本機控制連接埠，電腦上的其他應用程式可以偵測到該連接埠。\n\n### Xray\n\n[Xray-core](https://github.com/XTLS/Xray-core) 支援 VLESS、REALITY、XHTTP、VLESS Encryption 和 TLS 分片。 它還運行完整的供應商 Xray 配置文件，同時保留其路由和群組。 此類設定檔無法在不改變其行為的情況下自動轉換為另一個引擎。\n\n捆綁的 Xray 刪除了停用 TLS 憑證驗證的設定（「allowInsecure」）。 對於需要此設定的普通伺服器，自動選擇sing-box或mihomo。 在停止目前連線之前選擇 Xray 手動報告不相容性。 較舊的完整 JSON 設定檔需要更新的提供者設定檔以及可驗證的憑證或憑證 pin。\n\n### mihomo\n\n[mihomo](https://github.com/MetaCubeX/mihomo) 支援有序回退和負載平衡組 XHTTP 和 AmneziaWG。 當自動故障轉移到備份伺服器很重要時選擇它。 Sora 的 TLS 碎片設定在此引擎上不可用。\n\n## Sora 的兼容性\n\n|特色 | sing-box-lx | Xray | mihomo |\n| --- | --- | --- | --- |\n| Linux TUN 和 TCP/UDP |是的 |是的 |是的 |\n| XHTTP |是的 |是的 |是的 |\n| VLESS Encryption |是的 |是的 |是的 |\n| Xray 完整簡介 |沒有 |是的 |沒有 |\n| TUIC / AnyTLS |兩者 |沒有 | TUIC |\n| mieru | 沒有 | 沒有 | 是的 |\n| NaiveProxy | 是的 | 沒有 | 沒有 |\n| TLS 碎片 |是的 |是的 |沒有 |\n| AmneziaWG 1.x/2.x |是的 1 |沒有 |是的 |\n|有順序後備組 |沒有 |沒有² |是的 |\n\n1 附 J1/J2/J3/Itime 的型材使用 mihomo；這些欄位絕不能被默默地丟棄。 ² 對於一組完整的 Xray 設定文件，應用程式會選擇一個備份設定檔。 支援取決於安裝的版本；在「關於」中檢查其版本。\n\n## TUN 堆疊\n\n此堆疊在虛擬介面內處理 TCP 和 UDP。 在模式面板中，Xray和mihomo提供gVisor、System、Mixed和MIPS。 每個引擎都會保存自己的首選項。 System 代理程式和無伺服器模式不使用此首選項。\n\n- **Mixed**: TCP 使用系統堆疊，而 gVisor 處理 UDP。 這是 Linux 上 mihomo 的預設值。在 Windows 上，Xray 和 mihomo 預設使用 MIPS。\n- **System**: 使用系統堆疊。 如果網頁應用程式遇到問題，請嘗試其他選項。\n- **gVisor**: 處理用戶空間中的流量。\n- **MIPS**: mihomo 自己的 IP 堆疊，在捆綁版本 1.19.32 中提供。\n\n在Linux上，Xray預設使用其內建的gVisor。 Linux 上的 System、Mixed 和 MIPS 使用 mihomo 作為 TUN 引擎，透過經過驗證的本機 SOCKS 連結將 TCP 和 UDP 轉送到 Xray。 Xray 保留協定、提供者設定檔和路由。 這三個選項需要安裝 mihomo。 在Windows 上，Xray 的四種 TUN 協定堆疊均使用 mihomo 1.19.32 或更新版本。協定與路由仍由 Xray 處理。此組合中的應用程式規則僅支援直連與封鎖；在 Linux 上，這些規則需要 Xray 內建的 gVisor。\n\n橋接器運行第二個進程。 在 Linux 上的三個空閒測量中，它比本機 Xray TUN 多使用了約 32-36 MiB 的實體記憶體。 這不會測量下載負載：CPU 和記憶體成本取決於連接。 sing-box沒有堆疊選擇器。 沒有任何堆疊可以保證每個網路都有更好的效能。\n\n## 應用程式設定\n\n選擇伺服器會自動重新連線。 您對模式、引擎、DNS 或規則所做的變更會在短暫停頓後自動重新連線並套用一次；背景重新整理不會重新連線 VPN。 重新啟動引擎可能會中斷下載和通話。\n\n當隧道斷開時，僅透過 VPN 的 Internet 會阻止直接流量。 它影響整個機器。 明確斷開連線會刪除 Sora 的規則。 如果清理未完成，請重試斷開連線並開啟日誌。\n\n## 專案文檔\n\n- [sing-box-lx：設定與支援](https://github.com/Leadaxe/sing-box-lx/blob/lx/docs-lx/lx-config.md)\n- [sing-box 文件](https://sing-box.sagernet.org/)\n- [Xray 文件](https://xtls.github.io/)\n- [mihomo 文件](https://wiki.metacubex.one/)\n- [mieru](https://wiki.metacubex.one/en/config/proxies/mieru/)\n- [NaiveProxy](https://sing-box.sagernet.org/configuration/outbound/naive/)\n- [zapret：操作與限制](https://github.com/bol-van/zapret/blob/master/docs/readme.md)\n\n## OLCRTC\n\nOLCRTC 透過 Jitsi、Yandex Telemost 或 WB Stream 的視訊通話傳輸 TCP。請匯入 olcrtc:// 連結或 QR 碼。它支援 sing-box、Xray 和 mihomo 的代理及 TUN 模式，不支援 UDP。兩端需要相容的 OLC2 建置版本。上游專案已封存。\n';
 
   @override
   String get probeServers => '平';
@@ -5775,9 +5745,6 @@ class SZhHant extends SZh {
   String get zapretWithVpn => '直接連線流量的 DPI 繞過';
 
   @override
-  String get zapretWithVpnHint => '與 VPN 通道並行執行 zapret：通道流量使用 VPN，直接連線流量則透過繞過機制。';
-
-  @override
   String get chainDuplicate => '連線鏈中有重複的伺服器。請為每個節點選擇不同的伺服器。';
 
   @override
@@ -5859,9 +5826,6 @@ class SZhHant extends SZh {
 
   @override
   String get leakTestTitle => '洩漏測試';
-
-  @override
-  String get leakTestIntro => '檢查流量能否不經通道離開裝置：包括直接 DNS 和 ICMP 請求、IPv6 對外流量以及系統解析器。請在連接時執行。';
 
   @override
   String get leakTestRun => '執行測試';
@@ -6075,8 +6039,7 @@ class SZhHant extends SZh {
   String get strictKillSwitch => '嚴格網路鎖定';
 
   @override
-  String get strictKillSwitchWarning =>
-      '連線後，即使當機、重新啟動或結束應用程式，也會阻擋 VPN 以外的流量。只有中斷連線或關閉此選項才會恢復存取。裝置重新啟動後，僅在啟用啟動時連線時恢復阻擋。';
+  String get strictKillSwitchWarning => '連線後，即使結束應用程式，VPN 以外的流量也會持續被阻擋，直到您中斷連線。';
 
   @override
   String get extWorkerFailed => '擴充功能的背景工作失敗。請查看擴充功能記錄。';

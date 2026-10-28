@@ -161,7 +161,7 @@ class _AboutScreenState extends State<AboutScreen> {
             if (updates.rolloutPending && !updates.hasUpdate)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(s.updateRolloutPending, style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(s.updateRolloutPending, style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             if (release != null) ...[
               Padding(
@@ -172,21 +172,21 @@ class _AboutScreenState extends State<AboutScreen> {
                     Text(s.updateNotes(release.version), style: Styles.bodyStrong.copyWith(color: palette.ink)),
                     const SizedBox(height: 8),
                     if (release.notes.isEmpty)
-                      Text(s.updateNoNotes, style: Styles.secondary.copyWith(color: palette.ink2))
+                      Text(s.updateNoNotes, style: Styles.secondary.copyWith(color: palette.ink))
                     else
                       MarkdownBody(
                         key: const ValueKey('release-notes'),
                         data: release.notes,
                         selectable: true,
                         imageBuilder: (_, _, alt) =>
-                            Text(alt ?? '', style: Styles.secondary.copyWith(color: palette.ink2)),
+                            Text(alt ?? '', style: Styles.secondary.copyWith(color: palette.ink)),
                         styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                          p: Styles.secondary.copyWith(color: palette.ink2),
+                          p: Styles.secondary.copyWith(color: palette.ink),
                           a: Styles.secondary.copyWith(color: palette.ink, decoration: TextDecoration.underline),
                           h1: Styles.heading.copyWith(color: palette.ink),
                           h2: Styles.bodyStrong.copyWith(color: palette.ink),
                           h3: Styles.bodyStrong.copyWith(color: palette.ink),
-                          listBullet: Styles.secondary.copyWith(color: palette.ink2),
+                          listBullet: Styles.secondary.copyWith(color: palette.ink),
                           code: Styles.caption.copyWith(color: palette.ink),
                         ),
                         onTapLink: (_, href, _) {
@@ -248,7 +248,7 @@ class _AboutScreenState extends State<AboutScreen> {
                               UpdateStage.checking => s.updateChecking,
                               UpdateStage.installing => s.updateInstalling,
                               _ => s.updateDownloading,
-                            }, style: Styles.caption.copyWith(color: palette.ink2)),
+                            }, style: Styles.caption.copyWith(color: palette.ink)),
                           ),
                           if (updates.stage == UpdateStage.downloading || updates.stage == UpdateStage.checking)
                             Pressable(
@@ -257,19 +257,15 @@ class _AboutScreenState extends State<AboutScreen> {
                               semanticButton: true,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink2)),
+                                child: Text(s.cancel, style: Styles.caption.copyWith(color: palette.ink)),
                               ),
                             ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      // Honest limitation (D15): file hashes are checked, but
-                      // the release signature is not verified in-app yet.
-                      Text(s.updateSignaturePending, style: Styles.caption.copyWith(color: palette.ink2)),
                     ],
                     if (!canInstall) ...[
                       const SizedBox(height: 8),
-                      Text(s.updateWaitConnection, style: Styles.secondary.copyWith(color: palette.ink2)),
+                      Text(s.updateWaitConnection, style: Styles.secondary.copyWith(color: palette.ink)),
                     ],
                   ],
                 ),
@@ -279,7 +275,7 @@ class _AboutScreenState extends State<AboutScreen> {
             if (updates.rollbackTarget case final target? when updates.rollbackBusy)
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink2)),
+                child: Text(s.updateRollbacking(target), style: Styles.secondary.copyWith(color: palette.ink)),
               ),
             if (updates.lastRollback case final notice?)
               Padding(
@@ -289,7 +285,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   children: [
                     Text(
                       s.updateRolledBack(notice.to, notice.from),
-                      style: Styles.secondary.copyWith(color: palette.ink2),
+                      style: Styles.secondary.copyWith(color: palette.ink),
                     ),
                     const SizedBox(height: 8),
                     Pressable(
@@ -310,9 +306,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Honest fail-closed warning (D15): the manifest
-                    // signature was not verified, only the file hashes.
-                    Tile(title: s.updateManual, info: s.updateManualSigWarning),
+                    Tile(title: s.updateManual),
                     const SizedBox(height: 8),
                     SelectableText(
                       command,

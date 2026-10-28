@@ -857,7 +857,7 @@ void main() {
       expect(sora.history, isEmpty);
     });
 
-    test('settings during startup remain pending until explicit application', () async {
+    test('settings during startup apply once after the connection finishes', () async {
       core.gate = Completer<void>();
       final start = sora.connect();
       await until(() => core.connects == 1);
@@ -867,9 +867,41 @@ void main() {
       expect(sora.needsReconnect, isTrue);
       expect(core.connects, 1);
       core.gate = null;
-      await sora.connect();
+      await until(() => core.connects == 2 && !sora.busy);
       expect(core.plan!.engines, ['xray']);
       expect(sora.needsReconnect, isFalse);
+    });
+
+    test('user connection edits debounce once and background changes never reconnect', () async {
+      await sora.connect();
+      for (var i = 0; i < 50; i++) {
+        await sora.change((s) => s.engine = i.isEven ? 'xray' : 'mihomo');
+      }
+      expect(core.connects, 1);
+      await until(() => core.connects == 2 && !sora.busy);
+      expect(core.plan!.engines, ['mihomo']);
+      await sora.change((s) => s.engine = 'xray', userInitiated: false);
+      await sora.change((s) => s.theme = 'dark');
+      await sora.probe();
+      core.subscriptionChanges.add(core.subscriptions.first.deepCopy()..outbounds[0].displayName = 'Renamed');
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(core.connects, 2);
+      await sora.change((s) => s.engine = 'sing-box');
+      await sora.disconnect();
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      expect(core.connects, 2);
+      expect(sora.phase, Phase.off);
+    });
+
+    test('an automatically rejected replacement is reported once without retrying', () async {
+      await sora.connect();
+      core.reject = true;
+      await sora.change((s) => s.engine = 'sing-box');
+      await until(() => core.connects == 2 && !sora.busy);
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      expect(core.connects, 2);
+      expect(sora.history, hasLength(1));
+      expect(sora.phase, Phase.connected);
     });
 
     test('location clicks coalesce to the last choice while a replacement is starting', () async {
@@ -971,7 +1003,7 @@ void main() {
     });
 
     for (final selectedEngine in ['mihomo', 'xray']) {
-      test('$selectedEngine TUN stack click bursts are staged until one explicit reconnect', () async {
+      test('$selectedEngine TUN stack click bursts coalesce and disconnect cancels pending changes', () async {
         await sora.change(
           (s) => s
             ..server = 'a'

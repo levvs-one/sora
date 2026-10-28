@@ -800,7 +800,7 @@ class BackgroundFailureState extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(describe(s, failure), style: Styles.caption.copyWith(color: palette.ink2)),
+            child: Text(describe(s, failure), style: Styles.caption.copyWith(color: palette.ink)),
           ),
           if (retry != null) RoundButton(icon: Symbols.refresh_rounded, label: s.refresh, onTap: retry),
         ],

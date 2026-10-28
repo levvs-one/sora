@@ -134,7 +134,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     if (m.permissions.isEmpty)
-                                      Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink2))
+                                      Text(s.extNoPermissions, style: Styles.body.copyWith(color: palette.ink))
                                     else
                                       for (final p in m.permissions) ...[
                                         PermissionRow(
@@ -152,7 +152,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                             padding: const EdgeInsets.only(left: 28, bottom: 4),
                                             child: Text(
                                               s.extPermNotYetActive,
-                                              style: Styles.caption.copyWith(color: palette.ink2),
+                                              style: Styles.caption.copyWith(color: palette.ink),
                                             ),
                                           ),
                                         if (isNetworkPermission(p) && m.networkHosts.isNotEmpty)
@@ -420,7 +420,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text(s.extCancel, style: TextStyle(color: palette.ink2)),
+                  child: Text(s.extCancel, style: TextStyle(color: palette.ink)),
                 ),
               ],
             ),
@@ -429,8 +429,11 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       ),
     );
     if (ok == true) {
+      if (!context.mounted) return;
       try {
+        final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
         await action();
+        sora?.applyConnectionChanges();
       } catch (_) {
         // Lifecycle edge cases (disk, registry) must not fail silently: the
         // confirm dialog is already gone, so say what happened.
@@ -455,6 +458,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       final sora = SoraScope.read(context);
       await sora.change((settings) => settings.tunnel = 'tun', replan: false);
       await sora.select(profile.choiceId);
+      sora.applyConnectionChanges();
       if (sora.selected == profile.choiceId && (sora.phase == Phase.off || sora.phase == Phase.offline)) {
         await sora.connect();
       }
@@ -468,10 +472,12 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
   }
 
   Future<void> _saveSettings(String id) async {
+    final sora = context.getInheritedWidgetOfExactType<SoraScope>()?.notifier;
     final store = ExtScope.of(context);
     setState(() => _saving = true);
     try {
       await store.setSettings(id, _settings!);
+      sora?.applyConnectionChanges();
     } catch (_) {
       // The form only produces type-correct values, so this is a persistence
       // failure: say so and re-read the stored values instead of leaving the
@@ -511,7 +517,7 @@ class _QuietButton extends StatelessWidget {
     final palette = Palette.of(context);
     return TextButton.icon(
       style: TextButton.styleFrom(
-        foregroundColor: danger ? palette.danger : palette.ink2,
+        foregroundColor: danger ? palette.danger : palette.ink,
         minimumSize: const Size(44, 44),
         textStyle: Styles.secondary.copyWith(fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -708,7 +714,7 @@ class _BackgroundTaskSectionState extends State<_BackgroundTaskSection> {
           if (!widget.interactive)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
-              child: Text(s.extBgDisabledNote, style: Styles.caption.copyWith(color: palette.ink2)),
+              child: Text(s.extBgDisabledNote, style: Styles.caption.copyWith(color: palette.ink)),
             ),
         ],
       ],
@@ -772,7 +778,7 @@ class _ScreenshotsCarouselState extends State<_ScreenshotsCarousel> {
                     children: [
                       Icon(Symbols.broken_image_rounded, color: palette.ink3),
                       const SizedBox(height: 6),
-                      Text(s.extImageFailed, style: Styles.caption.copyWith(color: palette.ink2)),
+                      Text(s.extImageFailed, style: Styles.caption.copyWith(color: palette.ink)),
                     ],
                   ),
                 ),

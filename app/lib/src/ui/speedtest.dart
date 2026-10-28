@@ -130,7 +130,7 @@ class _SpeedtestScreenState extends State<SpeedtestScreen> {
                 return shown.isEmpty
                     ? Align(
                         alignment: Alignment.topLeft,
-                        child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink2)),
+                        child: Text(s.speedtestEmpty, style: Styles.secondary.copyWith(color: palette.ink)),
                       )
                     : ListView.builder(
                         key: const PageStorageKey('speedtest-list'),
@@ -539,7 +539,7 @@ class _SpeedtestBrowserState extends State<SpeedtestBrowser> {
                         Text(
                           describe(s, _failure!),
                           textAlign: TextAlign.center,
-                          style: Styles.secondary.copyWith(color: palette.ink2),
+                          style: Styles.secondary.copyWith(color: palette.ink),
                         ),
                         const SizedBox(height: 16),
                         Wrap(

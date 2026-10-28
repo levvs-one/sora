@@ -61,7 +61,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
       children: [
         if (showUnsupported)
           Group(
-            children: [Tile(title: s.chainUnsupported, titleColor: palette.ink2)],
+            children: [Tile(title: s.chainUnsupported, titleColor: palette.ink)],
           ),
         if (showUnsupported) const SizedBox(height: 16),
         if (chains.isEmpty)
@@ -76,7 +76,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
                     Text(
                       s.chainsEmpty,
                       textAlign: TextAlign.center,
-                      style: Styles.secondary.copyWith(color: palette.ink2),
+                      style: Styles.secondary.copyWith(color: palette.ink),
                     ),
                   ],
                 ),
@@ -289,7 +289,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
         Heading(s.chainOrderHint),
         if (_hops.isEmpty)
           Group(
-            children: [Tile(title: s.chainTooFew, titleColor: palette.ink2)],
+            children: [Tile(title: s.chainTooFew, titleColor: palette.ink)],
           )
         else
           Group(
@@ -330,7 +330,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
             Tile(
               title: s.chainEstimate,
               trailing: Text(
-                estimate == null ? '—' : s.latencyMs(estimate),
+                estimate == null ? '-' : s.latencyMs(estimate),
                 style: Styles.bodyStrong.copyWith(color: palette.ink),
               ),
             ),

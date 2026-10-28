@@ -67,13 +67,6 @@ class _ConnectionPane extends StatelessWidget {
           const Align(alignment: Alignment.centerRight, child: LanguageButton()),
           const SizedBox(height: 8),
           const _Status(),
-          if (SoraScope.of(context).cleanupPending)
-            TextButton(
-              onPressed: SoraScope.of(context).busy ? null : () => unawaited(SoraScope.read(context).disconnect()),
-              child: Text(S.of(context).retryDisconnect),
-            ),
-          if (SoraScope.of(context).watchUnstable) const _WatchBanner(),
-          if (SoraScope.of(context).pendingRestore != null) const _RestoreBanner(),
           const SizedBox(height: 24),
           const Center(child: TourTarget(step: 2, radius: 88, child: _Orb())),
           const SizedBox(height: 28),
@@ -147,105 +140,6 @@ class _Orb extends StatelessWidget {
   }
 }
 
-/// Visible when the session watch gave up auto-recovery.
-class _WatchBanner extends StatelessWidget {
-  const _WatchBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    final sora = SoraScope.of(context);
-    final s = S.of(context);
-    final palette = Palette.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: palette.field),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            children: [
-              Icon(Symbols.link_off_rounded, size: 20, color: palette.ink),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(s.coreWatchUnstable, style: Styles.secondary.copyWith(color: palette.ink)),
-              ),
-              const SizedBox(width: 8),
-              Pressable(
-                onTap: () => unawaited(sora.repairWatch()),
-                radius: 8,
-                semanticButton: true,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Text(s.watchReconnect, style: Styles.bodyStrong.copyWith(color: palette.ink)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Offer to restore the session left by a crashed run.
-class _RestoreBanner extends StatelessWidget {
-  const _RestoreBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    final sora = SoraScope.of(context);
-    final s = S.of(context);
-    final palette = Palette.of(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: DecoratedBox(
-        decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            children: [
-              Icon(Symbols.history_rounded, size: 20, color: palette.ink2),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(s.crashRestoreTitle, style: Styles.secondary.copyWith(color: palette.ink)),
-              ),
-              const SizedBox(width: 8),
-              Pressable(
-                onTap: () async {
-                  if (!await ensureSystemFilterConsent(context, sora.pendingRestore ?? sora.selected) ||
-                      !context.mounted) {
-                    return;
-                  }
-                  await sora.restoreCrashedSession();
-                },
-                radius: 8,
-                semanticButton: true,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Text(s.crashRestore, style: Styles.bodyStrong.copyWith(color: palette.ink)),
-                ),
-              ),
-              Pressable(
-                onTap: sora.dismissCrashRestore,
-                radius: 8,
-                semanticButton: true,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Text(s.crashDismiss, style: Styles.secondary.copyWith(color: palette.ink2)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _Status extends StatelessWidget {
   const _Status();
   @override
@@ -261,9 +155,67 @@ class _Status extends StatelessWidget {
       Phase.reconnecting => s.stateReconnecting,
       Phase.disconnecting => s.stateDisconnecting,
     };
-    final Widget detail = sora.phase == Phase.connected && sora.since != null
-        ? _Elapsed(key: const ValueKey('elapsed'), since: sora.since!)
-        : const SizedBox(key: ValueKey('none'));
+    final transient =
+        sora.phase == Phase.connecting || sora.phase == Phase.reconnecting || sora.phase == Phase.disconnecting;
+    final Widget detail;
+    if (transient) {
+      detail = const SizedBox();
+    } else if (sora.cleanupPending && sora.failure != null) {
+      detail = Column(
+        key: const ValueKey('status-cleanup'),
+        children: [
+          Text(
+            describe(s, sora.failure!),
+            textAlign: TextAlign.center,
+            style: Styles.secondary.copyWith(color: palette.ink),
+          ),
+          TextButton(onPressed: () => unawaited(sora.disconnect()), child: Text(s.retryDisconnect)),
+        ],
+      );
+    } else if (sora.pendingRestore != null) {
+      detail = Column(
+        key: const ValueKey('status-restore'),
+        children: [
+          Text(
+            s.crashRestoreTitle,
+            textAlign: TextAlign.center,
+            style: Styles.secondary.copyWith(color: palette.ink),
+          ),
+          Wrap(
+            alignment: WrapAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () async {
+                  if (!await ensureSystemFilterConsent(context, sora.pendingRestore ?? sora.selected) ||
+                      !context.mounted) {
+                    return;
+                  }
+                  await sora.restoreCrashedSession();
+                },
+                child: Text(s.crashRestore),
+              ),
+              TextButton(onPressed: sora.dismissCrashRestore, child: Text(s.crashDismiss)),
+            ],
+          ),
+        ],
+      );
+    } else if (sora.watchUnstable) {
+      detail = Column(
+        key: const ValueKey('status-watch'),
+        children: [
+          Text(
+            s.coreWatchUnstable,
+            textAlign: TextAlign.center,
+            style: Styles.secondary.copyWith(color: palette.ink),
+          ),
+          TextButton(onPressed: () => unawaited(sora.repairWatch()), child: Text(s.watchReconnect)),
+        ],
+      );
+    } else if (sora.phase == Phase.connected && sora.since != null) {
+      detail = _Elapsed(key: const ValueKey('elapsed'), since: sora.since!);
+    } else {
+      detail = const SizedBox();
+    }
     return Column(
       children: [
         _Swap(
@@ -279,7 +231,7 @@ class _Status extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        SizedBox(height: 20, child: _Swap(child: detail)),
+        ConstrainedBox(constraints: const BoxConstraints(maxWidth: 480), child: detail),
       ],
     );
   }

@@ -44,7 +44,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
       if (fingerprint.gateway != null && fingerprint.gateway!.isNotEmpty) fingerprint.gateway!,
       if (fingerprint.asn != null && fingerprint.asn!.isNotEmpty) 'AS${fingerprint.asn}',
     ];
-    return s.networkNow(parts.join(' · '));
+    return s.networkNow(parts.join(', '));
   }
 
   String _triggerSummary(NetworkProfile profile) {
@@ -91,7 +91,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                     Text(
                       s.profilesEmpty,
                       textAlign: TextAlign.center,
-                      style: Styles.secondary.copyWith(color: palette.ink2),
+                      style: Styles.secondary.copyWith(color: palette.ink),
                     ),
                   ],
                 ),
@@ -179,7 +179,7 @@ class _ProfileEditorScreenState extends State<ProfileEditorScreen> {
       if (_draft.preset != null) _draft.preset!,
       if (engine != null && engine.isNotEmpty) engine,
     ];
-    return parts.join(' · ');
+    return parts.join(', ');
   }
 
   Future<void> _editList({

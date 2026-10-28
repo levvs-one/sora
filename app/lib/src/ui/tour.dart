@@ -30,9 +30,7 @@ class TourTarget extends StatelessWidget {
       type: type,
       name: name,
       backgroundColor: type == TooltipDefaultActionType.next ? palette.ink : Colors.transparent,
-      textStyle: Styles.secondary.copyWith(
-        color: type == TooltipDefaultActionType.next ? palette.raised : palette.ink2,
-      ),
+      textStyle: Styles.secondary.copyWith(color: type == TooltipDefaultActionType.next ? palette.raised : palette.ink),
       borderRadius: BorderRadius.circular(6),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     );
@@ -43,7 +41,7 @@ class TourTarget extends StatelessWidget {
       titleAlignment: Alignment.centerLeft,
       descriptionAlignment: Alignment.centerLeft,
       titleTextStyle: Styles.bodyStrong.copyWith(color: palette.ink),
-      descTextStyle: Styles.secondary.copyWith(color: palette.ink2),
+      descTextStyle: Styles.secondary.copyWith(color: palette.ink),
       tooltipBackgroundColor: palette.raised,
       textColor: palette.ink,
       tooltipPadding: const EdgeInsets.all(16),
