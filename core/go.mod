@@ -7,10 +7,10 @@ toolchain go1.27.3
 require (
 	aead.dev/minisign v0.3.0
 	code.dny.dev/ssrf v0.3.0
-	github.com/Microsoft/go-winio v0.6.2
+	github.com/Microsoft/go-winio v0.6.4
 	github.com/dop251/goja v0.0.0-20261020172427-7b1a02208696
-	github.com/enfein/mieru/v3 v3.38.1
-	github.com/godbus/dbus/v5 v5.2.2
+	github.com/enfein/mieru/v3 v3.38.2
+	github.com/godbus/dbus/v5 v5.2.4
 	github.com/gopacket/gopacket v1.7.4
 	github.com/shirou/gopsutil/v4 v4.26.9
 	github.com/tailscale/wf v0.0.0-20240214030419-6fbb0a674ee6
@@ -20,7 +20,7 @@ require (
 	golang.org/x/sync v0.24.0
 	golang.org/x/sys v0.49.0
 	google.golang.org/grpc v1.83.2
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 )
 
