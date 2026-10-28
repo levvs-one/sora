@@ -496,6 +496,15 @@ cover the legacy clients, an independently authenticated bootstrap channel and
 a reviewed rollback baseline before stable publication. Do not assume that a
 rollout feed or a new package signature protects the old updater.
 
+On 28 October 2026, the published v1.1.2 Windows installer was checked without
+running it. Its size and SHA-256 matched the GitHub release API, and Windows
+Get-AuthenticodeSignature returned NotSigned. Matching metadata from the same
+distribution service does not independently authenticate the file. The
+annotated v1.1.2 tag has no tag signature; GitHub reports the underlying commit
+signature as valid, but that service assertion is not an independently pinned
+signer identity. These checks do not cover other distributions or every bundled
+binary, and do not establish a consumer bootstrap or a rollback baseline.
+
 On 25 October 2026, the authenticated GitHub release API returned eleven visible
 release records. None listed `SHA256SUMS.minisig`, `release.json` or a separate
 `.sig`/`.asc`/`.minisig` asset. The latest stable releases v1.1.2, v1.1.1 and
