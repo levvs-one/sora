@@ -867,6 +867,34 @@ jobs:
           flutter test "--dart-define=SORA_VERSION=$version" --dart-define=SORA_RELEASE_CHECK=true test/catalog_compatibility_test.dart
           flutter test --timeout=180s "--dart-define=SORA_VERSION=$version" test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
           flutter test --timeout=180s --dart-define=SORA_VERSION=1.1.2 test/extension_bypass_test.dart --plain-name 'catalog UI enforces candidate host compatibility'
+      - name: App and ByeDPI through an isolated real core
+        timeout-minutes: 6
+        working-directory: app
+        run: |
+          set -euo pipefail
+          private=$(realpath "$(mktemp -d "$RUNNER_TEMP/sora-live-app-XXXXXXXX")")
+          trap 'rm -rf -- "$private"' EXIT
+          mkdir -p "$private"/{home,config,cache,data,runtime,engines}
+          install -m 0755 ../dist/sora-core "$private/sora-core"
+          for file in byedpi mihomo; do install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
+          for file in geoip.dat geosite.dat; do install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
+          (cd ../tools/sora-ext && go build -o "$private/sora-ext-preflight" ./cmd/sora-ext)
+          version=$(dart pub deps --json | python3 -c 'import json,sys; roots=[p for p in json.load(sys.stdin)["packages"] if p["kind"]=="root"]; assert len(roots)==1 and roots[0]["name"]=="sora"; print(roots[0]["version"].split("+",1)[0])')
+          parent_net=$(readlink /proc/self/ns/net)
+          parent_user=$(readlink /proc/self/ns/user)
+          runner_uid=$(id -u)
+          runner_gid=$(id -g)
+          sudo -g "#$runner_gid" unshare --user --map-users="0:$runner_uid:1" --map-groups="0:$runner_gid:1" --setuid=0 --net \
+            env -u DBUS_SESSION_BUS_ADDRESS -u DISPLAY -u WAYLAND_DISPLAY -u NOTIFY_SOCKET -u SSH_AUTH_SOCK -u SORA_DATA_DIR \
+            HOME="$private/home" XDG_CONFIG_HOME="$private/config" XDG_CACHE_HOME="$private/cache" XDG_DATA_HOME="$private/data" XDG_RUNTIME_DIR="$private/runtime" TMPDIR="$private" \
+            PATH="$PATH" PUB_CACHE="${PUB_CACHE:-$HOME/.pub-cache}" GOCACHE="$(go env GOCACHE)" GOMODCACHE="$(go env GOMODCACHE)" GOPROXY=off \
+            SORA_LIVE_BYPASS=1 SORA_LIVE_BYPASS_ROOT="$private" SORA_CORE_SOCKET="$private/core.sock" SORA_PARENT_NETNS="$parent_net" SORA_PARENT_USERNS="$parent_user" \
+            bash -e -c '
+              test "$(readlink /proc/self/ns/net)" != "$SORA_PARENT_NETNS"
+              test "$(readlink /proc/self/ns/user)" != "$SORA_PARENT_USERNS"
+              ip link set lo up
+              flutter test --no-pub --timeout=180s "--dart-define=SORA_VERSION=$1" test/extension_bypass_test.dart --plain-name "signed ByeDPI profile connects the app to a real isolated core"
+            ' bash "$version"
       - name: Native signed extension panel on ARM64
         if: matrix.arch == 'arm64'
         working-directory: app

@@ -927,6 +927,156 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   }, skip: !Platform.isWindows);
 
+  test(
+    'signed ByeDPI profile connects the app to a real isolated core',
+    () async {
+      final env = Platform.environment;
+      expect(Platform.isLinux, isTrue);
+      final root = env['SORA_LIVE_BYPASS_ROOT'];
+      final parentNet = env['SORA_PARENT_NETNS'];
+      final parentUser = env['SORA_PARENT_USERNS'];
+      expect(root, isNotNull);
+      expect(parentNet, matches(RegExp(r'^net:\[\d+\]$')));
+      expect(parentUser, matches(RegExp(r'^user:\[\d+\]$')));
+      expect(await Link('/proc/self/ns/net').target(), isNot(parentNet));
+      expect(await Link('/proc/self/ns/user').target(), isNot(parentUser));
+      expect(await Directory(root!).resolveSymbolicLinks(), root);
+      expect(root.split(Platform.pathSeparator).last, startsWith('sora-live-app-'));
+      expect((await Directory(root).stat()).mode & 0x3f, 0);
+      expect(env['TMPDIR'], root);
+      for (final entry in {
+        'HOME': 'home',
+        'XDG_CONFIG_HOME': 'config',
+        'XDG_CACHE_HOME': 'cache',
+        'XDG_DATA_HOME': 'data',
+        'XDG_RUNTIME_DIR': 'runtime',
+      }.entries) {
+        final path = '$root/${entry.value}';
+        expect(env[entry.key], path, reason: entry.key);
+        expect(await Directory(path).resolveSymbolicLinks(), path, reason: entry.key);
+      }
+      for (final key in [
+        'DBUS_SESSION_BUS_ADDRESS',
+        'DISPLAY',
+        'WAYLAND_DISPLAY',
+        'NOTIFY_SOCKET',
+        'SSH_AUTH_SOCK',
+        'SORA_DATA_DIR',
+      ]) {
+        expect(env.containsKey(key), isFalse, reason: key);
+      }
+      expect(socket, '$root/core.sock');
+      expect(FileSystemEntity.typeSync(socket!, followLinks: false), FileSystemEntityType.notFound);
+      final binary = '$root/sora-core';
+      final engines = '$root/engines';
+      expect(await File(binary).exists(), isTrue);
+      expect(await File('$engines/byedpi').exists(), isTrue);
+      expect(await File('$engines/mihomo').exists(), isTrue);
+
+      final log = StringBuffer();
+      void capture(String chunk) {
+        if (log.length < 8192) log.write(chunk);
+      }
+
+      final core = await Process.start(binary, [
+        '-socket',
+        socket,
+        '-data-dir',
+        '$root/coredata',
+        '-engines-dir',
+        engines,
+        '-allow-file-keys',
+      ]);
+      core.stdout.transform(utf8.decoder).listen(capture);
+      core.stderr.transform(utf8.decoder).listen(capture);
+      addTearDown(() async {
+        core.kill(ProcessSignal.sigterm);
+        await core.exitCode.timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            core.kill(ProcessSignal.sigkill);
+            return core.exitCode;
+          },
+        );
+      });
+
+      Future<void> until(bool Function() condition, String stage) async {
+        final deadline = DateTime.now().add(const Duration(seconds: 30));
+        while (!condition()) {
+          if (DateTime.now().isAfter(deadline)) fail('$stage timed out; core log: $log');
+          await Future<void>.delayed(const Duration(milliseconds: 25));
+        }
+      }
+
+      await until(
+        () => FileSystemEntity.typeSync(socket, followLinks: false) != FileSystemEntityType.notFound,
+        'socket',
+      );
+      final byedpi = await signed(sourceOverride: Directory('../extensions/sources/byedpi'));
+      await install(byedpi);
+      final settings = await Settings.load();
+      settings.tunnel = 'proxy';
+      settings.engine = 'mihomo';
+      settings.blockAds = false;
+      settings.rules = ['proxy 127.0.0.1/32'];
+      final sora = Sora(settings, extensions: store);
+      ownedBySora = true;
+      final running = sora.run();
+      addTearDown(() async {
+        try {
+          if (sora.phase == Phase.connected || sora.phase == Phase.connecting || sora.phase == Phase.reconnecting) {
+            await sora.disconnect().timeout(const Duration(seconds: 15));
+          }
+        } finally {
+          sora.dispose();
+          await running.timeout(const Duration(seconds: 10));
+        }
+      });
+      await until(() => sora.coreCapabilities.contains('serverless-bydpi'), 'core capability');
+      final choice = store.bypassProfiles.single.choiceId;
+      await sora.select(choice);
+      expect(sora.currentPlan.outbounds.single.protocol, 'byedpi');
+      expect(sora.currentPlan.networkControlAllowed, isFalse);
+      expect(sora.currentPlan.outbounds.single.bypass.splitPos, ['1']);
+      expect(sora.currentPlan.routes.single.destination, '127.0.0.1/32');
+      expect(sora.currentPlan.routes.single.outboundId, Sora.bypassId);
+      await sora.connect();
+      expect(sora.phase, Phase.connected, reason: 'failure=${sora.failure}; core log: $log');
+      final proxy = sora.localProxy;
+      expect(proxy, isNotNull);
+      expect(InternetAddress.tryParse(proxy!.host)?.isLoopback, isTrue);
+      expect(proxy.port, greaterThan(0));
+
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      addTearDown(() => server.close(force: true));
+      server.listen((request) async {
+        final body = await utf8.decoder.bind(request).join();
+        request.response.write(body);
+        await request.response.close();
+      });
+      final connection = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
+      addTearDown(connection.destroy);
+      const payload = 'signed candidate through isolated core';
+      connection.write(
+        'POST http://127.0.0.1:${server.port}/ HTTP/1.1\r\n'
+        'Host: 127.0.0.1:${server.port}\r\n'
+        'Content-Length: ${utf8.encode(payload).length}\r\n'
+        'Connection: close\r\n\r\n$payload',
+      );
+      final response = await utf8.decoder.bind(connection).join().timeout(const Duration(seconds: 10));
+      expect(response, startsWith('HTTP/1.1 200'));
+      expect(response, contains(payload));
+
+      await store.setEnabled(byedpi.manifest.id, false);
+      await until(() => sora.phase == Phase.off, 'disable disconnect');
+      expect(sora.currentPlan.outbounds, isEmpty);
+    },
+    skip: Platform.environment['SORA_LIVE_BYPASS'] == '1'
+        ? false
+        : 'requires a guarded private user and network namespace with real core and engines',
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
+
   group('actual private gRPC transport', () {
     late _Core core;
     late Server server;
