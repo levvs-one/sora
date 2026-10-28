@@ -928,10 +928,12 @@ void main() {
   }, skip: !Platform.isWindows);
 
   test(
-    'signed ByeDPI profile connects the app to a real isolated core',
+    'signed network profile connects the app to a real isolated core',
     () async {
       final env = Platform.environment;
       expect(Platform.isLinux, isTrue);
+      final backend = env['SORA_LIVE_BYPASS_BACKEND'] ?? 'byedpi';
+      expect(backend, anyOf('byedpi', 'tpws'));
       final root = env['SORA_LIVE_BYPASS_ROOT'];
       final parentNet = env['SORA_PARENT_NETNS'];
       final parentUser = env['SORA_PARENT_USERNS'];
@@ -949,6 +951,21 @@ void main() {
       expect(root.split(Platform.pathSeparator).last, startsWith('sora-live-app-'));
       expect((await Directory(root).stat()).mode & 0x3f, 0);
       expect(env['TMPDIR'], root);
+      final targetsFile = File('$root/targets.json');
+      expect(FileSystemEntity.typeSync(targetsFile.path, followLinks: false), FileSystemEntityType.file);
+      final targets = jsonDecode(await targetsFile.readAsString()) as Map<String, dynamic>;
+      final httpTarget = Uri.parse(targets['HTTP'] as String);
+      final tlsTarget = Uri.parse(targets['HTTPS'] as String);
+      for (final (target, scheme) in [(httpTarget, 'http'), (tlsTarget, 'https')]) {
+        expect(target.scheme, scheme);
+        expect(target.host, '198.18.0.2');
+        expect(target.port, inInclusiveRange(1, 65535));
+      }
+      final encodedCertificate = targets['Certificate'] as String;
+      final certificateLines = RegExp(r'.{1,64}').allMatches(encodedCertificate).map((m) => m.group(0)).join('\n');
+      final trustedCertificate = utf8.encode(
+        '-----BEGIN CERTIFICATE-----\n$certificateLines\n-----END CERTIFICATE-----\n',
+      );
       for (final entry in {
         'HOME': 'home',
         'XDG_CONFIG_HOME': 'config',
@@ -975,7 +992,7 @@ void main() {
       final binary = '$root/sora-core';
       final engines = '$root/engines';
       expect(await File(binary).exists(), isTrue);
-      expect(await File('$engines/byedpi').exists(), isTrue);
+      expect(await File('$engines/$backend').exists(), isTrue);
       expect(await File('$engines/mihomo').exists(), isTrue);
 
       final log = StringBuffer();
@@ -1017,13 +1034,14 @@ void main() {
         () => FileSystemEntity.typeSync(socket, followLinks: false) != FileSystemEntityType.notFound,
         'socket',
       );
-      final byedpi = await signed(sourceOverride: Directory('../extensions/sources/byedpi'));
-      await install(byedpi);
+      final sourceName = backend == 'tpws' ? 'zapret' : 'byedpi';
+      final package = await signed(sourceOverride: Directory('../extensions/sources/$sourceName'));
+      await install(package);
       final settings = await Settings.load();
       settings.tunnel = 'proxy';
       settings.engine = 'mihomo';
       settings.blockAds = false;
-      settings.rules = ['proxy 127.0.0.1/32'];
+      settings.rules = ['proxy 198.18.0.2/32'];
       final sora = Sora(settings, extensions: store);
       ownedBySora = true;
       final running = sora.run();
@@ -1037,13 +1055,16 @@ void main() {
           await running.timeout(const Duration(seconds: 10));
         }
       });
-      await until(() => sora.coreCapabilities.contains('serverless-bydpi'), 'core capability');
+      await until(
+        () => backend == 'byedpi' ? sora.coreCapabilities.contains('serverless-bydpi') : sora.serverlessAvailable,
+        'core capability',
+      );
       final choice = store.bypassProfiles.single.choiceId;
       await sora.select(choice);
-      expect(sora.currentPlan.outbounds.single.protocol, 'byedpi');
+      expect(sora.currentPlan.outbounds.single.protocol, backend == 'byedpi' ? 'byedpi' : 'bypass');
       expect(sora.currentPlan.networkControlAllowed, isFalse);
-      expect(sora.currentPlan.outbounds.single.bypass.splitPos, ['1']);
-      expect(sora.currentPlan.routes.single.destination, '127.0.0.1/32');
+      expect(sora.currentPlan.outbounds.single.bypass.splitPos, backend == 'byedpi' ? ['1'] : ['1', 'midsld']);
+      expect(sora.currentPlan.routes.single.destination, '198.18.0.2/32');
       expect(sora.currentPlan.routes.single.outboundId, Sora.bypassId);
       await sora.connect();
       expect(sora.phase, Phase.connected, reason: 'failure=${sora.failure}; core log: $log');
@@ -1052,56 +1073,18 @@ void main() {
       expect(InternetAddress.tryParse(proxy!.host)?.isLoopback, isTrue);
       expect(proxy.port, greaterThan(0));
 
-      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-      addTearDown(() => server.close(force: true));
-      server.listen((request) async {
-        final body = await utf8.decoder.bind(request).join();
-        request.response.write(body);
-        await request.response.close();
-      });
       final connection = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
       addTearDown(connection.destroy);
       const payload = 'signed candidate through isolated core';
       connection.write(
-        'POST http://127.0.0.1:${server.port}/ HTTP/1.1\r\n'
-        'Host: 127.0.0.1:${server.port}\r\n'
+        'POST ${httpTarget.replace(path: '/')} HTTP/1.1\r\n'
+        'Host: ${httpTarget.authority}\r\n'
         'Content-Length: ${utf8.encode(payload).length}\r\n'
         'Connection: close\r\n\r\n$payload',
       );
       final response = await utf8.decoder.bind(connection).join().timeout(const Duration(seconds: 10));
-      expect(response, startsWith('HTTP/1.1 200'));
+      expect(response, startsWith('HTTP/1.1 200'), reason: 'backend=$backend; core log: $log');
       expect(response, contains(payload));
-
-      final certificate = '$root/tls-cert.pem';
-      final privateKey = '$root/tls-test-key.pem';
-      final generated = await Process.run('openssl', [
-        'req',
-        '-x509',
-        '-newkey',
-        'rsa:2048',
-        '-nodes',
-        '-days',
-        '1',
-        '-subj',
-        '/CN=localhost',
-        '-addext',
-        'subjectAltName=DNS:localhost',
-        '-keyout',
-        privateKey,
-        '-out',
-        certificate,
-      ]);
-      expect(generated.exitCode, 0, reason: 'temporary TLS certificate generation failed');
-      final serverContext = SecurityContext()
-        ..useCertificateChain(certificate)
-        ..usePrivateKey(privateKey);
-      final secureServer = await HttpServer.bindSecure(InternetAddress.loopbackIPv4, 0, serverContext);
-      addTearDown(() => secureServer.close(force: true));
-      secureServer.listen((request) async {
-        final body = await utf8.decoder.bind(request).join();
-        request.response.write(body);
-        await request.response.close();
-      });
 
       Future<Socket> connectTunnel() async {
         final tunnel = await Socket.connect(proxy.host, proxy.port, timeout: const Duration(seconds: 10));
@@ -1124,8 +1107,8 @@ void main() {
         );
         addTearDown(subscription.cancel);
         tunnel.write(
-          'CONNECT 127.0.0.1:${secureServer.port} HTTP/1.1\r\n'
-          'Host: 127.0.0.1:${secureServer.port}\r\n\r\n',
+          'CONNECT ${tlsTarget.authority} HTTP/1.1\r\n'
+          'Host: ${tlsTarget.authority}\r\n\r\n',
         );
         final header = await ready.future.timeout(const Duration(seconds: 10));
         expect(header, startsWith('HTTP/1.1 200'));
@@ -1136,21 +1119,21 @@ void main() {
       await expectLater(
         SecureSocket.secure(
           untrusted,
-          host: 'localhost',
+          host: 'example.com',
           context: SecurityContext(withTrustedRoots: false),
         ).timeout(const Duration(seconds: 10)),
         throwsA(isA<HandshakeException>()),
       );
-      final trustedContext = SecurityContext(withTrustedRoots: false)..setTrustedCertificates(certificate);
+      final trustedContext = SecurityContext(withTrustedRoots: false)..setTrustedCertificatesBytes(trustedCertificate);
       final secure = await SecureSocket.secure(
         await connectTunnel(),
-        host: 'localhost',
+        host: 'example.com',
         context: trustedContext,
       ).timeout(const Duration(seconds: 10));
       addTearDown(secure.destroy);
       secure.write(
         'POST / HTTP/1.1\r\n'
-        'Host: localhost\r\n'
+        'Host: example.com\r\n'
         'Content-Length: ${utf8.encode(payload).length}\r\n'
         'Connection: close\r\n\r\n$payload',
       );
@@ -1158,7 +1141,7 @@ void main() {
       expect(tlsResponse, startsWith('HTTP/1.1 200'));
       expect(tlsResponse, contains(payload));
 
-      await store.setEnabled(byedpi.manifest.id, false);
+      await store.setEnabled(package.manifest.id, false);
       await until(() => sora.phase == Phase.off, 'disable disconnect');
       expect(sora.currentPlan.outbounds, isEmpty);
     },
