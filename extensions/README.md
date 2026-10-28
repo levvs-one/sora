@@ -6,7 +6,7 @@ the compiled team key (`core/ext/sign.go`, `app/lib/src/ext/verifier.dart`):
 - `catalog.json` and `catalog.json.minisig`: the legacy store catalog used by
   the published v1.1.2 client;
 - `catalog-1.1.3.json` and `catalog-1.1.3.json.minisig`: the catalog for the
-  compatible host candidate;
+  published v1.1.3 host;
 - `revocations.json` and `revocations.json.minisig`: versions the app must
   disable and refuse;
 - `packages/`: the signed `.soraext` files the catalog points at.
@@ -24,6 +24,10 @@ the compiled team key (`core/ext/sign.go`, `app/lib/src/ext/verifier.dart`):
    even when the file has a versioned name:
    `sora-ext sign-file --key sora-team.key --role catalog.json extensions/catalog-1.1.3.json`
 
+The current CLI reads a key file; it does not provide a configured hardware
+or agent signing provider. Keep keys with the signing operator and out of the
+repository, packages and logs.
+
 Signing adds a signature to the archive and changes its package hash and size.
 Use the values reported by `publish` **after** author signing for the catalog;
 the command validates and prints an entry but does not upload it. For a catalog
@@ -32,19 +36,18 @@ version, minimum app version and permissions must also match. When an entry
 declares capabilities, they must match the manifest; older entries may omit
 them. Verify the signed catalog with the pinned production root before delivering it.
 
-Zapret, ByeDPI and the updated Hello source currently target the 1.1.3 host
-candidate. The published v1.1.2 client uses the legacy URL and offers an
+Zapret, ByeDPI and the updated Hello source require Sora 1.1.3 or later.
+The published v1.1.2 client uses the legacy URL and offers an
 install action before it checks a package's minimum host version. Keep entries
 that require the new host out of its catalog.
 
-The versioned catalog is initially an exact copy of the existing public signed
-catalog and signature; it does not publish the candidates. Both catalogs use
-the same team key and `catalog.json` signature role, so the file name does not
-provide a separate cryptographic scope or rollback protection. Before shipping
-a host that points at the versioned URL, the catalog and signature must be
-available and verify at that URL. Publish the candidates only after an actual
-compatible host is available. The existing v1.1.2 updater and the first
-signed-release transition have separate trust requirements described in
+The versioned catalog was seeded from the existing public signed catalog.
+Both catalogs use the same team key and `catalog.json` signature role, so the
+file name does not provide a separate cryptographic scope or rollback protection.
+The catalog and signature must remain available and verify at that URL. Before
+publishing an extension, verify host capabilities and platform coverage. The
+existing v1.1.2 updater and the first signed-release transition have separate
+trust requirements described in
 [release signatures](../docs/security/release-signatures.md#published-v112-update-boundary).
 
 The app test `ext_revocation_catalog_test.dart` checks both catalog signatures

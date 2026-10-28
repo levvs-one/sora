@@ -169,14 +169,14 @@ no network access in v1.
 ## 5. Catalog
 
 The published v1.1.2 app uses `catalog.json` and `catalog.json.minisig`.
-The compatible host candidate uses `catalog-1.1.3.json` and its `.minisig`.
+The published v1.1.3 app uses `catalog-1.1.3.json` and its `.minisig`.
 Both use the team key and the same catalog signature role, with trusted
 comment `timestamp:..\tfile:catalog.json\tsha256:..`. The versioned path
 separates listings but does not add a cryptographic scope or rollback
-protection. The repository seed is a copy of the existing signed catalog;
-it does not establish that a new host or extension has been published.
-The versioned files must be available and verify at the configured URL before
-shipping a host that uses it. See [catalog publishing](../extensions/README.md).
+protection. The repository seed was copied from the existing signed catalog;
+the live signed feed determines which extensions are offered.
+The versioned files must remain available and verify at the configured URL.
+See [catalog publishing](../extensions/README.md).
 Shape:
 
 ```json
@@ -543,10 +543,9 @@ registry or grants. A compromised app/control peer remains outside it.
 
 Sources: `extensions/sources/zapret` (Linux built-in settings) and
 `extensions/sources/byedpi` (Windows driverless backend).
-They are source projects, not published catalog entries. Production
-publication must choose the actual first host release with this consumer
-and set the matching min_app_version before author/team signing.
-The source's minimum version is not deployment evidence.
+These source projects do not by themselves establish catalog publication.
+Their minimum host version is 1.1.3; actual host capabilities and platform
+coverage still need validation before author/team signing.
 
 Catalog bytes and packages are delivered separately from the application.
 Opening/refreshing the catalog fetches and verifies its current team
