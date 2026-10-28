@@ -410,6 +410,14 @@ void main() {
         final card = find.byKey(ValueKey(id));
         expect(card, findsOneWidget);
         await tester.ensureVisible(card);
+        if (id == 'org.sora.zapret') {
+          await tester.tap(find.descendant(of: card, matching: find.text('Zapret')));
+          await tester.pumpAndSettle();
+          expect(find.byType(ExtensionDetailScreen), findsOneWidget);
+          expect(find.text('This permission does nothing in this version of Sora yet.'), findsNothing);
+          Navigator.of(tester.element(find.byType(ExtensionDetailScreen))).pop();
+          await tester.pumpAndSettle();
+        }
         await tester.tap(find.descendant(of: card, matching: find.text('Install')));
         await tester.pump();
         for (var i = 0; i < 1000 && find.byType(InstallPermissionPrompt).evaluate().isEmpty; i++) {
@@ -420,6 +428,13 @@ void main() {
         expect(prompt, findsOneWidget, reason: id);
         expect(tester.widget<InstallPermissionPrompt>(prompt).manifest.id, id);
         if (id != 'org.sora.hello-panel') {
+          expect(
+            find.descendant(
+              of: prompt,
+              matching: find.text('This permission does nothing in this version of Sora yet.'),
+            ),
+            findsNothing,
+          );
           final confirm = find.descendant(of: prompt, matching: find.byType(PrimaryButton));
           expect(tester.widget<PrimaryButton>(confirm).onTap, isNull);
           await tester.tap(find.text('I understand these permissions are powerful'));
@@ -476,6 +491,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('1 conflicts need your decision'), findsNothing);
 
+      late ExtPackage generic;
       await tester.runAsync(() async {
         final genericSource = await Directory('${fixture.path}/generic-hook').create();
         final manifest = jsonDecode(
@@ -487,8 +503,20 @@ void main() {
         manifest.remove('network_hook');
         manifest.remove('settings_schema');
         await File('${genericSource.path}/sora-extension.json').writeAsString(jsonEncode(manifest));
-        await install(await signed(sourceOverride: genericSource));
+        generic = await signed(sourceOverride: genericSource);
       });
+      final screenContext = tester.element(find.byType(ExtensionsScreen));
+      unawaited(
+        showDialog<void>(
+          context: screenContext,
+          builder: (_) => InstallPermissionPrompt(manifest: generic.manifest, sideload: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('This permission does nothing in this version of Sora yet.'), findsOneWidget);
+      await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('Cancel')));
+      await tester.pumpAndSettle();
+      await tester.runAsync(() => install(generic));
       for (var i = 0; i < 1000 && conflictBanner.evaluate().isEmpty; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
         await tester.pump(const Duration(milliseconds: 20));
@@ -510,6 +538,11 @@ void main() {
       expect(find.descendant(of: active, matching: inactiveNotice), findsNothing);
       await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('Cancel')));
       await tester.pumpAndSettle();
+      final dormantCard = find.byKey(const ValueKey('org.sora.dormant'));
+      await tester.ensureVisible(dormantCard);
+      await tester.tap(dormantCard);
+      await tester.pumpAndSettle();
+      expect(find.text('This permission does nothing in this version of Sora yet.'), findsOneWidget);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
     }, () => client);

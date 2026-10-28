@@ -144,7 +144,10 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                         // Same marker as the install prompt: a
                                         // permission whose runtime is not built must say
                                         // so here too, not only before the grant.
-                                        if (isNotYetActive(p))
+                                        if (isNotYetActive(p) ||
+                                            (p == 'net.hooks' &&
+                                                live != null &&
+                                                live.manifest.networkHookEntry == null))
                                           Padding(
                                             padding: const EdgeInsets.only(left: 28, bottom: 4),
                                             child: Text(

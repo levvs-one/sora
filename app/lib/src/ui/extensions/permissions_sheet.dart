@@ -240,11 +240,12 @@ class _InstallPromptState extends State<InstallPermissionPrompt> {
   /// "not yet active" marker for permissions whose runtime is not
   /// built (enforcement.dart is the source of truth): the prompt must
   /// never present an inert or unimplemented grant as live protection.
+  /// Network hooks also need a profile entry in the verified manifest.
   /// Empty when the blurb says it all.
   Widget _permissionExtra(BuildContext context, ExtManifest m, String permission) {
     final detail = permissionDetail(context, permission);
     final hosts = isNetworkPermission(permission) ? m.networkHosts : const <String>[];
-    final notYetActive = isNotYetActive(permission);
+    final notYetActive = isNotYetActive(permission) || (permission == 'net.hooks' && m.networkHookEntry == null);
     if (detail == null && hosts.isEmpty && !notYetActive) {
       return const SizedBox.shrink();
     }
