@@ -86,29 +86,22 @@ class InstallerSignatureTest(unittest.TestCase):
                 env = {**os.environ, "SORA_VERSION": version, "SORA_DIST": str(distribution), "SORA_VERIFIER": str(verifier)}
                 if bootstrap or installed_verifier:
                     env.pop("SORA_VERIFIER", None)
-                    env["PROGRAMFILES"] = str(case / "no-installed-client")
+                    env["SORA_TEST_PROGRAM_FILES"] = str(case / "no-installed-client")
                     if installed_verifier:
-                        installed = Path(env["PROGRAMFILES"]) / "Sora/core/sora-core.exe"
+                        installed = Path(env["SORA_TEST_PROGRAM_FILES"]) / "Sora/core/sora-core.exe"
                         installed.parent.mkdir(parents=True)
                         shutil.copyfile(verifier, installed)
                 if bootstrap:
                     public = (self.tools / "fixture-public-key.txt").read_text().strip()
                     script = case / "install.ps1"
                     script.write_text(self.script.read_text().replace("RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+", public))
-                elif installed_verifier:
-                    script = case / "install.ps1"
-                    text = self.script.read_text().replace(
-                        "$verifierFile = Get-Item -LiteralPath $verifier -ErrorAction SilentlyContinue",
-                        '$verifierFile = Get-Item -LiteralPath $verifier -ErrorAction SilentlyContinue\nWrite-Output "TEST verifier=$verifier exists=$([bool]$verifierFile) container=$($verifierFile.PSIsContainer) attributes=$($verifierFile.Attributes)"')
-                    text = text.replace("    if ($helpText -notmatch '-verify-release')",
-                                        "    Write-Output \"TEST help=$helpText\"\n    if ($helpText -notmatch '-verify-release')")
-                    script.write_text(text)
                 else:
                     script = self.script
                 # This intercepts only the final OS execution boundary; signature
                 # verification runs the real native verifier with the fixture root.
                 driver = case / "driver.ps1"
-                driver.write_text("function Start-Process { [IO.File]::WriteAllText($env:SORA_INSTALL_MARKER, 'reached'); throw 'INSTALL_BOUNDARY_REACHED' }\n& $env:SORA_INSTALL_SCRIPT\n")
+                # Windows reconstructs ProgramFiles when the shell starts; isolate it in that session.
+                driver.write_text("if ($env:SORA_TEST_PROGRAM_FILES) { $env:ProgramFiles = $env:SORA_TEST_PROGRAM_FILES }\nfunction Start-Process { [IO.File]::WriteAllText($env:SORA_INSTALL_MARKER, 'reached'); throw 'INSTALL_BOUNDARY_REACHED' }\n& $env:SORA_INSTALL_SCRIPT\n")
                 env["SORA_INSTALL_SCRIPT"] = str(script)
                 env["SORA_INSTALL_MARKER"] = str(case / "installation")
                 result = subprocess.run([shell, "-NoProfile", "-File", str(driver)], env=env, text=True, capture_output=True, timeout=30)
