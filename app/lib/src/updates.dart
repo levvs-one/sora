@@ -339,8 +339,10 @@ class AppUpdater extends ChangeNotifier {
     Abi? abi,
     Future<bool> Function()? canElevate,
     Directory Function(String fromVersion)? rollbackDir,
+    Directory Function()? tempRoot,
     this._signingPublicKey = teamPublicKey,
   }) : _client = client ?? (() => IOClient(HttpClient()..findProxy = HttpClient.findProxyFromEnvironment)),
+       _tempRoot = tempRoot ?? (() => Directory.systemTemp),
        _run = run ?? ((exe, args) => Process.run(exe, args)),
        _executable = executable ?? Platform.resolvedExecutable,
        _windows = windows ?? Platform.isWindows,
@@ -368,6 +370,9 @@ class AppUpdater extends ChangeNotifier {
   /// Test seam for the rollback cache location: production uses the
   /// XDG cache dir, tests point it at a temp directory.
   final Directory Function(String fromVersion)? _rollbackDirOverride;
+
+  /// Test seam for where `sora-update-*` download folders live.
+  final Directory Function() _tempRoot;
   final Future<bool> Function() _canElevate;
   Timer? _timer;
   bool _disposed = false;
@@ -424,7 +429,48 @@ class AppUpdater extends ChangeNotifier {
   void start() {
     if (_started || _disposed) return;
     _started = true;
+    unawaited(sweepStaleDownloads());
     _schedule();
+  }
+
+  /// Removes `sora-update-*` download folders whose files are all older than
+  /// [olderThan]. A closed app, a reboot mid-download or a Windows setup that
+  /// ran from its folder leaves one behind. Links are never followed, and a
+  /// folder held by a running setup or owned by someone else is skipped.
+  Future<void> sweepStaleDownloads({Duration olderThan = const Duration(days: 1)}) async {
+    final cutoff = DateTime.now().subtract(olderThan);
+    try {
+      await for (final entry in _tempRoot().list(followLinks: false)) {
+        if (entry is! Directory || !entry.path.replaceAll(r'\', '/').split('/').last.startsWith('sora-update-')) {
+          continue;
+        }
+        if (entry.path == _work?.path) continue;
+        try {
+          final stale = await entry
+              .list(recursive: true, followLinks: false)
+              .every((e) => e is! File || e.statSync().modified.isBefore(cutoff));
+          if (stale) await entry.delete(recursive: true);
+        } on FileSystemException {
+          continue;
+        }
+      }
+    } on FileSystemException {
+      return;
+    }
+  }
+
+  static Future<void> _deleteQuietly(Directory directory) async {
+    try {
+      await directory.delete(recursive: true);
+    } on FileSystemException {
+      // Already gone, or held by a setup that is still running.
+    }
+  }
+
+  /// Cancel can arrive between network requests (while a package is being
+  /// hashed, say), when no request is left to abort.
+  void _ensureNotCancelled() {
+    if (_cancelled || _disposed) throw const UpdateFailure(UpdateError.network);
   }
 
   void _schedule() {
@@ -706,7 +752,9 @@ class AppUpdater extends ChangeNotifier {
     required Future<void> Function() restartLinux,
     required Future<void> Function() quit,
   }) async {
-    if (busy || !hasUpdate || _disposed) return;
+    // A check in flight shares the stage and the abort trigger, and its end
+    // would reset the stage mid-download.
+    if (busy || checking || !hasUpdate || _disposed) return;
     error = null;
     manualCommand = null;
     busy = true;
@@ -715,6 +763,9 @@ class AppUpdater extends ChangeNotifier {
     _cancelled = false;
     notifyListeners();
     bool handedOff = false;
+    // This attempt's own folder: a cancelled attempt still cleaning up must
+    // never delete the folder of the next one.
+    Directory? downloads;
     try {
       _guard();
       if (_architecture == null || (_windows && _architecture != ReleaseArchitecture.amd64)) {
@@ -729,8 +780,10 @@ class AppUpdater extends ChangeNotifier {
       // Resolve the whole pair before downloading or invoking any installer.
       var assets = [for (final name in names) release.asset(name)];
       release.asset('SHA256SUMS.minisig');
-      if (_work != null) await _work!.delete(recursive: true);
-      final work = _work = await Directory.systemTemp.createTemp('sora-update-');
+      final kept = _work;
+      _work = null;
+      if (kept != null) await _deleteQuietly(kept);
+      final work = downloads = await _tempRoot().createTemp('sora-update-');
       final verified = await _signedManifest(release, work);
       final manifest = verified.manifest;
       assets = _boundAssets(assets, verified.metadata);
@@ -757,13 +810,16 @@ class AppUpdater extends ChangeNotifier {
         // The signature authenticates the manifest; this binds each package
         // to its signed hash before any installer handoff.
         await verifyUpdateFile(file, manifest, asset.name, size: asset.size);
+        _ensureNotCancelled();
       }
       _guard();
       if (connection() == UpdateConnection.connected && !await confirmDrop()) return;
+      _ensureNotCancelled();
       _guard();
       if (_windows) {
         await settings.saveResumeAfterUpdate(connection() == UpdateConnection.connected);
         _guard();
+        _ensureNotCancelled();
         stage = UpdateStage.installing;
         notifyListeners();
         await launchWindows(File('${work.path}/${names.single}'));
@@ -784,6 +840,7 @@ class AppUpdater extends ChangeNotifier {
         // Fail-closed: without the cache the update does not proceed.
         await _prepareRollbackCache(installation!);
         _guard();
+        _ensureNotCancelled();
         stage = UpdateStage.installing;
         notifyListeners();
         final result = await _run('/usr/bin/pkexec', [
@@ -816,20 +873,28 @@ class AppUpdater extends ChangeNotifier {
     } catch (e) {
       error = _cancelled ? null : (e is UpdateFailure ? e.reason : UpdateError.installation);
     } finally {
-      busy = false;
-      progress = null;
-      stage = UpdateStage.idle;
-      if (!handedOff && !installed) await settings.saveResumeAfterUpdate(false);
-      // The marker survives only when the helper confirmed the install:
-      // any earlier failure leaves the old build running, and a stale
-      // marker must never arm a health check for it.
-      if (!installed) await settings.clearPendingUpdate();
-      // Keep verified files for the manual command or a launched Windows setup.
-      if (!handedOff && manualCommand == null && _work != null) {
-        await _work!.delete(recursive: true);
-        _work = null;
+      try {
+        if (!handedOff && !installed) await settings.saveResumeAfterUpdate(false);
+        // The marker survives only when the helper confirmed the install:
+        // any earlier failure leaves the old build running, and a stale
+        // marker must never arm a health check for it.
+        if (!installed) await settings.clearPendingUpdate();
+        // Keep verified files for the manual command or a launched Windows setup.
+        if (downloads != null) {
+          if (handedOff || manualCommand != null) {
+            _work = downloads;
+          } else {
+            await _deleteQuietly(downloads);
+          }
+        }
+      } finally {
+        // Released last, so a new attempt starts only after this one has
+        // cleaned up.
+        busy = false;
+        progress = null;
+        stage = UpdateStage.idle;
+        if (!_disposed) notifyListeners();
       }
-      if (!_disposed) notifyListeners();
     }
   }
 

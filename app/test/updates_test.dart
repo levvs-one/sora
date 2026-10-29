@@ -367,6 +367,7 @@ void main() {
       'connecting',
       'changed',
       'cancel',
+      'cancelled',
       'manual',
       'denied',
       'missing',
@@ -550,6 +551,9 @@ void main() {
         await updater.install(
           confirmDrop: () async {
             order.add('warn');
+            // Cancel pressed while the last package was being hashed: no
+            // request is left to abort, and the dialog is still answered yes.
+            if (scenario == 'cancelled') updater.cancel();
             return scenario != 'cancel';
           },
           launchWindows: (file) async {
@@ -593,7 +597,7 @@ void main() {
           // No handoff happened (manual) or it failed (denied): no marker.
           expect(settings.pendingUpdate, isEmpty);
         } else {
-          expect(order, scenario == 'cancel' ? ['warn'] : isEmpty);
+          expect(order, scenario == 'cancel' || scenario == 'cancelled' ? ['warn'] : isEmpty);
           expect(updater.error, switch (scenario) {
             'hash' => UpdateError.checksum,
             'connecting' || 'changed' => UpdateError.connecting,
@@ -628,6 +632,63 @@ void main() {
       });
     }
   }
+
+  test('install does not start while a check is running', () async {
+    final requests = <String>[];
+    final updater = AppUpdater(
+      await Settings.load(),
+      version: '1.0.4',
+      windows: true,
+      connection: () => UpdateConnection.idle,
+      available: (_) async {},
+      client: () => MockClient((request) async {
+        requests.add(request.url.path);
+        return http.Response('not found', 404);
+      }),
+    );
+    addTearDown(updater.dispose);
+    updater.latest = release;
+    expect(updater.hasUpdate, isTrue);
+    updater.checking = true;
+    await updater.install(
+      confirmDrop: () async => throw StateError('must not ask'),
+      launchWindows: (_) async => throw StateError('must not launch'),
+      restartLinux: () async => throw StateError('must not restart'),
+      quit: () async => throw StateError('must not quit'),
+    );
+    expect(updater.busy, isFalse);
+    expect(updater.error, isNull);
+    expect(requests, isEmpty);
+  });
+
+  test('stale update folders are swept, fresh and unrelated ones stay', () async {
+    final root = await Directory.systemTemp.createTemp('sora-sweep-test-');
+    addTearDown(() => root.delete(recursive: true));
+    Future<Directory> folder(String name, {required bool old}) async {
+      final dir = await Directory('${root.path}/$name').create();
+      final file = await File('${dir.path}/Sora-Setup-1.0.5-x64.exe').writeAsBytes([1, 2, 3]);
+      if (old) await file.setLastModified(DateTime.now().subtract(const Duration(days: 3)));
+      return dir;
+    }
+
+    final stale = await folder('sora-update-old', old: true);
+    final fresh = await folder('sora-update-new', old: false);
+    final other = await folder('another-app-old', old: true);
+    final empty = await Directory('${root.path}/sora-update-empty').create();
+    final updater = AppUpdater(
+      await Settings.load(),
+      connection: () => UpdateConnection.idle,
+      available: (_) async {},
+      tempRoot: () => root,
+      client: () => MockClient((_) async => http.Response('not found', 404)),
+    );
+    addTearDown(updater.dispose);
+    await updater.sweepStaleDownloads();
+    expect(await stale.exists(), isFalse);
+    expect(await empty.exists(), isFalse);
+    expect(await fresh.exists(), isTrue);
+    expect(await other.exists(), isTrue);
+  });
 
   group('post-update health check and automatic rollback', () {
     AppUpdater makeUpdater(
