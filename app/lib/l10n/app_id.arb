@@ -44,6 +44,7 @@
   "appVersion": "Versi {version}",
   "notInstalled": "Tidak dipasang",
   "sourceCode": "Kode sumber",
+  "reportProblem": "Laporkan masalah",
   "license": "Lisensi",
   "usage": "{used} dari {total}",
   "until": "sampai {date}",

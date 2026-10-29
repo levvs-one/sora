@@ -146,6 +146,9 @@ class SPt extends S {
   String get sourceCode => 'Código fonte';
 
   @override
+  String get reportProblem => 'Relatar um problema';
+
+  @override
   String get license => 'Licença';
 
   @override

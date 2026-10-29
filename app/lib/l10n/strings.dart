@@ -417,6 +417,12 @@ abstract class S {
   /// **'Исходный код'**
   String get sourceCode;
 
+  /// No description provided for @reportProblem.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сообщить о проблеме'**
+  String get reportProblem;
+
   /// No description provided for @license.
   ///
   /// In ru, this message translates to:

@@ -146,6 +146,9 @@ class SIt extends S {
   String get sourceCode => 'Codice sorgente';
 
   @override
+  String get reportProblem => 'Segnala un problema';
+
+  @override
   String get license => 'Licenza';
 
   @override

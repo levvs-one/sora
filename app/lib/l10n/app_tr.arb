@@ -44,6 +44,7 @@
   "appVersion": "Sürüm {version}",
   "notInstalled": "Kurulu değil",
   "sourceCode": "Kaynak kodu",
+  "reportProblem": "Sorun bildir",
   "license": "Lisans",
   "usage": "{used} veya {total}",
   "until": "{date}'ye kadar",

@@ -146,6 +146,9 @@ class SFr extends S {
   String get sourceCode => 'Code source';
 
   @override
+  String get reportProblem => 'Signaler un problème';
+
+  @override
   String get license => 'Licence';
 
   @override

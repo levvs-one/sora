@@ -146,6 +146,9 @@ class STr extends S {
   String get sourceCode => 'Kaynak kodu';
 
   @override
+  String get reportProblem => 'Sorun bildir';
+
+  @override
   String get license => 'Lisans';
 
   @override

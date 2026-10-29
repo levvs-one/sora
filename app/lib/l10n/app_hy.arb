@@ -44,6 +44,7 @@
   "appVersion": "Տարբերակ {version}",
   "notInstalled": "Տեղադրված չէ",
   "sourceCode": "Աղբյուրի կոդը",
+  "reportProblem": "Հաղորդել խնդրի մասին",
   "license": "Լիցենզիա",
   "usage": "{used} {total}-ից",
   "until": "մինչև {date}",

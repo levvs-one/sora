@@ -44,6 +44,7 @@
   "appVersion": "版本 {version}",
   "notInstalled": "未安裝",
   "sourceCode": "原始碼",
+  "reportProblem": "回報問題",
   "license": "執照",
   "usage": "{used} {total}",
   "until": "直到{date}",

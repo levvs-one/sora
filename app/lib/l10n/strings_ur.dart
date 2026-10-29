@@ -146,6 +146,9 @@ class SUr extends S {
   String get sourceCode => 'سورس کوڈ';
 
   @override
+  String get reportProblem => 'مسئلے کی اطلاع دیں';
+
+  @override
   String get license => 'لائسنس';
 
   @override

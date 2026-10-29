@@ -146,6 +146,9 @@ class SZh extends S {
   String get sourceCode => '源代码';
 
   @override
+  String get reportProblem => '报告问题';
+
+  @override
   String get license => '执照';
 
   @override
@@ -2064,6 +2067,9 @@ class SZhHans extends SZh {
   String get sourceCode => '源代码';
 
   @override
+  String get reportProblem => '报告问题';
+
+  @override
   String get license => '执照';
 
   @override
@@ -3980,6 +3986,9 @@ class SZhHant extends SZh {
 
   @override
   String get sourceCode => '原始碼';
+
+  @override
+  String get reportProblem => '回報問題';
 
   @override
   String get license => '執照';

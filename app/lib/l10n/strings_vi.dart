@@ -146,6 +146,9 @@ class SVi extends S {
   String get sourceCode => 'Mã nguồn';
 
   @override
+  String get reportProblem => 'Báo cáo sự cố';
+
+  @override
   String get license => 'Giấy phép';
 
   @override

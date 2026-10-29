@@ -44,6 +44,7 @@
   "appVersion": "ვერსია {version}",
   "notInstalled": "არ არის დაინსტალირებული",
   "sourceCode": "წყაროს კოდი",
+  "reportProblem": "პრობლემის შეტყობინება",
   "license": "ლიცენზია",
   "usage": "{used} {total}-დან",
   "until": "{date}-მდე",

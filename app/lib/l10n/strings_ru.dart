@@ -146,6 +146,9 @@ class SRu extends S {
   String get sourceCode => 'Исходный код';
 
   @override
+  String get reportProblem => 'Сообщить о проблеме';
+
+  @override
   String get license => 'Лицензия';
 
   @override

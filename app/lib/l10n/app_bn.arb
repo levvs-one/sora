@@ -44,6 +44,7 @@
   "appVersion": "সংস্করণ {version}",
   "notInstalled": "ইনস্টল করা হয়নি",
   "sourceCode": "সোর্স কোড",
+  "reportProblem": "সমস্যা জানান",
   "license": "লাইসেন্স",
   "usage": "{total} এর {used}",
   "until": "{date} পর্যন্ত",

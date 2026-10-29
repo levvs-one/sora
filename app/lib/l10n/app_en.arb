@@ -44,6 +44,7 @@
   "appVersion": "Version {version}",
   "notInstalled": "Not installed",
   "sourceCode": "Source code",
+  "reportProblem": "Report a problem",
   "license": "License",
   "usage": "{used} of {total}",
   "until": "until {date}",
