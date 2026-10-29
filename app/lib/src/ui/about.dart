@@ -199,7 +199,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       key: const ValueKey('install-update'),
                       label: s.refresh,
                       busy: updates.busy,
-                      onTap: canInstall && desktop != null
+                      onTap: canInstall && !updates.checking && desktop != null
                           ? () => unawaited(
                               updates.install(
                                 confirmDrop: () {
