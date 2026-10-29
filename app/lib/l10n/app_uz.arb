@@ -44,6 +44,7 @@
   "appVersion": "{version} versiyasi",
   "notInstalled": "Oʻrnatilmagan",
   "sourceCode": "Manba kodi",
+  "reportProblem": "Muammo haqida xabar berish",
   "license": "Litsenziya",
   "usage": "{used}, {total}",
   "until": "{date} gacha",

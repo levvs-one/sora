@@ -146,6 +146,9 @@ class STg extends S {
   String get sourceCode => 'Рамзи манбаъ';
 
   @override
+  String get reportProblem => 'Дар бораи мушкилот хабар додан';
+
+  @override
   String get license => 'Иҷозатнома';
 
   @override

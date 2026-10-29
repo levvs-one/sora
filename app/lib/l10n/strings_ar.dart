@@ -146,6 +146,9 @@ class SAr extends S {
   String get sourceCode => 'كود المصدر';
 
   @override
+  String get reportProblem => 'الإبلاغ عن مشكلة';
+
+  @override
   String get license => 'رخصة';
 
   @override

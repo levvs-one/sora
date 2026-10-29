@@ -146,6 +146,9 @@ class SEs extends S {
   String get sourceCode => 'código fuente';
 
   @override
+  String get reportProblem => 'Informar de un problema';
+
+  @override
   String get license => 'Licencia';
 
   @override

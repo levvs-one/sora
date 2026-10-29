@@ -146,6 +146,9 @@ class SJa extends S {
   String get sourceCode => 'ソースコード';
 
   @override
+  String get reportProblem => '問題を報告';
+
+  @override
   String get license => 'ライセンス';
 
   @override

@@ -146,6 +146,9 @@ class SBn extends S {
   String get sourceCode => 'সোর্স কোড';
 
   @override
+  String get reportProblem => 'সমস্যা জানান';
+
+  @override
   String get license => 'লাইসেন্স';
 
   @override

@@ -112,32 +112,31 @@ func (w *networkWatch) changed() string {
 
 // renewConnections closes stale network flows so applications reconnect
 // promptly.
-func (s *Session) renewConnections(ctx context.Context, why string) {
+func (s *Session) renewConnections(ctx context.Context, why string) error {
 	if s.State() != StateConnected {
-		return
+		return nil
 	}
 	// Surface the network move itself, not just the renewal, so the
 	// client can show the connection state while flows re-establish.
 	s.log.Append(Event{Kind: EventNetwork, Detail: why})
 	s.log.Append(Event{Kind: EventLog, Detail: why + "; connections reopen"})
-	s.reopenFlows(ctx)
+	return s.reopenFlows(ctx)
 }
 
 // reopenFlows drops every live connection so applications reconnect on a
 // fresh path. Engines without bulk close, including Xray, reapply the plan
 // by restarting instead.
-func (s *Session) reopenFlows(ctx context.Context) {
+func (s *Session) reopenFlows(ctx context.Context) error {
 	if tracker, ok := s.eng.(engine.ConnectionTracker); ok {
 		if err := tracker.CloseConnections(ctx); err == nil {
-			return
+			return nil
 		}
 	}
-	if err := s.eng.Apply(ctx, s.cfg.Plan); err != nil {
-		s.log.Append(Event{
-			Kind:   EventError,
-			Reason: errs.CodeUnavailable,
-			Key:    errs.KeyEngineStartFailed,
-			Detail: s.mask(err.Error()),
-		})
+	if err := ctx.Err(); err != nil {
+		return err
 	}
+	if err := s.eng.Apply(ctx, s.cfg.Plan); err != nil {
+		return errs.Wrap(err, errs.CodeUnavailable, errs.KeyEngineStartFailed)
+	}
+	return nil
 }

@@ -146,6 +146,9 @@ class SHi extends S {
   String get sourceCode => 'सोर्स कोड';
 
   @override
+  String get reportProblem => 'समस्या की रिपोर्ट करें';
+
+  @override
   String get license => 'लाइसेंस';
 
   @override

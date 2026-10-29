@@ -44,6 +44,7 @@
   "appVersion": "버전 {version}",
   "notInstalled": "설치되지 않음",
   "sourceCode": "소스 코드",
+  "reportProblem": "문제 신고",
   "license": "특허",
   "usage": "{total}의 {used}",
   "until": "{date}까지",

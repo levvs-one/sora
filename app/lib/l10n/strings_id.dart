@@ -146,6 +146,9 @@ class SId extends S {
   String get sourceCode => 'Kode sumber';
 
   @override
+  String get reportProblem => 'Laporkan masalah';
+
+  @override
   String get license => 'Lisensi';
 
   @override

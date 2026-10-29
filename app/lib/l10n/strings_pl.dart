@@ -146,6 +146,9 @@ class SPl extends S {
   String get sourceCode => 'Kod źródłowy';
 
   @override
+  String get reportProblem => 'Zgłoś problem';
+
+  @override
   String get license => 'Licencja';
 
   @override

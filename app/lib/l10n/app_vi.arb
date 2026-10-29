@@ -44,6 +44,7 @@
   "appVersion": "Phiên bản {version}",
   "notInstalled": "Chưa được cài đặt",
   "sourceCode": "Mã nguồn",
+  "reportProblem": "Báo cáo sự cố",
   "license": "Giấy phép",
   "usage": "{used} của {total}",
   "until": "cho đến {date}",

@@ -146,6 +146,9 @@ class SKo extends S {
   String get sourceCode => '소스 코드';
 
   @override
+  String get reportProblem => '문제 신고';
+
+  @override
   String get license => '특허';
 
   @override

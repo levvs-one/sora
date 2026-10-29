@@ -44,6 +44,7 @@
   "appVersion": "{version} нұсқасы",
   "notInstalled": "Орнатылмаған",
   "sourceCode": "Бастапқы код",
+  "reportProblem": "Мәселе туралы хабарлау",
   "license": "Лицензия",
   "usage": "{used} {total}",
   "until": "{date} дейін",

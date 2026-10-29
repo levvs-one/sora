@@ -44,6 +44,7 @@
   "appVersion": "Версія {version}",
   "notInstalled": "Не ўстаноўлены",
   "sourceCode": "Зыходны код",
+  "reportProblem": "Паведаміць пра праблему",
   "license": "Ліцэнзія",
   "usage": "{used} з {total}",
   "until": "да {date}",

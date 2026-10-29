@@ -44,6 +44,7 @@
   "appVersion": "ورژن {version}",
   "notInstalled": "انسٹال نہیں ہے۔",
   "sourceCode": "سورس کوڈ",
+  "reportProblem": "مسئلے کی اطلاع دیں",
   "license": "لائسنس",
   "usage": "{total} کا {used}",
   "until": "{date} تک",

@@ -146,6 +146,9 @@ class STk extends S {
   String get sourceCode => 'Çeşme kody';
 
   @override
+  String get reportProblem => 'Mesele barada habar bermek';
+
+  @override
   String get license => 'Ygtyýarnama';
 
   @override

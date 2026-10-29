@@ -146,6 +146,9 @@ class SKy extends S {
   String get sourceCode => 'Булак коду';
 
   @override
+  String get reportProblem => 'Көйгөй тууралуу билдирүү';
+
+  @override
   String get license => 'Лицензия';
 
   @override

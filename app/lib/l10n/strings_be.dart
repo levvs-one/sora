@@ -146,6 +146,9 @@ class SBe extends S {
   String get sourceCode => 'Зыходны код';
 
   @override
+  String get reportProblem => 'Паведаміць пра праблему';
+
+  @override
   String get license => 'Ліцэнзія';
 
   @override

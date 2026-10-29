@@ -44,6 +44,7 @@
   "appVersion": "Версия {version}",
   "notInstalled": "Орнотулган эмес",
   "sourceCode": "Булак коду",
+  "reportProblem": "Көйгөй тууралуу билдирүү",
   "license": "Лицензия",
   "usage": "{total} ичинен {used}",
   "until": "{date} чейин",

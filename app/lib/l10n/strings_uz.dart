@@ -146,6 +146,9 @@ class SUz extends S {
   String get sourceCode => 'Manba kodi';
 
   @override
+  String get reportProblem => 'Muammo haqida xabar berish';
+
+  @override
   String get license => 'Litsenziya';
 
   @override

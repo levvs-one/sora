@@ -44,6 +44,7 @@
   "appVersion": "Wersja {version}",
   "notInstalled": "Nie zainstalowano",
   "sourceCode": "Kod źródłowy",
+  "reportProblem": "Zgłoś problem",
   "license": "Licencja",
   "usage": "{used} z {total}",
   "until": "aż do {date}",

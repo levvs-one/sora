@@ -44,6 +44,7 @@
   "appVersion": "Версияи {version}",
   "notInstalled": "Насб карда нашудааст",
   "sourceCode": "Рамзи манбаъ",
+  "reportProblem": "Дар бораи мушкилот хабар додан",
   "license": "Иҷозатнома",
   "usage": "{used} аз {total}",
   "until": "то {date}",

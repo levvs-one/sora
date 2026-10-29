@@ -146,6 +146,9 @@ class SKa extends S {
   String get sourceCode => 'წყაროს კოდი';
 
   @override
+  String get reportProblem => 'პრობლემის შეტყობინება';
+
+  @override
   String get license => 'ლიცენზია';
 
   @override
