@@ -47,14 +47,15 @@ func Random() (string, error) {
 }
 
 // Machine derives the identifier from the operating system's machine id. It
-// fails where no machine id is readable; callers then store a random one.
-func Machine() (string, error) {
+// fails where no machine id is readable; callers then store a random one. The
+// machine id is read once per process: every subscription fetch asks.
+var Machine = sync.OnceValues(func() (string, error) {
 	id, err := machineID()
 	if err != nil {
 		return "", err
 	}
 	return Derive(id), nil
-}
+})
 
 // Identity is what a subscription request tells the provider about the device.
 type Identity struct {
