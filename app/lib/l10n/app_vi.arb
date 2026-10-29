@@ -184,8 +184,17 @@
   "notificationsEmpty": "Không có thông báo",
   "retryConnect": "Thử lại kết nối",
   "openLogs": "Mở nhật ký",
+  "tourReplay": "Hiển thị lại hướng dẫn",
+  "tourStep": "Bước {step} của 5",
   "tourBack": "Mặt sau",
   "tourNext": "Kế tiếp",
+  "tourSkip": "Nhảy",
+  "tourFinish": "Xong",
+  "tourAdd": "Thêm liên kết đăng ký của nhà cung cấp của bạn.",
+  "tourServer": "Chọn một máy chủ. “Nhanh nhất” chọn một cho bạn.",
+  "tourConnect": "Nhấn vào đây để kết nối hoặc ngắt kết nối.",
+  "tourMode": "Chọn một chế độ. Kill switch chặn internet nếu VPN bị rớt.",
+  "tourSettings": "Mở cài đặt. Bạn có thể phát lại hướng dẫn này ở đó.",
   "chooseProgram": "Chọn một chương trình",
   "installedApps": "Ứng dụng đã cài đặt",
   "runningProcesses": "Tiến trình đang chạy",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

@@ -622,10 +622,39 @@ class SEn extends S {
   String get openLogs => 'Open logs';
 
   @override
+  String get tourReplay => 'Show guide again';
+
+  @override
+  String tourStep(int step) {
+    return 'Step $step of 5';
+  }
+
+  @override
   String get tourBack => 'Back';
 
   @override
   String get tourNext => 'Next';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourFinish => 'Done';
+
+  @override
+  String get tourAdd => 'Add your provider’s subscription link.';
+
+  @override
+  String get tourServer => 'Pick a server. “Fastest” selects one for you.';
+
+  @override
+  String get tourConnect => 'Click here to connect or disconnect.';
+
+  @override
+  String get tourMode => 'Choose a mode. Kill switch blocks internet if the VPN drops.';
+
+  @override
+  String get tourSettings => 'Open settings. You can replay this guide there.';
 
   @override
   String get chooseProgram => 'Choose a program';

@@ -23,6 +23,7 @@ import 'profiles.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
 import 'subscription_sheet.dart';
+import 'shell.dart';
 import 'sync.dart';
 import 'modes.dart';
 
@@ -256,6 +257,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.animations,
               onChanged: (v) => set((x) => x.animations = v, replan: false),
             ),
+            if (context.getInheritedWidgetOfExactType<ShellScope>() case final shell?)
+              LinkTile(title: s.tourReplay, onTap: shell.replayTour),
           ],
         ),
 

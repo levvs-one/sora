@@ -627,10 +627,39 @@ class SIt extends S {
   String get openLogs => 'Apri i log';
 
   @override
+  String get tourReplay => 'Mostra di nuovo la guida';
+
+  @override
+  String tourStep(int step) {
+    return 'Passaggio $step di 5';
+  }
+
+  @override
   String get tourBack => 'Indietro';
 
   @override
   String get tourNext => 'Prossima';
+
+  @override
+  String get tourSkip => 'Saltare';
+
+  @override
+  String get tourFinish => 'Fatto';
+
+  @override
+  String get tourAdd => 'Aggiungi il link di abbonamento del tuo provider.';
+
+  @override
+  String get tourServer => 'Scegli un server. \"Il più veloce\" ne seleziona uno per te.';
+
+  @override
+  String get tourConnect => 'Clicca qui per connetterti o disconnetterti.';
+
+  @override
+  String get tourMode => 'Scegli una modalità. Il kill switch blocca Internet se la VPN si interrompe.';
+
+  @override
+  String get tourSettings => 'Apri le impostazioni. Puoi riprodurre questa guida lì.';
 
   @override
   String get chooseProgram => 'Scegli un programma';

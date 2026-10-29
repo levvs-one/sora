@@ -627,10 +627,39 @@ class SFa extends S {
   String get openLogs => 'لاگ ها را باز کنید';
 
   @override
+  String get tourReplay => 'راهنما را دوباره نشان دهید';
+
+  @override
+  String tourStep(int step) {
+    return 'مرحله $step از 5';
+  }
+
+  @override
   String get tourBack => 'برگشت';
 
   @override
   String get tourNext => 'بعدی';
+
+  @override
+  String get tourSkip => 'پرش کنید';
+
+  @override
+  String get tourFinish => 'انجام شد';
+
+  @override
+  String get tourAdd => 'پیوند اشتراک ارائه دهنده خود را اضافه کنید.';
+
+  @override
+  String get tourServer => 'یک سرور انتخاب کنید \"سریعترین\" یکی را برای شما انتخاب می کند.';
+
+  @override
+  String get tourConnect => 'برای اتصال یا قطع ارتباط اینجا را کلیک کنید.';
+
+  @override
+  String get tourMode => 'یک حالت را انتخاب کنید. در صورت قطع شدن VPN، سوئیچ Kill اینترنت را مسدود می کند.';
+
+  @override
+  String get tourSettings => 'تنظیمات را باز کنید. می توانید این راهنما را دوباره در آنجا پخش کنید.';
 
   @override
   String get chooseProgram => 'یک برنامه را انتخاب کنید';

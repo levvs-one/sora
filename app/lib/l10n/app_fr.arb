@@ -184,8 +184,17 @@
   "notificationsEmpty": "Aucune notification",
   "retryConnect": "Réessayer la connexion",
   "openLogs": "Journaux ouverts",
+  "tourReplay": "Afficher à nouveau le guide",
+  "tourStep": "Étape {step} sur 5",
   "tourBack": "Dos",
   "tourNext": "Suivante",
+  "tourSkip": "Sauter",
+  "tourFinish": "Fait",
+  "tourAdd": "Ajoutez le lien d'abonnement de votre fournisseur.",
+  "tourServer": "Choisissez un serveur. « Le plus rapide » en sélectionne un pour vous.",
+  "tourConnect": "Cliquez ici pour vous connecter ou vous déconnecter.",
+  "tourMode": "Choisissez un mode. Kill Switch bloque Internet si le VPN tombe.",
+  "tourSettings": "Ouvrez les paramètres. Vous pouvez y rejouer ce guide.",
   "chooseProgram": "Choisissez un programme",
   "installedApps": "Applications installées",
   "runningProcesses": "Processus en cours d'exécution",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

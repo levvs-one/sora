@@ -627,10 +627,39 @@ class SHi extends S {
   String get openLogs => 'लॉग खोलें';
 
   @override
+  String get tourReplay => 'गाइड फिर से दिखाएँ';
+
+  @override
+  String tourStep(int step) {
+    return '5 का चरण $step';
+  }
+
+  @override
   String get tourBack => 'पीछे';
 
   @override
   String get tourNext => 'अगला';
+
+  @override
+  String get tourSkip => 'छोडना';
+
+  @override
+  String get tourFinish => 'हो गया';
+
+  @override
+  String get tourAdd => 'अपने प्रदाता का सदस्यता लिंक जोड़ें.';
+
+  @override
+  String get tourServer => 'एक सर्वर चुनें. \"सबसे तेज़\" आपके लिए एक का चयन करता है।';
+
+  @override
+  String get tourConnect => 'कनेक्ट या डिस्कनेक्ट करने के लिए यहां क्लिक करें.';
+
+  @override
+  String get tourMode => 'एक मोड चुनें. यदि वीपीएन बंद हो जाए तो किल स्विच इंटरनेट को ब्लॉक कर देता है।';
+
+  @override
+  String get tourSettings => 'खुली सेटिंग। आप वहां इस गाइड को दोबारा चला सकते हैं।';
 
   @override
   String get chooseProgram => 'एक प्रोग्राम चुनें';

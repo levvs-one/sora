@@ -627,10 +627,39 @@ class SPl extends S {
   String get openLogs => 'Otwórz logi';
 
   @override
+  String get tourReplay => 'Pokaż przewodnik ponownie';
+
+  @override
+  String tourStep(int step) {
+    return 'Krok $step z 5';
+  }
+
+  @override
   String get tourBack => 'Z powrotem';
 
   @override
   String get tourNext => 'Następny';
+
+  @override
+  String get tourSkip => 'Pominąć';
+
+  @override
+  String get tourFinish => 'Zrobione';
+
+  @override
+  String get tourAdd => 'Dodaj link do subskrypcji swojego dostawcy.';
+
+  @override
+  String get tourServer => 'Wybierz serwer. „Najszybszy” wybierze jeden za Ciebie.';
+
+  @override
+  String get tourConnect => 'Kliknij tutaj, aby połączyć lub rozłączyć.';
+
+  @override
+  String get tourMode => 'Wybierz tryb. Przełącznik Kill blokuje Internet, jeśli VPN spadnie.';
+
+  @override
+  String get tourSettings => 'Otwórz ustawienia. Możesz tam odtworzyć ten przewodnik.';
 
   @override
   String get chooseProgram => 'Wybierz program';

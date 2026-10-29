@@ -184,8 +184,17 @@
   "notificationsEmpty": "Bildirim yok",
   "retryConnect": "Bağlantıyı yeniden dene",
   "openLogs": "Günlükleri aç",
+  "tourReplay": "Kılavuzu tekrar göster",
+  "tourStep": "Adım {step}/5",
   "tourBack": "Geri",
   "tourNext": "Sonraki",
+  "tourSkip": "Atlamak",
+  "tourFinish": "Tamamlamak",
+  "tourAdd": "Sağlayıcınızın abonelik bağlantısını ekleyin.",
+  "tourServer": "Bir sunucu seçin. “En Hızlı” sizin için birini seçer.",
+  "tourConnect": "Bağlanmak veya bağlantıyı kesmek için burayı tıklayın.",
+  "tourMode": "Bir mod seçin. VPN düşerse Kill Switch interneti engeller.",
+  "tourSettings": "Ayarları açın. Bu kılavuzu orada tekrar oynatabilirsiniz.",
   "chooseProgram": "Bir program seçin",
   "installedApps": "Yüklü uygulamalar",
   "runningProcesses": "Çalışan işlemler",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

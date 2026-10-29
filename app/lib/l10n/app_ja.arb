@@ -184,8 +184,17 @@
   "notificationsEmpty": "通知はありません",
   "retryConnect": "接続を再試行します",
   "openLogs": "ログを開く",
+  "tourReplay": "ガイドを再度表示する",
+  "tourStep": "ステップ {step}/5",
   "tourBack": "戻る",
   "tourNext": "次",
+  "tourSkip": "スキップ",
+  "tourFinish": "終わり",
+  "tourAdd": "プロバイダーのサブスクリプション リンクを追加します。",
+  "tourServer": "サーバーを選択します。 「最速」では、1 つが選択されます。",
+  "tourConnect": "ここをクリックして接続または切断します。",
+  "tourMode": "モードを選択します。 VPN が切断された場合、キルスイッチはインターネットをブロックします。",
+  "tourSettings": "設定を開きます。 そこでこのガイドを再生できます。",
   "chooseProgram": "プログラムを選択してください",
   "installedApps": "インストールされているアプリケーション",
   "runningProcesses": "実行中のプロセス",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

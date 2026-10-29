@@ -184,8 +184,17 @@
   "notificationsEmpty": "Brak powiadomień",
   "retryConnect": "Ponów próbę połączenia",
   "openLogs": "Otwórz logi",
+  "tourReplay": "Pokaż przewodnik ponownie",
+  "tourStep": "Krok {step} z 5",
   "tourBack": "Z powrotem",
   "tourNext": "Następny",
+  "tourSkip": "Pominąć",
+  "tourFinish": "Zrobione",
+  "tourAdd": "Dodaj link do subskrypcji swojego dostawcy.",
+  "tourServer": "Wybierz serwer. „Najszybszy” wybierze jeden za Ciebie.",
+  "tourConnect": "Kliknij tutaj, aby połączyć lub rozłączyć.",
+  "tourMode": "Wybierz tryb. Przełącznik Kill blokuje Internet, jeśli VPN spadnie.",
+  "tourSettings": "Otwórz ustawienia. Możesz tam odtworzyć ten przewodnik.",
   "chooseProgram": "Wybierz program",
   "installedApps": "Zainstalowane aplikacje",
   "runningProcesses": "Uruchomione procesy",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

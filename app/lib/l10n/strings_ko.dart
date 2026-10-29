@@ -622,10 +622,39 @@ class SKo extends S {
   String get openLogs => '로그 열기';
 
   @override
+  String get tourReplay => '가이드 다시 표시';
+
+  @override
+  String tourStep(int step) {
+    return '5단계 $step';
+  }
+
+  @override
   String get tourBack => '뒤쪽에';
 
   @override
   String get tourNext => '다음';
+
+  @override
+  String get tourSkip => '건너뛰다';
+
+  @override
+  String get tourFinish => '완료';
+
+  @override
+  String get tourAdd => '제공업체의 구독 링크를 추가하세요.';
+
+  @override
+  String get tourServer => '서버를 선택하세요. \"가장 빠름\"이 하나를 선택합니다.';
+
+  @override
+  String get tourConnect => '연결하거나 연결을 끊으려면 여기를 클릭하세요.';
+
+  @override
+  String get tourMode => '모드를 선택하세요. VPN이 끊어지면 킬 스위치가 인터넷을 차단합니다.';
+
+  @override
+  String get tourSettings => '설정을 엽니다. 여기서 이 가이드를 다시 재생할 수 있습니다.';
 
   @override
   String get chooseProgram => '프로그램을 선택하세요';

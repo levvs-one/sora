@@ -184,8 +184,17 @@
   "notificationsEmpty": "Няма апавяшчэнняў",
   "retryConnect": "Паўтарыце падключэнне",
   "openLogs": "Адкрытыя лагі",
+  "tourReplay": "Зноў паказаць кіраўніцтва",
+  "tourStep": "Крок {step} з 5",
   "tourBack": "Назад",
   "tourNext": "Далей",
+  "tourSkip": "Прапусціць",
+  "tourFinish": "Гатова",
+  "tourAdd": "Дадайце спасылку на падпіску вашага правайдэра.",
+  "tourServer": "Выберыце сервер. «Самы хуткі» выбірае для вас адзін.",
+  "tourConnect": "Націсніце тут, каб падключыцца або адключыцца.",
+  "tourMode": "Выберыце рэжым. Kill Switch блакуе Інтэрнэт, калі VPN падае.",
+  "tourSettings": "Адкрыйце налады. Вы можаце паўтарыць гэта кіраўніцтва там.",
   "chooseProgram": "Выберыце праграму",
   "installedApps": "Усталяваныя прыкладанні",
   "runningProcesses": "Запушчаныя працэсы",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

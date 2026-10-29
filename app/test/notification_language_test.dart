@@ -184,7 +184,7 @@ void main() {
       ..physicalSize = const Size(1000, 900);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings
       ..language = 'en'
       ..animations = false;

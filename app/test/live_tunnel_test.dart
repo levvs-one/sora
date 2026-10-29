@@ -120,7 +120,7 @@ void main() {
       (tester) async {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-
+        await settings.completeTour();
         settings
           ..animations = false
           ..rules = ['direct process:xray.exe'];
@@ -154,7 +154,7 @@ void main() {
           expect(orb, findsOneWidget);
           await tester.runAsync(() => tester.tap(orb));
           await until(initiallyConnected ? Phase.off : Phase.connected);
-
+          expect(settings.tourDone, isTrue);
           if (initiallyConnected) {
             await tester.runAsync(() => tester.tap(orb));
             await until(Phase.connected);

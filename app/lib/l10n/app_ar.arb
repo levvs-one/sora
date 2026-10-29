@@ -184,8 +184,17 @@
   "notificationsEmpty": "لا توجد إشعارات",
   "retryConnect": "أعد محاولة الاتصال",
   "openLogs": "فتح السجلات",
+  "tourReplay": "أظهر الدليل مرة أخرى",
+  "tourStep": "الخطوة {step} من 5",
   "tourBack": "خلف",
   "tourNext": "التالي",
+  "tourSkip": "يتخطى",
+  "tourFinish": "منتهي",
+  "tourAdd": "أضف رابط اشتراك المزود الخاص بك.",
+  "tourServer": "اختر خادمًا. \"الأسرع\" يختار واحدًا لك.",
+  "tourConnect": "انقر هنا للاتصال أو قطع الاتصال.",
+  "tourMode": "اختر الوضع. يقوم Kill Switch بحظر الإنترنت في حالة انقطاع VPN.",
+  "tourSettings": "افتح الإعدادات. يمكنك إعادة تشغيل هذا الدليل هناك.",
   "chooseProgram": "اختر برنامجا",
   "installedApps": "التطبيقات المثبتة",
   "runningProcesses": "العمليات الجارية",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

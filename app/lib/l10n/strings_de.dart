@@ -627,10 +627,39 @@ class SDe extends S {
   String get openLogs => 'Protokolle öffnen';
 
   @override
+  String get tourReplay => 'Guide erneut anzeigen';
+
+  @override
+  String tourStep(int step) {
+    return 'Schritt $step von 5';
+  }
+
+  @override
   String get tourBack => 'Zurück';
 
   @override
   String get tourNext => 'Nächste';
+
+  @override
+  String get tourSkip => 'Überspringen';
+
+  @override
+  String get tourFinish => 'Erledigt';
+
+  @override
+  String get tourAdd => 'Fügen Sie den Abonnementlink Ihres Anbieters hinzu.';
+
+  @override
+  String get tourServer => 'Wählen Sie einen Server. „Am schnellsten“ wählt eines für Sie aus.';
+
+  @override
+  String get tourConnect => 'Klicken Sie hier, um eine Verbindung herzustellen oder zu trennen.';
+
+  @override
+  String get tourMode => 'Wählen Sie einen Modus. Der Kill-Switch blockiert das Internet, wenn das VPN ausfällt.';
+
+  @override
+  String get tourSettings => 'Einstellungen öffnen. Sie können diesen Leitfaden dort noch einmal ansehen.';
 
   @override
   String get chooseProgram => 'Wählen Sie ein Programm';

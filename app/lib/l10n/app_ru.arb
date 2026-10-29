@@ -340,13 +340,29 @@
   "notificationsEmpty": "Нет уведомлений",
   "retryConnect": "Подключиться снова",
   "openLogs": "Открыть логи",
+  "tourReplay": "Показать гайд снова",
+  "tourStep": "Шаг {step} из 5",
   "tourBack": "Назад",
   "tourNext": "Далее",
+  "tourSkip": "Пропустить",
+  "tourFinish": "Готово",
+  "tourAdd": "Добавьте ссылку на подписку от провайдера.",
+  "tourServer": "Выберите сервер. «Самый быстрый» подберёт его за вас.",
+  "tourConnect": "Нажмите здесь, чтобы подключиться или отключиться.",
+  "tourMode": "Выберите режим. Kill switch блокирует интернет при обрыве VPN.",
+  "tourSettings": "Откройте настройки. Здесь можно показать гайд снова.",
   "chooseProgram": "Выбрать программу",
   "installedApps": "Установленные программы",
   "runningProcesses": "Запущенные процессы",
   "programsEmpty": "Программы не найдены",
   "selectExe": "Выбрать файл .exe",
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "speedtest": "Скорость",
   "speedtestSearch": "Найти сервис",
   "speedtestEmpty": "Ничего не найдено",

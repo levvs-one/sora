@@ -627,10 +627,39 @@ class SHy extends S {
   String get openLogs => 'Բացեք տեղեկամատյանները';
 
   @override
+  String get tourReplay => 'Կրկին ցուցադրեք ուղեցույցը';
+
+  @override
+  String tourStep(int step) {
+    return 'Քայլ $step 5-ից';
+  }
+
+  @override
   String get tourBack => 'Ետ';
 
   @override
   String get tourNext => 'Հաջորդը';
+
+  @override
+  String get tourSkip => 'Բաց թողնել';
+
+  @override
+  String get tourFinish => 'Կատարված է';
+
+  @override
+  String get tourAdd => 'Ավելացրեք ձեր մատակարարի բաժանորդագրության հղումը:';
+
+  @override
+  String get tourServer => 'Ընտրեք սերվեր: «Ամենաարագ»-ը ձեզ համար ընտրում է մեկը:';
+
+  @override
+  String get tourConnect => 'Սեղմեք այստեղ՝ միանալու կամ անջատելու համար:';
+
+  @override
+  String get tourMode => 'Ընտրեք ռեժիմ: Kill switch-ը արգելափակում է ինտերնետը, եթե VPN-ն ընկնի։';
+
+  @override
+  String get tourSettings => 'Բացեք կարգավորումները: Դուք կարող եք վերարտադրել այս ուղեցույցը այնտեղ:';
 
   @override
   String get chooseProgram => 'Ընտրեք ծրագիր';

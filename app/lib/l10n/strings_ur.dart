@@ -627,10 +627,39 @@ class SUr extends S {
   String get openLogs => 'نوشتہ جات کھولیں۔';
 
   @override
+  String get tourReplay => 'دوبارہ گائیڈ دکھائیں۔';
+
+  @override
+  String tourStep(int step) {
+    return '5 میں سے $step مرحلہ';
+  }
+
+  @override
   String get tourBack => 'پیچھے';
 
   @override
   String get tourNext => 'اگلا';
+
+  @override
+  String get tourSkip => 'چھوڑیں۔';
+
+  @override
+  String get tourFinish => 'ہو گیا';
+
+  @override
+  String get tourAdd => 'اپنے فراہم کنندہ کی رکنیت کا لنک شامل کریں۔';
+
+  @override
+  String get tourServer => 'ایک سرور چنیں۔ \"تیز ترین\" آپ کے لیے ایک کا انتخاب کرتا ہے۔';
+
+  @override
+  String get tourConnect => 'جڑنے یا منقطع کرنے کے لیے یہاں کلک کریں۔';
+
+  @override
+  String get tourMode => 'ایک موڈ کا انتخاب کریں۔ VPN گرنے پر Kill سوئچ انٹرنیٹ کو بلاک کر دیتا ہے۔';
+
+  @override
+  String get tourSettings => 'ترتیبات کھولیں۔ آپ وہاں اس گائیڈ کو دوبارہ چلا سکتے ہیں۔';
 
   @override
   String get chooseProgram => 'ایک پروگرام کا انتخاب کریں۔';

@@ -627,10 +627,39 @@ class SPt extends S {
   String get openLogs => 'Registros abertos';
 
   @override
+  String get tourReplay => 'Mostrar guia novamente';
+
+  @override
+  String tourStep(int step) {
+    return 'Etapa $step de 5';
+  }
+
+  @override
   String get tourBack => 'Voltar';
 
   @override
   String get tourNext => 'Próxima';
+
+  @override
+  String get tourSkip => 'Pular';
+
+  @override
+  String get tourFinish => 'Feita';
+
+  @override
+  String get tourAdd => 'Adicione o link de assinatura do seu provedor.';
+
+  @override
+  String get tourServer => 'Escolha um servidor. “Mais rápido” seleciona um para você.';
+
+  @override
+  String get tourConnect => 'Clique aqui para conectar ou desconectar.';
+
+  @override
+  String get tourMode => 'Escolha um modo. Kill switch bloqueia a Internet se a VPN cair.';
+
+  @override
+  String get tourSettings => 'Abra as configurações. Você pode reproduzir este guia lá.';
 
   @override
   String get chooseProgram => 'Escolha um programa';

@@ -75,7 +75,7 @@ void main() {
       store = ExtensionStore(dir: dir.path);
       await store.load();
       settings = await Settings.load();
-
+      await settings.completeTour();
       settings.animations = false;
     });
     final sora = Sora(settings, extensions: store);

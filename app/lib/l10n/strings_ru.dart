@@ -629,10 +629,39 @@ class SRu extends S {
   String get openLogs => 'Открыть логи';
 
   @override
+  String get tourReplay => 'Показать гайд снова';
+
+  @override
+  String tourStep(int step) {
+    return 'Шаг $step из 5';
+  }
+
+  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далее';
+
+  @override
+  String get tourSkip => 'Пропустить';
+
+  @override
+  String get tourFinish => 'Готово';
+
+  @override
+  String get tourAdd => 'Добавьте ссылку на подписку от провайдера.';
+
+  @override
+  String get tourServer => 'Выберите сервер. «Самый быстрый» подберёт его за вас.';
+
+  @override
+  String get tourConnect => 'Нажмите здесь, чтобы подключиться или отключиться.';
+
+  @override
+  String get tourMode => 'Выберите режим. Kill switch блокирует интернет при обрыве VPN.';
+
+  @override
+  String get tourSettings => 'Откройте настройки. Здесь можно показать гайд снова.';
 
   @override
   String get chooseProgram => 'Выбрать программу';

@@ -627,10 +627,39 @@ class STk extends S {
   String get openLogs => 'Surnallary açyň';
 
   @override
+  String get tourReplay => 'Guideene-de gollanma görkez';
+
+  @override
+  String tourStep(int step) {
+    return '5-nji ädim $step';
+  }
+
+  @override
   String get tourBack => 'Yzyna';
 
   @override
   String get tourNext => 'Indiki';
+
+  @override
+  String get tourSkip => 'Geçmek';
+
+  @override
+  String get tourFinish => 'Boldy';
+
+  @override
+  String get tourAdd => 'Üpjün edijiňiziň abuna baglanyşygyny goşuň.';
+
+  @override
+  String get tourServer => 'Serwer saýlaň. “Iň çalt” siziň üçin birini saýlaýar.';
+
+  @override
+  String get tourConnect => 'Birikdirmek ýa-da aýyrmak üçin şu ýere basyň.';
+
+  @override
+  String get tourMode => 'Re modeimi saýlaň. VPN düşse, wyklýuçatel interneti bloklaýar.';
+
+  @override
+  String get tourSettings => 'Sazlamalary açyň. Bu gollanmany şol ýerde gaýtadan ulanyp bilersiňiz.';
 
   @override
   String get chooseProgram => 'Programma saýlaň';

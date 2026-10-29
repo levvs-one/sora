@@ -184,8 +184,17 @@
   "notificationsEmpty": "Bildiriş yoxdur",
   "retryConnect": "Bağlantıya yenidən cəhd edin",
   "openLogs": "Qeydləri açın",
+  "tourReplay": "Bələdçini yenidən göstərin",
+  "tourStep": "5 addımdan {step}",
   "tourBack": "Geri",
   "tourNext": "Sonrakı",
+  "tourSkip": "Keç",
+  "tourFinish": "Bitdi",
+  "tourAdd": "Provayderinizin abunə linkini əlavə edin.",
+  "tourServer": "Bir server seçin. “Ən sürətli” sizin üçün birini seçir.",
+  "tourConnect": "Qoşulmaq və ya əlaqəni kəsmək üçün bura klikləyin.",
+  "tourMode": "Bir rejim seçin. VPN düşərsə, keçid bloklarını öldürün.",
+  "tourSettings": "Parametrləri açın. Bu təlimatı orada təkrarlaya bilərsiniz.",
   "chooseProgram": "Proqram seçin",
   "installedApps": "Quraşdırılmış proqramlar",
   "runningProcesses": "Çalışan proseslər",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

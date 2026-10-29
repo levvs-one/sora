@@ -627,10 +627,39 @@ class SKa extends S {
   String get openLogs => 'გახსენით ჟურნალები';
 
   @override
+  String get tourReplay => 'ხელახლა აჩვენე სახელმძღვანელო';
+
+  @override
+  String tourStep(int step) {
+    return 'ნაბიჯი $step 5-დან';
+  }
+
+  @override
   String get tourBack => 'უკან';
 
   @override
   String get tourNext => 'შემდეგი';
+
+  @override
+  String get tourSkip => 'გამოტოვება';
+
+  @override
+  String get tourFinish => 'შესრულებულია';
+
+  @override
+  String get tourAdd => 'დაამატეთ თქვენი პროვაიდერის გამოწერის ბმული.';
+
+  @override
+  String get tourServer => 'აირჩიეთ სერვერი. „უსწრაფესი“ ირჩევს ერთს თქვენთვის.';
+
+  @override
+  String get tourConnect => 'დააწკაპუნეთ აქ დასაკავშირებლად ან გასათიშად.';
+
+  @override
+  String get tourMode => 'აირჩიეთ რეჟიმი. Kill switch ბლოკავს ინტერნეტს, თუ VPN ჩამოვარდება.';
+
+  @override
+  String get tourSettings => 'გახსენით პარამეტრები. თქვენ შეგიძლიათ გაიმეოროთ ეს სახელმძღვანელო იქ.';
 
   @override
   String get chooseProgram => 'აირჩიეთ პროგრამა';

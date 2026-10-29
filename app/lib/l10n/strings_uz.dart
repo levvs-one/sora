@@ -627,10 +627,39 @@ class SUz extends S {
   String get openLogs => 'Jurnallarni oching';
 
   @override
+  String get tourReplay => 'Yo‘riqnomani yana ko‘rsatish';
+
+  @override
+  String tourStep(int step) {
+    return '$step/5 qadam';
+  }
+
+  @override
   String get tourBack => 'Orqaga';
 
   @override
   String get tourNext => 'Keyingisi';
+
+  @override
+  String get tourSkip => 'Oʻtkazib yuborish';
+
+  @override
+  String get tourFinish => 'Bajarildi';
+
+  @override
+  String get tourAdd => 'Provayderingizning obuna havolasini qo\'shing.';
+
+  @override
+  String get tourServer => 'Serverni tanlang. “Eng tez” siz uchun birini tanlaydi.';
+
+  @override
+  String get tourConnect => 'Ulanish yoki uzish uchun shu yerni bosing.';
+
+  @override
+  String get tourMode => 'Tartibni tanlang. Agar VPN tushib qolsa, o\'chirish kaliti internetni bloklaydi.';
+
+  @override
+  String get tourSettings => 'Sozlamalarni oching. Siz ushbu qo\'llanmani u erda takrorlashingiz mumkin.';
 
   @override
   String get chooseProgram => 'Dasturni tanlang';

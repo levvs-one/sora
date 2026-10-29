@@ -627,10 +627,39 @@ class SKk extends S {
   String get openLogs => 'Журналдарды ашыңыз';
 
   @override
+  String get tourReplay => 'Нұсқаулықты қайта көрсетіңіз';
+
+  @override
+  String tourStep(int step) {
+    return '$step/5 қадамы';
+  }
+
+  @override
   String get tourBack => 'Артқа';
 
   @override
   String get tourNext => 'Келесі';
+
+  @override
+  String get tourSkip => 'Өткізіп жіберу';
+
+  @override
+  String get tourFinish => 'Дайын';
+
+  @override
+  String get tourAdd => 'Провайдеріңіздің жазылым сілтемесін қосыңыз.';
+
+  @override
+  String get tourServer => 'Серверді таңдаңыз. «Ең жылдам» сіз үшін біреуін таңдайды.';
+
+  @override
+  String get tourConnect => 'Қосылу немесе ажырату үшін осы жерді басыңыз.';
+
+  @override
+  String get tourMode => 'Режимді таңдаңыз. VPN өшірілсе, коммутаторды өшіріңіз.';
+
+  @override
+  String get tourSettings => 'Параметрлерді ашыңыз. Сіз бұл нұсқаулықты сол жерде қайталай аласыз.';
 
   @override
   String get chooseProgram => 'Бағдарламаны таңдаңыз';

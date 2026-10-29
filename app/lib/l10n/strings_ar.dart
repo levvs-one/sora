@@ -627,10 +627,39 @@ class SAr extends S {
   String get openLogs => 'فتح السجلات';
 
   @override
+  String get tourReplay => 'أظهر الدليل مرة أخرى';
+
+  @override
+  String tourStep(int step) {
+    return 'الخطوة $step من 5';
+  }
+
+  @override
   String get tourBack => 'خلف';
 
   @override
   String get tourNext => 'التالي';
+
+  @override
+  String get tourSkip => 'يتخطى';
+
+  @override
+  String get tourFinish => 'منتهي';
+
+  @override
+  String get tourAdd => 'أضف رابط اشتراك المزود الخاص بك.';
+
+  @override
+  String get tourServer => 'اختر خادمًا. \"الأسرع\" يختار واحدًا لك.';
+
+  @override
+  String get tourConnect => 'انقر هنا للاتصال أو قطع الاتصال.';
+
+  @override
+  String get tourMode => 'اختر الوضع. يقوم Kill Switch بحظر الإنترنت في حالة انقطاع VPN.';
+
+  @override
+  String get tourSettings => 'افتح الإعدادات. يمكنك إعادة تشغيل هذا الدليل هناك.';
 
   @override
   String get chooseProgram => 'اختر برنامجا';

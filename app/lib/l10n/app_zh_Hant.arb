@@ -184,8 +184,17 @@
   "notificationsEmpty": "暫無通知",
   "retryConnect": "重試連接",
   "openLogs": "打開日誌",
+  "tourReplay": "再次顯示指南",
+  "tourStep": "第 5 步 {step}",
   "tourBack": "後退",
   "tourNext": "下一個",
+  "tourSkip": "跳過",
+  "tourFinish": "完畢",
+  "tourAdd": "新增您的提供者的訂閱連結。",
+  "tourServer": "選擇一個伺服器。 “最快”為您選擇一個。",
+  "tourConnect": "按一下此處連接或斷開連接。",
+  "tourMode": "選擇一種模式。 如果 VPN 斷線，終止開關會阻止網路。",
+  "tourSettings": "打開設定。 您可以在那裡重播本指南。",
   "chooseProgram": "選擇一個程序",
   "installedApps": "已安裝的應用程式",
   "runningProcesses": "正在運行的進程",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

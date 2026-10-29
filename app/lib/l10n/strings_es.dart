@@ -627,10 +627,39 @@ class SEs extends S {
   String get openLogs => 'Abrir registros';
 
   @override
+  String get tourReplay => 'Mostrar guía nuevamente';
+
+  @override
+  String tourStep(int step) {
+    return 'Paso $step de 5';
+  }
+
+  @override
   String get tourBack => 'Atrás';
 
   @override
   String get tourNext => 'Próxima';
+
+  @override
+  String get tourSkip => 'Saltar';
+
+  @override
+  String get tourFinish => 'Hecho';
+
+  @override
+  String get tourAdd => 'Agregue el enlace de suscripción de su proveedor.';
+
+  @override
+  String get tourServer => 'Elige un servidor. \"Más rápido\" selecciona uno por usted.';
+
+  @override
+  String get tourConnect => 'Haga clic aquí para conectarse o desconectarse.';
+
+  @override
+  String get tourMode => 'Elige un modo. Kill Switch bloquea Internet si la VPN se cae.';
+
+  @override
+  String get tourSettings => 'Abra la configuración. Puedes reproducir esta guía allí.';
 
   @override
   String get chooseProgram => 'Elige un programa';

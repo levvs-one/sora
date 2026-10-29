@@ -628,10 +628,39 @@ class SBn extends S {
   String get openLogs => 'লগ খুলুন';
 
   @override
+  String get tourReplay => 'আবার গাইড দেখান';
+
+  @override
+  String tourStep(int step) {
+    return '5 এর মধ্যে $step ধাপ';
+  }
+
+  @override
   String get tourBack => 'ব্যাক';
 
   @override
   String get tourNext => 'পরবর্তী';
+
+  @override
+  String get tourSkip => 'এড়িয়ে যান';
+
+  @override
+  String get tourFinish => 'সম্পন্ন';
+
+  @override
+  String get tourAdd => 'আপনার প্রদানকারীর সদস্যতা লিঙ্ক যোগ করুন.';
+
+  @override
+  String get tourServer => 'একটি সার্ভার চয়ন করুন। \"দ্রুততম\" আপনার জন্য একটি নির্বাচন করে।';
+
+  @override
+  String get tourConnect => 'সংযোগ বা সংযোগ বিচ্ছিন্ন করতে এখানে ক্লিক করুন.';
+
+  @override
+  String get tourMode => 'একটি মোড চয়ন করুন. VPN কমে গেলে কিল সুইচ ইন্টারনেট ব্লক করে।';
+
+  @override
+  String get tourSettings => 'সেটিংস খুলুন। আপনি সেখানে এই নির্দেশিকা পুনরায় চালাতে পারেন।';
 
   @override
   String get chooseProgram => 'একটি প্রোগ্রাম চয়ন করুন';

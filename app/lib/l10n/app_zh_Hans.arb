@@ -184,8 +184,17 @@
   "notificationsEmpty": "暂无通知",
   "retryConnect": "重试连接",
   "openLogs": "打开日志",
+  "tourReplay": "再次显示指南",
+  "tourStep": "第 5 步 {step}",
   "tourBack": "后退",
   "tourNext": "下一个",
+  "tourSkip": "跳过",
+  "tourFinish": "完毕",
+  "tourAdd": "添加您的提供商的订阅链接。",
+  "tourServer": "选择一个服务器。 “最快”为您选择一个。",
+  "tourConnect": "单击此处连接或断开连接。",
+  "tourMode": "选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。",
+  "tourSettings": "打开设置。 您可以在那里重播本指南。",
   "chooseProgram": "选择一个程序",
   "installedApps": "已安装的应用程序",
   "runningProcesses": "正在运行的进程",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

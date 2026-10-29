@@ -627,10 +627,39 @@ class STg extends S {
   String get openLogs => 'Сабтҳоро кушоед';
 
   @override
+  String get tourReplay => 'Боз роҳнамо нишон диҳед';
+
+  @override
+  String tourStep(int step) {
+    return 'Қадами $step аз 5';
+  }
+
+  @override
   String get tourBack => 'Бозгашт';
 
   @override
   String get tourNext => 'Баъдӣ';
+
+  @override
+  String get tourSkip => 'Гузаштан';
+
+  @override
+  String get tourFinish => 'Иҷро шуд';
+
+  @override
+  String get tourAdd => 'Истиноди обунаи провайдери худро илова кунед.';
+
+  @override
+  String get tourServer => 'Серверро интихоб кунед. \"Зуртарин\" якеро барои шумо интихоб мекунад.';
+
+  @override
+  String get tourConnect => 'Барои пайваст кардан ё ҷудо кардан ин ҷо клик кунед.';
+
+  @override
+  String get tourMode => 'Режимро интихоб кунед. Агар VPN афтад, коммутаторро блокҳои интернетро кушед.';
+
+  @override
+  String get tourSettings => 'Танзимотҳоро кушоед. Шумо метавонед ин дастурро дар он ҷо такрор кунед.';
 
   @override
   String get chooseProgram => 'Барномаро интихоб кунед';

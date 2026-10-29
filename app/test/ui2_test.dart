@@ -18,6 +18,7 @@ import 'package:sora/src/ui/announcement.dart';
 import 'package:sora/src/ui/home.dart';
 import 'package:sora/src/ui/servers.dart';
 import 'package:sora/src/ui/speedtest.dart';
+import 'package:sora/src/ui/tour.dart';
 import 'package:sora/src/ui/notifications_screen.dart';
 import 'package:sora/src/ui/modes.dart';
 
@@ -42,7 +43,7 @@ void main() {
     size(tester, width, width == 420 ? 800 : 900);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings
       ..language = 'ru'
       ..animations = false;
@@ -157,7 +158,7 @@ void main() {
 
   testWidgets('first launch has one subscription action and no premature service failure', (tester) async {
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings
       ..language = 'ru'
       ..animations = false;
@@ -515,6 +516,21 @@ void main() {
 
   testWidgets('native browser yields to toast and returns after timeout', (tester) async {
     final sora = await start(tester);
+  testWidgets('tour cutout uses circle and card radii', (tester) async {
+    await start(tester);
+    await section(tester, 6);
+    await tester.scrollUntilVisible(find.text('Показать гайд снова'), 250);
+    await tester.tap(find.text('Показать гайд снова'));
+    await tester.pumpAndSettle();
+    for (final radius in [18.0, 12.0, 88.0, 8.0, 8.0]) {
+      final scrim = tester.widget<TourScrim>(find.byType(TourScrim));
+      expect(scrim.radius, radius);
+      if (radius == 88) expect(scrim.rect.size, const Size(176, 176));
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+    }
+  });
+
     await section(tester, 7);
     await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle();

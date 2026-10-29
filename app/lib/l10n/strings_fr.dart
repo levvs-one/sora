@@ -627,10 +627,39 @@ class SFr extends S {
   String get openLogs => 'Journaux ouverts';
 
   @override
+  String get tourReplay => 'Afficher à nouveau le guide';
+
+  @override
+  String tourStep(int step) {
+    return 'Étape $step sur 5';
+  }
+
+  @override
   String get tourBack => 'Dos';
 
   @override
   String get tourNext => 'Suivante';
+
+  @override
+  String get tourSkip => 'Sauter';
+
+  @override
+  String get tourFinish => 'Fait';
+
+  @override
+  String get tourAdd => 'Ajoutez le lien d\'abonnement de votre fournisseur.';
+
+  @override
+  String get tourServer => 'Choisissez un serveur. « Le plus rapide » en sélectionne un pour vous.';
+
+  @override
+  String get tourConnect => 'Cliquez ici pour vous connecter ou vous déconnecter.';
+
+  @override
+  String get tourMode => 'Choisissez un mode. Kill Switch bloque Internet si le VPN tombe.';
+
+  @override
+  String get tourSettings => 'Ouvrez les paramètres. Vous pouvez y rejouer ce guide.';
 
   @override
   String get chooseProgram => 'Choisissez un programme';

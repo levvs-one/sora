@@ -184,8 +184,17 @@
   "notificationsEmpty": "Nessuna notifica",
   "retryConnect": "Riprovare la connessione",
   "openLogs": "Apri i log",
+  "tourReplay": "Mostra di nuovo la guida",
+  "tourStep": "Passaggio {step} di 5",
   "tourBack": "Indietro",
   "tourNext": "Prossima",
+  "tourSkip": "Saltare",
+  "tourFinish": "Fatto",
+  "tourAdd": "Aggiungi il link di abbonamento del tuo provider.",
+  "tourServer": "Scegli un server. \"Il più veloce\" ne seleziona uno per te.",
+  "tourConnect": "Clicca qui per connetterti o disconnetterti.",
+  "tourMode": "Scegli una modalità. Il kill switch blocca Internet se la VPN si interrompe.",
+  "tourSettings": "Apri le impostazioni. Puoi riprodurre questa guida lì.",
   "chooseProgram": "Scegli un programma",
   "installedApps": "Applicazioni installate",
   "runningProcesses": "Processi in esecuzione",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

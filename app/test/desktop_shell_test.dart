@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:sora/main.dart';
 import 'package:sora/src/notifications.dart';
 import 'package:sora/src/core/link.dart';
@@ -17,6 +18,7 @@ import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
 import 'package:sora/src/ui/kit.dart';
 import 'package:sora/src/ui/about.dart';
+import 'package:sora/src/ui/tour.dart';
 import 'package:sora/src/ui/shell.dart';
 
 import 'fixtures/desktop_state.dart';
@@ -75,7 +77,7 @@ void main() {
     size(tester, 1440);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.animations = false;
     final sora = _SubscriptionsSora(settings);
     addTearDown(sora.dispose);
@@ -114,7 +116,7 @@ void main() {
     size(tester, 1440);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings
       ..language = 'ru'
       ..animations = false
@@ -197,7 +199,7 @@ void main() {
       size(tester, width);
       addTearDown(tester.view.reset);
       final settings = await Settings.load();
-
+      await settings.completeTour();
       settings.animations = false;
       final sora = DesktopState(settings);
       addTearDown(sora.dispose);
@@ -216,7 +218,7 @@ void main() {
     size(tester, 1440);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.animations = false;
     final sora = Sora(settings);
     addTearDown(sora.dispose);
@@ -246,7 +248,7 @@ void main() {
     size(tester, 1440);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.language = 'ru';
     settings.animations = false;
     settings.notifications = false;
@@ -287,22 +289,85 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('fresh installs and upgrades open directly without a guide', (tester) async {
+  testWidgets('tour starts on fresh install, resizes, skips and stays done', (tester) async {
     size(tester, 1440);
     addTearDown(tester.view.reset);
-    for (final upgraded in [false, true]) {
-      SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
-      if (upgraded) await SharedPreferencesAsync().setString('theme', 'dark');
-      final settings = await Settings.load();
-      settings.language = 'ru';
-      settings.animations = false;
-      final sora = Sora(settings);
-      await tester.pumpWidget(SoraApp(sora: sora));
+    final settings = await Settings.load();
+    expect(settings.tourDone, isFalse);
+    settings.language = 'ru';
+    settings.animations = false;
+    final sora = Sora(settings);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(SoraApp(sora: sora));
+    await tester.pumpAndSettle();
+    expect(ShowcaseView.getNamed('sora-tour').isShowcaseRunning, isTrue);
+    expect(find.text('Шаг 1 из 5'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(find.text('Шаг 2 из 5'), findsOneWidget);
+    size(tester, 420, 800);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('Шаг 1 из 5'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(ShowcaseView.getNamed('sora-tour').isShowcaseRunning, isFalse);
+    expect((await Settings.load()).tourDone, isTrue);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('upgrade does not start tour and settings can replay it', (tester) async {
+    await SharedPreferencesAsync().setString('theme', 'dark');
+    final settings = await Settings.load();
+    expect(settings.tourDone, isTrue);
+    expect(settings.theme, 'dark');
+    settings.language = 'ru';
+    settings.animations = false;
+    size(tester, 1440);
+    addTearDown(tester.view.reset);
+    final sora = Sora(settings);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(SoraApp(sora: sora));
+    await tester.pumpAndSettle();
+    expect(ShowcaseView.getNamed('sora-tour').isShowcaseRunning, isFalse);
+    await section(tester, 6);
+    await tester.scrollUntilVisible(find.text('Показать гайд снова'), 250);
+    await tester.tap(find.text('Показать гайд снова'));
+    await tester.pumpAndSettle();
+    expect(find.text('Шаг 1 из 5'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('all tour steps remain positioned when crossing breakpoints with motion', (tester) async {
+    size(tester, 1440);
+    addTearDown(tester.view.reset);
+    final settings = await Settings.load();
+    settings.language = 'ru';
+    final sora = Sora(settings);
+    addTearDown(sora.dispose);
+    await tester.pumpWidget(SoraApp(sora: sora));
+    await tester.pumpAndSettle();
+    for (var step = 1; step <= 5; step++) {
+      expect(find.text('Шаг $step из 5'), findsOneWidget);
+      size(tester, step.isEven ? 420 : 1000, step.isEven ? 800 : 720);
       await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('connect-control')), findsOneWidget);
-      expect(find.textContaining('Шаг 1'), findsNothing);
-      size(tester, 420, 800);
-      await tester.pumpAndSettle();
+      final scrim = tester.widget<TourScrim>(find.byType(TourScrim));
+      expect(scrim.rect.isEmpty, isFalse);
+      expect(scrim.duration, const Duration(milliseconds: 220));
+      expect(scrim.rect.right, lessThanOrEqualTo(tester.view.physicalSize.width));
+      expect(scrim.rect.bottom, lessThanOrEqualTo(tester.view.physicalSize.height));
+      final scope = tester.widget<TourScope>(find.byType(TourScope).first);
+      final target = tester.getRect(
+        find.byWidgetPredicate((w) => w is Showcase && w.showcaseKey == scope.keys[step - 1]),
+      );
+      expect(scrim.rect.left, closeTo(target.left, 1));
+      expect(scrim.rect.top, closeTo(target.top.clamp(0, tester.view.physicalSize.height), 1));
       expect(tester.takeException(), isNull);
       await section(tester, 6);
       expect(find.text('Показать гайд снова'), findsNothing);
@@ -312,8 +377,12 @@ void main() {
     }
   });
 
-  testWidgets('system reduced motion disables sidebar animation', (tester) async {
+  testWidgets('system reduced motion disables tour and sidebar animation', (tester) async {
     size(tester, 1440);
+    expect(ShowcaseView.getNamed('sora-tour').isShowcaseRunning, isFalse);
+    expect((await Settings.load()).tourDone, isTrue);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpAndSettle();
     addTearDown(tester.view.reset);
     tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
@@ -326,6 +395,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     await tester.pumpWidget(const SizedBox());
+    expect(tester.widget<TourScrim>(find.byType(TourScrim)).duration, Duration.zero);
     await tester.pumpAndSettle();
   });
 
@@ -333,7 +403,7 @@ void main() {
     size(tester, 1440);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.animations = false;
     final sora = DesktopState(settings);
     addTearDown(sora.dispose);
@@ -370,7 +440,7 @@ void main() {
     final processes = await tester.runAsync(runningPrograms);
     expect(processes, isNotEmpty);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.language = 'ru';
     settings.animations = false;
     final sora = Sora(settings);
@@ -404,7 +474,7 @@ void main() {
     size(tester, 1000, 720);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.language = 'ru';
     final sora = Sora(settings);
     addTearDown(sora.dispose);
@@ -428,7 +498,7 @@ void main() {
     size(tester, 1440);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.language = 'ru';
     settings.animations = false;
     final sora = Sora(settings);

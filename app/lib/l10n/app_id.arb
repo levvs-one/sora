@@ -184,8 +184,17 @@
   "notificationsEmpty": "Tidak ada notifikasi",
   "retryConnect": "Coba lagi koneksi",
   "openLogs": "Buka log",
+  "tourReplay": "Tampilkan panduan lagi",
+  "tourStep": "Langkah {step} dari 5",
   "tourBack": "Kembali",
   "tourNext": "Berikutnya",
+  "tourSkip": "Melewati",
+  "tourFinish": "Selesai",
+  "tourAdd": "Tambahkan tautan berlangganan penyedia Anda.",
+  "tourServer": "Pilih server. “Tercepat” memilih satu untuk Anda.",
+  "tourConnect": "Klik di sini untuk menghubungkan atau memutuskan sambungan.",
+  "tourMode": "Pilih mode. Tombol pemutus memblokir internet jika VPN terputus.",
+  "tourSettings": "Buka pengaturan. Anda dapat memutar ulang panduan ini di sana.",
   "chooseProgram": "Pilih sebuah program",
   "installedApps": "Aplikasi yang diinstal",
   "runningProcesses": "Proses yang berjalan",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

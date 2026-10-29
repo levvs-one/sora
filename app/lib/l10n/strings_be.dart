@@ -627,10 +627,39 @@ class SBe extends S {
   String get openLogs => 'Адкрытыя лагі';
 
   @override
+  String get tourReplay => 'Зноў паказаць кіраўніцтва';
+
+  @override
+  String tourStep(int step) {
+    return 'Крок $step з 5';
+  }
+
+  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далей';
+
+  @override
+  String get tourSkip => 'Прапусціць';
+
+  @override
+  String get tourFinish => 'Гатова';
+
+  @override
+  String get tourAdd => 'Дадайце спасылку на падпіску вашага правайдэра.';
+
+  @override
+  String get tourServer => 'Выберыце сервер. «Самы хуткі» выбірае для вас адзін.';
+
+  @override
+  String get tourConnect => 'Націсніце тут, каб падключыцца або адключыцца.';
+
+  @override
+  String get tourMode => 'Выберыце рэжым. Kill Switch блакуе Інтэрнэт, калі VPN падае.';
+
+  @override
+  String get tourSettings => 'Адкрыйце налады. Вы можаце паўтарыць гэта кіраўніцтва там.';
 
   @override
   String get chooseProgram => 'Выберыце праграму';

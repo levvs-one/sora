@@ -184,8 +184,17 @@
   "notificationsEmpty": "Habarnama ýok",
   "retryConnect": "Birikdirmek",
   "openLogs": "Surnallary açyň",
+  "tourReplay": "Guideene-de gollanma görkez",
+  "tourStep": "5-nji ädim {step}",
   "tourBack": "Yzyna",
   "tourNext": "Indiki",
+  "tourSkip": "Geçmek",
+  "tourFinish": "Boldy",
+  "tourAdd": "Üpjün edijiňiziň abuna baglanyşygyny goşuň.",
+  "tourServer": "Serwer saýlaň. “Iň çalt” siziň üçin birini saýlaýar.",
+  "tourConnect": "Birikdirmek ýa-da aýyrmak üçin şu ýere basyň.",
+  "tourMode": "Re modeimi saýlaň. VPN düşse, wyklýuçatel interneti bloklaýar.",
+  "tourSettings": "Sazlamalary açyň. Bu gollanmany şol ýerde gaýtadan ulanyp bilersiňiz.",
   "chooseProgram": "Programma saýlaň",
   "installedApps": "Gurlan programmalar",
   "runningProcesses": "Işleýiş amallary",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },

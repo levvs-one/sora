@@ -627,10 +627,39 @@ class SAz extends S {
   String get openLogs => 'Qeydləri açın';
 
   @override
+  String get tourReplay => 'Bələdçini yenidən göstərin';
+
+  @override
+  String tourStep(int step) {
+    return '5 addımdan $step';
+  }
+
+  @override
   String get tourBack => 'Geri';
 
   @override
   String get tourNext => 'Sonrakı';
+
+  @override
+  String get tourSkip => 'Keç';
+
+  @override
+  String get tourFinish => 'Bitdi';
+
+  @override
+  String get tourAdd => 'Provayderinizin abunə linkini əlavə edin.';
+
+  @override
+  String get tourServer => 'Bir server seçin. “Ən sürətli” sizin üçün birini seçir.';
+
+  @override
+  String get tourConnect => 'Qoşulmaq və ya əlaqəni kəsmək üçün bura klikləyin.';
+
+  @override
+  String get tourMode => 'Bir rejim seçin. VPN düşərsə, keçid bloklarını öldürün.';
+
+  @override
+  String get tourSettings => 'Parametrləri açın. Bu təlimatı orada təkrarlaya bilərsiniz.';
 
   @override
   String get chooseProgram => 'Proqram seçin';

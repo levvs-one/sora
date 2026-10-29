@@ -627,10 +627,39 @@ class SId extends S {
   String get openLogs => 'Buka log';
 
   @override
+  String get tourReplay => 'Tampilkan panduan lagi';
+
+  @override
+  String tourStep(int step) {
+    return 'Langkah $step dari 5';
+  }
+
+  @override
   String get tourBack => 'Kembali';
 
   @override
   String get tourNext => 'Berikutnya';
+
+  @override
+  String get tourSkip => 'Melewati';
+
+  @override
+  String get tourFinish => 'Selesai';
+
+  @override
+  String get tourAdd => 'Tambahkan tautan berlangganan penyedia Anda.';
+
+  @override
+  String get tourServer => 'Pilih server. “Tercepat” memilih satu untuk Anda.';
+
+  @override
+  String get tourConnect => 'Klik di sini untuk menghubungkan atau memutuskan sambungan.';
+
+  @override
+  String get tourMode => 'Pilih mode. Tombol pemutus memblokir internet jika VPN terputus.';
+
+  @override
+  String get tourSettings => 'Buka pengaturan. Anda dapat memutar ulang panduan ini di sana.';
 
   @override
   String get chooseProgram => 'Pilih sebuah program';

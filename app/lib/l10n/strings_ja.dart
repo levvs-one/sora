@@ -622,10 +622,39 @@ class SJa extends S {
   String get openLogs => 'ログを開く';
 
   @override
+  String get tourReplay => 'ガイドを再度表示する';
+
+  @override
+  String tourStep(int step) {
+    return 'ステップ $step/5';
+  }
+
+  @override
   String get tourBack => '戻る';
 
   @override
   String get tourNext => '次';
+
+  @override
+  String get tourSkip => 'スキップ';
+
+  @override
+  String get tourFinish => '終わり';
+
+  @override
+  String get tourAdd => 'プロバイダーのサブスクリプション リンクを追加します。';
+
+  @override
+  String get tourServer => 'サーバーを選択します。 「最速」では、1 つが選択されます。';
+
+  @override
+  String get tourConnect => 'ここをクリックして接続または切断します。';
+
+  @override
+  String get tourMode => 'モードを選択します。 VPN が切断された場合、キルスイッチはインターネットをブロックします。';
+
+  @override
+  String get tourSettings => '設定を開きます。 そこでこのガイドを再生できます。';
 
   @override
   String get chooseProgram => 'プログラムを選択してください';

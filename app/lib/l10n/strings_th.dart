@@ -627,10 +627,39 @@ class STh extends S {
   String get openLogs => 'เปิดบันทึก';
 
   @override
+  String get tourReplay => 'แสดงคำแนะนำอีกครั้ง';
+
+  @override
+  String tourStep(int step) {
+    return 'ขั้นตอนที่ $step จาก 5';
+  }
+
+  @override
   String get tourBack => 'กลับ';
 
   @override
   String get tourNext => 'ต่อไป';
+
+  @override
+  String get tourSkip => 'ข้าม';
+
+  @override
+  String get tourFinish => 'เสร็จแล้ว';
+
+  @override
+  String get tourAdd => 'เพิ่มลิงค์สมัครสมาชิกของผู้ให้บริการของคุณ';
+
+  @override
+  String get tourServer => 'เลือกเซิร์ฟเวอร์ “เร็วที่สุด” เลือกหนึ่งรายการสำหรับคุณ';
+
+  @override
+  String get tourConnect => 'คลิกที่นี่เพื่อเชื่อมต่อหรือยกเลิกการเชื่อมต่อ';
+
+  @override
+  String get tourMode => 'เลือกโหมด Kill switch จะบล็อกอินเทอร์เน็ตหาก VPN หลุด';
+
+  @override
+  String get tourSettings => 'เปิดการตั้งค่า คุณสามารถเล่นซ้ำคู่มือนี้ได้ที่นั่น';
 
   @override
   String get chooseProgram => 'เลือกโปรแกรม';

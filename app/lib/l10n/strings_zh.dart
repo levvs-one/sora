@@ -622,10 +622,39 @@ class SZh extends S {
   String get openLogs => '打开日志';
 
   @override
+  String get tourReplay => '再次显示指南';
+
+  @override
+  String tourStep(int step) {
+    return '第 5 步 $step';
+  }
+
+  @override
   String get tourBack => '后退';
 
   @override
   String get tourNext => '下一个';
+
+  @override
+  String get tourSkip => '跳过';
+
+  @override
+  String get tourFinish => '完毕';
+
+  @override
+  String get tourAdd => '添加您的提供商的订阅链接。';
+
+  @override
+  String get tourServer => '选择一个服务器。 “最快”为您选择一个。';
+
+  @override
+  String get tourConnect => '单击此处连接或断开连接。';
+
+  @override
+  String get tourMode => '选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。';
+
+  @override
+  String get tourSettings => '打开设置。 您可以在那里重播本指南。';
 
   @override
   String get chooseProgram => '选择一个程序';
@@ -2540,10 +2569,39 @@ class SZhHans extends SZh {
   String get openLogs => '打开日志';
 
   @override
+  String get tourReplay => '再次显示指南';
+
+  @override
+  String tourStep(int step) {
+    return '第 5 步 $step';
+  }
+
+  @override
   String get tourBack => '后退';
 
   @override
   String get tourNext => '下一个';
+
+  @override
+  String get tourSkip => '跳过';
+
+  @override
+  String get tourFinish => '完毕';
+
+  @override
+  String get tourAdd => '添加您的提供商的订阅链接。';
+
+  @override
+  String get tourServer => '选择一个服务器。 “最快”为您选择一个。';
+
+  @override
+  String get tourConnect => '单击此处连接或断开连接。';
+
+  @override
+  String get tourMode => '选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。';
+
+  @override
+  String get tourSettings => '打开设置。 您可以在那里重播本指南。';
 
   @override
   String get chooseProgram => '选择一个程序';
@@ -4458,10 +4516,39 @@ class SZhHant extends SZh {
   String get openLogs => '打開日誌';
 
   @override
+  String get tourReplay => '再次顯示指南';
+
+  @override
+  String tourStep(int step) {
+    return '第 5 步 $step';
+  }
+
+  @override
   String get tourBack => '後退';
 
   @override
   String get tourNext => '下一個';
+
+  @override
+  String get tourSkip => '跳過';
+
+  @override
+  String get tourFinish => '完畢';
+
+  @override
+  String get tourAdd => '新增您的提供者的訂閱連結。';
+
+  @override
+  String get tourServer => '選擇一個伺服器。 “最快”為您選擇一個。';
+
+  @override
+  String get tourConnect => '按一下此處連接或斷開連接。';
+
+  @override
+  String get tourMode => '選擇一種模式。 如果 VPN 斷線，終止開關會阻止網路。';
+
+  @override
+  String get tourSettings => '打開設定。 您可以在那裡重播本指南。';
 
   @override
   String get chooseProgram => '選擇一個程序';

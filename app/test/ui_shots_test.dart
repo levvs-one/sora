@@ -55,7 +55,7 @@ void main() {
       for (final theme in ['light', 'dark']) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-
+        await settings.completeTour();
         settings
           ..language = language
           ..theme = theme
@@ -193,7 +193,7 @@ void main() {
       for (final theme in ['light', 'dark']) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-
+        await settings.completeTour();
         settings
           ..language = language
           ..theme = theme
@@ -466,7 +466,7 @@ void main() {
         for (final (width, height) in [(1440.0, 900.0), (1000.0, 720.0), (420.0, 800.0)]) {
           SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
           final settings = await Settings.load();
-
+          await settings.completeTour();
           settings
             ..language = Platform.environment['SORA_SHOTS_LANG'] ?? 'ru'
             ..theme = theme
@@ -606,6 +606,13 @@ void main() {
           await tester.pumpWidget(
             RepaintBoundary(
               key: capture,
+          for (var step = 1; step <= 5; step++) {
+            expect(find.text('Шаг $step из 5'), findsOneWidget);
+            expect(tester.takeException(), isNull);
+            await save('$output/tour-$step-${width.toInt()}x${height.toInt()}-$theme.png');
+            await tester.tap(find.text(step == 5 ? 'Готово' : 'Далее'));
+            await tester.pumpAndSettle();
+          }
               child: SoraApp(sora: sora),
             ),
           );
@@ -708,7 +715,7 @@ void main() {
       unawaited(core.stderr.drain<void>());
       SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
       final settings = await Settings.load();
-
+      await settings.completeTour();
       settings
         ..animations = false
         ..probeMethod = 'connect';

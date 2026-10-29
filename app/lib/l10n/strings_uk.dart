@@ -627,10 +627,39 @@ class SUk extends S {
   String get openLogs => 'Відкриті журнали';
 
   @override
+  String get tourReplay => 'Знову показати посібник';
+
+  @override
+  String tourStep(int step) {
+    return 'Крок $step із 5';
+  }
+
+  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далі';
+
+  @override
+  String get tourSkip => 'Пропустити';
+
+  @override
+  String get tourFinish => 'Готово';
+
+  @override
+  String get tourAdd => 'Додайте посилання на підписку вашого постачальника.';
+
+  @override
+  String get tourServer => 'Виберіть сервер. «Найшвидший» вибере для вас один.';
+
+  @override
+  String get tourConnect => 'Натисніть тут, щоб підключитися або відключитися.';
+
+  @override
+  String get tourMode => 'Виберіть режим. Kill Switch блокує Інтернет, якщо VPN переривається.';
+
+  @override
+  String get tourSettings => 'Відкрийте налаштування. Ви можете відтворити цей посібник там.';
 
   @override
   String get chooseProgram => 'Виберіть програму';

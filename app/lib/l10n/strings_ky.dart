@@ -627,10 +627,39 @@ class SKy extends S {
   String get openLogs => 'Ачык журналдар';
 
   @override
+  String get tourReplay => 'Жолду кайра көрсөтүү';
+
+  @override
+  String tourStep(int step) {
+    return '5тин ичинен $step кадамы';
+  }
+
+  @override
   String get tourBack => 'Артка';
 
   @override
   String get tourNext => 'Кийинки';
+
+  @override
+  String get tourSkip => 'Өткөрүп жибер';
+
+  @override
+  String get tourFinish => 'Бүттү';
+
+  @override
+  String get tourAdd => 'Провайдериңиздин жазылуу шилтемесин кошуңуз.';
+
+  @override
+  String get tourServer => 'Серверди тандаңыз. \"Эң ылдам\" сиз үчүн бирин тандайт.';
+
+  @override
+  String get tourConnect => 'Туташуу же ажыратуу үчүн бул жерди басыңыз.';
+
+  @override
+  String get tourMode => 'Режимди тандаңыз. VPN түшүп калса, өчүрүү блокторун өлтүрүңүз.';
+
+  @override
+  String get tourSettings => 'Жөндөөлөрдү ачыңыз. Бул колдонмону ошол жерден кайталай аласыз.';
 
   @override
   String get chooseProgram => 'Программаны тандаңыз';

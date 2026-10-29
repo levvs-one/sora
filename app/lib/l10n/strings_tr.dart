@@ -627,10 +627,39 @@ class STr extends S {
   String get openLogs => 'Günlükleri aç';
 
   @override
+  String get tourReplay => 'Kılavuzu tekrar göster';
+
+  @override
+  String tourStep(int step) {
+    return 'Adım $step/5';
+  }
+
+  @override
   String get tourBack => 'Geri';
 
   @override
   String get tourNext => 'Sonraki';
+
+  @override
+  String get tourSkip => 'Atlamak';
+
+  @override
+  String get tourFinish => 'Tamamlamak';
+
+  @override
+  String get tourAdd => 'Sağlayıcınızın abonelik bağlantısını ekleyin.';
+
+  @override
+  String get tourServer => 'Bir sunucu seçin. “En Hızlı” sizin için birini seçer.';
+
+  @override
+  String get tourConnect => 'Bağlanmak veya bağlantıyı kesmek için burayı tıklayın.';
+
+  @override
+  String get tourMode => 'Bir mod seçin. VPN düşerse Kill Switch interneti engeller.';
+
+  @override
+  String get tourSettings => 'Ayarları açın. Bu kılavuzu orada tekrar oynatabilirsiniz.';
 
   @override
   String get chooseProgram => 'Bir program seçin';

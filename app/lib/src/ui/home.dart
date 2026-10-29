@@ -14,6 +14,7 @@ import '../sora.dart';
 import 'kit.dart';
 import 'language.dart';
 import 'servers.dart';
+import 'tour.dart';
 import 'modes.dart';
 import 'subscription_sheet.dart';
 
@@ -67,14 +68,20 @@ class _ConnectionPane extends StatelessWidget {
           const SizedBox(height: 8),
           const _Status(),
           const SizedBox(height: 24),
-          const Center(child: _Orb()),
+          const Center(child: TourTarget(step: 2, radius: 88, child: _Orb())),
           const SizedBox(height: 28),
-          const Center(child: ModeButton()),
+          const Center(child: TourTarget(step: 3, child: ModeButton())),
           const SizedBox(height: 24),
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
-              child: const _ServerCard(key: ValueKey('current-server')),
+              child: SoraScope.of(context).subscriptions.isEmpty
+                  ? const TourTarget(
+                      step: 0,
+                      radius: 12,
+                      child: TourTarget(step: 1, radius: 12, child: _ServerCard(key: ValueKey('current-server'))),
+                    )
+                  : const _ServerCard(key: ValueKey('current-server')),
             ),
           ),
         ],

@@ -1281,6 +1281,18 @@ abstract class S {
   /// **'Открыть логи'**
   String get openLogs;
 
+  /// No description provided for @tourReplay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать гайд снова'**
+  String get tourReplay;
+
+  /// No description provided for @tourStep.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шаг {step} из 5'**
+  String tourStep(int step);
+
   /// No description provided for @tourBack.
   ///
   /// In ru, this message translates to:
@@ -1292,6 +1304,48 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Далее'**
   String get tourNext;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропустить'**
+  String get tourSkip;
+
+  /// No description provided for @tourFinish.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get tourFinish;
+
+  /// No description provided for @tourAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте ссылку на подписку от провайдера.'**
+  String get tourAdd;
+
+  /// No description provided for @tourServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите сервер. «Самый быстрый» подберёт его за вас.'**
+  String get tourServer;
+
+  /// No description provided for @tourConnect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите здесь, чтобы подключиться или отключиться.'**
+  String get tourConnect;
+
+  /// No description provided for @tourMode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите режим. Kill switch блокирует интернет при обрыве VPN.'**
+  String get tourMode;
+
+  /// No description provided for @tourSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Откройте настройки. Здесь можно показать гайд снова.'**
+  String get tourSettings;
 
   /// No description provided for @chooseProgram.
   ///

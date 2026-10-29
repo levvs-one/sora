@@ -627,10 +627,39 @@ class SVi extends S {
   String get openLogs => 'Mở nhật ký';
 
   @override
+  String get tourReplay => 'Hiển thị lại hướng dẫn';
+
+  @override
+  String tourStep(int step) {
+    return 'Bước $step của 5';
+  }
+
+  @override
   String get tourBack => 'Mặt sau';
 
   @override
   String get tourNext => 'Kế tiếp';
+
+  @override
+  String get tourSkip => 'Nhảy';
+
+  @override
+  String get tourFinish => 'Xong';
+
+  @override
+  String get tourAdd => 'Thêm liên kết đăng ký của nhà cung cấp của bạn.';
+
+  @override
+  String get tourServer => 'Chọn một máy chủ. “Nhanh nhất” chọn một cho bạn.';
+
+  @override
+  String get tourConnect => 'Nhấn vào đây để kết nối hoặc ngắt kết nối.';
+
+  @override
+  String get tourMode => 'Chọn một chế độ. Kill switch chặn internet nếu VPN bị rớt.';
+
+  @override
+  String get tourSettings => 'Mở cài đặt. Bạn có thể phát lại hướng dẫn này ở đó.';
 
   @override
   String get chooseProgram => 'Chọn một chương trình';

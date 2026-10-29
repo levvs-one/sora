@@ -202,13 +202,29 @@
   "notificationsEmpty": "No notifications",
   "retryConnect": "Retry connection",
   "openLogs": "Open logs",
+  "tourReplay": "Show guide again",
+  "tourStep": "Step {step} of 5",
   "tourBack": "Back",
   "tourNext": "Next",
+  "tourSkip": "Skip",
+  "tourFinish": "Done",
+  "tourAdd": "Add your provider’s subscription link.",
+  "tourServer": "Pick a server. “Fastest” selects one for you.",
+  "tourConnect": "Click here to connect or disconnect.",
+  "tourMode": "Choose a mode. Kill switch blocks internet if the VPN drops.",
+  "tourSettings": "Open settings. You can replay this guide there.",
   "chooseProgram": "Choose a program",
   "installedApps": "Installed applications",
   "runningProcesses": "Running processes",
   "programsEmpty": "No applications found",
   "selectExe": "Choose an .exe file",
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "speedtest": "Speed",
   "speedtestSearch": "Find a service",
   "speedtestEmpty": "No matches",

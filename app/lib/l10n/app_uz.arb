@@ -184,8 +184,17 @@
   "notificationsEmpty": "Bildirishnomalar yoʻq",
   "retryConnect": "Qayta ulanishni sinab ko'ring",
   "openLogs": "Jurnallarni oching",
+  "tourReplay": "Yo‘riqnomani yana ko‘rsatish",
+  "tourStep": "{step}/5 qadam",
   "tourBack": "Orqaga",
   "tourNext": "Keyingisi",
+  "tourSkip": "Oʻtkazib yuborish",
+  "tourFinish": "Bajarildi",
+  "tourAdd": "Provayderingizning obuna havolasini qo'shing.",
+  "tourServer": "Serverni tanlang. “Eng tez” siz uchun birini tanlaydi.",
+  "tourConnect": "Ulanish yoki uzish uchun shu yerni bosing.",
+  "tourMode": "Tartibni tanlang. Agar VPN tushib qolsa, o'chirish kaliti internetni bloklaydi.",
+  "tourSettings": "Sozlamalarni oching. Siz ushbu qo'llanmani u erda takrorlashingiz mumkin.",
   "chooseProgram": "Dasturni tanlang",
   "installedApps": "O'rnatilgan ilovalar",
   "runningProcesses": "Ishlayotgan jarayonlar",
@@ -391,6 +400,13 @@
       },
       "server": {
         "type": "String"
+      }
+    }
+  },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
       }
     }
   },
