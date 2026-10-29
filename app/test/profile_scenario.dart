@@ -11,6 +11,7 @@ import 'package:sora/main.dart';
 import 'package:sora/src/notifications.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/ui/modes.dart';
+import 'package:sora/src/ui/shell.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'fixtures/desktop_state.dart';
@@ -73,7 +74,6 @@ Future<void> main() async {
   }
   await windowManager.setSize(const Size(1440, 900));
   await Future<void>.delayed(const Duration(seconds: 2));
-  await File(Platform.environment['SORA_PROFILE_OUTPUT'] ?? '/tmp/sora-ui2-profile.json')
   scene = 'tour';
   final shellContext = navigator.currentState!.overlay!.context;
   // Find the shell below the root navigator without opening a real service.
@@ -92,6 +92,7 @@ Future<void> main() async {
     ShowcaseView.getNamed('sora-tour').next();
   }
   await Future<void>.delayed(const Duration(seconds: 1));
+  await File(Platform.environment['SORA_PROFILE_OUTPUT'] ?? '/tmp/sora-ui2-profile.json')
       .writeAsString(jsonEncode({'renderer': 'Flutter Linux profile on Xvfb', 'errors': errors, 'frames': frames}));
   exit(errors.isEmpty ? 0 : 1);
 }

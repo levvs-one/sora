@@ -588,11 +588,11 @@ void extensionScreenshots() {
           debugPrint(path);
         });
       }
-        await settings.completeTour();
+
       for (final theme in ['light', 'dark']) {
         SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
         final settings = await Settings.load();
-
+        await settings.completeTour();
         settings
           ..language = lang
           ..theme = theme

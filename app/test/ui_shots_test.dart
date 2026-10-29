@@ -606,6 +606,10 @@ void main() {
           await tester.pumpWidget(
             RepaintBoundary(
               key: capture,
+              child: SoraApp(sora: sora),
+            ),
+          );
+          await tester.pumpAndSettle();
           for (var step = 1; step <= 5; step++) {
             expect(find.text('Шаг $step из 5'), findsOneWidget);
             expect(tester.takeException(), isNull);
@@ -613,10 +617,6 @@ void main() {
             await tester.tap(find.text(step == 5 ? 'Готово' : 'Далее'));
             await tester.pumpAndSettle();
           }
-              child: SoraApp(sora: sora),
-            ),
-          );
-          await tester.pumpAndSettle();
           sora.phase = Phase.off;
           sora.serverlessAvailable = true;
           sora.notifyListeners();

@@ -369,20 +369,24 @@ void main() {
       expect(scrim.rect.left, closeTo(target.left, 1));
       expect(scrim.rect.top, closeTo(target.top.clamp(0, tester.view.physicalSize.height), 1));
       expect(tester.takeException(), isNull);
-      await section(tester, 6);
-      expect(find.text('Показать гайд снова'), findsNothing);
-      await tester.pumpWidget(const SizedBox());
+      expect(find.text('Пропустить'), step == 5 ? findsNothing : findsOneWidget);
+      expect(find.text('Далее'), step == 5 ? findsNothing : findsOneWidget);
+      if (step == 5) {
+        expect(find.text('Готово').hitTestable(), findsOneWidget);
+        await tester.tap(find.text('Готово').hitTestable());
+      } else {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      }
       await tester.pumpAndSettle();
-      sora.dispose();
     }
-  });
-
-  testWidgets('system reduced motion disables tour and sidebar animation', (tester) async {
-    size(tester, 1440);
     expect(ShowcaseView.getNamed('sora-tour').isShowcaseRunning, isFalse);
     expect((await Settings.load()).tourDone, isTrue);
     await tester.pumpWidget(const SizedBox());
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('system reduced motion disables tour and sidebar animation', (tester) async {
+    size(tester, 1440);
     addTearDown(tester.view.reset);
     tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
@@ -391,11 +395,11 @@ void main() {
     addTearDown(sora.dispose);
     await tester.pumpWidget(SoraApp(sora: sora));
     await tester.pumpAndSettle();
+    expect(tester.widget<TourScrim>(find.byType(TourScrim)).duration, Duration.zero);
     expect(tester.widget<AnimatedContainer>(find.byKey(const ValueKey('sidebar'))).duration, Duration.zero);
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     await tester.pumpWidget(const SizedBox());
-    expect(tester.widget<TourScrim>(find.byType(TourScrim)).duration, Duration.zero);
     await tester.pumpAndSettle();
   });
 

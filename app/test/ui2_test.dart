@@ -514,8 +514,6 @@ void main() {
     expect(find.text('￼Нидерланды, Амстердам'), findsNWidgets(2));
   });
 
-  testWidgets('native browser yields to toast and returns after timeout', (tester) async {
-    final sora = await start(tester);
   testWidgets('tour cutout uses circle and card radii', (tester) async {
     await start(tester);
     await section(tester, 6);
@@ -531,6 +529,8 @@ void main() {
     }
   });
 
+  testWidgets('native browser yields to toast and returns after timeout', (tester) async {
+    final sora = await start(tester);
     await section(tester, 7);
     await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle();
