@@ -238,6 +238,24 @@ class SUk extends S {
   String get errSubFetch => 'Не вдалося завантажити підписку';
 
   @override
+  String get deviceIdentity => 'Ідентифікатор пристрою';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Скинути ідентифікатор';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Скинути ідентифікатор пристрою?';
+
+  @override
+  String get errSubDeviceLimit => 'Перевищено ліміт пристроїв';
+
+  @override
+  String get errSubDeviceRequired => 'Провайдер вимагає ідентифікатор пристрою';
+
+  @override
   String get errSubFormat => 'Формат підписки не розпізнано';
 
   @override

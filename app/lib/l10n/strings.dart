@@ -561,6 +561,42 @@ abstract class S {
   /// **'Не удалось загрузить подписку'**
   String get errSubFetch;
 
+  /// No description provided for @deviceIdentity.
+  ///
+  /// In ru, this message translates to:
+  /// **'Идентификатор устройства'**
+  String get deviceIdentity;
+
+  /// No description provided for @hwid.
+  ///
+  /// In ru, this message translates to:
+  /// **'HWID'**
+  String get hwid;
+
+  /// No description provided for @deviceIdentityReset.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить идентификатор'**
+  String get deviceIdentityReset;
+
+  /// No description provided for @deviceIdentityResetConfirm.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сбросить идентификатор устройства?'**
+  String get deviceIdentityResetConfirm;
+
+  /// No description provided for @errSubDeviceLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'Превышен лимит устройств'**
+  String get errSubDeviceLimit;
+
+  /// No description provided for @errSubDeviceRequired.
+  ///
+  /// In ru, this message translates to:
+  /// **'Провайдер требует идентификатор устройства'**
+  String get errSubDeviceRequired;
+
   /// No description provided for @errSubFormat.
   ///
   /// In ru, this message translates to:

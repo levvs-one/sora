@@ -238,6 +238,24 @@ class SKo extends S {
   String get errSubFetch => '구독을 다운로드하지 못했습니다';
 
   @override
+  String get deviceIdentity => '기기 식별자';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => '식별자 초기화';
+
+  @override
+  String get deviceIdentityResetConfirm => '기기 식별자를 초기화할까요?';
+
+  @override
+  String get errSubDeviceLimit => '기기 한도에 도달했습니다';
+
+  @override
+  String get errSubDeviceRequired => '제공자가 기기 식별자를 요구합니다';
+
+  @override
   String get errSubFormat => '구독 형식을 인식하지 못했습니다';
 
   @override

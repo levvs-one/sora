@@ -13,13 +13,14 @@ import '../generated/sora/leak/v1/leak.pbgrpc.dart';
 import '../generated/sora/ext/v1/ext_host.pbgrpc.dart';
 import 'pipe.dart';
 
-/// API 1.13 adds subscription failure age; 1.12 adds strict kill-switch intent; 1.11 adds the leak-test suite; 1.10 exposes proxy chains and
+/// API 1.14 adds the device identifier sent to subscription providers; 1.13
+/// adds subscription failure age; 1.12 adds strict kill-switch intent; 1.11 adds the leak-test suite; 1.10 exposes proxy chains and
 /// zapret-with-VPN in SessionPlan, network profiles and chain probing; 1.9
 /// adds throughput benchmarks, 1.8 DNS leak diagnostics. 1.6 is required to
 /// open subscription pages without exposing links in states. The client offers
 /// the newest minor it speaks and the core negotiates down, so older cores
 /// keep working for the fields they know.
-final apiVersion = ApiVersion(major: 1, minor: 13, minSupportedMinor: 6);
+final apiVersion = ApiVersion(major: 1, minor: 14, minSupportedMinor: 6);
 
 /// A gRPC channel to the core over a Unix socket or Windows named pipe, with
 /// the Handshake authentication token.

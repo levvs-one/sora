@@ -238,6 +238,24 @@ class SJa extends S {
   String get errSubFetch => 'サブスクリプションをダウンロードできませんでした';
 
   @override
+  String get deviceIdentity => 'デバイス識別子';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => '識別子をリセット';
+
+  @override
+  String get deviceIdentityResetConfirm => 'デバイス識別子をリセットしますか?';
+
+  @override
+  String get errSubDeviceLimit => 'デバイスの上限に達しました';
+
+  @override
+  String get errSubDeviceRequired => 'プロバイダーはデバイス識別子を必要としています';
+
+  @override
   String get errSubFormat => 'サブスクリプションの形式を認識できませんでした';
 
   @override

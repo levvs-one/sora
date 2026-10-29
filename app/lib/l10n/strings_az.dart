@@ -238,6 +238,24 @@ class SAz extends S {
   String get errSubFetch => 'Abunəliyi endirmək mümkün olmadı';
 
   @override
+  String get deviceIdentity => 'Cihaz identifikatoru';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'İdentifikatoru sıfırla';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Cihaz identifikatoru sıfırlansın?';
+
+  @override
+  String get errSubDeviceLimit => 'Cihaz limiti aşıldı';
+
+  @override
+  String get errSubDeviceRequired => 'Provayder cihaz identifikatoru tələb edir';
+
+  @override
   String get errSubFormat => 'Abunəliyin formatı tanınmadı';
 
   @override

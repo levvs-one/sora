@@ -238,6 +238,24 @@ class SHy extends S {
   String get errSubFetch => 'Չհաջողվեց ներբեռնել բաժանորդագրությունը';
 
   @override
+  String get deviceIdentity => 'Սարքի նույնացուցիչ';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Վերակայել նույնացուցիչը';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Վերակայե՞լ սարքի նույնացուցիչը';
+
+  @override
+  String get errSubDeviceLimit => 'Սարքերի սահմանաչափը գերազանցված է';
+
+  @override
+  String get errSubDeviceRequired => 'Մատակարարը պահանջում է սարքի նույնացուցիչ';
+
+  @override
   String get errSubFormat => 'Բաժանորդագրության ձևաչափը չի ճանաչվել';
 
   @override

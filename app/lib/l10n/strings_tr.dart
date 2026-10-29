@@ -238,6 +238,24 @@ class STr extends S {
   String get errSubFetch => 'Abonelik indirilemedi';
 
   @override
+  String get deviceIdentity => 'Cihaz kimliği';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Kimliği sıfırla';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Cihaz kimliği sıfırlansın mı?';
+
+  @override
+  String get errSubDeviceLimit => 'Cihaz sınırına ulaşıldı';
+
+  @override
+  String get errSubDeviceRequired => 'Sağlayıcı bir cihaz kimliği istiyor';
+
+  @override
   String get errSubFormat => 'Abonelik biçimi tanınmadı';
 
   @override

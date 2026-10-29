@@ -238,6 +238,24 @@ class SRu extends S {
   String get errSubFetch => 'Не удалось загрузить подписку';
 
   @override
+  String get deviceIdentity => 'Идентификатор устройства';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Сбросить идентификатор';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Сбросить идентификатор устройства?';
+
+  @override
+  String get errSubDeviceLimit => 'Превышен лимит устройств';
+
+  @override
+  String get errSubDeviceRequired => 'Провайдер требует идентификатор устройства';
+
+  @override
   String get errSubFormat => 'Формат подписки не распознан';
 
   @override

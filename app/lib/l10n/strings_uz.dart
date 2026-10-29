@@ -238,6 +238,24 @@ class SUz extends S {
   String get errSubFetch => 'Obunani yuklab boʻlmadi';
 
   @override
+  String get deviceIdentity => 'Qurilma identifikatori';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Identifikatorni tiklash';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Qurilma identifikatori tiklansinmi?';
+
+  @override
+  String get errSubDeviceLimit => 'Qurilmalar chegarasidan oshildi';
+
+  @override
+  String get errSubDeviceRequired => 'Provayder qurilma identifikatorini talab qiladi';
+
+  @override
   String get errSubFormat => 'Obuna formati tanilmadi';
 
   @override
