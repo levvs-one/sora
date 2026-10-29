@@ -81,6 +81,7 @@ type subscriptionRecord struct {
 	URL          string            `json:"url"`
 	Name         string            `json:"name,omitempty"`
 	UserAgent    string            `json:"ua,omitempty"`
+	DeviceOff    bool              `json:"no_hwid,omitempty"`
 	AutoUpdate   bool              `json:"auto"`
 	Interval     time.Duration     `json:"interval,omitempty"`
 	Created      time.Time         `json:"created"`
@@ -321,6 +322,7 @@ func (b *subscriptionBook) save(in *corev1.SubscriptionSettings) (*corev1.Subscr
 	}
 	rec.Name = strings.TrimSpace(in.GetName())
 	rec.UserAgent = agent
+	rec.DeviceOff = in.GetDeviceIdentityOff()
 	rec.AutoUpdate = in.GetAutoUpdate() && !isLocalServerLink(rec.URL)
 	rec.Interval = interval
 	if err := b.persistLocked(&rec, nil, nil); err != nil {
@@ -431,7 +433,7 @@ func (b *subscriptionBook) startSavedRefreshLocked(id string) {
 }
 
 func (b *subscriptionBook) fetchAccepted(ctx context.Context, rec *subscriptionRecord) (*corev1.SubscriptionState, error) {
-	id, link, agent := rec.ID, rec.URL, rec.UserAgent
+	id, link, agent, deviceOff := rec.ID, rec.URL, rec.UserAgent, rec.DeviceOff
 	requestCtx := ctx
 	ctx, cancel := context.WithTimeout(ctx, subscriptionFetchLimit)
 	defer cancel()
@@ -440,7 +442,7 @@ func (b *subscriptionBook) fetchAccepted(ctx context.Context, rec *subscriptionR
 	if isLocalServerLink(link) {
 		fetched.Body = []byte(link)
 	} else {
-		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent})
+		fetched, err = b.srv.fetcher.Fetch(ctx, link, subscription.FetchOptions{UserAgent: agent, Device: b.srv.subscriptionDevice(deviceOff)})
 	}
 	if err == nil {
 		err = ctx.Err()
@@ -713,7 +715,7 @@ func (b *subscriptionBook) broadcastCustomChange() {
 
 func (b *subscriptionBook) stateLocked(id string) *corev1.SubscriptionState {
 	rec := b.records[id]
-	settings := &corev1.SubscriptionSettings{Id: rec.ID, Name: rec.Name, UserAgent: rec.UserAgent, AutoUpdate: rec.AutoUpdate}
+	settings := &corev1.SubscriptionSettings{Id: rec.ID, Name: rec.Name, UserAgent: rec.UserAgent, AutoUpdate: rec.AutoUpdate, DeviceIdentityOff: rec.DeviceOff}
 	if rec.Interval > 0 {
 		settings.UpdateInterval = durationpb.New(rec.Interval)
 	}

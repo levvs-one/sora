@@ -6632,6 +6632,7 @@ class SubscriptionSettings extends $pb.GeneratedMessage {
     $core.String? userAgent,
     $core.bool? autoUpdate,
     $1.Duration? updateInterval,
+    $core.bool? deviceIdentityOff,
   }) {
     final result = SubscriptionSettings._();
     if (id != null) result.id = id;
@@ -6640,6 +6641,7 @@ class SubscriptionSettings extends $pb.GeneratedMessage {
     if (userAgent != null) result.userAgent = userAgent;
     if (autoUpdate != null) result.autoUpdate = autoUpdate;
     if (updateInterval != null) result.updateInterval = updateInterval;
+    if (deviceIdentityOff != null) result.deviceIdentityOff = deviceIdentityOff;
     return result;
   }
 
@@ -6661,6 +6663,7 @@ class SubscriptionSettings extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'userAgent')
     ..aOB(5, _omitFieldNames ? '' : 'autoUpdate')
     ..aOM<$1.Duration>(6, _omitFieldNames ? '' : 'updateInterval', subBuilder: $1.Duration.$_createMessage)
+    ..aOB(7, _omitFieldNames ? '' : 'deviceIdentityOff')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6745,6 +6748,18 @@ class SubscriptionSettings extends $pb.GeneratedMessage {
   void clearUpdateInterval() => $_clearField(6);
   @$pb.TagNumber(6)
   $1.Duration ensureUpdateInterval() => $_ensure(5);
+
+  /// Since 1.14. Stops sending the device identifier to this provider. Inverted
+  /// so a client that does not know the field keeps it sent, which is the
+  /// default.
+  @$pb.TagNumber(7)
+  $core.bool get deviceIdentityOff => $_getBF(6);
+  @$pb.TagNumber(7)
+  set deviceIdentityOff($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasDeviceIdentityOff() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDeviceIdentityOff() => $_clearField(7);
 }
 
 /// SubscriptionState omits settings.url because it carries a bearer token.
@@ -7557,6 +7572,415 @@ class WatchSubscriptionsRequest extends $pb.GeneratedMessage {
   $core.bool hasControlAuthenticator() => $_has(1);
   @$pb.TagNumber(2)
   void clearControlAuthenticator() => $_clearField(2);
+}
+
+/// Since 1.14. The identifier saved subscriptions send as x-hwid, with the
+/// x-device-os, x-ver-os and x-device-model headers, so providers can count
+/// devices. The core derives it from the machine id with a keyed hash and never
+/// sends it anywhere but to subscription providers. FetchSubscription, which
+/// needs no authenticator, never sends it.
+class DeviceIdentity extends $pb.GeneratedMessage {
+  factory DeviceIdentity({
+    $core.String? hwid,
+    $core.bool? enabled,
+    $core.String? os,
+    $core.String? osVersion,
+    $core.String? model,
+  }) {
+    final result = DeviceIdentity._();
+    if (hwid != null) result.hwid = hwid;
+    if (enabled != null) result.enabled = enabled;
+    if (os != null) result.os = os;
+    if (osVersion != null) result.osVersion = osVersion;
+    if (model != null) result.model = model;
+    return result;
+  }
+
+  DeviceIdentity._();
+
+  factory DeviceIdentity.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeviceIdentity()..mergeFromBuffer(data, registry);
+  factory DeviceIdentity.fromJson($core.String json, [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DeviceIdentity()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeviceIdentity',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: DeviceIdentity.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'hwid')
+    ..aOB(2, _omitFieldNames ? '' : 'enabled')
+    ..aOS(3, _omitFieldNames ? '' : 'os')
+    ..aOS(4, _omitFieldNames ? '' : 'osVersion')
+    ..aOS(5, _omitFieldNames ? '' : 'model')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceIdentity clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DeviceIdentity copyWith(void Function(DeviceIdentity) updates) =>
+      super.copyWith((message) => updates(message as DeviceIdentity)) as DeviceIdentity;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DeviceIdentity() / DeviceIdentity.new instead')
+  static DeviceIdentity create() => DeviceIdentity._();
+  static $pb.GeneratedMessage $_createMessage() => DeviceIdentity._();
+  @$core.override
+  DeviceIdentity createEmptyInstance() => DeviceIdentity._();
+  @$core.pragma('dart2js:noInline')
+  static DeviceIdentity getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeviceIdentity>(DeviceIdentity.$_createMessage);
+  static DeviceIdentity? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get hwid => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set hwid($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasHwid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearHwid() => $_clearField(1);
+
+  /// Off stops sending it to every provider.
+  @$pb.TagNumber(2)
+  $core.bool get enabled => $_getBF(1);
+  @$pb.TagNumber(2)
+  set enabled($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasEnabled() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearEnabled() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get os => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set os($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasOs() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearOs() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get osVersion => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set osVersion($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasOsVersion() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearOsVersion() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get model => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set model($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasModel() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearModel() => $_clearField(5);
+}
+
+class GetDeviceIdentityRequest extends $pb.GeneratedMessage {
+  factory GetDeviceIdentityRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+  }) {
+    final result = GetDeviceIdentityRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    return result;
+  }
+
+  GetDeviceIdentityRequest._();
+
+  factory GetDeviceIdentityRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetDeviceIdentityRequest()..mergeFromBuffer(data, registry);
+  factory GetDeviceIdentityRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetDeviceIdentityRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetDeviceIdentityRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetDeviceIdentityRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetDeviceIdentityRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetDeviceIdentityRequest copyWith(void Function(GetDeviceIdentityRequest) updates) =>
+      super.copyWith((message) => updates(message as GetDeviceIdentityRequest)) as GetDeviceIdentityRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetDeviceIdentityRequest() / GetDeviceIdentityRequest.new instead')
+  static GetDeviceIdentityRequest create() => GetDeviceIdentityRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetDeviceIdentityRequest._();
+  @$core.override
+  GetDeviceIdentityRequest createEmptyInstance() => GetDeviceIdentityRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetDeviceIdentityRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetDeviceIdentityRequest>(GetDeviceIdentityRequest.$_createMessage);
+  static GetDeviceIdentityRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+}
+
+class GetDeviceIdentityResponse extends $pb.GeneratedMessage {
+  factory GetDeviceIdentityResponse({
+    DeviceIdentity? identity,
+    SoraError? error,
+  }) {
+    final result = GetDeviceIdentityResponse._();
+    if (identity != null) result.identity = identity;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  GetDeviceIdentityResponse._();
+
+  factory GetDeviceIdentityResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetDeviceIdentityResponse()..mergeFromBuffer(data, registry);
+  factory GetDeviceIdentityResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetDeviceIdentityResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetDeviceIdentityResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetDeviceIdentityResponse.$_createMessage)
+    ..aOM<DeviceIdentity>(1, _omitFieldNames ? '' : 'identity', subBuilder: DeviceIdentity.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetDeviceIdentityResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetDeviceIdentityResponse copyWith(void Function(GetDeviceIdentityResponse) updates) =>
+      super.copyWith((message) => updates(message as GetDeviceIdentityResponse)) as GetDeviceIdentityResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetDeviceIdentityResponse() / GetDeviceIdentityResponse.new instead')
+  static GetDeviceIdentityResponse create() => GetDeviceIdentityResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetDeviceIdentityResponse._();
+  @$core.override
+  GetDeviceIdentityResponse createEmptyInstance() => GetDeviceIdentityResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetDeviceIdentityResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetDeviceIdentityResponse>(GetDeviceIdentityResponse.$_createMessage);
+  static GetDeviceIdentityResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  DeviceIdentity get identity => $_getN(0);
+  @$pb.TagNumber(1)
+  set identity(DeviceIdentity value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasIdentity() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearIdentity() => $_clearField(1);
+  @$pb.TagNumber(1)
+  DeviceIdentity ensureIdentity() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
+}
+
+class SetDeviceIdentityRequest extends $pb.GeneratedMessage {
+  factory SetDeviceIdentityRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    $core.bool? enabled,
+    $core.bool? regenerate,
+  }) {
+    final result = SetDeviceIdentityRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (enabled != null) result.enabled = enabled;
+    if (regenerate != null) result.regenerate = regenerate;
+    return result;
+  }
+
+  SetDeviceIdentityRequest._();
+
+  factory SetDeviceIdentityRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetDeviceIdentityRequest()..mergeFromBuffer(data, registry);
+  factory SetDeviceIdentityRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetDeviceIdentityRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetDeviceIdentityRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: SetDeviceIdentityRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOB(3, _omitFieldNames ? '' : 'enabled')
+    ..aOB(4, _omitFieldNames ? '' : 'regenerate')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetDeviceIdentityRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetDeviceIdentityRequest copyWith(void Function(SetDeviceIdentityRequest) updates) =>
+      super.copyWith((message) => updates(message as SetDeviceIdentityRequest)) as SetDeviceIdentityRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SetDeviceIdentityRequest() / SetDeviceIdentityRequest.new instead')
+  static SetDeviceIdentityRequest create() => SetDeviceIdentityRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SetDeviceIdentityRequest._();
+  @$core.override
+  SetDeviceIdentityRequest createEmptyInstance() => SetDeviceIdentityRequest._();
+  @$core.pragma('dart2js:noInline')
+  static SetDeviceIdentityRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetDeviceIdentityRequest>(SetDeviceIdentityRequest.$_createMessage);
+  static SetDeviceIdentityRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get enabled => $_getBF(2);
+  @$pb.TagNumber(3)
+  set enabled($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasEnabled() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearEnabled() => $_clearField(3);
+
+  /// Replaces the identifier with a new random one; providers then count this
+  /// machine as a new device.
+  @$pb.TagNumber(4)
+  $core.bool get regenerate => $_getBF(3);
+  @$pb.TagNumber(4)
+  set regenerate($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasRegenerate() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearRegenerate() => $_clearField(4);
+}
+
+class SetDeviceIdentityResponse extends $pb.GeneratedMessage {
+  factory SetDeviceIdentityResponse({
+    DeviceIdentity? identity,
+    SoraError? error,
+  }) {
+    final result = SetDeviceIdentityResponse._();
+    if (identity != null) result.identity = identity;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  SetDeviceIdentityResponse._();
+
+  factory SetDeviceIdentityResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetDeviceIdentityResponse()..mergeFromBuffer(data, registry);
+  factory SetDeviceIdentityResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      SetDeviceIdentityResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetDeviceIdentityResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: SetDeviceIdentityResponse.$_createMessage)
+    ..aOM<DeviceIdentity>(1, _omitFieldNames ? '' : 'identity', subBuilder: DeviceIdentity.$_createMessage)
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetDeviceIdentityResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  SetDeviceIdentityResponse copyWith(void Function(SetDeviceIdentityResponse) updates) =>
+      super.copyWith((message) => updates(message as SetDeviceIdentityResponse)) as SetDeviceIdentityResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use SetDeviceIdentityResponse() / SetDeviceIdentityResponse.new instead')
+  static SetDeviceIdentityResponse create() => SetDeviceIdentityResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SetDeviceIdentityResponse._();
+  @$core.override
+  SetDeviceIdentityResponse createEmptyInstance() => SetDeviceIdentityResponse._();
+  @$core.pragma('dart2js:noInline')
+  static SetDeviceIdentityResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SetDeviceIdentityResponse>(SetDeviceIdentityResponse.$_createMessage);
+  static SetDeviceIdentityResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  DeviceIdentity get identity => $_getN(0);
+  @$pb.TagNumber(1)
+  set identity(DeviceIdentity value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasIdentity() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearIdentity() => $_clearField(1);
+  @$pb.TagNumber(1)
+  DeviceIdentity ensureIdentity() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
 }
 
 /// Since 1.6. The link is available only through this authenticated request.

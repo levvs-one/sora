@@ -47,6 +47,8 @@ const (
 	CoreControl_RefreshSubscription_FullMethodName   = "/sora.core.v1.CoreControl/RefreshSubscription"
 	CoreControl_WatchSubscriptions_FullMethodName    = "/sora.core.v1.CoreControl/WatchSubscriptions"
 	CoreControl_GetSubscriptionLink_FullMethodName   = "/sora.core.v1.CoreControl/GetSubscriptionLink"
+	CoreControl_GetDeviceIdentity_FullMethodName     = "/sora.core.v1.CoreControl/GetDeviceIdentity"
+	CoreControl_SetDeviceIdentity_FullMethodName     = "/sora.core.v1.CoreControl/SetDeviceIdentity"
 	CoreControl_PutSecret_FullMethodName             = "/sora.core.v1.CoreControl/PutSecret"
 	CoreControl_DeleteSecret_FullMethodName          = "/sora.core.v1.CoreControl/DeleteSecret"
 	CoreControl_CheckDnsLeaks_FullMethodName         = "/sora.core.v1.CoreControl/CheckDnsLeaks"
@@ -105,6 +107,10 @@ type CoreControlClient interface {
 	// Since 1.6. Returns the stored subscription link only on an authenticated
 	// explicit request to open its page. Clients must not cache or log it.
 	GetSubscriptionLink(ctx context.Context, in *GetSubscriptionLinkRequest, opts ...grpc.CallOption) (*GetSubscriptionLinkResponse, error)
+	// Since 1.14, with the "device-identity" capability. The device identifier
+	// saved subscriptions send; both calls need the control authenticator.
+	GetDeviceIdentity(ctx context.Context, in *GetDeviceIdentityRequest, opts ...grpc.CallOption) (*GetDeviceIdentityResponse, error)
+	SetDeviceIdentity(ctx context.Context, in *SetDeviceIdentityRequest, opts ...grpc.CallOption) (*SetDeviceIdentityResponse, error)
 	// PutSecret and DeleteSecret manage the credential material the core keeps.
 	// They exist because the rest of the contract carries only references: a plan
 	// names a secret, and these two calls are the only way a secret ever reaches
@@ -465,6 +471,26 @@ func (c *coreControlClient) GetSubscriptionLink(ctx context.Context, in *GetSubs
 	return out, nil
 }
 
+func (c *coreControlClient) GetDeviceIdentity(ctx context.Context, in *GetDeviceIdentityRequest, opts ...grpc.CallOption) (*GetDeviceIdentityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeviceIdentityResponse)
+	err := c.cc.Invoke(ctx, CoreControl_GetDeviceIdentity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreControlClient) SetDeviceIdentity(ctx context.Context, in *SetDeviceIdentityRequest, opts ...grpc.CallOption) (*SetDeviceIdentityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetDeviceIdentityResponse)
+	err := c.cc.Invoke(ctx, CoreControl_SetDeviceIdentity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *coreControlClient) PutSecret(ctx context.Context, in *PutSecretRequest, opts ...grpc.CallOption) (*PutSecretResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PutSecretResponse)
@@ -620,6 +646,10 @@ type CoreControlServer interface {
 	// Since 1.6. Returns the stored subscription link only on an authenticated
 	// explicit request to open its page. Clients must not cache or log it.
 	GetSubscriptionLink(context.Context, *GetSubscriptionLinkRequest) (*GetSubscriptionLinkResponse, error)
+	// Since 1.14, with the "device-identity" capability. The device identifier
+	// saved subscriptions send; both calls need the control authenticator.
+	GetDeviceIdentity(context.Context, *GetDeviceIdentityRequest) (*GetDeviceIdentityResponse, error)
+	SetDeviceIdentity(context.Context, *SetDeviceIdentityRequest) (*SetDeviceIdentityResponse, error)
 	// PutSecret and DeleteSecret manage the credential material the core keeps.
 	// They exist because the rest of the contract carries only references: a plan
 	// names a secret, and these two calls are the only way a secret ever reaches
@@ -747,6 +777,12 @@ func (UnimplementedCoreControlServer) WatchSubscriptions(*WatchSubscriptionsRequ
 }
 func (UnimplementedCoreControlServer) GetSubscriptionLink(context.Context, *GetSubscriptionLinkRequest) (*GetSubscriptionLinkResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionLink not implemented")
+}
+func (UnimplementedCoreControlServer) GetDeviceIdentity(context.Context, *GetDeviceIdentityRequest) (*GetDeviceIdentityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeviceIdentity not implemented")
+}
+func (UnimplementedCoreControlServer) SetDeviceIdentity(context.Context, *SetDeviceIdentityRequest) (*SetDeviceIdentityResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetDeviceIdentity not implemented")
 }
 func (UnimplementedCoreControlServer) PutSecret(context.Context, *PutSecretRequest) (*PutSecretResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutSecret not implemented")
@@ -1275,6 +1311,42 @@ func _CoreControl_GetSubscriptionLink_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreControl_GetDeviceIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceIdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).GetDeviceIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_GetDeviceIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).GetDeviceIdentity(ctx, req.(*GetDeviceIdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CoreControl_SetDeviceIdentity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetDeviceIdentityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).SetDeviceIdentity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_SetDeviceIdentity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).SetDeviceIdentity(ctx, req.(*SetDeviceIdentityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CoreControl_PutSecret_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PutSecretRequest)
 	if err := dec(in); err != nil {
@@ -1550,6 +1622,14 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSubscriptionLink",
 			Handler:    _CoreControl_GetSubscriptionLink_Handler,
+		},
+		{
+			MethodName: "GetDeviceIdentity",
+			Handler:    _CoreControl_GetDeviceIdentity_Handler,
+		},
+		{
+			MethodName: "SetDeviceIdentity",
+			Handler:    _CoreControl_SetDeviceIdentity_Handler,
 		},
 		{
 			MethodName: "PutSecret",

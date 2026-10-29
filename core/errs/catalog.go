@@ -60,6 +60,9 @@ const (
 	KeySubscriptionScheme    Key = "core.subscription.scheme_unsupported"
 	KeySubscriptionFormat    Key = "core.subscription.format_unknown"
 	KeySubscriptionNoServers Key = "core.subscription.no_servers"
+	// The provider counts devices by x-hwid and refused this one.
+	KeySubscriptionDeviceLimit    Key = "core.subscription.device_limit"
+	KeySubscriptionDeviceRequired Key = "core.subscription.device_required"
 
 	// Secret store.
 	//nolint:gosec // a localization key, not a credential
@@ -145,14 +148,16 @@ var catalog = map[Key]Entry{
 	KeyEngineRestartSpent:  {CodeUnavailable, true, "the engine kept dying and the restart budget is spent"},
 
 	// Subscriptions and import.
-	KeySubscriptionEmpty:     {CodeInvalidArgument, false, "the subscription body is empty"},
-	KeySubscriptionTooLarge:  {CodeResourceExhausted, false, "the subscription body is larger than the import limit"},
-	KeySubscriptionFetch:     {CodeUnavailable, true, "the subscription host could not be reached"},
-	KeySubscriptionStatus:    {CodeUnavailable, false, "the subscription host answered with an error status"},
-	KeySubscriptionRedirect:  {CodeInvalidArgument, false, "the subscription host redirected somewhere not allowed"},
-	KeySubscriptionScheme:    {CodeUnsupported, false, "the subscription reference is not an http or https url"},
-	KeySubscriptionFormat:    {CodeUnsupported, false, "no parser claims this payload"},
-	KeySubscriptionNoServers: {CodeInvalidArgument, false, "the payload parsed but produced no usable server"},
+	KeySubscriptionEmpty:          {CodeInvalidArgument, false, "the subscription body is empty"},
+	KeySubscriptionTooLarge:       {CodeResourceExhausted, false, "the subscription body is larger than the import limit"},
+	KeySubscriptionFetch:          {CodeUnavailable, true, "the subscription host could not be reached"},
+	KeySubscriptionStatus:         {CodeUnavailable, false, "the subscription host answered with an error status"},
+	KeySubscriptionRedirect:       {CodeInvalidArgument, false, "the subscription host redirected somewhere not allowed"},
+	KeySubscriptionScheme:         {CodeUnsupported, false, "the subscription reference is not an http or https url"},
+	KeySubscriptionFormat:         {CodeUnsupported, false, "no parser claims this payload"},
+	KeySubscriptionNoServers:      {CodeInvalidArgument, false, "the payload parsed but produced no usable server"},
+	KeySubscriptionDeviceLimit:    {CodeFailedPrecondition, false, "the provider already counts the most devices this subscription allows"},
+	KeySubscriptionDeviceRequired: {CodeFailedPrecondition, false, "the provider serves only requests carrying a device identifier"},
 
 	// Secret store.
 	KeySecretReferenceInvalid: {CodeInvalidArgument, false, "the secret reference is not a well formed opaque id"},
