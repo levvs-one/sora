@@ -44,6 +44,7 @@
   "appVersion": "{version} wersiýasy",
   "notInstalled": "Gurulmady",
   "sourceCode": "Çeşme kody",
+  "reportProblem": "Mesele barada habar bermek",
   "license": "Ygtyýarnama",
   "usage": "{total}-iň {used}",
   "until": "{date} çenli",

@@ -146,6 +146,9 @@ class SKk extends S {
   String get sourceCode => 'Бастапқы код';
 
   @override
+  String get reportProblem => 'Мәселе туралы хабарлау';
+
+  @override
   String get license => 'Лицензия';
 
   @override

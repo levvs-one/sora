@@ -146,6 +146,9 @@ class SHy extends S {
   String get sourceCode => 'Աղբյուրի կոդը';
 
   @override
+  String get reportProblem => 'Հաղորդել խնդրի մասին';
+
+  @override
   String get license => 'Լիցենզիա';
 
   @override

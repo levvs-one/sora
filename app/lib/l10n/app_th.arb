@@ -44,6 +44,7 @@
   "appVersion": "เวอร์ชัน {version}",
   "notInstalled": "ไม่ได้ติดตั้ง",
   "sourceCode": "ซอร์สโค้ด",
+  "reportProblem": "รายงานปัญหา",
   "license": "ใบอนุญาต",
   "usage": "{used} ของ {total}",
   "until": "จนถึง {date}",

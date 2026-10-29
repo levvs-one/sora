@@ -146,6 +146,9 @@ class STh extends S {
   String get sourceCode => 'ซอร์สโค้ด';
 
   @override
+  String get reportProblem => 'รายงานปัญหา';
+
+  @override
   String get license => 'ใบอนุญาต';
 
   @override

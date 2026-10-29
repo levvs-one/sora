@@ -146,6 +146,9 @@ class SAz extends S {
   String get sourceCode => 'Mənbə kodu';
 
   @override
+  String get reportProblem => 'Problem barədə bildirin';
+
+  @override
   String get license => 'Lisenziya';
 
   @override

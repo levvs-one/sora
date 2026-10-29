@@ -351,6 +351,18 @@ class _AboutScreenState extends State<AboutScreen> {
               value: 'GitHub',
               onTap: () => unawaited(openLink(context, 'https://github.com/levvs-one/sora')),
             ),
+            // The issue form prefills its version field from the query.
+            LinkTile(
+              title: s.reportProblem,
+              value: 'GitHub',
+              onTap: () => unawaited(
+                openLink(
+                  context,
+                  'https://github.com/levvs-one/sora/issues/new?template=01_bug_report.yml'
+                  '&version=${Uri.encodeQueryComponent(updates.version)}',
+                ),
+              ),
+            ),
           ],
         ),
         Heading(s.licenses),

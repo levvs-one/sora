@@ -146,6 +146,9 @@ class SUk extends S {
   String get sourceCode => 'Вихідний код';
 
   @override
+  String get reportProblem => 'Повідомити про проблему';
+
+  @override
   String get license => 'Ліцензія';
 
   @override

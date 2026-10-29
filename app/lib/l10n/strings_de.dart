@@ -146,6 +146,9 @@ class SDe extends S {
   String get sourceCode => 'Quellcode';
 
   @override
+  String get reportProblem => 'Problem melden';
+
+  @override
   String get license => 'Lizenz';
 
   @override

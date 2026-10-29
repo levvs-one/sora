@@ -146,6 +146,9 @@ class SEn extends S {
   String get sourceCode => 'Source code';
 
   @override
+  String get reportProblem => 'Report a problem';
+
+  @override
   String get license => 'License';
 
   @override

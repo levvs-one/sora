@@ -146,6 +146,9 @@ class SFa extends S {
   String get sourceCode => 'کد منبع';
 
   @override
+  String get reportProblem => 'گزارش مشکل';
+
+  @override
   String get license => 'مجوز';
 
   @override

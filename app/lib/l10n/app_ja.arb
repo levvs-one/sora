@@ -44,6 +44,7 @@
   "appVersion": "バージョン {version}",
   "notInstalled": "インストールされていません",
   "sourceCode": "ソースコード",
+  "reportProblem": "問題を報告",
   "license": "ライセンス",
   "usage": "{used}/{total}",
   "until": "{date}まで",

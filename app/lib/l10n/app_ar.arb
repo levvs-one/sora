@@ -44,6 +44,7 @@
   "appVersion": "الإصدار {version}",
   "notInstalled": "غير مثبت",
   "sourceCode": "كود المصدر",
+  "reportProblem": "الإبلاغ عن مشكلة",
   "license": "رخصة",
   "usage": "{used} من {total}",
   "until": "حتى {date}",

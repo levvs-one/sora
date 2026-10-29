@@ -44,6 +44,7 @@
   "appVersion": "Versiya {version}",
   "notInstalled": "Quraşdırılmayıb",
   "sourceCode": "Mənbə kodu",
+  "reportProblem": "Problem barədə bildirin",
   "license": "Lisenziya",
   "usage": "{used} və {total}",
   "until": "{date} qədər",

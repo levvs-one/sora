@@ -58,6 +58,7 @@
   },
   "notInstalled": "Не установлено",
   "sourceCode": "Исходный код",
+  "reportProblem": "Сообщить о проблеме",
   "license": "Лицензия",
   "usage": "{used} из {total}",
   "@usage": {
