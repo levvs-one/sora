@@ -931,7 +931,8 @@ jobs:
           sudo install -m 0755 "$RUNNER_TEMP/sora-zapret-core-probe" "$private/probe"
           for file in tpws mihomo; do sudo install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
           for file in geoip.dat geosite.dat; do sudo install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
-          tar -C "$GITHUB_WORKSPACE" --exclude=app/build --exclude=app/.dart_tool -cf - app extensions/sources | sudo tar -C "$private/source" -xf -
+          tar -C "$GITHUB_WORKSPACE" --exclude=app/build --exclude=app/.dart_tool -cf - \
+            app extensions/sources extensions/catalog-1.1.3.json extensions/catalog-1.1.3.json.minisig extensions/packages | sudo tar -C "$private/source" -xf -
           sudo cp -a "$sdk_root" "$private/flutter"
           sudo cp -a "$pub_cache" "$private/pub-cache"
           sudo chown -R root:root "$private/source" "$private/flutter" "$private/pub-cache"
@@ -1029,7 +1030,8 @@ jobs:
           sudo install -m 0755 "$RUNNER_TEMP/sora-ext-preflight" "$private/sora-ext-preflight"
           for file in byedpi mihomo; do sudo install -m 0755 "../dist/engines/$file" "$private/engines/$file"; done
           for file in geoip.dat geosite.dat; do sudo install -m 0644 "../dist/engines/$file" "$private/engines/$file"; done
-          tar -C "$GITHUB_WORKSPACE" --exclude=app/build --exclude=app/.dart_tool -cf - app extensions/sources | sudo tar -C "$private/source" -xf -
+          tar -C "$GITHUB_WORKSPACE" --exclude=app/build --exclude=app/.dart_tool -cf - \
+            app extensions/sources extensions/catalog-1.1.3.json extensions/catalog-1.1.3.json.minisig extensions/packages | sudo tar -C "$private/source" -xf -
           sudo cp -a "$sdk_root" "$private/flutter"
           sudo cp -a "$pub_cache" "$private/pub-cache"
           sudo chown -R root:root "$private/source" "$private/flutter" "$private/pub-cache"

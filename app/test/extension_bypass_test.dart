@@ -926,7 +926,7 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   }, skip: !Platform.isWindows);
 
-  Future<void> liveNetworkProfile(String backend) async {
+  Future<void> liveNetworkProfile(String backend, {bool published = false}) async {
     final env = Platform.environment;
     expect(Platform.isLinux, isTrue);
     final root = env['SORA_LIVE_BYPASS_ROOT'];
@@ -1030,8 +1030,35 @@ void main() {
 
     await until(() => FileSystemEntity.typeSync(socket, followLinks: false) != FileSystemEntityType.notFound, 'socket');
     final sourceName = backend == 'tpws' ? 'zapret' : 'byedpi';
-    final package = await signed(sourceOverride: Directory('../extensions/sources/$sourceName'));
-    await install(package);
+    late final ExtPackage package;
+    if (published) {
+      final catalogBytes = await File('../extensions/catalog-1.1.3.json').readAsBytes();
+      final catalogSignature = await File('../extensions/catalog-1.1.3.json.minisig').readAsString();
+      await verifyCatalogSignature(catalogSignature, catalogBytes);
+      final entry = ExtensionCatalog.parse(catalogBytes).entries
+          .singleWhere((entry) => entry.id == 'org.sora.$sourceName');
+      expect(entry.supportsPlatform(Platform.operatingSystem), isTrue);
+      expect(entry.requiresNewerApp(appVersion), isFalse);
+      final archive = Uri.parse(entry.downloadUrl).pathSegments.last;
+      expect(archive, matches(RegExp(r'^[a-z0-9][a-z0-9._-]*\.soraext$')));
+      final bytes = await File('../extensions/packages/$archive').readAsBytes();
+      package = ExtPackage.open(bytes);
+      expect(package.manifest.id, entry.id);
+      expect(package.manifest.version, entry.version);
+      expect(package.manifest.minAppVersion, entry.minAppVersion);
+      expect(package.manifest.permissions, unorderedEquals(entry.permissions));
+      expect(package.manifest.capabilities, unorderedEquals(entry.capabilities));
+      await store.installBytes(
+        bytes,
+        source: 'catalog',
+        granted: entry.permissions,
+        expectedSha256: entry.sha256,
+        authorKeyPin: entry.authorKey,
+      );
+    } else {
+      package = await signed(sourceOverride: Directory('../extensions/sources/$sourceName'));
+      await install(package);
+    }
     final settings = await Settings.load();
     settings.tunnel = 'proxy';
     settings.engine = 'mihomo';
@@ -1206,6 +1233,24 @@ void main() {
   test(
     'signed Zapret profile connects the app to a real isolated core',
     () => liveNetworkProfile('tpws'),
+    skip: Platform.environment['SORA_LIVE_BYPASS'] == '1'
+        ? false
+        : 'requires guarded private user and peer network namespaces with real core and engines',
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
+
+  test(
+    'signed ByeDPI profile connects the app to a real isolated core with published catalog',
+    () => liveNetworkProfile('byedpi', published: true),
+    skip: Platform.environment['SORA_LIVE_BYPASS'] == '1'
+        ? false
+        : 'requires a guarded private user and network namespace with real core and engines',
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
+
+  test(
+    'signed Zapret profile connects the app to a real isolated core with published catalog',
+    () => liveNetworkProfile('tpws', published: true),
     skip: Platform.environment['SORA_LIVE_BYPASS'] == '1'
         ? false
         : 'requires guarded private user and peer network namespaces with real core and engines',
