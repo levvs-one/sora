@@ -331,6 +331,9 @@ class SZh extends S {
   String get dnsAuto => '汽车';
 
   @override
+  String get dnsHint => '地址，逗号分隔';
+
+  @override
   String get fragment => 'TLS 碎片';
 
   @override
@@ -625,10 +628,39 @@ class SZh extends S {
   String get openLogs => '打开日志';
 
   @override
+  String get tourReplay => '再次显示指南';
+
+  @override
+  String tourStep(int step) {
+    return '第 5 步 $step';
+  }
+
+  @override
   String get tourBack => '后退';
 
   @override
   String get tourNext => '下一个';
+
+  @override
+  String get tourSkip => '跳过';
+
+  @override
+  String get tourFinish => '完毕';
+
+  @override
+  String get tourAdd => '添加您的提供商的订阅链接。';
+
+  @override
+  String get tourServer => '选择一个服务器。 “最快”为您选择一个。';
+
+  @override
+  String get tourConnect => '单击此处连接或断开连接。';
+
+  @override
+  String get tourMode => '选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。';
+
+  @override
+  String get tourSettings => '打开设置。 您可以在那里重播本指南。';
 
   @override
   String get chooseProgram => '选择一个程序';
@@ -713,6 +745,12 @@ class SZh extends S {
   String get updateWaitConnection => '连接尚未就绪';
 
   @override
+  String get updateDownloading => '正在下载并验证文件...';
+
+  @override
+  String get updateInstalling => '正在准备更新或等待管理员身份验证...';
+
+  @override
   String get updateNetworkError => '无法下载更新';
 
   @override
@@ -728,7 +766,13 @@ class SZh extends S {
   String get updateUnsupported => '此可执行文件不属于受支持的 Sora 软件包对';
 
   @override
+  String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
+
+  @override
   String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版';
+
+  @override
+  String get updateRolloutPending => '新版本正分批推出，届时会自动通知您更新。';
 
   @override
   String updateRollbacking(String version) {
@@ -748,6 +792,9 @@ class SZh extends S {
 
   @override
   String get updateCopyCommand => '复制命令';
+
+  @override
+  String get updateChecksDisabled => '在“设置”中禁用自动检查。';
 
   @override
   String get updateInstalled => '已安装更新';
@@ -1172,6 +1219,9 @@ class SZh extends S {
   String get qrCopyLink => '复制链接';
 
   @override
+  String get qrWarning => '仅与信任的人分享此二维码。';
+
+  @override
   String get qrFromClipboard => '从剪贴板粘贴';
 
   @override
@@ -1250,10 +1300,28 @@ class SZh extends S {
   String get dnsLeakCheckKillSwitchDns => '网络锁定的 DNS 保护';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => '请在上方的 DNS 设置中指定隧道 DNS。';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => '检查系统在隧道外会使用哪些解析器。';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => '请启用网络锁定，让 DNS 流量保持在隧道内。';
+
+  @override
   String get dnsLeakCheckEncryptedDns => '操作系统加密 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS 响应伪造';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => '检查系统在隧道外使用的加密 DNS 端点。';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns => '请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。';
+
+  @override
+  String get dnsCheckNeedsConnection => '请先连接 VPN，再检查是否泄漏。';
 
   @override
   String get dnsExpected => '预期';
@@ -1561,6 +1629,9 @@ class SZh extends S {
   String get leakTestCancel => '取消';
 
   @override
+  String get leakTestNeedsConnection => '请先连接，再执行泄漏测试。';
+
+  @override
   String leakTestProgress(int count) {
     return '已完成测试：$count';
   }
@@ -1579,6 +1650,9 @@ class SZh extends S {
 
   @override
   String get leakTestFix => '修复';
+
+  @override
+  String get leakTestFixedNote => '已启用网络锁定，请重新测试以确认。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';
@@ -2252,6 +2326,9 @@ class SZhHans extends SZh {
   String get dnsAuto => '汽车';
 
   @override
+  String get dnsHint => '地址，逗号分隔';
+
+  @override
   String get fragment => 'TLS 碎片';
 
   @override
@@ -2546,10 +2623,39 @@ class SZhHans extends SZh {
   String get openLogs => '打开日志';
 
   @override
+  String get tourReplay => '再次显示指南';
+
+  @override
+  String tourStep(int step) {
+    return '第 5 步 $step';
+  }
+
+  @override
   String get tourBack => '后退';
 
   @override
   String get tourNext => '下一个';
+
+  @override
+  String get tourSkip => '跳过';
+
+  @override
+  String get tourFinish => '完毕';
+
+  @override
+  String get tourAdd => '添加您的提供商的订阅链接。';
+
+  @override
+  String get tourServer => '选择一个服务器。 “最快”为您选择一个。';
+
+  @override
+  String get tourConnect => '单击此处连接或断开连接。';
+
+  @override
+  String get tourMode => '选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。';
+
+  @override
+  String get tourSettings => '打开设置。 您可以在那里重播本指南。';
 
   @override
   String get chooseProgram => '选择一个程序';
@@ -2634,6 +2740,12 @@ class SZhHans extends SZh {
   String get updateWaitConnection => '连接尚未就绪';
 
   @override
+  String get updateDownloading => '正在下载并验证文件...';
+
+  @override
+  String get updateInstalling => '正在准备更新或等待管理员身份验证...';
+
+  @override
   String get updateNetworkError => '无法下载更新';
 
   @override
@@ -2649,7 +2761,13 @@ class SZhHans extends SZh {
   String get updateUnsupported => '此可执行文件不属于受支持的 Sora 软件包对';
 
   @override
+  String get updateManual => '在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。';
+
+  @override
   String get updateVersionRevoked => '开发者已撤回此版本，请等待修复版';
+
+  @override
+  String get updateRolloutPending => '新版本正分批推出，届时会自动通知您更新。';
 
   @override
   String updateRollbacking(String version) {
@@ -2669,6 +2787,9 @@ class SZhHans extends SZh {
 
   @override
   String get updateCopyCommand => '复制命令';
+
+  @override
+  String get updateChecksDisabled => '在“设置”中禁用自动检查。';
 
   @override
   String get updateInstalled => '已安装更新';
@@ -3093,6 +3214,9 @@ class SZhHans extends SZh {
   String get qrCopyLink => '复制链接';
 
   @override
+  String get qrWarning => '仅与信任的人分享此二维码。';
+
+  @override
   String get qrFromClipboard => '从剪贴板粘贴';
 
   @override
@@ -3171,10 +3295,28 @@ class SZhHans extends SZh {
   String get dnsLeakCheckKillSwitchDns => '网络锁定的 DNS 保护';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => '请在上方的 DNS 设置中指定隧道 DNS。';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => '检查系统在隧道外会使用哪些解析器。';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => '请启用网络锁定，让 DNS 流量保持在隧道内。';
+
+  @override
   String get dnsLeakCheckEncryptedDns => '操作系统加密 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS 响应伪造';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => '检查系统在隧道外使用的加密 DNS 端点。';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns => '请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。';
+
+  @override
+  String get dnsCheckNeedsConnection => '请先连接 VPN，再检查是否泄漏。';
 
   @override
   String get dnsExpected => '预期';
@@ -3482,6 +3624,9 @@ class SZhHans extends SZh {
   String get leakTestCancel => '取消';
 
   @override
+  String get leakTestNeedsConnection => '请先连接，再执行泄漏测试。';
+
+  @override
   String leakTestProgress(int count) {
     return '已完成测试：$count';
   }
@@ -3500,6 +3645,9 @@ class SZhHans extends SZh {
 
   @override
   String get leakTestFix => '修复';
+
+  @override
+  String get leakTestFixedNote => '已启用网络锁定，请重新测试以确认。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';
@@ -4173,6 +4321,9 @@ class SZhHant extends SZh {
   String get dnsAuto => '汽車';
 
   @override
+  String get dnsHint => '地址，逗號分隔';
+
+  @override
   String get fragment => 'TLS 碎片';
 
   @override
@@ -4467,10 +4618,39 @@ class SZhHant extends SZh {
   String get openLogs => '打開日誌';
 
   @override
+  String get tourReplay => '再次顯示指南';
+
+  @override
+  String tourStep(int step) {
+    return '第 5 步 $step';
+  }
+
+  @override
   String get tourBack => '後退';
 
   @override
   String get tourNext => '下一個';
+
+  @override
+  String get tourSkip => '跳過';
+
+  @override
+  String get tourFinish => '完畢';
+
+  @override
+  String get tourAdd => '新增您的提供者的訂閱連結。';
+
+  @override
+  String get tourServer => '選擇一個伺服器。 “最快”為您選擇一個。';
+
+  @override
+  String get tourConnect => '按一下此處連接或斷開連接。';
+
+  @override
+  String get tourMode => '選擇一種模式。 如果 VPN 斷線，終止開關會阻止網路。';
+
+  @override
+  String get tourSettings => '打開設定。 您可以在那裡重播本指南。';
 
   @override
   String get chooseProgram => '選擇一個程序';
@@ -4555,6 +4735,12 @@ class SZhHant extends SZh {
   String get updateWaitConnection => '連線尚未就緒';
 
   @override
+  String get updateDownloading => '正在下載並驗證文件...';
+
+  @override
+  String get updateInstalling => '正在準備更新或等待管理員身份驗證...';
+
+  @override
   String get updateNetworkError => '無法下載更新';
 
   @override
@@ -4570,7 +4756,13 @@ class SZhHant extends SZh {
   String get updateUnsupported => '此可執行檔不屬於受支援的 Sora 軟體包對';
 
   @override
+  String get updateManual => '在終端機中執行此命令以安裝兩個經過驗證的軟體包，然後重新開啟 Sora。 檔案保留在下載目錄中。 VPN 連線將會中斷。';
+
+  @override
   String get updateVersionRevoked => '開發者已撤回此版本，請等待修正版';
+
+  @override
+  String get updateRolloutPending => '新版本正分批推出，屆時會自動通知您更新。';
 
   @override
   String updateRollbacking(String version) {
@@ -4590,6 +4782,9 @@ class SZhHant extends SZh {
 
   @override
   String get updateCopyCommand => '複製指令';
+
+  @override
+  String get updateChecksDisabled => '在「設定」中停用自動檢查。';
 
   @override
   String get updateInstalled => '已安裝更新';
@@ -5014,6 +5209,9 @@ class SZhHant extends SZh {
   String get qrCopyLink => '複製連結';
 
   @override
+  String get qrWarning => '僅與信任的人分享此 QR 碼。';
+
+  @override
   String get qrFromClipboard => '從剪貼簿貼上';
 
   @override
@@ -5092,10 +5290,28 @@ class SZhHant extends SZh {
   String get dnsLeakCheckKillSwitchDns => '網路鎖定的 DNS 保護';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => '請在上方的 DNS 設定中指定通道 DNS。';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => '檢查系統在通道外會使用哪些解析器。';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => '請啟用網路鎖定，讓 DNS 流量保持在通道內。';
+
+  @override
   String get dnsLeakCheckEncryptedDns => '作業系統加密 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS 回應偽造';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => '檢查系統在通道外使用的加密 DNS 端點。';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns => '請為通道使用加密 DNS（DoT 或 DoH），避免解析器偽造回應。';
+
+  @override
+  String get dnsCheckNeedsConnection => '請先連接 VPN，再檢查是否洩漏。';
 
   @override
   String get dnsExpected => '預期';
@@ -5403,6 +5619,9 @@ class SZhHant extends SZh {
   String get leakTestCancel => '取消';
 
   @override
+  String get leakTestNeedsConnection => '請先連接，再執行洩漏測試。';
+
+  @override
   String leakTestProgress(int count) {
     return '已完成測試：$count';
   }
@@ -5421,6 +5640,9 @@ class SZhHant extends SZh {
 
   @override
   String get leakTestFix => '修正';
+
+  @override
+  String get leakTestFixedNote => '已啟用網路鎖定，請重新測試以確認。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';

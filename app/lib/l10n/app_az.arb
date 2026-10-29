@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Avtomatik",
+  "dnsHint": "Ünvanlar, vergüllə ayrılmış",
   "fragment": "TLS parçalanması",
   "fragmentPackets": "Nə bölmək",
   "fragmentLength": "Parça ölçüsü",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Bildiriş yoxdur",
   "retryConnect": "Bağlantıya yenidən cəhd edin",
   "openLogs": "Qeydləri açın",
+  "tourReplay": "Bələdçini yenidən göstərin",
+  "tourStep": "5 addımdan {step}",
   "tourBack": "Geri",
   "tourNext": "Sonrakı",
+  "tourSkip": "Keç",
+  "tourFinish": "Bitdi",
+  "tourAdd": "Provayderinizin abunə linkini əlavə edin.",
+  "tourServer": "Bir server seçin. “Ən sürətli” sizin üçün birini seçir.",
+  "tourConnect": "Qoşulmaq və ya əlaqəni kəsmək üçün bura klikləyin.",
+  "tourMode": "Bir rejim seçin. VPN düşərsə, keçid bloklarını öldürün.",
+  "tourSettings": "Parametrləri açın. Bu təlimatı orada təkrarlaya bilərsiniz.",
   "chooseProgram": "Proqram seçin",
   "installedApps": "Quraşdırılmış proqramlar",
   "runningProcesses": "Çalışan proseslər",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Buraxılışda qeydlər yoxdur.",
   "updateDropWarning": "Yeniləmək üçün bağlantını kəsmək?",
   "updateWaitConnection": "Bağlantı hazır deyil",
+  "updateDownloading": "Fayllar endirilir və təsdiqlənir...",
+  "updateInstalling": "Güncəlləmə hazırlanır və ya administrator autentifikasiyası gözlənilir...",
   "updateNetworkError": "Güncəlləməni endirmək mümkün olmadı",
   "updateReleaseError": "Buraxılış məlumatları və ya tələb olunan fayllar yoxdur və ya etibarsızdır.",
   "updateChecksumError": "Endirmə SHA256SUMS ilə uyğun gəlmir",
   "updateInstallError": "Yeniləmə tamamlanmadı",
   "updateUnsupported": "Bu icra olunan fayl dəstəklənən Sora paket cütlüyünə məxsus deyil",
+  "updateManual": "Hər iki təsdiqlənmiş paketi quraşdırmaq üçün bu əmri terminalda işə salın, sonra Sora-i yenidən açın. Fayllar yükləmə qovluğunda qalır. VPN bağlantısı kəsiləcək.",
   "updateCopyCommand": "Kopyalama əmri",
+  "updateChecksDisabled": "Avtomatik yoxlamalar Parametrlərdə deaktiv edilib.",
   "updateInstalled": "Yeniləmə quraşdırılıb",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Məlumat sızması üçün test edin",
   "leakTestRun": "Yoxlayın",
   "leakTestCancel": "Ləğv et",
+  "leakTestNeedsConnection": "Məlumat sızmasını yoxlamaq üçün VPN-ə qoşulun.",
   "leakTestProgress": "Testlər tamamlandı: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Düzəlt",
+  "leakTestFixedNote": "Şəbəkə kilidi aktivdir. Yoxlamaq üçün testi yenidən başladın.",
   "leakTestCheckDirectDns": "Birbaşa DNS",
   "leakTestCheckIcmpEcho": "ICMP əks-səda",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Tərtibatçı bu versiyanı geri götürdü",
+  "updateRolloutPending": "Daha yeni versiya tədricən yayılır və avtomatik olaraq sizə təklif olunacaq.",
   "updateRollbacking": "{version} versiyasına qayıdır...",
   "updateRolledBack": "{version} yeniləməsi işləkliyin yoxlanışından keçmədi, buna görə Sora {fromVersion} versiyasına qaytarıldı.",
   "updateRollbackError": "Avtomatik geri qaytarma uğursuz oldu",
@@ -722,6 +746,7 @@
   "qrShareTitle": "QR kodunu paylaşın",
   "qrScanTitle": "QR kodunu skan edin",
   "qrCopyLink": "Linki kopyalayın",
+  "qrWarning": "Kodu yalnız etibar etdiyiniz şəxslərlə paylaşın.",
   "qrFromClipboard": "Buferdən yapışdırın",
   "qrNoCode": "Bu şəkildə QR kod tapılmadı.",
   "qrInvalid": "Bu QR kodunda etibarlı keçid yoxdur.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Tunelin DNS həllediciləri",
   "dnsLeakCheckSystemResolvers": "Sistemin ad həllediciləri",
   "dnsLeakCheckKillSwitchDns": "Şəbəkə kilidinin DNS qoruması",
+  "dnsLeakFixConfigureTunnelDns": "Yuxarıdakı DNS parametrlərində tunel üçün DNS konfiqurasiya edin.",
+  "dnsLeakFixReviewSystemResolvers": "Sisteminizin tuneldən kənarda hansı həlledicilərdən istifadə edəcəyini yoxlayın.",
+  "dnsLeakFixEnableKillSwitch": "DNS trafikinin tuneldə qalması üçün şəbəkə kilidini aktivləşdirin.",
   "dnsLeakCheckEncryptedDns": "Əməliyyat sisteminin şifrələnmiş DNS-i",
   "dnsLeakCheckDnsSpoof": "Saxta DNS cavablar",
+  "dnsLeakFixReviewEncryptedDns": "Sisteminizin tuneldən kənarda hansı şifrələnmiş DNS son nöqtələrindən istifadə etdiyini yoxlayın.",
+  "dnsLeakFixUseEncryptedDns": "Tunel üçün şifrələnmiş DNS (DoT və ya DoH) istifadə edin ki, həlledicilər cavabları saxtalaşdırmasın.",
+  "dnsCheckNeedsConnection": "Əvvəlcə VPN-ə qoşulun, sonra sızma olub olmadığını yoxlayın.",
   "dnsExpected": "Gözlənilir",
   "dnsActual": "Müşahidə edilmişdir",
   "measureSpeed": "Sürəti ölçün",

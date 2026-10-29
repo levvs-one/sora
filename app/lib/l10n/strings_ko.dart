@@ -331,6 +331,9 @@ class SKo extends S {
   String get dnsAuto => '자동';
 
   @override
+  String get dnsHint => '주소, 쉼표로 구분';
+
+  @override
   String get fragment => 'TLS 조각화';
 
   @override
@@ -625,10 +628,39 @@ class SKo extends S {
   String get openLogs => '로그 열기';
 
   @override
+  String get tourReplay => '가이드 다시 표시';
+
+  @override
+  String tourStep(int step) {
+    return '5단계 $step';
+  }
+
+  @override
   String get tourBack => '뒤쪽에';
 
   @override
   String get tourNext => '다음';
+
+  @override
+  String get tourSkip => '건너뛰다';
+
+  @override
+  String get tourFinish => '완료';
+
+  @override
+  String get tourAdd => '제공업체의 구독 링크를 추가하세요.';
+
+  @override
+  String get tourServer => '서버를 선택하세요. \"가장 빠름\"이 하나를 선택합니다.';
+
+  @override
+  String get tourConnect => '연결하거나 연결을 끊으려면 여기를 클릭하세요.';
+
+  @override
+  String get tourMode => '모드를 선택하세요. VPN이 끊어지면 킬 스위치가 인터넷을 차단합니다.';
+
+  @override
+  String get tourSettings => '설정을 엽니다. 여기서 이 가이드를 다시 재생할 수 있습니다.';
 
   @override
   String get chooseProgram => '프로그램을 선택하세요';
@@ -713,6 +745,12 @@ class SKo extends S {
   String get updateWaitConnection => '연결이 준비되지 않았습니다';
 
   @override
+  String get updateDownloading => '파일 다운로드 및 확인 중...';
+
+  @override
+  String get updateInstalling => '업데이트를 준비 중이거나 관리자 인증을 기다리는 중...';
+
+  @override
   String get updateNetworkError => '업데이트를 다운로드할 수 없습니다';
 
   @override
@@ -728,7 +766,13 @@ class SKo extends S {
   String get updateUnsupported => '이 실행 파일은 지원되는 Sora 패키지 쌍의 소유가 아닙니다';
 
   @override
+  String get updateManual => '터미널에서 이 명령을 실행하여 확인된 두 패키지를 모두 설치한 다음 Sora를 다시 엽니다. 파일은 다운로드 디렉터리에 유지됩니다. VPN 연결이 끊어집니다.';
+
+  @override
   String get updateVersionRevoked => '개발자가 이 버전을 철회했습니다';
+
+  @override
+  String get updateRolloutPending => '최신 버전이 점진적으로 출시되고 자동으로 제공됩니다.';
 
   @override
   String updateRollbacking(String version) {
@@ -748,6 +792,9 @@ class SKo extends S {
 
   @override
   String get updateCopyCommand => '복사 명령';
+
+  @override
+  String get updateChecksDisabled => '설정에서 자동 검사가 비활성화되어 있습니다.';
 
   @override
   String get updateInstalled => '업데이트가 설치되었습니다';
@@ -1172,6 +1219,9 @@ class SKo extends S {
   String get qrCopyLink => '링크 복사';
 
   @override
+  String get qrWarning => '신뢰하는 사람에게만 코드를 공유하세요.';
+
+  @override
   String get qrFromClipboard => '클립보드에서 붙여넣기';
 
   @override
@@ -1250,10 +1300,28 @@ class SKo extends S {
   String get dnsLeakCheckKillSwitchDns => '네트워크 차단을 통한 DNS 보호';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => '위의 DNS 설정에서 터널에 대해 DNS을 구성합니다.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => '시스템이 터널 외부에서 사용할 확인 프로그램을 확인하세요.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS 트래픽이 터널 안에 머물도록 네트워크 차단을 켜세요.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => '운영 체제의 암호화 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => '위조된 DNS 응답';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => '시스템이 터널 외부에서 사용하는 암호화된 DNS 엔드포인트를 확인하세요.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns => '리졸버가 응답을 위조할 수 없도록 터널에 암호화 DNS(DoT 또는 DoH)를 사용하세요.';
+
+  @override
+  String get dnsCheckNeedsConnection => '먼저 VPN에 연결한 후 누출이 있는지 확인하세요.';
 
   @override
   String get dnsExpected => '예상됨';
@@ -1561,6 +1629,9 @@ class SKo extends S {
   String get leakTestCancel => '취소';
 
   @override
+  String get leakTestNeedsConnection => 'VPN에 연결하여 데이터 유출을 테스트합니다.';
+
+  @override
   String leakTestProgress(int count) {
     return '테스트 완료: $count';
   }
@@ -1579,6 +1650,9 @@ class SKo extends S {
 
   @override
   String get leakTestFix => '수정';
+
+  @override
+  String get leakTestFixedNote => '네트워크 차단이 켜져 있습니다. 테스트를 다시 실행해 확인하세요.';
 
   @override
   String get leakTestCheckDirectDns => '직접 DNS';

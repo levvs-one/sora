@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "อัตโนมัติ",
+  "dnsHint": "ที่อยู่ คั่นด้วยเครื่องหมายจุลภาค",
   "fragment": "การกระจายตัวของ TLS",
   "fragmentPackets": "จะแบ่งอะไร.",
   "fragmentLength": "ขนาดชิ้น",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "ไม่มีการแจ้งเตือน",
   "retryConnect": "ลองเชื่อมต่ออีกครั้ง",
   "openLogs": "เปิดบันทึก",
+  "tourReplay": "แสดงคำแนะนำอีกครั้ง",
+  "tourStep": "ขั้นตอนที่ {step} จาก 5",
   "tourBack": "กลับ",
   "tourNext": "ต่อไป",
+  "tourSkip": "ข้าม",
+  "tourFinish": "เสร็จแล้ว",
+  "tourAdd": "เพิ่มลิงค์สมัครสมาชิกของผู้ให้บริการของคุณ",
+  "tourServer": "เลือกเซิร์ฟเวอร์ “เร็วที่สุด” เลือกหนึ่งรายการสำหรับคุณ",
+  "tourConnect": "คลิกที่นี่เพื่อเชื่อมต่อหรือยกเลิกการเชื่อมต่อ",
+  "tourMode": "เลือกโหมด Kill switch จะบล็อกอินเทอร์เน็ตหาก VPN หลุด",
+  "tourSettings": "เปิดการตั้งค่า คุณสามารถเล่นซ้ำคู่มือนี้ได้ที่นั่น",
   "chooseProgram": "เลือกโปรแกรม",
   "installedApps": "แอพพลิเคชั่นที่ติดตั้ง",
   "runningProcesses": "กระบวนการที่กำลังทำงานอยู่",
@@ -213,12 +223,16 @@
   "updateNoNotes": "การเปิดตัวไม่มีบันทึก",
   "updateDropWarning": "ตัดการเชื่อมต่อเพื่ออัปเดตหรือไม่?",
   "updateWaitConnection": "การเชื่อมต่อยังไม่พร้อม",
+  "updateDownloading": "กำลังดาวน์โหลดและยืนยันไฟล์...",
+  "updateInstalling": "กำลังเตรียมการอัปเดตหรือรอการรับรองความถูกต้องของผู้ดูแลระบบ...",
   "updateNetworkError": "ไม่สามารถดาวน์โหลดการอัปเดตได้",
   "updateReleaseError": "ข้อมูลการเผยแพร่หรือไฟล์ที่จำเป็นหายไปหรือไม่ถูกต้อง",
   "updateChecksumError": "การดาวน์โหลดไม่ตรงกับ SHA256SUMS",
   "updateInstallError": "การอัปเดตไม่เสร็จสิ้น",
   "updateUnsupported": "ไฟล์ปฏิบัติการนี้ไม่ได้เป็นเจ้าของโดยคู่แพ็คเกจ Sora ที่รองรับ",
+  "updateManual": "เรียกใช้คำสั่งนี้ในเทอร์มินัลเพื่อติดตั้งแพ็คเกจที่ตรวจสอบแล้วทั้งสองรายการ จากนั้นเปิด Sora อีกครั้ง ไฟล์จะยังคงอยู่ในไดเร็กทอรีดาวน์โหลด การเชื่อมต่อ VPN จะลดลง",
   "updateCopyCommand": "คำสั่งคัดลอก",
+  "updateChecksDisabled": "การตรวจสอบอัตโนมัติถูกปิดใช้งานในการตั้งค่า",
   "updateInstalled": "ติดตั้งการอัปเดตแล้ว",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "ทดสอบการรั่วไหลของข้อมูล",
   "leakTestRun": "ตรวจสอบ",
   "leakTestCancel": "ยกเลิก",
+  "leakTestNeedsConnection": "เชื่อมต่อกับ VPN เพื่อทดสอบข้อมูลรั่วไหล",
   "leakTestProgress": "การทดสอบเสร็จสมบูรณ์: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "แก้ไข",
+  "leakTestFixedNote": "เปิดการตัดเครือข่ายแล้ว เรียกใช้การทดสอบอีกครั้งเพื่อตรวจสอบ",
   "leakTestCheckDirectDns": "โดยตรง DNS",
   "leakTestCheckIcmpEcho": "ICMP ก้อง",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "ผู้พัฒนาได้ถอนเวอร์ชันนี้ออกแล้ว กรุณารอการแก้ไขการเผยแพร่",
+  "updateRolloutPending": "เวอร์ชันใหม่กำลังทยอยเปิดตัว และจะเสนอให้คุณโดยอัตโนมัติ",
   "updateRollbacking": "กำลังย้อนกลับเป็นเวอร์ชัน {version}...",
   "updateRolledBack": "การอัปเดตเป็น {version} ไม่ผ่านการตรวจสุขภาพ ดังนั้น Sora จึงถูกย้อนกลับเป็น {fromVersion}",
   "updateRollbackError": "การย้อนกลับอัตโนมัติล้มเหลว",
@@ -722,6 +746,7 @@
   "qrShareTitle": "แบ่งปันรหัส QR",
   "qrScanTitle": "สแกนโค้ด QR",
   "qrCopyLink": "คัดลอกลิงค์",
+  "qrWarning": "แชร์รหัสนี้กับคนที่คุณไว้ใจเท่านั้น",
   "qrFromClipboard": "วางจากคลิปบอร์ด",
   "qrNoCode": "ไม่พบคิวอาร์โค้ดในรูปภาพนี้",
   "qrInvalid": "รหัส QR นี้ไม่มีลิงก์ที่ถูกต้อง",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "ตัวแปลงชื่อ DNS ของอุโมงค์",
   "dnsLeakCheckSystemResolvers": "ตัวแปลงชื่อของระบบ",
   "dnsLeakCheckKillSwitchDns": "การป้องกัน DNS ด้วยการตัดเครือข่าย",
+  "dnsLeakFixConfigureTunnelDns": "กำหนดค่า DNS สำหรับช่องสัญญาณในการตั้งค่า DNS ด้านบน",
+  "dnsLeakFixReviewSystemResolvers": "ตรวจสอบว่ารีโซลเวอร์ใดที่ระบบของคุณจะใช้นอกอุโมงค์",
+  "dnsLeakFixEnableKillSwitch": "เปิดการตัดเครือข่ายเพื่อให้การรับส่งข้อมูล DNS อยู่ในอุโมงค์",
   "dnsLeakCheckEncryptedDns": "DNS แบบเข้ารหัสของระบบ",
   "dnsLeakCheckDnsSpoof": "ปลอมแปลงคำตอบ DNS",
+  "dnsLeakFixReviewEncryptedDns": "ตรวจสอบว่าปลายทาง DNS ที่เข้ารหัสซึ่งระบบของคุณใช้นอกอุโมงค์",
+  "dnsLeakFixUseEncryptedDns": "ใช้ DNS แบบเข้ารหัส (DoT หรือ DoH) ในอุโมงค์เพื่อป้องกันตัวแปลงชื่อปลอมคำตอบ",
+  "dnsCheckNeedsConnection": "เชื่อมต่อกับ VPN ก่อน จากนั้นจึงตรวจสอบรอยรั่ว",
   "dnsExpected": "คาดว่า",
   "dnsActual": "สังเกตแล้ว",
   "measureSpeed": "วัดความเร็ว",

@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "خودکار",
+  "dnsHint": "آدرس ها، با کاما از هم جدا شده اند",
   "fragment": "تکه تکه شدن TLS",
   "fragmentPackets": "چه چیزی تقسیم شود",
   "fragmentLength": "اندازه قطعه",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "اعلانی وجود ندارد",
   "retryConnect": "اتصال را دوباره امتحان کنید",
   "openLogs": "لاگ ها را باز کنید",
+  "tourReplay": "راهنما را دوباره نشان دهید",
+  "tourStep": "مرحله {step} از 5",
   "tourBack": "برگشت",
   "tourNext": "بعدی",
+  "tourSkip": "پرش کنید",
+  "tourFinish": "انجام شد",
+  "tourAdd": "پیوند اشتراک ارائه دهنده خود را اضافه کنید.",
+  "tourServer": "یک سرور انتخاب کنید \"سریعترین\" یکی را برای شما انتخاب می کند.",
+  "tourConnect": "برای اتصال یا قطع ارتباط اینجا را کلیک کنید.",
+  "tourMode": "یک حالت را انتخاب کنید. در صورت قطع شدن VPN، سوئیچ Kill اینترنت را مسدود می کند.",
+  "tourSettings": "تنظیمات را باز کنید. می توانید این راهنما را دوباره در آنجا پخش کنید.",
   "chooseProgram": "یک برنامه را انتخاب کنید",
   "installedApps": "برنامه های نصب شده",
   "runningProcesses": "فرآیندهای در حال اجرا",
@@ -213,12 +223,16 @@
   "updateNoNotes": "انتشار هیچ یادداشتی ندارد.",
   "updateDropWarning": "اتصال برای به‌روزرسانی قطع شود؟",
   "updateWaitConnection": "اتصال آماده نیست",
+  "updateDownloading": "دانلود و تایید فایل ها...",
+  "updateInstalling": "در حال آماده سازی به روز رسانی یا انتظار برای احراز هویت سرپرست...",
   "updateNetworkError": "آپدیت دانلود نشد دوباره امتحان کنید",
   "updateReleaseError": "داده‌های انتشار یا فایل‌های مورد نیاز وجود ندارد یا نامعتبر است.",
   "updateChecksumError": "دانلود با SHA256SUMS مطابقت ندارد",
   "updateInstallError": "آپدیت تمام نشد",
   "updateUnsupported": "این فایل اجرایی متعلق به یک جفت بسته پشتیبانی شده Sora نیست",
+  "updateManual": "این دستور را در ترمینال اجرا کنید تا هر دو بسته تایید شده نصب شوند، سپس Sora را دوباره باز کنید. فایل ها در دایرکتوری دانلود می مانند. اتصال VPN قطع می شود.",
   "updateCopyCommand": "دستور کپی",
+  "updateChecksDisabled": "بررسی خودکار در تنظیمات غیرفعال است.",
   "updateInstalled": "آپدیت نصب شد Sora را دوباره باز کنید",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "تست نشت داده ها",
   "leakTestRun": "بررسی کنید",
   "leakTestCancel": "لغو",
+  "leakTestNeedsConnection": "برای آزمایش نشت داده به VPN متصل شوید.",
   "leakTestProgress": "آزمایشات تکمیل شده: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "رفع کنید",
+  "leakTestFixedNote": "قطع اضطراری روشن است. برای بررسی، آزمایش را دوباره اجرا کنید.",
   "leakTestCheckDirectDns": "مستقیم DNS",
   "leakTestCheckIcmpEcho": "ICMP اکو",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "توسعه دهنده این نسخه را پس گرفته است",
+  "updateRolloutPending": "نسخه جدیدتر به تدریج در حال انتشار است و به طور خودکار به شما ارائه می شود.",
   "updateRollbacking": "بازگشت به نسخه {version}...",
   "updateRolledBack": "به‌روزرسانی {version} از بررسی سلامت عبور نکرد، بنابراین Sora به {fromVersion} بازگشت.",
   "updateRollbackError": "بازگشت خودکار شکست خورد",
@@ -722,6 +746,7 @@
   "qrShareTitle": "کد QR را به اشتراک بگذارید",
   "qrScanTitle": "کد QR را اسکن کنید",
   "qrCopyLink": "پیوند را کپی کنید",
+  "qrWarning": "کد را فقط با افراد مورد اعتماد به اشتراک بگذارید.",
   "qrFromClipboard": "چسباندن از کلیپ بورد",
   "qrNoCode": "در این تصویر کد QR پیدا نشد.",
   "qrInvalid": "این کد QR حاوی پیوند معتبری نیست.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "تحلیلگرهای DNS تونل",
   "dnsLeakCheckSystemResolvers": "تحلیلگرهای نام سیستم",
   "dnsLeakCheckKillSwitchDns": "محافظت DNS با قطع اضطراری",
+  "dnsLeakFixConfigureTunnelDns": "DNS را برای تونل در تنظیمات DNS بالا پیکربندی کنید.",
+  "dnsLeakFixReviewSystemResolvers": "بررسی کنید که سیستم شما از کدام حل کننده ها در خارج از تونل استفاده می کند.",
+  "dnsLeakFixEnableKillSwitch": "قطع اضطراری را روشن کنید تا ترافیک DNS درون تونل بماند.",
   "dnsLeakCheckEncryptedDns": "DNS رمزگذاری‌شدهٔ سیستم‌عامل",
   "dnsLeakCheckDnsSpoof": "پاسخ های جعلی DNS",
+  "dnsLeakFixReviewEncryptedDns": "بررسی کنید که سیستم شما از کدام نقاط پایانی DNS رمزگذاری شده در خارج از تونل استفاده می کند.",
+  "dnsLeakFixUseEncryptedDns": "از DNS (DoT یا DoH) رمزگذاری شده برای تونل استفاده کنید تا حل‌کننده‌ها نتوانند پاسخ‌ها را جعل کنند.",
+  "dnsCheckNeedsConnection": "ابتدا به VPN متصل شوید، سپس نشتی را بررسی کنید.",
   "dnsExpected": "مورد انتظار",
   "dnsActual": "مشاهده شد",
   "measureSpeed": "اندازه گیری سرعت",

@@ -331,6 +331,9 @@ class SHi extends S {
   String get dnsAuto => 'ऑटो';
 
   @override
+  String get dnsHint => 'पते, अल्पविराम से अलग';
+
+  @override
   String get fragment => 'टीएलएस विखंडन';
 
   @override
@@ -630,10 +633,39 @@ class SHi extends S {
   String get openLogs => 'लॉग खोलें';
 
   @override
+  String get tourReplay => 'गाइड फिर से दिखाएँ';
+
+  @override
+  String tourStep(int step) {
+    return '5 का चरण $step';
+  }
+
+  @override
   String get tourBack => 'पीछे';
 
   @override
   String get tourNext => 'अगला';
+
+  @override
+  String get tourSkip => 'छोडना';
+
+  @override
+  String get tourFinish => 'हो गया';
+
+  @override
+  String get tourAdd => 'अपने प्रदाता का सदस्यता लिंक जोड़ें.';
+
+  @override
+  String get tourServer => 'एक सर्वर चुनें. \"सबसे तेज़\" आपके लिए एक का चयन करता है।';
+
+  @override
+  String get tourConnect => 'कनेक्ट या डिस्कनेक्ट करने के लिए यहां क्लिक करें.';
+
+  @override
+  String get tourMode => 'एक मोड चुनें. यदि वीपीएन बंद हो जाए तो किल स्विच इंटरनेट को ब्लॉक कर देता है।';
+
+  @override
+  String get tourSettings => 'खुली सेटिंग। आप वहां इस गाइड को दोबारा चला सकते हैं।';
 
   @override
   String get chooseProgram => 'एक प्रोग्राम चुनें';
@@ -718,6 +750,12 @@ class SHi extends S {
   String get updateWaitConnection => 'कनेक्शन तैयार नहीं है';
 
   @override
+  String get updateDownloading => 'फ़ाइलें डाउनलोड और सत्यापित की जा रही हैं...';
+
+  @override
+  String get updateInstalling => 'अद्यतन तैयार किया जा रहा है या व्यवस्थापक प्रमाणीकरण की प्रतीक्षा की जा रही है...';
+
+  @override
   String get updateNetworkError => 'अपडेट डाउनलोड नहीं हो सका';
 
   @override
@@ -733,7 +771,15 @@ class SHi extends S {
   String get updateUnsupported => 'यह निष्पादन योग्य समर्थित Sora पैकेज जोड़ी के स्वामित्व में नहीं है';
 
   @override
+  String get updateManual =>
+      'दोनों सत्यापित पैकेजों को स्थापित करने के लिए इस कमांड को टर्मिनल में चलाएँ, फिर Sora को फिर से खोलें। फ़ाइलें डाउनलोड निर्देशिका में रहती हैं। वीपीएन कनेक्शन बंद हो जाएगा.';
+
+  @override
   String get updateVersionRevoked => 'डेवलपर ने इस संस्करण को वापस ले लिया है';
+
+  @override
+  String get updateRolloutPending =>
+      'एक नया संस्करण धीरे-धीरे जारी किया जा रहा है और आपको स्वचालित रूप से पेश किया जाएगा।';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +800,9 @@ class SHi extends S {
 
   @override
   String get updateCopyCommand => 'आदेश कॉपी करें';
+
+  @override
+  String get updateChecksDisabled => 'सेटिंग्स में स्वचालित जाँच अक्षम हैं।';
 
   @override
   String get updateInstalled => 'अद्यतन स्थापित किया गया';
@@ -1179,6 +1228,9 @@ class SHi extends S {
   String get qrCopyLink => 'लिंक कॉपी करें';
 
   @override
+  String get qrWarning => 'यह कोड केवल भरोसेमंद लोगों को दिखाएँ।';
+
+  @override
   String get qrFromClipboard => 'क्लिपबोर्ड से चिपकाएँ';
 
   @override
@@ -1257,10 +1309,30 @@ class SHi extends S {
   String get dnsLeakCheckKillSwitchDns => 'नेटवर्क अवरोध से DNS सुरक्षा';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'उपरोक्त DNS सेटिंग्स में सुरंग के लिए DNS कॉन्फ़िगर करें।';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'जांचें कि आपका सिस्टम सुरंग के बाहर कौन से रिज़ॉल्वर का उपयोग करेगा।';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS ट्रैफ़िक को टनल के अंदर रखने के लिए नेटवर्क अवरोध चालू करें।';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'सिस्टम का एन्क्रिप्टेड DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS जवाबों की जालसाज़ी';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'जांचें कि आपका सिस्टम सुरंग के बाहर किस एन्क्रिप्टेड DNS एंडपॉइंट का उपयोग करता है।';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'सुरंग के लिए एन्क्रिप्टेड DNS (DoT या DoH) का उपयोग करें ताकि रिज़ॉल्वर नकली उत्तर न दे सकें।';
+
+  @override
+  String get dnsCheckNeedsConnection => 'पहले VPN से कनेक्ट करें, फिर लीक की जांच करें।';
 
   @override
   String get dnsExpected => 'अपेक्षित';
@@ -1568,6 +1640,9 @@ class SHi extends S {
   String get leakTestCancel => 'रद्द करें';
 
   @override
+  String get leakTestNeedsConnection => 'डेटा लीक की जांच के लिए VPN से कनेक्ट करें।';
+
+  @override
   String leakTestProgress(int count) {
     return 'परीक्षण पूर्ण: $count';
   }
@@ -1586,6 +1661,9 @@ class SHi extends S {
 
   @override
   String get leakTestFix => 'ठीक करें';
+
+  @override
+  String get leakTestFixedNote => 'नेटवर्क अवरोध चालू है। पुष्टि के लिए दोबारा जाँचें।';
 
   @override
   String get leakTestCheckDirectDns => 'प्रत्यक्ष DNS';

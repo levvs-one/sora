@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Авто",
+  "dnsHint": "Мекенжайлар, үтірмен бөлінген",
   "fragment": "TLS фрагментациясы",
   "fragmentPackets": "Нені бөлу керек",
   "fragmentLength": "Бөлшек өлшемі",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Хабарландырулар жоқ",
   "retryConnect": "Қосылымды қайталап көріңіз",
   "openLogs": "Журналдарды ашыңыз",
+  "tourReplay": "Нұсқаулықты қайта көрсетіңіз",
+  "tourStep": "{step}/5 қадамы",
   "tourBack": "Артқа",
   "tourNext": "Келесі",
+  "tourSkip": "Өткізіп жіберу",
+  "tourFinish": "Дайын",
+  "tourAdd": "Провайдеріңіздің жазылым сілтемесін қосыңыз.",
+  "tourServer": "Серверді таңдаңыз. «Ең жылдам» сіз үшін біреуін таңдайды.",
+  "tourConnect": "Қосылу немесе ажырату үшін осы жерді басыңыз.",
+  "tourMode": "Режимді таңдаңыз. VPN өшірілсе, коммутаторды өшіріңіз.",
+  "tourSettings": "Параметрлерді ашыңыз. Сіз бұл нұсқаулықты сол жерде қайталай аласыз.",
   "chooseProgram": "Бағдарламаны таңдаңыз",
   "installedApps": "Орнатылған қолданбалар",
   "runningProcesses": "Орындалатын процестер",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Шығарылымда ескертулер жоқ.",
   "updateDropWarning": "Жаңарту үшін қосылымды үзу керек пе?",
   "updateWaitConnection": "Қосылым дайын емес",
+  "updateDownloading": "Файлдар жүктелуде және тексерілуде...",
+  "updateInstalling": "Жаңарту дайындалуда немесе әкімшінің аутентификациясын күтуде...",
   "updateNetworkError": "Жаңартуды жүктеп алу мүмкін болмады",
   "updateReleaseError": "Шығарылым деректері немесе қажетті файлдар жоқ немесе жарамсыз.",
   "updateChecksumError": "Жүктеп алу SHA256SUMS сәйкес емес",
   "updateInstallError": "Жаңарту аяқталмады",
   "updateUnsupported": "Бұл орындалатын файл қолдау көрсетілетін Sora бума жұбына тиесілі емес",
+  "updateManual": "Тексерілген екі буманы орнату үшін осы пәрменді терминалда іске қосыңыз, содан кейін Sora қайта ашыңыз. Файлдар жүктеп алу каталогында қалады. VPN байланысы үзіледі.",
   "updateCopyCommand": "Көшіру пәрмені",
+  "updateChecksDisabled": "Параметрлерде автоматты тексерулер өшірілген.",
   "updateInstalled": "Жаңарту орнатылды",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Деректердің ағып кетуіне сынақ",
   "leakTestRun": "Тексеріңіз",
   "leakTestCancel": "Болдырмау",
+  "leakTestNeedsConnection": "Деректердің ағып кетуін тексеру үшін VPN желісіне қосылыңыз.",
   "leakTestProgress": "Тестілеу аяқталды: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Түзету",
+  "leakTestFixedNote": "Желі бұғаттауы қосулы. Тексеру үшін сынақты қайта іске қосыңыз.",
   "leakTestCheckDirectDns": "Тікелей DNS",
   "leakTestCheckIcmpEcho": "ICMP жаңғырық",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Әзірлеуші бұл нұсқаны қайтарып алды",
+  "updateRolloutPending": "Жаңарақ нұсқасы бірте-бірте шығарылады және сізге автоматты түрде ұсынылады.",
   "updateRollbacking": "{version} нұсқасына оралу...",
   "updateRolledBack": "{version} жаңартуы денсаулық тексеруінен өтпеді, сондықтан Sora {fromVersion} нұсқасына қайтарылды.",
   "updateRollbackError": "Автоматты кері қайтару сәтсіз аяқталды",
@@ -722,6 +746,7 @@
   "qrShareTitle": "QR кодын бөлісіңіз",
   "qrScanTitle": "QR кодын сканерлеңіз",
   "qrCopyLink": "Сілтемені көшіру",
+  "qrWarning": "Кодты тек сенімді адамдармен бөлісіңіз.",
   "qrFromClipboard": "Буферден қою",
   "qrNoCode": "Бұл суреттен QR код табылмады.",
   "qrInvalid": "Бұл QR кодында жарамды сілтеме жоқ.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Туннельдің DNS резолверлері",
   "dnsLeakCheckSystemResolvers": "Жүйелік резолверлер",
   "dnsLeakCheckKillSwitchDns": "Желі бұғаттауының DNS қорғанысы",
+  "dnsLeakFixConfigureTunnelDns": "Жоғарыдағы DNS параметрлерінде туннель үшін DNS конфигурациялаңыз.",
+  "dnsLeakFixReviewSystemResolvers": "Жүйе туннельден тыс қандай шешушілерді пайдаланатынын тексеріңіз.",
+  "dnsLeakFixEnableKillSwitch": "DNS трафигі туннельде қалуы үшін желі бұғаттауын қосыңыз.",
   "dnsLeakCheckEncryptedDns": "Жүйенің шифрланған DNS қызметі",
   "dnsLeakCheckDnsSpoof": "Жалған DNS жауаптар",
+  "dnsLeakFixReviewEncryptedDns": "Жүйе туннельден тыс қандай шифрланған DNS соңғы нүктелерді пайдаланатынын тексеріңіз.",
+  "dnsLeakFixUseEncryptedDns": "Резолверлер жауаптарды қолдан жасай алмауы үшін туннельде шифрланған DNS (DoT немесе DoH) пайдаланыңыз.",
+  "dnsCheckNeedsConnection": "Алдымен VPN желісіне қосылыңыз, содан кейін ағып кетуді тексеріңіз.",
   "dnsExpected": "Күтілетін",
   "dnsActual": "Бақыланады",
   "measureSpeed": "Жылдамдықты өлшеңіз",

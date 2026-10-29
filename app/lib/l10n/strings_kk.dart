@@ -331,6 +331,9 @@ class SKk extends S {
   String get dnsAuto => 'Авто';
 
   @override
+  String get dnsHint => 'Мекенжайлар, үтірмен бөлінген';
+
+  @override
   String get fragment => 'TLS фрагментациясы';
 
   @override
@@ -630,10 +633,39 @@ class SKk extends S {
   String get openLogs => 'Журналдарды ашыңыз';
 
   @override
+  String get tourReplay => 'Нұсқаулықты қайта көрсетіңіз';
+
+  @override
+  String tourStep(int step) {
+    return '$step/5 қадамы';
+  }
+
+  @override
   String get tourBack => 'Артқа';
 
   @override
   String get tourNext => 'Келесі';
+
+  @override
+  String get tourSkip => 'Өткізіп жіберу';
+
+  @override
+  String get tourFinish => 'Дайын';
+
+  @override
+  String get tourAdd => 'Провайдеріңіздің жазылым сілтемесін қосыңыз.';
+
+  @override
+  String get tourServer => 'Серверді таңдаңыз. «Ең жылдам» сіз үшін біреуін таңдайды.';
+
+  @override
+  String get tourConnect => 'Қосылу немесе ажырату үшін осы жерді басыңыз.';
+
+  @override
+  String get tourMode => 'Режимді таңдаңыз. VPN өшірілсе, коммутаторды өшіріңіз.';
+
+  @override
+  String get tourSettings => 'Параметрлерді ашыңыз. Сіз бұл нұсқаулықты сол жерде қайталай аласыз.';
 
   @override
   String get chooseProgram => 'Бағдарламаны таңдаңыз';
@@ -718,6 +750,12 @@ class SKk extends S {
   String get updateWaitConnection => 'Қосылым дайын емес';
 
   @override
+  String get updateDownloading => 'Файлдар жүктелуде және тексерілуде...';
+
+  @override
+  String get updateInstalling => 'Жаңарту дайындалуда немесе әкімшінің аутентификациясын күтуде...';
+
+  @override
   String get updateNetworkError => 'Жаңартуды жүктеп алу мүмкін болмады';
 
   @override
@@ -733,7 +771,14 @@ class SKk extends S {
   String get updateUnsupported => 'Бұл орындалатын файл қолдау көрсетілетін Sora бума жұбына тиесілі емес';
 
   @override
+  String get updateManual =>
+      'Тексерілген екі буманы орнату үшін осы пәрменді терминалда іске қосыңыз, содан кейін Sora қайта ашыңыз. Файлдар жүктеп алу каталогында қалады. VPN байланысы үзіледі.';
+
+  @override
   String get updateVersionRevoked => 'Әзірлеуші бұл нұсқаны қайтарып алды';
+
+  @override
+  String get updateRolloutPending => 'Жаңарақ нұсқасы бірте-бірте шығарылады және сізге автоматты түрде ұсынылады.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class SKk extends S {
 
   @override
   String get updateCopyCommand => 'Көшіру пәрмені';
+
+  @override
+  String get updateChecksDisabled => 'Параметрлерде автоматты тексерулер өшірілген.';
 
   @override
   String get updateInstalled => 'Жаңарту орнатылды';
@@ -1179,6 +1227,9 @@ class SKk extends S {
   String get qrCopyLink => 'Сілтемені көшіру';
 
   @override
+  String get qrWarning => 'Кодты тек сенімді адамдармен бөлісіңіз.';
+
+  @override
   String get qrFromClipboard => 'Буферден қою';
 
   @override
@@ -1257,10 +1308,30 @@ class SKk extends S {
   String get dnsLeakCheckKillSwitchDns => 'Желі бұғаттауының DNS қорғанысы';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Жоғарыдағы DNS параметрлерінде туннель үшін DNS конфигурациялаңыз.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Жүйе туннельден тыс қандай шешушілерді пайдаланатынын тексеріңіз.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS трафигі туннельде қалуы үшін желі бұғаттауын қосыңыз.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Жүйенің шифрланған DNS қызметі';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Жалған DNS жауаптар';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Жүйе туннельден тыс қандай шифрланған DNS соңғы нүктелерді пайдаланатынын тексеріңіз.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Резолверлер жауаптарды қолдан жасай алмауы үшін туннельде шифрланған DNS (DoT немесе DoH) пайдаланыңыз.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Алдымен VPN желісіне қосылыңыз, содан кейін ағып кетуді тексеріңіз.';
 
   @override
   String get dnsExpected => 'Күтілетін';
@@ -1568,6 +1639,9 @@ class SKk extends S {
   String get leakTestCancel => 'Болдырмау';
 
   @override
+  String get leakTestNeedsConnection => 'Деректердің ағып кетуін тексеру үшін VPN желісіне қосылыңыз.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Тестілеу аяқталды: $count';
   }
@@ -1591,6 +1665,9 @@ class SKk extends S {
 
   @override
   String get leakTestFix => 'Түзету';
+
+  @override
+  String get leakTestFixedNote => 'Желі бұғаттауы қосулы. Тексеру үшін сынақты қайта іске қосыңыз.';
 
   @override
   String get leakTestCheckDirectDns => 'Тікелей DNS';

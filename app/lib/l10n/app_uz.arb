@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Avtomatik",
+  "dnsHint": "Manzillar, vergul bilan ajratilgan",
   "fragment": "TLS parchalanishi",
   "fragmentPackets": "Nimani ajratish kerak",
   "fragmentLength": "Parcha o'lchami",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Bildirishnomalar yoʻq",
   "retryConnect": "Qayta ulanishni sinab ko'ring",
   "openLogs": "Jurnallarni oching",
+  "tourReplay": "Yo‘riqnomani yana ko‘rsatish",
+  "tourStep": "{step}/5 qadam",
   "tourBack": "Orqaga",
   "tourNext": "Keyingisi",
+  "tourSkip": "Oʻtkazib yuborish",
+  "tourFinish": "Bajarildi",
+  "tourAdd": "Provayderingizning obuna havolasini qo'shing.",
+  "tourServer": "Serverni tanlang. “Eng tez” siz uchun birini tanlaydi.",
+  "tourConnect": "Ulanish yoki uzish uchun shu yerni bosing.",
+  "tourMode": "Tartibni tanlang. Agar VPN tushib qolsa, o'chirish kaliti internetni bloklaydi.",
+  "tourSettings": "Sozlamalarni oching. Siz ushbu qo'llanmani u erda takrorlashingiz mumkin.",
   "chooseProgram": "Dasturni tanlang",
   "installedApps": "O'rnatilgan ilovalar",
   "runningProcesses": "Ishlayotgan jarayonlar",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Relizda hech qanday eslatma yo'q.",
   "updateDropWarning": "Yangilash uchun ulanish uzilsinmi?",
   "updateWaitConnection": "Ulanish tayyor emas",
+  "updateDownloading": "Fayllar yuklab olinmoqda va tekshirilmoqda...",
+  "updateInstalling": "Yangilanish tayyorlanmoqda yoki administrator autentifikatsiyasi kutilmoqda...",
   "updateNetworkError": "Yangilanishni yuklab boʻlmadi",
   "updateReleaseError": "Chiqarish ma'lumotlari yoki kerakli fayllar etishmayotgan yoki yaroqsiz.",
   "updateChecksumError": "Yuklab olish SHA256SUMSga mos kelmaydi",
   "updateInstallError": "Yangilash tugamadi",
   "updateUnsupported": "Bu bajariladigan fayl qoʻllab-quvvatlanadigan Sora paketlar juftligiga tegishli emas",
+  "updateManual": "Ikkala tasdiqlangan paketni o'rnatish uchun ushbu buyruqni terminalda ishga tushiring, so'ngra Sora ni qayta oching. Fayllar yuklab olish katalogida qoladi. VPN ulanishi uziladi.",
   "updateCopyCommand": "Nusxa ko'chirish buyrug'i",
+  "updateChecksDisabled": "Avtomatik tekshirish sozlamalarida o'chirib qo'yilgan.",
   "updateInstalled": "Yangilash oʻrnatildi",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Ma'lumotlar sizib chiqishi uchun sinov",
   "leakTestRun": "Tekshiring",
   "leakTestCancel": "Bekor qilish",
+  "leakTestNeedsConnection": "Ma'lumotlar sizib chiqishini tekshirish uchun VPN ga ulaning.",
   "leakTestProgress": "Testlar yakunlandi: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Tuzatish",
+  "leakTestFixedNote": "Tarmoq qulfi yoqilgan. Tekshirish uchun sinovni qayta ishga tushiring.",
   "leakTestCheckDirectDns": "Toʻgʻridan-toʻgʻri DNS",
   "leakTestCheckIcmpEcho": "ICMP aks-sado",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Ishlab chiquvchi ushbu versiyani bekor qildi",
+  "updateRolloutPending": "Yangiroq versiya asta-sekin chiqarilmoqda va sizga avtomatik ravishda taklif qilinadi.",
   "updateRollbacking": "{version} versiyasiga qaytarilmoqda...",
   "updateRolledBack": "{version} yangilanishi ishlash tekshiruvidan oʻtmadi, shuning uchun Sora {fromVersion} versiyasiga qaytarildi.",
   "updateRollbackError": "Avtomatik orqaga qaytarish amalga oshmadi",
@@ -722,6 +746,7 @@
   "qrShareTitle": "QR kodini ulashing",
   "qrScanTitle": "QR kodini skanerlang",
   "qrCopyLink": "Havolani nusxalash",
+  "qrWarning": "Kodni faqat ishonchli odamlarga ko‘rsating.",
   "qrFromClipboard": "Buferdan joylashtirish",
   "qrNoCode": "Bu rasmda QR kod topilmadi.",
   "qrInvalid": "Ushbu QR kodida yaroqli havola mavjud emas.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Tunnelning DNS nom yechuvchilari",
   "dnsLeakCheckSystemResolvers": "Tizim nom yechuvchilari",
   "dnsLeakCheckKillSwitchDns": "Tarmoq qulfi orqali DNS himoyasi",
+  "dnsLeakFixConfigureTunnelDns": "Yuqoridagi DNS sozlamalarida tunnel uchun DNS ni sozlang.",
+  "dnsLeakFixReviewSystemResolvers": "Tizim tunnel tashqarisida qaysi nom yechuvchilardan foydalanishini tekshiring.",
+  "dnsLeakFixEnableKillSwitch": "DNS trafigi tunnelda qolishi uchun tarmoq qulfini yoqing.",
   "dnsLeakCheckEncryptedDns": "Tizimning shifrlangan DNS xizmati",
   "dnsLeakCheckDnsSpoof": "Soxta DNS javoblar",
+  "dnsLeakFixReviewEncryptedDns": "Tizimingiz tunneldan tashqarida qaysi shifrlangan DNS so‘nggi nuqtalardan foydalanishini tekshiring.",
+  "dnsLeakFixUseEncryptedDns": "Nom yechuvchilar javoblarni soxtalashtira olmasligi uchun tunnelda shifrlangan DNS (DoT yoki DoH) ishlating.",
+  "dnsCheckNeedsConnection": "Avval VPN ga ulaning, keyin sizib chiqmasligini tekshiring.",
   "dnsExpected": "kutilmoqda",
   "dnsActual": "Kuzatilgan",
   "measureSpeed": "Tezlikni o'lchash",

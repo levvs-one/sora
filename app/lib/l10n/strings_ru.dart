@@ -331,6 +331,9 @@ class SRu extends S {
   String get dnsAuto => 'Авто';
 
   @override
+  String get dnsHint => 'Адреса через запятую';
+
+  @override
   String get fragment => 'Фрагментация TLS';
 
   @override
@@ -632,10 +635,39 @@ class SRu extends S {
   String get openLogs => 'Открыть логи';
 
   @override
+  String get tourReplay => 'Показать гайд снова';
+
+  @override
+  String tourStep(int step) {
+    return 'Шаг $step из 5';
+  }
+
+  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далее';
+
+  @override
+  String get tourSkip => 'Пропустить';
+
+  @override
+  String get tourFinish => 'Готово';
+
+  @override
+  String get tourAdd => 'Добавьте ссылку на подписку от провайдера.';
+
+  @override
+  String get tourServer => 'Выберите сервер. «Самый быстрый» подберёт его за вас.';
+
+  @override
+  String get tourConnect => 'Нажмите здесь, чтобы подключиться или отключиться.';
+
+  @override
+  String get tourMode => 'Выберите режим. Kill switch блокирует интернет при обрыве VPN.';
+
+  @override
+  String get tourSettings => 'Откройте настройки. Здесь можно показать гайд снова.';
 
   @override
   String get chooseProgram => 'Выбрать программу';
@@ -720,6 +752,12 @@ class SRu extends S {
   String get updateWaitConnection => 'Подключение ещё не готово';
 
   @override
+  String get updateDownloading => 'Скачиваем и проверяем файлы...';
+
+  @override
+  String get updateInstalling => 'Подготовка обновления или ожидание пароля администратора...';
+
+  @override
   String get updateNetworkError => 'Не удалось скачать обновление';
 
   @override
@@ -735,7 +773,14 @@ class SRu extends S {
   String get updateUnsupported => 'Этот файл приложения не принадлежит поддерживаемой паре пакетов Sora';
 
   @override
+  String get updateManual =>
+      'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.';
+
+  @override
   String get updateVersionRevoked => 'Эта версия отозвана разработчиком';
+
+  @override
+  String get updateRolloutPending => 'Новая версия распространяется постепенно и будет предложена вам автоматически.';
 
   @override
   String updateRollbacking(String version) {
@@ -756,6 +801,9 @@ class SRu extends S {
 
   @override
   String get updateCopyCommand => 'Скопировать команду';
+
+  @override
+  String get updateChecksDisabled => 'Автоматические проверки отключены в настройках.';
 
   @override
   String get updateInstalled => 'Обновление установлено';
@@ -1193,6 +1241,9 @@ class SRu extends S {
   String get qrCopyLink => 'Скопировать ссылку';
 
   @override
+  String get qrWarning => 'Показывайте код только тем, кому доверяете.';
+
+  @override
   String get qrFromClipboard => 'Вставить из буфера обмена';
 
   @override
@@ -1277,10 +1328,30 @@ class SRu extends S {
   String get dnsLeakCheckKillSwitchDns => 'Kill switch закрывает DNS';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Задайте DNS туннеля в настройках выше.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Проверьте, какие резолверы система использует вне туннеля.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Включите kill switch, чтобы DNS оставался в туннеле.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Зашифрованный DNS системы';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Подмена ответов DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Сначала подключитесь к VPN, затем проверьте утечки.';
 
   @override
   String get dnsExpected => 'Ожидалось';
@@ -1588,6 +1659,9 @@ class SRu extends S {
   String get leakTestCancel => 'Отмена';
 
   @override
+  String get leakTestNeedsConnection => 'Подключитесь, чтобы проверить утечки.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Выполнено тестов: $count';
   }
@@ -1612,6 +1686,9 @@ class SRu extends S {
 
   @override
   String get leakTestFix => 'Исправить';
+
+  @override
+  String get leakTestFixedNote => 'Kill switch включён, запустите проверку снова.';
 
   @override
   String get leakTestCheckDirectDns => 'Прямой DNS';

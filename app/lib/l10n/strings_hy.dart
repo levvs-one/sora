@@ -331,6 +331,9 @@ class SHy extends S {
   String get dnsAuto => 'Ավտոմատ';
 
   @override
+  String get dnsHint => 'Հասցեներ՝ բաժանված ստորակետերով';
+
+  @override
   String get fragment => 'TLS մասնատում';
 
   @override
@@ -630,10 +633,39 @@ class SHy extends S {
   String get openLogs => 'Բացեք տեղեկամատյանները';
 
   @override
+  String get tourReplay => 'Կրկին ցուցադրեք ուղեցույցը';
+
+  @override
+  String tourStep(int step) {
+    return 'Քայլ $step 5-ից';
+  }
+
+  @override
   String get tourBack => 'Ետ';
 
   @override
   String get tourNext => 'Հաջորդը';
+
+  @override
+  String get tourSkip => 'Բաց թողնել';
+
+  @override
+  String get tourFinish => 'Կատարված է';
+
+  @override
+  String get tourAdd => 'Ավելացրեք ձեր մատակարարի բաժանորդագրության հղումը:';
+
+  @override
+  String get tourServer => 'Ընտրեք սերվեր: «Ամենաարագ»-ը ձեզ համար ընտրում է մեկը:';
+
+  @override
+  String get tourConnect => 'Սեղմեք այստեղ՝ միանալու կամ անջատելու համար:';
+
+  @override
+  String get tourMode => 'Ընտրեք ռեժիմ: Kill switch-ը արգելափակում է ինտերնետը, եթե VPN-ն ընկնի։';
+
+  @override
+  String get tourSettings => 'Բացեք կարգավորումները: Դուք կարող եք վերարտադրել այս ուղեցույցը այնտեղ:';
 
   @override
   String get chooseProgram => 'Ընտրեք ծրագիր';
@@ -718,6 +750,12 @@ class SHy extends S {
   String get updateWaitConnection => 'Կապը պատրաստ չէ';
 
   @override
+  String get updateDownloading => 'Ֆայլերի ներբեռնում և հաստատում...';
+
+  @override
+  String get updateInstalling => 'Թարմացումը պատրաստվում է կամ սպասում է ադմինիստրատորի նույնականացմանը...';
+
+  @override
   String get updateNetworkError => 'Չհաջողվեց ներբեռնել թարմացումը';
 
   @override
@@ -733,7 +771,14 @@ class SHy extends S {
   String get updateUnsupported => 'Այս գործարկիչը չի պատկանում աջակցվող Sora փաթեթի զույգին';
 
   @override
+  String get updateManual =>
+      'Գործարկեք այս հրամանը տերմինալում՝ երկու ստուգված փաթեթները տեղադրելու համար, այնուհետև նորից բացեք Sora: Ֆայլերը մնում են ներբեռնման գրացուցակում: VPN կապը կդադարի:';
+
+  @override
   String get updateVersionRevoked => 'Մշակողը հանել է այս տարբերակը';
+
+  @override
+  String get updateRolloutPending => 'Ավելի նոր տարբերակ է տարածվում աստիճանաբար և ավտոմատ կերպով կառաջարկվի ձեզ:';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class SHy extends S {
 
   @override
   String get updateCopyCommand => 'Պատճենել հրամանը';
+
+  @override
+  String get updateChecksDisabled => 'Ավտոմատ ստուգումները անջատված են Կարգավորումներում:';
 
   @override
   String get updateInstalled => 'Տեղադրված է թարմացում';
@@ -1179,6 +1227,9 @@ class SHy extends S {
   String get qrCopyLink => 'Պատճենել հղումը';
 
   @override
+  String get qrWarning => 'Կոդը ցույց տվեք միայն վստահելի մարդկանց։';
+
+  @override
   String get qrFromClipboard => 'Կպցնել սեղմատախտակից';
 
   @override
@@ -1257,10 +1308,30 @@ class SHy extends S {
   String get dnsLeakCheckKillSwitchDns => 'DNS-ի պաշտպանություն ցանցի արգելափակմամբ';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Կազմաձևեք DNS թունելի համար վերը նշված DNS կարգավորումներում:';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Ստուգեք, թե որ լուծիչները կօգտագործի ձեր համակարգը թունելից դուրս:';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Միացրեք ցանցի արգելափակումը, որպեսզի DNS տրաֆիկը մնա թունելի ներսում։';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Համակարգի գաղտնագրված DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Կեղծված DNS պատասխաններ';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Ստուգեք, թե որ կոդավորված DNS վերջնակետերն է օգտագործում ձեր համակարգը թունելից դուրս:';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Թունելի համար օգտագործեք գաղտնագրված DNS (DoT կամ DoH), որպեսզի անվան լուծիչները չկարողանան կեղծել պատասխանները։';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Նախ միացեք VPN-ին, ապա ստուգեք արտահոսքի համար:';
 
   @override
   String get dnsExpected => 'Ակնկալվում էր';
@@ -1568,6 +1639,9 @@ class SHy extends S {
   String get leakTestCancel => 'Չեղարկել';
 
   @override
+  String get leakTestNeedsConnection => 'Միացեք VPN-ին՝ տվյալների արտահոսքի ստուգման համար:';
+
+  @override
   String leakTestProgress(int count) {
     return 'Կատարված թեստեր՝ $count';
   }
@@ -1591,6 +1665,9 @@ class SHy extends S {
 
   @override
   String get leakTestFix => 'Ամրագրել';
+
+  @override
+  String get leakTestFixedNote => 'Ցանցի արգելափակումը միացված է։ Ստուգելու համար կրկին գործարկեք թեստը։';
 
   @override
   String get leakTestCheckDirectDns => 'Ուղիղ DNS';

@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Auto",
+  "dnsHint": "Adresses, séparées par des virgules",
   "fragment": "Fragmentation TLS",
   "fragmentPackets": "Que diviser",
   "fragmentLength": "Taille de la pièce",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Aucune notification",
   "retryConnect": "Réessayer la connexion",
   "openLogs": "Journaux ouverts",
+  "tourReplay": "Afficher à nouveau le guide",
+  "tourStep": "Étape {step} sur 5",
   "tourBack": "Dos",
   "tourNext": "Suivante",
+  "tourSkip": "Sauter",
+  "tourFinish": "Fait",
+  "tourAdd": "Ajoutez le lien d'abonnement de votre fournisseur.",
+  "tourServer": "Choisissez un serveur. « Le plus rapide » en sélectionne un pour vous.",
+  "tourConnect": "Cliquez ici pour vous connecter ou vous déconnecter.",
+  "tourMode": "Choisissez un mode. Kill Switch bloque Internet si le VPN tombe.",
+  "tourSettings": "Ouvrez les paramètres. Vous pouvez y rejouer ce guide.",
   "chooseProgram": "Choisissez un programme",
   "installedApps": "Applications installées",
   "runningProcesses": "Processus en cours d'exécution",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Le communiqué ne contient aucune note.",
   "updateDropWarning": "Déconnecter pour mettre à jour ?",
   "updateWaitConnection": "La connexion n’est pas prête",
+  "updateDownloading": "Téléchargement et vérification des fichiers...",
+  "updateInstalling": "Préparation de la mise à jour ou attente de l'authentification de l'administrateur...",
   "updateNetworkError": "Impossible de télécharger la mise à jour",
   "updateReleaseError": "Les données de version ou les fichiers requis sont manquants ou invalides.",
   "updateChecksumError": "Le téléchargement ne correspond pas à SHA256SUMS",
   "updateInstallError": "La mise à jour n'est pas terminée",
   "updateUnsupported": "Cet exécutable n'appartient pas à une paire de packages Sora prise en charge",
+  "updateManual": "Exécutez cette commande dans un terminal pour installer les deux packages vérifiés, puis rouvrez Sora. Les fichiers restent dans le répertoire de téléchargement. La connexion VPN sera interrompue.",
   "updateCopyCommand": "Commande Copier",
+  "updateChecksDisabled": "Les vérifications automatiques sont désactivées dans les paramètres.",
   "updateInstalled": "Mise à jour installée",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Test de fuite de données",
   "leakTestRun": "Vérifier",
   "leakTestCancel": "Annuler",
+  "leakTestNeedsConnection": "Connectez-vous au VPN pour tester les fuites de données.",
   "leakTestProgress": "Tests terminés : {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Correction",
+  "leakTestFixedNote": "Le coupe-circuit est activé. Relancez le test pour vérifier.",
   "leakTestCheckDirectDns": "Direct DNS",
   "leakTestCheckIcmpEcho": "Écho ICMP",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Le développeur a retiré cette version",
+  "updateRolloutPending": "Une version plus récente est déployée progressivement et vous sera proposée automatiquement.",
   "updateRollbacking": "Revenir à la version {version}...",
   "updateRolledBack": "La mise à jour vers {version} n'a pas réussi le contrôle de santé, donc Sora a été restauré vers {fromVersion}.",
   "updateRollbackError": "La restauration automatique a échoué",
@@ -722,6 +746,7 @@
   "qrShareTitle": "Partager le code QR",
   "qrScanTitle": "Scanner le code QR",
   "qrCopyLink": "Copier le lien",
+  "qrWarning": "Ne partagez ce code qu’avec des personnes de confiance.",
   "qrFromClipboard": "Coller depuis le presse-papiers",
   "qrNoCode": "Aucun code QR trouvé dans cette image.",
   "qrInvalid": "Ce code QR ne contient pas de lien valide.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Résolveurs DNS du tunnel",
   "dnsLeakCheckSystemResolvers": "Résolveurs système",
   "dnsLeakCheckKillSwitchDns": "Protection DNS du coupe-circuit",
+  "dnsLeakFixConfigureTunnelDns": "Configurez DNS pour le tunnel dans les paramètres DNS ci-dessus.",
+  "dnsLeakFixReviewSystemResolvers": "Vérifiez quels résolveurs votre système utiliserait en dehors du tunnel.",
+  "dnsLeakFixEnableKillSwitch": "Activez le coupe-circuit pour que le trafic DNS reste dans le tunnel.",
   "dnsLeakCheckEncryptedDns": "DNS chiffré du système",
   "dnsLeakCheckDnsSpoof": "Réponses DNS falsifiées",
+  "dnsLeakFixReviewEncryptedDns": "Vérifiez quels points de terminaison DNS chiffrés votre système utilise en dehors du tunnel.",
+  "dnsLeakFixUseEncryptedDns": "Utilisez un DNS chiffré (DoT ou DoH) pour le tunnel afin que les résolveurs ne puissent pas falsifier les réponses.",
+  "dnsCheckNeedsConnection": "Connectez-vous d'abord au VPN, puis vérifiez s'il y a des fuites.",
   "dnsExpected": "Attendu",
   "dnsActual": "Observé",
   "measureSpeed": "Mesurer la vitesse",

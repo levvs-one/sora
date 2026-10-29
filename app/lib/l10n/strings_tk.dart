@@ -331,6 +331,9 @@ class STk extends S {
   String get dnsAuto => 'Awto';
 
   @override
+  String get dnsHint => 'Salgylar, vergul aýry';
+
+  @override
   String get fragment => 'TLS bölekleri';
 
   @override
@@ -630,10 +633,39 @@ class STk extends S {
   String get openLogs => 'Surnallary açyň';
 
   @override
+  String get tourReplay => 'Guideene-de gollanma görkez';
+
+  @override
+  String tourStep(int step) {
+    return '5-nji ädim $step';
+  }
+
+  @override
   String get tourBack => 'Yzyna';
 
   @override
   String get tourNext => 'Indiki';
+
+  @override
+  String get tourSkip => 'Geçmek';
+
+  @override
+  String get tourFinish => 'Boldy';
+
+  @override
+  String get tourAdd => 'Üpjün edijiňiziň abuna baglanyşygyny goşuň.';
+
+  @override
+  String get tourServer => 'Serwer saýlaň. “Iň çalt” siziň üçin birini saýlaýar.';
+
+  @override
+  String get tourConnect => 'Birikdirmek ýa-da aýyrmak üçin şu ýere basyň.';
+
+  @override
+  String get tourMode => 'Re modeimi saýlaň. VPN düşse, wyklýuçatel interneti bloklaýar.';
+
+  @override
+  String get tourSettings => 'Sazlamalary açyň. Bu gollanmany şol ýerde gaýtadan ulanyp bilersiňiz.';
 
   @override
   String get chooseProgram => 'Programma saýlaň';
@@ -718,6 +750,12 @@ class STk extends S {
   String get updateWaitConnection => 'Birikme taýýar däl';
 
   @override
+  String get updateDownloading => 'Faýllary göçürip almak we barlamak ...';
+
+  @override
+  String get updateInstalling => 'Täzelenmäni taýýarlamak ýa-da administratoryň tassyklanmagyna garaşmak ...';
+
+  @override
   String get updateNetworkError => 'Täzelenmäni göçürip alyp bolmady Gaýtadan synanyşyň';
 
   @override
@@ -733,7 +771,14 @@ class STk extends S {
   String get updateUnsupported => 'Bu ýerine ýetirip boljak, goldanýan Sora paket jübütine degişli däl';
 
   @override
+  String get updateManual =>
+      'Barlanylan paketleri gurmak üçin bu buýrugy terminalda işlediň, soňra Sora açyň. Faýllar göçürip almak katalogynda galýarlar. VPN birikmesi peseler.';
+
+  @override
   String get updateVersionRevoked => 'Dörediji bu wersiýany yzyna aldy';
+
+  @override
+  String get updateRolloutPending => 'Täze wersiýa kem-kemden çykýar we size awtomatiki usulda hödürlener.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class STk extends S {
 
   @override
   String get updateCopyCommand => 'Buýrugy göçüriň';
+
+  @override
+  String get updateChecksDisabled => 'Sazlamalarda awtomatiki barlaglar ýapylýar.';
 
   @override
   String get updateInstalled => 'Täzelenme guruldy Sora açyň';
@@ -1179,6 +1227,9 @@ class STk extends S {
   String get qrCopyLink => 'Baglanyşygy göçüriň';
 
   @override
+  String get qrWarning => 'Kody diňe ynanýan adamlaryňyz bilen paýlaşyň.';
+
+  @override
   String get qrFromClipboard => 'Buferden goýuň';
 
   @override
@@ -1257,10 +1308,29 @@ class STk extends S {
   String get dnsLeakCheckKillSwitchDns => 'Tor gulpynyň DNS goragy';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Ýokardaky DNS sazlamalarynda tuneliň DNS-ini belläň.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Ulgamyňyzyň tunelden daşarda haýsy çözgütleri ulanjakdygyny barlaň.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS trafiginiň tunelde galmagy üçin tor gulpyny açyň.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Ulgamyň şifrlenen DNS-i';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Galp DNS jogaplar';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'Ulgamyň tuneliň daşynda ulanýan haýsy kodlanan DNS nokatlaryny barlaň.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'At çözüjiler jogaplary galplaşdyryp bilmez ýaly, tunelde şifrlenen DNS (DoT ýa-da DoH) ulanyň.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Ilki VPN birikdiriň, soňra syzyşlary barlaň.';
 
   @override
   String get dnsExpected => 'Garaşylýar';
@@ -1568,6 +1638,9 @@ class STk extends S {
   String get leakTestCancel => 'Ýatyr';
 
   @override
+  String get leakTestNeedsConnection => 'Maglumatlaryň syzmagyny barlamak üçin VPN birikdiriň.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Synaglar tamamlandy: $count';
   }
@@ -1591,6 +1664,9 @@ class STk extends S {
 
   @override
   String get leakTestFix => 'düzediň';
+
+  @override
+  String get leakTestFixedNote => 'Tor gulpy açyk. Barlamak üçin synagy gaýtadan işlediň.';
 
   @override
   String get leakTestCheckDirectDns => 'Göni DNS';

@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Ավտոմատ",
+  "dnsHint": "Հասցեներ՝ բաժանված ստորակետերով",
   "fragment": "TLS մասնատում",
   "fragmentPackets": "Ինչ բաժանել",
   "fragmentLength": "Կտորի չափը",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Ծանուցումներ չկան",
   "retryConnect": "Կրկին փորձեք կապը",
   "openLogs": "Բացեք տեղեկամատյանները",
+  "tourReplay": "Կրկին ցուցադրեք ուղեցույցը",
+  "tourStep": "Քայլ {step} 5-ից",
   "tourBack": "Ետ",
   "tourNext": "Հաջորդը",
+  "tourSkip": "Բաց թողնել",
+  "tourFinish": "Կատարված է",
+  "tourAdd": "Ավելացրեք ձեր մատակարարի բաժանորդագրության հղումը:",
+  "tourServer": "Ընտրեք սերվեր: «Ամենաարագ»-ը ձեզ համար ընտրում է մեկը:",
+  "tourConnect": "Սեղմեք այստեղ՝ միանալու կամ անջատելու համար:",
+  "tourMode": "Ընտրեք ռեժիմ: Kill switch-ը արգելափակում է ինտերնետը, եթե VPN-ն ընկնի։",
+  "tourSettings": "Բացեք կարգավորումները: Դուք կարող եք վերարտադրել այս ուղեցույցը այնտեղ:",
   "chooseProgram": "Ընտրեք ծրագիր",
   "installedApps": "Տեղադրված հավելվածներ",
   "runningProcesses": "Գործող գործընթացներ",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Թողարկումը նշումներ չունի:",
   "updateDropWarning": "Անջատե՞լ կապը թարմացնելու համար",
   "updateWaitConnection": "Կապը պատրաստ չէ",
+  "updateDownloading": "Ֆայլերի ներբեռնում և հաստատում...",
+  "updateInstalling": "Թարմացումը պատրաստվում է կամ սպասում է ադմինիստրատորի նույնականացմանը...",
   "updateNetworkError": "Չհաջողվեց ներբեռնել թարմացումը",
   "updateReleaseError": "Թողարկման տվյալները կամ պահանջվող ֆայլերը բացակայում են կամ անվավեր են:",
   "updateChecksumError": "Ներբեռնումը չի համապատասխանում SHA256SUMS-ին",
   "updateInstallError": "Թարմացումը չի ավարտվել",
   "updateUnsupported": "Այս գործարկիչը չի պատկանում աջակցվող Sora փաթեթի զույգին",
+  "updateManual": "Գործարկեք այս հրամանը տերմինալում՝ երկու ստուգված փաթեթները տեղադրելու համար, այնուհետև նորից բացեք Sora: Ֆայլերը մնում են ներբեռնման գրացուցակում: VPN կապը կդադարի:",
   "updateCopyCommand": "Պատճենել հրամանը",
+  "updateChecksDisabled": "Ավտոմատ ստուգումները անջատված են Կարգավորումներում:",
   "updateInstalled": "Տեղադրված է թարմացում",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Տվյալների արտահոսքի ստուգում",
   "leakTestRun": "Ստուգեք",
   "leakTestCancel": "Չեղարկել",
+  "leakTestNeedsConnection": "Միացեք VPN-ին՝ տվյալների արտահոսքի ստուգման համար:",
   "leakTestProgress": "Կատարված թեստեր՝ {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Ամրագրել",
+  "leakTestFixedNote": "Ցանցի արգելափակումը միացված է։ Ստուգելու համար կրկին գործարկեք թեստը։",
   "leakTestCheckDirectDns": "Ուղիղ DNS",
   "leakTestCheckIcmpEcho": "ICMP արձագանք",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Մշակողը հանել է այս տարբերակը",
+  "updateRolloutPending": "Ավելի նոր տարբերակ է տարածվում աստիճանաբար և ավտոմատ կերպով կառաջարկվի ձեզ:",
   "updateRollbacking": "Վերադառնալ {version} տարբերակին...",
   "updateRolledBack": "{version}-ի թարմացումը չի անցել առողջության ստուգումը, ուստի Sora-ը հետ է վերադարձվել {fromVersion}:",
   "updateRollbackError": "Ավտոմատ հետ վերադարձը ձախողվեց",
@@ -722,6 +746,7 @@
   "qrShareTitle": "Համօգտագործեք QR կոդը",
   "qrScanTitle": "Սկան QR կոդը",
   "qrCopyLink": "Պատճենել հղումը",
+  "qrWarning": "Կոդը ցույց տվեք միայն վստահելի մարդկանց։",
   "qrFromClipboard": "Կպցնել սեղմատախտակից",
   "qrNoCode": "Այս պատկերում QR կոդ չի գտնվել։",
   "qrInvalid": "Այս QR կոդը վավեր հղում չի պարունակում:",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Թունելի DNS լուծիչներ",
   "dnsLeakCheckSystemResolvers": "Համակարգային անվան լուծիչներ",
   "dnsLeakCheckKillSwitchDns": "DNS-ի պաշտպանություն ցանցի արգելափակմամբ",
+  "dnsLeakFixConfigureTunnelDns": "Կազմաձևեք DNS թունելի համար վերը նշված DNS կարգավորումներում:",
+  "dnsLeakFixReviewSystemResolvers": "Ստուգեք, թե որ լուծիչները կօգտագործի ձեր համակարգը թունելից դուրս:",
+  "dnsLeakFixEnableKillSwitch": "Միացրեք ցանցի արգելափակումը, որպեսզի DNS տրաֆիկը մնա թունելի ներսում։",
   "dnsLeakCheckEncryptedDns": "Համակարգի գաղտնագրված DNS",
   "dnsLeakCheckDnsSpoof": "Կեղծված DNS պատասխաններ",
+  "dnsLeakFixReviewEncryptedDns": "Ստուգեք, թե որ կոդավորված DNS վերջնակետերն է օգտագործում ձեր համակարգը թունելից դուրս:",
+  "dnsLeakFixUseEncryptedDns": "Թունելի համար օգտագործեք գաղտնագրված DNS (DoT կամ DoH), որպեսզի անվան լուծիչները չկարողանան կեղծել պատասխանները։",
+  "dnsCheckNeedsConnection": "Նախ միացեք VPN-ին, ապա ստուգեք արտահոսքի համար:",
   "dnsExpected": "Ակնկալվում էր",
   "dnsActual": "Դիտարկված",
   "measureSpeed": "Չափել արագությունը",

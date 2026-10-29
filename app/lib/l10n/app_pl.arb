@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Automatyczny",
+  "dnsHint": "Adresy, oddzielone przecinkami",
   "fragment": "Fragmentacja TLS",
   "fragmentPackets": "Co podzielić",
   "fragmentLength": "Rozmiar kawałka",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Brak powiadomień",
   "retryConnect": "Ponów próbę połączenia",
   "openLogs": "Otwórz logi",
+  "tourReplay": "Pokaż przewodnik ponownie",
+  "tourStep": "Krok {step} z 5",
   "tourBack": "Z powrotem",
   "tourNext": "Następny",
+  "tourSkip": "Pominąć",
+  "tourFinish": "Zrobione",
+  "tourAdd": "Dodaj link do subskrypcji swojego dostawcy.",
+  "tourServer": "Wybierz serwer. „Najszybszy” wybierze jeden za Ciebie.",
+  "tourConnect": "Kliknij tutaj, aby połączyć lub rozłączyć.",
+  "tourMode": "Wybierz tryb. Przełącznik Kill blokuje Internet, jeśli VPN spadnie.",
+  "tourSettings": "Otwórz ustawienia. Możesz tam odtworzyć ten przewodnik.",
   "chooseProgram": "Wybierz program",
   "installedApps": "Zainstalowane aplikacje",
   "runningProcesses": "Uruchomione procesy",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Wydanie nie posiada żadnych notatek.",
   "updateDropWarning": "Rozłączyć, aby zaktualizować?",
   "updateWaitConnection": "Połączenie nie jest gotowe",
+  "updateDownloading": "Pobieranie i weryfikacja plików...",
+  "updateInstalling": "Przygotowywanie aktualizacji lub oczekiwanie na autoryzację administratora...",
   "updateNetworkError": "Nie można pobrać aktualizacji",
   "updateReleaseError": "Brakuje danych wersji lub wymaganych plików lub są one nieprawidłowe.",
   "updateChecksumError": "Pobieranie nie jest zgodne z SHA256SUMS",
   "updateInstallError": "Aktualizacja nie została zakończona",
   "updateUnsupported": "Ten plik wykonywalny nie jest własnością obsługiwanej pary pakietów Sora",
+  "updateManual": "Uruchom to polecenie w terminalu, aby zainstalować oba zweryfikowane pakiety, a następnie otwórz ponownie Sora. Pliki pozostają w katalogu pobierania. Połączenie VPN zostanie zerwane.",
   "updateCopyCommand": "Kopiuj polecenie",
+  "updateChecksDisabled": "Automatyczne sprawdzanie jest wyłączone w Ustawieniach.",
   "updateInstalled": "Aktualizacja zainstalowana",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Test pod kątem wycieków danych",
   "leakTestRun": "Sprawdź",
   "leakTestCancel": "Anuluj",
+  "leakTestNeedsConnection": "Połącz się z VPN, aby przetestować wycieki danych.",
   "leakTestProgress": "Ukończone testy: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Poprawka",
+  "leakTestFixedNote": "Blokada sieci jest włączona. Uruchom test ponownie, aby to sprawdzić.",
   "leakTestCheckDirectDns": "Bezpośrednio DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Deweloper wycofał tę wersję",
+  "updateRolloutPending": "Nowsza wersja jest wprowadzana stopniowo i będzie oferowana automatycznie.",
   "updateRollbacking": "Wycofywanie do wersji {version}...",
   "updateRolledBack": "Aktualizacja {version} nie przeszła kontroli stanu, więc Sora została przywrócona do {fromVersion}.",
   "updateRollbackError": "Automatyczne przywracanie nie powiodło się",
@@ -722,6 +746,7 @@
   "qrShareTitle": "Udostępnij kod QR",
   "qrScanTitle": "Zeskanuj kod QR",
   "qrCopyLink": "Skopiuj link",
+  "qrWarning": "Udostępniaj kod tylko zaufanym osobom.",
   "qrFromClipboard": "Wklej ze schowka",
   "qrNoCode": "Na tym obrazie nie znaleziono kodu QR.",
   "qrInvalid": "Ten kod QR nie zawiera prawidłowego łącza.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Resolwery DNS tunelu",
   "dnsLeakCheckSystemResolvers": "Systemowe resolwery",
   "dnsLeakCheckKillSwitchDns": "Ochrona DNS przez blokadę sieci",
+  "dnsLeakFixConfigureTunnelDns": "Skonfiguruj DNS dla tunelu w ustawieniach DNS powyżej.",
+  "dnsLeakFixReviewSystemResolvers": "Sprawdź, jakich algorytmów rozpoznawania nazw Twój system użyłby poza tunelem.",
+  "dnsLeakFixEnableKillSwitch": "Włącz blokadę sieci, aby ruch DNS pozostał w tunelu.",
   "dnsLeakCheckEncryptedDns": "Szyfrowany DNS systemu",
   "dnsLeakCheckDnsSpoof": "Sfałszowane odpowiedzi DNS",
+  "dnsLeakFixReviewEncryptedDns": "Sprawdź, jakich zaszyfrowanych DNS punktów końcowych używa Twój system poza tunelem.",
+  "dnsLeakFixUseEncryptedDns": "Użyj zaszyfrowanego DNS (DoT lub DoH) dla tunelu, aby mechanizmy rozpoznawania nazw nie mogły sfałszować odpowiedzi.",
+  "dnsCheckNeedsConnection": "Najpierw podłącz do VPN, a następnie sprawdź, czy nie ma wycieków.",
   "dnsExpected": "Oczekiwano",
   "dnsActual": "Zaobserwowano",
   "measureSpeed": "Zmierz prędkość",

@@ -97,6 +97,7 @@
   "ipv6": "आईपीवी6",
   "dns": "डीएनएस",
   "dnsAuto": "ऑटो",
+  "dnsHint": "पते, अल्पविराम से अलग",
   "fragment": "टीएलएस विखंडन",
   "fragmentPackets": "क्या बांटना है",
   "fragmentLength": "टुकड़े का आकार",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "कोई सूचना नहीं",
   "retryConnect": "कनेक्शन पुनः प्रयास करें",
   "openLogs": "लॉग खोलें",
+  "tourReplay": "गाइड फिर से दिखाएँ",
+  "tourStep": "5 का चरण {step}",
   "tourBack": "पीछे",
   "tourNext": "अगला",
+  "tourSkip": "छोडना",
+  "tourFinish": "हो गया",
+  "tourAdd": "अपने प्रदाता का सदस्यता लिंक जोड़ें.",
+  "tourServer": "एक सर्वर चुनें. \"सबसे तेज़\" आपके लिए एक का चयन करता है।",
+  "tourConnect": "कनेक्ट या डिस्कनेक्ट करने के लिए यहां क्लिक करें.",
+  "tourMode": "एक मोड चुनें. यदि वीपीएन बंद हो जाए तो किल स्विच इंटरनेट को ब्लॉक कर देता है।",
+  "tourSettings": "खुली सेटिंग। आप वहां इस गाइड को दोबारा चला सकते हैं।",
   "chooseProgram": "एक प्रोग्राम चुनें",
   "installedApps": "इंस्टॉल किए गए एप्लिकेशन",
   "runningProcesses": "चल रही प्रक्रियाएँ",
@@ -213,12 +223,16 @@
   "updateNoNotes": "रिलीज़ में कोई नोट नहीं है.",
   "updateDropWarning": "अपडेट के लिए कनेक्शन तोड़ें?",
   "updateWaitConnection": "कनेक्शन तैयार नहीं है",
+  "updateDownloading": "फ़ाइलें डाउनलोड और सत्यापित की जा रही हैं...",
+  "updateInstalling": "अद्यतन तैयार किया जा रहा है या व्यवस्थापक प्रमाणीकरण की प्रतीक्षा की जा रही है...",
   "updateNetworkError": "अपडेट डाउनलोड नहीं हो सका",
   "updateReleaseError": "रिलीज़ डेटा या आवश्यक फ़ाइलें गुम या अमान्य हैं।",
   "updateChecksumError": "डाउनलोड SHA256SUMS से मेल नहीं खाता",
   "updateInstallError": "अद्यतन समाप्त नहीं हुआ",
   "updateUnsupported": "यह निष्पादन योग्य समर्थित Sora पैकेज जोड़ी के स्वामित्व में नहीं है",
+  "updateManual": "दोनों सत्यापित पैकेजों को स्थापित करने के लिए इस कमांड को टर्मिनल में चलाएँ, फिर Sora को फिर से खोलें। फ़ाइलें डाउनलोड निर्देशिका में रहती हैं। वीपीएन कनेक्शन बंद हो जाएगा.",
   "updateCopyCommand": "आदेश कॉपी करें",
+  "updateChecksDisabled": "सेटिंग्स में स्वचालित जाँच अक्षम हैं।",
   "updateInstalled": "अद्यतन स्थापित किया गया",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "डेटा लीक के लिए परीक्षण",
   "leakTestRun": "जांचें",
   "leakTestCancel": "रद्द करें",
+  "leakTestNeedsConnection": "डेटा लीक की जांच के लिए VPN से कनेक्ट करें।",
   "leakTestProgress": "परीक्षण पूर्ण: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "ठीक करें",
+  "leakTestFixedNote": "नेटवर्क अवरोध चालू है। पुष्टि के लिए दोबारा जाँचें।",
   "leakTestCheckDirectDns": "प्रत्यक्ष DNS",
   "leakTestCheckIcmpEcho": "ICMP प्रतिध्वनि",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "डेवलपर ने इस संस्करण को वापस ले लिया है",
+  "updateRolloutPending": "एक नया संस्करण धीरे-धीरे जारी किया जा रहा है और आपको स्वचालित रूप से पेश किया जाएगा।",
   "updateRollbacking": "संस्करण {version}... पर वापस जा रहा हूं",
   "updateRolledBack": "{version} का अपडेट स्वास्थ्य जांच में खरा नहीं उतरा, इसलिए Sora को वापस {fromVersion} पर रोल कर दिया गया।",
   "updateRollbackError": "स्वचालित रोलबैक विफल रहा",
@@ -722,6 +746,7 @@
   "qrShareTitle": "QR कोड साझा करें",
   "qrScanTitle": "QR कोड स्कैन करें",
   "qrCopyLink": "लिंक कॉपी करें",
+  "qrWarning": "यह कोड केवल भरोसेमंद लोगों को दिखाएँ।",
   "qrFromClipboard": "क्लिपबोर्ड से चिपकाएँ",
   "qrNoCode": "इस छवि में कोई QR कोड नहीं मिला।",
   "qrInvalid": "इस QR कोड में कोई वैध लिंक नहीं है।",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "टनल के DNS रिज़ॉल्वर",
   "dnsLeakCheckSystemResolvers": "सिस्टम रिज़ॉल्वर",
   "dnsLeakCheckKillSwitchDns": "नेटवर्क अवरोध से DNS सुरक्षा",
+  "dnsLeakFixConfigureTunnelDns": "उपरोक्त DNS सेटिंग्स में सुरंग के लिए DNS कॉन्फ़िगर करें।",
+  "dnsLeakFixReviewSystemResolvers": "जांचें कि आपका सिस्टम सुरंग के बाहर कौन से रिज़ॉल्वर का उपयोग करेगा।",
+  "dnsLeakFixEnableKillSwitch": "DNS ट्रैफ़िक को टनल के अंदर रखने के लिए नेटवर्क अवरोध चालू करें।",
   "dnsLeakCheckEncryptedDns": "सिस्टम का एन्क्रिप्टेड DNS",
   "dnsLeakCheckDnsSpoof": "DNS जवाबों की जालसाज़ी",
+  "dnsLeakFixReviewEncryptedDns": "जांचें कि आपका सिस्टम सुरंग के बाहर किस एन्क्रिप्टेड DNS एंडपॉइंट का उपयोग करता है।",
+  "dnsLeakFixUseEncryptedDns": "सुरंग के लिए एन्क्रिप्टेड DNS (DoT या DoH) का उपयोग करें ताकि रिज़ॉल्वर नकली उत्तर न दे सकें।",
+  "dnsCheckNeedsConnection": "पहले VPN से कनेक्ट करें, फिर लीक की जांच करें।",
   "dnsExpected": "अपेक्षित",
   "dnsActual": "अवलोकन किया गया",
   "measureSpeed": "गति मापें",

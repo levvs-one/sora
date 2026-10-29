@@ -331,6 +331,9 @@ class SUk extends S {
   String get dnsAuto => 'Авто';
 
   @override
+  String get dnsHint => 'Адреси, розділені комами';
+
+  @override
   String get fragment => 'TLS фрагментація';
 
   @override
@@ -630,10 +633,39 @@ class SUk extends S {
   String get openLogs => 'Відкриті журнали';
 
   @override
+  String get tourReplay => 'Знову показати посібник';
+
+  @override
+  String tourStep(int step) {
+    return 'Крок $step із 5';
+  }
+
+  @override
   String get tourBack => 'Назад';
 
   @override
   String get tourNext => 'Далі';
+
+  @override
+  String get tourSkip => 'Пропустити';
+
+  @override
+  String get tourFinish => 'Готово';
+
+  @override
+  String get tourAdd => 'Додайте посилання на підписку вашого постачальника.';
+
+  @override
+  String get tourServer => 'Виберіть сервер. «Найшвидший» вибере для вас один.';
+
+  @override
+  String get tourConnect => 'Натисніть тут, щоб підключитися або відключитися.';
+
+  @override
+  String get tourMode => 'Виберіть режим. Kill Switch блокує Інтернет, якщо VPN переривається.';
+
+  @override
+  String get tourSettings => 'Відкрийте налаштування. Ви можете відтворити цей посібник там.';
 
   @override
   String get chooseProgram => 'Виберіть програму';
@@ -718,6 +750,12 @@ class SUk extends S {
   String get updateWaitConnection => 'З’єднання ще не готове';
 
   @override
+  String get updateDownloading => 'Завантаження та перевірка файлів...';
+
+  @override
+  String get updateInstalling => 'Підготовка оновлення або очікування автентифікації адміністратора...';
+
+  @override
   String get updateNetworkError => 'Не вдалося завантажити оновлення';
 
   @override
@@ -733,7 +771,14 @@ class SUk extends S {
   String get updateUnsupported => 'Цей виконуваний файл не належить підтримуваній парі пакетів Sora';
 
   @override
+  String get updateManual =>
+      'Виконайте цю команду в терміналі, щоб інсталювати обидва перевірені пакети, а потім повторно відкрийте Sora. Файли залишаються в каталозі завантаження. З’єднання VPN припиниться.';
+
+  @override
   String get updateVersionRevoked => 'Розробник відкликав цю версію';
+
+  @override
+  String get updateRolloutPending => 'Поступово розгортається новіша версія, яка буде запропонована вам автоматично.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class SUk extends S {
 
   @override
   String get updateCopyCommand => 'Копіювати команду';
+
+  @override
+  String get updateChecksDisabled => 'Автоматичні перевірки вимкнено в налаштуваннях.';
 
   @override
   String get updateInstalled => 'Оновлення встановлено';
@@ -1193,6 +1241,9 @@ class SUk extends S {
   String get qrCopyLink => 'Копіювати посилання';
 
   @override
+  String get qrWarning => 'Показуйте код лише тим, кому довіряєте.';
+
+  @override
   String get qrFromClipboard => 'Вставити з буфера обміну';
 
   @override
@@ -1278,10 +1329,30 @@ class SUk extends S {
   String get dnsLeakCheckKillSwitchDns => 'Захист DNS через kill switch';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Налаштуйте DNS для тунелю в налаштуваннях DNS вище.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Перевірте, які резолвери ваша система використовуватиме поза тунелем.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Увімкніть kill switch, щоб трафік DNS залишався в тунелі.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Зашифрований DNS системи';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Підроблені відповіді DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Перевірте, які зашифровані кінцеві точки DNS використовує ваша система поза тунелем.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Використовуйте зашифрований DNS (DoT або DoH) для тунелю, щоб резолвери не могли підробити відповіді.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Спочатку підключіться до VPN, а потім перевірте наявність витоків.';
 
   @override
   String get dnsExpected => 'Очікується';
@@ -1589,6 +1660,9 @@ class SUk extends S {
   String get leakTestCancel => 'Скасувати';
 
   @override
+  String get leakTestNeedsConnection => 'Підключіться до VPN, щоб перевірити наявність витоку даних.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Тести завершено: $count';
   }
@@ -1614,6 +1688,9 @@ class SUk extends S {
 
   @override
   String get leakTestFix => 'Виправити';
+
+  @override
+  String get leakTestFixedNote => 'Kill switch увімкнено. Повторіть перевірку.';
 
   @override
   String get leakTestCheckDirectDns => 'Прямий DNS';

@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "ავტო",
+  "dnsHint": "მისამართები, მძიმით გამოყოფილი",
   "fragment": "TLS ფრაგმენტაცია",
   "fragmentPackets": "რა უნდა გაიყოს",
   "fragmentLength": "ცალი ზომა",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "შეტყობინებები არ არის",
   "retryConnect": "ხელახლა სცადეთ კავშირი",
   "openLogs": "გახსენით ჟურნალები",
+  "tourReplay": "ხელახლა აჩვენე სახელმძღვანელო",
+  "tourStep": "ნაბიჯი {step} 5-დან",
   "tourBack": "უკან",
   "tourNext": "შემდეგი",
+  "tourSkip": "გამოტოვება",
+  "tourFinish": "შესრულებულია",
+  "tourAdd": "დაამატეთ თქვენი პროვაიდერის გამოწერის ბმული.",
+  "tourServer": "აირჩიეთ სერვერი. „უსწრაფესი“ ირჩევს ერთს თქვენთვის.",
+  "tourConnect": "დააწკაპუნეთ აქ დასაკავშირებლად ან გასათიშად.",
+  "tourMode": "აირჩიეთ რეჟიმი. Kill switch ბლოკავს ინტერნეტს, თუ VPN ჩამოვარდება.",
+  "tourSettings": "გახსენით პარამეტრები. თქვენ შეგიძლიათ გაიმეოროთ ეს სახელმძღვანელო იქ.",
   "chooseProgram": "აირჩიეთ პროგრამა",
   "installedApps": "დაინსტალირებული აპლიკაციები",
   "runningProcesses": "მიმდინარე პროცესები",
@@ -213,12 +223,16 @@
   "updateNoNotes": "გამოცემას არ აქვს შენიშვნები.",
   "updateDropWarning": "გაითიშოს კავშირი განახლებისთვის?",
   "updateWaitConnection": "კავშირი მზად არ არის",
+  "updateDownloading": "მიმდინარეობს ფაილების ჩამოტვირთვა და დადასტურება...",
+  "updateInstalling": "განახლების მომზადება ან ადმინისტრატორის ავტორიზაციის მოლოდინში...",
   "updateNetworkError": "განახლების ჩამოტვირთვა ვერ მოხერხდა",
   "updateReleaseError": "გამოშვების მონაცემები ან საჭირო ფაილები აკლია ან არასწორია.",
   "updateChecksumError": "ჩამოტვირთვა არ ემთხვევა SHA256SUMS",
   "updateInstallError": "განახლება არ დასრულებულა",
   "updateUnsupported": "ეს შესრულებადი არ ეკუთვნის მხარდაჭერილ Sora პაკეტის წყვილს",
+  "updateManual": "გაუშვით ეს ბრძანება ტერმინალში ორივე დამოწმებული პაკეტის დასაყენებლად, შემდეგ ხელახლა გახსენით Sora. ფაილები რჩება ჩამოტვირთვის დირექტორიაში. VPN კავშირი შეწყდება.",
   "updateCopyCommand": "დააკოპირეთ ბრძანება",
+  "updateChecksDisabled": "ავტომატური შემოწმება გამორთულია პარამეტრებში.",
   "updateInstalled": "დაინსტალირებულია განახლება",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "ტესტი მონაცემთა გაჟონვისთვის",
   "leakTestRun": "შეამოწმეთ",
   "leakTestCancel": "გაუქმება",
+  "leakTestNeedsConnection": "დაუკავშირდით VPN-ს მონაცემთა გაჟონვის შესამოწმებლად.",
   "leakTestProgress": "დასრულებული ტესტები: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "დაფიქსირება",
+  "leakTestFixedNote": "ქსელის ბლოკირება ჩართულია. შესამოწმებლად ტესტი ხელახლა გაუშვით.",
   "leakTestCheckDirectDns": "პირდაპირი DNS",
   "leakTestCheckIcmpEcho": "ICMP ექო",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "დეველოპერმა გააუქმა ეს ვერსია",
+  "updateRolloutPending": "უფრო ახალი ვერსია გამოდის თანდათანობით და შემოგთავაზებთ ავტომატურად.",
   "updateRollbacking": "დაბრუნება ვერსიაზე {version}...",
   "updateRolledBack": "{version}-ის განახლებამ ვერ გაიარა ჯანმრთელობის შემოწმება, ამიტომ Sora დაბრუნდა {fromVersion}-ზე.",
   "updateRollbackError": "ავტომატური დაბრუნება ვერ მოხერხდა",
@@ -722,6 +746,7 @@
   "qrShareTitle": "გააზიარეთ QR კოდი",
   "qrScanTitle": "QR კოდის სკანირება",
   "qrCopyLink": "დააკოპირეთ ბმული",
+  "qrWarning": "კოდი მხოლოდ სანდო ადამიანებს გაუზიარეთ.",
   "qrFromClipboard": "ჩასმა ბუფერიდან",
   "qrNoCode": "ამ სურათში QR კოდი ვერ მოიძებნა.",
   "qrInvalid": "ეს QR კოდი არ შეიცავს მოქმედ ბმულს.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "გვირაბის DNS რეზოლვერები",
   "dnsLeakCheckSystemResolvers": "სისტემის რეზოლვერები",
   "dnsLeakCheckKillSwitchDns": "DNS-ის დაცვა ქსელის ბლოკირებით",
+  "dnsLeakFixConfigureTunnelDns": "დააკონფიგურირეთ DNS გვირაბისთვის ზემოთ DNS პარამეტრებში.",
+  "dnsLeakFixReviewSystemResolvers": "შეამოწმეთ, რომელ გადამწყვეტებს გამოიყენებდა თქვენი სისტემა გვირაბის გარეთ.",
+  "dnsLeakFixEnableKillSwitch": "ჩართეთ ქსელის ბლოკირება, რათა DNS ტრაფიკი გვირაბში დარჩეს.",
   "dnsLeakCheckEncryptedDns": "სისტემის დაშიფრული DNS",
   "dnsLeakCheckDnsSpoof": "ყალბი DNS პასუხი",
+  "dnsLeakFixReviewEncryptedDns": "შეამოწმეთ, რომელ დაშიფრულ DNS ბოლო წერტილებს იყენებს თქვენი სისტემა გვირაბის გარეთ.",
+  "dnsLeakFixUseEncryptedDns": "გვირაბისთვის გამოიყენეთ დაშიფრული DNS (DoT ან DoH), რათა რეზოლვერებმა პასუხები ვერ გააყალბონ.",
+  "dnsCheckNeedsConnection": "ჯერ დაუკავშირდით VPN-ს, შემდეგ შეამოწმეთ გაჟონვა.",
   "dnsExpected": "მოსალოდნელია",
   "dnsActual": "დაფიქსირდა",
   "measureSpeed": "გაზომეთ სიჩქარე",

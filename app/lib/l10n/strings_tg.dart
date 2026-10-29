@@ -331,6 +331,9 @@ class STg extends S {
   String get dnsAuto => 'Авто';
 
   @override
+  String get dnsHint => 'Суроғаҳо, вергул ҷудо';
+
+  @override
   String get fragment => 'Тақсимоти TLS';
 
   @override
@@ -630,10 +633,39 @@ class STg extends S {
   String get openLogs => 'Сабтҳоро кушоед';
 
   @override
+  String get tourReplay => 'Боз роҳнамо нишон диҳед';
+
+  @override
+  String tourStep(int step) {
+    return 'Қадами $step аз 5';
+  }
+
+  @override
   String get tourBack => 'Бозгашт';
 
   @override
   String get tourNext => 'Баъдӣ';
+
+  @override
+  String get tourSkip => 'Гузаштан';
+
+  @override
+  String get tourFinish => 'Иҷро шуд';
+
+  @override
+  String get tourAdd => 'Истиноди обунаи провайдери худро илова кунед.';
+
+  @override
+  String get tourServer => 'Серверро интихоб кунед. \"Зуртарин\" якеро барои шумо интихоб мекунад.';
+
+  @override
+  String get tourConnect => 'Барои пайваст кардан ё ҷудо кардан ин ҷо клик кунед.';
+
+  @override
+  String get tourMode => 'Режимро интихоб кунед. Агар VPN афтад, коммутаторро блокҳои интернетро кушед.';
+
+  @override
+  String get tourSettings => 'Танзимотҳоро кушоед. Шумо метавонед ин дастурро дар он ҷо такрор кунед.';
 
   @override
   String get chooseProgram => 'Барномаро интихоб кунед';
@@ -718,6 +750,12 @@ class STg extends S {
   String get updateWaitConnection => 'Пайвастшавӣ омода нест';
 
   @override
+  String get updateDownloading => 'Зеркашӣ ва тасдиқи файлҳо...';
+
+  @override
+  String get updateInstalling => 'Омода кардани навсозӣ ё мунтазири аутентификатсияи администратор...';
+
+  @override
   String get updateNetworkError => 'Навсозӣ зеркашӣ карда нашуд';
 
   @override
@@ -733,7 +771,15 @@ class STg extends S {
   String get updateUnsupported => 'Ин файли иҷрошаванда ба ҷуфти бастаи дастгиришавандаи Sora тааллуқ надорад';
 
   @override
+  String get updateManual =>
+      'Ин фармонро дар терминал иҷро кунед, то ҳарду бастаи тасдиқшударо насб кунед, пас Sora-ро аз нав кушоед. Файлҳо дар директорияи зеркашӣ мемонанд. Пайвасти VPN қатъ мешавад.';
+
+  @override
   String get updateVersionRevoked => 'Таҳиягар ин версияро бозпас гирифт';
+
+  @override
+  String get updateRolloutPending =>
+      'Версияи навтар тадриҷан паҳн мешавад ва ба таври худкор ба шумо пешниҳод карда мешавад.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +800,9 @@ class STg extends S {
 
   @override
   String get updateCopyCommand => 'Фармони нусхабардорӣ';
+
+  @override
+  String get updateChecksDisabled => 'Санҷишҳои худкор дар Танзимот ғайрифаъол карда мешаванд.';
 
   @override
   String get updateInstalled => 'Навсозии насбшуда';
@@ -1179,6 +1228,9 @@ class STg extends S {
   String get qrCopyLink => 'Истиноди нусхабардорӣ';
 
   @override
+  String get qrWarning => 'Рамзро танҳо ба шахсони боэътимод нишон диҳед.';
+
+  @override
   String get qrFromClipboard => 'Аз буфер часбонед';
 
   @override
@@ -1257,10 +1309,31 @@ class STg extends S {
   String get dnsLeakCheckKillSwitchDns => 'Ҳифзи DNS бо бастани шабака';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'DNS-ро барои нақб дар танзимоти DNS дар боло танзим кунед.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Санҷед, ки кадом ҳалкунандаҳои системаи шумо берун аз нақб истифода мешавад.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Бастани шабакаро фаъол кунед, то трафики DNS дар нақб бимонад.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS-и рамзгузоришудаи система';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Ҷавобҳои қалбакӣ DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Санҷед, ки кадом нуқтаи ниҳоии рамзгузоришудаи DNS системаи шумо берун аз нақб истифода мебарад.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Дар нақб DNS-и рамзгузоришуда (DoT ё DoH) истифода баред, то ҳалкунандаҳои ном ҷавобҳоро сохта натавонанд.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Аввал ба VPN пайваст шавед, сипас ихроҷро тафтиш кунед.';
 
   @override
   String get dnsExpected => 'Дар назар аст';
@@ -1568,6 +1641,9 @@ class STg extends S {
   String get leakTestCancel => 'Бекор кардан';
 
   @override
+  String get leakTestNeedsConnection => 'Барои санҷидани ихроҷи маълумот ба VPN пайваст шавед.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Санҷишҳо анҷом ёфтанд: $count';
   }
@@ -1586,6 +1662,9 @@ class STg extends S {
 
   @override
   String get leakTestFix => 'Ислоҳ';
+
+  @override
+  String get leakTestFixedNote => 'Бастани шабака фаъол аст. Барои санҷидан озмоишро такрор кунед.';
 
   @override
   String get leakTestCheckDirectDns => 'мустақим DNS';

@@ -747,6 +747,12 @@ abstract class S {
   /// **'Авто'**
   String get dnsAuto;
 
+  /// No description provided for @dnsHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Адреса через запятую'**
+  String get dnsHint;
+
   /// No description provided for @fragment.
   ///
   /// In ru, this message translates to:
@@ -1287,6 +1293,18 @@ abstract class S {
   /// **'Открыть логи'**
   String get openLogs;
 
+  /// No description provided for @tourReplay.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать гайд снова'**
+  String get tourReplay;
+
+  /// No description provided for @tourStep.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шаг {step} из 5'**
+  String tourStep(int step);
+
   /// No description provided for @tourBack.
   ///
   /// In ru, this message translates to:
@@ -1298,6 +1316,48 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Далее'**
   String get tourNext;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пропустить'**
+  String get tourSkip;
+
+  /// No description provided for @tourFinish.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get tourFinish;
+
+  /// No description provided for @tourAdd.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте ссылку на подписку от провайдера.'**
+  String get tourAdd;
+
+  /// No description provided for @tourServer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите сервер. «Самый быстрый» подберёт его за вас.'**
+  String get tourServer;
+
+  /// No description provided for @tourConnect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите здесь, чтобы подключиться или отключиться.'**
+  String get tourConnect;
+
+  /// No description provided for @tourMode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите режим. Kill switch блокирует интернет при обрыве VPN.'**
+  String get tourMode;
+
+  /// No description provided for @tourSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Откройте настройки. Здесь можно показать гайд снова.'**
+  String get tourSettings;
 
   /// No description provided for @chooseProgram.
   ///
@@ -1455,6 +1515,18 @@ abstract class S {
   /// **'Подключение ещё не готово'**
   String get updateWaitConnection;
 
+  /// No description provided for @updateDownloading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скачиваем и проверяем файлы...'**
+  String get updateDownloading;
+
+  /// No description provided for @updateInstalling.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подготовка обновления или ожидание пароля администратора...'**
+  String get updateInstalling;
+
   /// No description provided for @updateNetworkError.
   ///
   /// In ru, this message translates to:
@@ -1485,11 +1557,23 @@ abstract class S {
   /// **'Этот файл приложения не принадлежит поддерживаемой паре пакетов Sora'**
   String get updateUnsupported;
 
+  /// No description provided for @updateManual.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выполните команду в терминале для установки обоих проверенных пакетов, затем откройте Sora снова. Файлы сохранены в каталоге загрузки. VPN-соединение прервётся.'**
+  String get updateManual;
+
   /// No description provided for @updateVersionRevoked.
   ///
   /// In ru, this message translates to:
   /// **'Эта версия отозвана разработчиком'**
   String get updateVersionRevoked;
+
+  /// No description provided for @updateRolloutPending.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новая версия распространяется постепенно и будет предложена вам автоматически.'**
+  String get updateRolloutPending;
 
   /// No description provided for @updateRollbacking.
   ///
@@ -1520,6 +1604,12 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Скопировать команду'**
   String get updateCopyCommand;
+
+  /// No description provided for @updateChecksDisabled.
+  ///
+  /// In ru, this message translates to:
+  /// **'Автоматические проверки отключены в настройках.'**
+  String get updateChecksDisabled;
 
   /// No description provided for @updateInstalled.
   ///
@@ -2283,6 +2373,12 @@ abstract class S {
   /// **'Скопировать ссылку'**
   String get qrCopyLink;
 
+  /// No description provided for @qrWarning.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показывайте код только тем, кому доверяете.'**
+  String get qrWarning;
+
   /// No description provided for @qrFromClipboard.
   ///
   /// In ru, this message translates to:
@@ -2433,6 +2529,24 @@ abstract class S {
   /// **'Kill switch закрывает DNS'**
   String get dnsLeakCheckKillSwitchDns;
 
+  /// No description provided for @dnsLeakFixConfigureTunnelDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Задайте DNS туннеля в настройках выше.'**
+  String get dnsLeakFixConfigureTunnelDns;
+
+  /// No description provided for @dnsLeakFixReviewSystemResolvers.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте, какие резолверы система использует вне туннеля.'**
+  String get dnsLeakFixReviewSystemResolvers;
+
+  /// No description provided for @dnsLeakFixEnableKillSwitch.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включите kill switch, чтобы DNS оставался в туннеле.'**
+  String get dnsLeakFixEnableKillSwitch;
+
   /// No description provided for @dnsLeakCheckEncryptedDns.
   ///
   /// In ru, this message translates to:
@@ -2444,6 +2558,24 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Подмена ответов DNS'**
   String get dnsLeakCheckDnsSpoof;
+
+  /// No description provided for @dnsLeakFixReviewEncryptedDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверьте, какие конечные точки зашифрованного DNS система использует вне туннеля.'**
+  String get dnsLeakFixReviewEncryptedDns;
+
+  /// No description provided for @dnsLeakFixUseEncryptedDns.
+  ///
+  /// In ru, this message translates to:
+  /// **'Используйте зашифрованный DNS (DoT или DoH) в туннеле, чтобы резолверы не могли подделывать ответы.'**
+  String get dnsLeakFixUseEncryptedDns;
+
+  /// No description provided for @dnsCheckNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сначала подключитесь к VPN, затем проверьте утечки.'**
+  String get dnsCheckNeedsConnection;
 
   /// No description provided for @dnsExpected.
   ///
@@ -3015,6 +3147,12 @@ abstract class S {
   /// **'Отмена'**
   String get leakTestCancel;
 
+  /// No description provided for @leakTestNeedsConnection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключитесь, чтобы проверить утечки.'**
+  String get leakTestNeedsConnection;
+
   /// No description provided for @leakTestProgress.
   ///
   /// In ru, this message translates to:
@@ -3044,6 +3182,12 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Исправить'**
   String get leakTestFix;
+
+  /// No description provided for @leakTestFixedNote.
+  ///
+  /// In ru, this message translates to:
+  /// **'Kill switch включён, запустите проверку снова.'**
+  String get leakTestFixedNote;
 
   /// No description provided for @leakTestCheckDirectDns.
   ///

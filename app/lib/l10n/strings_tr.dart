@@ -331,6 +331,9 @@ class STr extends S {
   String get dnsAuto => 'Otomatik';
 
   @override
+  String get dnsHint => 'Adresler, virgülle ayrılmış';
+
+  @override
   String get fragment => 'TLS parçalanması';
 
   @override
@@ -630,10 +633,39 @@ class STr extends S {
   String get openLogs => 'Günlükleri aç';
 
   @override
+  String get tourReplay => 'Kılavuzu tekrar göster';
+
+  @override
+  String tourStep(int step) {
+    return 'Adım $step/5';
+  }
+
+  @override
   String get tourBack => 'Geri';
 
   @override
   String get tourNext => 'Sonraki';
+
+  @override
+  String get tourSkip => 'Atlamak';
+
+  @override
+  String get tourFinish => 'Tamamlamak';
+
+  @override
+  String get tourAdd => 'Sağlayıcınızın abonelik bağlantısını ekleyin.';
+
+  @override
+  String get tourServer => 'Bir sunucu seçin. “En Hızlı” sizin için birini seçer.';
+
+  @override
+  String get tourConnect => 'Bağlanmak veya bağlantıyı kesmek için burayı tıklayın.';
+
+  @override
+  String get tourMode => 'Bir mod seçin. VPN düşerse Kill Switch interneti engeller.';
+
+  @override
+  String get tourSettings => 'Ayarları açın. Bu kılavuzu orada tekrar oynatabilirsiniz.';
 
   @override
   String get chooseProgram => 'Bir program seçin';
@@ -718,6 +750,12 @@ class STr extends S {
   String get updateWaitConnection => 'Bağlantı hazır değil';
 
   @override
+  String get updateDownloading => 'Dosyalar indiriliyor ve doğrulanıyor...';
+
+  @override
+  String get updateInstalling => 'Güncelleme hazırlanıyor veya yönetici kimlik doğrulaması bekleniyor...';
+
+  @override
   String get updateNetworkError => 'Güncelleme indirilemedi';
 
   @override
@@ -733,7 +771,15 @@ class STr extends S {
   String get updateUnsupported => 'Bu yürütülebilir dosya, desteklenen bir Sora paket çiftine ait değil';
 
   @override
+  String get updateManual =>
+      'Her iki doğrulanmış paketi de yüklemek için bu komutu bir terminalde çalıştırın, ardından Sora\'yi yeniden açın. Dosyalar indirme dizininde kalır. VPN bağlantısı kesilecek.';
+
+  @override
   String get updateVersionRevoked => 'Geliştirici bu sürümü geri çekti';
+
+  @override
+  String get updateRolloutPending =>
+      'Daha yeni bir sürüm yavaş yavaş kullanıma sunuluyor ve size otomatik olarak sunulacak.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +800,9 @@ class STr extends S {
 
   @override
   String get updateCopyCommand => 'Komutu kopyala';
+
+  @override
+  String get updateChecksDisabled => 'Otomatik kontroller Ayarlar\'da devre dışı bırakıldı.';
 
   @override
   String get updateInstalled => 'Güncelleme yüklendi';
@@ -1179,6 +1228,9 @@ class STr extends S {
   String get qrCopyLink => 'Bağlantıyı kopyala';
 
   @override
+  String get qrWarning => 'Kodu yalnızca güvendiğiniz kişilerle paylaşın.';
+
+  @override
   String get qrFromClipboard => 'Panodan yapıştır';
 
   @override
@@ -1257,10 +1309,31 @@ class STr extends S {
   String get dnsLeakCheckKillSwitchDns => 'Ağ kilidi ile DNS koruması';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Yukarıdaki DNS ayarlarında tünel için DNS yapılandırın.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Sisteminizin tünel dışında hangi çözümleyicileri kullanacağını kontrol edin.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS trafiğinin tünelde kalması için ağ kilidini etkinleştirin.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'İşletim sisteminin şifreli DNS\'i';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Sahte DNS yanıtları';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Sisteminizin tünel dışında hangi şifrelenmiş DNS uç noktalarını kullandığını kontrol edin.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Çözümleyicilerin yanıtları taklit edememesi için tünel için şifrelenmiş DNS (DoT veya DoH) kullanın.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Önce VPN\'ye bağlanın, ardından sızıntı olup olmadığını kontrol edin.';
 
   @override
   String get dnsExpected => 'Beklenen';
@@ -1568,6 +1641,9 @@ class STr extends S {
   String get leakTestCancel => 'İptal';
 
   @override
+  String get leakTestNeedsConnection => 'Veri sızıntılarını test etmek için VPN\'ye bağlanın.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Tamamlanan testler: $count';
   }
@@ -1591,6 +1667,9 @@ class STr extends S {
 
   @override
   String get leakTestFix => 'Düzelt';
+
+  @override
+  String get leakTestFixedNote => 'Ağ kilidi etkin. Doğrulamak için testi yeniden çalıştırın.';
 
   @override
   String get leakTestCheckDirectDns => 'Doğrudan DNS';

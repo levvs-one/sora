@@ -331,6 +331,9 @@ class SKa extends S {
   String get dnsAuto => 'ავტო';
 
   @override
+  String get dnsHint => 'მისამართები, მძიმით გამოყოფილი';
+
+  @override
   String get fragment => 'TLS ფრაგმენტაცია';
 
   @override
@@ -630,10 +633,39 @@ class SKa extends S {
   String get openLogs => 'გახსენით ჟურნალები';
 
   @override
+  String get tourReplay => 'ხელახლა აჩვენე სახელმძღვანელო';
+
+  @override
+  String tourStep(int step) {
+    return 'ნაბიჯი $step 5-დან';
+  }
+
+  @override
   String get tourBack => 'უკან';
 
   @override
   String get tourNext => 'შემდეგი';
+
+  @override
+  String get tourSkip => 'გამოტოვება';
+
+  @override
+  String get tourFinish => 'შესრულებულია';
+
+  @override
+  String get tourAdd => 'დაამატეთ თქვენი პროვაიდერის გამოწერის ბმული.';
+
+  @override
+  String get tourServer => 'აირჩიეთ სერვერი. „უსწრაფესი“ ირჩევს ერთს თქვენთვის.';
+
+  @override
+  String get tourConnect => 'დააწკაპუნეთ აქ დასაკავშირებლად ან გასათიშად.';
+
+  @override
+  String get tourMode => 'აირჩიეთ რეჟიმი. Kill switch ბლოკავს ინტერნეტს, თუ VPN ჩამოვარდება.';
+
+  @override
+  String get tourSettings => 'გახსენით პარამეტრები. თქვენ შეგიძლიათ გაიმეოროთ ეს სახელმძღვანელო იქ.';
 
   @override
   String get chooseProgram => 'აირჩიეთ პროგრამა';
@@ -718,6 +750,12 @@ class SKa extends S {
   String get updateWaitConnection => 'კავშირი მზად არ არის';
 
   @override
+  String get updateDownloading => 'მიმდინარეობს ფაილების ჩამოტვირთვა და დადასტურება...';
+
+  @override
+  String get updateInstalling => 'განახლების მომზადება ან ადმინისტრატორის ავტორიზაციის მოლოდინში...';
+
+  @override
   String get updateNetworkError => 'განახლების ჩამოტვირთვა ვერ მოხერხდა';
 
   @override
@@ -733,7 +771,14 @@ class SKa extends S {
   String get updateUnsupported => 'ეს შესრულებადი არ ეკუთვნის მხარდაჭერილ Sora პაკეტის წყვილს';
 
   @override
+  String get updateManual =>
+      'გაუშვით ეს ბრძანება ტერმინალში ორივე დამოწმებული პაკეტის დასაყენებლად, შემდეგ ხელახლა გახსენით Sora. ფაილები რჩება ჩამოტვირთვის დირექტორიაში. VPN კავშირი შეწყდება.';
+
+  @override
   String get updateVersionRevoked => 'დეველოპერმა გააუქმა ეს ვერსია';
+
+  @override
+  String get updateRolloutPending => 'უფრო ახალი ვერსია გამოდის თანდათანობით და შემოგთავაზებთ ავტომატურად.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class SKa extends S {
 
   @override
   String get updateCopyCommand => 'დააკოპირეთ ბრძანება';
+
+  @override
+  String get updateChecksDisabled => 'ავტომატური შემოწმება გამორთულია პარამეტრებში.';
 
   @override
   String get updateInstalled => 'დაინსტალირებულია განახლება';
@@ -1179,6 +1227,9 @@ class SKa extends S {
   String get qrCopyLink => 'დააკოპირეთ ბმული';
 
   @override
+  String get qrWarning => 'კოდი მხოლოდ სანდო ადამიანებს გაუზიარეთ.';
+
+  @override
   String get qrFromClipboard => 'ჩასმა ბუფერიდან';
 
   @override
@@ -1257,10 +1308,31 @@ class SKa extends S {
   String get dnsLeakCheckKillSwitchDns => 'DNS-ის დაცვა ქსელის ბლოკირებით';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'დააკონფიგურირეთ DNS გვირაბისთვის ზემოთ DNS პარამეტრებში.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'შეამოწმეთ, რომელ გადამწყვეტებს გამოიყენებდა თქვენი სისტემა გვირაბის გარეთ.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'ჩართეთ ქსელის ბლოკირება, რათა DNS ტრაფიკი გვირაბში დარჩეს.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'სისტემის დაშიფრული DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'ყალბი DNS პასუხი';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'შეამოწმეთ, რომელ დაშიფრულ DNS ბოლო წერტილებს იყენებს თქვენი სისტემა გვირაბის გარეთ.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'გვირაბისთვის გამოიყენეთ დაშიფრული DNS (DoT ან DoH), რათა რეზოლვერებმა პასუხები ვერ გააყალბონ.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'ჯერ დაუკავშირდით VPN-ს, შემდეგ შეამოწმეთ გაჟონვა.';
 
   @override
   String get dnsExpected => 'მოსალოდნელია';
@@ -1568,6 +1640,9 @@ class SKa extends S {
   String get leakTestCancel => 'გაუქმება';
 
   @override
+  String get leakTestNeedsConnection => 'დაუკავშირდით VPN-ს მონაცემთა გაჟონვის შესამოწმებლად.';
+
+  @override
   String leakTestProgress(int count) {
     return 'დასრულებული ტესტები: $count';
   }
@@ -1591,6 +1666,9 @@ class SKa extends S {
 
   @override
   String get leakTestFix => 'დაფიქსირება';
+
+  @override
+  String get leakTestFixedNote => 'ქსელის ბლოკირება ჩართულია. შესამოწმებლად ტესტი ხელახლა გაუშვით.';
 
   @override
   String get leakTestCheckDirectDns => 'პირდაპირი DNS';

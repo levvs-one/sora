@@ -331,6 +331,9 @@ class SEn extends S {
   String get dnsAuto => 'Auto';
 
   @override
+  String get dnsHint => 'Addresses, comma separated';
+
+  @override
   String get fragment => 'TLS fragmentation';
 
   @override
@@ -625,10 +628,39 @@ class SEn extends S {
   String get openLogs => 'Open logs';
 
   @override
+  String get tourReplay => 'Show guide again';
+
+  @override
+  String tourStep(int step) {
+    return 'Step $step of 5';
+  }
+
+  @override
   String get tourBack => 'Back';
 
   @override
   String get tourNext => 'Next';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourFinish => 'Done';
+
+  @override
+  String get tourAdd => 'Add your provider’s subscription link.';
+
+  @override
+  String get tourServer => 'Pick a server. “Fastest” selects one for you.';
+
+  @override
+  String get tourConnect => 'Click here to connect or disconnect.';
+
+  @override
+  String get tourMode => 'Choose a mode. Kill switch blocks internet if the VPN drops.';
+
+  @override
+  String get tourSettings => 'Open settings. You can replay this guide there.';
 
   @override
   String get chooseProgram => 'Choose a program';
@@ -713,6 +745,12 @@ class SEn extends S {
   String get updateWaitConnection => 'Connection is not ready';
 
   @override
+  String get updateDownloading => 'Downloading and verifying files...';
+
+  @override
+  String get updateInstalling => 'Preparing the update or waiting for administrator authentication...';
+
+  @override
   String get updateNetworkError => 'Could not download the update';
 
   @override
@@ -728,7 +766,15 @@ class SEn extends S {
   String get updateUnsupported => 'This executable is not owned by a supported Sora package pair';
 
   @override
+  String get updateManual =>
+      'Run this command in a terminal to install both verified packages, then reopen Sora. The files stay in the download directory. The VPN connection will drop.';
+
+  @override
   String get updateVersionRevoked => 'This version has been recalled by the developer';
+
+  @override
+  String get updateRolloutPending =>
+      'A newer version is rolling out gradually and will be offered to you automatically.';
 
   @override
   String updateRollbacking(String version) {
@@ -749,6 +795,9 @@ class SEn extends S {
 
   @override
   String get updateCopyCommand => 'Copy command';
+
+  @override
+  String get updateChecksDisabled => 'Automatic checks are disabled in Settings.';
 
   @override
   String get updateInstalled => 'Update installed';
@@ -1174,6 +1223,9 @@ class SEn extends S {
   String get qrCopyLink => 'Copy link';
 
   @override
+  String get qrWarning => 'Only share this code with people you trust.';
+
+  @override
   String get qrFromClipboard => 'Paste from clipboard';
 
   @override
@@ -1257,10 +1309,29 @@ class SEn extends S {
   String get dnsLeakCheckKillSwitchDns => 'Kill switch DNS cover';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Set the tunnel DNS in the DNS settings above.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'Check which resolvers your system would use outside the tunnel.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Enable the kill switch so DNS stays inside the tunnel.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'OS encrypted DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'DNS answer spoofing';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'Check which encrypted DNS endpoints your system uses outside the tunnel.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Use encrypted DNS (DoT or DoH) for the tunnel so resolvers cannot forge answers.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Connect to the VPN first, then check for leaks.';
 
   @override
   String get dnsExpected => 'Expected';
@@ -1568,6 +1639,9 @@ class SEn extends S {
   String get leakTestCancel => 'Cancel';
 
   @override
+  String get leakTestNeedsConnection => 'Connect to run the leak test.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Tests completed: $count';
   }
@@ -1591,6 +1665,9 @@ class SEn extends S {
 
   @override
   String get leakTestFix => 'Fix';
+
+  @override
+  String get leakTestFixedNote => 'Kill switch is on, run the test again to verify.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';

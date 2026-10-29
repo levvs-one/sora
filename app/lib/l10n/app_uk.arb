@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Авто",
+  "dnsHint": "Адреси, розділені комами",
   "fragment": "TLS фрагментація",
   "fragmentPackets": "Що розділити",
   "fragmentLength": "Розмір шматка",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Немає сповіщень",
   "retryConnect": "Повторити підключення",
   "openLogs": "Відкриті журнали",
+  "tourReplay": "Знову показати посібник",
+  "tourStep": "Крок {step} із 5",
   "tourBack": "Назад",
   "tourNext": "Далі",
+  "tourSkip": "Пропустити",
+  "tourFinish": "Готово",
+  "tourAdd": "Додайте посилання на підписку вашого постачальника.",
+  "tourServer": "Виберіть сервер. «Найшвидший» вибере для вас один.",
+  "tourConnect": "Натисніть тут, щоб підключитися або відключитися.",
+  "tourMode": "Виберіть режим. Kill Switch блокує Інтернет, якщо VPN переривається.",
+  "tourSettings": "Відкрийте налаштування. Ви можете відтворити цей посібник там.",
   "chooseProgram": "Виберіть програму",
   "installedApps": "Встановлені програми",
   "runningProcesses": "Запущені процеси",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Реліз не має приміток.",
   "updateDropWarning": "Перервати з’єднання для оновлення?",
   "updateWaitConnection": "З’єднання ще не готове",
+  "updateDownloading": "Завантаження та перевірка файлів...",
+  "updateInstalling": "Підготовка оновлення або очікування автентифікації адміністратора...",
   "updateNetworkError": "Не вдалося завантажити оновлення",
   "updateReleaseError": "Дані випуску або необхідні файли відсутні або недійсні.",
   "updateChecksumError": "Завантаження не відповідає SHA256SUMS",
   "updateInstallError": "Оновлення не завершено",
   "updateUnsupported": "Цей виконуваний файл не належить підтримуваній парі пакетів Sora",
+  "updateManual": "Виконайте цю команду в терміналі, щоб інсталювати обидва перевірені пакети, а потім повторно відкрийте Sora. Файли залишаються в каталозі завантаження. З’єднання VPN припиниться.",
   "updateCopyCommand": "Копіювати команду",
+  "updateChecksDisabled": "Автоматичні перевірки вимкнено в налаштуваннях.",
   "updateInstalled": "Оновлення встановлено",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Перевірка на витік даних",
   "leakTestRun": "Перевірити",
   "leakTestCancel": "Скасувати",
+  "leakTestNeedsConnection": "Підключіться до VPN, щоб перевірити наявність витоку даних.",
   "leakTestProgress": "Тести завершено: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Виправити",
+  "leakTestFixedNote": "Kill switch увімкнено. Повторіть перевірку.",
   "leakTestCheckDirectDns": "Прямий DNS",
   "leakTestCheckIcmpEcho": "ICMP відлуння",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Розробник відкликав цю версію",
+  "updateRolloutPending": "Поступово розгортається новіша версія, яка буде запропонована вам автоматично.",
   "updateRollbacking": "Повернення до версії {version}...",
   "updateRolledBack": "Оновлення до {version} не пройшло перевірку справності, тому Sora було відкочено до {fromVersion}.",
   "updateRollbackError": "Помилка автоматичного відкоту",
@@ -722,6 +746,7 @@
   "qrShareTitle": "Поділитися QR-кодом",
   "qrScanTitle": "Сканувати QR-код",
   "qrCopyLink": "Копіювати посилання",
+  "qrWarning": "Показуйте код лише тим, кому довіряєте.",
   "qrFromClipboard": "Вставити з буфера обміну",
   "qrNoCode": "На зображенні не знайдено QR-код.",
   "qrInvalid": "Цей код QR не містить дійсного посилання.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Резолвери DNS тунелю",
   "dnsLeakCheckSystemResolvers": "Системні резолвери",
   "dnsLeakCheckKillSwitchDns": "Захист DNS через kill switch",
+  "dnsLeakFixConfigureTunnelDns": "Налаштуйте DNS для тунелю в налаштуваннях DNS вище.",
+  "dnsLeakFixReviewSystemResolvers": "Перевірте, які резолвери ваша система використовуватиме поза тунелем.",
+  "dnsLeakFixEnableKillSwitch": "Увімкніть kill switch, щоб трафік DNS залишався в тунелі.",
   "dnsLeakCheckEncryptedDns": "Зашифрований DNS системи",
   "dnsLeakCheckDnsSpoof": "Підроблені відповіді DNS",
+  "dnsLeakFixReviewEncryptedDns": "Перевірте, які зашифровані кінцеві точки DNS використовує ваша система поза тунелем.",
+  "dnsLeakFixUseEncryptedDns": "Використовуйте зашифрований DNS (DoT або DoH) для тунелю, щоб резолвери не могли підробити відповіді.",
+  "dnsCheckNeedsConnection": "Спочатку підключіться до VPN, а потім перевірте наявність витоків.",
   "dnsExpected": "Очікується",
   "dnsActual": "Дотримується",
   "measureSpeed": "Виміряйте швидкість",

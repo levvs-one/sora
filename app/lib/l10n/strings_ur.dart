@@ -331,6 +331,9 @@ class SUr extends S {
   String get dnsAuto => 'آٹو';
 
   @override
+  String get dnsHint => 'پتے، کوما سے الگ';
+
+  @override
   String get fragment => 'TLS فریگمنٹیشن';
 
   @override
@@ -630,10 +633,39 @@ class SUr extends S {
   String get openLogs => 'نوشتہ جات کھولیں۔';
 
   @override
+  String get tourReplay => 'دوبارہ گائیڈ دکھائیں۔';
+
+  @override
+  String tourStep(int step) {
+    return '5 میں سے $step مرحلہ';
+  }
+
+  @override
   String get tourBack => 'پیچھے';
 
   @override
   String get tourNext => 'اگلا';
+
+  @override
+  String get tourSkip => 'چھوڑیں۔';
+
+  @override
+  String get tourFinish => 'ہو گیا';
+
+  @override
+  String get tourAdd => 'اپنے فراہم کنندہ کی رکنیت کا لنک شامل کریں۔';
+
+  @override
+  String get tourServer => 'ایک سرور چنیں۔ \"تیز ترین\" آپ کے لیے ایک کا انتخاب کرتا ہے۔';
+
+  @override
+  String get tourConnect => 'جڑنے یا منقطع کرنے کے لیے یہاں کلک کریں۔';
+
+  @override
+  String get tourMode => 'ایک موڈ کا انتخاب کریں۔ VPN گرنے پر Kill سوئچ انٹرنیٹ کو بلاک کر دیتا ہے۔';
+
+  @override
+  String get tourSettings => 'ترتیبات کھولیں۔ آپ وہاں اس گائیڈ کو دوبارہ چلا سکتے ہیں۔';
 
   @override
   String get chooseProgram => 'ایک پروگرام کا انتخاب کریں۔';
@@ -718,6 +750,12 @@ class SUr extends S {
   String get updateWaitConnection => 'کنکشن تیار نہیں';
 
   @override
+  String get updateDownloading => 'فائلیں ڈاؤن لوڈ اور تصدیق کی جا رہی ہیں...';
+
+  @override
+  String get updateInstalling => 'اپ ڈیٹ کی تیاری ہو رہی ہے یا ایڈمنسٹریٹر کی تصدیق کا انتظار کر رہا ہے...';
+
+  @override
   String get updateNetworkError => 'اپ ڈیٹ ڈاؤن لوڈ نہیں ہو سکا';
 
   @override
@@ -733,7 +771,14 @@ class SUr extends S {
   String get updateUnsupported => 'یہ قابل عمل Sora پیکیج جوڑے کی ملکیت نہیں ہے';
 
   @override
+  String get updateManual =>
+      'دونوں تصدیق شدہ پیکیجز کو انسٹال کرنے کے لیے اس کمانڈ کو ٹرمینل میں چلائیں، پھر Sora کو دوبارہ کھولیں۔ فائلیں ڈاؤن لوڈ ڈائرکٹری میں رہتی ہیں۔ VPN کنکشن ختم ہو جائے گا۔';
+
+  @override
   String get updateVersionRevoked => 'ڈویلپر نے یہ ورژن واپس لے لیا ہے';
+
+  @override
+  String get updateRolloutPending => 'ایک نیا ورژن بتدریج شروع ہو رہا ہے اور خود بخود آپ کو پیش کیا جائے گا۔';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class SUr extends S {
 
   @override
   String get updateCopyCommand => 'کمانڈ کاپی کریں۔';
+
+  @override
+  String get updateChecksDisabled => 'خودکار چیک سیٹنگز میں غیر فعال ہیں۔';
 
   @override
   String get updateInstalled => 'اپ ڈیٹ انسٹال ہو گیا';
@@ -1179,6 +1227,9 @@ class SUr extends S {
   String get qrCopyLink => 'لنک کاپی کریں۔';
 
   @override
+  String get qrWarning => 'یہ کوڈ صرف قابل اعتماد لوگوں کو دکھائیں۔';
+
+  @override
   String get qrFromClipboard => 'کلپ بورڈ سے پیسٹ کریں۔';
 
   @override
@@ -1257,10 +1308,30 @@ class SUr extends S {
   String get dnsLeakCheckKillSwitchDns => 'نیٹ ورک بندش سے DNS کا تحفظ';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'اوپر دی گئی DNS ترتیبات میں سرنگ کے لئے DNS کو ترتیب دیں۔';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'چیک کریں کہ آپ کا سسٹم سرنگ کے باہر کون سے ریزولورز استعمال کرے گا۔';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS ٹریفک کو ٹنل کے اندر رکھنے کے لیے نیٹ ورک بندش فعال کریں۔';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'سسٹم کا خفیہ کردہ DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'جعلی DNS جوابات';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'چیک کریں کہ کون سے خفیہ کردہ DNS اینڈ پوائنٹس کو آپ کا سسٹم ٹنل کے باہر استعمال کرتا ہے۔';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'ٹنل کے لیے خفیہ کردہ DNS (DoT یا DoH) استعمال کریں تاکہ ریزولورز جعلی جواب نہ دے سکیں۔';
+
+  @override
+  String get dnsCheckNeedsConnection => 'پہلے VPN سے جڑیں، پھر لیک کی جانچ کریں۔';
 
   @override
   String get dnsExpected => 'متوقع';
@@ -1568,6 +1639,9 @@ class SUr extends S {
   String get leakTestCancel => 'منسوخ کریں۔';
 
   @override
+  String get leakTestNeedsConnection => 'لیک ٹیسٹ چلانے کے لیے جڑیں۔';
+
+  @override
   String leakTestProgress(int count) {
     return 'ٹیسٹ مکمل ہوئے: $count';
   }
@@ -1586,6 +1660,9 @@ class SUr extends S {
 
   @override
   String get leakTestFix => 'درست کریں۔';
+
+  @override
+  String get leakTestFixedNote => 'نیٹ ورک بندش فعال ہے۔ تصدیق کے لیے دوبارہ ٹیسٹ چلائیں۔';
 
   @override
   String get leakTestCheckDirectDns => 'براہ راست DNS';

@@ -331,6 +331,9 @@ class SPl extends S {
   String get dnsAuto => 'Automatyczny';
 
   @override
+  String get dnsHint => 'Adresy, oddzielone przecinkami';
+
+  @override
   String get fragment => 'Fragmentacja TLS';
 
   @override
@@ -630,10 +633,39 @@ class SPl extends S {
   String get openLogs => 'Otwórz logi';
 
   @override
+  String get tourReplay => 'Pokaż przewodnik ponownie';
+
+  @override
+  String tourStep(int step) {
+    return 'Krok $step z 5';
+  }
+
+  @override
   String get tourBack => 'Z powrotem';
 
   @override
   String get tourNext => 'Następny';
+
+  @override
+  String get tourSkip => 'Pominąć';
+
+  @override
+  String get tourFinish => 'Zrobione';
+
+  @override
+  String get tourAdd => 'Dodaj link do subskrypcji swojego dostawcy.';
+
+  @override
+  String get tourServer => 'Wybierz serwer. „Najszybszy” wybierze jeden za Ciebie.';
+
+  @override
+  String get tourConnect => 'Kliknij tutaj, aby połączyć lub rozłączyć.';
+
+  @override
+  String get tourMode => 'Wybierz tryb. Przełącznik Kill blokuje Internet, jeśli VPN spadnie.';
+
+  @override
+  String get tourSettings => 'Otwórz ustawienia. Możesz tam odtworzyć ten przewodnik.';
 
   @override
   String get chooseProgram => 'Wybierz program';
@@ -718,6 +750,12 @@ class SPl extends S {
   String get updateWaitConnection => 'Połączenie nie jest gotowe';
 
   @override
+  String get updateDownloading => 'Pobieranie i weryfikacja plików...';
+
+  @override
+  String get updateInstalling => 'Przygotowywanie aktualizacji lub oczekiwanie na autoryzację administratora...';
+
+  @override
   String get updateNetworkError => 'Nie można pobrać aktualizacji';
 
   @override
@@ -733,7 +771,14 @@ class SPl extends S {
   String get updateUnsupported => 'Ten plik wykonywalny nie jest własnością obsługiwanej pary pakietów Sora';
 
   @override
+  String get updateManual =>
+      'Uruchom to polecenie w terminalu, aby zainstalować oba zweryfikowane pakiety, a następnie otwórz ponownie Sora. Pliki pozostają w katalogu pobierania. Połączenie VPN zostanie zerwane.';
+
+  @override
   String get updateVersionRevoked => 'Deweloper wycofał tę wersję';
+
+  @override
+  String get updateRolloutPending => 'Nowsza wersja jest wprowadzana stopniowo i będzie oferowana automatycznie.';
 
   @override
   String updateRollbacking(String version) {
@@ -754,6 +799,9 @@ class SPl extends S {
 
   @override
   String get updateCopyCommand => 'Kopiuj polecenie';
+
+  @override
+  String get updateChecksDisabled => 'Automatyczne sprawdzanie jest wyłączone w Ustawieniach.';
 
   @override
   String get updateInstalled => 'Aktualizacja zainstalowana';
@@ -1193,6 +1241,9 @@ class SPl extends S {
   String get qrCopyLink => 'Skopiuj link';
 
   @override
+  String get qrWarning => 'Udostępniaj kod tylko zaufanym osobom.';
+
+  @override
   String get qrFromClipboard => 'Wklej ze schowka';
 
   @override
@@ -1278,10 +1329,31 @@ class SPl extends S {
   String get dnsLeakCheckKillSwitchDns => 'Ochrona DNS przez blokadę sieci';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Skonfiguruj DNS dla tunelu w ustawieniach DNS powyżej.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Sprawdź, jakich algorytmów rozpoznawania nazw Twój system użyłby poza tunelem.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Włącz blokadę sieci, aby ruch DNS pozostał w tunelu.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Szyfrowany DNS systemu';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Sfałszowane odpowiedzi DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Sprawdź, jakich zaszyfrowanych DNS punktów końcowych używa Twój system poza tunelem.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Użyj zaszyfrowanego DNS (DoT lub DoH) dla tunelu, aby mechanizmy rozpoznawania nazw nie mogły sfałszować odpowiedzi.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Najpierw podłącz do VPN, a następnie sprawdź, czy nie ma wycieków.';
 
   @override
   String get dnsExpected => 'Oczekiwano';
@@ -1589,6 +1661,9 @@ class SPl extends S {
   String get leakTestCancel => 'Anuluj';
 
   @override
+  String get leakTestNeedsConnection => 'Połącz się z VPN, aby przetestować wycieki danych.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Ukończone testy: $count';
   }
@@ -1614,6 +1689,9 @@ class SPl extends S {
 
   @override
   String get leakTestFix => 'Poprawka';
+
+  @override
+  String get leakTestFixedNote => 'Blokada sieci jest włączona. Uruchom test ponownie, aby to sprawdzić.';
 
   @override
   String get leakTestCheckDirectDns => 'Bezpośrednio DNS';

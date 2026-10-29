@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Авто",
+  "dnsHint": "Суроғаҳо, вергул ҷудо",
   "fragment": "Тақсимоти TLS",
   "fragmentPackets": "Чӣ бояд тақсим кард",
   "fragmentLength": "Андозаи порча",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Огоҳӣ нест",
   "retryConnect": "Пайвастшавӣ аз нав кӯшиш кунед",
   "openLogs": "Сабтҳоро кушоед",
+  "tourReplay": "Боз роҳнамо нишон диҳед",
+  "tourStep": "Қадами {step} аз 5",
   "tourBack": "Бозгашт",
   "tourNext": "Баъдӣ",
+  "tourSkip": "Гузаштан",
+  "tourFinish": "Иҷро шуд",
+  "tourAdd": "Истиноди обунаи провайдери худро илова кунед.",
+  "tourServer": "Серверро интихоб кунед. \"Зуртарин\" якеро барои шумо интихоб мекунад.",
+  "tourConnect": "Барои пайваст кардан ё ҷудо кардан ин ҷо клик кунед.",
+  "tourMode": "Режимро интихоб кунед. Агар VPN афтад, коммутаторро блокҳои интернетро кушед.",
+  "tourSettings": "Танзимотҳоро кушоед. Шумо метавонед ин дастурро дар он ҷо такрор кунед.",
   "chooseProgram": "Барномаро интихоб кунед",
   "installedApps": "Барномаҳои насбшуда",
   "runningProcesses": "Равандҳои иҷрошаванда",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Нашрия ягон қайд надорад.",
   "updateDropWarning": "Пайвастшавӣ барои навсозӣ қатъ шавад?",
   "updateWaitConnection": "Пайвастшавӣ омода нест",
+  "updateDownloading": "Зеркашӣ ва тасдиқи файлҳо...",
+  "updateInstalling": "Омода кардани навсозӣ ё мунтазири аутентификатсияи администратор...",
   "updateNetworkError": "Навсозӣ зеркашӣ карда нашуд",
   "updateReleaseError": "Маълумоти релиз ё файлҳои зарурӣ нест ё беэътибор аст.",
   "updateChecksumError": "Зеркашӣ ба SHA256SUMS мувофиқат намекунад",
   "updateInstallError": "Навсозӣ ба охир нарасид",
   "updateUnsupported": "Ин файли иҷрошаванда ба ҷуфти бастаи дастгиришавандаи Sora тааллуқ надорад",
+  "updateManual": "Ин фармонро дар терминал иҷро кунед, то ҳарду бастаи тасдиқшударо насб кунед, пас Sora-ро аз нав кушоед. Файлҳо дар директорияи зеркашӣ мемонанд. Пайвасти VPN қатъ мешавад.",
   "updateCopyCommand": "Фармони нусхабардорӣ",
+  "updateChecksDisabled": "Санҷишҳои худкор дар Танзимот ғайрифаъол карда мешаванд.",
   "updateInstalled": "Навсозии насбшуда",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Санҷиши ихроҷи маълумот",
   "leakTestRun": "Санҷед",
   "leakTestCancel": "Бекор кардан",
+  "leakTestNeedsConnection": "Барои санҷидани ихроҷи маълумот ба VPN пайваст шавед.",
   "leakTestProgress": "Санҷишҳо анҷом ёфтанд: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Ислоҳ",
+  "leakTestFixedNote": "Бастани шабака фаъол аст. Барои санҷидан озмоишро такрор кунед.",
   "leakTestCheckDirectDns": "мустақим DNS",
   "leakTestCheckIcmpEcho": "ICMP акси садо",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Таҳиягар ин версияро бозпас гирифт",
+  "updateRolloutPending": "Версияи навтар тадриҷан паҳн мешавад ва ба таври худкор ба шумо пешниҳод карда мешавад.",
   "updateRollbacking": "Бозгашт ба версияи {version}...",
   "updateRolledBack": "Навсозӣ ба {version} аз санҷиши коршоямӣ нагузашт, бинобар ин Sora ба {fromVersion} баргардонида шуд.",
   "updateRollbackError": "Бозгашти худкор ноком шуд",
@@ -722,6 +746,7 @@
   "qrShareTitle": "Рамзи QR мубодила кунед",
   "qrScanTitle": "Рамзи QR скан кунед",
   "qrCopyLink": "Истиноди нусхабардорӣ",
+  "qrWarning": "Рамзро танҳо ба шахсони боэътимод нишон диҳед.",
   "qrFromClipboard": "Аз буфер часбонед",
   "qrNoCode": "Дар ин тасвир рамзи QR ёфт нашуд.",
   "qrInvalid": "Ин рамзи QR дорои истиноди дуруст нест.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Ҳалкунандаҳои DNS-и нақб",
   "dnsLeakCheckSystemResolvers": "Ҳалкунандаҳои номи система",
   "dnsLeakCheckKillSwitchDns": "Ҳифзи DNS бо бастани шабака",
+  "dnsLeakFixConfigureTunnelDns": "DNS-ро барои нақб дар танзимоти DNS дар боло танзим кунед.",
+  "dnsLeakFixReviewSystemResolvers": "Санҷед, ки кадом ҳалкунандаҳои системаи шумо берун аз нақб истифода мешавад.",
+  "dnsLeakFixEnableKillSwitch": "Бастани шабакаро фаъол кунед, то трафики DNS дар нақб бимонад.",
   "dnsLeakCheckEncryptedDns": "DNS-и рамзгузоришудаи система",
   "dnsLeakCheckDnsSpoof": "Ҷавобҳои қалбакӣ DNS",
+  "dnsLeakFixReviewEncryptedDns": "Санҷед, ки кадом нуқтаи ниҳоии рамзгузоришудаи DNS системаи шумо берун аз нақб истифода мебарад.",
+  "dnsLeakFixUseEncryptedDns": "Дар нақб DNS-и рамзгузоришуда (DoT ё DoH) истифода баред, то ҳалкунандаҳои ном ҷавобҳоро сохта натавонанд.",
+  "dnsCheckNeedsConnection": "Аввал ба VPN пайваст шавед, сипас ихроҷро тафтиш кунед.",
   "dnsExpected": "Дар назар аст",
   "dnsActual": "мушохида карда шуд",
   "measureSpeed": "Суръатро чен кунед",

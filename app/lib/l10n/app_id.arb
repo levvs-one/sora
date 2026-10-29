@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Mobil",
+  "dnsHint": "Alamat, dipisahkan koma",
   "fragment": "Fragmentasi TLS",
   "fragmentPackets": "Apa yang harus dibagi",
   "fragmentLength": "Ukuran potongan",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Tidak ada notifikasi",
   "retryConnect": "Coba lagi koneksi",
   "openLogs": "Buka log",
+  "tourReplay": "Tampilkan panduan lagi",
+  "tourStep": "Langkah {step} dari 5",
   "tourBack": "Kembali",
   "tourNext": "Berikutnya",
+  "tourSkip": "Melewati",
+  "tourFinish": "Selesai",
+  "tourAdd": "Tambahkan tautan berlangganan penyedia Anda.",
+  "tourServer": "Pilih server. “Tercepat” memilih satu untuk Anda.",
+  "tourConnect": "Klik di sini untuk menghubungkan atau memutuskan sambungan.",
+  "tourMode": "Pilih mode. Tombol pemutus memblokir internet jika VPN terputus.",
+  "tourSettings": "Buka pengaturan. Anda dapat memutar ulang panduan ini di sana.",
   "chooseProgram": "Pilih sebuah program",
   "installedApps": "Aplikasi yang diinstal",
   "runningProcesses": "Proses yang berjalan",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Rilisan ini tidak memiliki catatan.",
   "updateDropWarning": "Putuskan koneksi untuk memperbarui?",
   "updateWaitConnection": "Koneksi belum siap",
+  "updateDownloading": "Mengunduh dan memverifikasi file...",
+  "updateInstalling": "Mempersiapkan pembaruan atau menunggu otentikasi administrator...",
   "updateNetworkError": "Tidak dapat mengunduh pembaruan",
   "updateReleaseError": "Data rilis atau file yang diperlukan hilang atau tidak valid.",
   "updateChecksumError": "Unduhan tidak cocok dengan SHA256SUMS",
   "updateInstallError": "Pembaruan tidak selesai",
   "updateUnsupported": "Eksekusi ini tidak dimiliki oleh pasangan paket Sora yang didukung",
+  "updateManual": "Jalankan perintah ini di terminal untuk menginstal kedua paket terverifikasi, lalu buka kembali Sora. File-file tersebut tetap berada di direktori unduhan. Koneksi VPN akan terputus.",
   "updateCopyCommand": "Salin perintah",
+  "updateChecksDisabled": "Pemeriksaan otomatis dinonaktifkan di Pengaturan.",
   "updateInstalled": "Pembaruan diinstal",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Uji kebocoran data",
   "leakTestRun": "Periksa",
   "leakTestCancel": "Batal",
+  "leakTestNeedsConnection": "Hubungkan ke VPN untuk menguji kebocoran data.",
   "leakTestProgress": "Tes selesai: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Perbaiki",
+  "leakTestFixedNote": "Pemutus jaringan aktif. Jalankan pengujian lagi untuk memastikannya.",
   "leakTestCheckDirectDns": "Langsung DNS",
   "leakTestCheckIcmpEcho": "ICMP gema",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Pengembang telah menarik versi ini",
+  "updateRolloutPending": "Versi yang lebih baru diluncurkan secara bertahap dan akan ditawarkan kepada Anda secara otomatis.",
   "updateRollbacking": "Mengembalikan ke versi {version}...",
   "updateRolledBack": "Pembaruan ke {version} tidak lolos pemeriksaan kesehatan, jadi Sora dibatalkan ke {fromVersion}.",
   "updateRollbackError": "Pengembalian otomatis gagal",
@@ -722,6 +746,7 @@
   "qrShareTitle": "Bagikan kode QR",
   "qrScanTitle": "Pindai kode QR",
   "qrCopyLink": "Salin tautan",
+  "qrWarning": "Bagikan kode ini hanya kepada orang yang Anda percaya.",
   "qrFromClipboard": "Tempel dari papan klip",
   "qrNoCode": "Tidak ada kode QR di gambar ini.",
   "qrInvalid": "Kode QR ini tidak berisi tautan yang valid.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Resolver DNS terowongan",
   "dnsLeakCheckSystemResolvers": "Resolver sistem",
   "dnsLeakCheckKillSwitchDns": "Perlindungan DNS oleh pemutus jaringan",
+  "dnsLeakFixConfigureTunnelDns": "Konfigurasikan DNS untuk terowongan dalam pengaturan DNS di atas.",
+  "dnsLeakFixReviewSystemResolvers": "Periksa penyelesai mana yang akan digunakan sistem Anda di luar terowongan.",
+  "dnsLeakFixEnableKillSwitch": "Aktifkan pemutus jaringan agar lalu lintas DNS tetap di dalam terowongan.",
   "dnsLeakCheckEncryptedDns": "DNS terenkripsi sistem operasi",
   "dnsLeakCheckDnsSpoof": "Tanggapan DNS palsu",
+  "dnsLeakFixReviewEncryptedDns": "Periksa titik akhir DNS terenkripsi mana yang digunakan sistem Anda di luar terowongan.",
+  "dnsLeakFixUseEncryptedDns": "Gunakan DNS terenkripsi (DoT atau DoH) untuk terowongan agar resolver tidak dapat memalsukan jawaban.",
+  "dnsCheckNeedsConnection": "Hubungkan ke VPN terlebih dahulu, lalu periksa kebocorannya.",
   "dnsExpected": "Diharapkan",
   "dnsActual": "Diamati",
   "measureSpeed": "Ukur kecepatan",

@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "Авто",
+  "dnsHint": "Даректер, үтүр менен бөлүнгөн",
   "fragment": "TLS фрагментациясы",
   "fragmentPackets": "Эмне бөлүү керек",
   "fragmentLength": "Даана өлчөмү",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "Билдирмелер жок",
   "retryConnect": "Кайталануу",
   "openLogs": "Ачык журналдар",
+  "tourReplay": "Жолду кайра көрсөтүү",
+  "tourStep": "5тин ичинен {step} кадамы",
   "tourBack": "Артка",
   "tourNext": "Кийинки",
+  "tourSkip": "Өткөрүп жибер",
+  "tourFinish": "Бүттү",
+  "tourAdd": "Провайдериңиздин жазылуу шилтемесин кошуңуз.",
+  "tourServer": "Серверди тандаңыз. \"Эң ылдам\" сиз үчүн бирин тандайт.",
+  "tourConnect": "Туташуу же ажыратуу үчүн бул жерди басыңыз.",
+  "tourMode": "Режимди тандаңыз. VPN түшүп калса, өчүрүү блокторун өлтүрүңүз.",
+  "tourSettings": "Жөндөөлөрдү ачыңыз. Бул колдонмону ошол жерден кайталай аласыз.",
   "chooseProgram": "Программаны тандаңыз",
   "installedApps": "Орнотулган колдонмолор",
   "runningProcesses": "Иштеп жаткан процесстер",
@@ -213,12 +223,16 @@
   "updateNoNotes": "Чыгармада эскертүүлөр жок.",
   "updateDropWarning": "Жаңыртуу үчүн туташууну үзөлүбү?",
   "updateWaitConnection": "Туташуу даяр эмес",
+  "updateDownloading": "Файлдар жүктөлүп алынууда жана текшерилүүдө...",
+  "updateInstalling": "Жаңыртуу даярдалууда же администратордун аутентификациясын күтүүдө...",
   "updateNetworkError": "Жаңыртуу жүктөлүп алынбай койду",
   "updateReleaseError": "Чыгарылган маалыматтар же талап кылынган файлдар жок же жараксыз.",
   "updateChecksumError": "Жүктөп алуу SHA256SUMS менен дал келбейт",
   "updateInstallError": "Жаңыртуу аягына чыккан жок",
   "updateUnsupported": "Бул аткарылуучу файл колдоого алынган Sora пакет жупуна таандык эмес",
+  "updateManual": "Текшерилген эки пакетти тең орнотуу үчүн бул буйрукту терминалда иштетиңиз, андан кийин Soraди кайра ачыңыз. Файлдар жүктөө каталогунда калат. VPN байланышы үзүлөт.",
   "updateCopyCommand": "Көчүрүү буйругу",
+  "updateChecksDisabled": "Автоматтык текшерүүлөр Жөндөөлөрдөн өчүрүлгөн.",
   "updateInstalled": "Жаңыртуу орнотулду",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "Маалыматтын агып кетишин текшерүү",
   "leakTestRun": "Текшерүү",
   "leakTestCancel": "Жокко чыгаруу",
+  "leakTestNeedsConnection": "Дайындардын агып кетишин текшерүү үчүн VPN менен туташыңыз.",
   "leakTestProgress": "Сыноолор аяктады: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "Оңдоо",
+  "leakTestFixedNote": "Тармак бөгөтү күйүк. Текшерүү үчүн сыноону кайра иштетиңиз.",
   "leakTestCheckDirectDns": "Түз DNS",
   "leakTestCheckIcmpEcho": "ICMP echo",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "Иштеп чыгуучу бул версияны алып салды",
+  "updateRolloutPending": "Жаңыраак версия акырындык менен чыгарылып жатат жана сизге автоматтык түрдө сунушталат.",
   "updateRollbacking": "{version} версиясына кайтуу...",
   "updateRolledBack": "{version} жаңыртуусу ден соолук текшерүүсүнөн өткөн жок, андыктан Sora кайра {fromVersion} га жылдырылды.",
   "updateRollbackError": "Автоматтык артка кайтаруу ишке ашкан жок",
@@ -722,6 +746,7 @@
   "qrShareTitle": "QR кодун бөлүшүү",
   "qrScanTitle": "QR кодун сканерлеңиз",
   "qrCopyLink": "Шилтемени көчүрүү",
+  "qrWarning": "Кодду ишенген адамдарга гана көрсөтүңүз.",
   "qrFromClipboard": "Алмашуу буферинен чаптоо",
   "qrNoCode": "Бул сүрөттөн QR код табылган жок.",
   "qrInvalid": "Бул QR кодунда жарактуу шилтеме жок.",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "Туннелдин DNS резолверлери",
   "dnsLeakCheckSystemResolvers": "Системалык резолверлер",
   "dnsLeakCheckKillSwitchDns": "Тармак бөгөтүнүн DNS коргоосу",
+  "dnsLeakFixConfigureTunnelDns": "Туннелдин DNS конфигурациясын жогорудагы DNS жөндөөлөрүндө.",
+  "dnsLeakFixReviewSystemResolvers": "Туннелдин сыртында тутумуңуз кайсы чечүүчүлөрдү колдоноорун текшериңиз.",
+  "dnsLeakFixEnableKillSwitch": "DNS трафиги туннелде калышы үчүн тармак бөгөтүн күйгүзүңүз.",
   "dnsLeakCheckEncryptedDns": "Системанын шифрленген DNS кызматы",
   "dnsLeakCheckDnsSpoof": "Жасалма DNS жооптор",
+  "dnsLeakFixReviewEncryptedDns": "Туннелдин сыртында тутумуңуз кайсы шифрленген DNS акыркы чекиттерин колдоноорун текшериңиз.",
+  "dnsLeakFixUseEncryptedDns": "Резолверлер жоопторду жасалмалай албашы үчүн туннелде шифрленген DNS (DoT же DoH) колдонуңуз.",
+  "dnsCheckNeedsConnection": "Адегенде VPN менен туташып, андан кийин агып кеткендигин текшериңиз.",
   "dnsExpected": "Күтүлгөн",
   "dnsActual": "байкалган",
   "measureSpeed": "Ылдамдыкты өлчөө",

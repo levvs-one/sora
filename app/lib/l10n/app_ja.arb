@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "DNS",
   "dnsAuto": "自動",
+  "dnsHint": "アドレス、カンマ区切り",
   "fragment": "TLS フラグメンテーション",
   "fragmentPackets": "何を分割するか",
   "fragmentLength": "ピースサイズ",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "通知はありません",
   "retryConnect": "接続を再試行します",
   "openLogs": "ログを開く",
+  "tourReplay": "ガイドを再度表示する",
+  "tourStep": "ステップ {step}/5",
   "tourBack": "戻る",
   "tourNext": "次",
+  "tourSkip": "スキップ",
+  "tourFinish": "終わり",
+  "tourAdd": "プロバイダーのサブスクリプション リンクを追加します。",
+  "tourServer": "サーバーを選択します。 「最速」では、1 つが選択されます。",
+  "tourConnect": "ここをクリックして接続または切断します。",
+  "tourMode": "モードを選択します。 VPN が切断された場合、キルスイッチはインターネットをブロックします。",
+  "tourSettings": "設定を開きます。 そこでこのガイドを再生できます。",
   "chooseProgram": "プログラムを選択してください",
   "installedApps": "インストールされているアプリケーション",
   "runningProcesses": "実行中のプロセス",
@@ -213,12 +223,16 @@
   "updateNoNotes": "リリースにはメモがありません。",
   "updateDropWarning": "更新のために切断しますか？",
   "updateWaitConnection": "接続の準備ができていません",
+  "updateDownloading": "ファイルをダウンロードして確認しています...",
+  "updateInstalling": "アップデートを準備中または管理者の認証を待っています...",
   "updateNetworkError": "アップデートをダウンロードできませんでした",
   "updateReleaseError": "リリース データまたは必要なファイルが欠落しているか無効です。",
   "updateChecksumError": "ダウンロードは SHA256SUMS と一致しません",
   "updateInstallError": "アップデートが完了しませんでした",
   "updateUnsupported": "この実行可能ファイルは、サポートされている Sora パッケージ ペアによって所有されていません",
+  "updateManual": "ターミナルでこのコマンドを実行して両方の検証済みパッケージをインストールし、Sora を再度開きます。 ファイルはダウンロード ディレクトリに残ります。 VPN 接続が切断されます。",
   "updateCopyCommand": "コピーコマンド",
+  "updateChecksDisabled": "自動チェックは設定で無効になっています。",
   "updateInstalled": "アップデートがインストールされました",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "データ漏洩のテスト",
   "leakTestRun": "チェック",
   "leakTestCancel": "キャンセル",
+  "leakTestNeedsConnection": "VPN に接続してデータ漏洩をテストします。",
   "leakTestProgress": "完了したテスト: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "修正",
+  "leakTestFixedNote": "ネットワーク遮断は有効です。もう一度テストして確認してください。",
   "leakTestCheckDirectDns": "直接 DNS",
   "leakTestCheckIcmpEcho": "ICMP エコー",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "開発者はこのバージョンを取り下げました",
+  "updateRolloutPending": "新しいバージョンは段階的に公開されており、自動的に提供されます。",
   "updateRollbacking": "バージョン {version} にロールバックしています...",
   "updateRolledBack": "{version} への更新はヘルスチェックに合格しなかったため、Sora は {fromVersion} にロールバックされました。",
   "updateRollbackError": "自動ロールバックに失敗しました",
@@ -722,6 +746,7 @@
   "qrShareTitle": "QR コードを共有",
   "qrScanTitle": "QR コードをスキャンします",
   "qrCopyLink": "リンクをコピー",
+  "qrWarning": "信頼できる人にだけコードを共有してください。",
   "qrFromClipboard": "クリップボードから貼り付け",
   "qrNoCode": "この画像に QR コードが見つかりません。",
   "qrInvalid": "この QR コードには有効なリンクが含まれていません。",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "トンネルの DNS リゾルバー",
   "dnsLeakCheckSystemResolvers": "システムリゾルバー",
   "dnsLeakCheckKillSwitchDns": "ネットワーク遮断による DNS 保護",
+  "dnsLeakFixConfigureTunnelDns": "上記の DNS 設定でトンネルの DNS を構成します。",
+  "dnsLeakFixReviewSystemResolvers": "システムがトンネルの外側でどのリゾルバーを使用するかを確認してください。",
+  "dnsLeakFixEnableKillSwitch": "ネットワーク遮断を有効にして、DNS 通信をトンネル内に留めてください。",
   "dnsLeakCheckEncryptedDns": "OS の暗号化 DNS",
   "dnsLeakCheckDnsSpoof": "偽造されたDNS応答",
+  "dnsLeakFixReviewEncryptedDns": "システムがトンネルの外でどの暗号化された DNS エンドポイントを使用しているかを確認してください。",
+  "dnsLeakFixUseEncryptedDns": "リゾルバーが応答を偽造できないように、トンネルには暗号化された DNS (DoT または DoH) を使用します。",
+  "dnsCheckNeedsConnection": "まずVPNに接続してから、漏れがないか確認してください。",
   "dnsExpected": "予想される",
   "dnsActual": "観察された",
   "measureSpeed": "速度を測定する",

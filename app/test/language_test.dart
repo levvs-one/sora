@@ -58,7 +58,7 @@ void main() {
       tester.view.physicalSize = const Size(420, 800);
       addTearDown(tester.view.reset);
       final settings = await Settings.load();
-
+      await settings.completeTour();
       settings.language = language.code;
       settings.animations = false;
       final sora = DesktopState(settings);
@@ -88,7 +88,7 @@ void main() {
     tester.view.physicalSize = const Size(1000, 800);
     addTearDown(tester.view.reset);
     final settings = await Settings.load();
-
+    await settings.completeTour();
     settings.language = 'ru';
     settings.animations = false;
     final sora = DesktopState(settings);

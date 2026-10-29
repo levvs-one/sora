@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "域名系统",
   "dnsAuto": "汽车",
+  "dnsHint": "地址，逗号分隔",
   "fragment": "TLS 碎片",
   "fragmentPackets": "分割什么",
   "fragmentLength": "件数",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "暂无通知",
   "retryConnect": "重试连接",
   "openLogs": "打开日志",
+  "tourReplay": "再次显示指南",
+  "tourStep": "第 5 步 {step}",
   "tourBack": "后退",
   "tourNext": "下一个",
+  "tourSkip": "跳过",
+  "tourFinish": "完毕",
+  "tourAdd": "添加您的提供商的订阅链接。",
+  "tourServer": "选择一个服务器。 “最快”为您选择一个。",
+  "tourConnect": "单击此处连接或断开连接。",
+  "tourMode": "选择一种模式。 如果 VPN 掉线，终止开关会阻止互联网。",
+  "tourSettings": "打开设置。 您可以在那里重播本指南。",
   "chooseProgram": "选择一个程序",
   "installedApps": "已安装的应用程序",
   "runningProcesses": "正在运行的进程",
@@ -213,12 +223,16 @@
   "updateNoNotes": "该版本没有注释。",
   "updateDropWarning": "断开连接以更新？",
   "updateWaitConnection": "连接尚未就绪",
+  "updateDownloading": "正在下载并验证文件...",
+  "updateInstalling": "正在准备更新或等待管理员身份验证...",
   "updateNetworkError": "无法下载更新",
   "updateReleaseError": "发布数据或所需文件丢失或无效。",
   "updateChecksumError": "下载的内容与 SHA256SUMS 不匹配",
   "updateInstallError": "更新没有完成",
   "updateUnsupported": "此可执行文件不属于受支持的 Sora 软件包对",
+  "updateManual": "在终端中运行此命令以安装两个经过验证的软件包，然后重新打开 Sora。 文件保留在下载目录中。 VPN 连接将会断开。",
   "updateCopyCommand": "复制命令",
+  "updateChecksDisabled": "在“设置”中禁用自动检查。",
   "updateInstalled": "已安装更新",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "泄漏测试",
   "leakTestRun": "执行测试",
   "leakTestCancel": "取消",
+  "leakTestNeedsConnection": "请先连接，再执行泄漏测试。",
   "leakTestProgress": "已完成测试：{count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "修复",
+  "leakTestFixedNote": "已启用网络锁定，请重新测试以确认。",
   "leakTestCheckDirectDns": "直接 DNS",
   "leakTestCheckIcmpEcho": "ICMP 回显",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "开发者已撤回此版本，请等待修复版",
+  "updateRolloutPending": "新版本正分批推出，届时会自动通知您更新。",
   "updateRollbacking": "正在回滚至版本 {version}...",
   "updateRolledBack": "更新至 {version} 后未通过运行检查，Sora 已回滚至 {fromVersion}。",
   "updateRollbackError": "自动回滚失败",
@@ -722,6 +746,7 @@
   "qrShareTitle": "透过 QR 分享",
   "qrScanTitle": "扫描 QR 码",
   "qrCopyLink": "复制链接",
+  "qrWarning": "仅与信任的人分享此二维码。",
   "qrFromClipboard": "从剪贴板粘贴",
   "qrNoCode": "此图片中未找到二维码。",
   "qrInvalid": "此 QR 码不含有效链接。",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "隧道 DNS 解析器",
   "dnsLeakCheckSystemResolvers": "系统解析器",
   "dnsLeakCheckKillSwitchDns": "网络锁定的 DNS 保护",
+  "dnsLeakFixConfigureTunnelDns": "请在上方的 DNS 设置中指定隧道 DNS。",
+  "dnsLeakFixReviewSystemResolvers": "检查系统在隧道外会使用哪些解析器。",
+  "dnsLeakFixEnableKillSwitch": "请启用网络锁定，让 DNS 流量保持在隧道内。",
   "dnsLeakCheckEncryptedDns": "操作系统加密 DNS",
   "dnsLeakCheckDnsSpoof": "DNS 响应伪造",
+  "dnsLeakFixReviewEncryptedDns": "检查系统在隧道外使用的加密 DNS 端点。",
+  "dnsLeakFixUseEncryptedDns": "请为隧道使用加密 DNS（DoT 或 DoH），避免解析器伪造响应。",
+  "dnsCheckNeedsConnection": "请先连接 VPN，再检查是否泄漏。",
   "dnsExpected": "预期",
   "dnsActual": "实际",
   "measureSpeed": "测量速度",

@@ -292,7 +292,7 @@ void main() {
 
   testWidgets('repeated action failures keep one visible toast and one history entry', (tester) async {
     final sora = await start();
-
+    await sora.settings.completeTour();
     sora.settings.animations = false;
     await tester.pumpWidget(SoraApp(sora: sora));
     await tester.pumpAndSettle();
@@ -321,7 +321,7 @@ void main() {
       ..physicalSize = const Size(420, 900);
     for (final locale in S.supportedLocales) {
       final sora = await start();
-
+      await sora.settings.completeTour();
       sora.settings
         ..language = locale.toString()
         ..animations = false;
@@ -364,7 +364,7 @@ void main() {
 
   testWidgets('notifications and UI resolve unsupported and Chinese system locales identically', (tester) async {
     final sora = await start();
-
+    await sora.settings.completeTour();
     sora.settings.language = 'system';
     await tester.pumpWidget(SoraApp(sora: sora));
     for (final locales in [

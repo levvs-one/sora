@@ -33,7 +33,7 @@ void main() {
     testWidgets('provider order survives old $mode preference, measurements and search', (tester) async {
       await SharedPreferencesAsync().setString('serverSortMode', mode);
       final settings = await Settings.load();
-
+      await settings.completeTour();
       settings
         ..animations = false
         ..language = 'en';

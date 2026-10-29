@@ -97,6 +97,7 @@
   "ipv6": "IPv6",
   "dns": "ডিএনএস",
   "dnsAuto": "অটো",
+  "dnsHint": "ঠিকানা, কমা পৃথক",
   "fragment": "TLS ফ্র্যাগমেন্টেশন",
   "fragmentPackets": "কি বিভক্ত করা",
   "fragmentLength": "টুকরা আকার",
@@ -185,8 +186,17 @@
   "notificationsEmpty": "কোনো বিজ্ঞপ্তি নেই",
   "retryConnect": "সংযোগ পুনরায় চেষ্টা করুন",
   "openLogs": "লগ খুলুন",
+  "tourReplay": "আবার গাইড দেখান",
+  "tourStep": "5 এর মধ্যে {step} ধাপ",
   "tourBack": "ব্যাক",
   "tourNext": "পরবর্তী",
+  "tourSkip": "এড়িয়ে যান",
+  "tourFinish": "সম্পন্ন",
+  "tourAdd": "আপনার প্রদানকারীর সদস্যতা লিঙ্ক যোগ করুন.",
+  "tourServer": "একটি সার্ভার চয়ন করুন। \"দ্রুততম\" আপনার জন্য একটি নির্বাচন করে।",
+  "tourConnect": "সংযোগ বা সংযোগ বিচ্ছিন্ন করতে এখানে ক্লিক করুন.",
+  "tourMode": "একটি মোড চয়ন করুন. VPN কমে গেলে কিল সুইচ ইন্টারনেট ব্লক করে।",
+  "tourSettings": "সেটিংস খুলুন। আপনি সেখানে এই নির্দেশিকা পুনরায় চালাতে পারেন।",
   "chooseProgram": "একটি প্রোগ্রাম চয়ন করুন",
   "installedApps": "ইনস্টল করা অ্যাপ্লিকেশন",
   "runningProcesses": "চলমান প্রক্রিয়া",
@@ -213,12 +223,16 @@
   "updateNoNotes": "রিলিজ কোন নোট আছে.",
   "updateDropWarning": "আপডেটের জন্য সংযোগ বিচ্ছিন্ন করবেন?",
   "updateWaitConnection": "সংযোগ প্রস্তুত নয়",
+  "updateDownloading": "ফাইল ডাউনলোড এবং যাচাই করা হচ্ছে...",
+  "updateInstalling": "আপডেট প্রস্তুত করা হচ্ছে বা প্রশাসকের প্রমাণীকরণের জন্য অপেক্ষা করা হচ্ছে...",
   "updateNetworkError": "আপডেট ডাউনলোড করা যায়নি",
   "updateReleaseError": "রিলিজ ডেটা বা প্রয়োজনীয় ফাইলগুলি অনুপস্থিত বা অবৈধ৷",
   "updateChecksumError": "ডাউনলোডটি SHA256SUMS-এর সাথে মেলে না৷ কিছুই ইনস্টল করা হয়নি",
   "updateInstallError": "আপডেট শেষ হয়নি",
   "updateUnsupported": "এই এক্সিকিউটেবল একটি সমর্থিত Sora প্যাকেজ জোড়ার মালিকানাধীন নয়",
+  "updateManual": "উভয় যাচাইকৃত প্যাকেজ ইনস্টল করতে একটি টার্মিনালে এই কমান্ডটি চালান, তারপর Sora পুনরায় খুলুন। ফাইলগুলি ডাউনলোড ডিরেক্টরিতে থাকে। ভিপিএন কানেকশন বন্ধ হয়ে যাবে।",
   "updateCopyCommand": "কমান্ড অনুলিপি করুন",
+  "updateChecksDisabled": "সেটিংসে স্বয়ংক্রিয় চেক অক্ষম করা হয়েছে৷",
   "updateInstalled": "আপডেট ইনস্টল করা হয়েছে",
   "@updateRollbacking": {
     "placeholders": {
@@ -395,6 +409,13 @@
       }
     }
   },
+  "@tourStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
   "@updateAvailable": {
     "placeholders": {
       "version": {
@@ -444,6 +465,7 @@
   "leakTestTitle": "তথ্য ফাঁস জন্য পরীক্ষা",
   "leakTestRun": "চেক করুন",
   "leakTestCancel": "বাতিল",
+  "leakTestNeedsConnection": "ডেটা ফাঁস পরীক্ষা করতে VPN-এর সাথে সংযোগ করুন।",
   "leakTestProgress": "পরীক্ষা সম্পন্ন হয়েছে: {count}",
   "@leakTestProgress": {
     "placeholders": {
@@ -463,6 +485,7 @@
   },
   "leakTestSkipped": "Skipped, not applicable in this session",
   "leakTestFix": "ফিক্স",
+  "leakTestFixedNote": "নেটওয়ার্ক অবরোধ চালু আছে। যাচাই করতে আবার পরীক্ষা চালান।",
   "leakTestCheckDirectDns": "সরাসরি DNS",
   "leakTestCheckIcmpEcho": "ICMP প্রতিধ্বনি",
   "leakTestCheckIpv6": "IPv6",
@@ -488,6 +511,7 @@
     }
   },
   "updateVersionRevoked": "বিকাশকারী এই সংস্করণটি প্রত্যাহার করেছে",
+  "updateRolloutPending": "একটি নতুন সংস্করণ ধীরে ধীরে চালু হচ্ছে এবং স্বয়ংক্রিয়ভাবে আপনাকে অফার করা হবে।",
   "updateRollbacking": "{version} সংস্করণে ফিরে আসছে...",
   "updateRolledBack": "{version}-এর আপডেট স্বাস্থ্য পরীক্ষায় উত্তীর্ণ হয়নি, তাই Sora কে {fromVersion} এ ফিরিয়ে আনা হয়েছে।",
   "updateRollbackError": "স্বয়ংক্রিয় রোলব্যাক ব্যর্থ হয়েছে",
@@ -722,6 +746,7 @@
   "qrShareTitle": "শেয়ার করুন QR কোড",
   "qrScanTitle": "স্ক্যান করুন QR কোড",
   "qrCopyLink": "কপি লিঙ্ক",
+  "qrWarning": "শুধু বিশ্বস্ত ব্যক্তিদের কোডটি দেখান।",
   "qrFromClipboard": "ক্লিপবোর্ড থেকে পেস্ট করুন",
   "qrNoCode": "এই ছবিতে কোনো QR কোড পাওয়া যায়নি।",
   "qrInvalid": "এই QR কোডটিতে কোনো বৈধ লিঙ্ক নেই।",
@@ -747,8 +772,14 @@
   "dnsLeakCheckTunnelDns": "টানেলের DNS রিজলভার",
   "dnsLeakCheckSystemResolvers": "সিস্টেমের DNS রিজলভার",
   "dnsLeakCheckKillSwitchDns": "নেটওয়ার্ক অবরোধের DNS সুরক্ষা",
+  "dnsLeakFixConfigureTunnelDns": "উপরের DNS সেটিংসে টানেলের জন্য DNS কনফিগার করুন।",
+  "dnsLeakFixReviewSystemResolvers": "আপনার সিস্টেম টানেলের বাইরে ব্যবহার করবে কোন সমাধানকারী পরীক্ষা করুন.",
+  "dnsLeakFixEnableKillSwitch": "DNS ট্রাফিক টানেলের ভেতরে রাখতে নেটওয়ার্ক অবরোধ চালু করুন।",
   "dnsLeakCheckEncryptedDns": "সিস্টেমের এনক্রিপ্ট করা DNS",
   "dnsLeakCheckDnsSpoof": "নকল DNS প্রতিক্রিয়া",
+  "dnsLeakFixReviewEncryptedDns": "আপনার সিস্টেম টানেলের বাইরে কোন এনক্রিপ্টেড DNS এন্ডপয়েন্ট ব্যবহার করে তা পরীক্ষা করে দেখুন।",
+  "dnsLeakFixUseEncryptedDns": "টানেলের জন্য এনক্রিপ্ট করা DNS (DoT বা DoH) ব্যবহার করুন যাতে সমাধানকারীরা উত্তর জাল করতে না পারে।",
+  "dnsCheckNeedsConnection": "প্রথমে VPN এর সাথে সংযোগ করুন, তারপরে ফাঁস পরীক্ষা করুন।",
   "dnsExpected": "প্রত্যাশিত",
   "dnsActual": "পালন করা হয়েছে",
   "measureSpeed": "গতি পরিমাপ",
