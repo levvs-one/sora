@@ -524,7 +524,12 @@ func (s *Session) supervise(events <-chan engine.Event) {
 			}
 		case <-network:
 			if why := watch.changed(); why != "" {
-				s.renewConnections(ctx, why)
+				if err := s.renewConnections(ctx, why); err != nil {
+					if ctx.Err() == nil {
+						s.fail(err)
+					}
+					return
+				}
 				s.checkProfile()
 			} else if watch.last == "" {
 				// Going offline must allow the same profile on the next join.
@@ -686,7 +691,12 @@ func (s *Session) mask(text string) string {
 // fail records the cause, enters failed, and ends supervision. Stop, also
 // called by the control plane after failure, cleans up the engine and guard.
 func (s *Session) fail(err error) {
-	s.setState(StateFailed, errs.CodeOf(err), errs.KeyOf(err), s.mask(errs.Detail(err)))
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.stopping {
+		return
+	}
+	s.setStateLocked(StateFailed, errs.CodeOf(err), errs.KeyOf(err), s.mask(errs.Detail(err)))
 	s.log.Append(Event{
 		Kind:   EventError,
 		Reason: errs.CodeOf(err),

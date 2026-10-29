@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/errs"
 )
 
 // sequence answers a fixed run of fingerprints, then keeps the last one.
@@ -149,4 +151,199 @@ func TestAnEngineThatCannotDropConnectionsStartsOver(t *testing.T) {
 		time.Sleep(5 * time.Millisecond)
 	}
 	t.Error("the engine was not moved onto the plan again after the network changed")
+}
+
+// A failed restart must not leave a connected status when the engine is gone.
+func TestFailedNetworkRenewalReportsFailureAndKeepsGuard(t *testing.T) {
+	eng, guard := newFakeEngine(), &fakeGuard{}
+	var moved atomic.Bool
+	observed := make(chan struct{})
+	var observedOnce sync.Once
+	cfg := testConfig(eng, guard)
+	cfg.Settings.KillSwitch = true
+	cfg.NetworkInterval = 5 * time.Millisecond
+	cfg.Network = func() string {
+		if moved.Load() {
+			return "wifi-b"
+		}
+		observedOnce.Do(func() { close(observed) })
+		return "wifi-a"
+	}
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+	select {
+	case <-observed:
+	case <-time.After(2 * time.Second):
+		t.Fatal("network watcher did not establish its initial fingerprint")
+	}
+	eng.mu.Lock()
+	eng.apply = errors.New("synthetic network renewal failure")
+	eng.mu.Unlock()
+	moved.Store(true)
+	waitFor(t, 2*time.Second, func() bool { return s.State() == StateFailed })
+	if status := s.Status(); status.Key != errs.KeyEngineStartFailed {
+		t.Fatalf("failure key = %q, want %q", status.Key, errs.KeyEngineStartFailed)
+	}
+	select {
+	case <-s.Done():
+	case <-time.After(2 * time.Second):
+		t.Fatal("supervision continued after the terminal renewal failure")
+	}
+	if !guard.Current().KillSwitch {
+		t.Fatal("failed renewal released the kill switch before disconnect")
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if guard.Current().KillSwitch {
+		t.Fatal("disconnect did not restore the guard")
+	}
+}
+
+type rejectedRenewalEngine struct {
+	*fakeEngine
+	attempts atomic.Int32
+}
+
+func (e *rejectedRenewalEngine) Apply(ctx context.Context, plan *engine.Plan) error {
+	if e.attempts.Add(1) == 1 {
+		return e.fakeEngine.Apply(ctx, plan)
+	}
+	// An error does not establish that the old engine is usable on the new path.
+	return errors.New("synthetic renewal rejected")
+}
+
+func TestRejectedNetworkRenewalDoesNotRemainConnected(t *testing.T) {
+	eng := &rejectedRenewalEngine{fakeEngine: newFakeEngine()}
+	cfg := testConfig(eng, &fakeGuard{})
+	cfg.Network = sequence("wifi-a", "wifi-b")
+	cfg.NetworkInterval = 5 * time.Millisecond
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+	waitFor(t, 2*time.Second, func() bool { return s.State() == StateFailed })
+	if eng.State() != engine.StateRunning {
+		t.Fatal("test engine did not retain its previous running state")
+	}
+	if status := s.Status(); status.Key != errs.KeyEngineStartFailed {
+		t.Fatalf("failure key = %q, want %q", status.Key, errs.KeyEngineStartFailed)
+	}
+}
+
+type interruptibleRenewalEngine struct {
+	*fakeEngine
+	attempts atomic.Int32
+	entered  chan struct{}
+}
+
+func (e *interruptibleRenewalEngine) Apply(ctx context.Context, plan *engine.Plan) error {
+	if e.attempts.Add(1) == 1 {
+		return e.fakeEngine.Apply(ctx, plan)
+	}
+	close(e.entered)
+	<-ctx.Done()
+	return ctx.Err()
+}
+
+func TestDisconnectDuringNetworkRenewalDoesNotReportFailure(t *testing.T) {
+	eng := &interruptibleRenewalEngine{fakeEngine: newFakeEngine(), entered: make(chan struct{})}
+	guard := &fakeGuard{}
+	cfg := testConfig(eng, guard)
+	cfg.Settings.KillSwitch = true
+	cfg.Network = sequence("wifi-a", "wifi-b")
+	cfg.NetworkInterval = 5 * time.Millisecond
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+	select {
+	case <-eng.entered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("network renewal did not begin")
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-s.Done():
+	case <-time.After(2 * time.Second):
+		t.Fatal("supervision did not stop after disconnect")
+	}
+	if s.State() != StateDisconnected || guard.Current().KillSwitch {
+		t.Fatal("disconnect did not restore the session and guard")
+	}
+	for _, event := range s.Journal().Since(0, 0) {
+		if event.State == StateFailed || event.Kind == EventError {
+			t.Fatalf("disconnect recorded a failure: %+v", event)
+		}
+	}
+}
+
+type interruptibleTracker struct {
+	*fakeEngine
+	entered chan struct{}
+}
+
+func (e *interruptibleTracker) Connections(context.Context) ([]engine.Connection, error) {
+	return nil, nil
+}
+func (e *interruptibleTracker) CloseConnection(context.Context, string) error { return nil }
+func (e *interruptibleTracker) CloseConnections(ctx context.Context) error {
+	close(e.entered)
+	<-ctx.Done()
+	return ctx.Err()
+}
+
+func TestDisconnectDuringBulkCloseDoesNotRestartEngine(t *testing.T) {
+	eng := &interruptibleTracker{fakeEngine: newFakeEngine(), entered: make(chan struct{})}
+	cfg := testConfig(eng, &fakeGuard{})
+	cfg.Network = sequence("wifi-a", "wifi-b")
+	cfg.NetworkInterval = 5 * time.Millisecond
+	s, err := New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Stop(context.Background()) })
+	select {
+	case <-eng.entered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("bulk connection close did not begin")
+	}
+	if err := s.Stop(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-s.Done():
+	case <-time.After(2 * time.Second):
+		t.Fatal("supervision did not stop after disconnect")
+	}
+	if applies, _, _ := eng.counts(); applies != 1 {
+		t.Fatalf("engine applied %d times, want only the initial start", applies)
+	}
+	if s.State() != StateDisconnected {
+		t.Fatalf("session state = %v, want disconnected", s.State())
+	}
+	for _, event := range s.Journal().Since(0, 0) {
+		if event.State == StateFailed || event.Kind == EventError {
+			t.Fatalf("disconnect recorded a failure: %+v", event)
+		}
+	}
 }
