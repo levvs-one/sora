@@ -528,7 +528,9 @@ contenders with invalid assets. The user selects the winning profile in
 the mode picker or connects explicitly from its detail screen. Its plan
 contains a copy of that strategy, separate from manual bypass settings.
 Changing an active profile reuses the serialized authenticated core
-Connect flow. A failed replacement retains the old core session. Disabling,
+Connect flow. A replacement rejected before the current session is stopped
+leaves that session running. If starting the replacement fails after the old
+session stops, the old session is not automatically restored. Disabling,
 removing, revoking or losing the selected grant/winner stops that session
 instead of silently substituting another profile. The selection remains
 visible; reconnect fails until it becomes available or the user chooses
