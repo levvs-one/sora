@@ -26,14 +26,28 @@ An open source VPN client for Windows and Linux. Paste your subscription link, p
 
 ## Install
 
-| System | Files | How |
-| --- | --- | --- |
-| Windows 10 1809+ and Windows 11, x64 | `Sora-Setup-<version>-x64.exe` | The authenticated local script or the installer from the releases page |
-| Debian, Ubuntu | `sora_<version>_amd64.deb` and `sora-core_<version>_amd64.deb` | The authenticated local script or `apt install ./sora*.deb` |
-| Fedora, openSUSE | `sora-<version>-1.x86_64.rpm` and `sora-core-<version>-1.x86_64.rpm` | The authenticated local script or `dnf install ./sora*.rpm` |
-| Arch | `sora-<version>-1-x86_64.pkg.tar.zst` and `sora-core-…` | The authenticated local script or `pacman -U sora*.pkg.tar.zst` |
+Windows, PowerShell:
 
-This branch requires a signed release manifest and a previously authenticated script and verifier. See the [installation prerequisites](docs/security/release-signatures.md#initial-installation) before running local install scripts. Published v1.1.2 does not meet this contract; downloading and executing a script from the same release cannot authenticate that release. A consumer bootstrap channel and signed-release transition must be provisioned before publication. Older Windows versions use the separate [sora-legacy](https://github.com/levvs-one/sora-legacy) client.
+```powershell
+irm https://github.com/levvs-one/sora/releases/latest/download/install.ps1 | iex
+```
+
+Linux:
+
+```sh
+curl -fsSL https://github.com/levvs-one/sora/releases/latest/download/install.sh | sh
+```
+
+The script picks the packages for your system and architecture and checks their hashes; it also verifies the manifest signature when OpenSSL 3 or minisign is available. What a first install trusts is described in the [installation prerequisites](docs/security/release-signatures.md#initial-installation).
+
+| System | Files | By hand |
+| --- | --- | --- |
+| Windows 10 1809+ and Windows 11, x64 | `Sora-Setup-<version>-x64.exe` | run the installer |
+| Debian, Ubuntu, amd64 and ARM64 | `sora_<version>_<arch>.deb` and `sora-core_<version>_<arch>.deb` | `apt install ./sora*.deb` |
+| Fedora, openSUSE, x86_64 and aarch64 | `sora-<version>-1.<arch>.rpm` and `sora-core-<version>-1.<arch>.rpm` | `dnf install ./sora*.rpm` |
+| Arch, x86_64 and aarch64 | `sora-<version>-1-<arch>.pkg.tar.zst` and `sora-core-…` | `pacman -U sora*.pkg.tar.zst` |
+
+All files are on the [releases page](https://github.com/levvs-one/sora/releases/latest), details in [docs/install.md](docs/install.md). Older Windows versions use the separate [sora-legacy](https://github.com/levvs-one/sora-legacy) client.
 
 ## Features
 
@@ -46,7 +60,7 @@ This branch requires a signed release manifest and a previously authenticated sc
 - **Sync.** Subscriptions, rules and settings between your computers on the local network: QR pairing, end-to-end encryption, no accounts and no cloud.
 - **Extensions.** A catalog of signed extensions: panels, themes, routing rules and background tasks that may fetch allowlisted addresses through the VPN only. Permissions are confirmed at install. See [docs/extensions.md](docs/extensions.md).
 - **zapret on Linux.** DPI bypass without a server, and next to the VPN for direct traffic. It does not hide your IP address or replace a VPN.
-- **Everything else.** Tray, start at login, in-app updates with a staged rollout and, on Linux, an automatic rollback when the new version fails to start. 31 interface language variants, light and dark themes.
+- **Everything else.** Tray, start at login, in-app updates with a staged rollout and, on Linux, an automatic rollback when the new version fails to start. 32 interface languages, light and dark themes.
 
 <table>
   <tr>
@@ -94,7 +108,7 @@ The app never touches the network stack itself: everything that needs privileges
 ## Security and privacy
 
 - No telemetry. The app itself only contacts GitHub: for update information (can be turned off in settings) and, when you open the extension store, for the catalog and the revocation list. GitHub sees your IP address, as with any website visit.
-- This branch requires a version-bound Minisign signature over `SHA256SUMS` before installation, updates or Linux rollback, then verifies package hashes. Initial installation requires an independently trusted verifier. Published v1.1.2 is unsigned and rejected; see the [transition requirements](docs/security/release-signatures.md#signed-release-transition).
+- Since 1.1.3 every release is signed with the Sora team key (`SHA256SUMS.minisig`). The app and the service check the signature, version, platform, size and hash of an update before installing it, and on Linux before a rollback too. Unsigned 1.1.2 and older are rejected; see the [transition requirements](docs/security/release-signatures.md#signed-release-transition). The Windows installer is not Authenticode-signed yet, so SmartScreen may warn.
 - The extension catalog and the revocation list are signed with the Sora team key compiled into the app. Extension packages are signed with their authors' keys, and the key is checked again on every update.
 
 The threat model and the data Sora keeps are described in [docs/security.md](docs/security.md). Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
