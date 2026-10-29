@@ -328,6 +328,9 @@ class SVi extends S {
   String get dnsAuto => 'Tự động';
 
   @override
+  String get dnsHint => 'Địa chỉ, được phân tách bằng dấu phẩy';
+
+  @override
   String get fragment => 'Phân mảnh TLS';
 
   @override
@@ -744,6 +747,12 @@ class SVi extends S {
   String get updateWaitConnection => 'Kết nối chưa sẵn sàng';
 
   @override
+  String get updateDownloading => 'Đang tải xuống và xác minh tệp...';
+
+  @override
+  String get updateInstalling => 'Đang chuẩn bị cập nhật hoặc chờ xác thực của quản trị viên...';
+
+  @override
   String get updateNetworkError => 'Không thể tải xuống bản cập nhật';
 
   @override
@@ -759,7 +768,15 @@ class SVi extends S {
   String get updateUnsupported => 'Tệp thực thi này không thuộc sở hữu của cặp gói Sora được hỗ trợ';
 
   @override
+  String get updateManual =>
+      'Chạy lệnh này trong thiết bị đầu cuối để cài đặt cả hai gói đã được xác minh, sau đó mở lại Sora. Các tập tin vẫn ở trong thư mục tải xuống. Kết nối VPN sẽ bị rớt.';
+
+  @override
   String get updateVersionRevoked => 'Nhà phát triển đã rút phiên bản này';
+
+  @override
+  String get updateRolloutPending =>
+      'Một phiên bản mới hơn đang được triển khai dần dần và sẽ tự động được cung cấp cho bạn.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +797,9 @@ class SVi extends S {
 
   @override
   String get updateCopyCommand => 'Sao chép lệnh';
+
+  @override
+  String get updateChecksDisabled => 'Kiểm tra tự động bị tắt trong Cài đặt.';
 
   @override
   String get updateInstalled => 'Đã cài đặt bản cập nhật';
@@ -1205,6 +1225,9 @@ class SVi extends S {
   String get qrCopyLink => 'Sao chép liên kết';
 
   @override
+  String get qrWarning => 'Chỉ chia sẻ mã này với người bạn tin tưởng.';
+
+  @override
   String get qrFromClipboard => 'Dán từ bảng nhớ tạm';
 
   @override
@@ -1283,10 +1306,31 @@ class SVi extends S {
   String get dnsLeakCheckKillSwitchDns => 'Bảo vệ DNS bằng chặn mạng';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Định cấu hình DNS cho đường hầm trong cài đặt DNS ở trên.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Kiểm tra xem hệ thống của bạn sẽ sử dụng bộ phân giải nào bên ngoài đường hầm.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Bật chặn mạng để lưu lượng DNS luôn đi trong đường hầm.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS mã hóa của hệ điều hành';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Giả mạo DNS phản hồi';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Kiểm tra xem điểm cuối DNS được mã hóa nào mà hệ thống của bạn sử dụng bên ngoài đường hầm.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Dùng DNS mã hóa (DoT hoặc DoH) cho đường hầm để trình phân giải không thể giả mạo câu trả lời.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Trước tiên hãy kết nối với VPN, sau đó kiểm tra xem có rò rỉ không.';
 
   @override
   String get dnsExpected => 'Dự kiến';
@@ -1594,6 +1638,9 @@ class SVi extends S {
   String get leakTestCancel => 'Hủy';
 
   @override
+  String get leakTestNeedsConnection => 'Kết nối với VPN để kiểm tra rò rỉ dữ liệu.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Đã hoàn thành kiểm tra: $count';
   }
@@ -1612,6 +1659,9 @@ class SVi extends S {
 
   @override
   String get leakTestFix => 'Sửa';
+
+  @override
+  String get leakTestFixedNote => 'Đã bật chặn mạng. Chạy lại kiểm tra để xác nhận.';
 
   @override
   String get leakTestCheckDirectDns => 'Trực tiếp DNS';

@@ -328,6 +328,9 @@ class SIt extends S {
   String get dnsAuto => 'Auto';
 
   @override
+  String get dnsHint => 'Indirizzi separati da virgole';
+
+  @override
   String get fragment => 'Frammentazione TLS';
 
   @override
@@ -744,6 +747,13 @@ class SIt extends S {
   String get updateWaitConnection => 'La connessione non è pronta';
 
   @override
+  String get updateDownloading => 'Download e verifica dei file...';
+
+  @override
+  String get updateInstalling =>
+      'Preparazione dell\'aggiornamento o attesa dell\'autenticazione dell\'amministratore...';
+
+  @override
   String get updateNetworkError => 'Impossibile scaricare l\'aggiornamento';
 
   @override
@@ -759,7 +769,15 @@ class SIt extends S {
   String get updateUnsupported => 'Questo eseguibile non è di proprietà di una coppia di pacchetti Sora supportata';
 
   @override
+  String get updateManual =>
+      'Esegui questo comando in un terminale per installare entrambi i pacchetti verificati, quindi riapri Sora. I file rimangono nella directory di download. La connessione VPN verrà interrotta.';
+
+  @override
   String get updateVersionRevoked => 'Lo sviluppatore ha ritirato questa versione';
+
+  @override
+  String get updateRolloutPending =>
+      'Una versione più recente verrà lanciata gradualmente e ti verrà offerta automaticamente.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +798,9 @@ class SIt extends S {
 
   @override
   String get updateCopyCommand => 'Copia comando';
+
+  @override
+  String get updateChecksDisabled => 'I controlli automatici sono disabilitati nelle Impostazioni.';
 
   @override
   String get updateInstalled => 'Aggiornamento installato';
@@ -1205,6 +1226,9 @@ class SIt extends S {
   String get qrCopyLink => 'Copia collegamento';
 
   @override
+  String get qrWarning => 'Condividi il codice solo con persone fidate.';
+
+  @override
   String get qrFromClipboard => 'Incolla dagli appunti';
 
   @override
@@ -1288,10 +1312,31 @@ class SIt extends S {
   String get dnsLeakCheckKillSwitchDns => 'Protezione DNS del blocco di rete';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Configurare DNS per il tunnel nelle impostazioni DNS sopra.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Controlla quali risolutori utilizzerebbe il tuo sistema al di fuori del tunnel.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Attiva il blocco di rete per mantenere il traffico DNS nel tunnel.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS cifrato del sistema operativo';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Risposte DNS contraffatte';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Controlla quali endpoint DNS crittografati utilizza il tuo sistema all\'esterno del tunnel.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Utilizzare DNS crittografato (DoT o DoH) per il tunnel in modo che i risolutori non possano falsificare le risposte.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Connettersi prima a VPN, quindi verificare eventuali perdite.';
 
   @override
   String get dnsExpected => 'Previsto';
@@ -1599,6 +1644,9 @@ class SIt extends S {
   String get leakTestCancel => 'Annulla';
 
   @override
+  String get leakTestNeedsConnection => 'Connettersi a VPN per verificare eventuali fughe di dati.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Test completati: $count';
   }
@@ -1622,6 +1670,9 @@ class SIt extends S {
 
   @override
   String get leakTestFix => 'Correzione';
+
+  @override
+  String get leakTestFixedNote => 'Il blocco di rete è attivo. Ripeti il test per verificare.';
 
   @override
   String get leakTestCheckDirectDns => 'Diretto DNS';

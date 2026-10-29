@@ -328,6 +328,9 @@ class SAz extends S {
   String get dnsAuto => 'Avtomatik';
 
   @override
+  String get dnsHint => 'Ünvanlar, vergüllə ayrılmış';
+
+  @override
   String get fragment => 'TLS parçalanması';
 
   @override
@@ -744,6 +747,12 @@ class SAz extends S {
   String get updateWaitConnection => 'Bağlantı hazır deyil';
 
   @override
+  String get updateDownloading => 'Fayllar endirilir və təsdiqlənir...';
+
+  @override
+  String get updateInstalling => 'Güncəlləmə hazırlanır və ya administrator autentifikasiyası gözlənilir...';
+
+  @override
   String get updateNetworkError => 'Güncəlləməni endirmək mümkün olmadı';
 
   @override
@@ -759,7 +768,14 @@ class SAz extends S {
   String get updateUnsupported => 'Bu icra olunan fayl dəstəklənən Sora paket cütlüyünə məxsus deyil';
 
   @override
+  String get updateManual =>
+      'Hər iki təsdiqlənmiş paketi quraşdırmaq üçün bu əmri terminalda işə salın, sonra Sora-i yenidən açın. Fayllar yükləmə qovluğunda qalır. VPN bağlantısı kəsiləcək.';
+
+  @override
   String get updateVersionRevoked => 'Tərtibatçı bu versiyanı geri götürdü';
+
+  @override
+  String get updateRolloutPending => 'Daha yeni versiya tədricən yayılır və avtomatik olaraq sizə təklif olunacaq.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +796,9 @@ class SAz extends S {
 
   @override
   String get updateCopyCommand => 'Kopyalama əmri';
+
+  @override
+  String get updateChecksDisabled => 'Avtomatik yoxlamalar Parametrlərdə deaktiv edilib.';
 
   @override
   String get updateInstalled => 'Yeniləmə quraşdırılıb';
@@ -1205,6 +1224,9 @@ class SAz extends S {
   String get qrCopyLink => 'Linki kopyalayın';
 
   @override
+  String get qrWarning => 'Kodu yalnız etibar etdiyiniz şəxslərlə paylaşın.';
+
+  @override
   String get qrFromClipboard => 'Buferdən yapışdırın';
 
   @override
@@ -1283,10 +1305,31 @@ class SAz extends S {
   String get dnsLeakCheckKillSwitchDns => 'Şəbəkə kilidinin DNS qoruması';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Yuxarıdakı DNS parametrlərində tunel üçün DNS konfiqurasiya edin.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Sisteminizin tuneldən kənarda hansı həlledicilərdən istifadə edəcəyini yoxlayın.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS trafikinin tuneldə qalması üçün şəbəkə kilidini aktivləşdirin.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Əməliyyat sisteminin şifrələnmiş DNS-i';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Saxta DNS cavablar';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Sisteminizin tuneldən kənarda hansı şifrələnmiş DNS son nöqtələrindən istifadə etdiyini yoxlayın.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Tunel üçün şifrələnmiş DNS (DoT və ya DoH) istifadə edin ki, həlledicilər cavabları saxtalaşdırmasın.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Əvvəlcə VPN-ə qoşulun, sonra sızma olub olmadığını yoxlayın.';
 
   @override
   String get dnsExpected => 'Gözlənilir';
@@ -1594,6 +1637,9 @@ class SAz extends S {
   String get leakTestCancel => 'Ləğv et';
 
   @override
+  String get leakTestNeedsConnection => 'Məlumat sızmasını yoxlamaq üçün VPN-ə qoşulun.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Testlər tamamlandı: $count';
   }
@@ -1617,6 +1663,9 @@ class SAz extends S {
 
   @override
   String get leakTestFix => 'Düzəlt';
+
+  @override
+  String get leakTestFixedNote => 'Şəbəkə kilidi aktivdir. Yoxlamaq üçün testi yenidən başladın.';
 
   @override
   String get leakTestCheckDirectDns => 'Birbaşa DNS';

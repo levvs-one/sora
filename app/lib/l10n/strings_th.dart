@@ -328,6 +328,9 @@ class STh extends S {
   String get dnsAuto => 'อัตโนมัติ';
 
   @override
+  String get dnsHint => 'ที่อยู่ คั่นด้วยเครื่องหมายจุลภาค';
+
+  @override
   String get fragment => 'การกระจายตัวของ TLS';
 
   @override
@@ -744,6 +747,12 @@ class STh extends S {
   String get updateWaitConnection => 'การเชื่อมต่อยังไม่พร้อม';
 
   @override
+  String get updateDownloading => 'กำลังดาวน์โหลดและยืนยันไฟล์...';
+
+  @override
+  String get updateInstalling => 'กำลังเตรียมการอัปเดตหรือรอการรับรองความถูกต้องของผู้ดูแลระบบ...';
+
+  @override
   String get updateNetworkError => 'ไม่สามารถดาวน์โหลดการอัปเดตได้';
 
   @override
@@ -759,7 +768,14 @@ class STh extends S {
   String get updateUnsupported => 'ไฟล์ปฏิบัติการนี้ไม่ได้เป็นเจ้าของโดยคู่แพ็คเกจ Sora ที่รองรับ';
 
   @override
+  String get updateManual =>
+      'เรียกใช้คำสั่งนี้ในเทอร์มินัลเพื่อติดตั้งแพ็คเกจที่ตรวจสอบแล้วทั้งสองรายการ จากนั้นเปิด Sora อีกครั้ง ไฟล์จะยังคงอยู่ในไดเร็กทอรีดาวน์โหลด การเชื่อมต่อ VPN จะลดลง';
+
+  @override
   String get updateVersionRevoked => 'ผู้พัฒนาได้ถอนเวอร์ชันนี้ออกแล้ว กรุณารอการแก้ไขการเผยแพร่';
+
+  @override
+  String get updateRolloutPending => 'เวอร์ชันใหม่กำลังทยอยเปิดตัว และจะเสนอให้คุณโดยอัตโนมัติ';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +796,9 @@ class STh extends S {
 
   @override
   String get updateCopyCommand => 'คำสั่งคัดลอก';
+
+  @override
+  String get updateChecksDisabled => 'การตรวจสอบอัตโนมัติถูกปิดใช้งานในการตั้งค่า';
 
   @override
   String get updateInstalled => 'ติดตั้งการอัปเดตแล้ว';
@@ -1205,6 +1224,9 @@ class STh extends S {
   String get qrCopyLink => 'คัดลอกลิงค์';
 
   @override
+  String get qrWarning => 'แชร์รหัสนี้กับคนที่คุณไว้ใจเท่านั้น';
+
+  @override
   String get qrFromClipboard => 'วางจากคลิปบอร์ด';
 
   @override
@@ -1283,10 +1305,29 @@ class STh extends S {
   String get dnsLeakCheckKillSwitchDns => 'การป้องกัน DNS ด้วยการตัดเครือข่าย';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'กำหนดค่า DNS สำหรับช่องสัญญาณในการตั้งค่า DNS ด้านบน';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'ตรวจสอบว่ารีโซลเวอร์ใดที่ระบบของคุณจะใช้นอกอุโมงค์';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'เปิดการตัดเครือข่ายเพื่อให้การรับส่งข้อมูล DNS อยู่ในอุโมงค์';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS แบบเข้ารหัสของระบบ';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'ปลอมแปลงคำตอบ DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'ตรวจสอบว่าปลายทาง DNS ที่เข้ารหัสซึ่งระบบของคุณใช้นอกอุโมงค์';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'ใช้ DNS แบบเข้ารหัส (DoT หรือ DoH) ในอุโมงค์เพื่อป้องกันตัวแปลงชื่อปลอมคำตอบ';
+
+  @override
+  String get dnsCheckNeedsConnection => 'เชื่อมต่อกับ VPN ก่อน จากนั้นจึงตรวจสอบรอยรั่ว';
 
   @override
   String get dnsExpected => 'คาดว่า';
@@ -1594,6 +1635,9 @@ class STh extends S {
   String get leakTestCancel => 'ยกเลิก';
 
   @override
+  String get leakTestNeedsConnection => 'เชื่อมต่อกับ VPN เพื่อทดสอบข้อมูลรั่วไหล';
+
+  @override
   String leakTestProgress(int count) {
     return 'การทดสอบเสร็จสมบูรณ์: $count';
   }
@@ -1612,6 +1656,9 @@ class STh extends S {
 
   @override
   String get leakTestFix => 'แก้ไข';
+
+  @override
+  String get leakTestFixedNote => 'เปิดการตัดเครือข่ายแล้ว เรียกใช้การทดสอบอีกครั้งเพื่อตรวจสอบ';
 
   @override
   String get leakTestCheckDirectDns => 'โดยตรง DNS';

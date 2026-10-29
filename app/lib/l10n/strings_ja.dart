@@ -328,6 +328,9 @@ class SJa extends S {
   String get dnsAuto => '自動';
 
   @override
+  String get dnsHint => 'アドレス、カンマ区切り';
+
+  @override
   String get fragment => 'TLS フラグメンテーション';
 
   @override
@@ -739,6 +742,12 @@ class SJa extends S {
   String get updateWaitConnection => '接続の準備ができていません';
 
   @override
+  String get updateDownloading => 'ファイルをダウンロードして確認しています...';
+
+  @override
+  String get updateInstalling => 'アップデートを準備中または管理者の認証を待っています...';
+
+  @override
   String get updateNetworkError => 'アップデートをダウンロードできませんでした';
 
   @override
@@ -754,7 +763,14 @@ class SJa extends S {
   String get updateUnsupported => 'この実行可能ファイルは、サポートされている Sora パッケージ ペアによって所有されていません';
 
   @override
+  String get updateManual =>
+      'ターミナルでこのコマンドを実行して両方の検証済みパッケージをインストールし、Sora を再度開きます。 ファイルはダウンロード ディレクトリに残ります。 VPN 接続が切断されます。';
+
+  @override
   String get updateVersionRevoked => '開発者はこのバージョンを取り下げました';
+
+  @override
+  String get updateRolloutPending => '新しいバージョンは段階的に公開されており、自動的に提供されます。';
 
   @override
   String updateRollbacking(String version) {
@@ -774,6 +790,9 @@ class SJa extends S {
 
   @override
   String get updateCopyCommand => 'コピーコマンド';
+
+  @override
+  String get updateChecksDisabled => '自動チェックは設定で無効になっています。';
 
   @override
   String get updateInstalled => 'アップデートがインストールされました';
@@ -1198,6 +1217,9 @@ class SJa extends S {
   String get qrCopyLink => 'リンクをコピー';
 
   @override
+  String get qrWarning => '信頼できる人にだけコードを共有してください。';
+
+  @override
   String get qrFromClipboard => 'クリップボードから貼り付け';
 
   @override
@@ -1276,10 +1298,28 @@ class SJa extends S {
   String get dnsLeakCheckKillSwitchDns => 'ネットワーク遮断による DNS 保護';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => '上記の DNS 設定でトンネルの DNS を構成します。';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'システムがトンネルの外側でどのリゾルバーを使用するかを確認してください。';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'ネットワーク遮断を有効にして、DNS 通信をトンネル内に留めてください。';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'OS の暗号化 DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => '偽造されたDNS応答';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'システムがトンネルの外でどの暗号化された DNS エンドポイントを使用しているかを確認してください。';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns => 'リゾルバーが応答を偽造できないように、トンネルには暗号化された DNS (DoT または DoH) を使用します。';
+
+  @override
+  String get dnsCheckNeedsConnection => 'まずVPNに接続してから、漏れがないか確認してください。';
 
   @override
   String get dnsExpected => '予想される';
@@ -1587,6 +1627,9 @@ class SJa extends S {
   String get leakTestCancel => 'キャンセル';
 
   @override
+  String get leakTestNeedsConnection => 'VPN に接続してデータ漏洩をテストします。';
+
+  @override
   String leakTestProgress(int count) {
     return '完了したテスト: $count';
   }
@@ -1605,6 +1648,9 @@ class SJa extends S {
 
   @override
   String get leakTestFix => '修正';
+
+  @override
+  String get leakTestFixedNote => 'ネットワーク遮断は有効です。もう一度テストして確認してください。';
 
   @override
   String get leakTestCheckDirectDns => '直接 DNS';

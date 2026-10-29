@@ -328,6 +328,9 @@ class SFr extends S {
   String get dnsAuto => 'Auto';
 
   @override
+  String get dnsHint => 'Adresses, séparées par des virgules';
+
+  @override
   String get fragment => 'Fragmentation TLS';
 
   @override
@@ -744,6 +747,13 @@ class SFr extends S {
   String get updateWaitConnection => 'La connexion n’est pas prête';
 
   @override
+  String get updateDownloading => 'Téléchargement et vérification des fichiers...';
+
+  @override
+  String get updateInstalling =>
+      'Préparation de la mise à jour ou attente de l\'authentification de l\'administrateur...';
+
+  @override
   String get updateNetworkError => 'Impossible de télécharger la mise à jour';
 
   @override
@@ -759,7 +769,15 @@ class SFr extends S {
   String get updateUnsupported => 'Cet exécutable n\'appartient pas à une paire de packages Sora prise en charge';
 
   @override
+  String get updateManual =>
+      'Exécutez cette commande dans un terminal pour installer les deux packages vérifiés, puis rouvrez Sora. Les fichiers restent dans le répertoire de téléchargement. La connexion VPN sera interrompue.';
+
+  @override
   String get updateVersionRevoked => 'Le développeur a retiré cette version';
+
+  @override
+  String get updateRolloutPending =>
+      'Une version plus récente est déployée progressivement et vous sera proposée automatiquement.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +798,9 @@ class SFr extends S {
 
   @override
   String get updateCopyCommand => 'Commande Copier';
+
+  @override
+  String get updateChecksDisabled => 'Les vérifications automatiques sont désactivées dans les paramètres.';
 
   @override
   String get updateInstalled => 'Mise à jour installée';
@@ -1205,6 +1226,9 @@ class SFr extends S {
   String get qrCopyLink => 'Copier le lien';
 
   @override
+  String get qrWarning => 'Ne partagez ce code qu’avec des personnes de confiance.';
+
+  @override
   String get qrFromClipboard => 'Coller depuis le presse-papiers';
 
   @override
@@ -1288,10 +1312,31 @@ class SFr extends S {
   String get dnsLeakCheckKillSwitchDns => 'Protection DNS du coupe-circuit';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Configurez DNS pour le tunnel dans les paramètres DNS ci-dessus.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Vérifiez quels résolveurs votre système utiliserait en dehors du tunnel.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Activez le coupe-circuit pour que le trafic DNS reste dans le tunnel.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS chiffré du système';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Réponses DNS falsifiées';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Vérifiez quels points de terminaison DNS chiffrés votre système utilise en dehors du tunnel.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Utilisez un DNS chiffré (DoT ou DoH) pour le tunnel afin que les résolveurs ne puissent pas falsifier les réponses.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Connectez-vous d\'abord au VPN, puis vérifiez s\'il y a des fuites.';
 
   @override
   String get dnsExpected => 'Attendu';
@@ -1599,6 +1644,9 @@ class SFr extends S {
   String get leakTestCancel => 'Annuler';
 
   @override
+  String get leakTestNeedsConnection => 'Connectez-vous au VPN pour tester les fuites de données.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Tests terminés : $count';
   }
@@ -1622,6 +1670,9 @@ class SFr extends S {
 
   @override
   String get leakTestFix => 'Correction';
+
+  @override
+  String get leakTestFixedNote => 'Le coupe-circuit est activé. Relancez le test pour vérifier.';
 
   @override
   String get leakTestCheckDirectDns => 'Direct DNS';

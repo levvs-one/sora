@@ -328,6 +328,9 @@ class SId extends S {
   String get dnsAuto => 'Mobil';
 
   @override
+  String get dnsHint => 'Alamat, dipisahkan koma';
+
+  @override
   String get fragment => 'Fragmentasi TLS';
 
   @override
@@ -744,6 +747,12 @@ class SId extends S {
   String get updateWaitConnection => 'Koneksi belum siap';
 
   @override
+  String get updateDownloading => 'Mengunduh dan memverifikasi file...';
+
+  @override
+  String get updateInstalling => 'Mempersiapkan pembaruan atau menunggu otentikasi administrator...';
+
+  @override
   String get updateNetworkError => 'Tidak dapat mengunduh pembaruan';
 
   @override
@@ -759,7 +768,15 @@ class SId extends S {
   String get updateUnsupported => 'Eksekusi ini tidak dimiliki oleh pasangan paket Sora yang didukung';
 
   @override
+  String get updateManual =>
+      'Jalankan perintah ini di terminal untuk menginstal kedua paket terverifikasi, lalu buka kembali Sora. File-file tersebut tetap berada di direktori unduhan. Koneksi VPN akan terputus.';
+
+  @override
   String get updateVersionRevoked => 'Pengembang telah menarik versi ini';
+
+  @override
+  String get updateRolloutPending =>
+      'Versi yang lebih baru diluncurkan secara bertahap dan akan ditawarkan kepada Anda secara otomatis.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +797,9 @@ class SId extends S {
 
   @override
   String get updateCopyCommand => 'Salin perintah';
+
+  @override
+  String get updateChecksDisabled => 'Pemeriksaan otomatis dinonaktifkan di Pengaturan.';
 
   @override
   String get updateInstalled => 'Pembaruan diinstal';
@@ -1205,6 +1225,9 @@ class SId extends S {
   String get qrCopyLink => 'Salin tautan';
 
   @override
+  String get qrWarning => 'Bagikan kode ini hanya kepada orang yang Anda percaya.';
+
+  @override
   String get qrFromClipboard => 'Tempel dari papan klip';
 
   @override
@@ -1283,10 +1306,31 @@ class SId extends S {
   String get dnsLeakCheckKillSwitchDns => 'Perlindungan DNS oleh pemutus jaringan';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Konfigurasikan DNS untuk terowongan dalam pengaturan DNS di atas.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Periksa penyelesai mana yang akan digunakan sistem Anda di luar terowongan.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Aktifkan pemutus jaringan agar lalu lintas DNS tetap di dalam terowongan.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS terenkripsi sistem operasi';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Tanggapan DNS palsu';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Periksa titik akhir DNS terenkripsi mana yang digunakan sistem Anda di luar terowongan.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Gunakan DNS terenkripsi (DoT atau DoH) untuk terowongan agar resolver tidak dapat memalsukan jawaban.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Hubungkan ke VPN terlebih dahulu, lalu periksa kebocorannya.';
 
   @override
   String get dnsExpected => 'Diharapkan';
@@ -1594,6 +1638,9 @@ class SId extends S {
   String get leakTestCancel => 'Batal';
 
   @override
+  String get leakTestNeedsConnection => 'Hubungkan ke VPN untuk menguji kebocoran data.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Tes selesai: $count';
   }
@@ -1612,6 +1659,9 @@ class SId extends S {
 
   @override
   String get leakTestFix => 'Perbaiki';
+
+  @override
+  String get leakTestFixedNote => 'Pemutus jaringan aktif. Jalankan pengujian lagi untuk memastikannya.';
 
   @override
   String get leakTestCheckDirectDns => 'Langsung DNS';

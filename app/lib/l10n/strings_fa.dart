@@ -328,6 +328,9 @@ class SFa extends S {
   String get dnsAuto => 'خودکار';
 
   @override
+  String get dnsHint => 'آدرس ها، با کاما از هم جدا شده اند';
+
+  @override
   String get fragment => 'تکه تکه شدن TLS';
 
   @override
@@ -744,6 +747,12 @@ class SFa extends S {
   String get updateWaitConnection => 'اتصال آماده نیست';
 
   @override
+  String get updateDownloading => 'دانلود و تایید فایل ها...';
+
+  @override
+  String get updateInstalling => 'در حال آماده سازی به روز رسانی یا انتظار برای احراز هویت سرپرست...';
+
+  @override
   String get updateNetworkError => 'آپدیت دانلود نشد دوباره امتحان کنید';
 
   @override
@@ -759,7 +768,14 @@ class SFa extends S {
   String get updateUnsupported => 'این فایل اجرایی متعلق به یک جفت بسته پشتیبانی شده Sora نیست';
 
   @override
+  String get updateManual =>
+      'این دستور را در ترمینال اجرا کنید تا هر دو بسته تایید شده نصب شوند، سپس Sora را دوباره باز کنید. فایل ها در دایرکتوری دانلود می مانند. اتصال VPN قطع می شود.';
+
+  @override
   String get updateVersionRevoked => 'توسعه دهنده این نسخه را پس گرفته است';
+
+  @override
+  String get updateRolloutPending => 'نسخه جدیدتر به تدریج در حال انتشار است و به طور خودکار به شما ارائه می شود.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +796,9 @@ class SFa extends S {
 
   @override
   String get updateCopyCommand => 'دستور کپی';
+
+  @override
+  String get updateChecksDisabled => 'بررسی خودکار در تنظیمات غیرفعال است.';
 
   @override
   String get updateInstalled => 'آپدیت نصب شد Sora را دوباره باز کنید';
@@ -1205,6 +1224,9 @@ class SFa extends S {
   String get qrCopyLink => 'پیوند را کپی کنید';
 
   @override
+  String get qrWarning => 'کد را فقط با افراد مورد اعتماد به اشتراک بگذارید.';
+
+  @override
   String get qrFromClipboard => 'چسباندن از کلیپ بورد';
 
   @override
@@ -1283,10 +1305,31 @@ class SFa extends S {
   String get dnsLeakCheckKillSwitchDns => 'محافظت DNS با قطع اضطراری';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'DNS را برای تونل در تنظیمات DNS بالا پیکربندی کنید.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'بررسی کنید که سیستم شما از کدام حل کننده ها در خارج از تونل استفاده می کند.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'قطع اضطراری را روشن کنید تا ترافیک DNS درون تونل بماند.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS رمزگذاری‌شدهٔ سیستم‌عامل';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'پاسخ های جعلی DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'بررسی کنید که سیستم شما از کدام نقاط پایانی DNS رمزگذاری شده در خارج از تونل استفاده می کند.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'از DNS (DoT یا DoH) رمزگذاری شده برای تونل استفاده کنید تا حل‌کننده‌ها نتوانند پاسخ‌ها را جعل کنند.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'ابتدا به VPN متصل شوید، سپس نشتی را بررسی کنید.';
 
   @override
   String get dnsExpected => 'مورد انتظار';
@@ -1594,6 +1637,9 @@ class SFa extends S {
   String get leakTestCancel => 'لغو';
 
   @override
+  String get leakTestNeedsConnection => 'برای آزمایش نشت داده به VPN متصل شوید.';
+
+  @override
   String leakTestProgress(int count) {
     return 'آزمایشات تکمیل شده: $count';
   }
@@ -1617,6 +1663,9 @@ class SFa extends S {
 
   @override
   String get leakTestFix => 'رفع کنید';
+
+  @override
+  String get leakTestFixedNote => 'قطع اضطراری روشن است. برای بررسی، آزمایش را دوباره اجرا کنید.';
 
   @override
   String get leakTestCheckDirectDns => 'مستقیم DNS';

@@ -328,6 +328,9 @@ class SBn extends S {
   String get dnsAuto => 'অটো';
 
   @override
+  String get dnsHint => 'ঠিকানা, কমা পৃথক';
+
+  @override
   String get fragment => 'TLS ফ্র্যাগমেন্টেশন';
 
   @override
@@ -745,6 +748,12 @@ class SBn extends S {
   String get updateWaitConnection => 'সংযোগ প্রস্তুত নয়';
 
   @override
+  String get updateDownloading => 'ফাইল ডাউনলোড এবং যাচাই করা হচ্ছে...';
+
+  @override
+  String get updateInstalling => 'আপডেট প্রস্তুত করা হচ্ছে বা প্রশাসকের প্রমাণীকরণের জন্য অপেক্ষা করা হচ্ছে...';
+
+  @override
   String get updateNetworkError => 'আপডেট ডাউনলোড করা যায়নি';
 
   @override
@@ -760,7 +769,14 @@ class SBn extends S {
   String get updateUnsupported => 'এই এক্সিকিউটেবল একটি সমর্থিত Sora প্যাকেজ জোড়ার মালিকানাধীন নয়';
 
   @override
+  String get updateManual =>
+      'উভয় যাচাইকৃত প্যাকেজ ইনস্টল করতে একটি টার্মিনালে এই কমান্ডটি চালান, তারপর Sora পুনরায় খুলুন। ফাইলগুলি ডাউনলোড ডিরেক্টরিতে থাকে। ভিপিএন কানেকশন বন্ধ হয়ে যাবে।';
+
+  @override
   String get updateVersionRevoked => 'বিকাশকারী এই সংস্করণটি প্রত্যাহার করেছে';
+
+  @override
+  String get updateRolloutPending => 'একটি নতুন সংস্করণ ধীরে ধীরে চালু হচ্ছে এবং স্বয়ংক্রিয়ভাবে আপনাকে অফার করা হবে।';
 
   @override
   String updateRollbacking(String version) {
@@ -781,6 +797,9 @@ class SBn extends S {
 
   @override
   String get updateCopyCommand => 'কমান্ড অনুলিপি করুন';
+
+  @override
+  String get updateChecksDisabled => 'সেটিংসে স্বয়ংক্রিয় চেক অক্ষম করা হয়েছে৷';
 
   @override
   String get updateInstalled => 'আপডেট ইনস্টল করা হয়েছে';
@@ -1206,6 +1225,9 @@ class SBn extends S {
   String get qrCopyLink => 'কপি লিঙ্ক';
 
   @override
+  String get qrWarning => 'শুধু বিশ্বস্ত ব্যক্তিদের কোডটি দেখান।';
+
+  @override
   String get qrFromClipboard => 'ক্লিপবোর্ড থেকে পেস্ট করুন';
 
   @override
@@ -1284,10 +1306,30 @@ class SBn extends S {
   String get dnsLeakCheckKillSwitchDns => 'নেটওয়ার্ক অবরোধের DNS সুরক্ষা';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'উপরের DNS সেটিংসে টানেলের জন্য DNS কনফিগার করুন।';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'আপনার সিস্টেম টানেলের বাইরে ব্যবহার করবে কোন সমাধানকারী পরীক্ষা করুন.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS ট্রাফিক টানেলের ভেতরে রাখতে নেটওয়ার্ক অবরোধ চালু করুন।';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'সিস্টেমের এনক্রিপ্ট করা DNS';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'নকল DNS প্রতিক্রিয়া';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'আপনার সিস্টেম টানেলের বাইরে কোন এনক্রিপ্টেড DNS এন্ডপয়েন্ট ব্যবহার করে তা পরীক্ষা করে দেখুন।';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'টানেলের জন্য এনক্রিপ্ট করা DNS (DoT বা DoH) ব্যবহার করুন যাতে সমাধানকারীরা উত্তর জাল করতে না পারে।';
+
+  @override
+  String get dnsCheckNeedsConnection => 'প্রথমে VPN এর সাথে সংযোগ করুন, তারপরে ফাঁস পরীক্ষা করুন।';
 
   @override
   String get dnsExpected => 'প্রত্যাশিত';
@@ -1595,6 +1637,9 @@ class SBn extends S {
   String get leakTestCancel => 'বাতিল';
 
   @override
+  String get leakTestNeedsConnection => 'ডেটা ফাঁস পরীক্ষা করতে VPN-এর সাথে সংযোগ করুন।';
+
+  @override
   String leakTestProgress(int count) {
     return 'পরীক্ষা সম্পন্ন হয়েছে: $count';
   }
@@ -1618,6 +1663,9 @@ class SBn extends S {
 
   @override
   String get leakTestFix => 'ফিক্স';
+
+  @override
+  String get leakTestFixedNote => 'নেটওয়ার্ক অবরোধ চালু আছে। যাচাই করতে আবার পরীক্ষা চালান।';
 
   @override
   String get leakTestCheckDirectDns => 'সরাসরি DNS';

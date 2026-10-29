@@ -328,6 +328,9 @@ class SUz extends S {
   String get dnsAuto => 'Avtomatik';
 
   @override
+  String get dnsHint => 'Manzillar, vergul bilan ajratilgan';
+
+  @override
   String get fragment => 'TLS parchalanishi';
 
   @override
@@ -744,6 +747,12 @@ class SUz extends S {
   String get updateWaitConnection => 'Ulanish tayyor emas';
 
   @override
+  String get updateDownloading => 'Fayllar yuklab olinmoqda va tekshirilmoqda...';
+
+  @override
+  String get updateInstalling => 'Yangilanish tayyorlanmoqda yoki administrator autentifikatsiyasi kutilmoqda...';
+
+  @override
   String get updateNetworkError => 'Yangilanishni yuklab boʻlmadi';
 
   @override
@@ -760,7 +769,15 @@ class SUz extends S {
       'Bu bajariladigan fayl qoʻllab-quvvatlanadigan Sora paketlar juftligiga tegishli emas';
 
   @override
+  String get updateManual =>
+      'Ikkala tasdiqlangan paketni o\'rnatish uchun ushbu buyruqni terminalda ishga tushiring, so\'ngra Sora ni qayta oching. Fayllar yuklab olish katalogida qoladi. VPN ulanishi uziladi.';
+
+  @override
   String get updateVersionRevoked => 'Ishlab chiquvchi ushbu versiyani bekor qildi';
+
+  @override
+  String get updateRolloutPending =>
+      'Yangiroq versiya asta-sekin chiqarilmoqda va sizga avtomatik ravishda taklif qilinadi.';
 
   @override
   String updateRollbacking(String version) {
@@ -781,6 +798,9 @@ class SUz extends S {
 
   @override
   String get updateCopyCommand => 'Nusxa ko\'chirish buyrug\'i';
+
+  @override
+  String get updateChecksDisabled => 'Avtomatik tekshirish sozlamalarida o\'chirib qo\'yilgan.';
 
   @override
   String get updateInstalled => 'Yangilash oʻrnatildi';
@@ -1206,6 +1226,9 @@ class SUz extends S {
   String get qrCopyLink => 'Havolani nusxalash';
 
   @override
+  String get qrWarning => 'Kodni faqat ishonchli odamlarga ko‘rsating.';
+
+  @override
   String get qrFromClipboard => 'Buferdan joylashtirish';
 
   @override
@@ -1284,10 +1307,31 @@ class SUz extends S {
   String get dnsLeakCheckKillSwitchDns => 'Tarmoq qulfi orqali DNS himoyasi';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Yuqoridagi DNS sozlamalarida tunnel uchun DNS ni sozlang.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Tizim tunnel tashqarisida qaysi nom yechuvchilardan foydalanishini tekshiring.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS trafigi tunnelda qolishi uchun tarmoq qulfini yoqing.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Tizimning shifrlangan DNS xizmati';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Soxta DNS javoblar';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Tizimingiz tunneldan tashqarida qaysi shifrlangan DNS so‘nggi nuqtalardan foydalanishini tekshiring.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Nom yechuvchilar javoblarni soxtalashtira olmasligi uchun tunnelda shifrlangan DNS (DoT yoki DoH) ishlating.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Avval VPN ga ulaning, keyin sizib chiqmasligini tekshiring.';
 
   @override
   String get dnsExpected => 'kutilmoqda';
@@ -1595,6 +1639,9 @@ class SUz extends S {
   String get leakTestCancel => 'Bekor qilish';
 
   @override
+  String get leakTestNeedsConnection => 'Ma\'lumotlar sizib chiqishini tekshirish uchun VPN ga ulaning.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Testlar yakunlandi: $count';
   }
@@ -1618,6 +1665,9 @@ class SUz extends S {
 
   @override
   String get leakTestFix => 'Tuzatish';
+
+  @override
+  String get leakTestFixedNote => 'Tarmoq qulfi yoqilgan. Tekshirish uchun sinovni qayta ishga tushiring.';
 
   @override
   String get leakTestCheckDirectDns => 'Toʻgʻridan-toʻgʻri DNS';

@@ -328,6 +328,9 @@ class SBe extends S {
   String get dnsAuto => 'Аўто';
 
   @override
+  String get dnsHint => 'Адрасы праз коску';
+
+  @override
   String get fragment => 'Фрагментацыя TLS';
 
   @override
@@ -744,6 +747,12 @@ class SBe extends S {
   String get updateWaitConnection => 'Злучэнне не гатова';
 
   @override
+  String get updateDownloading => 'Ідзе загрузка і праверка файлаў...';
+
+  @override
+  String get updateInstalling => 'Падрыхтоўка абнаўлення або чаканне аўтэнтыфікацыі адміністратара...';
+
+  @override
   String get updateNetworkError => 'Не атрымалася спампаваць абнаўленне';
 
   @override
@@ -759,7 +768,14 @@ class SBe extends S {
   String get updateUnsupported => 'Гэты выкананы файл не належыць падтрымоўванай пары пакетаў Sora';
 
   @override
+  String get updateManual =>
+      'Запусціце гэту каманду ў тэрмінале, каб усталяваць абодва правераныя пакеты, затым зноў адкрыйце Sora. Файлы застаюцца ў каталогу загрузкі. VPN-злучэнне абарвецца.';
+
+  @override
   String get updateVersionRevoked => 'Распрацоўшчык адклікаў гэтую версію';
+
+  @override
+  String get updateRolloutPending => 'Новая версія разгортваецца паступова і будзе прапанавана вам аўтаматычна.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +796,9 @@ class SBe extends S {
 
   @override
   String get updateCopyCommand => 'Капіяваць каманду';
+
+  @override
+  String get updateChecksDisabled => 'Аўтаматычныя праверкі адключаны ў наладах.';
 
   @override
   String get updateInstalled => 'Абнаўленне ўстаноўлена';
@@ -1219,6 +1238,9 @@ class SBe extends S {
   String get qrCopyLink => 'Скапіраваць спасылку';
 
   @override
+  String get qrWarning => 'Паказвайце код толькі тым, каму давяраеце.';
+
+  @override
   String get qrFromClipboard => 'Уставіць з буфера абмену';
 
   @override
@@ -1304,10 +1326,31 @@ class SBe extends S {
   String get dnsLeakCheckKillSwitchDns => 'Абарона DNS праз kill switch';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Наладзьце DNS для тунэля ў наладах DNS вышэй.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Праверце, якія рэзолверы ваша сістэма будзе выкарыстоўваць па-за тунэлем.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'Уключыце kill switch, каб трафік DNS заставаўся ў тунэлі.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Зашыфраваны DNS сістэмы';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Падробленыя адказы DNS';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Праверце, якія зашыфраваныя канечныя кропкі DNS выкарыстоўвае ваша сістэма па-за тунэлем.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Выкарыстоўвайце зашыфраваны DNS (DoT або DoH) у тунэлі, каб рэзолверы не маглі падрабляць адказы.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Спачатку падключыцеся да VPN, потым праверце на ўцечкі.';
 
   @override
   String get dnsExpected => 'Чакаецца';
@@ -1615,6 +1658,9 @@ class SBe extends S {
   String get leakTestCancel => 'Адмена';
 
   @override
+  String get leakTestNeedsConnection => 'Падключыцеся да VPN, каб праверыць наяўнасць уцечак дадзеных.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Выпрабаванні завершаны: $count';
   }
@@ -1640,6 +1686,9 @@ class SBe extends S {
 
   @override
   String get leakTestFix => 'Выправіць';
+
+  @override
+  String get leakTestFixedNote => 'Kill switch уключаны. Паўтарыце праверку.';
 
   @override
   String get leakTestCheckDirectDns => 'Прамы DNS';

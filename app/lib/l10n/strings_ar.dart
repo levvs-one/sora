@@ -328,6 +328,9 @@ class SAr extends S {
   String get dnsAuto => 'آلي';
 
   @override
+  String get dnsHint => 'العناوين مفصولة بفواصل';
+
+  @override
   String get fragment => 'تجزئة TLS';
 
   @override
@@ -744,6 +747,12 @@ class SAr extends S {
   String get updateWaitConnection => 'الاتصال غير جاهز';
 
   @override
+  String get updateDownloading => 'جارٍ تنزيل الملفات والتحقق منها...';
+
+  @override
+  String get updateInstalling => 'جارٍ تحضير التحديث أو انتظار مصادقة المسؤول...';
+
+  @override
   String get updateNetworkError => 'تعذر تنزيل التحديث';
 
   @override
@@ -759,7 +768,14 @@ class SAr extends S {
   String get updateUnsupported => 'هذا الملف القابل للتنفيذ ليس مملوكًا لزوج حزمة Sora المدعوم';
 
   @override
+  String get updateManual =>
+      'قم بتشغيل هذا الأمر في الوحدة الطرفية لتثبيت الحزمتين اللتين تم التحقق منهما، ثم أعد فتح Sora. تبقى الملفات في دليل التنزيل. سينقطع اتصال VPN.';
+
+  @override
   String get updateVersionRevoked => 'قام المطور بسحب هذا الإصدار';
+
+  @override
+  String get updateRolloutPending => 'يتم طرح إصدار أحدث تدريجيًا وسيتم تقديمه لك تلقائيًا.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +796,9 @@ class SAr extends S {
 
   @override
   String get updateCopyCommand => 'أمر النسخ';
+
+  @override
+  String get updateChecksDisabled => 'تم تعطيل عمليات التحقق التلقائية في الإعدادات.';
 
   @override
   String get updateInstalled => 'تم تثبيت التحديث';
@@ -1222,6 +1241,9 @@ class SAr extends S {
   String get qrCopyLink => 'نسخ الرابط';
 
   @override
+  String get qrWarning => 'لا تشارك الرمز إلا مع من تثق بهم.';
+
+  @override
   String get qrFromClipboard => 'لصق من الحافظة';
 
   @override
@@ -1309,10 +1331,29 @@ class SAr extends S {
   String get dnsLeakCheckKillSwitchDns => 'حماية DNS بمفتاح الإيقاف';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'قم بتكوين DNS للنفق في إعدادات DNS أعلاه.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers => 'تحقق من وحدات الحل التي سيستخدمها نظامك خارج النفق.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'فعّل مفتاح الإيقاف لإبقاء حركة DNS داخل النفق.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'DNS المشفّر في نظام التشغيل';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'ردود DNS مزورة';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns => 'تحقق من نقاط النهاية المشفرة DNS التي يستخدمها نظامك خارج النفق.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'استخدم DNS (DoT أو DoH) المشفر للنفق حتى لا تتمكن أدوات الحل من تزوير الإجابات.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'اتصل بـ VPN أولاً، ثم تحقق من عدم وجود تسربات.';
 
   @override
   String get dnsExpected => 'المنتظر';
@@ -1620,6 +1661,9 @@ class SAr extends S {
   String get leakTestCancel => 'إلغاء';
 
   @override
+  String get leakTestNeedsConnection => 'اتصل بـ VPN لاختبار تسرب البيانات.';
+
+  @override
   String leakTestProgress(int count) {
     return 'الاختبارات المنجزة: $count';
   }
@@ -1647,6 +1691,9 @@ class SAr extends S {
 
   @override
   String get leakTestFix => 'الإصلاح';
+
+  @override
+  String get leakTestFixedNote => 'مفتاح الإيقاف مفعّل. أعد الاختبار للتحقق.';
 
   @override
   String get leakTestCheckDirectDns => 'مباشر DNS';

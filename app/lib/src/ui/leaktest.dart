@@ -161,7 +161,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
           ],
         ),
         if (_running) _progress(context),
-        if (_needsConnection) _note(context, Symbols.info_rounded, s.stateOff),
+        if (_needsConnection) _note(context, Symbols.info_rounded, s.leakTestNeedsConnection),
         if (_failure != null) _note(context, Symbols.info_rounded, describe(s, _failure!)),
         if (_results.isNotEmpty) _report(context),
       ],
@@ -315,7 +315,7 @@ class _LeakTestScreenState extends State<LeakTestScreen> {
                   Icon(Symbols.check_circle_rounded, size: 14, color: palette.ink2),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: Text(s.killSwitch, style: Styles.caption.copyWith(color: palette.ink)),
+                    child: Text(s.leakTestFixedNote, style: Styles.caption.copyWith(color: palette.ink)),
                   ),
                 ],
               ),

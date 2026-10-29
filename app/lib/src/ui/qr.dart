@@ -104,6 +104,12 @@ class _QrShareScreenState extends State<QrShareScreen> {
                               ),
                               const SizedBox(height: 32),
                               PrimaryButton(label: _copied ? s.copied : s.qrCopyLink, onTap: _copy),
+                              const SizedBox(height: 12),
+                              Text(
+                                s.qrWarning,
+                                textAlign: TextAlign.center,
+                                style: Styles.secondary.copyWith(color: palette.ink),
+                              ),
                             ],
                           ),
                         ),

@@ -328,6 +328,9 @@ class SKy extends S {
   String get dnsAuto => 'Авто';
 
   @override
+  String get dnsHint => 'Даректер, үтүр менен бөлүнгөн';
+
+  @override
   String get fragment => 'TLS фрагментациясы';
 
   @override
@@ -744,6 +747,12 @@ class SKy extends S {
   String get updateWaitConnection => 'Туташуу даяр эмес';
 
   @override
+  String get updateDownloading => 'Файлдар жүктөлүп алынууда жана текшерилүүдө...';
+
+  @override
+  String get updateInstalling => 'Жаңыртуу даярдалууда же администратордун аутентификациясын күтүүдө...';
+
+  @override
   String get updateNetworkError => 'Жаңыртуу жүктөлүп алынбай койду';
 
   @override
@@ -759,7 +768,15 @@ class SKy extends S {
   String get updateUnsupported => 'Бул аткарылуучу файл колдоого алынган Sora пакет жупуна таандык эмес';
 
   @override
+  String get updateManual =>
+      'Текшерилген эки пакетти тең орнотуу үчүн бул буйрукту терминалда иштетиңиз, андан кийин Soraди кайра ачыңыз. Файлдар жүктөө каталогунда калат. VPN байланышы үзүлөт.';
+
+  @override
   String get updateVersionRevoked => 'Иштеп чыгуучу бул версияны алып салды';
+
+  @override
+  String get updateRolloutPending =>
+      'Жаңыраак версия акырындык менен чыгарылып жатат жана сизге автоматтык түрдө сунушталат.';
 
   @override
   String updateRollbacking(String version) {
@@ -780,6 +797,9 @@ class SKy extends S {
 
   @override
   String get updateCopyCommand => 'Көчүрүү буйругу';
+
+  @override
+  String get updateChecksDisabled => 'Автоматтык текшерүүлөр Жөндөөлөрдөн өчүрүлгөн.';
 
   @override
   String get updateInstalled => 'Жаңыртуу орнотулду';
@@ -1205,6 +1225,9 @@ class SKy extends S {
   String get qrCopyLink => 'Шилтемени көчүрүү';
 
   @override
+  String get qrWarning => 'Кодду ишенген адамдарга гана көрсөтүңүз.';
+
+  @override
   String get qrFromClipboard => 'Алмашуу буферинен чаптоо';
 
   @override
@@ -1283,10 +1306,31 @@ class SKy extends S {
   String get dnsLeakCheckKillSwitchDns => 'Тармак бөгөтүнүн DNS коргоосу';
 
   @override
+  String get dnsLeakFixConfigureTunnelDns => 'Туннелдин DNS конфигурациясын жогорудагы DNS жөндөөлөрүндө.';
+
+  @override
+  String get dnsLeakFixReviewSystemResolvers =>
+      'Туннелдин сыртында тутумуңуз кайсы чечүүчүлөрдү колдоноорун текшериңиз.';
+
+  @override
+  String get dnsLeakFixEnableKillSwitch => 'DNS трафиги туннелде калышы үчүн тармак бөгөтүн күйгүзүңүз.';
+
+  @override
   String get dnsLeakCheckEncryptedDns => 'Системанын шифрленген DNS кызматы';
 
   @override
   String get dnsLeakCheckDnsSpoof => 'Жасалма DNS жооптор';
+
+  @override
+  String get dnsLeakFixReviewEncryptedDns =>
+      'Туннелдин сыртында тутумуңуз кайсы шифрленген DNS акыркы чекиттерин колдоноорун текшериңиз.';
+
+  @override
+  String get dnsLeakFixUseEncryptedDns =>
+      'Резолверлер жоопторду жасалмалай албашы үчүн туннелде шифрленген DNS (DoT же DoH) колдонуңуз.';
+
+  @override
+  String get dnsCheckNeedsConnection => 'Адегенде VPN менен туташып, андан кийин агып кеткендигин текшериңиз.';
 
   @override
   String get dnsExpected => 'Күтүлгөн';
@@ -1594,6 +1638,9 @@ class SKy extends S {
   String get leakTestCancel => 'Жокко чыгаруу';
 
   @override
+  String get leakTestNeedsConnection => 'Дайындардын агып кетишин текшерүү үчүн VPN менен туташыңыз.';
+
+  @override
   String leakTestProgress(int count) {
     return 'Сыноолор аяктады: $count';
   }
@@ -1617,6 +1664,9 @@ class SKy extends S {
 
   @override
   String get leakTestFix => 'Оңдоо';
+
+  @override
+  String get leakTestFixedNote => 'Тармак бөгөтү күйүк. Текшерүү үчүн сыноону кайра иштетиңиз.';
 
   @override
   String get leakTestCheckDirectDns => 'Түз DNS';
