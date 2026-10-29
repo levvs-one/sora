@@ -238,6 +238,24 @@ class SId extends S {
   String get errSubFetch => 'Langganan tidak dapat diunduh';
 
   @override
+  String get deviceIdentity => 'Pengenal perangkat';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Atur ulang pengenal';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Atur ulang pengenal perangkat?';
+
+  @override
+  String get errSubDeviceLimit => 'Batas perangkat tercapai';
+
+  @override
+  String get errSubDeviceRequired => 'Penyedia memerlukan pengenal perangkat';
+
+  @override
   String get errSubFormat => 'Format langganan tidak dikenali';
 
   @override

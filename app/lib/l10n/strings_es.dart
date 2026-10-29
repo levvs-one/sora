@@ -238,6 +238,24 @@ class SEs extends S {
   String get errSubFetch => 'No se pudo descargar la suscripción';
 
   @override
+  String get deviceIdentity => 'Identificador del dispositivo';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Restablecer identificador';
+
+  @override
+  String get deviceIdentityResetConfirm => '¿Restablecer el identificador del dispositivo?';
+
+  @override
+  String get errSubDeviceLimit => 'Se alcanzó el límite de dispositivos';
+
+  @override
+  String get errSubDeviceRequired => 'El proveedor requiere un identificador de dispositivo';
+
+  @override
   String get errSubFormat => 'No se reconoce el formato de la suscripción';
 
   @override

@@ -641,6 +641,37 @@ class Sora extends ChangeNotifier {
   /// engine. The engine registry sets the [chainCapability] flag per engine.
   bool get chainsSupported => coreCapabilities.contains(chainCapability);
 
+  /// The identifier saved subscriptions send as x-hwid; null until the core
+  /// answers, or when the core predates it.
+  DeviceIdentity? deviceIdentity;
+
+  bool get deviceIdentitySupported => coreCapabilities.contains('device-identity');
+
+  Future<void> _loadDeviceIdentity(CoreLink link) async {
+    final answer = await link.stub.getDeviceIdentity(
+      GetDeviceIdentityRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
+    );
+    if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
+    deviceIdentity = answer.identity;
+  }
+
+  /// Turns the identifier on or off for every provider, or replaces it with a
+  /// new random one.
+  Future<CoreFailure?> setDeviceIdentity({required bool enabled, bool regenerate = false}) => _call(() async {
+    final link = _link!;
+    final answer = await link.stub.setDeviceIdentity(
+      SetDeviceIdentityRequest(
+        apiVersion: apiVersion,
+        controlAuthenticator: link.token,
+        enabled: enabled,
+        regenerate: regenerate,
+      ),
+    );
+    if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
+    deviceIdentity = answer.identity;
+    notifyListeners();
+  });
+
   /// Server IDs hidden by subscription overrides.
   Set<String> get hiddenServerIds => overrides.hiddenIds;
 
@@ -809,6 +840,9 @@ class Sora extends ChangeNotifier {
         coreCapabilities = about.about.contract.capabilities.toSet();
         serverlessAvailable = coreCapabilities.contains('serverless');
         localProxy = about.about.hasLocalProxy() ? about.about.localProxy : null;
+        // The identifier rows stay hidden when it cannot be read; the core
+        // connection does not depend on it.
+        if (deviceIdentitySupported) await _loadDeviceIdentity(link).catchError((Object _) {});
         if (failure?.key == CoreFailure.unavailable.key) failure = null;
         recovered('core');
         // GetStatus + getAbout answered: the post-update
@@ -858,6 +892,7 @@ class Sora extends ChangeNotifier {
       _link = null;
       serverlessAvailable = false;
       coreCapabilities = {};
+      deviceIdentity = null;
       await link.close();
       phase = Phase.offline;
       stats = null;

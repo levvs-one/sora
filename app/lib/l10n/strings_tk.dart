@@ -238,6 +238,24 @@ class STk extends S {
   String get errSubFetch => 'Abunalygy ýükläp bolmady';
 
   @override
+  String get deviceIdentity => 'Enjamyň identifikatory';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Identifikatory täzelemek';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Enjamyň identifikatory täzelensinmi?';
+
+  @override
+  String get errSubDeviceLimit => 'Enjamlaryň çägi geçildi';
+
+  @override
+  String get errSubDeviceRequired => 'Üpjün ediji enjamyň identifikatoryny talap edýär';
+
+  @override
   String get errSubFormat => 'Abunalygyň formaty tanalmady';
 
   @override

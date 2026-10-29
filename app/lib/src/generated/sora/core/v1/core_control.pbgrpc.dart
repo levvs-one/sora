@@ -241,6 +241,22 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$getSubscriptionLink, request, options: options);
   }
 
+  /// Since 1.14, with the "device-identity" capability. The device identifier
+  /// saved subscriptions send; both calls need the control authenticator.
+  $grpc.ResponseFuture<$0.GetDeviceIdentityResponse> getDeviceIdentity(
+    $0.GetDeviceIdentityRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getDeviceIdentity, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.SetDeviceIdentityResponse> setDeviceIdentity(
+    $0.SetDeviceIdentityRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$setDeviceIdentity, request, options: options);
+  }
+
   /// PutSecret and DeleteSecret manage the credential material the core keeps.
   /// They exist because the rest of the contract carries only references: a plan
   /// names a secret, and these two calls are the only way a secret ever reaches
@@ -449,6 +465,14 @@ class CoreControlClient extends $grpc.Client {
           '/sora.core.v1.CoreControl/GetSubscriptionLink',
           ($0.GetSubscriptionLinkRequest value) => value.writeToBuffer(),
           $0.GetSubscriptionLinkResponse.fromBuffer);
+  static final _$getDeviceIdentity = $grpc.ClientMethod<$0.GetDeviceIdentityRequest, $0.GetDeviceIdentityResponse>(
+      '/sora.core.v1.CoreControl/GetDeviceIdentity',
+      ($0.GetDeviceIdentityRequest value) => value.writeToBuffer(),
+      $0.GetDeviceIdentityResponse.fromBuffer);
+  static final _$setDeviceIdentity = $grpc.ClientMethod<$0.SetDeviceIdentityRequest, $0.SetDeviceIdentityResponse>(
+      '/sora.core.v1.CoreControl/SetDeviceIdentity',
+      ($0.SetDeviceIdentityRequest value) => value.writeToBuffer(),
+      $0.SetDeviceIdentityResponse.fromBuffer);
   static final _$putSecret = $grpc.ClientMethod<$0.PutSecretRequest, $0.PutSecretResponse>(
       '/sora.core.v1.CoreControl/PutSecret',
       ($0.PutSecretRequest value) => value.writeToBuffer(),
@@ -693,6 +717,20 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.GetSubscriptionLinkRequest.fromBuffer(value),
         ($0.GetSubscriptionLinkResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetDeviceIdentityRequest, $0.GetDeviceIdentityResponse>(
+        'GetDeviceIdentity',
+        getDeviceIdentity_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetDeviceIdentityRequest.fromBuffer(value),
+        ($0.GetDeviceIdentityResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SetDeviceIdentityRequest, $0.SetDeviceIdentityResponse>(
+        'SetDeviceIdentity',
+        setDeviceIdentity_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SetDeviceIdentityRequest.fromBuffer(value),
+        ($0.SetDeviceIdentityResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.PutSecretRequest, $0.PutSecretResponse>(
         'PutSecret',
         putSecret_Pre,
@@ -968,6 +1006,22 @@ abstract class CoreControlServiceBase extends $grpc.Service {
 
   $async.Future<$0.GetSubscriptionLinkResponse> getSubscriptionLink(
       $grpc.ServiceCall call, $0.GetSubscriptionLinkRequest request);
+
+  $async.Future<$0.GetDeviceIdentityResponse> getDeviceIdentity_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetDeviceIdentityRequest> $request) async {
+    return getDeviceIdentity($call, await $request);
+  }
+
+  $async.Future<$0.GetDeviceIdentityResponse> getDeviceIdentity(
+      $grpc.ServiceCall call, $0.GetDeviceIdentityRequest request);
+
+  $async.Future<$0.SetDeviceIdentityResponse> setDeviceIdentity_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.SetDeviceIdentityRequest> $request) async {
+    return setDeviceIdentity($call, await $request);
+  }
+
+  $async.Future<$0.SetDeviceIdentityResponse> setDeviceIdentity(
+      $grpc.ServiceCall call, $0.SetDeviceIdentityRequest request);
 
   $async.Future<$0.PutSecretResponse> putSecret_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.PutSecretRequest> $request) async {

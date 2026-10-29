@@ -321,6 +321,7 @@ void main() {
           ('timeout', 'core.network.timeout', ''),
           ('empty', 'core.subscription.no_servers', ''),
           ('http403', 'core.subscription.status', 'HTTP 403'),
+          ('device-limit', 'core.subscription.device_limit', ''),
         ]) {
           final wire = SoraError(userMessageKey: key, detailRedacted: detail);
           final failure = CoreFailure.fromWire(wire);
@@ -353,6 +354,8 @@ void main() {
         }
         sora.history = history;
         sora.subscription.lastError = SoraError(userMessageKey: 'core.network.timeout');
+        // A synthetic identifier; screenshots never read this machine's.
+        sora.deviceIdentity = DeviceIdentity(hwid: '3f9a1c07d24e8b6a5f10c93e7d2b4a68', enabled: true);
         sora.notifyListeners();
         unawaited(navigator.push<void>(MaterialPageRoute(builder: (_) => const SubscriptionsScreen())));
         await save('subscription-list');

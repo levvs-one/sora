@@ -238,6 +238,24 @@ class SHi extends S {
   String get errSubFetch => 'सदस्यता डाउनलोड नहीं हो सकी';
 
   @override
+  String get deviceIdentity => 'डिवाइस पहचानकर्ता';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'पहचानकर्ता रीसेट करें';
+
+  @override
+  String get deviceIdentityResetConfirm => 'डिवाइस पहचानकर्ता रीसेट करें?';
+
+  @override
+  String get errSubDeviceLimit => 'डिवाइस सीमा पूरी हो गई';
+
+  @override
+  String get errSubDeviceRequired => 'प्रदाता को डिवाइस पहचानकर्ता चाहिए';
+
+  @override
   String get errSubFormat => 'सदस्यता का फ़ॉर्मैट पहचाना नहीं जा सका';
 
   @override

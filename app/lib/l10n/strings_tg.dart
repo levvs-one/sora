@@ -238,6 +238,24 @@ class STg extends S {
   String get errSubFetch => 'Обуна боргирӣ нашуд';
 
   @override
+  String get deviceIdentity => 'Идентификатори дастгоҳ';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Аз нав танзим кардани идентификатор';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Идентификатори дастгоҳ аз нав танзим карда шавад?';
+
+  @override
+  String get errSubDeviceLimit => 'Ҳадди дастгоҳҳо гузашт';
+
+  @override
+  String get errSubDeviceRequired => 'Провайдер идентификатори дастгоҳро талаб мекунад';
+
+  @override
   String get errSubFormat => 'Формати обуна шинохта нашуд';
 
   @override

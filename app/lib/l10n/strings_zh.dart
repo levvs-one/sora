@@ -238,6 +238,24 @@ class SZh extends S {
   String get errSubFetch => '无法下载订阅';
 
   @override
+  String get deviceIdentity => '设备标识符';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => '重置标识符';
+
+  @override
+  String get deviceIdentityResetConfirm => '要重置设备标识符吗?';
+
+  @override
+  String get errSubDeviceLimit => '已达到设备数量上限';
+
+  @override
+  String get errSubDeviceRequired => '提供商要求设备标识符';
+
+  @override
   String get errSubFormat => '无法识别订阅格式';
 
   @override
@@ -2138,6 +2156,24 @@ class SZhHans extends SZh {
   String get errSubFetch => '无法下载订阅';
 
   @override
+  String get deviceIdentity => '设备标识符';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => '重置标识符';
+
+  @override
+  String get deviceIdentityResetConfirm => '要重置设备标识符吗?';
+
+  @override
+  String get errSubDeviceLimit => '已达到设备数量上限';
+
+  @override
+  String get errSubDeviceRequired => '提供商要求设备标识符';
+
+  @override
   String get errSubFormat => '无法识别订阅格式';
 
   @override
@@ -4036,6 +4072,24 @@ class SZhHant extends SZh {
 
   @override
   String get errSubFetch => '無法下載訂閱';
+
+  @override
+  String get deviceIdentity => '裝置識別碼';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => '重設識別碼';
+
+  @override
+  String get deviceIdentityResetConfirm => '要重設裝置識別碼嗎?';
+
+  @override
+  String get errSubDeviceLimit => '已達到裝置數量上限';
+
+  @override
+  String get errSubDeviceRequired => '供應商要求裝置識別碼';
 
   @override
   String get errSubFormat => '無法辨識訂閱格式';

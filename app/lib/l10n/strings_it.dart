@@ -238,6 +238,24 @@ class SIt extends S {
   String get errSubFetch => 'Non è stato possibile scaricare l’abbonamento';
 
   @override
+  String get deviceIdentity => 'Identificativo del dispositivo';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Reimposta identificativo';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Reimpostare l\'identificativo del dispositivo?';
+
+  @override
+  String get errSubDeviceLimit => 'Limite di dispositivi raggiunto';
+
+  @override
+  String get errSubDeviceRequired => 'Il provider richiede un identificativo del dispositivo';
+
+  @override
   String get errSubFormat => 'Il formato dell’abbonamento non è riconosciuto';
 
   @override

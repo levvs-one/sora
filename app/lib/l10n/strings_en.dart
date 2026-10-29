@@ -238,6 +238,24 @@ class SEn extends S {
   String get errSubFetch => 'The subscription could not be downloaded';
 
   @override
+  String get deviceIdentity => 'Device identifier';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Reset identifier';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Reset the device identifier?';
+
+  @override
+  String get errSubDeviceLimit => 'Device limit reached';
+
+  @override
+  String get errSubDeviceRequired => 'The provider requires a device identifier';
+
+  @override
   String get errSubFormat => 'The subscription format was not recognized';
 
   @override

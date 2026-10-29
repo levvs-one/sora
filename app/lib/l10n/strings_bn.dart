@@ -238,6 +238,24 @@ class SBn extends S {
   String get errSubFetch => 'সাবস্ক্রিপশন ডাউনলোড করা যায়নি';
 
   @override
+  String get deviceIdentity => 'ডিভাইস শনাক্তকারী';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'শনাক্তকারী রিসেট করুন';
+
+  @override
+  String get deviceIdentityResetConfirm => 'ডিভাইস শনাক্তকারী রিসেট করবেন?';
+
+  @override
+  String get errSubDeviceLimit => 'ডিভাইসের সীমা পূর্ণ হয়েছে';
+
+  @override
+  String get errSubDeviceRequired => 'প্রদানকারী ডিভাইস শনাক্তকারী চায়';
+
+  @override
   String get errSubFormat => 'সাবস্ক্রিপশনের ফরম্যাট চেনা যায়নি';
 
   @override

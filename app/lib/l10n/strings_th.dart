@@ -238,6 +238,24 @@ class STh extends S {
   String get errSubFetch => 'ดาวน์โหลดการสมัครไม่ได้';
 
   @override
+  String get deviceIdentity => 'ตัวระบุอุปกรณ์';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'รีเซ็ตตัวระบุ';
+
+  @override
+  String get deviceIdentityResetConfirm => 'รีเซ็ตตัวระบุอุปกรณ์หรือไม่';
+
+  @override
+  String get errSubDeviceLimit => 'ถึงขีดจำกัดอุปกรณ์แล้ว';
+
+  @override
+  String get errSubDeviceRequired => 'ผู้ให้บริการต้องการตัวระบุอุปกรณ์';
+
+  @override
   String get errSubFormat => 'ไม่รู้จักรูปแบบการสมัครนี้';
 
   @override
