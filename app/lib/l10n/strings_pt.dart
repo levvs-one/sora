@@ -238,6 +238,24 @@ class SPt extends S {
   String get errSubFetch => 'Não foi possível baixar a assinatura';
 
   @override
+  String get deviceIdentity => 'Identificador do dispositivo';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Redefinir identificador';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Redefinir o identificador do dispositivo?';
+
+  @override
+  String get errSubDeviceLimit => 'Limite de dispositivos atingido';
+
+  @override
+  String get errSubDeviceRequired => 'O provedor exige um identificador do dispositivo';
+
+  @override
   String get errSubFormat => 'O formato da assinatura não foi reconhecido';
 
   @override

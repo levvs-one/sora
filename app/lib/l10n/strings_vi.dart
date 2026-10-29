@@ -238,6 +238,24 @@ class SVi extends S {
   String get errSubFetch => 'Không thể tải gói đăng ký';
 
   @override
+  String get deviceIdentity => 'Mã định danh thiết bị';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Đặt lại mã định danh';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Đặt lại mã định danh thiết bị?';
+
+  @override
+  String get errSubDeviceLimit => 'Đã đạt giới hạn thiết bị';
+
+  @override
+  String get errSubDeviceRequired => 'Nhà cung cấp yêu cầu mã định danh thiết bị';
+
+  @override
   String get errSubFormat => 'Không nhận dạng được định dạng gói đăng ký';
 
   @override

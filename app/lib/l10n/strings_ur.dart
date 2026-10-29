@@ -238,6 +238,24 @@ class SUr extends S {
   String get errSubFetch => 'سبسکرپشن ڈاؤن لوڈ نہیں ہو سکی';
 
   @override
+  String get deviceIdentity => 'ڈیوائس شناخت کنندہ';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'شناخت کنندہ ری سیٹ کریں';
+
+  @override
+  String get deviceIdentityResetConfirm => 'ڈیوائس شناخت کنندہ ری سیٹ کریں؟';
+
+  @override
+  String get errSubDeviceLimit => 'ڈیوائسز کی حد پوری ہو گئی';
+
+  @override
+  String get errSubDeviceRequired => 'فراہم کنندہ کو ڈیوائس شناخت کنندہ درکار ہے';
+
+  @override
   String get errSubFormat => 'سبسکرپشن کا فارمیٹ پہچانا نہیں جا سکا';
 
   @override

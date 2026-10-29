@@ -238,6 +238,24 @@ class SDe extends S {
   String get errSubFetch => 'Das Abonnement konnte nicht geladen werden';
 
   @override
+  String get deviceIdentity => 'Gerätekennung';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Kennung zurücksetzen';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Gerätekennung zurücksetzen?';
+
+  @override
+  String get errSubDeviceLimit => 'Gerätelimit erreicht';
+
+  @override
+  String get errSubDeviceRequired => 'Der Anbieter verlangt eine Gerätekennung';
+
+  @override
   String get errSubFormat => 'Das Abonnementformat wurde nicht erkannt';
 
   @override

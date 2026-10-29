@@ -169,6 +169,8 @@ type Server struct {
 	// disables the profile RPCs with explicit errors.
 	profiles  *profiles.Store
 	captureMu sync.Mutex
+	// device is the identifier saved subscriptions send as x-hwid.
+	device deviceIdentity
 }
 
 // SecretStore exposes credential resolution, writes, deletion, and reference
@@ -319,6 +321,9 @@ func (s *Server) apiVersion() *corev1.ApiVersion {
 	capabilities := Capabilities()
 	if s.version.Minor >= 12 && (runtime.GOOS == "linux" || runtime.GOOS == "windows") {
 		capabilities = append(capabilities, "strict-kill-switch")
+	}
+	if s.version.Minor >= 14 {
+		capabilities = append(capabilities, "device-identity")
 	}
 	if provider, ok := s.measurer.(interface{ BypassAvailable() bool }); ok && provider.BypassAvailable() {
 		capabilities = append(capabilities, "serverless")

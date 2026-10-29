@@ -238,6 +238,24 @@ class SKa extends S {
   String get errSubFetch => 'გამოწერა ვერ ჩამოიტვირთა';
 
   @override
+  String get deviceIdentity => 'მოწყობილობის იდენტიფიკატორი';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'იდენტიფიკატორის გადაყენება';
+
+  @override
+  String get deviceIdentityResetConfirm => 'გადავაყენოთ მოწყობილობის იდენტიფიკატორი?';
+
+  @override
+  String get errSubDeviceLimit => 'მოწყობილობების ლიმიტი ამოიწურა';
+
+  @override
+  String get errSubDeviceRequired => 'პროვაიდერი ითხოვს მოწყობილობის იდენტიფიკატორს';
+
+  @override
   String get errSubFormat => 'გამოწერის ფორმატი ვერ ამოიცნო';
 
   @override

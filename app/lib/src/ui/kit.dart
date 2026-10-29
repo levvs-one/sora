@@ -840,6 +840,8 @@ String describe(S s, CoreFailure failure) {
     'core.request.invalid' => s.errInvalidRequest,
     'core.subscription.no_servers' || 'core.subscription.empty' => s.errSubEmpty,
     'core.subscription.fetch_failed' => s.errSubFetch,
+    'core.subscription.device_limit' => s.errSubDeviceLimit,
+    'core.subscription.device_required' => s.errSubDeviceRequired,
     'core.subscription.not_found' => s.errMissingItem,
     'core.subscription.interval_invalid' => s.errSubInterval,
     'core.subscription.too_large' ||

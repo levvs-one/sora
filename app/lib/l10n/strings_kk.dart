@@ -238,6 +238,24 @@ class SKk extends S {
   String get errSubFetch => 'Жазылымды жүктеу мүмкін болмады';
 
   @override
+  String get deviceIdentity => 'Құрылғы идентификаторы';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Идентификаторды қалпына келтіру';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Құрылғы идентификаторын қалпына келтіру керек пе?';
+
+  @override
+  String get errSubDeviceLimit => 'Құрылғылар шегінен асты';
+
+  @override
+  String get errSubDeviceRequired => 'Провайдер құрылғы идентификаторын талап етеді';
+
+  @override
   String get errSubFormat => 'Жазылым пішімі танылмады';
 
   @override

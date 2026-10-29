@@ -19,6 +19,7 @@ import (
 	"golang.org/x/net/idna"
 
 	"github.com/levvs-one/sora-client/core/errs"
+	"github.com/levvs-one/sora-client/core/hwid"
 )
 
 // Default retrieval limits allow distant providers while bounding total fetch
@@ -44,6 +45,10 @@ type FetchOptions struct {
 	// UserAgent overrides the default because panels may choose
 	// client-specific subscription formats.
 	UserAgent string
+	// Device, when set, is sent on every hop as the x-hwid headers. Redirects
+	// keep it: every hop already receives the bearer link, which identifies
+	// the user far more than the device identifier does.
+	Device *hwid.Identity
 }
 
 // Result is one retrieved subscription.
@@ -145,7 +150,7 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 			return Result{}, errs.Newf(errs.CodeInvalidArgument, errs.KeySubscriptionRedirect,
 				"subscription: the provider led the request more than %d times", f.maxRedirects)
 		}
-		body, header, location, err := f.hop(ctx, target, agent)
+		body, header, location, err := f.hop(ctx, target, agent, opts.Device)
 		if err != nil {
 			return Result{}, err
 		}
@@ -167,7 +172,7 @@ func (f *Fetcher) Fetch(ctx context.Context, reference string, opts FetchOptions
 }
 
 // hop returns one response's body and headers or its redirect target.
-func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byte, http.Header, string, error) {
+func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string, device *hwid.Identity) ([]byte, http.Header, string, error) {
 	allowPrivate, _ := ctx.Value(privateKey{}).(bool)
 	host := target.Hostname()
 	if addr, err := netip.ParseAddr(host); err == nil {
@@ -189,6 +194,9 @@ func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byt
 	// Bound decompressed size so compressed responses cannot exceed the
 	// body limit.
 	request.Header.Set("Accept-Encoding", "identity")
+	if device != nil {
+		device.Apply(request.Header)
+	}
 
 	client := f.client
 	if allowPrivate {
@@ -219,6 +227,9 @@ func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byt
 		}
 		return nil, nil, "", failure
 	}
+	if err := deviceRefusal(response.Header); err != nil {
+		return nil, nil, "", err
+	}
 	if response.ContentLength > int64(f.maxBody) {
 		return nil, nil, "", errs.Newf(errs.CodeResourceExhausted, errs.KeySubscriptionTooLarge,
 			"subscription: the provider announced %d bytes, the limit is %d",
@@ -237,6 +248,22 @@ func (f *Fetcher) hop(ctx context.Context, target *url.URL, agent string) ([]byt
 			"subscription: the provider answered with an empty body")
 	}
 	return body, response.Header, "", nil
+}
+
+// deviceRefusal recognises a panel refusing the device. Remnawave answers 200
+// with an empty body, or one holding only placeholder remarks, and marks the
+// refusal in headers (subscription.service.ts in remnawave/backend). Reading
+// that body as a subscription would replace the user's servers with nothing.
+func deviceRefusal(header http.Header) error {
+	switch {
+	case strings.EqualFold(header.Get("X-Hwid-Max-Devices-Reached"), "true"):
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySubscriptionDeviceLimit,
+			"subscription: the provider refused this device: the device limit is reached")
+	case strings.EqualFold(header.Get("X-Hwid-Not-Supported"), "true"):
+		return errs.Newf(errs.CodeFailedPrecondition, errs.KeySubscriptionDeviceRequired,
+			"subscription: the provider requires a device identifier")
+	}
+	return nil
 }
 
 // drainLimit bounds unwanted body reads for connection reuse. Larger bodies

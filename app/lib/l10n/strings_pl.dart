@@ -238,6 +238,24 @@ class SPl extends S {
   String get errSubFetch => 'Nie udało się pobrać subskrypcji';
 
   @override
+  String get deviceIdentity => 'Identyfikator urządzenia';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Zresetuj identyfikator';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Zresetować identyfikator urządzenia?';
+
+  @override
+  String get errSubDeviceLimit => 'Osiągnięto limit urządzeń';
+
+  @override
+  String get errSubDeviceRequired => 'Dostawca wymaga identyfikatora urządzenia';
+
+  @override
   String get errSubFormat => 'Nie rozpoznano formatu subskrypcji';
 
   @override

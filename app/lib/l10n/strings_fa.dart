@@ -238,6 +238,24 @@ class SFa extends S {
   String get errSubFetch => 'اشتراک دریافت نشد';
 
   @override
+  String get deviceIdentity => 'شناسه دستگاه';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'بازنشانی شناسه';
+
+  @override
+  String get deviceIdentityResetConfirm => 'شناسه دستگاه بازنشانی شود؟';
+
+  @override
+  String get errSubDeviceLimit => 'سقف تعداد دستگاه‌ها پر شده است';
+
+  @override
+  String get errSubDeviceRequired => 'ارائه‌دهنده به شناسه دستگاه نیاز دارد';
+
+  @override
   String get errSubFormat => 'قالب اشتراک شناسایی نشد';
 
   @override

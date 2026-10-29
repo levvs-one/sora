@@ -238,6 +238,24 @@ class SAr extends S {
   String get errSubFetch => 'تعذّر تنزيل الاشتراك';
 
   @override
+  String get deviceIdentity => 'معرّف الجهاز';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'إعادة تعيين المعرّف';
+
+  @override
+  String get deviceIdentityResetConfirm => 'إعادة تعيين معرّف الجهاز؟';
+
+  @override
+  String get errSubDeviceLimit => 'تم بلوغ حد الأجهزة';
+
+  @override
+  String get errSubDeviceRequired => 'يتطلب المزوّد معرّف الجهاز';
+
+  @override
   String get errSubFormat => 'تعذّر التعرّف على تنسيق الاشتراك';
 
   @override

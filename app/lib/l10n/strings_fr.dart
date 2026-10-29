@@ -238,6 +238,24 @@ class SFr extends S {
   String get errSubFetch => 'L’abonnement n’a pas pu être téléchargé';
 
   @override
+  String get deviceIdentity => 'Identifiant de l\'appareil';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Réinitialiser l\'identifiant';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Réinitialiser l\'identifiant de l\'appareil ?';
+
+  @override
+  String get errSubDeviceLimit => 'Limite d\'appareils atteinte';
+
+  @override
+  String get errSubDeviceRequired => 'Le fournisseur exige un identifiant d\'appareil';
+
+  @override
   String get errSubFormat => 'Le format de l’abonnement n’est pas reconnu';
 
   @override

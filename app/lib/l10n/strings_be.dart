@@ -238,6 +238,24 @@ class SBe extends S {
   String get errSubFetch => 'Не ўдалося спампаваць падпіску';
 
   @override
+  String get deviceIdentity => 'Ідэнтыфікатар прылады';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Скінуць ідэнтыфікатар';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Скінуць ідэнтыфікатар прылады?';
+
+  @override
+  String get errSubDeviceLimit => 'Перавышаны ліміт прылад';
+
+  @override
+  String get errSubDeviceRequired => 'Правайдар патрабуе ідэнтыфікатар прылады';
+
+  @override
   String get errSubFormat => 'Фармат падпіскі не распазнаны';
 
   @override

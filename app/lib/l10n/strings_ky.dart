@@ -238,6 +238,24 @@ class SKy extends S {
   String get errSubFetch => 'Жазылууну жүктөө мүмкүн болгон жок';
 
   @override
+  String get deviceIdentity => 'Түзмөктүн идентификатору';
+
+  @override
+  String get hwid => 'HWID';
+
+  @override
+  String get deviceIdentityReset => 'Идентификаторду жаңылоо';
+
+  @override
+  String get deviceIdentityResetConfirm => 'Түзмөктүн идентификаторун жаңылайсызбы?';
+
+  @override
+  String get errSubDeviceLimit => 'Түзмөктөрдүн чеги ашты';
+
+  @override
+  String get errSubDeviceRequired => 'Провайдер түзмөктүн идентификаторун талап кылат';
+
+  @override
   String get errSubFormat => 'Жазылуунун форматы таанылган жок';
 
   @override

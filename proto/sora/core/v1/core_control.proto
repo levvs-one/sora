@@ -52,6 +52,10 @@ service CoreControl {
   // Since 1.6. Returns the stored subscription link only on an authenticated
   // explicit request to open its page. Clients must not cache or log it.
   rpc GetSubscriptionLink(GetSubscriptionLinkRequest) returns (GetSubscriptionLinkResponse);
+  // Since 1.14, with the "device-identity" capability. The device identifier
+  // saved subscriptions send; both calls need the control authenticator.
+  rpc GetDeviceIdentity(GetDeviceIdentityRequest) returns (GetDeviceIdentityResponse);
+  rpc SetDeviceIdentity(SetDeviceIdentityRequest) returns (SetDeviceIdentityResponse);
   // PutSecret and DeleteSecret manage the credential material the core keeps.
   // They exist because the rest of the contract carries only references: a plan
   // names a secret, and these two calls are the only way a secret ever reaches
@@ -568,6 +572,10 @@ message SubscriptionSettings {
   // Overrides the interval the provider asks for; unset follows the provider,
   // and 24 hours when the provider did not say. At least one hour.
   google.protobuf.Duration update_interval = 6;
+  // Since 1.14. Stops sending the device identifier to this provider. Inverted
+  // so a client that does not know the field keeps it sent, which is the
+  // default.
+  bool device_identity_off = 7;
 }
 
 // SubscriptionState omits settings.url because it carries a bearer token.
@@ -600,6 +608,31 @@ message DeleteSubscriptionResponse { SoraError error = 1; }
 message RefreshSubscriptionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }
 message RefreshSubscriptionResponse { SubscriptionState state = 1; SoraError error = 2; }
 message WatchSubscriptionsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
+
+// Since 1.14. The identifier saved subscriptions send as x-hwid, with the
+// x-device-os, x-ver-os and x-device-model headers, so providers can count
+// devices. The core derives it from the machine id with a keyed hash and never
+// sends it anywhere but to subscription providers. FetchSubscription, which
+// needs no authenticator, never sends it.
+message DeviceIdentity {
+  string hwid = 1;
+  // Off stops sending it to every provider.
+  bool enabled = 2;
+  string os = 3;
+  string os_version = 4;
+  string model = 5;
+}
+message GetDeviceIdentityRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; }
+message GetDeviceIdentityResponse { DeviceIdentity identity = 1; SoraError error = 2; }
+message SetDeviceIdentityRequest {
+  ApiVersion api_version = 1;
+  bytes control_authenticator = 2;
+  bool enabled = 3;
+  // Replaces the identifier with a new random one; providers then count this
+  // machine as a new device.
+  bool regenerate = 4;
+}
+message SetDeviceIdentityResponse { DeviceIdentity identity = 1; SoraError error = 2; }
 
 // Since 1.6. The link is available only through this authenticated request.
 message GetSubscriptionLinkRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string id = 3; }

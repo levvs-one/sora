@@ -1515,6 +1515,7 @@ const SubscriptionSettings$json = {
     {'1': 'user_agent', '3': 4, '4': 1, '5': 9, '10': 'userAgent'},
     {'1': 'auto_update', '3': 5, '4': 1, '5': 8, '10': 'autoUpdate'},
     {'1': 'update_interval', '3': 6, '4': 1, '5': 11, '6': '.google.protobuf.Duration', '10': 'updateInterval'},
+    {'1': 'device_identity_off', '3': 7, '4': 1, '5': 8, '10': 'deviceIdentityOff'},
   ],
 };
 
@@ -1523,7 +1524,8 @@ final $typed_data.Uint8List subscriptionSettingsDescriptor =
     $convert.base64Decode('ChRTdWJzY3JpcHRpb25TZXR0aW5ncxIOCgJpZBgBIAEoCVICaWQSEAoDdXJsGAIgASgJUgN1cm'
         'wSEgoEbmFtZRgDIAEoCVIEbmFtZRIdCgp1c2VyX2FnZW50GAQgASgJUgl1c2VyQWdlbnQSHwoL'
         'YXV0b191cGRhdGUYBSABKAhSCmF1dG9VcGRhdGUSQgoPdXBkYXRlX2ludGVydmFsGAYgASgLMh'
-        'kuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUg51cGRhdGVJbnRlcnZhbA==');
+        'kuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUg51cGRhdGVJbnRlcnZhbBIuChNkZXZpY2VfaWRl'
+        'bnRpdHlfb2ZmGAcgASgIUhFkZXZpY2VJZGVudGl0eU9mZg==');
 
 @$core.Deprecated('Use subscriptionStateDescriptor instead')
 const SubscriptionState$json = {
@@ -1691,6 +1693,87 @@ final $typed_data.Uint8List watchSubscriptionsRequestDescriptor =
     $convert.base64Decode('ChlXYXRjaFN1YnNjcmlwdGlvbnNSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc29yYS'
         '5jb3JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9y'
         'GAIgASgMUhRjb250cm9sQXV0aGVudGljYXRvcg==');
+
+@$core.Deprecated('Use deviceIdentityDescriptor instead')
+const DeviceIdentity$json = {
+  '1': 'DeviceIdentity',
+  '2': [
+    {'1': 'hwid', '3': 1, '4': 1, '5': 9, '10': 'hwid'},
+    {'1': 'enabled', '3': 2, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'os', '3': 3, '4': 1, '5': 9, '10': 'os'},
+    {'1': 'os_version', '3': 4, '4': 1, '5': 9, '10': 'osVersion'},
+    {'1': 'model', '3': 5, '4': 1, '5': 9, '10': 'model'},
+  ],
+};
+
+/// Descriptor for `DeviceIdentity`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List deviceIdentityDescriptor =
+    $convert.base64Decode('Cg5EZXZpY2VJZGVudGl0eRISCgRod2lkGAEgASgJUgRod2lkEhgKB2VuYWJsZWQYAiABKAhSB2'
+        'VuYWJsZWQSDgoCb3MYAyABKAlSAm9zEh0KCm9zX3ZlcnNpb24YBCABKAlSCW9zVmVyc2lvbhIU'
+        'CgVtb2RlbBgFIAEoCVIFbW9kZWw=');
+
+@$core.Deprecated('Use getDeviceIdentityRequestDescriptor instead')
+const GetDeviceIdentityRequest$json = {
+  '1': 'GetDeviceIdentityRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+  ],
+};
+
+/// Descriptor for `GetDeviceIdentityRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getDeviceIdentityRequestDescriptor =
+    $convert.base64Decode('ChhHZXREZXZpY2VJZGVudGl0eVJlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
+        'NvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IY'
+        'AiABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9y');
+
+@$core.Deprecated('Use getDeviceIdentityResponseDescriptor instead')
+const GetDeviceIdentityResponse$json = {
+  '1': 'GetDeviceIdentityResponse',
+  '2': [
+    {'1': 'identity', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.DeviceIdentity', '10': 'identity'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `GetDeviceIdentityResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getDeviceIdentityResponseDescriptor =
+    $convert.base64Decode('ChlHZXREZXZpY2VJZGVudGl0eVJlc3BvbnNlEjgKCGlkZW50aXR5GAEgASgLMhwuc29yYS5jb3'
+        'JlLnYxLkRldmljZUlkZW50aXR5UghpZGVudGl0eRItCgVlcnJvchgCIAEoCzIXLnNvcmEuY29y'
+        'ZS52MS5Tb3JhRXJyb3JSBWVycm9y');
+
+@$core.Deprecated('Use setDeviceIdentityRequestDescriptor instead')
+const SetDeviceIdentityRequest$json = {
+  '1': 'SetDeviceIdentityRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'enabled', '3': 3, '4': 1, '5': 8, '10': 'enabled'},
+    {'1': 'regenerate', '3': 4, '4': 1, '5': 8, '10': 'regenerate'},
+  ],
+};
+
+/// Descriptor for `SetDeviceIdentityRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List setDeviceIdentityRequestDescriptor =
+    $convert.base64Decode('ChhTZXREZXZpY2VJZGVudGl0eVJlcXVlc3QSOQoLYXBpX3ZlcnNpb24YASABKAsyGC5zb3JhLm'
+        'NvcmUudjEuQXBpVmVyc2lvblIKYXBpVmVyc2lvbhIzChVjb250cm9sX2F1dGhlbnRpY2F0b3IY'
+        'AiABKAxSFGNvbnRyb2xBdXRoZW50aWNhdG9yEhgKB2VuYWJsZWQYAyABKAhSB2VuYWJsZWQSHg'
+        'oKcmVnZW5lcmF0ZRgEIAEoCFIKcmVnZW5lcmF0ZQ==');
+
+@$core.Deprecated('Use setDeviceIdentityResponseDescriptor instead')
+const SetDeviceIdentityResponse$json = {
+  '1': 'SetDeviceIdentityResponse',
+  '2': [
+    {'1': 'identity', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.DeviceIdentity', '10': 'identity'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `SetDeviceIdentityResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List setDeviceIdentityResponseDescriptor =
+    $convert.base64Decode('ChlTZXREZXZpY2VJZGVudGl0eVJlc3BvbnNlEjgKCGlkZW50aXR5GAEgASgLMhwuc29yYS5jb3'
+        'JlLnYxLkRldmljZUlkZW50aXR5UghpZGVudGl0eRItCgVlcnJvchgCIAEoCzIXLnNvcmEuY29y'
+        'ZS52MS5Tb3JhRXJyb3JSBWVycm9y');
 
 @$core.Deprecated('Use getSubscriptionLinkRequestDescriptor instead')
 const GetSubscriptionLinkRequest$json = {

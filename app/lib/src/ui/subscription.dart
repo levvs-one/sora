@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../core/link.dart';
@@ -51,6 +52,64 @@ class SubscriptionsScreen extends StatelessWidget {
               trailing: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
             ),
           ],
+        ),
+        if (sora.deviceIdentity != null) const _DeviceIdentityGroup(),
+      ],
+    );
+  }
+}
+
+/// The identifier saved subscriptions send as x-hwid: one switch for every
+/// provider, the value that copies on tap, and a reset.
+class _DeviceIdentityGroup extends StatefulWidget {
+  const _DeviceIdentityGroup();
+
+  @override
+  State<_DeviceIdentityGroup> createState() => _DeviceIdentityGroupState();
+}
+
+class _DeviceIdentityGroupState extends State<_DeviceIdentityGroup> {
+  bool _copied = false;
+
+  /// Keeps an earlier tap's timer from hiding a later confirmation.
+  int _copiedStamp = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final identity = sora.deviceIdentity!;
+    return Group(
+      children: [
+        SwitchTile(
+          key: const ValueKey('device-identity'),
+          title: s.deviceIdentity,
+          value: identity.enabled,
+          onChanged: (v) => unawaited(sora.setDeviceIdentity(enabled: v)),
+        ),
+        Tile(
+          key: const ValueKey('device-identity-value'),
+          title: s.hwid,
+          detail: _copied ? s.copied : identity.hwid,
+          onTap: () async {
+            await Clipboard.setData(ClipboardData(text: identity.hwid));
+            final stamp = ++_copiedStamp;
+            setState(() => _copied = true);
+            await Future<void>.delayed(const Duration(milliseconds: 1500));
+            if (mounted && stamp == _copiedStamp) setState(() => _copied = false);
+          },
+          trailing: Icon(Symbols.content_copy_rounded, size: 18, color: palette.ink2),
+        ),
+        Tile(
+          key: const ValueKey('device-identity-reset'),
+          title: s.deviceIdentityReset,
+          titleColor: palette.danger,
+          onTap: () async {
+            if (await confirm(context, question: s.deviceIdentityResetConfirm, action: s.resetAction)) {
+              await sora.setDeviceIdentity(enabled: identity.enabled, regenerate: true);
+            }
+          },
         ),
       ],
     );
@@ -127,6 +186,13 @@ class SubscriptionScreen extends StatelessWidget {
                 submit: (v) => save((x) => x.userAgent = v),
               ),
             ),
+            if (sora.deviceIdentity case final identity?)
+              SwitchTile(
+                key: ValueKey('subscription-device-identity-$id'),
+                title: s.deviceIdentity,
+                value: identity.enabled && !chosen.deviceIdentityOff,
+                onChanged: identity.enabled ? (v) => unawaited(save((x) => x.deviceIdentityOff = !v)) : null,
+              ),
             SwitchTile(
               title: s.autoUpdate,
               value: chosen.autoUpdate,
