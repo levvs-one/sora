@@ -14,6 +14,7 @@ import 'package:sora/src/ext/catalog.dart';
 import 'package:sora/src/ext/manifest.dart' show compareVersions;
 import 'package:sora/src/ext/package.dart';
 import 'package:sora/src/ext/store.dart';
+import 'package:sora/src/ext/verifier.dart';
 import 'package:sora/src/settings.dart';
 import 'package:sora/src/sora.dart';
 import 'package:sora/src/updates.dart' show appVersion;
@@ -22,7 +23,7 @@ import 'package:webview_all/webview_all.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  for (final scenario in ['published package', 'current source', 'candidate catalog']) {
+  for (final scenario in ['published package', 'published versioned catalog', 'current source', 'candidate catalog']) {
     testWidgets(
       'signed Hello Panel $scenario opens twice in the native WebView and exchanges bridge messages without a running core or owner network',
       (tester) async {
@@ -106,7 +107,13 @@ void main() {
         }
         if (!useSource) {
           final catalogRoot = useCandidate ? '${work.path}/candidate-catalog' : '$root/extensions';
-          final catalog = ExtensionCatalog.parse(await File('$catalogRoot/catalog.json').readAsBytes());
+          final catalogName = scenario == 'published versioned catalog' ? 'catalog-1.1.3.json' : 'catalog.json';
+          final catalogBytes = await File('$catalogRoot/$catalogName').readAsBytes();
+          if (!useCandidate) {
+            final signature = await File('$catalogRoot/$catalogName.minisig').readAsString();
+            await verifyCatalogSignature(signature, catalogBytes);
+          }
+          final catalog = ExtensionCatalog.parse(catalogBytes);
           final entry = catalog.find(id)!;
           packageBytes = await File('$catalogRoot/packages/${entry.downloadUrl.split('/').last}').readAsBytes();
           package = ExtPackage.open(packageBytes);
@@ -115,6 +122,9 @@ void main() {
           expect(package.manifest.version, entry.version);
           expect(package.manifest.minAppVersion, entry.minAppVersion);
           expect(package.manifest.permissions, unorderedEquals(entry.permissions));
+          if (scenario == 'published versioned catalog') {
+            expect(package.manifest.capabilities, unorderedEquals(entry.capabilities));
+          }
           authorPin = entry.authorKey;
           expectedSha256 = entry.sha256;
         }
