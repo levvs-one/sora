@@ -2054,12 +2054,10 @@ class SRu extends S {
   String get extAboutHello => 'Пример панели: показывает активные соединения и отправляет тестовое уведомление.';
 
   @override
-  String get extAboutZapret =>
-      'Обход блокировок без VPN: меняет начало соединений, чтобы провайдер не узнал сайт. Работает в режиме «Без сервера».';
+  String get extAboutZapret => 'Обход блокировок без VPN: меняет начало соединений, чтобы провайдер не узнал сайт.';
 
   @override
-  String get extAboutByedpi =>
-      'Обход блокировок без VPN через локальный прокси ByeDPI. Работает в режиме «Без сервера».';
+  String get extAboutByedpi => 'Обход блокировок без VPN через локальный прокси ByeDPI.';
 
   @override
   String get modeTunHint => 'Весь трафик компьютера идёт через VPN';

@@ -2034,11 +2034,10 @@ class SBn extends S {
   String get extAboutHello => 'উদাহরণ প্যানেল: সক্রিয় সংযোগ দেখায় এবং একটি পরীক্ষামূলক বিজ্ঞপ্তি পাঠায়।';
 
   @override
-  String get extAboutZapret =>
-      'VPN ছাড়া ব্লক এড়ানো: সংযোগের শুরু বদলায় যাতে প্রদানকারী সাইট চিনতে না পারে। «সার্ভার ছাড়া» মোডে কাজ করে।';
+  String get extAboutZapret => 'VPN ছাড়া ব্লক এড়ানো: সংযোগের শুরু বদলায় যাতে প্রদানকারী সাইট চিনতে না পারে।';
 
   @override
-  String get extAboutByedpi => 'স্থানীয় ByeDPI প্রক্সির মাধ্যমে VPN ছাড়া ব্লক এড়ানো। «সার্ভার ছাড়া» মোডে কাজ করে।';
+  String get extAboutByedpi => 'স্থানীয় ByeDPI প্রক্সির মাধ্যমে VPN ছাড়া ব্লক এড়ানো।';
 
   @override
   String get modeTunHint => 'কম্পিউটারের সব ট্রাফিক VPN দিয়ে যায়';

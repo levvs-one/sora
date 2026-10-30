@@ -2044,11 +2044,10 @@ class SFr extends S {
 
   @override
   String get extAboutZapret =>
-      'Contourne les blocages sans VPN en modifiant le début des connexions pour que le fournisseur ne reconnaisse pas le site. Fonctionne en mode « Sans serveur ».';
+      'Contourne les blocages sans VPN en modifiant le début des connexions pour que le fournisseur ne reconnaisse pas le site.';
 
   @override
-  String get extAboutByedpi =>
-      'Contourne les blocages sans VPN via le proxy local ByeDPI. Fonctionne en mode « Sans serveur ».';
+  String get extAboutByedpi => 'Contourne les blocages sans VPN via le proxy local ByeDPI.';
 
   @override
   String get modeTunHint => 'Tout le trafic de l\'ordinateur passe par le VPN';

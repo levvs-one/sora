@@ -2018,10 +2018,10 @@ class SJa extends S {
   String get extAboutHello => 'サンプルパネル：アクティブな接続を表示し、テスト通知を送ります。';
 
   @override
-  String get extAboutZapret => 'VPN なしでブロックを回避します。接続の先頭を変えて、プロバイダーにサイトを識別させません。「サーバーなし」モードで動作します。';
+  String get extAboutZapret => 'VPN なしでブロックを回避します。接続の先頭を変えて、プロバイダーにサイトを識別させません。';
 
   @override
-  String get extAboutByedpi => 'ローカルの ByeDPI プロキシで VPN なしにブロックを回避します。「サーバーなし」モードで動作します。';
+  String get extAboutByedpi => 'ローカルの ByeDPI プロキシで VPN なしにブロックを回避します。';
 
   @override
   String get modeTunHint => 'コンピューターの全通信が VPN を通ります';

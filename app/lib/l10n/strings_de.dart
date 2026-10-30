@@ -2042,11 +2042,10 @@ class SDe extends S {
 
   @override
   String get extAboutZapret =>
-      'Umgeht Sperren ohne VPN, indem es den Anfang von Verbindungen so verändert, dass der Anbieter die Website nicht erkennt. Funktioniert im Modus „Ohne Server“.';
+      'Umgeht Sperren ohne VPN, indem es den Anfang von Verbindungen so verändert, dass der Anbieter die Website nicht erkennt.';
 
   @override
-  String get extAboutByedpi =>
-      'Umgeht Sperren ohne VPN über den lokalen ByeDPI-Proxy. Funktioniert im Modus „Ohne Server“.';
+  String get extAboutByedpi => 'Umgeht Sperren ohne VPN über den lokalen ByeDPI-Proxy.';
 
   @override
   String get modeTunHint => 'Der gesamte Datenverkehr des Computers läuft über das VPN';

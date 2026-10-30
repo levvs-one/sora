@@ -2034,11 +2034,10 @@ class SFa extends S {
   String get extAboutHello => 'نمونهٔ پنل: اتصال‌های فعال را نشان می‌دهد و یک اعلان آزمایشی می‌فرستد.';
 
   @override
-  String get extAboutZapret =>
-      'دور زدن فیلتر بدون VPN: آغاز اتصال‌ها را تغییر می‌دهد تا ارائه‌دهنده سایت را نشناسد. در حالت «بدون سرور» کار می‌کند.';
+  String get extAboutZapret => 'دور زدن فیلتر بدون VPN: آغاز اتصال‌ها را تغییر می‌دهد تا ارائه‌دهنده سایت را نشناسد.';
 
   @override
-  String get extAboutByedpi => 'دور زدن فیلتر بدون VPN با پراکسی محلی ByeDPI. در حالت «بدون سرور» کار می‌کند.';
+  String get extAboutByedpi => 'دور زدن فیلتر بدون VPN با پراکسی محلی ByeDPI.';
 
   @override
   String get modeTunHint => 'همهٔ ترافیک رایانه از VPN می‌گذرد';

@@ -2044,11 +2044,10 @@ class SIt extends S {
 
   @override
   String get extAboutZapret =>
-      'Aggira i blocchi senza VPN modificando l\'inizio delle connessioni perché il provider non riconosca il sito. Funziona nella modalità Senza server.';
+      'Aggira i blocchi senza VPN modificando l\'inizio delle connessioni perché il provider non riconosca il sito.';
 
   @override
-  String get extAboutByedpi =>
-      'Aggira i blocchi senza VPN tramite il proxy locale ByeDPI. Funziona nella modalità Senza server.';
+  String get extAboutByedpi => 'Aggira i blocchi senza VPN tramite il proxy locale ByeDPI.';
 
   @override
   String get modeTunHint => 'Tutto il traffico del computer passa dalla VPN';

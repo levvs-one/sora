@@ -2061,11 +2061,10 @@ class SAr extends S {
   String get extAboutHello => 'لوحة مثال: تعرض الاتصالات النشطة وترسل إشعارًا تجريبيًا.';
 
   @override
-  String get extAboutZapret =>
-      'تجاوز الحجب دون VPN: يغيّر بداية الاتصالات كي لا يتعرّف المزوّد على الموقع. يعمل في وضع «دون خادم».';
+  String get extAboutZapret => 'تجاوز الحجب دون VPN: يغيّر بداية الاتصالات كي لا يتعرّف المزوّد على الموقع.';
 
   @override
-  String get extAboutByedpi => 'تجاوز الحجب دون VPN عبر وكيل ByeDPI المحلي. يعمل في وضع «دون خادم».';
+  String get extAboutByedpi => 'تجاوز الحجب دون VPN عبر وكيل ByeDPI المحلي.';
 
   @override
   String get modeTunHint => 'كل حركة مرور الحاسوب تمر عبر VPN';

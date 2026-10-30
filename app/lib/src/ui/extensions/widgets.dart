@@ -153,7 +153,7 @@ String extensionBlurb(S s, {required String id, required bool team, required Str
 
 /// The extension's mark: a glyph for what it does on a quiet tile.
 class ExtensionIcon extends StatelessWidget {
-  const ExtensionIcon({super.key, required this.capabilities, this.size = 44});
+  const ExtensionIcon({super.key, required this.capabilities, this.size = 40});
   final List<String> capabilities;
   final double size;
 
@@ -317,11 +317,11 @@ class ExtensionCard extends StatelessWidget {
                   onTap: onTap,
                   radius: 16,
                   give: 0.99,
-                  child: Padding(padding: const EdgeInsets.all(14), child: body),
+                  child: Padding(padding: const EdgeInsets.all(12), child: body),
                 ),
               ),
             ),
-            if (trailing != null) Padding(padding: const EdgeInsetsDirectional.only(end: 14), child: trailing),
+            if (trailing != null) Padding(padding: const EdgeInsetsDirectional.only(end: 12), child: trailing),
           ],
         ),
       ),

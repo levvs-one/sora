@@ -2036,10 +2036,10 @@ class SAz extends S {
 
   @override
   String get extAboutZapret =>
-      'VPN-siz blokların keçilməsi: provayder saytı tanımasın deyə bağlantının əvvəlini dəyişir. «Serversiz» rejimində işləyir.';
+      'VPN-siz blokların keçilməsi: provayder saytı tanımasın deyə bağlantının əvvəlini dəyişir.';
 
   @override
-  String get extAboutByedpi => 'Yerli ByeDPI proksisi ilə VPN-siz blokların keçilməsi. «Serversiz» rejimində işləyir.';
+  String get extAboutByedpi => 'Yerli ByeDPI proksisi ilə VPN-siz blokların keçilməsi.';
 
   @override
   String get modeTunHint => 'Kompüterin bütün trafiki VPN-dən keçir';

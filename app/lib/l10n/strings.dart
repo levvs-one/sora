@@ -3858,13 +3858,13 @@ abstract class S {
   /// No description provided for @extAboutZapret.
   ///
   /// In ru, this message translates to:
-  /// **'Обход блокировок без VPN: меняет начало соединений, чтобы провайдер не узнал сайт. Работает в режиме «Без сервера».'**
+  /// **'Обход блокировок без VPN: меняет начало соединений, чтобы провайдер не узнал сайт.'**
   String get extAboutZapret;
 
   /// No description provided for @extAboutByedpi.
   ///
   /// In ru, this message translates to:
-  /// **'Обход блокировок без VPN через локальный прокси ByeDPI. Работает в режиме «Без сервера».'**
+  /// **'Обход блокировок без VPN через локальный прокси ByeDPI.'**
   String get extAboutByedpi;
 
   /// No description provided for @modeTunHint.

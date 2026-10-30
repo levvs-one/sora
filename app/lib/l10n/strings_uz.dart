@@ -2037,11 +2037,10 @@ class SUz extends S {
 
   @override
   String get extAboutZapret =>
-      'VPN\'siz bloklarni chetlab o\'tish: provayder saytni tanimasligi uchun ulanish boshini o\'zgartiradi. «Serversiz» rejimida ishlaydi.';
+      'VPN\'siz bloklarni chetlab o\'tish: provayder saytni tanimasligi uchun ulanish boshini o\'zgartiradi.';
 
   @override
-  String get extAboutByedpi =>
-      'Mahalliy ByeDPI proksi orqali VPN\'siz bloklarni chetlab o\'tish. «Serversiz» rejimida ishlaydi.';
+  String get extAboutByedpi => 'Mahalliy ByeDPI proksi orqali VPN\'siz bloklarni chetlab o\'tish.';
 
   @override
   String get modeTunHint => 'Kompyuterning butun trafigi VPN orqali o\'tadi';

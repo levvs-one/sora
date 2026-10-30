@@ -2012,10 +2012,10 @@ class SZh extends S {
   String get extAboutHello => '示例面板：显示活动连接并发送测试通知。';
 
   @override
-  String get extAboutZapret => '无需 VPN 绕过封锁：改变连接开头，让运营商无法识别网站。在“无服务器”模式下工作。';
+  String get extAboutZapret => '无需 VPN 绕过封锁：改变连接开头，让运营商无法识别网站。';
 
   @override
-  String get extAboutByedpi => '通过本地 ByeDPI 代理无需 VPN 绕过封锁。在“无服务器”模式下工作。';
+  String get extAboutByedpi => '通过本地 ByeDPI 代理无需 VPN 绕过封锁。';
 
   @override
   String get modeTunHint => '电脑的全部流量都经过 VPN';
@@ -4094,10 +4094,10 @@ class SZhHans extends SZh {
   String get extAboutHello => '示例面板：显示活动连接并发送测试通知。';
 
   @override
-  String get extAboutZapret => '无需 VPN 绕过封锁：改变连接开头，让运营商无法识别网站。在“无服务器”模式下工作。';
+  String get extAboutZapret => '无需 VPN 绕过封锁：改变连接开头，让运营商无法识别网站。';
 
   @override
-  String get extAboutByedpi => '通过本地 ByeDPI 代理无需 VPN 绕过封锁。在“无服务器”模式下工作。';
+  String get extAboutByedpi => '通过本地 ByeDPI 代理无需 VPN 绕过封锁。';
 
   @override
   String get modeTunHint => '电脑的全部流量都经过 VPN';
@@ -6176,10 +6176,10 @@ class SZhHant extends SZh {
   String get extAboutHello => '範例面板：顯示使用中的連線並傳送測試通知。';
 
   @override
-  String get extAboutZapret => '不用 VPN 繞過封鎖：改變連線開頭，讓電信業者無法辨識網站。在「無伺服器」模式下運作。';
+  String get extAboutZapret => '不用 VPN 繞過封鎖：改變連線開頭，讓電信業者無法辨識網站。';
 
   @override
-  String get extAboutByedpi => '透過本機 ByeDPI 代理不用 VPN 繞過封鎖。在「無伺服器」模式下運作。';
+  String get extAboutByedpi => '透過本機 ByeDPI 代理不用 VPN 繞過封鎖。';
 
   @override
   String get modeTunHint => '電腦的所有流量都經過 VPN';

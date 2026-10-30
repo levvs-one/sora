@@ -2041,11 +2041,10 @@ class SEs extends S {
 
   @override
   String get extAboutZapret =>
-      'Evita bloqueos sin VPN cambiando el inicio de las conexiones para que el proveedor no reconozca el sitio. Funciona en el modo Sin servidor.';
+      'Evita bloqueos sin VPN cambiando el inicio de las conexiones para que el proveedor no reconozca el sitio.';
 
   @override
-  String get extAboutByedpi =>
-      'Evita bloqueos sin VPN a través del proxy local ByeDPI. Funciona en el modo Sin servidor.';
+  String get extAboutByedpi => 'Evita bloqueos sin VPN a través del proxy local ByeDPI.';
 
   @override
   String get modeTunHint => 'Todo el tráfico del ordenador pasa por la VPN';

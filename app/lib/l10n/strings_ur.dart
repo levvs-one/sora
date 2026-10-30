@@ -2027,12 +2027,10 @@ class SUr extends S {
   String get extAboutHello => 'مثالی پینل: فعال کنکشن دکھاتا ہے اور آزمائشی اطلاع بھیجتا ہے۔';
 
   @override
-  String get extAboutZapret =>
-      'VPN کے بغیر پابندیوں سے بچاؤ: کنکشن کا آغاز بدلتا ہے تاکہ فراہم کنندہ سائٹ نہ پہچانے۔ «بغیر سرور» موڈ میں کام کرتا ہے۔';
+  String get extAboutZapret => 'VPN کے بغیر پابندیوں سے بچاؤ: کنکشن کا آغاز بدلتا ہے تاکہ فراہم کنندہ سائٹ نہ پہچانے۔';
 
   @override
-  String get extAboutByedpi =>
-      'مقامی ByeDPI پراکسی کے ذریعے VPN کے بغیر پابندیوں سے بچاؤ۔ «بغیر سرور» موڈ میں کام کرتا ہے۔';
+  String get extAboutByedpi => 'مقامی ByeDPI پراکسی کے ذریعے VPN کے بغیر پابندیوں سے بچاؤ۔';
 
   @override
   String get modeTunHint => 'کمپیوٹر کا سارا ٹریفک VPN سے گزرتا ہے';

@@ -2058,10 +2058,10 @@ class SPl extends S {
 
   @override
   String get extAboutZapret =>
-      'Omija blokady bez VPN, zmieniając początek połączeń tak, by dostawca nie rozpoznał strony. Działa w trybie „Bez serwera”.';
+      'Omija blokady bez VPN, zmieniając początek połączeń tak, by dostawca nie rozpoznał strony.';
 
   @override
-  String get extAboutByedpi => 'Omija blokady bez VPN przez lokalne proxy ByeDPI. Działa w trybie „Bez serwera”.';
+  String get extAboutByedpi => 'Omija blokady bez VPN przez lokalne proxy ByeDPI.';
 
   @override
   String get modeTunHint => 'Cały ruch komputera idzie przez VPN';

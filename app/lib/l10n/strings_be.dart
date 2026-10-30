@@ -2057,11 +2057,10 @@ class SBe extends S {
   String get extAboutHello => 'Прыклад панэлі: паказвае актыўныя злучэнні і дасылае тэставае апавяшчэнне.';
 
   @override
-  String get extAboutZapret =>
-      'Абыход блакіровак без VPN: змяняе пачатак злучэнняў, каб правайдар не пазнаў сайт. Працуе ў рэжыме «Без сервера».';
+  String get extAboutZapret => 'Абыход блакіровак без VPN: змяняе пачатак злучэнняў, каб правайдар не пазнаў сайт.';
 
   @override
-  String get extAboutByedpi => 'Абыход блакіровак без VPN праз лакальны проксі ByeDPI. Працуе ў рэжыме «Без сервера».';
+  String get extAboutByedpi => 'Абыход блакіровак без VPN праз лакальны проксі ByeDPI.';
 
   @override
   String get modeTunHint => 'Увесь трафік камп\'ютара ідзе праз VPN';

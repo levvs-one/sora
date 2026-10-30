@@ -777,62 +777,40 @@ class PillButton extends StatelessWidget {
   }
 }
 
-/// A quiet labelled toolbar button on the field color.
-///
-/// While [busy] it keeps its size and label and shows a small progress ring
-/// in place of the icon, so toolbars never reflow or lose a control.
-class QuietPill extends StatelessWidget {
-  const QuietPill({super.key, required this.icon, required this.label, required this.onTap, this.busy = false});
+/// A secondary action in the outlined style of the mode button.
+class OutlineAction extends StatelessWidget {
+  const OutlineAction({super.key, required this.icon, required this.label, required this.onTap});
 
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
-  final bool busy;
 
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    final color = onTap == null && !busy ? palette.ink3 : palette.ink;
-    return Semantics(
-      button: true,
-      enabled: onTap != null,
-      label: label,
-      excludeSemantics: true,
-      onTap: onTap,
-      child: Pressable(
-        onTap: onTap,
-        radius: 18,
-        wash: false,
-        child: AnimatedContainer(
-          duration: Motion.of(context, Motion.fast),
-          height: 36,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(18)),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox.square(
-                dimension: 18,
-                child: busy
-                    ? Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: CircularProgressIndicator(strokeWidth: 2, color: palette.ink),
-                      )
-                    : Icon(icon, size: 18, weight: 600, color: color),
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: Styles.secondary.copyWith(color: color, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: palette.ink,
+        side: BorderSide(color: palette.ink3.withValues(alpha: .35)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        minimumSize: const Size(0, 40),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: palette.ink),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Styles.secondary.copyWith(color: palette.ink, fontWeight: FontWeight.w600),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

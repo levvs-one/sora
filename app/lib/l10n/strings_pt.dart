@@ -2036,10 +2036,10 @@ class SPt extends S {
 
   @override
   String get extAboutZapret =>
-      'Contorna bloqueios sem VPN, mudando o início das conexões para que o provedor não reconheça o site. Funciona no modo Sem servidor.';
+      'Contorna bloqueios sem VPN, mudando o início das conexões para que o provedor não reconheça o site.';
 
   @override
-  String get extAboutByedpi => 'Contorna bloqueios sem VPN pelo proxy local ByeDPI. Funciona no modo Sem servidor.';
+  String get extAboutByedpi => 'Contorna bloqueios sem VPN pelo proxy local ByeDPI.';
 
   @override
   String get modeTunHint => 'Todo o tráfego do computador passa pela VPN';

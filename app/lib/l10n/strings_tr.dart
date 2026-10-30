@@ -2036,10 +2036,10 @@ class STr extends S {
 
   @override
   String get extAboutZapret =>
-      'VPN olmadan engelleri aşar: sağlayıcı siteyi tanımasın diye bağlantıların başını değiştirir. Sunucusuz modda çalışır.';
+      'VPN olmadan engelleri aşar: sağlayıcı siteyi tanımasın diye bağlantıların başını değiştirir.';
 
   @override
-  String get extAboutByedpi => 'Yerel ByeDPI proxy\'si ile VPN olmadan engelleri aşar. Sunucusuz modda çalışır.';
+  String get extAboutByedpi => 'Yerel ByeDPI proxy\'si ile VPN olmadan engelleri aşar.';
 
   @override
   String get modeTunHint => 'Bilgisayarın tüm trafiği VPN\'den geçer';

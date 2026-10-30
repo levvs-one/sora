@@ -2032,12 +2032,10 @@ class STk extends S {
   String get extAboutHello => 'Panel nusgasy: işjeň birikmeleri görkezýär we synag habarnamasyny iberýär.';
 
   @override
-  String get extAboutZapret =>
-      'VPN-siz petiklerden geçmek: üpjünçi sahypany tanamaz ýaly birikmäniň başyny üýtgedýär. «Serwersiz» režiminde işleýär.';
+  String get extAboutZapret => 'VPN-siz petiklerden geçmek: üpjünçi sahypany tanamaz ýaly birikmäniň başyny üýtgedýär.';
 
   @override
-  String get extAboutByedpi =>
-      'Ýerli ByeDPI proksisi arkaly VPN-siz petiklerden geçmek. «Serwersiz» režiminde işleýär.';
+  String get extAboutByedpi => 'Ýerli ByeDPI proksisi arkaly VPN-siz petiklerden geçmek.';
 
   @override
   String get modeTunHint => 'Kompýuteriň ähli trafigi VPN arkaly geçýär';

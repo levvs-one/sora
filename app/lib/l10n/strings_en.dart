@@ -2034,11 +2034,10 @@ class SEn extends S {
 
   @override
   String get extAboutZapret =>
-      'Bypasses blocking without a VPN by reshaping the start of connections so the provider cannot recognise the site. Works in the No server mode.';
+      'Bypasses blocking without a VPN by reshaping the start of connections so the provider cannot recognise the site.';
 
   @override
-  String get extAboutByedpi =>
-      'Bypasses blocking without a VPN through the local ByeDPI proxy. Works in the No server mode.';
+  String get extAboutByedpi => 'Bypasses blocking without a VPN through the local ByeDPI proxy.';
 
   @override
   String get modeTunHint => 'All of the computer\'s traffic goes through the VPN';

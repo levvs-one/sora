@@ -2031,10 +2031,10 @@ class SVi extends S {
 
   @override
   String get extAboutZapret =>
-      'Vượt chặn không cần VPN bằng cách thay đổi phần đầu kết nối để nhà mạng không nhận ra trang web. Hoạt động ở chế độ Không máy chủ.';
+      'Vượt chặn không cần VPN bằng cách thay đổi phần đầu kết nối để nhà mạng không nhận ra trang web.';
 
   @override
-  String get extAboutByedpi => 'Vượt chặn không cần VPN qua proxy ByeDPI cục bộ. Hoạt động ở chế độ Không máy chủ.';
+  String get extAboutByedpi => 'Vượt chặn không cần VPN qua proxy ByeDPI cục bộ.';
 
   @override
   String get modeTunHint => 'Toàn bộ lưu lượng của máy tính đi qua VPN';

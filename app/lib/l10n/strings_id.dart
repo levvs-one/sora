@@ -2032,11 +2032,10 @@ class SId extends S {
 
   @override
   String get extAboutZapret =>
-      'Menembus pemblokiran tanpa VPN dengan mengubah awal koneksi agar penyedia tidak mengenali situs. Berfungsi di mode Tanpa server.';
+      'Menembus pemblokiran tanpa VPN dengan mengubah awal koneksi agar penyedia tidak mengenali situs.';
 
   @override
-  String get extAboutByedpi =>
-      'Menembus pemblokiran tanpa VPN lewat proxy lokal ByeDPI. Berfungsi di mode Tanpa server.';
+  String get extAboutByedpi => 'Menembus pemblokiran tanpa VPN lewat proxy lokal ByeDPI.';
 
   @override
   String get modeTunHint => 'Semua lalu lintas komputer melewati VPN';

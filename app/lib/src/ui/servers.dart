@@ -71,39 +71,19 @@ class _ServersScreenState extends State<ServersScreen> {
     final s = S.of(context);
     final palette = Palette.of(context);
     final empty = sora.subscriptions.isEmpty && sora.customServers.isEmpty;
-    // Both actions keep their place while they work: the ping button shows
-    // its progress inside itself instead of turning into a bare spinner.
-    // Flexible: with large text on a narrow window the labels shorten
-    // instead of pushing the buttons out of the row.
-    final actions = [
-      Flexible(
-        child: QuietPill(
-          key: const ValueKey('probe-all'),
-          icon: Symbols.signal_cellular_alt_rounded,
-          label: s.probeServers,
-          busy: sora.probing,
-          onTap: sora.canProbe && !sora.probing && sora.servers.isNotEmpty ? () => unawaited(sora.probe()) : null,
-        ),
-      ),
-      const SizedBox(width: 8),
-      Flexible(child: _tourTarget(0, const _AddMenu())),
-    ];
-    final search = Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        key: const ValueKey('server-search'),
-        controller: _search,
-        style: Styles.secondary.copyWith(color: palette.ink),
-        decoration: InputDecoration(
-          hintText: s.search,
-          hintStyle: Styles.secondary.copyWith(color: palette.ink3),
-          prefixIcon: Icon(Symbols.search_rounded, size: 18, color: palette.ink3),
-          isDense: true,
-          filled: true,
-          fillColor: palette.field,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        ),
+    final search = TextField(
+      key: const ValueKey('server-search'),
+      controller: _search,
+      style: Styles.secondary.copyWith(color: palette.ink),
+      decoration: InputDecoration(
+        hintText: s.search,
+        hintStyle: Styles.secondary.copyWith(color: palette.ink3),
+        prefixIcon: Icon(Symbols.search_rounded, size: 18, color: palette.ink3),
+        isDense: true,
+        filled: true,
+        fillColor: palette.field,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
       ),
     );
     final automatic = Padding(
@@ -119,6 +99,8 @@ class _ServersScreenState extends State<ServersScreen> {
         ),
       ),
     );
+    // Search and the list's actions share one row, in the same round buttons
+    // as each subscription's header. Ping keeps its place while it works.
     final toolbar = Row(
       children: [
         if (!widget.embedded)
@@ -127,8 +109,19 @@ class _ServersScreenState extends State<ServersScreen> {
             label: MaterialLocalizations.of(context).backButtonTooltip,
             onTap: () => Navigator.of(context).maybePop(),
           ),
-        const Spacer(),
-        ...actions,
+        Expanded(child: sora.subscriptions.isNotEmpty ? search : const SizedBox.shrink()),
+        const SizedBox(width: 4),
+        Tooltip(
+          message: s.probeServers,
+          child: BusyRoundButton(
+            key: const ValueKey('probe-all'),
+            icon: Symbols.signal_cellular_alt_rounded,
+            label: s.probeServers,
+            busy: sora.probing,
+            onTap: sora.canProbe && !sora.probing && sora.servers.isNotEmpty ? () => unawaited(sora.probe()) : null,
+          ),
+        ),
+        _tourTarget(0, const _AddMenu()),
       ],
     );
     final separator = palette.ink3.withValues(alpha: 0.28);
@@ -148,7 +141,7 @@ class _ServersScreenState extends State<ServersScreen> {
               )
             else ...[
               toolbar,
-              if (sora.subscriptions.isNotEmpty) ...[const SizedBox(height: 12), search],
+              const SizedBox(height: 12),
             ],
           ],
         ),
@@ -673,7 +666,7 @@ class _AddMenu extends StatelessWidget {
       child: Text(label, style: Styles.secondary.copyWith(color: palette.ink)),
     );
     return MenuAnchor(
-      alignmentOffset: const Offset(0, 6),
+      alignmentOffset: const Offset(-184, 4),
       menuChildren: [
         item(
           const ValueKey('add-subscription'),
@@ -694,11 +687,14 @@ class _AddMenu extends StatelessWidget {
           () => unawaited(push<void>(context, const QrScanScreen())),
         ),
       ],
-      builder: (context, controller, _) => QuietPill(
-        key: const ValueKey('add-menu'),
-        icon: Symbols.add_rounded,
-        label: s.add,
-        onTap: () => controller.isOpen ? controller.close() : controller.open(),
+      builder: (context, controller, _) => Tooltip(
+        message: s.add,
+        child: RoundButton(
+          key: const ValueKey('add-menu'),
+          icon: Symbols.add_rounded,
+          label: s.add,
+          onTap: () => controller.isOpen ? controller.close() : controller.open(),
+        ),
       ),
     );
   }
@@ -757,22 +753,24 @@ class _EmptyServers extends StatelessWidget {
           const SizedBox(height: 16),
           add,
           const SizedBox(height: 8),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
+          Row(
             children: [
-              QuietPill(
-                key: const ValueKey('add-own-server'),
-                icon: Symbols.dns_rounded,
-                label: s.customServerOwn,
-                onTap: () => unawaited(showAddServerSheet(context)),
+              Expanded(
+                child: OutlineAction(
+                  key: const ValueKey('add-own-server'),
+                  icon: Symbols.dns_rounded,
+                  label: s.customServerOwn,
+                  onTap: () => unawaited(showAddServerSheet(context)),
+                ),
               ),
-              QuietPill(
-                key: const ValueKey('empty-qr'),
-                icon: Symbols.qr_code_scanner_rounded,
-                label: s.qrShort,
-                onTap: () => unawaited(push<void>(context, const QrScanScreen())),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlineAction(
+                  key: const ValueKey('empty-qr'),
+                  icon: Symbols.qr_code_scanner_rounded,
+                  label: s.qrShort,
+                  onTap: () => unawaited(push<void>(context, const QrScanScreen())),
+                ),
               ),
             ],
           ),

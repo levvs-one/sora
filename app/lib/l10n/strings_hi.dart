@@ -2028,12 +2028,10 @@ class SHi extends S {
   String get extAboutHello => 'उदाहरण पैनल: सक्रिय कनेक्शन दिखाता है और एक परीक्षण सूचना भेजता है।';
 
   @override
-  String get extAboutZapret =>
-      'VPN के बिना ब्लॉकिंग से बचाव: कनेक्शन की शुरुआत बदलता है ताकि प्रदाता साइट न पहचाने। «बिना सर्वर» मोड में काम करता है।';
+  String get extAboutZapret => 'VPN के बिना ब्लॉकिंग से बचाव: कनेक्शन की शुरुआत बदलता है ताकि प्रदाता साइट न पहचाने।';
 
   @override
-  String get extAboutByedpi =>
-      'स्थानीय ByeDPI प्रॉक्सी से VPN के बिना ब्लॉकिंग से बचाव। «बिना सर्वर» मोड में काम करता है।';
+  String get extAboutByedpi => 'स्थानीय ByeDPI प्रॉक्सी से VPN के बिना ब्लॉकिंग से बचाव।';
 
   @override
   String get modeTunHint => 'कंप्यूटर का सारा ट्रैफ़िक VPN से जाता है';

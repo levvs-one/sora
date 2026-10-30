@@ -2057,11 +2057,10 @@ class SUk extends S {
   String get extAboutHello => 'Приклад панелі: показує активні з\'єднання й надсилає тестове сповіщення.';
 
   @override
-  String get extAboutZapret =>
-      'Обхід блокувань без VPN: змінює початок з\'єднань, щоб провайдер не впізнав сайт. Працює в режимі «Без сервера».';
+  String get extAboutZapret => 'Обхід блокувань без VPN: змінює початок з\'єднань, щоб провайдер не впізнав сайт.';
 
   @override
-  String get extAboutByedpi => 'Обхід блокувань без VPN через локальний проксі ByeDPI. Працює в режимі «Без сервера».';
+  String get extAboutByedpi => 'Обхід блокувань без VPN через локальний проксі ByeDPI.';
 
   @override
   String get modeTunHint => 'Увесь трафік комп\'ютера йде через VPN';

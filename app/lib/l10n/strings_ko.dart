@@ -2017,10 +2017,10 @@ class SKo extends S {
   String get extAboutHello => '예제 패널: 활성 연결을 보여 주고 테스트 알림을 보냅니다.';
 
   @override
-  String get extAboutZapret => 'VPN 없이 차단을 우회합니다. 연결의 시작 부분을 바꿔 통신사가 사이트를 알아보지 못하게 합니다. 서버 없음 모드에서 작동합니다.';
+  String get extAboutZapret => 'VPN 없이 차단을 우회합니다. 연결의 시작 부분을 바꿔 통신사가 사이트를 알아보지 못하게 합니다.';
 
   @override
-  String get extAboutByedpi => '로컬 ByeDPI 프록시로 VPN 없이 차단을 우회합니다. 서버 없음 모드에서 작동합니다.';
+  String get extAboutByedpi => '로컬 ByeDPI 프록시로 VPN 없이 차단을 우회합니다.';
 
   @override
   String get modeTunHint => '컴퓨터의 모든 트래픽이 VPN을 거칩니다';
