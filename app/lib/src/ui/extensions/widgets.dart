@@ -84,19 +84,14 @@ class StarRating extends StatelessWidget {
   }
 }
 
-/// The "verified by Sora" mark. A plain icon: a Tooltip here would add its
-/// own semantics node and overlay inside every name it decorates, and the
-/// name rows already carry the meaning in their labels.
 class VerifiedBadge extends StatelessWidget {
   const VerifiedBadge({super.key, this.size = 16});
   final double size;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: S.of(context).extVerifiedSora,
-    child: ExcludeSemantics(
-      child: Icon(Symbols.verified_rounded, fill: 1, size: size, color: Palette.of(context).verified),
-    ),
+  Widget build(BuildContext context) => Tooltip(
+    message: S.of(context).extVerifiedSora,
+    child: Icon(Symbols.verified_rounded, fill: 1, size: size, color: Palette.of(context).verified),
   );
 }
 
@@ -106,10 +101,6 @@ bool isTeamExtension(InstalledExtension extension) =>
 bool isTeamEntry(CatalogEntry entry) => entry.authorKey.trim() == teamPublicKey;
 
 /// Extension name with the verified mark after it.
-///
-/// A Row, not a WidgetSpan: badges placed inside paragraph text made the
-/// Windows accessibility tree drop nodes it still referenced, and Sora
-/// crashed when the catalog opened an extension.
 class ExtensionName extends StatelessWidget {
   const ExtensionName({super.key, required this.name, required this.verified, this.list = false});
   final String name;

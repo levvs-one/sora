@@ -687,14 +687,13 @@ class _AddMenu extends StatelessWidget {
           () => unawaited(push<void>(context, const QrScanScreen())),
         ),
       ],
-      builder: (context, controller, _) => Tooltip(
-        message: s.add,
-        child: RoundButton(
-          key: const ValueKey('add-menu'),
-          icon: Symbols.add_rounded,
-          label: s.add,
-          onTap: () => controller.isOpen ? controller.close() : controller.open(),
-        ),
+      // No Tooltip here: a menu and a tooltip on one button share a semantics
+      // node, and screen readers would lose one of the two overlays.
+      builder: (context, controller, _) => RoundButton(
+        key: const ValueKey('add-menu'),
+        icon: Symbols.add_rounded,
+        label: s.add,
+        onTap: () => controller.isOpen ? controller.close() : controller.open(),
       ),
     );
   }

@@ -186,8 +186,7 @@ void main() {
     expect(tester.widget<AnimatedSwitcher>(find.byType(AnimatedSwitcher)).duration, Duration.zero);
   });
 
-  testWidgets('verified badge follows the name as a plain labelled icon', (tester) async {
-    final semantics = tester.ensureSemantics();
+  testWidgets('verified badge follows the name with only a tooltip', (tester) async {
     await tester.pumpWidget(
       _app(
         const Scaffold(
@@ -200,10 +199,7 @@ void main() {
     final icon = tester.widget<Icon>(find.descendant(of: find.byType(VerifiedBadge), matching: find.byType(Icon)));
     expect(icon.fill, 1);
     expect(icon.color, Palette.light.verified);
-    // No Tooltip inside the name: its overlay and semantics node made the
-    // Windows accessibility tree drop nodes, and opening a card crashed Sora.
-    expect(find.byType(Tooltip), findsNothing);
-    expect(find.bySemanticsLabel(RegExp('Verified by Sora')), findsOneWidget);
+    expect(find.byTooltip('Verified by Sora'), findsOneWidget);
     expect(find.text('Sora team'), findsNothing);
     expect(find.ancestor(of: find.byType(VerifiedBadge), matching: find.byType(ExtensionName)), findsOneWidget);
     await tester.pumpWidget(
@@ -214,7 +210,6 @@ void main() {
       ),
     );
     expect(find.byType(VerifiedBadge), findsNothing);
-    semantics.dispose();
   });
 
   testWidgets('sideload key status and dangerous permissions still require consent', (tester) async {
