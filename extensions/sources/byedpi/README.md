@@ -1,14 +1,18 @@
-# ByeDPI profiles
+# ByeDPI
 
-This extension selects profiles for the existing Windows and Linux host backend.
-It does not install a native executable, driver or operating-system component.
-The profile is selected explicitly as a serverless mode; manual Sora settings
-are retained. Disabling or uninstalling the selected extension stops its session.
+Blocking bypass without a VPN through the local ByeDPI proxy bundled with
+Sora. It reshapes the start of each connection so the provider cannot
+recognise the site, and needs no driver. The panel shows whether the bypass
+runs and switches between three profiles:
 
-Version 1.0.0 is published in `extensions/catalog-1.1.3.json` and requires
-Sora 1.1.3 or later. Integration tests use a separate temporary author identity.
-The host backend is driverless and uses a local TCP SOCKS proxy. Linux packages
-support amd64 and arm64; Windows uses the amd64 backend.
+| Profile | What it does |
+|---|---|
+| Strong (`TCP+TLS`) | Splits and reorders the start of a connection. Works most often. |
+| Gentle (`TLS`) | Splits TLS further in. Use it if Strong breaks a site. |
+| Plain HTTP (`HTTP`) | Changes the case of HTTP headers for sites without HTTPS. |
 
-The `net.hooks` permission is dangerous and requires the existing explicit
-installation consent. No profile guarantees evasion in every network.
+Turning it on switches Sora to the No server mode; choose a server or TUN to
+use the VPN again. Works on Windows x64 and on Linux amd64 and arm64.
+
+The extension ships profiles and a panel only: no executables, drivers or
+scripts. Requires Sora 1.1.6.

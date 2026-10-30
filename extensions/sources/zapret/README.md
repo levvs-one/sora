@@ -1,26 +1,22 @@
-# Zapret profiles
+# Zapret
 
-One signed descriptor selects platform-specific profiles: Linux uses the existing
-host TPWS backend; native Windows x64 uses the host's pinned Winws/WinDivert
-bundle. This extension supplies no executable, DLL, driver, script or native path.
+Blocking bypass without a VPN. Zapret reshapes the first packets of each
+connection so the provider cannot recognise the site. The panel shows whether
+the bypass runs and switches between three profiles:
 
-The HTTP profile omits methodEol: its leading line can cause strict HTTP
-servers to reject a request. The remaining shaping options do not guarantee
-compatibility or evasion on every network.
+| Profile | What it does |
+|---|---|
+| Strong (`TCP+TLS`) | Splits and reorders the start of a connection. Works most often. |
+| Gentle (`TLS`) | Only splits TLS. Use it if Strong breaks a site. |
+| Plain HTTP (`HTTP`) | Changes the case of HTTP headers for sites without HTTPS. |
 
-Windows mode shapes TCP traffic on ports 80 and 443 for every application.
-The pinned upstream LAN exclusions are not a complete IANA address classifier.
-It is not a VPN or a per-application filter. Sora requires its advertised native
-capability and explicit host consent for this author/version during each app
-launch. The scope cannot be widened by extension settings. Unsupported Windows
-architectures, missing WLANAPI, unverified components or driver rejection refuse
-the mode; protection settings are never weakened. Driver and platform coverage
-must be validated on the supported images before publication.
+Turning it on switches Sora to the No server mode; choose a server or TUN to
+use the VPN again.
 
-Shutdown closes Sora's processes/filter handles. It never stops or deletes the
-shared WinDivert service. The driver can remain loaded until a normal Windows
-restart. Native component licences and complete upstream sources accompany the
-host bundle. No profile guarantees evasion in every network.
+- **Linux** uses the TPWS backend bundled with Sora.
+- **Windows** uses the WinDivert backend. It shapes TCP ports 80 and 443 for
+  every application, so Sora asks for consent on each launch, and the backend
+  must be installed separately.
 
-Version 1.0.0 is published in `extensions/catalog-1.1.3.json` with author and
-team signatures and requires Sora 1.1.3 or later.
+The extension ships profiles and a panel only: no executables, drivers or
+scripts. Requires Sora 1.1.6.

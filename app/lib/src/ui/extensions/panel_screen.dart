@@ -495,7 +495,11 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
         _preparingController = null;
         _controller = controller;
       });
-      await controller.loadRequest(_origin!.resolve(_panel.entry));
+      // Panels speak the app's language, which may differ from the system's
+      // that the WebView reports as navigator.language.
+      final entry = _origin!.resolve(_panel.entry);
+      final language = Localizations.localeOf(context).languageCode;
+      await controller.loadRequest(entry.replace(queryParameters: {...entry.queryParameters, 'lang': language}));
       if (!mounted || generation != _generation) return;
       _watchSora();
     } catch (_) {

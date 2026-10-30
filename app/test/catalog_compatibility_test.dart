@@ -36,8 +36,8 @@ void main() {
       'packages/material_symbols_icons/MaterialSymbolsRounded',
     )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
   });
-  final catalogBytes = File('../extensions/catalog-1.1.3.json').readAsBytesSync();
-  final signature = File('../extensions/catalog-1.1.3.json.minisig').readAsBytesSync();
+  final catalogBytes = File('../extensions/catalog-1.1.6.json').readAsBytesSync();
+  final signature = File('../extensions/catalog-1.1.6.json.minisig').readAsBytesSync();
   Map<String, dynamic> document() => jsonDecode(utf8.decode(catalogBytes)) as Map<String, dynamic>;
   Map<String, dynamic> entry(Map<String, dynamic> doc) => (doc['extensions'] as List)
       .cast<Map<String, dynamic>>()
@@ -161,10 +161,14 @@ void main() {
       final doc = document();
       entry(doc)['min_app_version'] = manifest['min_app_version'];
       final listing = model(doc);
-      // v1.1.2 is the current public release; v1.1.3 is a candidate,
-      // not a claim that a supporting host has already been published.
+      // A source never installs on the last host before its requirement and
+      // always installs on the version it names.
+      final required = manifest['min_app_version'] as String;
+      final parts = required.split('.').map(int.parse).toList();
+      final before = '${parts[0]}.${parts[1]}.${parts[2] - 1}';
       expect(listing.requiresNewerApp('1.1.2'), isTrue);
-      expect(listing.requiresNewerApp('1.1.3'), isFalse);
+      expect(listing.requiresNewerApp(before), isTrue);
+      expect(listing.requiresNewerApp(required), isFalse);
     });
   }
   test('release host version enables candidate sources and rejects a future requirement', () {

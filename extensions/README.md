@@ -6,7 +6,9 @@ the compiled team key (`core/ext/sign.go`, `app/lib/src/ext/verifier.dart`):
 - `catalog.json` and `catalog.json.minisig`: the legacy store catalog used by
   the published v1.1.2 client;
 - `catalog-1.1.3.json` and `catalog-1.1.3.json.minisig`: the catalog for
-  Sora 1.1.3 and later;
+  Sora 1.1.3 to 1.1.5;
+- `catalog-1.1.6.json` and `catalog-1.1.6.json.minisig`: the catalog for
+  Sora 1.1.6 and later;
 - `revocations.json` and `revocations.json.minisig`: versions the app must
   disable and refuse;
 - `packages/`: the signed `.soraext` files the catalog points at.
@@ -33,7 +35,9 @@ declares capabilities, they must match the manifest; older entries may omit
 them. Verify the signed catalog with the pinned production root before delivering it.
 
 Zapret 1.0.0, ByeDPI 1.0.0 and Hello Panel 1.0.1 require Sora 1.1.3 and are
-listed only in `catalog-1.1.3.json`. The v1.1.2 client uses the legacy URL and
+listed in `catalog-1.1.3.json`. Zapret 1.1.0 and ByeDPI 1.1.0 add panels
+that call `getBypass`/`setBypass`, so they require Sora 1.1.6 and are
+listed only in `catalog-1.1.6.json`, next to Hello Panel 1.0.1. The v1.1.2 client uses the legacy URL and
 offers an install action before it checks a package's minimum host version, so
 entries that require a newer host stay out of `catalog.json`.
 

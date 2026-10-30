@@ -33,14 +33,16 @@ void main() {
   Future<ExtPackage> revokedPackage() async => ExtPackage.open(await fixture('revoked.soraext').readAsBytes());
 
   const legacyUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog.json';
+  const catalog113Url = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog-1.1.3.json';
   test('the compatible host uses its own catalog URL', () {
-    expect(defaultCatalogUrl, 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog-1.1.3.json');
+    expect(defaultCatalogUrl, 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog-1.1.6.json');
     expect(defaultCatalogUrl, isNot(legacyUrl));
   });
 
   for (final (label, url, file) in [
     ('legacy published catalog', legacyUrl, 'catalog.json'),
-    ('compatible-host repository catalog', defaultCatalogUrl, 'catalog-1.1.3.json'),
+    ('1.1.3 to 1.1.5 repository catalog', catalog113Url, 'catalog-1.1.3.json'),
+    ('compatible-host repository catalog', defaultCatalogUrl, 'catalog-1.1.6.json'),
   ]) {
     test('$label verifies and every package matches and installs', () async {
       final client = serving({url: published(file), '$url.minisig': published('$file.minisig')});
@@ -80,8 +82,8 @@ void main() {
     });
     final offline = serving({});
     final compatible = serving({
-      defaultCatalogUrl: published('catalog-1.1.3.json'),
-      '$defaultCatalogUrl.minisig': published('catalog-1.1.3.json.minisig'),
+      defaultCatalogUrl: published('catalog-1.1.6.json'),
+      '$defaultCatalogUrl.minisig': published('catalog-1.1.6.json.minisig'),
     });
     addTearDown(legacy.close);
     addTearDown(offline.close);
