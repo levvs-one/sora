@@ -6,6 +6,7 @@ package probe
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"math"
 	"net"
 	"strconv"
@@ -208,26 +209,26 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32, mode Mode) 
 	return time.Since(start), nil
 }
 
-// handshake times a TCP connection and a TLS handshake without checking the
-// certificate. The host is sent as SNI when it is a name.
+// handshake times a TCP connection and a TLS handshake. Verification stays
+// on; a server that completes its side of the handshake but presents a
+// certificate this machine does not trust (REALITY, self-signed) has still
+// answered, so the time until that verdict counts. Nothing is sent after the
+// handshake either way.
 func handshake(ctx context.Context, host, address string, timeout time.Duration) (time.Duration, error) {
-	config := &tls.Config{
-		MinVersion: tls.VersionTLS12,
-		// Only the handshake is timed and nothing is sent over it, so an
-		// unverified certificate cannot leak or accept data.
-		InsecureSkipVerify: true, //nolint:gosec // latency only, see above
-	}
-	if net.ParseIP(host) == nil {
-		config.ServerName = host
-	}
+	// An IP literal is not sent as SNI; verification then checks IP SANs.
+	config := &tls.Config{MinVersion: tls.VersionTLS12, ServerName: host}
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	start := time.Now()
 	connection, err := (&tls.Dialer{NetDialer: &net.Dialer{Timeout: timeout}, Config: config}).DialContext(ctx, "tcp", address)
+	elapsed := time.Since(start)
 	if err != nil {
+		var untrusted *tls.CertificateVerificationError
+		if errors.As(err, &untrusted) {
+			return elapsed, nil
+		}
 		return 0, errs.From(err)
 	}
-	elapsed := time.Since(start)
 	_ = connection.Close()
 	return elapsed, nil
 }
