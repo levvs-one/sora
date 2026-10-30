@@ -134,7 +134,10 @@ void main() {
     expect(find.byKey(const ValueKey('own-servers-group')), findsNothing);
     expect(find.text('My servers'), findsNothing);
     expect(find.byKey(const ValueKey('add-own-server')), findsOneWidget);
-    expect(find.byTooltip('Add custom server'), findsOneWidget);
+    expect(
+      find.descendant(of: find.byKey(const ValueKey('add-own-server')), matching: find.byType(Text)),
+      findsOneWidget,
+    );
     await open(tester);
     expect(tester.getSize(find.byKey(const ValueKey('custom-server-sheet'))).width, 520);
     expect(saveEnabled(tester), isFalse);

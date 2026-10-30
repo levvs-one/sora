@@ -2047,4 +2047,96 @@ class SAr extends S {
 
   @override
   String get winwsRequirements => 'وضع VPN هذا غير متاح';
+
+  @override
+  String get emptyServersTitle => 'أضف خادمًا أو اشتراكًا';
+
+  @override
+  String get emptyServersBody => 'الصق رابط الاشتراك من خدمة VPN، أو أضف خادمك الخاص، أو امسح رمز QR.';
+
+  @override
+  String get qrShort => 'رمز QR';
+
+  @override
+  String get extAboutHello => 'لوحة مثال: تعرض الاتصالات النشطة وترسل إشعارًا تجريبيًا.';
+
+  @override
+  String get extAboutZapret =>
+      'تجاوز الحجب دون VPN: يغيّر بداية الاتصالات كي لا يتعرّف المزوّد على الموقع. يعمل في وضع «دون خادم».';
+
+  @override
+  String get extAboutByedpi => 'تجاوز الحجب دون VPN عبر وكيل ByeDPI المحلي. يعمل في وضع «دون خادم».';
+
+  @override
+  String get modeTunHint => 'كل حركة مرور الحاسوب تمر عبر VPN';
+
+  @override
+  String get modeProxyHint => 'المتصفحات والتطبيقات التي تستخدم وكيل النظام فقط';
+
+  @override
+  String get modeBypassHint => 'تجاوز الحجب دون خادم VPN';
+
+  @override
+  String get modeExtensionHint => 'تجاوز الحجب من إضافة';
+
+  @override
+  String get engineInfo =>
+      'المحرّك هو ما ينشئ الاتصال بالخادم.\n\nتلقائي: يختار Sora محرّكًا يدعم بروتوكول الخادم.\nsing-box: سريع ومتعدد الاستخدامات.\nXray: الأفضل لـ VLESS مع REALITY وXHTTP.\nmihomo: اشتراكات Clash وقواعد مرنة.\n\nغيّر المحرّك فقط إذا لم يتصل الخادم في الوضع التلقائي.';
+
+  @override
+  String get tunStackInfo =>
+      'كيف تصل حركة المرور من النظام إلى VPN.\n\nالنظام: الأسرع، عبر مكدّس شبكة نظام التشغيل.\ngVisor: مكدّس خاص، متوافق مع معظم التطبيقات.\nمختلط: TCP عبر النظام وUDP عبر gVisor.\n\nإذا تعطّلت المواقع أو الألعاب فجرّب مكدّسًا آخر.';
+
+  @override
+  String get protection => 'الحماية';
+
+  @override
+  String get killSwitchInfo =>
+      'إذا انقطع VPN يحجب Sora الإنترنت كي لا تخرج حركة المرور خارج النفق. يعود الوصول بعد إعادة الاتصال أو إيقاف VPN.';
+
+  @override
+  String get strictKillSwitchInfo => 'يبقى الحجب بعد الخروج من Sora وبعد إعادة التشغيل، حتى توقفه من هنا.';
+
+  @override
+  String get zapretWithVpnInfo => 'المواقع التي ترسلها قواعدك خارج VPN تحصل على تجاوز الحجب عبر Zapret.';
+
+  @override
+  String get failoverInfo => 'إذا توقف خادم عن الاستجابة، ينتقل Sora تلقائيًا إلى الخادم العامل التالي.';
+
+  @override
+  String get ipv6Info => 'تمرير IPv6 عبر VPN. أوقفه إذا كان الخادم لا يدعم IPv6 والمواقع بطيئة.';
+
+  @override
+  String get fragmentInfo =>
+      'يقسّم بداية اتصال TLS إلى أجزاء كي لا يرى مرشّح المزوّد اسم الموقع. يفيد عندما يُحجب الخادم عبر SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'موضع قطع الحزمة الأولى: رقم بايت أو علامة مثل midsld (منتصف النطاق). افصل القيم المتعددة بفواصل.';
+
+  @override
+  String get disorderInfo => 'يرسل أجزاء الحزمة بترتيب معكوس لإرباك المرشّحات التي تجمّعها بالترتيب.';
+
+  @override
+  String get tlsRecordInfo => 'يقسّم تحية TLS إلى عدة سجلات كي لا يظهر اسم الموقع كاملًا في سجل واحد.';
+
+  @override
+  String get hostCaseInfo =>
+      'يغيّر حالة أحرف ترويسة Host في طلبات HTTP (Host → hoSt) فلا تتعرّف المرشّحات القديمة على الطلب.';
+
+  @override
+  String get probeMethodInfo =>
+      'عبر المحرّك: التأخير الحقيقي إلى موقع عبر الخادم، الأدق.\nاتصال فقط: اتصال TCP بالخادم فقط، سريع لكنه لا يختبر VPN.\nمصافحة TLS: ‏TCP وTLS مع الخادم.\nICMP: ‏ping عادي، وبعض الخوادم لا تردّ عليه.\nتلقائي: عبر المحرّك، واتصال حيث يتعذّر ذلك.';
+
+  @override
+  String get autoSelectInfo => 'كيف يختار «الأسرع» الخادم: حسب ping أو حسب السرعة المقيسة أو حسب كليهما.';
+
+  @override
+  String get autoSwitchInfo => 'إذا أصبح الخادم الحالي أبطأ بشكل ملحوظ، ينتقل Sora إلى خادم أسرع.';
+
+  @override
+  String get probeTls => 'مصافحة TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

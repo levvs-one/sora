@@ -13,7 +13,6 @@ import 'package:intl/intl.dart';
 import '../../../l10n/strings.dart';
 import '../../design/theme.dart';
 import '../kit.dart';
-import '../modes.dart';
 import '../../ext/catalog.dart';
 import '../../ext/enforcement.dart';
 import '../../ext/manifest.dart';
@@ -274,29 +273,37 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
 
   Widget _header(BuildContext context, ExtManifest m, CatalogEntry? entry) {
     final palette = Palette.of(context);
+    final s = S.of(context);
     final live = ExtScope.of(context).get(m.id) ?? widget.installed;
-    return Row(
+    final team = live == null ? (entry != null && isTeamEntry(entry)) : isTeamExtension(live);
+    final capabilities = live?.manifest.capabilities ?? entry?.capabilities ?? const <String>[];
+    final about = extensionBlurb(s, id: m.id, team: team, fallback: m.description);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(14)),
-          child: Icon(Symbols.extension_rounded, color: palette.ink2, size: 28),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ExtensionName(
-                name: m.name,
-                verified: live == null ? (entry?.badges.contains('staff') ?? false) : isTeamExtension(live),
+        Row(
+          children: [
+            ExtensionIcon(capabilities: capabilities, size: 60),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ExtensionName(
+                    name: m.name,
+                    verified: live == null ? (entry?.badges.contains('staff') ?? false) : isTeamExtension(live),
+                  ),
+                  const SizedBox(height: 4),
+                  Text('${m.author.name} · ${m.version}', style: Styles.secondary.copyWith(color: palette.ink2)),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text('${m.author.name}, ${m.version}', style: Styles.secondary.copyWith(color: palette.ink2)),
-            ],
-          ),
+            ),
+          ],
         ),
+        if (about.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text(about, style: Styles.body.copyWith(color: palette.ink, height: 1.5)),
+        ],
       ],
     );
   }
@@ -445,18 +452,9 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     final store = ExtScope.of(context);
     setState(() => _saving = true);
     try {
-      if (!await ensureSystemFilterConsent(context, '$extensionBypassPrefix$id') || !mounted) return;
       await store.setSettings(id, _settings ?? await store.getSettings(id));
-      final profile = store.bypassProfile('$extensionBypassPrefix$id');
-      if (profile == null) throw ExtAssetError('bypass profile is unavailable');
       if (!mounted) return;
-      final sora = SoraScope.read(context);
-      await sora.change((settings) => settings.tunnel = 'tun', replan: false);
-      await sora.select(profile.choiceId);
-      sora.applyConnectionChanges();
-      if (sora.selected == profile.choiceId && (sora.phase == Phase.off || sora.phase == Phase.offline)) {
-        await sora.connect();
-      }
+      await connectExtensionBypass(context, id);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).extAssetRejected)));

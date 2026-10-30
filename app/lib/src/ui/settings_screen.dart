@@ -270,13 +270,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.rules.isEmpty ? null : '${settings.rules.length}',
               onTap: () => push<void>(context, const RulesScreen()),
             ),
-            SwitchTile(title: s.failover, value: settings.failover, onChanged: (v) => set((x) => x.failover = v)),
+            SwitchTile(
+              title: s.failover,
+              info: s.failoverInfo,
+              value: settings.failover,
+              onChanged: (v) => set((x) => x.failover = v),
+            ),
             SwitchTile(
               title: s.restoreOnCrash,
               value: settings.restoreOnCrash,
               onChanged: (v) => set((x) => x.restoreOnCrash = v, replan: false),
             ),
-            SwitchTile(title: s.ipv6, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
+            SwitchTile(title: s.ipv6, info: s.ipv6Info, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
             LinkTile(
               title: s.dns,
               value: _dnsSummary(s, settings),
@@ -297,7 +302,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => push<void>(context, const ChainsScreen()),
             ),
             LinkTile(title: s.sync, onTap: () => push<void>(context, const SyncScreen())),
-            SwitchTile(title: s.fragment, value: settings.fragment, onChanged: (v) => set((x) => x.fragment = v)),
+            SwitchTile(
+              title: s.fragment,
+              info: s.fragmentInfo,
+              value: settings.fragment,
+              onChanged: (v) => set((x) => x.fragment = v),
+            ),
             if (settings.fragment) ...[
               LinkTile(
                 title: s.fragmentPackets,
@@ -342,6 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               LinkTile(
                 title: s.splitPos,
+                info: s.splitPosInfo,
                 value: settings.splitPos.join(', '),
                 onTap: () => _edit(
                   title: s.splitPos,
@@ -351,14 +362,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   apply: (x, v) => x.splitPos = v.isEmpty ? Settings.defaultSplitPos : _parts(v),
                 ),
               ),
-              SwitchTile(title: s.disorder, value: settings.disorder, onChanged: (v) => set((x) => x.disorder = v)),
+              SwitchTile(
+                title: s.disorder,
+                info: s.disorderInfo,
+                value: settings.disorder,
+                onChanged: (v) => set((x) => x.disorder = v),
+              ),
               ChoiceTile<String>(
                 title: s.tlsRecord,
+                info: s.tlsRecordInfo,
                 value: settings.tlsRecord,
                 choices: {'': s.tlsRecordNo, if (!Platform.isWindows) 'sniext': s.tlsRecordSni, '1': s.tlsRecordFirst},
                 onChanged: (v) => set((x) => x.tlsRecord = v),
               ),
-              SwitchTile(title: s.hostCase, value: settings.hostCase, onChanged: (v) => set((x) => x.hostCase = v)),
+              SwitchTile(
+                title: s.hostCase,
+                info: s.hostCaseInfo,
+                value: settings.hostCase,
+                onChanged: (v) => set((x) => x.hostCase = v),
+              ),
             ],
           ),
         ],
@@ -367,8 +389,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             ChoiceTile<String>(
               title: s.probeMethod,
+              info: s.probeMethodInfo,
               value: settings.probeMethod,
-              choices: {'auto': s.probeAuto, 'engine': s.probeEngine, 'connect': s.probeConnect},
+              choices: {
+                'auto': s.probeAuto,
+                'engine': s.probeEngine,
+                'connect': s.probeConnect,
+                if (sora.probeModesSupported || settings.probeMethod == 'tls') 'tls': s.probeTls,
+                if (sora.probeModesSupported || settings.probeMethod == 'icmp') 'icmp': s.probeIcmp,
+              },
               onChanged: (v) => set((x) => x.probeMethod = v, replan: false),
             ),
             LinkTile(
@@ -390,13 +419,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             ChoiceTile<String>(
               title: s.autoSelectMode,
+              info: s.autoSelectInfo,
               value: settings.autoSelectMode,
               choices: {'ping': s.autoSelectPing, 'speed': s.autoSelectSpeed, 'smart': s.autoSelectSmart},
               onChanged: (v) => set((x) => x.autoSelectMode = v),
             ),
             SwitchTile(
               title: s.autoSwitchOnDegrade,
-
+              info: s.autoSwitchInfo,
               value: settings.autoSwitchOnDegrade,
               onChanged: (v) => set((x) => x.autoSwitchOnDegrade = v, replan: false),
             ),

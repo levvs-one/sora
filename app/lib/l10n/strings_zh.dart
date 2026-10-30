@@ -1998,6 +1998,93 @@ class SZh extends S {
 
   @override
   String get winwsRequirements => '此 VPN 模式不可用';
+
+  @override
+  String get emptyServersTitle => '添加服务器或订阅';
+
+  @override
+  String get emptyServersBody => '粘贴 VPN 服务的订阅链接、添加自己的服务器，或扫描二维码。';
+
+  @override
+  String get qrShort => '二维码';
+
+  @override
+  String get extAboutHello => '示例面板：显示活动连接并发送测试通知。';
+
+  @override
+  String get extAboutZapret => '无需 VPN 绕过封锁：改变连接开头，让运营商无法识别网站。在“无服务器”模式下工作。';
+
+  @override
+  String get extAboutByedpi => '通过本地 ByeDPI 代理无需 VPN 绕过封锁。在“无服务器”模式下工作。';
+
+  @override
+  String get modeTunHint => '电脑的全部流量都经过 VPN';
+
+  @override
+  String get modeProxyHint => '仅限使用系统代理的浏览器和应用';
+
+  @override
+  String get modeBypassHint => '无需 VPN 服务器绕过封锁';
+
+  @override
+  String get modeExtensionHint => '来自扩展的封锁绕过';
+
+  @override
+  String get engineInfo =>
+      '内核负责与服务器建立连接。\n\n自动：Sora 自行选择支持该服务器协议的内核。\nsing-box：快速、通用。\nXray：最适合使用 REALITY 和 XHTTP 的 VLESS。\nmihomo：Clash 订阅和灵活规则。\n\n只有当服务器在“自动”下无法连接时才更换内核。';
+
+  @override
+  String get tunStackInfo =>
+      '流量如何从系统进入 VPN。\n\n系统：最快，使用操作系统网络栈。\ngVisor：自带网络栈，兼容大多数应用。\n混合：TCP 走系统，UDP 走 gVisor。\n\n如果网站或游戏异常，请换一个网络栈。';
+
+  @override
+  String get protection => '保护';
+
+  @override
+  String get killSwitchInfo => 'VPN 断开时，Sora 会阻断网络，防止流量绕过隧道。重新连接或关闭 VPN 后恢复访问。';
+
+  @override
+  String get strictKillSwitchInfo => '退出 Sora 和重启后阻断仍然有效，直到你在这里关闭。';
+
+  @override
+  String get zapretWithVpnInfo => '按规则不走 VPN 的网站将使用 Zapret 绕过封锁。';
+
+  @override
+  String get failoverInfo => '服务器无响应时，Sora 会自动切换到下一个可用的服务器。';
+
+  @override
+  String get ipv6Info => '让 IPv6 经过 VPN。如果服务器不支持 IPv6 且网站打开缓慢，请关闭。';
+
+  @override
+  String get fragmentInfo => '将 TLS 连接的开头拆成多段，让运营商的过滤器看不到网站名称。服务器因 SNI 被封锁时有帮助。';
+
+  @override
+  String get splitPosInfo => '第一个数据包的切分位置：字节序号或标记，例如 midsld（域名中间）。多个值用逗号分隔。';
+
+  @override
+  String get disorderInfo => '以相反顺序发送数据包片段，干扰按顺序重组的过滤器。';
+
+  @override
+  String get tlsRecordInfo => '将 TLS 握手问候拆成多条记录，使网站名称不会完整出现在一条里。';
+
+  @override
+  String get hostCaseInfo => '改变 HTTP 请求中 Host 头的大小写（Host → hoSt），让旧式过滤器无法识别。';
+
+  @override
+  String get probeMethodInfo =>
+      '通过内核：经服务器访问网站的真实延迟，最准确。\n仅连接：只与服务器建立 TCP 连接，速度快但不检验 VPN。\nTLS 握手：与服务器的 TCP 和 TLS。\nICMP：普通 ping，部分服务器不响应。\n自动：通过内核，不行时用连接。';
+
+  @override
+  String get autoSelectInfo => '“最快”如何选服务器：按 ping、按实测速度或两者结合。';
+
+  @override
+  String get autoSwitchInfo => '当前服务器明显变慢时，Sora 会切换到更快的服务器。';
+
+  @override
+  String get probeTls => 'TLS 握手';
+
+  @override
+  String get probeIcmp => 'ICMP（ping）';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -3993,6 +4080,93 @@ class SZhHans extends SZh {
 
   @override
   String get winwsRequirements => '此 VPN 模式不可用';
+
+  @override
+  String get emptyServersTitle => '添加服务器或订阅';
+
+  @override
+  String get emptyServersBody => '粘贴 VPN 服务的订阅链接、添加自己的服务器，或扫描二维码。';
+
+  @override
+  String get qrShort => '二维码';
+
+  @override
+  String get extAboutHello => '示例面板：显示活动连接并发送测试通知。';
+
+  @override
+  String get extAboutZapret => '无需 VPN 绕过封锁：改变连接开头，让运营商无法识别网站。在“无服务器”模式下工作。';
+
+  @override
+  String get extAboutByedpi => '通过本地 ByeDPI 代理无需 VPN 绕过封锁。在“无服务器”模式下工作。';
+
+  @override
+  String get modeTunHint => '电脑的全部流量都经过 VPN';
+
+  @override
+  String get modeProxyHint => '仅限使用系统代理的浏览器和应用';
+
+  @override
+  String get modeBypassHint => '无需 VPN 服务器绕过封锁';
+
+  @override
+  String get modeExtensionHint => '来自扩展的封锁绕过';
+
+  @override
+  String get engineInfo =>
+      '内核负责与服务器建立连接。\n\n自动：Sora 自行选择支持该服务器协议的内核。\nsing-box：快速、通用。\nXray：最适合使用 REALITY 和 XHTTP 的 VLESS。\nmihomo：Clash 订阅和灵活规则。\n\n只有当服务器在“自动”下无法连接时才更换内核。';
+
+  @override
+  String get tunStackInfo =>
+      '流量如何从系统进入 VPN。\n\n系统：最快，使用操作系统网络栈。\ngVisor：自带网络栈，兼容大多数应用。\n混合：TCP 走系统，UDP 走 gVisor。\n\n如果网站或游戏异常，请换一个网络栈。';
+
+  @override
+  String get protection => '保护';
+
+  @override
+  String get killSwitchInfo => 'VPN 断开时，Sora 会阻断网络，防止流量绕过隧道。重新连接或关闭 VPN 后恢复访问。';
+
+  @override
+  String get strictKillSwitchInfo => '退出 Sora 和重启后阻断仍然有效，直到你在这里关闭。';
+
+  @override
+  String get zapretWithVpnInfo => '按规则不走 VPN 的网站将使用 Zapret 绕过封锁。';
+
+  @override
+  String get failoverInfo => '服务器无响应时，Sora 会自动切换到下一个可用的服务器。';
+
+  @override
+  String get ipv6Info => '让 IPv6 经过 VPN。如果服务器不支持 IPv6 且网站打开缓慢，请关闭。';
+
+  @override
+  String get fragmentInfo => '将 TLS 连接的开头拆成多段，让运营商的过滤器看不到网站名称。服务器因 SNI 被封锁时有帮助。';
+
+  @override
+  String get splitPosInfo => '第一个数据包的切分位置：字节序号或标记，例如 midsld（域名中间）。多个值用逗号分隔。';
+
+  @override
+  String get disorderInfo => '以相反顺序发送数据包片段，干扰按顺序重组的过滤器。';
+
+  @override
+  String get tlsRecordInfo => '将 TLS 握手问候拆成多条记录，使网站名称不会完整出现在一条里。';
+
+  @override
+  String get hostCaseInfo => '改变 HTTP 请求中 Host 头的大小写（Host → hoSt），让旧式过滤器无法识别。';
+
+  @override
+  String get probeMethodInfo =>
+      '通过内核：经服务器访问网站的真实延迟，最准确。\n仅连接：只与服务器建立 TCP 连接，速度快但不检验 VPN。\nTLS 握手：与服务器的 TCP 和 TLS。\nICMP：普通 ping，部分服务器不响应。\n自动：通过内核，不行时用连接。';
+
+  @override
+  String get autoSelectInfo => '“最快”如何选服务器：按 ping、按实测速度或两者结合。';
+
+  @override
+  String get autoSwitchInfo => '当前服务器明显变慢时，Sora 会切换到更快的服务器。';
+
+  @override
+  String get probeTls => 'TLS 握手';
+
+  @override
+  String get probeIcmp => 'ICMP（ping）';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -5988,4 +6162,91 @@ class SZhHant extends SZh {
 
   @override
   String get winwsRequirements => '此 VPN 模式無法使用';
+
+  @override
+  String get emptyServersTitle => '新增伺服器或訂閱';
+
+  @override
+  String get emptyServersBody => '貼上 VPN 服務的訂閱連結、新增自己的伺服器，或掃描 QR 碼。';
+
+  @override
+  String get qrShort => 'QR 碼';
+
+  @override
+  String get extAboutHello => '範例面板：顯示使用中的連線並傳送測試通知。';
+
+  @override
+  String get extAboutZapret => '不用 VPN 繞過封鎖：改變連線開頭，讓電信業者無法辨識網站。在「無伺服器」模式下運作。';
+
+  @override
+  String get extAboutByedpi => '透過本機 ByeDPI 代理不用 VPN 繞過封鎖。在「無伺服器」模式下運作。';
+
+  @override
+  String get modeTunHint => '電腦的所有流量都經過 VPN';
+
+  @override
+  String get modeProxyHint => '僅限使用系統代理的瀏覽器和應用程式';
+
+  @override
+  String get modeBypassHint => '不用 VPN 伺服器繞過封鎖';
+
+  @override
+  String get modeExtensionHint => '來自擴充功能的封鎖繞過';
+
+  @override
+  String get engineInfo =>
+      '核心負責與伺服器建立連線。\n\n自動：Sora 自行選擇支援該伺服器協定的核心。\nsing-box：快速、通用。\nXray：最適合使用 REALITY 和 XHTTP 的 VLESS。\nmihomo：Clash 訂閱與彈性規則。\n\n只有當伺服器在「自動」下無法連線時才更換核心。';
+
+  @override
+  String get tunStackInfo =>
+      '流量如何從系統進入 VPN。\n\n系統：最快，使用作業系統網路堆疊。\ngVisor：自帶堆疊，相容大多數應用程式。\n混合：TCP 走系統，UDP 走 gVisor。\n\n如果網站或遊戲異常，請換一個堆疊。';
+
+  @override
+  String get protection => '保護';
+
+  @override
+  String get killSwitchInfo => 'VPN 中斷時，Sora 會封鎖網路，防止流量繞過通道。重新連線或關閉 VPN 後恢復存取。';
+
+  @override
+  String get strictKillSwitchInfo => '結束 Sora 和重新開機後封鎖仍然有效，直到你在這裡關閉。';
+
+  @override
+  String get zapretWithVpnInfo => '依規則不走 VPN 的網站會使用 Zapret 繞過封鎖。';
+
+  @override
+  String get failoverInfo => '伺服器沒有回應時，Sora 會自動切換到下一個可用的伺服器。';
+
+  @override
+  String get ipv6Info => '讓 IPv6 經過 VPN。若伺服器不支援 IPv6 且網站開啟緩慢，請關閉。';
+
+  @override
+  String get fragmentInfo => '將 TLS 連線的開頭拆成多段，讓業者的過濾器看不到網站名稱。伺服器因 SNI 被封鎖時有幫助。';
+
+  @override
+  String get splitPosInfo => '第一個封包的切分位置：位元組序號或標記，例如 midsld（網域中間）。多個值以逗號分隔。';
+
+  @override
+  String get disorderInfo => '以相反順序傳送封包片段，干擾依序重組的過濾器。';
+
+  @override
+  String get tlsRecordInfo => '將 TLS 問候拆成多筆紀錄，使網站名稱不會完整出現在一筆中。';
+
+  @override
+  String get hostCaseInfo => '改變 HTTP 請求中 Host 標頭的大小寫（Host → hoSt），讓舊式過濾器無法辨識。';
+
+  @override
+  String get probeMethodInfo =>
+      '透過核心：經伺服器連到網站的實際延遲，最準確。\n僅連線：只與伺服器建立 TCP 連線，速度快但不檢驗 VPN。\nTLS 交握：與伺服器的 TCP 和 TLS。\nICMP：一般 ping，部分伺服器不回應。\n自動：透過核心，不行時用連線。';
+
+  @override
+  String get autoSelectInfo => '「最快」如何選伺服器：依 ping、依實測速度或兩者兼顧。';
+
+  @override
+  String get autoSwitchInfo => '目前的伺服器明顯變慢時，Sora 會切換到更快的伺服器。';
+
+  @override
+  String get probeTls => 'TLS 交握';
+
+  @override
+  String get probeIcmp => 'ICMP（ping）';
 }

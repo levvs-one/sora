@@ -158,7 +158,7 @@ void main() {
           await tester.pumpAndSettle();
           await tester.tap(find.byKey(const ValueKey('mode-button')));
           await tester.pumpAndSettle();
-          await tester.tap(find.byKey(const ValueKey('advanced-protection')));
+          await tester.ensureVisible(find.byKey(const ValueKey('strict-kill-switch')));
           await tester.pumpAndSettle();
           await save('modes');
           await tester.tap(find.text(sora.strings.strictKillSwitch));

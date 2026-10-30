@@ -101,13 +101,22 @@ class ProbeMethod extends $pb.ProtobufEnum {
   /// Only a TCP connection, which is fast and needs no engine but proves less.
   static const ProbeMethod PROBE_METHOD_CONNECT = ProbeMethod._(2, _omitEnumNames ? '' : 'PROBE_METHOD_CONNECT');
 
+  /// Since capability "probe-tls-icmp": a TCP connection and a TLS handshake
+  /// with the server, timed. The certificate is not checked.
+  static const ProbeMethod PROBE_METHOD_TLS = ProbeMethod._(3, _omitEnumNames ? '' : 'PROBE_METHOD_TLS');
+
+  /// Since capability "probe-tls-icmp": one ICMP echo to the server's address.
+  static const ProbeMethod PROBE_METHOD_ICMP = ProbeMethod._(4, _omitEnumNames ? '' : 'PROBE_METHOD_ICMP');
+
   static const $core.List<ProbeMethod> values = <ProbeMethod>[
     PROBE_METHOD_UNSPECIFIED,
     PROBE_METHOD_ENGINE,
     PROBE_METHOD_CONNECT,
+    PROBE_METHOD_TLS,
+    PROBE_METHOD_ICMP,
   ];
 
-  static final $core.List<ProbeMethod?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static final $core.List<ProbeMethod?> _byValue = $pb.ProtobufEnum.$_initByValueList(values, 4);
   static ProbeMethod? valueOf($core.int value) => value < 0 || value >= _byValue.length ? null : _byValue[value];
 
   const ProbeMethod._(super.value, super.name);

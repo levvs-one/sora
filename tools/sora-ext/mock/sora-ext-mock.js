@@ -104,6 +104,7 @@
   }
 
   var settingsStore = null; // lazy: defaults merged with setSettings
+  var mockBypassActive = false; // getBypass/setBypass state
   var listeners = [];
 
   function logCall(method, args, outcome) {
@@ -173,6 +174,25 @@
           if (Object.prototype.hasOwnProperty.call(args, k)) settingsStore[k] = args[k];
         }
         p = Promise.resolve();
+        break;
+      }
+      case 'getBypass': {
+        p = check('net.hooks') || (function () {
+          if (settingsStore === null) settingsStore = defaults();
+          var schema = manifest && manifest.settings_schema && manifest.settings_schema.properties;
+          var profiles = schema && schema.profile && schema.profile.enum ? schema.profile.enum.slice() : [];
+          return Promise.resolve({available: true, active: mockBypassActive, connecting: false,
+            profile: settingsStore.profile || '', profiles: profiles});
+        })();
+        break;
+      }
+      case 'setBypass': {
+        p = check('net.hooks') || (function () {
+          if (!args || typeof args.active !== 'boolean') return deny('invalid-argument', 'setBypass needs {active: boolean}');
+          mockBypassActive = args.active;
+          dispatch(args.active ? 'session.connected' : 'session.disconnected', '');
+          return Promise.resolve();
+        })();
         break;
       }
       default:

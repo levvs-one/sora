@@ -28,6 +28,8 @@ try {
 | `notify` | `notifications` | `{title, body}` | `void` |
 | `getSettings` | none (own settings) | none | object |
 | `setSettings` | none (own settings) | object | `void` |
+| `getBypass` | `net.hooks` (since 1.1.6) | none | `{available, active, connecting, profile, profiles}` |
+| `setBypass` | `net.hooks` (since 1.1.6) | `{active: boolean}` | `void` |
 
 Notes:
 
@@ -39,6 +41,12 @@ Notes:
   their stored values. Values are validated against `settings_schema`;
   invalid values reject with `invalid-argument` and change nothing.
   Unknown properties reject too.
+- `getBypass` describes the extension's own network hook: whether it can run on
+  this computer, whether Sora runs it now (`active`) or is connecting, the
+  chosen `profile` setting and the `profiles` its schema offers.
+- `setBypass` turns that hook on through the host's own consent and connect
+  flow (it may ask the user first) or off. It never stops a session another
+  server or extension started. Switch profiles with `setSettings`.
 - Calling a method without its permission rejects with
   `permission-denied`. The app bridge checks the installed grants;
   disabling tears down panels and cancels the worker stream.

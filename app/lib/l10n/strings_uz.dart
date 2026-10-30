@@ -2021,4 +2021,104 @@ class SUz extends S {
 
   @override
   String get winwsRequirements => 'Bu VPN rejimi mavjud emas';
+
+  @override
+  String get emptyServersTitle => 'Server yoki obuna qo\'shing';
+
+  @override
+  String get emptyServersBody =>
+      'VPN xizmatidan obuna havolasini qo\'ying, o\'z serveringizni qo\'shing yoki QR kodni skanerlang.';
+
+  @override
+  String get qrShort => 'QR kod';
+
+  @override
+  String get extAboutHello => 'Panel namunasi: faol ulanishlarni ko\'rsatadi va sinov bildirishnomasini yuboradi.';
+
+  @override
+  String get extAboutZapret =>
+      'VPN\'siz bloklarni chetlab o\'tish: provayder saytni tanimasligi uchun ulanish boshini o\'zgartiradi. «Serversiz» rejimida ishlaydi.';
+
+  @override
+  String get extAboutByedpi =>
+      'Mahalliy ByeDPI proksi orqali VPN\'siz bloklarni chetlab o\'tish. «Serversiz» rejimida ishlaydi.';
+
+  @override
+  String get modeTunHint => 'Kompyuterning butun trafigi VPN orqali o\'tadi';
+
+  @override
+  String get modeProxyHint => 'Faqat tizim proksisidan foydalanadigan brauzerlar va dasturlar';
+
+  @override
+  String get modeBypassHint => 'VPN serversiz bloklarni chetlab o\'tish';
+
+  @override
+  String get modeExtensionHint => 'Kengaytmadan bloklarni chetlab o\'tish';
+
+  @override
+  String get engineInfo =>
+      'Yadro server bilan ulanish o\'rnatadi.\n\nAvto: Sora server protokolini qo\'llaydigan yadroni o\'zi tanlaydi.\nsing-box: tez va universal.\nXray: REALITY va XHTTP bilan VLESS uchun eng yaxshisi.\nmihomo: Clash obunalari va moslashuvchan qoidalar.\n\nServer «Avto» rejimida ulanmasagina yadroni almashtiring.';
+
+  @override
+  String get tunStackInfo =>
+      'Trafik tizimdan VPN\'ga qanday tushadi.\n\nTizim: eng tez, OT tarmoq steki orqali.\ngVisor: o\'z steki, ko\'p dasturlar bilan mos.\nAralash: TCP tizim orqali, UDP gVisor orqali.\n\nSaytlar yoki o\'yinlar yomon ishlasa, boshqa stekni sinab ko\'ring.';
+
+  @override
+  String get protection => 'Himoya';
+
+  @override
+  String get killSwitchInfo =>
+      'VPN uzilsa, trafik tunneldan tashqariga chiqmasligi uchun Sora internetni bloklaydi. Qayta ulanganda yoki VPN o\'chirilganda kirish qaytadi.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Blok Sora\'dan chiqqandan keyin ham, qayta yuklangandan keyin ham shu yerda o\'chirmaguningizcha qoladi.';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'Qoidalar bo\'yicha VPN\'ni chetlab o\'tadigan saytlar Zapret orqali bloklarni chetlab o\'tadi.';
+
+  @override
+  String get failoverInfo => 'Server javob bermay qolsa, Sora keyingi ishlaydigan serverga o\'zi o\'tadi.';
+
+  @override
+  String get ipv6Info =>
+      'IPv6\'ni VPN orqali yuborish. Server IPv6\'ni qo\'llamasa va saytlar sekin ochilsa, o\'chiring.';
+
+  @override
+  String get fragmentInfo =>
+      'Provayder filtri sayt nomini ko\'rmasligi uchun TLS ulanishi boshini qismlarga bo\'ladi. Server SNI bo\'yicha bloklanganda yordam beradi.';
+
+  @override
+  String get splitPosInfo =>
+      'Birinchi paketni qayerdan kesish: bayt raqami yoki belgi, masalan midsld (domen o\'rtasi). Bir nechta qiymatni vergul bilan ajrating.';
+
+  @override
+  String get disorderInfo =>
+      'Paketni tartib bilan yig\'adigan filtrlarni chalg\'itish uchun paket qismlarini teskari tartibda yuboradi.';
+
+  @override
+  String get tlsRecordInfo =>
+      'Sayt nomi bitta yozuvga to\'liq tushmasligi uchun TLS salomlashuvini bir nechta yozuvga bo\'ladi.';
+
+  @override
+  String get hostCaseInfo =>
+      'HTTP so\'rovlaridagi Host sarlavhasi registrini o\'zgartiradi (Host → hoSt), eski filtrlar so\'rovni tanimay qoladi.';
+
+  @override
+  String get probeMethodInfo =>
+      'Yadro orqali: server orqali saytgacha haqiqiy kechikish, eng aniq.\nFaqat ulanish: serverga faqat TCP ulanish, tez, lekin VPN\'ni tekshirmaydi.\nTLS qo\'l siqish: server bilan TCP va TLS.\nICMP: oddiy ping, ba\'zi serverlar javob bermaydi.\nAvto: yadro orqali, iloji bo\'lmasa — ulanish.';
+
+  @override
+  String get autoSelectInfo =>
+      '«Eng tez» serverni qanday tanlaydi: ping bo\'yicha, o\'lchangan tezlik bo\'yicha yoki ikkalasi bo\'yicha.';
+
+  @override
+  String get autoSwitchInfo => 'Joriy server sezilarli sekinlashsa, Sora tezroq serverga o\'tadi.';
+
+  @override
+  String get probeTls => 'TLS qo\'l siqish';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

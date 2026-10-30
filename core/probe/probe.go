@@ -55,6 +55,22 @@ type Prober struct {
 	requests chan struct{}
 }
 
+// Mode selects what one measurement does.
+type Mode int
+
+const (
+	// ModeDefault is the prober's configured check: a TCP connection, or a
+	// verified TLS handshake when Config.TLS is set.
+	ModeDefault Mode = iota
+	// ModeTLS times a TCP connection plus a TLS handshake. Certificates are
+	// not checked: VPN servers often present a borrowed or self-signed one,
+	// and only the time is measured. Nothing is sent after the handshake.
+	ModeTLS
+	// ModeICMP times one ICMP echo to the endpoint's address. The port is
+	// ignored.
+	ModeICMP
+)
+
 // MaxConcurrentRequests bounds how many measurements a prober runs at once.
 const MaxConcurrentRequests = 4
 
@@ -80,6 +96,11 @@ func New(cfg Config) *Prober {
 // channel. Missing serverIDs produce empty IDs. Socket limits are global to the
 // prober; excess requests are rejected instead of queued.
 func (p *Prober) Probe(ctx context.Context, endpoints []*corev1.Endpoint, serverIDs []string) (<-chan *corev1.ProbeResult, error) {
+	return p.ProbeMode(ctx, endpoints, serverIDs, ModeDefault)
+}
+
+// ProbeMode is Probe with an explicit measurement mode.
+func (p *Prober) ProbeMode(ctx context.Context, endpoints []*corev1.Endpoint, serverIDs []string, mode Mode) (<-chan *corev1.ProbeResult, error) {
 	if len(endpoints) == 0 {
 		return nil, errs.Newf(errs.CodeInvalidArgument, errs.KeyProbeNoEndpoints,
 			"probe: the request carries no endpoints")
@@ -110,7 +131,7 @@ func (p *Prober) Probe(ctx context.Context, endpoints []*corev1.Endpoint, server
 				case <-ctx.Done():
 					return
 				}
-				result := p.measure(ctx, index, endpoint, serverIDs)
+				result := p.measure(ctx, index, endpoint, serverIDs, mode)
 				select {
 				case results <- result:
 				case <-ctx.Done():
@@ -124,7 +145,7 @@ func (p *Prober) Probe(ctx context.Context, endpoints []*corev1.Endpoint, server
 
 // measure always returns a result so failed endpoints remain represented in the
 // list.
-func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoint, serverIDs []string) *corev1.ProbeResult {
+func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoint, serverIDs []string, mode Mode) *corev1.ProbeResult {
 	result := &corev1.ProbeResult{}
 	if index < len(serverIDs) {
 		result.ServerId = serverIDs[index]
@@ -134,7 +155,7 @@ func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoi
 		result.Error = toWire(err, "")
 		return result
 	}
-	latency, err := p.dial(ctx, host, port)
+	latency, err := p.dial(ctx, host, port, mode)
 	if err != nil {
 		result.Error = toWire(err, host)
 		return result
@@ -146,7 +167,7 @@ func (p *Prober) measure(ctx context.Context, index int, endpoint *corev1.Endpoi
 
 // dial opens the connection, optionally completes a handshake, and reports how
 // long the whole thing took.
-func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Duration, error) {
+func (p *Prober) dial(ctx context.Context, host string, port uint32, mode Mode) (time.Duration, error) {
 	address := net.JoinHostPort(host, strconv.FormatUint(uint64(port), 10))
 	timeout := p.timeout
 	if deadline, ok := ctx.Deadline(); ok {
@@ -157,6 +178,12 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 	if timeout <= 0 {
 		return 0, errs.Newf(errs.CodeDeadlineExceeded, errs.KeyProbeInvalidEndpoint,
 			"probe: the request has no time left")
+	}
+	switch mode {
+	case ModeICMP:
+		return echo(ctx, host, timeout)
+	case ModeTLS:
+		return handshake(ctx, host, address, timeout)
 	}
 	start := time.Now()
 	if !p.tls {
@@ -179,6 +206,30 @@ func (p *Prober) dial(ctx context.Context, host string, port uint32) (time.Durat
 	}
 	_ = connection.Close()
 	return time.Since(start), nil
+}
+
+// handshake times a TCP connection and a TLS handshake without checking the
+// certificate. The host is sent as SNI when it is a name.
+func handshake(ctx context.Context, host, address string, timeout time.Duration) (time.Duration, error) {
+	config := &tls.Config{
+		MinVersion: tls.VersionTLS12,
+		// Only the handshake is timed and nothing is sent over it, so an
+		// unverified certificate cannot leak or accept data.
+		InsecureSkipVerify: true, //nolint:gosec // latency only, see above
+	}
+	if net.ParseIP(host) == nil {
+		config.ServerName = host
+	}
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	start := time.Now()
+	connection, err := (&tls.Dialer{NetDialer: &net.Dialer{Timeout: timeout}, Config: config}).DialContext(ctx, "tcp", address)
+	if err != nil {
+		return 0, errs.From(err)
+	}
+	elapsed := time.Since(start)
+	_ = connection.Close()
+	return elapsed, nil
 }
 
 // EndpointProber defines the interface required by the control plane, keeping

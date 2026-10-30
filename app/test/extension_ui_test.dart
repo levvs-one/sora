@@ -186,7 +186,8 @@ void main() {
     expect(tester.widget<AnimatedSwitcher>(find.byType(AnimatedSwitcher)).duration, Duration.zero);
   });
 
-  testWidgets('verified badge follows the name with only a tooltip', (tester) async {
+  testWidgets('verified badge follows the name as a plain labelled icon', (tester) async {
+    final semantics = tester.ensureSemantics();
     await tester.pumpWidget(
       _app(
         const Scaffold(
@@ -195,11 +196,14 @@ void main() {
       ),
     );
     final badge = tester.widget<VerifiedBadge>(find.byType(VerifiedBadge));
-    expect(badge.size, 14);
+    expect(badge.size, 15);
     final icon = tester.widget<Icon>(find.descendant(of: find.byType(VerifiedBadge), matching: find.byType(Icon)));
     expect(icon.fill, 1);
     expect(icon.color, Palette.light.verified);
-    expect(find.byTooltip('Verified by Sora'), findsOneWidget);
+    // No Tooltip inside the name: its overlay and semantics node made the
+    // Windows accessibility tree drop nodes, and opening a card crashed Sora.
+    expect(find.byType(Tooltip), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('Verified by Sora')), findsOneWidget);
     expect(find.text('Sora team'), findsNothing);
     expect(find.ancestor(of: find.byType(VerifiedBadge), matching: find.byType(ExtensionName)), findsOneWidget);
     await tester.pumpWidget(
@@ -210,6 +214,7 @@ void main() {
       ),
     );
     expect(find.byType(VerifiedBadge), findsNothing);
+    semantics.dispose();
   });
 
   testWidgets('sideload key status and dangerous permissions still require consent', (tester) async {
@@ -227,7 +232,7 @@ void main() {
   });
 
   for (final installed in [false, true]) {
-    testWidgets('detail has one header and actions before permissions without explanatory copy, installed=$installed', (
+    testWidgets('detail has one header, a short description and actions before permissions, installed=$installed', (
       tester,
     ) async {
       final store = await _store(tester, installed: installed);
@@ -236,14 +241,16 @@ void main() {
       await _io(tester);
       await tester.pumpAndSettle();
       expect(find.byType(ExtensionName), findsOneWidget);
-      expect(find.text('${_entry.author}, ${_entry.version}'), findsOneWidget);
+      expect(find.text('${_entry.author} · ${_entry.version}'), findsOneWidget);
       expect(find.text('Author'), findsNothing);
       expect(find.text('Version'), findsNothing);
       expect(find.text('Changelog'), findsNothing);
       expect(find.byType(Group), findsOneWidget);
-      expect(tester.widget<VerifiedBadge>(find.byType(VerifiedBadge)).size, 16);
+      expect(tester.widget<VerifiedBadge>(find.byType(VerifiedBadge)).size, 18);
       final action = find.text(installed ? 'Open' : 'Install');
+      // The team's own extensions describe themselves in the user's language.
       expect(find.text(_entry.description), findsNothing);
+      expect(find.text('Example panel: shows active connections and sends a test notification.'), findsOneWidget);
       expect(tester.getTopLeft(action).dy, lessThan(tester.getTopLeft(find.byType(PermissionRow).first).dy));
       expect(find.byType(PermissionRow), findsNWidgets(_entry.permissions.length));
       expect(tester.takeException(), isNull);

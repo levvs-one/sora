@@ -113,6 +113,19 @@ export interface SoraNotifyArgs {
  * All `call()` methods return promises. A rejected promise always carries
  * a `SoraExtError` (never a bare string), so `catch (e) { e.code }` works.
  */
+export interface SoraBypassState {
+  /** Whether this computer can run the hook's backend. */
+  available: boolean;
+  /** Whether Sora runs this extension's hook now. */
+  active: boolean;
+  /** Whether Sora is starting it. */
+  connecting: boolean;
+  /** The chosen `profile` setting. */
+  profile: string;
+  /** The profiles `settings_schema` offers. */
+  profiles: string[];
+}
+
 export interface SoraExt {
   /** Worker only: net.fetch permission, HTTPS network_hosts, VPN proxy or fail
    * closed. No direct network. Each run has 2 CPU seconds, 128 MiB committed
@@ -149,6 +162,18 @@ export interface SoraExt {
    * Needs no permission.
    */
   call(method: 'setSettings', args: Record<string, unknown>): Promise<void>;
+  /**
+   * Since Sora 1.1.6. The extension's own network hook (blocking bypass):
+   * whether it can run here, whether Sora runs it now, and the profiles
+   * its `settings_schema` offers. Needs `net.hooks`.
+   */
+  call(method: 'getBypass'): Promise<SoraBypassState>;
+  /**
+   * Since Sora 1.1.6. Turns the extension's network hook on through the
+   * host's consent and connect flow, or off. Never stops a session another
+   * choice started. Needs `net.hooks`.
+   */
+  call(method: 'setBypass', args: {active: boolean}): Promise<void>;
   /**
    * Panels: subscribe to live lifecycle events. Workers: a session snapshot
    * once per subscription per run; subscriptions do not persist between runs.

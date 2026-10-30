@@ -2020,4 +2020,99 @@ class SAz extends S {
 
   @override
   String get winwsRequirements => 'Bu VPN rejimi əlçatan deyil';
+
+  @override
+  String get emptyServersTitle => 'Server və ya abunə əlavə edin';
+
+  @override
+  String get emptyServersBody =>
+      'VPN xidmətindən abunə linkini yapışdırın, öz serverinizi əlavə edin və ya QR kodu skan edin.';
+
+  @override
+  String get qrShort => 'QR kod';
+
+  @override
+  String get extAboutHello => 'Panel nümunəsi: aktiv bağlantıları göstərir və test bildirişi göndərir.';
+
+  @override
+  String get extAboutZapret =>
+      'VPN-siz blokların keçilməsi: provayder saytı tanımasın deyə bağlantının əvvəlini dəyişir. «Serversiz» rejimində işləyir.';
+
+  @override
+  String get extAboutByedpi => 'Yerli ByeDPI proksisi ilə VPN-siz blokların keçilməsi. «Serversiz» rejimində işləyir.';
+
+  @override
+  String get modeTunHint => 'Kompüterin bütün trafiki VPN-dən keçir';
+
+  @override
+  String get modeProxyHint => 'Yalnız sistem proksisindən istifadə edən brauzerlər və proqramlar';
+
+  @override
+  String get modeBypassHint => 'VPN serversiz blokların keçilməsi';
+
+  @override
+  String get modeExtensionHint => 'Genişlənmədən blokların keçilməsi';
+
+  @override
+  String get engineInfo =>
+      'Nüvə serverlə bağlantı qurur.\n\nAvto: Sora serverin protokolunu dəstəkləyən nüvəni özü seçir.\nsing-box: sürətli və universal.\nXray: REALITY və XHTTP ilə VLESS üçün ən yaxşısı.\nmihomo: Clash abunələri və çevik qaydalar.\n\nNüvəni yalnız server «Avto» rejimində qoşulmursa dəyişin.';
+
+  @override
+  String get tunStackInfo =>
+      'Trafik sistemdən VPN-ə necə düşür.\n\nSistem: ən sürətli, ƏS şəbəkə steki ilə.\ngVisor: öz steki, əksər proqramlarla uyğundur.\nQarışıq: TCP sistemlə, UDP gVisor ilə.\n\nSaytlar və ya oyunlar pis işləsə, başqa steki sınayın.';
+
+  @override
+  String get protection => 'Qoruma';
+
+  @override
+  String get killSwitchInfo =>
+      'VPN kəsilsə, trafik tuneldən kənara getməsin deyə Sora interneti bloklayır. Yenidən qoşulduqda və ya VPN söndürüldükdə giriş qayıdır.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Blok Sora-dan çıxdıqdan və yenidən başladıqdan sonra da burada söndürənə qədər qalır.';
+
+  @override
+  String get zapretWithVpnInfo => 'Qaydalara görə VPN-dən yan keçən saytlar Zapret ilə blokları keçir.';
+
+  @override
+  String get failoverInfo => 'Server cavab vermirsə, Sora növbəti işləyən serverə özü keçir.';
+
+  @override
+  String get ipv6Info => 'IPv6-nı VPN ilə göndərmək. Server IPv6 dəstəkləmirsə və saytlar yavaş açılırsa, söndürün.';
+
+  @override
+  String get fragmentInfo =>
+      'Provayderin filtri saytın adını görməsin deyə TLS bağlantısının əvvəlini hissələrə bölür. Server SNI ilə bloklananda kömək edir.';
+
+  @override
+  String get splitPosInfo =>
+      'İlk paketi haradan kəsmək: bayt nömrəsi və ya işarə, məsələn midsld (domenin ortası). Bir neçə dəyəri vergüllə ayırın.';
+
+  @override
+  String get disorderInfo =>
+      'Paketi ardıcıl yığan filtrləri çaşdırmaq üçün paketin hissələrini tərs ardıcıllıqla göndərir.';
+
+  @override
+  String get tlsRecordInfo => 'Saytın adı bir yazıya tam düşməsin deyə TLS salamlaşmasını bir neçə yazıya bölür.';
+
+  @override
+  String get hostCaseInfo =>
+      'HTTP sorğularında Host başlığının registrini dəyişir (Host → hoSt), köhnə filtrlər sorğunu tanımır.';
+
+  @override
+  String get probeMethodInfo =>
+      'Nüvə ilə: server vasitəsilə sayta qədər real gecikmə, ən dəqiq.\nYalnız bağlantı: serverə yalnız TCP bağlantısı, sürətli, amma VPN-i yoxlamır.\nTLS əl sıxma: serverlə TCP və TLS.\nICMP: adi ping, bəzi serverlər cavab vermir.\nAvto: nüvə ilə, mümkün olmayanda — bağlantı.';
+
+  @override
+  String get autoSelectInfo => '«Ən sürətli» serveri necə seçir: pingə, ölçülmüş sürətə və ya hər ikisinə görə.';
+
+  @override
+  String get autoSwitchInfo => 'Cari server nəzərəçarpacaq dərəcədə yavaşlasa, Sora daha sürətli serverə keçir.';
+
+  @override
+  String get probeTls => 'TLS əl sıxma';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

@@ -2012,4 +2012,96 @@ class STh extends S {
 
   @override
   String get winwsRequirements => 'โหมด VPN นี้ไม่พร้อมใช้งาน';
+
+  @override
+  String get emptyServersTitle => 'เพิ่มเซิร์ฟเวอร์หรือการสมัครใช้งาน';
+
+  @override
+  String get emptyServersBody => 'วางลิงก์การสมัครใช้งานจากบริการ VPN เพิ่มเซิร์ฟเวอร์ของคุณเอง หรือสแกนคิวอาร์โค้ด';
+
+  @override
+  String get qrShort => 'คิวอาร์โค้ด';
+
+  @override
+  String get extAboutHello => 'แผงตัวอย่าง: แสดงการเชื่อมต่อที่ใช้งานอยู่และส่งการแจ้งเตือนทดสอบ';
+
+  @override
+  String get extAboutZapret =>
+      'เลี่ยงการบล็อกโดยไม่ใช้ VPN ด้วยการเปลี่ยนส่วนต้นของการเชื่อมต่อเพื่อไม่ให้ผู้ให้บริการจดจำเว็บไซต์ได้ ทำงานในโหมดไม่ใช้เซิร์ฟเวอร์';
+
+  @override
+  String get extAboutByedpi => 'เลี่ยงการบล็อกโดยไม่ใช้ VPN ผ่านพร็อกซี ByeDPI ในเครื่อง ทำงานในโหมดไม่ใช้เซิร์ฟเวอร์';
+
+  @override
+  String get modeTunHint => 'ทราฟฟิกทั้งหมดของคอมพิวเตอร์ผ่าน VPN';
+
+  @override
+  String get modeProxyHint => 'เฉพาะเบราว์เซอร์และแอปที่ใช้พร็อกซีของระบบ';
+
+  @override
+  String get modeBypassHint => 'เลี่ยงการบล็อกโดยไม่ใช้เซิร์ฟเวอร์ VPN';
+
+  @override
+  String get modeExtensionHint => 'การเลี่ยงการบล็อกจากส่วนขยาย';
+
+  @override
+  String get engineInfo =>
+      'เอนจินสร้างการเชื่อมต่อกับเซิร์ฟเวอร์\n\nอัตโนมัติ: Sora เลือกเอนจินที่รองรับโปรโตคอลของเซิร์ฟเวอร์เอง\nsing-box: เร็วและใช้ได้หลากหลาย\nXray: ดีที่สุดสำหรับ VLESS ที่ใช้ REALITY และ XHTTP\nmihomo: การสมัครแบบ Clash และกฎที่ยืดหยุ่น\n\nเปลี่ยนเอนจินเฉพาะเมื่อเซิร์ฟเวอร์เชื่อมต่อแบบอัตโนมัติไม่ได้';
+
+  @override
+  String get tunStackInfo =>
+      'วิธีที่ทราฟฟิกเดินทางจากระบบเข้าสู่ VPN\n\nระบบ: เร็วที่สุด ใช้สแตกเครือข่ายของระบบปฏิบัติการ\ngVisor: สแตกของตัวเอง เข้ากันได้กับแอปส่วนใหญ่\nผสม: TCP ผ่านระบบ UDP ผ่าน gVisor\n\nหากเว็บไซต์หรือเกมทำงานผิดปกติ ให้ลองสแตกอื่น';
+
+  @override
+  String get protection => 'การป้องกัน';
+
+  @override
+  String get killSwitchInfo =>
+      'หาก VPN หลุด Sora จะบล็อกอินเทอร์เน็ตเพื่อไม่ให้ทราฟฟิกออกนอกอุโมงค์ การเข้าถึงจะกลับมาเมื่อ VPN เชื่อมต่อใหม่หรือถูกปิด';
+
+  @override
+  String get strictKillSwitchInfo => 'การบล็อกยังคงอยู่หลังออกจาก Sora และหลังรีสตาร์ต จนกว่าคุณจะปิดที่นี่';
+
+  @override
+  String get zapretWithVpnInfo => 'เว็บไซต์ที่กฎของคุณส่งออกนอก VPN จะได้การเลี่ยงการบล็อกของ Zapret';
+
+  @override
+  String get failoverInfo => 'หากเซิร์ฟเวอร์หยุดตอบสนอง Sora จะสลับไปยังเซิร์ฟเวอร์ถัดไปที่ใช้งานได้เอง';
+
+  @override
+  String get ipv6Info => 'ส่ง IPv6 ผ่าน VPN ปิดไว้หากเซิร์ฟเวอร์ไม่มี IPv6 และเว็บไซต์โหลดช้า';
+
+  @override
+  String get fragmentInfo =>
+      'แบ่งส่วนต้นของการเชื่อมต่อ TLS เป็นชิ้น เพื่อไม่ให้ตัวกรองของผู้ให้บริการเห็นชื่อเว็บไซต์ ช่วยได้เมื่อเซิร์ฟเวอร์ถูกบล็อกด้วย SNI';
+
+  @override
+  String get splitPosInfo =>
+      'ตำแหน่งที่ตัดแพ็กเก็ตแรก: หมายเลขไบต์หรือเครื่องหมายเช่น midsld (กลางโดเมน) คั่นหลายค่าด้วยจุลภาค';
+
+  @override
+  String get disorderInfo => 'ส่งส่วนของแพ็กเก็ตในลำดับย้อนกลับ เพื่อหลอกตัวกรองที่ประกอบแพ็กเก็ตตามลำดับ';
+
+  @override
+  String get tlsRecordInfo => 'แบ่ง TLS hello เป็นหลายเรคคอร์ด เพื่อไม่ให้ชื่อเว็บไซต์อยู่ครบในเรคคอร์ดเดียว';
+
+  @override
+  String get hostCaseInfo =>
+      'เปลี่ยนตัวพิมพ์ของส่วนหัว Host ในคำขอ HTTP (Host → hoSt) ทำให้ตัวกรองรุ่นเก่าจำคำขอไม่ได้';
+
+  @override
+  String get probeMethodInfo =>
+      'ผ่านเอนจิน: ความหน่วงจริงไปยังเว็บไซต์ผ่านเซิร์ฟเวอร์ แม่นยำที่สุด\nเฉพาะการเชื่อมต่อ: แค่การเชื่อมต่อ TCP กับเซิร์ฟเวอร์ เร็วแต่ไม่ได้ทดสอบ VPN\nTLS แฮนด์เชก: TCP และ TLS กับเซิร์ฟเวอร์\nICMP: ping ธรรมดา บางเซิร์ฟเวอร์ไม่ตอบ\nอัตโนมัติ: ผ่านเอนจิน ถ้าทำไม่ได้ใช้การเชื่อมต่อ';
+
+  @override
+  String get autoSelectInfo => 'วิธีที่ «เร็วที่สุด» เลือกเซิร์ฟเวอร์: ตาม ping ตามความเร็วที่วัดได้ หรือทั้งสองอย่าง';
+
+  @override
+  String get autoSwitchInfo => 'หากเซิร์ฟเวอร์ปัจจุบันช้าลงอย่างเห็นได้ชัด Sora จะสลับไปยังเซิร์ฟเวอร์ที่เร็วกว่า';
+
+  @override
+  String get probeTls => 'TLS แฮนด์เชก';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

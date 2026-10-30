@@ -325,6 +325,9 @@ func (s *Server) apiVersion() *corev1.ApiVersion {
 	if s.version.Minor >= 14 {
 		capabilities = append(capabilities, "device-identity")
 	}
+	if _, ok := s.prober.(modeProber); ok {
+		capabilities = append(capabilities, "probe-tls-icmp")
+	}
 	if provider, ok := s.measurer.(interface{ BypassAvailable() bool }); ok && provider.BypassAvailable() {
 		capabilities = append(capabilities, "serverless")
 	}
@@ -1196,7 +1199,7 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 
 	results := make(chan *corev1.ProbeResult, total)
 	var wg sync.WaitGroup
-	connect := func(endpoints []*corev1.Endpoint, ids []string) error {
+	connect := func(endpoints []*corev1.Endpoint, ids []string, mode probe.Mode) error {
 		if len(endpoints) == 0 {
 			return nil
 		}
@@ -1204,7 +1207,18 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
 				"control: this core cannot probe endpoints")
 		}
-		found, err := s.prober.Probe(ctx, endpoints, ids)
+		var found <-chan *corev1.ProbeResult
+		var err error
+		method := probeConnect
+		if mode == probe.ModeDefault {
+			found, err = s.prober.Probe(ctx, endpoints, ids)
+		} else if modes, ok := s.prober.(modeProber); ok {
+			found, err = modes.ProbeMode(ctx, endpoints, ids, mode)
+			method = probeModeNames[mode]
+		} else {
+			err = errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
+				"control: this core cannot probe with TLS or ICMP")
+		}
 		if err != nil {
 			return err
 		}
@@ -1212,7 +1226,7 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 		go func() {
 			defer wg.Done()
 			for r := range found {
-				r.Method = probeConnect
+				r.Method = method
 				results <- r
 			}
 		}()
@@ -1236,7 +1250,7 @@ func (s *Server) ProbeServers(req *corev1.ProbeServersRequest, stream grpc.Serve
 			if ctx.Err() != nil {
 				return
 			}
-			note(connect(chunk, nil))
+			note(connect(chunk, nil, probe.ModeDefault))
 			wg.Wait()
 		}
 		for _, chunk := range chunkServers(outbounds, ProbeChunkSize) {
@@ -1275,6 +1289,20 @@ func chunkServers[T any](xs []T, size int) [][]T {
 	return chunks
 }
 
+// modeProber measures endpoints with an explicit mode (TLS, ICMP).
+type modeProber interface {
+	ProbeMode(ctx context.Context, endpoints []*corev1.Endpoint, serverIDs []string, mode probe.Mode) (<-chan *corev1.ProbeResult, error)
+}
+
+// probeModes maps the wire methods measured on the server itself.
+var probeModes = map[corev1.ProbeMethod]probe.Mode{
+	corev1.ProbeMethod_PROBE_METHOD_TLS:  probe.ModeTLS,
+	corev1.ProbeMethod_PROBE_METHOD_ICMP: probe.ModeICMP,
+}
+
+// probeModeNames names those modes in results.
+var probeModeNames = map[probe.Mode]string{probe.ModeTLS: "tls", probe.ModeICMP: "icmp"}
+
 // Probe methods as the results name them.
 const (
 	probeEngine  = "engine"
@@ -1285,14 +1313,19 @@ const (
 // measures them through engines, falling back to a connection check where
 // the options allow.
 func (s *Server) measureOutbounds(ctx context.Context, opts *corev1.ProbeOptions, specs []*corev1.OutboundSpec, id string,
-	results chan<- *corev1.ProbeResult, wg *sync.WaitGroup, connect func([]*corev1.Endpoint, []string) error) error {
+	results chan<- *corev1.ProbeResult, wg *sync.WaitGroup, connect func([]*corev1.Endpoint, []string, probe.Mode) error) error {
+	// TLS and ICMP measure the server itself, never through an engine.
+	if mode, ok := probeModes[opts.GetMethod()]; ok {
+		endpoints, ids := endpointsOf(specs)
+		return connect(endpoints, ids, mode)
+	}
 	if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_CONNECT || s.measurer == nil {
 		if opts.GetMethod() == corev1.ProbeMethod_PROBE_METHOD_ENGINE {
 			return errs.Newf(errs.CodeUnsupported, errs.KeyProbeInvalidEndpoint,
 				"control: this core cannot measure through an engine")
 		}
 		endpoints, ids := endpointsOf(specs)
-		return connect(endpoints, ids)
+		return connect(endpoints, ids, probe.ModeDefault)
 	}
 
 	// Mask measured outbound values because engine errors may include
@@ -1342,7 +1375,7 @@ func (s *Server) measureOutbounds(ctx context.Context, opts *corev1.ProbeOptions
 			results <- result
 		}
 		endpoints, ids := endpointsOf(orphans)
-		if err := connect(endpoints, ids); err != nil {
+		if err := connect(endpoints, ids, probe.ModeDefault); err != nil {
 			for _, spec := range orphans {
 				results <- &corev1.ProbeResult{ServerId: spec.GetId(), Method: probeConnect, Error: toWire(err, nil, id)}
 			}

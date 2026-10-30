@@ -2020,4 +2020,99 @@ class STr extends S {
 
   @override
   String get winwsRequirements => 'Bu VPN modu kullanılamıyor';
+
+  @override
+  String get emptyServersTitle => 'Sunucu veya abonelik ekleyin';
+
+  @override
+  String get emptyServersBody =>
+      'VPN hizmetinizden abonelik bağlantısını yapıştırın, kendi sunucunuzu ekleyin veya bir QR kodu tarayın.';
+
+  @override
+  String get qrShort => 'QR kodu';
+
+  @override
+  String get extAboutHello => 'Örnek panel: etkin bağlantıları gösterir ve deneme bildirimi gönderir.';
+
+  @override
+  String get extAboutZapret =>
+      'VPN olmadan engelleri aşar: sağlayıcı siteyi tanımasın diye bağlantıların başını değiştirir. Sunucusuz modda çalışır.';
+
+  @override
+  String get extAboutByedpi => 'Yerel ByeDPI proxy\'si ile VPN olmadan engelleri aşar. Sunucusuz modda çalışır.';
+
+  @override
+  String get modeTunHint => 'Bilgisayarın tüm trafiği VPN\'den geçer';
+
+  @override
+  String get modeProxyHint => 'Yalnızca sistem proxy\'sini kullanan tarayıcılar ve uygulamalar';
+
+  @override
+  String get modeBypassHint => 'VPN sunucusu olmadan engelleri aşma';
+
+  @override
+  String get modeExtensionHint => 'Bir uzantıdan engel aşma';
+
+  @override
+  String get engineInfo =>
+      'Çekirdek sunucuyla bağlantıyı kurar.\n\nOtomatik: Sora, sunucunun protokolünü destekleyen çekirdeği kendisi seçer.\nsing-box: hızlı ve çok yönlü.\nXray: REALITY ve XHTTP ile VLESS için en iyisi.\nmihomo: Clash abonelikleri ve esnek kurallar.\n\nÇekirdeği yalnızca bir sunucu Otomatik ile bağlanmıyorsa değiştirin.';
+
+  @override
+  String get tunStackInfo =>
+      'Trafiğin sistemden VPN\'e nasıl geçtiği.\n\nSistem: en hızlısı, işletim sisteminin ağ yığınını kullanır.\ngVisor: kendi yığını, çoğu uygulamayla uyumlu.\nKarma: TCP sistemden, UDP gVisor\'dan.\n\nSiteler veya oyunlar sorun çıkarırsa başka bir yığın deneyin.';
+
+  @override
+  String get protection => 'Koruma';
+
+  @override
+  String get killSwitchInfo =>
+      'VPN koparsa Sora, trafik tünelin dışına çıkmasın diye interneti engeller. VPN yeniden bağlanınca veya kapatılınca erişim geri gelir.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Engel, Sora\'dan çıktıktan ve yeniden başlattıktan sonra da siz burada kapatana kadar sürer.';
+
+  @override
+  String get zapretWithVpnInfo => 'Kurallarınızın VPN dışından gönderdiği siteler Zapret engel aşmasını kullanır.';
+
+  @override
+  String get failoverInfo => 'Bir sunucu yanıt vermeyi keserse Sora kendiliğinden sonraki çalışan sunucuya geçer.';
+
+  @override
+  String get ipv6Info => 'IPv6\'yı VPN üzerinden gönderir. Sunucuda IPv6 yoksa ve siteler yavaş açılıyorsa kapatın.';
+
+  @override
+  String get fragmentInfo =>
+      'Sağlayıcının filtresi site adını göremesin diye TLS bağlantısının başını parçalara böler. Sunucu SNI ile engellendiğinde işe yarar.';
+
+  @override
+  String get splitPosInfo =>
+      'İlk paketin nereden kesileceği: bir bayt numarası veya midsld (alan adının ortası) gibi bir işaret. Birden çok değeri virgülle ayırın.';
+
+  @override
+  String get disorderInfo =>
+      'Paketin parçalarını ters sırayla gönderir; paketi sırayla birleştiren filtreleri şaşırtır.';
+
+  @override
+  String get tlsRecordInfo => 'TLS selamlamasını birkaç kayda böler, böylece site adı tek parça hâlinde bulunmaz.';
+
+  @override
+  String get hostCaseInfo =>
+      'HTTP isteklerinde Host başlığının büyük/küçük harfini değiştirir (Host → hoSt); eski filtreler isteği tanımaz.';
+
+  @override
+  String get probeMethodInfo =>
+      'Çekirdek üzerinden: sunucu üzerinden bir siteye gerçek gecikme, en doğrusu.\nYalnızca bağlantı: sunucuya sadece TCP bağlantısı; hızlı ama VPN\'i sınamaz.\nTLS el sıkışması: sunucuyla TCP ve TLS.\nICMP: sıradan ping; bazı sunucular yanıt vermez.\nOtomatik: çekirdek üzerinden, olmuyorsa bağlantı.';
+
+  @override
+  String get autoSelectInfo => 'En hızlı seçeneğinin sunucuyu nasıl seçtiği: pinge, ölçülen hıza ya da ikisine göre.';
+
+  @override
+  String get autoSwitchInfo => 'Geçerli sunucu belirgin biçimde yavaşlarsa Sora daha hızlı bir sunucuya geçer.';
+
+  @override
+  String get probeTls => 'TLS el sıkışması';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

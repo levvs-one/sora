@@ -265,6 +265,74 @@ void main() {
       expect(reply['error'], 'invalid-argument');
     }
   });
+
+  test('bypass panel methods need net.hooks and reach only the host callbacks', () async {
+    final toggles = <bool>[];
+    PanelBridge bridge(Set<String> granted) => PanelBridge(
+      extensionId: 'org.sora.zapret',
+      granted: granted,
+      getConnections: () async => [],
+      servers: () => [],
+      notify: (_, _) async {},
+      getSettings: () async => {},
+      setSettings: (_) async {},
+      getBypass: () async => {
+        'available': true,
+        'active': false,
+        'connecting': false,
+        'profile': 'TLS',
+        'profiles': ['TCP+TLS', 'TLS'],
+      },
+      setBypass: (active) async => toggles.add(active),
+    );
+    Future<Map<String, dynamic>> call(PanelBridge b, Map<String, dynamic> message) async =>
+        jsonDecode(await b.handle(jsonEncode(message))) as Map<String, dynamic>;
+
+    final without = bridge({'ui.panel'});
+    for (final method in ['getBypass', 'setBypass']) {
+      expect((await call(without, {'id': 1, 'method': method}))['error'], 'permission-denied');
+    }
+    expect(toggles, isEmpty);
+
+    final hooks = bridge({'ui.panel', 'net.hooks'});
+    final state = await call(hooks, {'id': 2, 'method': 'getBypass'});
+    expect(state['ok'], isTrue);
+    expect((state['result'] as Map<String, dynamic>)['profile'], 'TLS');
+    for (final args in [
+      <String, dynamic>{},
+      {'active': 'yes'},
+    ]) {
+      expect((await call(hooks, {'id': 3, 'method': 'setBypass', 'args': args}))['error'], 'invalid-argument');
+    }
+    expect(
+      (await call(hooks, {
+        'id': 4,
+        'method': 'setBypass',
+        'args': {'active': true},
+      }))['ok'],
+      isTrue,
+    );
+    expect(
+      (await call(hooks, {
+        'id': 5,
+        'method': 'setBypass',
+        'args': {'active': false},
+      }))['ok'],
+      isTrue,
+    );
+    expect(toggles, [true, false]);
+
+    final hostWithoutBypass = PanelBridge(
+      extensionId: 'org.sora.zapret',
+      granted: {'net.hooks'},
+      getConnections: () async => [],
+      servers: () => [],
+      notify: (_, _) async {},
+      getSettings: () async => {},
+      setSettings: (_) async {},
+    );
+    expect((await call(hostWithoutBypass, {'id': 6, 'method': 'getBypass'}))['error'], 'invalid-argument');
+  });
   testWidgets('an unreadable theme is refused with a localized toast', (tester) async {
     late InstalledExtension inst;
     late ExtensionStore store;

@@ -3830,6 +3830,174 @@ abstract class S {
   /// In ru, this message translates to:
   /// **'Этот режим VPN недоступен'**
   String get winwsRequirements;
+
+  /// No description provided for @emptyServersTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавьте сервер или подписку'**
+  String get emptyServersTitle;
+
+  /// No description provided for @emptyServersBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вставьте ссылку на подписку от VPN-сервиса, добавьте свой сервер или отсканируйте QR-код.'**
+  String get emptyServersBody;
+
+  /// No description provided for @qrShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'QR-код'**
+  String get qrShort;
+
+  /// No description provided for @extAboutHello.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пример панели: показывает активные соединения и отправляет тестовое уведомление.'**
+  String get extAboutHello;
+
+  /// No description provided for @extAboutZapret.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обход блокировок без VPN: меняет начало соединений, чтобы провайдер не узнал сайт. Работает в режиме «Без сервера».'**
+  String get extAboutZapret;
+
+  /// No description provided for @extAboutByedpi.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обход блокировок без VPN через локальный прокси ByeDPI. Работает в режиме «Без сервера».'**
+  String get extAboutByedpi;
+
+  /// No description provided for @modeTunHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Весь трафик компьютера идёт через VPN'**
+  String get modeTunHint;
+
+  /// No description provided for @modeProxyHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Только браузеры и программы с системным прокси'**
+  String get modeProxyHint;
+
+  /// No description provided for @modeBypassHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обход блокировок без VPN-сервера'**
+  String get modeBypassHint;
+
+  /// No description provided for @modeExtensionHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обход блокировок из расширения'**
+  String get modeExtensionHint;
+
+  /// No description provided for @engineInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ядро устанавливает соединение с сервером.\n\nАвто: Sora сама берёт ядро, которое поддерживает протокол сервера.\nsing-box: быстрое и универсальное.\nXray: лучше всего для VLESS с REALITY и XHTTP.\nmihomo: Clash-подписки и гибкие правила.\n\nМеняйте ядро, только если сервер не подключается в режиме «Авто».'**
+  String get engineInfo;
+
+  /// No description provided for @tunStackInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как трафик попадает из системы в VPN.\n\nСистемный: быстрее всего, через сетевой стек ОС.\ngVisor: собственный стек, совместим с большинством программ.\nСмешанный: TCP через систему, UDP через gVisor.\n\nЕсли сайты или игры работают плохо, попробуйте другой стек.'**
+  String get tunStackInfo;
+
+  /// No description provided for @protection.
+  ///
+  /// In ru, this message translates to:
+  /// **'Защита'**
+  String get protection;
+
+  /// No description provided for @killSwitchInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если VPN отключится, Sora заблокирует интернет, чтобы трафик не ушёл мимо туннеля. Доступ вернётся после переподключения или выключения VPN.'**
+  String get killSwitchInfo;
+
+  /// No description provided for @strictKillSwitchInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Блокировка остаётся и после выхода из Sora, и после перезагрузки, пока вы не выключите её здесь.'**
+  String get strictKillSwitchInfo;
+
+  /// No description provided for @zapretWithVpnInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сайты, которые по правилам идут мимо VPN, получают обход блокировок Zapret.'**
+  String get zapretWithVpnInfo;
+
+  /// No description provided for @failoverInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если сервер перестал отвечать, Sora сама переключится на следующий рабочий.'**
+  String get failoverInfo;
+
+  /// No description provided for @ipv6Info.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пускать IPv6 через VPN. Выключите, если сервер не поддерживает IPv6 и сайты открываются медленно.'**
+  String get ipv6Info;
+
+  /// No description provided for @fragmentInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разбивает начало TLS-соединения на части, чтобы фильтр провайдера не увидел имя сайта. Помогает, когда сервер блокируют по SNI.'**
+  String get fragmentInfo;
+
+  /// No description provided for @splitPosInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Где резать первый пакет: номер байта или метка, например midsld (середина домена). Несколько значений — через запятую.'**
+  String get splitPosInfo;
+
+  /// No description provided for @disorderInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отправляет части пакета в обратном порядке, чтобы сбить фильтры, которые собирают пакет по порядку.'**
+  String get disorderInfo;
+
+  /// No description provided for @tlsRecordInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Делит TLS-приветствие на несколько записей, чтобы имя сайта не попало в одну целиком.'**
+  String get tlsRecordInfo;
+
+  /// No description provided for @hostCaseInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Меняет регистр заголовка Host в HTTP-запросах (Host → hoSt), и старые фильтры перестают узнавать запрос.'**
+  String get hostCaseInfo;
+
+  /// No description provided for @probeMethodInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Через ядро: настоящая задержка до сайта через сервер, точнее всего.\nСоединение: только TCP-подключение к серверу, быстро, но не проверяет VPN.\nTLS-рукопожатие: TCP и TLS с сервером.\nICMP: обычный ping, некоторые серверы на него не отвечают.\nАвто: через ядро, а где нельзя — соединение.'**
+  String get probeMethodInfo;
+
+  /// No description provided for @autoSelectInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Как «Самый быстрый» выбирает сервер: по пингу, по замеренной скорости или по обоим сразу.'**
+  String get autoSelectInfo;
+
+  /// No description provided for @autoSwitchInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'Если текущий сервер стал заметно медленнее, Sora переключится на более быстрый.'**
+  String get autoSwitchInfo;
+
+  /// No description provided for @probeTls.
+  ///
+  /// In ru, this message translates to:
+  /// **'TLS-рукопожатие'**
+  String get probeTls;
+
+  /// No description provided for @probeIcmp.
+  ///
+  /// In ru, this message translates to:
+  /// **'ICMP (ping)'**
+  String get probeIcmp;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -2039,4 +2039,102 @@ class SRu extends S {
 
   @override
   String get winwsRequirements => 'Этот режим VPN недоступен';
+
+  @override
+  String get emptyServersTitle => 'Добавьте сервер или подписку';
+
+  @override
+  String get emptyServersBody =>
+      'Вставьте ссылку на подписку от VPN-сервиса, добавьте свой сервер или отсканируйте QR-код.';
+
+  @override
+  String get qrShort => 'QR-код';
+
+  @override
+  String get extAboutHello => 'Пример панели: показывает активные соединения и отправляет тестовое уведомление.';
+
+  @override
+  String get extAboutZapret =>
+      'Обход блокировок без VPN: меняет начало соединений, чтобы провайдер не узнал сайт. Работает в режиме «Без сервера».';
+
+  @override
+  String get extAboutByedpi =>
+      'Обход блокировок без VPN через локальный прокси ByeDPI. Работает в режиме «Без сервера».';
+
+  @override
+  String get modeTunHint => 'Весь трафик компьютера идёт через VPN';
+
+  @override
+  String get modeProxyHint => 'Только браузеры и программы с системным прокси';
+
+  @override
+  String get modeBypassHint => 'Обход блокировок без VPN-сервера';
+
+  @override
+  String get modeExtensionHint => 'Обход блокировок из расширения';
+
+  @override
+  String get engineInfo =>
+      'Ядро устанавливает соединение с сервером.\n\nАвто: Sora сама берёт ядро, которое поддерживает протокол сервера.\nsing-box: быстрое и универсальное.\nXray: лучше всего для VLESS с REALITY и XHTTP.\nmihomo: Clash-подписки и гибкие правила.\n\nМеняйте ядро, только если сервер не подключается в режиме «Авто».';
+
+  @override
+  String get tunStackInfo =>
+      'Как трафик попадает из системы в VPN.\n\nСистемный: быстрее всего, через сетевой стек ОС.\ngVisor: собственный стек, совместим с большинством программ.\nСмешанный: TCP через систему, UDP через gVisor.\n\nЕсли сайты или игры работают плохо, попробуйте другой стек.';
+
+  @override
+  String get protection => 'Защита';
+
+  @override
+  String get killSwitchInfo =>
+      'Если VPN отключится, Sora заблокирует интернет, чтобы трафик не ушёл мимо туннеля. Доступ вернётся после переподключения или выключения VPN.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Блокировка остаётся и после выхода из Sora, и после перезагрузки, пока вы не выключите её здесь.';
+
+  @override
+  String get zapretWithVpnInfo => 'Сайты, которые по правилам идут мимо VPN, получают обход блокировок Zapret.';
+
+  @override
+  String get failoverInfo => 'Если сервер перестал отвечать, Sora сама переключится на следующий рабочий.';
+
+  @override
+  String get ipv6Info =>
+      'Пускать IPv6 через VPN. Выключите, если сервер не поддерживает IPv6 и сайты открываются медленно.';
+
+  @override
+  String get fragmentInfo =>
+      'Разбивает начало TLS-соединения на части, чтобы фильтр провайдера не увидел имя сайта. Помогает, когда сервер блокируют по SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Где резать первый пакет: номер байта или метка, например midsld (середина домена). Несколько значений — через запятую.';
+
+  @override
+  String get disorderInfo =>
+      'Отправляет части пакета в обратном порядке, чтобы сбить фильтры, которые собирают пакет по порядку.';
+
+  @override
+  String get tlsRecordInfo => 'Делит TLS-приветствие на несколько записей, чтобы имя сайта не попало в одну целиком.';
+
+  @override
+  String get hostCaseInfo =>
+      'Меняет регистр заголовка Host в HTTP-запросах (Host → hoSt), и старые фильтры перестают узнавать запрос.';
+
+  @override
+  String get probeMethodInfo =>
+      'Через ядро: настоящая задержка до сайта через сервер, точнее всего.\nСоединение: только TCP-подключение к серверу, быстро, но не проверяет VPN.\nTLS-рукопожатие: TCP и TLS с сервером.\nICMP: обычный ping, некоторые серверы на него не отвечают.\nАвто: через ядро, а где нельзя — соединение.';
+
+  @override
+  String get autoSelectInfo =>
+      'Как «Самый быстрый» выбирает сервер: по пингу, по замеренной скорости или по обоим сразу.';
+
+  @override
+  String get autoSwitchInfo => 'Если текущий сервер стал заметно медленнее, Sora переключится на более быстрый.';
+
+  @override
+  String get probeTls => 'TLS-рукопожатие';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

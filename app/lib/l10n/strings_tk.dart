@@ -2017,4 +2017,101 @@ class STk extends S {
 
   @override
   String get winwsRequirements => 'Bu VPN tertibi elýeterli däl';
+
+  @override
+  String get emptyServersTitle => 'Serwer ýa-da abuna goşuň';
+
+  @override
+  String get emptyServersBody =>
+      'VPN hyzmatyndan abuna salgysyny goýuň, öz serweriňizi goşuň ýa-da QR koduny skanirläň.';
+
+  @override
+  String get qrShort => 'QR kod';
+
+  @override
+  String get extAboutHello => 'Panel nusgasy: işjeň birikmeleri görkezýär we synag habarnamasyny iberýär.';
+
+  @override
+  String get extAboutZapret =>
+      'VPN-siz petiklerden geçmek: üpjünçi sahypany tanamaz ýaly birikmäniň başyny üýtgedýär. «Serwersiz» režiminde işleýär.';
+
+  @override
+  String get extAboutByedpi =>
+      'Ýerli ByeDPI proksisi arkaly VPN-siz petiklerden geçmek. «Serwersiz» režiminde işleýär.';
+
+  @override
+  String get modeTunHint => 'Kompýuteriň ähli trafigi VPN arkaly geçýär';
+
+  @override
+  String get modeProxyHint => 'Diňe ulgam proksisini ulanýan brauzerler we programmalar';
+
+  @override
+  String get modeBypassHint => 'VPN serwersiz petiklerden geçmek';
+
+  @override
+  String get modeExtensionHint => 'Giňeltmeden petiklerden geçmek';
+
+  @override
+  String get engineInfo =>
+      'Ýadro serwer bilen birikme gurýar.\n\nAwto: Sora serweriň protokolyny goldaýan ýadrony özi saýlaýar.\nsing-box: çalt we uniwersal.\nXray: REALITY we XHTTP bilen VLESS üçin iň gowusy.\nmihomo: Clash abunalary we çeýe düzgünler.\n\nServer «Awto» režiminde birikmese ýadrony üýtgediň.';
+
+  @override
+  String get tunStackInfo =>
+      'Trafik ulgamdan VPN-e nähili düşýär.\n\nUlgam: iň çalt, OU tor steki arkaly.\ngVisor: öz steki, köp programma bilen gabat gelýär.\nGarylan: TCP ulgam arkaly, UDP gVisor arkaly.\n\nSahypalar ýa-da oýunlar erbet işlese, başga steki synap görüň.';
+
+  @override
+  String get protection => 'Gorag';
+
+  @override
+  String get killSwitchInfo =>
+      'VPN kesilse, trafik tunelden daşary gitmez ýaly Sora interneti petikleýär. Täzeden birikende ýa-da VPN öçürilende elýeterlilik gaýdyp gelýär.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Petik Sora-dan çykandan soň hem, täzeden ýüklenenden soň hem şu ýerde öçürýänçäňiz galýar.';
+
+  @override
+  String get zapretWithVpnInfo => 'Düzgünler boýunça VPN-den geçmeýän sahypalar Zapret arkaly petiklerden geçýär.';
+
+  @override
+  String get failoverInfo => 'Serwer jogap bermän galsa, Sora indiki işleýän serwere özi geçýär.';
+
+  @override
+  String get ipv6Info => 'IPv6-ny VPN arkaly ibermek. Serwer IPv6 goldamasa we sahypalar haýal açylsa, öçüriň.';
+
+  @override
+  String get fragmentInfo =>
+      'Üpjünçiniň süzgüji sahypanyň adyny görmez ýaly TLS birikmesiniň başyny böleklere bölýär. Serwer SNI boýunça petiklenende kömek edýär.';
+
+  @override
+  String get splitPosInfo =>
+      'Ilkinji paketi nireden kesmeli: baýt belgisi ýa-da bellik, meselem midsld (domeniň ortasy). Birnäçe bahany otur bilen bölüň.';
+
+  @override
+  String get disorderInfo =>
+      'Paketi tertip boýunça ýygnaýan süzgüçleri aldatmak üçin paketiň böleklerini ters tertipde iberýär.';
+
+  @override
+  String get tlsRecordInfo => 'Sahypanyň ady bir ýazga doly düşmez ýaly TLS salamlaşmasyny birnäçe ýazga bölýär.';
+
+  @override
+  String get hostCaseInfo =>
+      'HTTP haýyşlarynda Host sözbaşysynyň registrini üýtgedýär (Host → hoSt), köne süzgüçler haýyşy tanamaýar.';
+
+  @override
+  String get probeMethodInfo =>
+      'Ýadro arkaly: serwer arkaly sahypa çenli hakyky gijikme, iň takyk.\nDiňe birikme: serwere diňe TCP birikme, çalt, ýöne VPN-i barlamaýar.\nTLS el gysyşmasy: serwer bilen TCP we TLS.\nICMP: adaty ping, käbir serwerler jogap bermeýär.\nAwto: ýadro arkaly, bolmasa — birikme.';
+
+  @override
+  String get autoSelectInfo =>
+      '«Iň çalt» serweri nähili saýlaýar: ping boýunça, ölçelen tizlik boýunça ýa-da ikisi boýunça.';
+
+  @override
+  String get autoSwitchInfo => 'Häzirki serwer duýarlyk derejede haýallasa, Sora has çalt serwere geçýär.';
+
+  @override
+  String get probeTls => 'TLS el gysyşmasy';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

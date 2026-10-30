@@ -70,33 +70,23 @@ class _ServersScreenState extends State<ServersScreen> {
     final sora = SoraScope.of(context);
     final s = S.of(context);
     final palette = Palette.of(context);
+    final empty = sora.subscriptions.isEmpty && sora.customServers.isEmpty;
+    // Both actions keep their place while they work: the ping button shows
+    // its progress inside itself instead of turning into a bare spinner.
+    // Flexible: with large text on a narrow window the labels shorten
+    // instead of pushing the buttons out of the row.
     final actions = [
-      if (sora.probing)
-        SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
-      else
-        RoundButton(
-          icon: Symbols.radar_rounded,
+      Flexible(
+        child: QuietPill(
+          key: const ValueKey('probe-all'),
+          icon: Symbols.signal_cellular_alt_rounded,
           label: s.probeServers,
-          onTap: sora.canProbe ? () => unawaited(sora.probe()) : null,
+          busy: sora.probing,
+          onTap: sora.canProbe && !sora.probing && sora.servers.isNotEmpty ? () => unawaited(sora.probe()) : null,
         ),
-      if (sora.benchmarking)
-        SizedBox.square(dimension: 36, child: CupertinoActivityIndicator(color: palette.ink))
-      else
-        RoundButton(
-          icon: Symbols.speed_rounded,
-          label: s.measureSpeed,
-          onTap: sora.canBenchmark ? () => push<void>(context, const BenchmarkScreen()) : null,
-        ),
-      _tourTarget(
-        0,
-        RoundButton(icon: Symbols.add_rounded, label: s.addSubscription, onTap: () => showSubscriptionSheet(context)),
       ),
-      if (sora.customServers.isEmpty) const _OwnServerAction(),
-      RoundButton(
-        icon: Symbols.qr_code_scanner_rounded,
-        label: s.qrScan,
-        onTap: () => push<void>(context, const QrScanScreen()),
-      ),
+      const SizedBox(width: 8),
+      Flexible(child: _tourTarget(0, const _AddMenu())),
     ];
     final search = Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -137,9 +127,8 @@ class _ServersScreenState extends State<ServersScreen> {
             label: MaterialLocalizations.of(context).backButtonTooltip,
             onTap: () => Navigator.of(context).maybePop(),
           ),
-        Expanded(
-          child: Wrap(alignment: WrapAlignment.end, crossAxisAlignment: WrapCrossAlignment.center, children: actions),
-        ),
+        const Spacer(),
+        ...actions,
       ],
     );
     final separator = palette.ink3.withValues(alpha: 0.28);
@@ -150,8 +139,17 @@ class _ServersScreenState extends State<ServersScreen> {
             const BackgroundFailureState(source: 'probe'),
             const BackgroundFailureState(source: 'benchmark'),
             const BackgroundFailureState(source: 'custom-servers'),
-            toolbar,
-            if (sora.subscriptions.isNotEmpty) ...[const SizedBox(height: 8), search],
+            if (empty)
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: _EmptyServers(tour: widget.embedded && !sora.bypassSelected),
+                ),
+              )
+            else ...[
+              toolbar,
+              if (sora.subscriptions.isNotEmpty) ...[const SizedBox(height: 12), search],
+            ],
           ],
         ),
       ),
@@ -512,40 +510,30 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                   ],
                 ),
               ),
-              if (sora.probing && (sora.probingSubscription == null || sora.probingSubscription == state.settings.id))
-                SizedBox.square(
+              Tooltip(
+                message: '${s.probeServers}: ${state.displayName}',
+                child: BusyRoundButton(
                   key: ValueKey('probe-subscription-${state.settings.id}'),
-                  dimension: 36,
-                  child: CupertinoActivityIndicator(color: palette.ink),
-                )
-              else
-                Tooltip(
-                  message: '${s.probeServers}: ${state.displayName}',
-                  child: RoundButton(
-                    key: ValueKey('probe-subscription-${state.settings.id}'),
-                    icon: Symbols.radar_rounded,
-                    label: '${s.probeServers}: ${state.displayName}',
-                    onTap: !sora.canProbe || state.outbounds.isEmpty
-                        ? null
-                        : () => unawaited(sora.probe(subscriptionId: state.settings.id)),
-                  ),
+                  icon: Symbols.signal_cellular_alt_rounded,
+                  label: '${s.probeServers}: ${state.displayName}',
+                  busy:
+                      sora.probing &&
+                      (sora.probingSubscription == null || sora.probingSubscription == state.settings.id),
+                  onTap: !sora.canProbe || state.outbounds.isEmpty
+                      ? null
+                      : () => unawaited(sora.probe(subscriptionId: state.settings.id)),
                 ),
-              if (state.updating)
-                SizedBox.square(
+              ),
+              Tooltip(
+                message: '${s.refresh}: ${state.displayName}',
+                child: BusyRoundButton(
                   key: ValueKey('refresh-subscription-${state.settings.id}'),
-                  dimension: 36,
-                  child: CupertinoActivityIndicator(color: palette.ink),
-                )
-              else
-                Tooltip(
-                  message: '${s.refresh}: ${state.displayName}',
-                  child: RoundButton(
-                    key: ValueKey('refresh-subscription-${state.settings.id}'),
-                    icon: Symbols.refresh_rounded,
-                    label: '${s.refresh}: ${state.displayName}',
-                    onTap: () => unawaited(sora.refreshSubscription(state.settings.id)),
-                  ),
+                  icon: Symbols.refresh_rounded,
+                  label: '${s.refresh}: ${state.displayName}',
+                  busy: state.updating,
+                  onTap: () => unawaited(sora.refreshSubscription(state.settings.id)),
                 ),
+              ),
               Tooltip(
                 message: s.qrShareTitle,
                 child: RoundButton(
@@ -563,6 +551,14 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     _item(context, s.providerWebsite, () => unawaited(openLink(context, info.webPageUrl))),
                   if (info.supportUrl.isNotEmpty)
                     _item(context, s.support, () => unawaited(openLink(context, info.supportUrl))),
+                  if (sora.canBenchmark && state.outbounds.isNotEmpty)
+                    _item(
+                      context,
+                      s.measureSpeed,
+                      () => unawaited(
+                        push<void>(context, BenchmarkScreen(serverIds: [for (final o in state.outbounds) o.id])),
+                      ),
+                    ),
                   _item(
                     context,
                     s.subscriptionSettings,
@@ -655,25 +651,132 @@ Future<void> _deleteCustomServer(BuildContext context, CustomServer server) asyn
   }
 }
 
-class _OwnServerAction extends StatelessWidget {
-  const _OwnServerAction();
+/// One "Add" button for every way to get servers: a subscription link, an
+/// own server or a QR code.
+class _AddMenu extends StatelessWidget {
+  const _AddMenu();
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
     final palette = Palette.of(context);
-    return Tooltip(
-      message: s.customServerAdd,
-      child: TextButton.icon(
-        key: const ValueKey('add-own-server'),
-        onPressed: () => unawaited(showAddServerSheet(context)),
-        icon: Icon(Symbols.add_rounded, size: 18, color: palette.ink),
-        label: Text(s.customServerOwn, style: Styles.secondary.copyWith(color: palette.ink)),
-        style: TextButton.styleFrom(
-          minimumSize: const Size(0, 36),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    MenuItemButton item(Key key, IconData icon, String label, VoidCallback onTap) => MenuItemButton(
+      key: key,
+      onPressed: onTap,
+      leadingIcon: Icon(icon, size: 18, color: palette.ink),
+      style: ButtonStyle(
+        minimumSize: const WidgetStatePropertyAll(Size(220, 40)),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(9))),
+        overlayColor: WidgetStatePropertyAll(palette.hover),
+        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 12)),
+      ),
+      child: Text(label, style: Styles.secondary.copyWith(color: palette.ink)),
+    );
+    return MenuAnchor(
+      alignmentOffset: const Offset(0, 6),
+      menuChildren: [
+        item(
+          const ValueKey('add-subscription'),
+          Symbols.link_rounded,
+          s.addSubscription,
+          () => unawaited(showSubscriptionSheet(context)),
         ),
+        item(
+          const ValueKey('add-menu-own-server'),
+          Symbols.dns_rounded,
+          s.customServerAdd,
+          () => unawaited(showAddServerSheet(context)),
+        ),
+        item(
+          const ValueKey('add-qr'),
+          Symbols.qr_code_scanner_rounded,
+          s.qrScan,
+          () => unawaited(push<void>(context, const QrScanScreen())),
+        ),
+      ],
+      builder: (context, controller, _) => QuietPill(
+        key: const ValueKey('add-menu'),
+        icon: Symbols.add_rounded,
+        label: s.add,
+        onTap: () => controller.isOpen ? controller.close() : controller.open(),
+      ),
+    );
+  }
+}
+
+/// No subscriptions and no own servers yet: say what to do, with the three
+/// ways to do it right here instead of an unlabeled toolbar.
+class _EmptyServers extends StatelessWidget {
+  const _EmptyServers({required this.tour});
+
+  /// Whether this card is the onboarding tour's target (the home pane).
+  final bool tour;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    Widget add = PrimaryButton(
+      key: const ValueKey('empty-add-subscription'),
+      label: s.addSubscription,
+      onTap: () => unawaited(showSubscriptionSheet(context)),
+    );
+    // The tour points at the button itself: it stays on screen without
+    // scrolling, so the highlight never has to chase a moving card.
+    if (tour) add = TourTarget(step: 1, radius: 26, child: TourTarget(step: 0, radius: 26, child: add));
+    return Container(
+      key: const ValueKey('servers-empty'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(color: palette.surface, borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: palette.field, borderRadius: BorderRadius.circular(12)),
+                child: Icon(Symbols.dns_rounded, size: 21, fill: 1, color: palette.ink),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(s.emptyServersTitle, style: Styles.bodyStrong.copyWith(color: palette.ink, fontSize: 16)),
+                    const SizedBox(height: 3),
+                    Text(s.emptyServersBody, style: Styles.secondary.copyWith(color: palette.ink, height: 1.4)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          add,
+          const SizedBox(height: 8),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              QuietPill(
+                key: const ValueKey('add-own-server'),
+                icon: Symbols.dns_rounded,
+                label: s.customServerOwn,
+                onTap: () => unawaited(showAddServerSheet(context)),
+              ),
+              QuietPill(
+                key: const ValueKey('empty-qr'),
+                icon: Symbols.qr_code_scanner_rounded,
+                label: s.qrShort,
+                onTap: () => unawaited(push<void>(context, const QrScanScreen())),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -707,7 +810,12 @@ class _CustomServersGroup extends StatelessWidget {
                     Expanded(
                       child: Text(S.of(context).customServers, style: Styles.bodyStrong.copyWith(color: palette.ink)),
                     ),
-                    const _OwnServerAction(),
+                    RoundButton(
+                      key: const ValueKey('add-own-server'),
+                      icon: Symbols.add_rounded,
+                      label: S.of(context).customServerAdd,
+                      onTap: () => unawaited(showAddServerSheet(context)),
+                    ),
                   ],
                 ),
               ),
@@ -831,7 +939,7 @@ class _CustomServerRowState extends State<_CustomServerRow> {
                         padding: const EdgeInsets.all(8),
                         child: _testing
                             ? const SizedBox(width: 18, height: 18, child: CupertinoActivityIndicator(radius: 9))
-                            : Icon(Symbols.radar_rounded, size: 18, color: palette.ink2),
+                            : Icon(Symbols.signal_cellular_alt_rounded, size: 18, color: palette.ink2),
                       ),
                     ),
                   ),
