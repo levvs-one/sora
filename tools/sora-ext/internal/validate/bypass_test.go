@@ -52,6 +52,9 @@ func TestBypassProjectInvalidDescriptorFailsBeforePack(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "sora-extension.json"), raw, 0o600); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.WriteFile(filepath.Join(dir, "panel.html"), []byte("<!doctype html>"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	if err := os.WriteFile(filepath.Join(dir, "hook.json"), []byte(`{"hook_version":1}`), 0o600); err != nil {
 		t.Fatal(err)
 	}

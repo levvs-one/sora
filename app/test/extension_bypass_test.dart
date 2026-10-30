@@ -856,7 +856,7 @@ void main() {
     expect(sora.approveSystemFilter(choice, key), true);
     await sora.select(choice);
     expect(sora.currentPlan.outbounds.single.protocol, 'winws');
-    final updated = await signed(id: winws.manifest.id, version: '1.0.1', descriptor: descriptor);
+    final updated = await signed(id: winws.manifest.id, version: '1.1.1', descriptor: descriptor);
     await install(updated);
     expect(sora.needsSystemFilterConsent(choice), true);
     expect(sora.approveSystemFilter(choice, key), false);
