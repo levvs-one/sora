@@ -16,7 +16,7 @@ var logLine = regexp.MustCompile(`^(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)
 var connectionTrace = regexp.MustCompile(`^\[\d+\] (?:proxy/|transport/internet/|app/dispatcher:)`)
 
 // ParseLog reads one Xray output line. Xray writes local time.
-func (*driver) ParseLog(line string) (time.Time, logs.Level, string) {
+func (d *driver) ParseLog(line string) (time.Time, logs.Level, string) {
 	m := logLine.FindStringSubmatch(line)
 	if m == nil {
 		return time.Time{}, logs.LevelInfo, line
@@ -25,6 +25,7 @@ func (*driver) ParseLog(line string) (time.Time, logs.Level, string) {
 	level, ok := logs.ParseLevel(m[2])
 	if !ok {
 		level = logs.LevelDebug
+		d.flows.note(m[3], at)
 	}
 	if level == logs.LevelInfo && connectionTrace.MatchString(m[3]) {
 		level = logs.LevelDebug

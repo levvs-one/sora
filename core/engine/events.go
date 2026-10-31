@@ -144,14 +144,16 @@ type Connection struct {
 	Upload   uint64
 	Download uint64
 	Start    time.Time
+	// Closable is false where the engine only reports the connection.
+	Closable bool
 }
 
-// ConnectionTracker lists and closes session connections. Xray does not
-// implement it.
+// ConnectionTracker lists and closes session connections.
 type ConnectionTracker interface {
 	Connections(ctx context.Context) ([]Connection, error)
 	CloseConnection(ctx context.Context, id string) error
-	// CloseConnections drops every live connection at once.
+	// CloseConnections drops every live connection at once. An engine without
+	// bulk close returns an error, and the session restarts it instead.
 	CloseConnections(ctx context.Context) error
 }
 

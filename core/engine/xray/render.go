@@ -71,7 +71,7 @@ func Render(p *engine.Plan, rt supervise.Runtime, sel Selection) ([]byte, error)
 	if p.Tun.Enabled && p.Tun.Stack != "" && p.Tun.Stack != "gvisor" {
 		return nil, fmt.Errorf("xray: TUN uses gvisor; stack %q is not supported", p.Tun.Stack)
 	}
-	if len(p.Outbounds) == 1 && p.Outbounds[0].Protocol == engine.ProtocolXrayProfile {
+	if slices.ContainsFunc(p.Outbounds, func(o engine.Outbound) bool { return o.Protocol == engine.ProtocolXrayProfile }) {
 		return renderProfile(p, rt)
 	}
 	r := renderer{plan: p, sel: sel, tags: map[string]string{}, groups: map[string]engine.Group{}, byGroup: map[string]string{}}

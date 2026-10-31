@@ -156,7 +156,7 @@ class _Status extends StatelessWidget {
     final title = switch (sora.phase) {
       Phase.offline => sora.failure?.key == CoreFailure.unavailable.key ? s.coreMissing : s.stateOff,
       Phase.off => s.stateOff,
-      Phase.connecting => s.stateConnecting,
+      Phase.connecting => sora.replacing ? s.stateReconnecting : s.stateConnecting,
       Phase.connected => s.stateConnected,
       Phase.reconnecting => s.stateReconnecting,
       Phase.disconnecting => s.stateDisconnecting,

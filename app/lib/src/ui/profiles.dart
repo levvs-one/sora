@@ -70,6 +70,12 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
       children: [
         Group(
           children: [
+            SwitchTile(
+              title: s.profilesEnabled,
+              info: s.profilesEnabledInfo,
+              value: sora.settings.profilesEnabled,
+              onChanged: (v) => unawaited(sora.change((x) => x.profilesEnabled = v, replan: false)),
+            ),
             Tile(
               title: _fingerprintLine(s, sora.networkFingerprint),
               trailing: _refreshing

@@ -78,6 +78,13 @@ class _ChainsScreenState extends State<ChainsScreen> {
                       textAlign: TextAlign.center,
                       style: Styles.secondary.copyWith(color: palette.ink),
                     ),
+                    if (!showUnsupported) ...[
+                      const SizedBox(height: 16),
+                      PrimaryButton(
+                        label: s.chainAdd,
+                        onTap: () => push<void>(context, const ChainBuilderScreen()),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -261,7 +268,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
     final hidden = sora.hiddenServerIds;
     final servers = [
       for (final o in sora.servers)
-        if (!hidden.contains(o.id)) o,
+        if (!hidden.contains(o.id) && !isProfile(o)) o,
     ];
     final estimate = ProxyChain(id: '', name: '', hops: _hops).estimatedLatency(sora.latency);
     return Screen(
@@ -275,6 +282,7 @@ class _ChainBuilderScreenState extends State<ChainBuilderScreen> {
         Heading(s.servers),
         Group(
           children: [
+            if (servers.isEmpty) Tile(title: s.chainNoServers),
             for (final server in servers)
               _ServerPickRow(
                 name: sora.displayNameOf(server.id),

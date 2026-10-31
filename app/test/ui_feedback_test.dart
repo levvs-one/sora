@@ -126,7 +126,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(info);
       await tester.pumpAndSettle();
-      expect(find.text(sora.strings.autoSwitchInfo), findsOneWidget);
+      expect(find.byKey(const ValueKey('feature-info')), findsOneWidget);
+      expect(find.text(sora.strings.autoSwitchInfo.split('\n\n').first), findsOneWidget);
+      expect(find.text(sora.strings.autoSwitchOnDegrade), findsOneWidget);
       await shot(tester, 'settings-full-${brightness.name}');
       expect(tester.takeException(), isNull);
     });

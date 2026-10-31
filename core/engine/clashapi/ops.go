@@ -68,7 +68,7 @@ func (c *Client) ListConnections(ctx context.Context) ([]engine.Connection, erro
 		// client-facing group-to-outbound order.
 		chain := slices.Clone(in.Chains)
 		slices.Reverse(chain)
-		out = append(out, engine.Connection{
+		out = append(out, engine.Connection{Closable: true,
 			ID: in.ID, Network: m.Network, Host: host, Port: uint16(port),
 			Process: firstOf(m.Process, filepath.Base(m.ProcessPath)), Rule: rule, Chain: chain,
 			Upload: in.Upload, Download: in.Download, Start: in.Start,

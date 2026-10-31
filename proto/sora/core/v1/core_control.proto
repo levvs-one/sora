@@ -39,6 +39,9 @@ service CoreControl {
 
   // Since 1.3. The connection center: live connections of the session.
   rpc ListConnections(ListConnectionsRequest) returns (ListConnectionsResponse);
+  // The configuration behind one server, with its credentials, for the person
+  // who owns it. Needs the control authenticator.
+  rpc GetServerConfig(GetServerConfigRequest) returns (GetServerConfigResponse);
   rpc CloseConnection(CloseConnectionRequest) returns (CloseConnectionResponse);
 
   // Since 1.3. Subscriptions the core keeps and updates by itself, so they stay
@@ -556,7 +559,12 @@ message Connection {
   uint64 upload = 8;
   uint64 download = 9;
   google.protobuf.Timestamp start = 10;
+  // False where the engine only reports the connection: Xray lists what opened
+  // in the last minute, without counters and without a way to close it.
+  bool closable = 11;
 }
+message GetServerConfigRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; OutboundSpec outbound = 3; }
+message GetServerConfigResponse { string config = 1; SoraError error = 2; }
 message ListConnectionsRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string session_id = 3; }
 message ListConnectionsResponse { repeated Connection connections = 1; SoraError error = 2; }
 message CloseConnectionRequest { ApiVersion api_version = 1; bytes control_authenticator = 2; string session_id = 3; string connection_id = 4; }

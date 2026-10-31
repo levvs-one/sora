@@ -52,17 +52,17 @@ class Palette extends ThemeExtension<Palette> {
   Color get pressed => ink.withValues(alpha: 0.09);
 
   static const light = Palette(
-    background: Color(0xFFF5F5F7),
+    background: Color(0xFFE9E9EE),
     surface: Color(0xFFFFFFFF),
-    field: Color(0xFFEBEBEF),
-    ink: Color(0xFF1D1D1F),
-    ink2: Color(0xFF4A4D53),
-    ink3: Color(0xFF5C6068),
-    danger: Color(0xFFD02A22),
+    field: Color(0xFFE3E3E9),
+    ink: Color(0xFF101012),
+    ink2: Color(0xFF3A3D43),
+    ink3: Color(0xFF4E5158),
+    danger: Color(0xFFC0241C),
     onDanger: Color(0xFFFFFFFF),
-    shadow: Color(0x14000000),
+    shadow: Color(0x1F000000),
     raised: Color(0xFFFFFFFF),
-    raisedField: Color(0xFFEBEBEF),
+    raisedField: Color(0xFFE3E3E9),
     scrim: Color(0x38000000),
   );
 

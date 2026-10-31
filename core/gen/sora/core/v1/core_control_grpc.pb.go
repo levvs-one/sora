@@ -40,6 +40,7 @@ const (
 	CoreControl_GetLogSettings_FullMethodName        = "/sora.core.v1.CoreControl/GetLogSettings"
 	CoreControl_SetLogSettings_FullMethodName        = "/sora.core.v1.CoreControl/SetLogSettings"
 	CoreControl_ListConnections_FullMethodName       = "/sora.core.v1.CoreControl/ListConnections"
+	CoreControl_GetServerConfig_FullMethodName       = "/sora.core.v1.CoreControl/GetServerConfig"
 	CoreControl_CloseConnection_FullMethodName       = "/sora.core.v1.CoreControl/CloseConnection"
 	CoreControl_SaveSubscription_FullMethodName      = "/sora.core.v1.CoreControl/SaveSubscription"
 	CoreControl_ListSubscriptions_FullMethodName     = "/sora.core.v1.CoreControl/ListSubscriptions"
@@ -95,6 +96,9 @@ type CoreControlClient interface {
 	SetLogSettings(ctx context.Context, in *SetLogSettingsRequest, opts ...grpc.CallOption) (*SetLogSettingsResponse, error)
 	// Since 1.3. The connection center: live connections of the session.
 	ListConnections(ctx context.Context, in *ListConnectionsRequest, opts ...grpc.CallOption) (*ListConnectionsResponse, error)
+	// The configuration behind one server, with its credentials, for the person
+	// who owns it. Needs the control authenticator.
+	GetServerConfig(ctx context.Context, in *GetServerConfigRequest, opts ...grpc.CallOption) (*GetServerConfigResponse, error)
 	CloseConnection(ctx context.Context, in *CloseConnectionRequest, opts ...grpc.CallOption) (*CloseConnectionResponse, error)
 	// Since 1.3. Subscriptions the core keeps and updates by itself, so they stay
 	// current while the interface is closed. The link of a subscription is its
@@ -392,6 +396,16 @@ func (c *coreControlClient) ListConnections(ctx context.Context, in *ListConnect
 	return out, nil
 }
 
+func (c *coreControlClient) GetServerConfig(ctx context.Context, in *GetServerConfigRequest, opts ...grpc.CallOption) (*GetServerConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetServerConfigResponse)
+	err := c.cc.Invoke(ctx, CoreControl_GetServerConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *coreControlClient) CloseConnection(ctx context.Context, in *CloseConnectionRequest, opts ...grpc.CallOption) (*CloseConnectionResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CloseConnectionResponse)
@@ -634,6 +648,9 @@ type CoreControlServer interface {
 	SetLogSettings(context.Context, *SetLogSettingsRequest) (*SetLogSettingsResponse, error)
 	// Since 1.3. The connection center: live connections of the session.
 	ListConnections(context.Context, *ListConnectionsRequest) (*ListConnectionsResponse, error)
+	// The configuration behind one server, with its credentials, for the person
+	// who owns it. Needs the control authenticator.
+	GetServerConfig(context.Context, *GetServerConfigRequest) (*GetServerConfigResponse, error)
 	CloseConnection(context.Context, *CloseConnectionRequest) (*CloseConnectionResponse, error)
 	// Since 1.3. Subscriptions the core keeps and updates by itself, so they stay
 	// current while the interface is closed. The link of a subscription is its
@@ -756,6 +773,9 @@ func (UnimplementedCoreControlServer) SetLogSettings(context.Context, *SetLogSet
 }
 func (UnimplementedCoreControlServer) ListConnections(context.Context, *ListConnectionsRequest) (*ListConnectionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListConnections not implemented")
+}
+func (UnimplementedCoreControlServer) GetServerConfig(context.Context, *GetServerConfigRequest) (*GetServerConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServerConfig not implemented")
 }
 func (UnimplementedCoreControlServer) CloseConnection(context.Context, *CloseConnectionRequest) (*CloseConnectionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CloseConnection not implemented")
@@ -1192,6 +1212,24 @@ func _CoreControl_ListConnections_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CoreControl_GetServerConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetServerConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreControlServer).GetServerConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CoreControl_GetServerConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreControlServer).GetServerConfig(ctx, req.(*GetServerConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CoreControl_CloseConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CloseConnectionRequest)
 	if err := dec(in); err != nil {
@@ -1598,6 +1636,10 @@ var CoreControl_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListConnections",
 			Handler:    _CoreControl_ListConnections_Handler,
+		},
+		{
+			MethodName: "GetServerConfig",
+			Handler:    _CoreControl_GetServerConfig_Handler,
 		},
 		{
 			MethodName: "CloseConnection",

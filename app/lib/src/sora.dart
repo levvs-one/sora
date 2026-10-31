@@ -516,6 +516,9 @@ class Sora extends ChangeNotifier {
   Endpoint? localProxy;
 
   Phase phase = Phase.offline;
+
+  /// True while a new session replaces a running one.
+  bool replacing = false;
   DateTime? since;
   String? sessionId;
 
@@ -1059,7 +1062,9 @@ class Sora extends ChangeNotifier {
     // Refresh status because a closed watch may mean the session ended or was
     // replaced.
     void resync() {
-      if (_link == link) unawaited(_readStatus().then((_) => notifyListeners(), onError: _drop));
+      if (_link == link && _connectionWork == null) {
+        unawaited(_readStatus().then((_) => notifyListeners(), onError: _drop));
+      }
     }
 
     // The stream replays history; old events must not trigger notices or repeat
@@ -1091,6 +1096,9 @@ class Sora extends ChangeNotifier {
         _seenSequence = event.sequence;
         final fresh = !event.hasEmittedAt() || event.emittedAt.toDateTime().isAfter(opened);
         if (event.hasStateChanged()) {
+          // A replacement stops this session on the way up; the answer to
+          // Connect says how it ended, so the switch reads as one state.
+          if (_connectionWork != null) return;
           _applyState(event.stateChanged.state, report: fresh);
           notifyListeners();
         } else if (event.hasGroupSwitched() && fresh) {
@@ -1353,6 +1361,7 @@ class Sora extends ChangeNotifier {
   /// either applies it (auto-apply) or asks first. Applying posts an undo
   /// snapshot so the previous settings are one tap away.
   Future<void> handleProfileMatched(String profileId) async {
+    if (!settings.profilesEnabled) return;
     final profile = profiles.byId(profileId);
     if (profile == null) return;
     profiles.activeId = profileId;
@@ -1589,6 +1598,7 @@ class Sora extends ChangeNotifier {
     if (!retry) _memberSpare = entry == null ? 0 : entry.members.length - 1;
     final work = _connectionWork = Completer<void>();
     _connectionMode = mode;
+    replacing = phase == Phase.connected || phase == Phase.reconnecting;
     phase = Phase.connecting;
     notifyListeners();
     // Include events emitted during these requests, before the watch opens.
@@ -1647,6 +1657,7 @@ class Sora extends ChangeNotifier {
       _clearSessionIntent();
     } finally {
       _connectionWork = null;
+      replacing = false;
       work.complete();
     }
     if (connected && !_disposed && !_stopping && settings.strictKillSwitch != strict) {
@@ -2364,6 +2375,31 @@ class Sora extends ChangeNotifier {
       bad ~/= 2;
     }
     probeStats[id] = ok ? (ok: good + 1, fail: bad) : (ok: good, fail: bad + 1);
+  }
+
+  /// The configuration behind a server, with its credentials.
+  Future<String> serverConfig(OutboundSpec server) async {
+    final link = _link;
+    if (link == null) throw CoreFailure.unavailable;
+    final answer = await link.stub.getServerConfig(
+      GetServerConfigRequest(apiVersion: apiVersion, controlAuthenticator: link.token, outbound: server),
+    );
+    if (answer.hasError()) throw CoreFailure.fromWire(answer.error);
+    return answer.config;
+  }
+
+  /// The server a bypass replaced, to come back to when it is turned off.
+  String? _beforeBypass;
+
+  void rememberServer() {
+    if (!settings.server.startsWith(extensionBypassPrefix)) _beforeBypass = settings.server;
+  }
+
+  /// Ends a bypass and goes back to the server chosen before it.
+  Future<void> leaveBypass(String choice) async {
+    if (selected != choice) return;
+    if (phase != Phase.off && phase != Phase.offline) await disconnect();
+    await select(_beforeBypass ?? 'auto');
   }
 
   bool benchmarking = false;

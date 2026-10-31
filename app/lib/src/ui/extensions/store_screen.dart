@@ -582,6 +582,41 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
               child: _SearchField(controller: _catalogSearch, placeholder: s.extSearchHint),
             ),
             const SizedBox(width: 8),
+            // A filter with a single choice filters nothing, so it stays
+            // hidden until the catalog offers at least two.
+            if (categories.length > 2 || capabilities.length > 2)
+              MenuAnchor(
+                menuChildren: [
+                  if (categories.length > 2)
+                    for (final c in categories)
+                      MenuItemButton(
+                        onPressed: () => setState(() => _category = c),
+                        leadingIcon: _category == c
+                            ? Icon(Symbols.check_rounded, size: 18, color: palette.ink)
+                            : const SizedBox(width: 18),
+                        child: Text(_categoryLabel(context, c)),
+                      ),
+                  if (categories.length > 2 && capabilities.length > 2) const Divider(height: 9),
+                  if (capabilities.length > 2)
+                    for (final c in capabilities)
+                      if (c != 'all' || categories.length <= 2)
+                        MenuItemButton(
+                          onPressed: () => setState(() => _capability = _capability == c ? 'all' : c),
+                          leadingIcon: _capability == c
+                              ? Icon(Symbols.check_rounded, size: 18, color: palette.ink)
+                              : const SizedBox(width: 18),
+                          child: Text(_capabilityLabel(context, c)),
+                        ),
+                ],
+                builder: (context, controller, _) => RoundButton(
+                  key: const ValueKey('extension-filter'),
+                  icon: _category == 'all' && _capability == 'all'
+                      ? Symbols.filter_list_rounded
+                      : Symbols.filter_alt_rounded,
+                  label: s.extFilter,
+                  onTap: () => controller.isOpen ? controller.close() : controller.open(),
+                ),
+              ),
             MenuAnchor(
               menuChildren: [
                 for (final (value, label) in [
@@ -606,35 +641,6 @@ class _ExtensionsBodyState extends State<_ExtensionsBody> {
             ),
           ],
         ),
-        // A filter with a single choice filters nothing, so its row stays
-        // hidden until the catalog offers at least two.
-        if (categories.length > 2 || capabilities.length > 2) ...[
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 32,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                if (categories.length > 2)
-                  for (final c in categories)
-                    _FilterPill(
-                      label: _categoryLabel(context, c),
-                      selected: _category == c,
-                      onTap: () => setState(() => _category = c),
-                    ),
-                if (categories.length > 2 && capabilities.length > 2) const SizedBox(width: 8),
-                if (capabilities.length > 2)
-                  for (final c in capabilities)
-                    if (c != 'all' || categories.length <= 2)
-                      _FilterPill(
-                        label: _capabilityLabel(context, c),
-                        selected: _capability == c,
-                        onTap: () => setState(() => _capability = _capability == c ? 'all' : c),
-                      ),
-              ],
-            ),
-          ),
-        ],
         const SizedBox(height: 12),
         Expanded(
           child: ValueListenableBuilder<TextEditingValue>(
@@ -1145,38 +1151,3 @@ class _SearchField extends StatelessWidget {
 
 /// A filter choice in the catalog's single row: ink when selected, like
 /// [Segments], quiet field color otherwise.
-class _FilterPill extends StatelessWidget {
-  const _FilterPill({required this.label, required this.selected, required this.onTap});
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = Palette.of(context);
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(end: 8),
-      child: Semantics(
-        selected: selected,
-        button: true,
-        child: Pressable(
-          onTap: onTap,
-          radius: 16,
-          wash: false,
-          child: AnimatedContainer(
-            duration: Motion.of(context, Motion.fast),
-            height: 32,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: selected ? palette.ink : palette.field,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(label, style: Styles.secondary.copyWith(color: selected ? palette.surface : palette.ink)),
-          ),
-        ),
-      ),
-    );
-  }
-}

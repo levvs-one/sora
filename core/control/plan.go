@@ -864,8 +864,6 @@ func applyChain(plan *engine.Plan, chain []string) error {
 	return nil
 }
 
-const zapretDirectOutboundID = "sora-zapret-direct"
-
 func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) error {
 	if !plan.Tun.Enabled {
 		return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanTunnel,
@@ -880,9 +878,9 @@ func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) erro
 			"control: zapret_with_vpn needs an explicit tpws strategy from the client")
 	}
 	for _, o := range plan.Outbounds {
-		if o.ID == zapretDirectOutboundID {
+		if o.ID == engine.ZapretDirect {
 			return errs.Newf(errs.CodeInvalidArgument, errs.KeyPlanDuplicateID,
-				"control: outbound id %q is reserved for zapret", zapretDirectOutboundID)
+				"control: outbound id %q is reserved for zapret", engine.ZapretDirect)
 		}
 	}
 	bs := engine.BypassStrategy{
@@ -891,12 +889,13 @@ func applyZapretWithVPN(plan *engine.Plan, strategy *corev1.BypassStrategy) erro
 		DomainCase: strategy.GetDomainCase(), MethodEOL: strategy.GetMethodEol(),
 	}
 	plan.Outbounds = append(plan.Outbounds, engine.Outbound{
-		ID: zapretDirectOutboundID, Name: "Zapret (direct traffic)",
+		ID: engine.ZapretDirect, Name: "Zapret (direct traffic)",
 		Protocol: engine.ProtocolBypass, Bypass: &bs,
 	})
-	for i := range plan.Rules {
-		if plan.Rules[i].Target == "direct" {
-			plan.Rules[i].Target = zapretDirectOutboundID
+	for i, rule := range plan.Rules {
+		// The local network has no DPI on the way.
+		if rule.Target == "direct" && (rule.Type != engine.RuleGeoIP || rule.Value != "private") {
+			plan.Rules[i].Target = engine.ZapretDirect
 		}
 	}
 	return nil

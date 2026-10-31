@@ -236,11 +236,12 @@ void main() {
       await _io(tester);
       await tester.pumpAndSettle();
       expect(find.byType(ExtensionName), findsOneWidget);
-      expect(find.text('${_entry.author} · ${_entry.version}'), findsOneWidget);
+      expect(find.text(_entry.author), findsOneWidget);
+      expect(find.text(_entry.version), findsOneWidget);
       expect(find.text('Author'), findsNothing);
       expect(find.text('Version'), findsNothing);
       expect(find.text('Changelog'), findsNothing);
-      expect(find.byType(Group), findsOneWidget);
+      expect(find.byType(Group), findsNWidgets(installed ? 2 : 1));
       expect(tester.widget<VerifiedBadge>(find.byType(VerifiedBadge)).size, 18);
       final action = find.text(installed ? 'Open' : 'Install');
       // The team's own extensions describe themselves in the user's language.

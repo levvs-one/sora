@@ -463,18 +463,25 @@ class NetworkHostsList extends StatelessWidget {
 /// do: consent for system-wide filters, then TUN, the extension's profile and
 /// a connection. Throws [ExtAssetError] when the profile cannot run here.
 Future<void> connectExtensionBypass(BuildContext context, String id) async {
-  final store = ExtScope.of(context);
+  final sora = SoraScope.read(context);
   final choice = '$extensionBypassPrefix$id';
   if (!await ensureSystemFilterConsent(context, choice) || !context.mounted) return;
-  final profile = store.bypassProfile(choice);
+  final profile = sora.extensions.bypassProfile(choice);
   if (profile == null) throw ExtAssetError('bypass profile is unavailable');
-  final sora = SoraScope.read(context);
+  sora.rememberServer();
   await sora.change((settings) => settings.tunnel = 'tun', replan: false);
   await sora.select(profile.choiceId);
   sora.applyConnectionChanges();
   if (sora.selected == profile.choiceId && (sora.phase == Phase.off || sora.phase == Phase.offline)) {
     await sora.connect();
   }
+}
+
+/// Turns an extension's bypass on or off. Off goes back to the server it
+/// replaced and never stops a session another choice started.
+Future<void> setExtensionBypass(BuildContext context, String id, bool active) async {
+  if (active) return connectExtensionBypass(context, id);
+  await SoraScope.read(context).leaveBypass('$extensionBypassPrefix$id');
 }
 
 /// Localized text for store refusals the user can act on.

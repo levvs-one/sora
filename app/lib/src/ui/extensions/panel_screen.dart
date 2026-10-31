@@ -29,7 +29,7 @@ import '../../ext/store.dart';
 import '../../notifications.dart';
 import '../../core/link.dart';
 import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
-import 'widgets.dart' show connectExtensionBypass;
+import 'widgets.dart' show setExtensionBypass;
 
 /// The lockdown policy for extension panels. Panels are embedded WebViews
 /// whose only sanctioned way out is the host API (the private JS channel to
@@ -201,6 +201,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   static const _startupTimeout = Duration(seconds: 15);
 
   WebViewController? _controller;
+  String? _shownTheme;
   WebViewController? _preparingController;
   Timer? _startupTimer;
   Sora? _soraRef;
@@ -226,6 +227,7 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _followTheme();
     if (_depsReady) return;
     _depsReady = true;
     final store = ExtScope.of(context);
@@ -268,6 +270,17 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
 
   String get _bypassChoice => '$extensionBypassPrefix${widget.extensionId}';
 
+  String get _themeName => Theme.of(context).brightness == Brightness.dark ? 'dark' : 'light';
+
+  /// A panel follows the app's theme, not the system's, while it stays open.
+  void _followTheme() {
+    final name = _themeName;
+    if (name == _shownTheme) return;
+    final first = _shownTheme == null;
+    _shownTheme = name;
+    if (!first) unawaited(_controller?.runJavaScript("document.documentElement.dataset.theme = '$name'"));
+  }
+
   /// This extension's bypass as its panel sees it: the profiles its schema
   /// offers, the chosen one, and whether Sora runs it now.
   Future<Map<String, dynamic>> _getBypass() async {
@@ -297,18 +310,11 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
   /// connect flow, or off. Never stops a session another choice started.
   Future<void> _setBypass(bool active) async {
     if (!mounted) throw BridgeError('internal', 'the panel is closed');
-    final sora = SoraScope.read(context);
-    if (!active) {
-      if (sora.selected == _bypassChoice && sora.phase != Phase.off && sora.phase != Phase.offline) {
-        await sora.disconnect();
-      }
-      return;
-    }
-    if (ExtScope.of(context).bypassProfile(_bypassChoice) == null) {
+    if (active && ExtScope.of(context).bypassProfile(_bypassChoice) == null) {
       throw BridgeError('invalid-argument', 'the bypass is unavailable');
     }
     try {
-      await connectExtensionBypass(context, widget.extensionId);
+      await setExtensionBypass(context, widget.extensionId, active);
     } on ExtAssetError {
       throw BridgeError('invalid-argument', 'the bypass is unavailable');
     }
@@ -499,7 +505,9 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
       // that the WebView reports as navigator.language.
       final entry = _origin!.resolve(_panel.entry);
       final language = Localizations.localeOf(context).languageCode;
-      await controller.loadRequest(entry.replace(queryParameters: {...entry.queryParameters, 'lang': language}));
+      await controller.loadRequest(
+        entry.replace(queryParameters: {...entry.queryParameters, 'lang': language, 'theme': _themeName}),
+      );
       if (!mounted || generation != _generation) return;
       _watchSora();
     } catch (_) {

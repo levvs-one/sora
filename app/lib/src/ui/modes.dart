@@ -9,6 +9,7 @@ import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../sora.dart';
 import 'addserver.dart';
+import 'extensions/widgets.dart' show setExtensionBypass;
 import 'kit.dart';
 import 'subscription_sheet.dart';
 
@@ -308,9 +309,10 @@ class _EngineSegments extends StatelessWidget {
 }
 
 class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.text, {this.info});
+  const _SectionTitle(this.text, {this.info, this.sources = const []});
   final String text;
   final String? info;
+  final List<InfoSource> sources;
 
   @override
   Widget build(BuildContext context) {
@@ -323,7 +325,7 @@ class _SectionTitle extends StatelessWidget {
             text,
             style: Styles.secondary.copyWith(color: palette.ink2, fontWeight: FontWeight.w600),
           ),
-          if (info != null) InfoButton(title: text, description: info!, dense: true),
+          if (info != null) InfoButton(title: text, description: info!, sources: sources, dense: true),
         ],
       ),
     );
@@ -338,12 +340,6 @@ class _Modes extends StatelessWidget {
     final settings = sora.settings;
     final current = sora.bypassSelected ? sora.selected : settings.tunnel;
     Future<void> mode(String value) async {
-      if (sora.extensions.bypassProfile(value) != null) {
-        if (!await ensureSystemFilterConsent(context, value) || !context.mounted) return;
-        await sora.change((settings) => settings.tunnel = 'tun', replan: false);
-        await sora.select(value);
-        return;
-      }
       await sora.change((x) {
         if (value == 'bypass') {
           x.server = 'bypass';
@@ -355,7 +351,6 @@ class _Modes extends StatelessWidget {
       });
     }
 
-    final extensionProfiles = sora.extensions.bypassProfiles;
     final routes = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -385,21 +380,12 @@ class _Modes extends StatelessWidget {
             selected: current == 'bypass',
             onTap: () => unawaited(mode('bypass')),
           ),
-        for (final profile in extensionProfiles)
-          _ModeOption(
-            key: ValueKey('mode-${profile.choiceId}'),
-            icon: Symbols.extension_rounded,
-            title: profile.name,
-            hint: s.modeExtensionHint,
-            selected: current == profile.choiceId,
-            onTap: () => unawaited(mode(profile.choiceId)),
-          ),
       ],
     );
     final engines = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionTitle(s.engine, info: s.engineInfo),
+        _SectionTitle(s.engine, info: s.engineInfo, sources: Sources.engine),
         _EngineSegments(
           value: settings.engine,
           choices: [('', s.engineAuto), ('sing-box', 'sing-box'), ('xray', 'Xray'), ('mihomo', 'mihomo')],
@@ -445,6 +431,7 @@ class _Modes extends StatelessWidget {
                   key: const ValueKey('mihomo-tun-stack'),
                   title: s.tunStack,
                   info: s.tunStackInfo,
+                  sources: Sources.tunStack,
                   value: settings.mihomoTunStack,
                   choices: {'mixed': s.tunStackMixed, 'system': s.tunStackSystem, 'gvisor': 'gVisor', 'mips': 'MIPS'},
                   onChanged: (value) => unawaited(sora.change((x) => x.mihomoTunStack = value)),
@@ -456,6 +443,7 @@ class _Modes extends StatelessWidget {
                   key: const ValueKey('xray-tun-stack'),
                   title: s.tunStack,
                   info: s.tunStackInfo,
+                  sources: Sources.tunStack,
                   value: settings.xrayTunStack,
                   choices: {'gvisor': 'gVisor', 'system': s.tunStackSystem, 'mixed': s.tunStackMixed, 'mips': 'MIPS'},
                   onChanged: (value) => unawaited(sora.change((x) => x.xrayTunStack = value)),
@@ -472,6 +460,7 @@ class _Modes extends StatelessWidget {
                       SwitchTile(
                         title: s.killSwitch,
                         info: s.killSwitchInfo,
+                        sources: Sources.killSwitch,
                         value: settings.killSwitch,
                         onChanged: (v) => unawaited(sora.setKillSwitch(v)),
                       ),
@@ -480,6 +469,7 @@ class _Modes extends StatelessWidget {
                           key: const ValueKey('strict-kill-switch'),
                           title: s.strictKillSwitch,
                           info: s.strictKillSwitchInfo,
+                          sources: Sources.killSwitch,
                           value: settings.strictKillSwitch,
                           onChanged: (v) async {
                             if (v &&
@@ -494,10 +484,21 @@ class _Modes extends StatelessWidget {
                             await sora.setStrictKillSwitch(v);
                           },
                         ),
+                      for (final profile in sora.extensions.bypassProfiles)
+                        SwitchTile(
+                          key: ValueKey('protection-${profile.extensionId}'),
+                          title: profile.name,
+                          info: s.extensionBypassInfo,
+                          sources: Sources.bypass,
+                          value:
+                              sora.selected == profile.choiceId && sora.phase != Phase.off && sora.phase != Phase.offline,
+                          onChanged: (v) => unawaited(setExtensionBypass(context, profile.extensionId, v)),
+                        ),
                       if (Platform.isLinux && sora.serverlessAvailable)
                         SwitchTile(
                           title: s.zapretWithVpn,
                           info: s.zapretWithVpnInfo,
+                          sources: Sources.bypass,
                           value: settings.zapretWithVpn,
                           onChanged: (v) => unawaited(sora.change((x) => x.zapretWithVpn = v)),
                         ),

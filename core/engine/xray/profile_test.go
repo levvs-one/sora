@@ -149,3 +149,48 @@ func TestAProfileCannotReachBackOrTouchFiles(t *testing.T) {
 		t.Error("the latency check carries a file path from the profile")
 	}
 }
+
+func TestZapretCarriesTheDirectTrafficOfAProfile(t *testing.T) {
+	const withDirect = `{"outbounds":[{"tag":"vpn","protocol":"vless"},{"tag":"home","protocol":"freedom"}],
+ "routing":{"rules":[{"domain":["domain:example.ru"],"outboundTag":"home"},{"network":"tcp,udp","outboundTag":"vpn"}]}}`
+	p := profilePlan(true)
+	p.Outbounds[0].Profile = json.RawMessage(withDirect)
+	p.Outbounds = append(p.Outbounds, engine.Outbound{ID: engine.ZapretDirect, Protocol: engine.ProtocolSOCKS5, Server: "127.0.0.1", Port: 4100})
+	p.Rules[1].Target = engine.ZapretDirect
+	out, err := Render(p, supervise.Runtime{LocalPort: 4000}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg map[string]any
+	if err := json.Unmarshal(out, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	socks := false
+	for _, item := range cfg["outbounds"].([]any) {
+		o := item.(map[string]any)
+		if o["tag"] == profileZapret && o["protocol"] == "socks" {
+			server := o["settings"].(map[string]any)["servers"].([]any)[0].(map[string]any)
+			socks = server["port"] == float64(4100)
+		}
+	}
+	if !socks {
+		t.Fatalf("no DPI outbound: %s", out)
+	}
+	var session, provider, vpn string
+	for _, item := range cfg["routing"].(map[string]any)["rules"].([]any) {
+		rule := item.(map[string]any)
+		tag, _ := rule["outboundTag"].(string)
+		domains, _ := rule["domain"].([]any)
+		switch {
+		case slices.Contains(domains, any("domain:ru")):
+			session = tag
+		case slices.Contains(domains, any("domain:example.ru")):
+			provider = tag
+		case tag == "vpn":
+			vpn = tag
+		}
+	}
+	if session != profileZapret || provider != profileZapret || vpn != "vpn" {
+		t.Fatalf("session %q, provider %q, vpn %q: %s", session, provider, vpn, out)
+	}
+}

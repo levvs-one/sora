@@ -71,6 +71,7 @@ class Settings {
     'networkProfiles',
     'proxyChains',
     'zapretWithVpn',
+    'profilesEnabled',
   };
 
   final SharedPreferencesWithCache _store;
@@ -326,6 +327,10 @@ class Settings {
   set proxyChains(String value) => _store.setString('proxyChains', value);
 
   /// Run zapret for direct traffic alongside the VPN tunnel (F11, Linux only).
+  /// Network profiles do nothing until they are turned on.
+  bool get profilesEnabled => _store.getBool('profilesEnabled') ?? false;
+  set profilesEnabled(bool value) => _store.setBool('profilesEnabled', value);
+
   bool get zapretWithVpn => _store.getBool('zapretWithVpn') ?? false;
   set zapretWithVpn(bool value) => _store.setBool('zapretWithVpn', value);
 
@@ -403,6 +408,7 @@ class Settings {
     'autoSwitchOnDegrade': 'b',
     'restoreOnCrash': 'b',
     'zapretWithVpn': 'b',
+    'profilesEnabled': 'b',
     'probeTimeout': 'i',
     'dns': 'sl',
     'splitPos': 'sl',

@@ -44,6 +44,9 @@ const (
 	// ProtocolWinws selects a system-wide Windows filter, not a proxy. Older
 	// cores reject this name instead of silently routing its traffic direct.
 	ProtocolWinws Protocol = "winws"
+	// ZapretDirect is the reserved outbound that reshapes direct traffic while a
+	// VPN carries the rest. It is the only outbound that may join a profile.
+	ZapretDirect = "sora-zapret-direct"
 	// ProtocolXrayProfile runs a provider's full Xray configuration within
 	// the session, preserving outbounds, balancers, and routing. Only Xray
 	// supports it.

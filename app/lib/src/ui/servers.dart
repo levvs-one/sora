@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -14,7 +15,6 @@ import '../groups.dart';
 import '../sora.dart';
 import '../notifications.dart';
 import 'addserver.dart';
-import 'benchmark.dart';
 import 'kit.dart';
 import 'qr.dart';
 import 'subscription.dart';
@@ -129,9 +129,6 @@ class _ServersScreenState extends State<ServersScreen> {
       SliverToBoxAdapter(
         child: Column(
           children: [
-            const BackgroundFailureState(source: 'probe'),
-            const BackgroundFailureState(source: 'benchmark'),
-            const BackgroundFailureState(source: 'custom-servers'),
             if (empty)
               Center(
                 child: ConstrainedBox(
@@ -331,16 +328,20 @@ class _ServerRow extends StatelessWidget {
     final staleBps = bps == null ? sora.bandwidth[measuredId]?.bps : null;
     final group = entry;
     final detail = group?.members.map(protocolLine).toSet().join(' | ');
+    final server = shown ?? sora.servers.where((o) => o.id == id).firstOrNull;
     return Semantics(
       selected: chosen,
       button: true,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: chosen ? palette.field : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Pressable(
-          onTap: () => unawaited(sora.select(id)),
+      child: GestureDetector(
+        onSecondaryTapUp: server == null ? null : (details) => unawaited(_menu(context, details.globalPosition, server)),
+        onLongPressStart: server == null ? null : (details) => unawaited(_menu(context, details.globalPosition, server)),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: chosen ? palette.field : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Pressable(
+            onTap: () => unawaited(sora.select(id)),
           radius: 8,
           give: 1,
           child: SizedBox(
@@ -413,11 +414,87 @@ class _ServerRow extends StatelessWidget {
                 ],
               ),
             ),
+            ),
           ),
         ),
       ),
     );
   }
+
+  Future<void> _menu(BuildContext context, Offset at, OutboundSpec server) async {
+    final s = S.of(context);
+    final palette = Palette.of(context);
+    final area = Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final show = await showMenu<bool>(
+      context: context,
+      position: RelativeRect.fromRect(at & Size.zero, Offset.zero & area.size),
+      color: palette.raised,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: palette.shadow,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      items: [
+        PopupMenuItem(
+          value: true,
+          height: 40,
+          child: Text(s.serverConfig, style: Styles.secondary.copyWith(color: palette.ink)),
+        ),
+      ],
+    );
+    if (show == true && context.mounted) await showServerConfig(context, server);
+  }
+}
+
+/// Shows the configuration behind a server, with its credentials, to copy.
+Future<void> showServerConfig(BuildContext context, OutboundSpec server) async {
+  final sora = SoraScope.read(context);
+  final String config;
+  try {
+    config = await sora.serverConfig(server);
+  } catch (error) {
+    sora.reportFailure(error, source: 'server-config', mode: FailureMode.action);
+    return;
+  }
+  if (!context.mounted) return;
+  final s = S.of(context);
+  final palette = Palette.of(context);
+  await showDialog<void>(
+    context: context,
+    barrierColor: palette.scrim,
+    builder: (context) => AlertDialog(
+      key: const ValueKey('server-config-dialog'),
+      backgroundColor: palette.raised,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      constraints: const BoxConstraints(maxWidth: 640),
+      insetPadding: const EdgeInsets.all(24),
+      titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      title: Text(sora.displayNameOf(server.id), style: Styles.heading.copyWith(color: palette.ink)),
+      content: SizedBox(
+        width: 592,
+        height: 420,
+        child: SingleChildScrollView(
+          child: SelectableText(
+            config,
+            style: Styles.figures(Styles.caption).copyWith(color: palette.ink, height: 1.5),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => unawaited(Clipboard.setData(ClipboardData(text: config))),
+          child: Text(s.copy, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(s.close, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+        ),
+      ],
+    ),
+  );
 }
 
 class _SubscriptionHeader extends StatefulWidget {
@@ -544,14 +621,6 @@ class _SubscriptionHeaderState extends State<_SubscriptionHeader> {
                     _item(context, s.providerWebsite, () => unawaited(openLink(context, info.webPageUrl))),
                   if (info.supportUrl.isNotEmpty)
                     _item(context, s.support, () => unawaited(openLink(context, info.supportUrl))),
-                  if (sora.canBenchmark && state.outbounds.isNotEmpty)
-                    _item(
-                      context,
-                      s.measureSpeed,
-                      () => unawaited(
-                        push<void>(context, BenchmarkScreen(serverIds: [for (final o in state.outbounds) o.id])),
-                      ),
-                    ),
                   _item(
                     context,
                     s.subscriptionSettings,

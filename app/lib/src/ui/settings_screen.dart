@@ -14,7 +14,6 @@ import '../settings.dart';
 import '../sora.dart';
 import 'about.dart';
 import 'chains.dart';
-import 'connections.dart';
 import 'dns.dart';
 import 'kit.dart';
 import 'language.dart';
@@ -272,7 +271,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             SwitchTile(
               title: s.failover,
-              info: s.failoverInfo,
+              info: s.failoverInfo, sources: Sources.failover,
               value: settings.failover,
               onChanged: (v) => set((x) => x.failover = v),
             ),
@@ -281,7 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.restoreOnCrash,
               onChanged: (v) => set((x) => x.restoreOnCrash = v, replan: false),
             ),
-            SwitchTile(title: s.ipv6, info: s.ipv6Info, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
+            SwitchTile(title: s.ipv6, info: s.ipv6Info, sources: Sources.ipv6, value: settings.ipv6, onChanged: (v) => set((x) => x.ipv6 = v)),
             LinkTile(
               title: s.dns,
               value: _dnsSummary(s, settings),
@@ -304,7 +303,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             LinkTile(title: s.sync, onTap: () => push<void>(context, const SyncScreen())),
             SwitchTile(
               title: s.fragment,
-              info: s.fragmentInfo,
+              info: s.fragmentInfo, sources: Sources.fragment,
               value: settings.fragment,
               onChanged: (v) => set((x) => x.fragment = v),
             ),
@@ -352,7 +351,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               LinkTile(
                 title: s.splitPos,
-                info: s.splitPosInfo,
+                info: s.splitPosInfo, sources: Sources.split,
                 value: settings.splitPos.join(', '),
                 onTap: () => _edit(
                   title: s.splitPos,
@@ -364,20 +363,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SwitchTile(
                 title: s.disorder,
-                info: s.disorderInfo,
+                info: s.disorderInfo, sources: Sources.disorder,
                 value: settings.disorder,
                 onChanged: (v) => set((x) => x.disorder = v),
               ),
               ChoiceTile<String>(
                 title: s.tlsRecord,
-                info: s.tlsRecordInfo,
+                info: s.tlsRecordInfo, sources: Sources.tlsRecord,
                 value: settings.tlsRecord,
                 choices: {'': s.tlsRecordNo, if (!Platform.isWindows) 'sniext': s.tlsRecordSni, '1': s.tlsRecordFirst},
                 onChanged: (v) => set((x) => x.tlsRecord = v),
               ),
               SwitchTile(
                 title: s.hostCase,
-                info: s.hostCaseInfo,
+                info: s.hostCaseInfo, sources: Sources.hostCase,
                 value: settings.hostCase,
                 onChanged: (v) => set((x) => x.hostCase = v),
               ),
@@ -389,7 +388,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             ChoiceTile<String>(
               title: s.probeMethod,
-              info: s.probeMethodInfo,
+              info: s.probeMethodInfo, sources: Sources.probe,
               value: settings.probeMethod,
               choices: {
                 'auto': s.probeAuto,
@@ -416,13 +415,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.probeTimeout,
               choices: {0: s.byDefault, 2000: s.seconds(2), 5000: s.seconds(5), 10000: s.seconds(10)},
               onChanged: (v) => set((x) => x.probeTimeout = v, replan: false),
-            ),
-            ChoiceTile<String>(
-              title: s.autoSelectMode,
-              info: s.autoSelectInfo,
-              value: settings.autoSelectMode,
-              choices: {'ping': s.autoSelectPing, 'speed': s.autoSelectSpeed, 'smart': s.autoSelectSmart},
-              onChanged: (v) => set((x) => x.autoSelectMode = v),
             ),
             SwitchTile(
               title: s.autoSwitchOnDegrade,
@@ -467,7 +459,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
             LinkTile(title: s.logs, onTap: () => push<void>(context, const LogsScreen())),
-            LinkTile(title: s.connections, onTap: () => push<void>(context, const ConnectionsScreen())),
           ],
         ),
 
