@@ -333,8 +333,12 @@ class _ServerRow extends StatelessWidget {
       selected: chosen,
       button: true,
       child: GestureDetector(
-        onSecondaryTapUp: server == null ? null : (details) => unawaited(_menu(context, details.globalPosition, server)),
-        onLongPressStart: server == null ? null : (details) => unawaited(_menu(context, details.globalPosition, server)),
+        onSecondaryTapUp: server == null
+            ? null
+            : (details) => unawaited(_menu(context, details.globalPosition, server)),
+        onLongPressStart: server == null
+            ? null
+            : (details) => unawaited(_menu(context, details.globalPosition, server)),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: chosen ? palette.field : Colors.transparent,
@@ -342,78 +346,78 @@ class _ServerRow extends StatelessWidget {
           ),
           child: Pressable(
             onTap: () => unawaited(sora.select(id)),
-          radius: 8,
-          give: 1,
-          child: SizedBox(
-            height: entry == null ? 48 : 56,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text.rich(
-                          serverNameSpan(name),
-                          semanticsLabel: name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Styles.row.copyWith(color: palette.ink),
-                        ),
-                        if (detail != null && detail.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 3),
-                            child: Row(
-                              children: [
-                                if (detail.isNotEmpty)
-                                  Expanded(
-                                    child: Text(
-                                      detail,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Styles.caption.copyWith(color: palette.ink3),
+            radius: 8,
+            give: 1,
+            child: SizedBox(
+              height: entry == null ? 48 : 56,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
+                            serverNameSpan(name),
+                            semanticsLabel: name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Styles.row.copyWith(color: palette.ink),
+                          ),
+                          if (detail != null && detail.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 3),
+                              child: Row(
+                                children: [
+                                  if (detail.isNotEmpty)
+                                    Expanded(
+                                      child: Text(
+                                        detail,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Styles.caption.copyWith(color: palette.ink3),
+                                      ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    width: 84,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (pinging)
-                          CupertinoActivityIndicator(key: ValueKey('ping-row-$id'), radius: 8, color: palette.ink)
-                        else
-                          Text(
-                            !measured
-                                ? ''
-                                : ms == null
-                                ? s.noAnswer
-                                : s.milliseconds(ms),
-                            textAlign: TextAlign.right,
-                            style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
-                          ),
-                        if (bps != null || staleBps != null)
-                          Text(
-                            s.speedMbps(mbpsOf(bps ?? staleBps!)),
-                            textAlign: TextAlign.right,
-                            style: Styles.figures(Styles.caption)
-                                .copyWith(color: bps != null ? palette.ink2 : palette.ink3),
-                          ),
-                      ],
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 84,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (pinging)
+                            CupertinoActivityIndicator(key: ValueKey('ping-row-$id'), radius: 8, color: palette.ink)
+                          else
+                            Text(
+                              !measured
+                                  ? ''
+                                  : ms == null
+                                  ? s.noAnswer
+                                  : s.milliseconds(ms),
+                              textAlign: TextAlign.right,
+                              style: Styles.figures(Styles.caption).copyWith(color: palette.ink2),
+                            ),
+                          if (bps != null || staleBps != null)
+                            Text(
+                              s.speedMbps(mbpsOf(bps ?? staleBps!)),
+                              textAlign: TextAlign.right,
+                              style: Styles.figures(Styles.caption)
+                                  .copyWith(color: bps != null ? palette.ink2 : palette.ink3),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
             ),
           ),
         ),

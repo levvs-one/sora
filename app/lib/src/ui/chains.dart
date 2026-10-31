@@ -80,10 +80,7 @@ class _ChainsScreenState extends State<ChainsScreen> {
                     ),
                     if (!showUnsupported) ...[
                       const SizedBox(height: 16),
-                      PrimaryButton(
-                        label: s.chainAdd,
-                        onTap: () => push<void>(context, const ChainBuilderScreen()),
-                      ),
+                      PrimaryButton(label: s.chainAdd, onTap: () => push<void>(context, const ChainBuilderScreen())),
                     ],
                   ],
                 ),

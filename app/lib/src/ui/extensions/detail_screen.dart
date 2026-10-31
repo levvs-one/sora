@@ -399,7 +399,8 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                 title: s.extBypassRun,
                 info: s.extensionBypassInfo,
                 sources: Sources.bypass,
-                value: sora != null && sora.selected == bypass && sora.phase != Phase.off && sora.phase != Phase.offline,
+                value:
+                    sora != null && sora.selected == bypass && sora.phase != Phase.off && sora.phase != Phase.offline,
                 onChanged: _saving
                     ? null
                     : (v) => unawaited(v ? _connectBypass(live.id) : setExtensionBypass(context, live.id, false)),

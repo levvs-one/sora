@@ -411,13 +411,20 @@ abstract final class Sources {
     InfoSource('sing-box: TUN', 'https://sing-box.sagernet.org/configuration/inbound/tun/'),
     InfoSource('gVisor: networking', 'https://gvisor.dev/docs/user_guide/networking/'),
   ];
-  static const killSwitch = [InfoSource('Proton VPN: kill switch', 'https://protonvpn.com/support/what-is-kill-switch')];
+  static const killSwitch = [
+    InfoSource('Proton VPN: kill switch', 'https://protonvpn.com/support/what-is-kill-switch'),
+  ];
   static const bypass = [_dpi, _zapret];
-  static const failover = [InfoSource('mihomo: fallback', 'https://wiki.metacubex.one/en/config/proxy-groups/fallback/')];
+  static const failover = [
+    InfoSource('mihomo: fallback', 'https://wiki.metacubex.one/en/config/proxy-groups/fallback/'),
+  ];
   static const ipv6 = [
     InfoSource('Wikipedia: IPv6', 'https://en.wikipedia.org/wiki/IPv6', 'https://ru.wikipedia.org/wiki/IPv6'),
   ];
-  static const fragment = [_sni, InfoSource('Xray: fragment', 'https://xtls.github.io/en/config/outbounds/freedom.html')];
+  static const fragment = [
+    _sni,
+    InfoSource('Xray: fragment', 'https://xtls.github.io/en/config/outbounds/freedom.html'),
+  ];
   static const split = [_sni, _zapret];
   static const disorder = [_tcp, _zapret];
   static const tlsRecord = [_tls, _zapret];
@@ -610,7 +617,14 @@ class Tile extends StatelessWidget {
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, this.sources = const [], required this.title, required this.value, required this.onChanged, this.info});
+  const SwitchTile({
+    super.key,
+    this.sources = const [],
+    required this.title,
+    required this.value,
+    required this.onChanged,
+    this.info,
+  });
 
   final String title;
 

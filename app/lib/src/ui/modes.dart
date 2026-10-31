@@ -491,7 +491,9 @@ class _Modes extends StatelessWidget {
                           info: s.extensionBypassInfo,
                           sources: Sources.bypass,
                           value:
-                              sora.selected == profile.choiceId && sora.phase != Phase.off && sora.phase != Phase.offline,
+                              sora.selected == profile.choiceId &&
+                              sora.phase != Phase.off &&
+                              sora.phase != Phase.offline,
                           onChanged: (v) => unawaited(setExtensionBypass(context, profile.extensionId, v)),
                         ),
                       if (Platform.isLinux && sora.serverlessAvailable)
