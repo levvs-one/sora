@@ -16,6 +16,7 @@ import (
 
 	"github.com/levvs-one/sora-client/core/engine"
 	"github.com/levvs-one/sora-client/core/engine/supervise"
+	"github.com/levvs-one/sora-client/core/errs"
 	"github.com/levvs-one/sora-client/core/logs"
 )
 
@@ -107,6 +108,30 @@ type proxy struct {
 // Wrap adds bypass outbounds using the installed platform proxy.
 func Wrap(inner engine.Engine, binary, home string, center *logs.Center, protocol engine.Protocol) *Engine {
 	return &Engine{Engine: inner, binary: binary, home: home, logs: center, protocol: protocol, procs: map[string]*proxy{}}
+}
+
+// Connections keeps the connection list of the engine under the proxy.
+func (e *Engine) Connections(ctx context.Context) ([]engine.Connection, error) {
+	if tracker, ok := e.Engine.(engine.ConnectionTracker); ok {
+		return tracker.Connections(ctx)
+	}
+	return nil, errs.Newf(errs.CodeUnsupported, errs.KeyConnectionsUnavailable, "bypass: the engine cannot list connections")
+}
+
+// CloseConnection leaves the connection to the engine that owns it.
+func (e *Engine) CloseConnection(ctx context.Context, id string) error {
+	if tracker, ok := e.Engine.(engine.ConnectionTracker); ok {
+		return tracker.CloseConnection(ctx, id)
+	}
+	return errs.Newf(errs.CodeUnsupported, errs.KeyConnectionsUnavailable, "bypass: the engine cannot close connections")
+}
+
+// CloseConnections leaves bulk close to the engine under the proxy.
+func (e *Engine) CloseConnections(ctx context.Context) error {
+	if tracker, ok := e.Engine.(engine.ConnectionTracker); ok {
+		return tracker.CloseConnections(ctx)
+	}
+	return errs.Newf(errs.CodeUnsupported, errs.KeyConnectionsUnavailable, "bypass: the engine cannot close connections")
 }
 
 // Validate checks the plan the engine will run.

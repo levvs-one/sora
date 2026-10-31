@@ -187,6 +187,15 @@ class CoreControlClient extends $grpc.Client {
     return $createUnaryCall(_$listConnections, request, options: options);
   }
 
+  /// The configuration behind one server, with its credentials, for the person
+  /// who owns it. Needs the control authenticator.
+  $grpc.ResponseFuture<$0.GetServerConfigResponse> getServerConfig(
+    $0.GetServerConfigRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$getServerConfig, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.CloseConnectionResponse> closeConnection(
     $0.CloseConnectionRequest request, {
     $grpc.CallOptions? options,
@@ -435,6 +444,10 @@ class CoreControlClient extends $grpc.Client {
       '/sora.core.v1.CoreControl/ListConnections',
       ($0.ListConnectionsRequest value) => value.writeToBuffer(),
       $0.ListConnectionsResponse.fromBuffer);
+  static final _$getServerConfig = $grpc.ClientMethod<$0.GetServerConfigRequest, $0.GetServerConfigResponse>(
+      '/sora.core.v1.CoreControl/GetServerConfig',
+      ($0.GetServerConfigRequest value) => value.writeToBuffer(),
+      $0.GetServerConfigResponse.fromBuffer);
   static final _$closeConnection = $grpc.ClientMethod<$0.CloseConnectionRequest, $0.CloseConnectionResponse>(
       '/sora.core.v1.CoreControl/CloseConnection',
       ($0.CloseConnectionRequest value) => value.writeToBuffer(),
@@ -668,6 +681,13 @@ abstract class CoreControlServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.ListConnectionsRequest.fromBuffer(value),
         ($0.ListConnectionsResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetServerConfigRequest, $0.GetServerConfigResponse>(
+        'GetServerConfig',
+        getServerConfig_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetServerConfigRequest.fromBuffer(value),
+        ($0.GetServerConfigResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.CloseConnectionRequest, $0.CloseConnectionResponse>(
         'CloseConnection',
         closeConnection_Pre,
@@ -952,6 +972,13 @@ abstract class CoreControlServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.ListConnectionsResponse> listConnections($grpc.ServiceCall call, $0.ListConnectionsRequest request);
+
+  $async.Future<$0.GetServerConfigResponse> getServerConfig_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.GetServerConfigRequest> $request) async {
+    return getServerConfig($call, await $request);
+  }
+
+  $async.Future<$0.GetServerConfigResponse> getServerConfig($grpc.ServiceCall call, $0.GetServerConfigRequest request);
 
   $async.Future<$0.CloseConnectionResponse> closeConnection_Pre(
       $grpc.ServiceCall $call, $async.Future<$0.CloseConnectionRequest> $request) async {

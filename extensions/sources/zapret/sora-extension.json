@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "id": "org.sora.zapret",
   "name": "Zapret",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "min_app_version": "1.1.6",
   "description": "Blocking bypass without a VPN: reshapes the start of connections so the provider cannot recognise the site. A panel shows its state and switches profiles.",
   "author": {

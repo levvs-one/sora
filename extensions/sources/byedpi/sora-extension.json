@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "id": "org.sora.byedpi",
   "name": "ByeDPI",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "min_app_version": "1.1.6",
   "description": "Blocking bypass without a VPN through the local ByeDPI proxy. A panel shows its state and switches profiles.",
   "author": {

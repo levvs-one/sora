@@ -42,21 +42,21 @@ The script picks the packages for your system and architecture and checks their 
 
 | System | Files | By hand |
 | --- | --- | --- |
-| Windows 10 1809+ and Windows 11, x64 | `Sora-Setup-<version>-x64.exe` | run the installer |
-| Debian, Ubuntu, amd64 and ARM64 | `sora_<version>_<arch>.deb` and `sora-core_<version>_<arch>.deb` | `apt install ./sora*.deb` |
-| Fedora, openSUSE, x86_64 and aarch64 | `sora-<version>-1.<arch>.rpm` and `sora-core-<version>-1.<arch>.rpm` | `dnf install ./sora*.rpm` |
-| Arch, x86_64 and aarch64 | `sora-<version>-1-<arch>.pkg.tar.zst` and `sora-core-…` | `pacman -U sora*.pkg.tar.zst` |
+| Windows 10 1809+ and Windows 11, x64 | `Sora-Setup-*-x64.exe` | run the installer |
+| Debian, Ubuntu, amd64 and ARM64 | `sora_*.deb` and `sora-core_*.deb` | `apt install ./sora*.deb` |
+| Fedora, openSUSE, x86_64 and aarch64 | `sora-*.rpm` and `sora-core-*.rpm` | `dnf install ./sora*.rpm` |
+| Arch, x86_64 and aarch64 | `sora-*.pkg.tar.zst` and `sora-core-*.pkg.tar.zst` | `pacman -U sora*.pkg.tar.zst` |
 
-All files are on the [releases page](https://github.com/levvs-one/sora/releases/latest), details in [docs/install.md](docs/install.md). Older Windows versions use the separate [sora-legacy](https://github.com/levvs-one/sora-legacy) client.
+The star stands for the version and architecture. All files are on the [releases page](https://github.com/levvs-one/sora/releases/latest), details in [docs/install.md](docs/install.md). Older Windows versions use the separate [sora-legacy](https://github.com/levvs-one/sora-legacy) client.
 
 ## Features
 
 - **Subscriptions.** Subscription links, including Xray JSON subscriptions. Scheduled refresh, remaining traffic, expiry and provider announcements. Your own edits on top of a subscription (rename, hide a server) survive its refresh.
 - **Protocols and engines.** VLESS, VMess, Trojan, Shadowsocks, Hysteria2, TUIC, WireGuard and AmneziaWG, with REALITY and XHTTP transports. Three engines, sing-box, Xray and mihomo, chosen per connection.
-- **Server choice.** Automatic choice by latency, measured throughput or both, failover and switching away from a badly degraded server, chains of two or three servers, and servers you add by hand.
+- **Server choice.** Automatic choice by latency, failover and switching away from a badly degraded server, chains of two or three servers, and servers you add by hand.
 - **Traffic protection.** A virtual adapter (TUN) or the system proxy. A kill switch, and an optional strict mode that keeps the block even after the app crashes, until you disconnect on purpose. Rules by site, IP address and app.
 - **Checks.** DNS, IPv6 and tunnel leak tests with a suggested fix. A connections screen grouped by app, a log and diagnostics export.
-- **Network profiles.** Settings bound to a Wi-Fi network, gateway or provider, applied on request or on their own.
+- **Network profiles.** Settings bound to a Wi-Fi network, gateway or provider, applied on request or on their own once profiles are turned on.
 - **Sync.** Subscriptions, rules and settings between your computers on the local network: QR pairing, end-to-end encryption, no accounts and no cloud.
 - **Extensions.** A catalog of signed extensions: panels, themes, routing rules and background tasks that may fetch allowlisted addresses through the VPN only. Permissions are confirmed at install. See [docs/extensions.md](docs/extensions.md).
 - **zapret on Linux.** DPI bypass without a server, and next to the VPN for direct traffic. It does not hide your IP address or replace a VPN.

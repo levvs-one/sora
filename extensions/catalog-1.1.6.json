@@ -1,55 +1,12 @@
 {
   "catalog_version": 1,
-  "updated_at": "2026-10-30T07:52:36Z",
+  "updated_at": "2026-10-31T19:49:41Z",
   "max_age": 3600,
   "extensions": [
     {
-      "id": "org.sora.hello-panel",
-      "name": "Hello Panel",
-      "version": "1.0.1",
-      "description": "The official example extension: a panel with live connection statistics.",
-      "author": "Sora",
-      "author_identity": "github:levvs-one",
-      "author_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+",
-      "icon_url": "",
-      "rating": 0,
-      "ratings_count": 0,
-      "installs": 0,
-      "badges": [
-        "staff"
-      ],
-      "categories": [
-        "tools"
-      ],
-      "capabilities": [
-        "ui-panel"
-      ],
-      "permissions": [
-        "connections.read",
-        "notifications",
-        "ui.panel"
-      ],
-      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/hello-panel-1.0.1.soraext",
-      "sha256": "d79d76b14bdaef7c484580cf595c8c5c52517fd5c1ea7017c9adef48fced7689",
-      "size": 492845,
-      "min_app_version": "1.1.3",
-      "changelog": [
-        {
-          "version": "1.0.1",
-          "date": "2026-10-28T22:44:38Z",
-          "notes": "Native dialog, quiet automatic refresh and a bundled Inter font."
-        },
-        {
-          "version": "1.0.0",
-          "date": "2026-10-21T03:16:12Z",
-          "notes": "First catalog release."
-        }
-      ]
-    },
-    {
       "id": "org.sora.zapret",
       "name": "Zapret",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Blocking bypass without a VPN: reshapes the start of connections so the provider cannot recognise the site. A panel shows its state and switches profiles.",
       "author": "Sora",
       "author_identity": "github:levvs-one",
@@ -76,11 +33,16 @@
         "linux",
         "windows"
       ],
-      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/zapret-1.1.0.soraext",
-      "sha256": "52d02a97db5b1400aa1024da5ccca3b051b64fa3f67c6841f594abb4b2f6f04b",
-      "size": 495030,
+      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/zapret-1.1.1.soraext",
+      "sha256": "49f09ccfe3488dab64975468a61416d19ebbaeab32dacc9eee34ff70f6dd74c7",
+      "size": 494461,
       "min_app_version": "1.1.6",
       "changelog": [
+        {
+          "version": "1.1.1",
+          "date": "2026-10-31T19:49:41Z",
+          "notes": "The panel matches Sora and follows its light or dark theme."
+        },
         {
           "version": "1.1.0",
           "date": "2026-10-30T07:52:36Z",
@@ -96,7 +58,7 @@
     {
       "id": "org.sora.byedpi",
       "name": "ByeDPI",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "Blocking bypass without a VPN through the local ByeDPI proxy. A panel shows its state and switches profiles.",
       "author": "Sora",
       "author_identity": "github:levvs-one",
@@ -123,11 +85,16 @@
         "linux",
         "windows"
       ],
-      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/byedpi-1.1.0.soraext",
-      "sha256": "c3e5af97e03fadfb83929f5e4729be2e28af0ef253e57eeb31c2c4fcd040e9b9",
-      "size": 494894,
+      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/byedpi-1.1.1.soraext",
+      "sha256": "73471b5e5db6d4aed7dc7fc0360d79c2dbbe6073e8f4f6a1e09a9c1b662079a5",
+      "size": 494324,
       "min_app_version": "1.1.6",
       "changelog": [
+        {
+          "version": "1.1.1",
+          "date": "2026-10-31T19:49:41Z",
+          "notes": "The panel matches Sora and follows its light or dark theme."
+        },
         {
           "version": "1.1.0",
           "date": "2026-10-30T07:52:36Z",

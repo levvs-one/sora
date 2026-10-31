@@ -44,9 +44,8 @@ class DesktopShell extends StatefulWidget {
 }
 
 class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver {
-  // Connections (2) opens from Settings; About (7) stays last and is pinned
-  // at the sidebar bottom.
-  static const _sectionOrder = [0, 6, 8, 4, 1, 3, 5, 7];
+  // About (7) stays last and is pinned at the sidebar bottom.
+  static const _sectionOrder = [0, 6, 8, 2, 4, 1, 3, 5, 7];
 
   // Section widgets by section index. All are const constructors and only
   // the selected one is ever inflated (by the content Navigator below), so
@@ -242,6 +241,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
       LogicalKeyboardKey.digit6,
       LogicalKeyboardKey.digit7,
       LogicalKeyboardKey.digit8,
+      LogicalKeyboardKey.digit9,
     ];
     final index = numbers.indexOf(key);
     if (index >= 0) {

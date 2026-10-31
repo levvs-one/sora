@@ -259,6 +259,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                               onSave: () => _saveSettings(m.id),
                             ),
                           ],
+                          if (live != null) _manage(context, store, m, live),
                         ],
                       ),
                     ),
@@ -284,7 +285,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       children: [
         Row(
           children: [
-            ExtensionIcon(capabilities: capabilities, size: 60),
+            ExtensionIcon(capabilities: capabilities, size: 52),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -295,7 +296,20 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                     verified: live == null ? (entry?.badges.contains('staff') ?? false) : isTeamExtension(live),
                   ),
                   const SizedBox(height: 4),
-                  Text('${m.author.name} · ${m.version}', style: Styles.secondary.copyWith(color: palette.ink2)),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          m.author.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Styles.secondary.copyWith(color: palette.ink2),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(m.version, style: Styles.figures(Styles.secondary).copyWith(color: palette.ink2)),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -317,6 +331,8 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     CatalogEntry? entry,
   ) {
     final s = S.of(context);
+    final sora = context.dependOnInheritedWidgetOfExactType<SoraScope>()?.notifier;
+    final bypass = '$extensionBypassPrefix${m.id}';
     final compatibility = entry == null ? null : catalogCompatibilityText(s, entry);
     if (live == null && compatibility != null) {
       return Row(
@@ -331,7 +347,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
     }
     if (live == null) {
       // Not installed: install straight from the detail screen.
-      return PrimaryButton(label: s.extInstall, onTap: entry == null ? null : () => widget.onInstall?.call(entry));
+      return _Action(label: s.extInstall, onTap: entry == null ? null : () => widget.onInstall?.call(entry));
     }
     final needsUpdate =
         entry != null && compareVersions(entry.version, live.version) > 0 && entry.rolloutEligible(store.installId);
@@ -354,7 +370,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
               ],
             )
           else
-            PrimaryButton(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
+            _Action(label: s.extUpdateTo(entry.version), onTap: () => widget.onInstall?.call(entry)),
         ],
         if (live.enabled && m.panels.length == 1) ...[
           if (needsUpdate)
@@ -364,40 +380,62 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
               onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: m.panels.single.id)),
             )
           else
-            PrimaryButton(
+            _Action(
               label: s.extOpen,
               onTap: () => push<void>(context, ExtensionPanelScreen(extensionId: live.id, panelId: m.panels.single.id)),
             ),
           const SizedBox(height: 12),
         ],
-        if (store.bypassProfile('$extensionBypassPrefix${live.id}') != null) ...[
-          PrimaryButton(label: s.trayConnect, busy: _saving, onTap: _saving ? null : () => _connectBypass(live.id)),
-          const SizedBox(height: 12),
-        ],
-        SwitchTile(
-          title: s.extEnabled,
-          value: live.enabled,
-          onChanged: (v) => toggleExtension(context, store, live.id, v),
-        ),
-        if (live.previous != null) ...[
-          const SizedBox(height: 8),
-          _QuietButton(
-            label: s.extRollbackTo(live.previous!),
-            icon: Symbols.history_rounded,
-            onTap: () => _confirm(context, s.extRollbackConfirm(live.previous!), () => store.rollback(live.id)),
-          ),
-        ],
-        const SizedBox(height: 8),
-        _QuietButton(
-          label: s.extUninstall,
-          icon: Symbols.delete_rounded,
-          danger: true,
-          onTap: () => _confirm(context, s.extUninstallConfirm(m.name), () async {
-            await store.uninstall(live.id);
-            if (context.mounted) Navigator.pop(context);
-          }),
+        Group(
+          children: [
+            SwitchTile(
+              title: s.extEnabled,
+              value: live.enabled,
+              onChanged: (v) => toggleExtension(context, store, live.id, v),
+            ),
+            if (store.bypassProfile(bypass) != null)
+              SwitchTile(
+                key: const ValueKey('extension-bypass'),
+                title: s.extBypassRun,
+                info: s.extensionBypassInfo,
+                sources: Sources.bypass,
+                value:
+                    sora != null && sora.selected == bypass && sora.phase != Phase.off && sora.phase != Phase.offline,
+                onChanged: _saving
+                    ? null
+                    : (v) => unawaited(v ? _connectBypass(live.id) : setExtensionBypass(context, live.id, false)),
+              ),
+          ],
         ),
       ],
+    );
+  }
+
+  /// Rollback and removal end the page, away from everyday controls.
+  Widget _manage(BuildContext context, ExtensionStore store, ExtManifest m, InstalledExtension live) {
+    final s = S.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Wrap(
+        spacing: 8,
+        children: [
+          if (live.previous != null)
+            _QuietButton(
+              label: s.extRollbackTo(live.previous!),
+              icon: Symbols.history_rounded,
+              onTap: () => _confirm(context, s.extRollbackConfirm(live.previous!), () => store.rollback(live.id)),
+            ),
+          _QuietButton(
+            label: s.extUninstall,
+            icon: Symbols.delete_rounded,
+            danger: true,
+            onTap: () => _confirm(context, s.extUninstallConfirm(m.name), () async {
+              await store.uninstall(live.id);
+              if (context.mounted) Navigator.pop(context);
+            }),
+          ),
+        ],
+      ),
     );
   }
 
@@ -486,6 +524,19 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       if (mounted) setState(() => _saving = false);
     }
   }
+}
+
+/// The page's main action, compact like the one on a catalog card.
+class _Action extends StatelessWidget {
+  const _Action({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: AlignmentDirectional.centerStart,
+    child: PillButton(label: label, onTap: onTap),
+  );
 }
 
 class _SectionHeading extends StatelessWidget {

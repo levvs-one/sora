@@ -225,7 +225,6 @@ class _ConnectionsScreenState extends State<ConnectionsScreen> {
               },
             ),
       children: [
-        const BackgroundFailureState(source: 'stats'),
         if (active) _statsBar(context),
         if (usable && _list.isNotEmpty) ...[
           CupertinoSearchTextField(
@@ -385,7 +384,8 @@ class _Row extends StatelessWidget {
     final detail = [
       if (c.process.isNotEmpty) c.process,
       if (c.chain.isNotEmpty) _carrier(s, SoraScope.read(context), c.chain.last),
-      '↑ ${formatBytes(s, c.upload, locale)}  ↓ ${formatBytes(s, c.download, locale)}',
+      if (c.closable || c.upload != 0 || c.download != 0)
+        '↑ ${formatBytes(s, c.upload, locale)}  ↓ ${formatBytes(s, c.download, locale)}',
     ];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -418,7 +418,7 @@ class _Row extends StatelessWidget {
           MenuAnchor(
             alignmentOffset: const Offset(-140, 4),
             menuChildren: [
-              _menuItem(context, s.close, onClose),
+              if (c.closable) _menuItem(context, s.close, onClose),
               _menuItem(context, s.connCopyHost, onCopyHost),
               _menuItem(context, s.connAddRule, onAddRule),
             ],
@@ -428,7 +428,7 @@ class _Row extends StatelessWidget {
               onTap: () => controller.isOpen ? controller.close() : controller.open(),
             ),
           ),
-          RoundButton(icon: Symbols.close_rounded, label: s.close, onTap: onClose),
+          if (c.closable) RoundButton(icon: Symbols.close_rounded, label: s.close, onTap: onClose),
         ],
       ),
     );
@@ -456,5 +456,6 @@ String _carrier(S s, Sora sora, String hop) => switch (hop) {
   Sora.autoGroup => s.serverAuto,
   Sora.entryGroup => sora.displayNameOf(sora.selected),
   Sora.bypassId => s.serverBypass,
+  'sora-zapret-direct' => s.chainDirect,
   _ => sora.displayNameOf(hop),
 };

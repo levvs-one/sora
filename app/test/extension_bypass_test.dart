@@ -788,12 +788,12 @@ void main() {
       expect(find.text('DPI'), findsOneWidget);
       expect(find.text('TCP+TLS'), findsOneWidget);
       await tester.scrollUntilVisible(
-        find.text(sora.strings.trayConnect),
+        find.text(sora.strings.extBypassRun),
         -200,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
-      expect(find.text(sora.strings.trayConnect), findsOneWidget);
+      expect(find.text(sora.strings.extBypassRun), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (Platform.environment['SORA_SHOTS'] != null) {
         final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
@@ -822,6 +822,8 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('mode-button')));
       await tester.pumpAndSettle();
       expect(find.text(pkg.manifest.name), findsOneWidget);
+      await tester.ensureVisible(find.text(pkg.manifest.name));
+      await tester.pumpAndSettle();
       await tester.tap(find.text(pkg.manifest.name));
       for (var i = 0; i < 10; i++) {
         await tester.runAsync(() => Future<void>.delayed(Duration.zero));
@@ -907,7 +909,6 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('mode-button')));
     await tester.pumpAndSettle();
     final name = store.get('org.sora.winws-fixture')!.manifest.name;
-    expect(find.byKey(ValueKey('info-$name')), findsNothing);
     expect(sora.needsSystemFilterConsent(choice), true);
     await tester.tap(find.text(name));
     await tester.pumpAndSettle();

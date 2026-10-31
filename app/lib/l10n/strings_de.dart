@@ -2125,4 +2125,32 @@ class SDe extends S {
 
   @override
   String get probeIcmp => 'ICMP (Ping)';
+
+  @override
+  String get serverConfig => 'Server config';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get profilesEnabled => 'Use profiles';
+
+  @override
+  String get profilesEnabledInfo => 'While this is off, Sora ignores networks and changes nothing on its own.';
+
+  @override
+  String get extensionBypassInfo => 'Turns on this extension\'s blocking bypass instead of a VPN.';
+
+  @override
+  String get infoSources => 'Read more';
+
+  @override
+  String get extFilter => 'Filter';
+
+  @override
+  String get extBypassRun => 'Blocking bypass';
+
+  @override
+  String get chainNoServers =>
+      'Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here.';
 }

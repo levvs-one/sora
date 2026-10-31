@@ -1030,5 +1030,14 @@
   "autoSelectInfo": "«सबसे तेज़» सर्वर कैसे चुनता है: ping से, मापी गई गति से या दोनों से।",
   "autoSwitchInfo": "अगर मौजूदा सर्वर साफ़ तौर पर धीमा हो जाए, तो Sora तेज़ सर्वर पर चला जाता है।",
   "probeTls": "TLS हैंडशेक",
-  "probeIcmp": "ICMP (ping)"
+  "probeIcmp": "ICMP (ping)",
+  "serverConfig": "Server config",
+  "copy": "Copy",
+  "profilesEnabled": "Use profiles",
+  "profilesEnabledInfo": "While this is off, Sora ignores networks and changes nothing on its own.",
+  "extensionBypassInfo": "Turns on this extension's blocking bypass instead of a VPN.",
+  "infoSources": "Read more",
+  "extFilter": "Filter",
+  "extBypassRun": "Blocking bypass",
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
 }

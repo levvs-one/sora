@@ -36,8 +36,8 @@ void main() {
       'packages/material_symbols_icons/MaterialSymbolsRounded',
     )..addFont(rootBundle.load('packages/material_symbols_icons/lib/fonts/MaterialSymbolsRounded.ttf'))).load();
   });
-  final catalogBytes = File('../extensions/catalog-1.1.6.json').readAsBytesSync();
-  final signature = File('../extensions/catalog-1.1.6.json.minisig').readAsBytesSync();
+  final catalogBytes = File('../extensions/catalog-1.1.3.json').readAsBytesSync();
+  final signature = File('../extensions/catalog-1.1.3.json.minisig').readAsBytesSync();
   Map<String, dynamic> document() => jsonDecode(utf8.decode(catalogBytes)) as Map<String, dynamic>;
   Map<String, dynamic> entry(Map<String, dynamic> doc) => (doc['extensions'] as List)
       .cast<Map<String, dynamic>>()
@@ -307,7 +307,7 @@ void main() {
           expect(find.byType(InfoButton), findsOneWidget);
           await tester.tap(find.byType(InfoButton));
           await tester.pumpAndSettle();
-          expect(find.text(action), findsOneWidget);
+          expect(find.byKey(const ValueKey('feature-info')), findsOneWidget);
           expect(find.textContaining(checkVersion ? '999.0.0' : (os == 'linux' ? 'Linux' : 'Windows')), findsOneWidget);
           if (Platform.environment['SORA_SHOTS'] != null) {
             final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
@@ -320,7 +320,7 @@ void main() {
               image.dispose();
             });
           }
-          await tester.tap(find.text('Close'));
+          await tester.tap(find.byType(InfoButton));
           await tester.pumpAndSettle();
           if (installed) {
             await tester.tap(find.text('Installed'));

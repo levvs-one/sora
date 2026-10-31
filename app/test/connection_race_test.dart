@@ -255,7 +255,7 @@ void main() {
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         await tester.tap(find.byKey(const ValueKey('logs-section-dns')));
@@ -309,7 +309,7 @@ void main() {
         expect(saves, hasLength(8), reason: 'Leaving logs must suppress the late save dialog');
         for (final extension in ['json', 'har', 'pcapng']) {
           await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-          await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+          await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
           await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
           await tester.pump();
           await tester.tap(find.byWidgetPredicate((w) => w is RoundButton && w.label == sora.strings.export));
@@ -325,7 +325,7 @@ void main() {
           expect(core.diagnosticRequests, isEmpty);
         }
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         sora.coreCapabilities.remove('log-export-formats');
@@ -366,7 +366,7 @@ void main() {
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         await packetMenu();
@@ -457,7 +457,7 @@ void main() {
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         for (var i = 0; i < 30 && core.logWatches.isEmpty; i++) {
@@ -522,7 +522,7 @@ void main() {
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         await waitForTail();
@@ -594,7 +594,7 @@ void main() {
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
@@ -659,7 +659,7 @@ void main() {
       try {
         await tester.pumpWidget(SoraApp(sora: sora));
         await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.digit6);
+        await tester.sendKeyEvent(LogicalKeyboardKey.digit7);
         await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
         await tester.pump();
         for (var i = 0; i < 30 && !core.logs.hasListener; i++) {
@@ -918,6 +918,35 @@ void main() {
       expect(sora.phase, Phase.connected);
       expect(sora.needsReconnect, isFalse);
       expect(sora.history, isEmpty);
+    });
+
+    test('a server switch reads as one state while the old session ends', () async {
+      await sora.select('a');
+      await sora.connect();
+      final old = sora.sessionId!;
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      core.gate = Completer<void>();
+      final phases = <Phase>[];
+      void watch() => phases.add(sora.phase);
+      sora.addListener(watch);
+      final replacement = sora.select('b');
+      await until(() => core.connects == 2);
+      expect(sora.replacing, isTrue);
+      core.events.add(
+        CoreEvent(
+          sessionId: old,
+          stateChanged: StateChanged(
+            state: ConnectionState(sessionId: old, value: ConnectionStateValue.CONNECTION_STATE_VALUE_DISCONNECTED),
+          ),
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      core.gate!.complete();
+      await replacement;
+      sora.removeListener(watch);
+      expect(phases, isNot(contains(Phase.off)));
+      expect(sora.replacing, isFalse);
+      expect(sora.phase, Phase.connected);
     });
 
     test('explicit disconnect cancels queued location changes without restarting', () async {

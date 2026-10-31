@@ -1030,5 +1030,14 @@
   "autoSelectInfo": "“最快”如何选服务器：按 ping、按实测速度或两者结合。",
   "autoSwitchInfo": "当前服务器明显变慢时，Sora 会切换到更快的服务器。",
   "probeTls": "TLS 握手",
-  "probeIcmp": "ICMP（ping）"
+  "probeIcmp": "ICMP（ping）",
+  "serverConfig": "Server config",
+  "copy": "Copy",
+  "profilesEnabled": "Use profiles",
+  "profilesEnabledInfo": "While this is off, Sora ignores networks and changes nothing on its own.",
+  "extensionBypassInfo": "Turns on this extension's blocking bypass instead of a VPN.",
+  "infoSources": "Read more",
+  "extFilter": "Filter",
+  "extBypassRun": "Blocking bypass",
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
 }

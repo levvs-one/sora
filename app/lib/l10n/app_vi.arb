@@ -1030,5 +1030,14 @@
   "autoSelectInfo": "Cách «Nhanh nhất» chọn máy chủ: theo ping, theo tốc độ đã đo hoặc cả hai.",
   "autoSwitchInfo": "Nếu máy chủ hiện tại chậm đi rõ rệt, Sora chuyển sang máy chủ nhanh hơn.",
   "probeTls": "Bắt tay TLS",
-  "probeIcmp": "ICMP (ping)"
+  "probeIcmp": "ICMP (ping)",
+  "serverConfig": "Server config",
+  "copy": "Copy",
+  "profilesEnabled": "Use profiles",
+  "profilesEnabledInfo": "While this is off, Sora ignores networks and changes nothing on its own.",
+  "extensionBypassInfo": "Turns on this extension's blocking bypass instead of a VPN.",
+  "infoSources": "Read more",
+  "extFilter": "Filter",
+  "extBypassRun": "Blocking bypass",
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
 }

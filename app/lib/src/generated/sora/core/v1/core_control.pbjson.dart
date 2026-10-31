@@ -1434,6 +1434,7 @@ const Connection$json = {
     {'1': 'upload', '3': 8, '4': 1, '5': 4, '10': 'upload'},
     {'1': 'download', '3': 9, '4': 1, '5': 4, '10': 'download'},
     {'1': 'start', '3': 10, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'start'},
+    {'1': 'closable', '3': 11, '4': 1, '5': 8, '10': 'closable'},
   ],
 };
 
@@ -1443,7 +1444,39 @@ final $typed_data.Uint8List connectionDescriptor =
         'IKBGhvc3QYAyABKAlSBGhvc3QSEgoEcG9ydBgEIAEoDVIEcG9ydBIYCgdwcm9jZXNzGAUgASgJ'
         'Ugdwcm9jZXNzEhIKBHJ1bGUYBiABKAlSBHJ1bGUSFAoFY2hhaW4YByADKAlSBWNoYWluEhYKBn'
         'VwbG9hZBgIIAEoBFIGdXBsb2FkEhoKCGRvd25sb2FkGAkgASgEUghkb3dubG9hZBIwCgVzdGFy'
-        'dBgKIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBXN0YXJ0');
+        'dBgKIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBXN0YXJ0EhoKCGNsb3NhYmxlGA'
+        'sgASgIUghjbG9zYWJsZQ==');
+
+@$core.Deprecated('Use getServerConfigRequestDescriptor instead')
+const GetServerConfigRequest$json = {
+  '1': 'GetServerConfigRequest',
+  '2': [
+    {'1': 'api_version', '3': 1, '4': 1, '5': 11, '6': '.sora.core.v1.ApiVersion', '10': 'apiVersion'},
+    {'1': 'control_authenticator', '3': 2, '4': 1, '5': 12, '10': 'controlAuthenticator'},
+    {'1': 'outbound', '3': 3, '4': 1, '5': 11, '6': '.sora.core.v1.OutboundSpec', '10': 'outbound'},
+  ],
+};
+
+/// Descriptor for `GetServerConfigRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getServerConfigRequestDescriptor =
+    $convert.base64Decode('ChZHZXRTZXJ2ZXJDb25maWdSZXF1ZXN0EjkKC2FwaV92ZXJzaW9uGAEgASgLMhguc29yYS5jb3'
+        'JlLnYxLkFwaVZlcnNpb25SCmFwaVZlcnNpb24SMwoVY29udHJvbF9hdXRoZW50aWNhdG9yGAIg'
+        'ASgMUhRjb250cm9sQXV0aGVudGljYXRvchI2CghvdXRib3VuZBgDIAEoCzIaLnNvcmEuY29yZS'
+        '52MS5PdXRib3VuZFNwZWNSCG91dGJvdW5k');
+
+@$core.Deprecated('Use getServerConfigResponseDescriptor instead')
+const GetServerConfigResponse$json = {
+  '1': 'GetServerConfigResponse',
+  '2': [
+    {'1': 'config', '3': 1, '4': 1, '5': 9, '10': 'config'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.sora.core.v1.SoraError', '10': 'error'},
+  ],
+};
+
+/// Descriptor for `GetServerConfigResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getServerConfigResponseDescriptor =
+    $convert.base64Decode('ChdHZXRTZXJ2ZXJDb25maWdSZXNwb25zZRIWCgZjb25maWcYASABKAlSBmNvbmZpZxItCgVlcn'
+        'JvchgCIAEoCzIXLnNvcmEuY29yZS52MS5Tb3JhRXJyb3JSBWVycm9y');
 
 @$core.Deprecated('Use listConnectionsRequestDescriptor instead')
 const ListConnectionsRequest$json = {

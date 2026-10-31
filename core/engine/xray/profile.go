@@ -16,6 +16,7 @@ const (
 	profileDNS    = "sora-dns"
 	profileDirect = "sora-direct"
 	profileBlock  = "sora-block"
+	profileZapret = "sora-zapret"
 )
 
 // profileOwned replaces provider listeners, logs, stats, and controllers with
@@ -50,7 +51,7 @@ func stripFiles(v any) {
 // renderProfile preserves provider routing after session DNS, ad-block, and
 // preset rules. Unmatched traffic uses the provider's first outbound.
 func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
-	profile := p.Outbounds[0]
+	profile := p.Outbounds[slices.IndexFunc(p.Outbounds, func(o engine.Outbound) bool { return o.Protocol == engine.ProtocolXrayProfile })]
 	var cfg obj
 	if err := json.Unmarshal(profile.Profile, &cfg); err != nil {
 		return nil, fmt.Errorf("xray: profile %s: %w", profile.ID, err)
@@ -63,11 +64,18 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	}
 	stripFiles(cfg)
 	outbounds, _ := cfg["outbounds"].([]any)
+	free := freedomTags(outbounds)
 	cfg["outbounds"] = append(outbounds,
 		obj{"tag": profileDNS, "protocol": "dns"},
 		obj{"tag": profileDirect, "protocol": "freedom"},
 		obj{"tag": profileBlock, "protocol": "blackhole"},
 	)
+	zapret := slices.IndexFunc(p.Outbounds, func(o engine.Outbound) bool { return o.ID == engine.ZapretDirect })
+	if zapret >= 0 {
+		proxy := p.Outbounds[zapret]
+		cfg["outbounds"] = append(cfg["outbounds"].([]any), obj{"tag": profileZapret, "protocol": "socks",
+			"settings": obj{"servers": []obj{{"address": proxy.Server, "port": proxy.Port}}}})
+	}
 
 	var ours []any
 	if p.Tun.Enabled {
@@ -80,6 +88,8 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 			target = profileDirect
 		case "reject", "block":
 			target = profileBlock
+		case engine.ZapretDirect:
+			target = profileZapret
 		default:
 			// Profile-target rules defer to provider routing,
 			// including catch-all rules.
@@ -97,6 +107,9 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 		routing = obj{}
 	}
 	provider, _ := routing["rules"].([]any)
+	if zapret >= 0 {
+		reshapeDirect(provider, free)
+	}
 	routing["rules"] = append(ours, provider...)
 	cfg["routing"] = routing
 
@@ -118,6 +131,30 @@ func renderProfile(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 		return nil, err
 	}
 	return raw, nil
+}
+
+// freedomTags lists the provider's outbounds that leave the machine directly.
+func freedomTags(outbounds []any) []string {
+	var tags []string
+	for _, item := range outbounds {
+		o, _ := item.(map[string]any)
+		if protocol, _ := o["protocol"].(string); strings.EqualFold(protocol, "freedom") {
+			if tag, _ := o["tag"].(string); tag != "" {
+				tags = append(tags, tag)
+			}
+		}
+	}
+	return tags
+}
+
+// reshapeDirect sends the provider's own direct rules through the DPI proxy.
+func reshapeDirect(rules []any, free []string) {
+	for _, item := range rules {
+		rule, _ := item.(map[string]any)
+		if tag, _ := rule["outboundTag"].(string); slices.Contains(free, tag) {
+			rule["outboundTag"] = profileZapret
+		}
+	}
 }
 
 // probeProfile prefixes tags and references so profiles share one probe

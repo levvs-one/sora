@@ -38,7 +38,8 @@ Future<void> section(WidgetTester tester, int number) async {
     LogicalKeyboardKey.digit6,
     LogicalKeyboardKey.digit7,
     LogicalKeyboardKey.digit8,
-  ][const [0, 4, 0, 5, 3, 6, 1, 7][number - 1]];
+    LogicalKeyboardKey.digit9,
+  ][const [0, 5, 0, 6, 4, 7, 1, 8][number - 1]];
   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
   await tester.sendKeyEvent(key);
   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
@@ -141,6 +142,7 @@ void main() {
       'Главная',
       'Скорость',
       'Расширения',
+      'Подключения',
       'Уведомления',
       'Правила',
       'Логи',

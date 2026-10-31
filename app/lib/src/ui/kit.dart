@@ -235,59 +235,211 @@ class Heading extends StatelessWidget {
   );
 }
 
-/// The (i) after a feature's name: opens a short explanation of what it
-/// does, so rows stay one line instead of carrying grey paragraphs.
-class InfoButton extends StatelessWidget {
-  const InfoButton({super.key, required this.title, required this.description, this.dense = false});
+/// A page to read more about a feature.
+class InfoSource {
+  const InfoSource(this.label, this.url, [this.ruUrl]);
+  final String label;
+  final String url;
+  final String? ruUrl;
+}
+
+/// The (i) after a feature's name. Pointing at it, or tapping it, shows what
+/// the feature does and where to read more; the name stays on the row.
+class InfoButton extends StatefulWidget {
+  const InfoButton({
+    super.key,
+    required this.title,
+    required this.description,
+    this.sources = const [],
+    this.dense = false,
+  });
+
+  /// What a screen reader calls the button.
   final String title;
   final String description;
+  final List<InfoSource> sources;
 
   /// The small variant that sits inside a settings row after its title.
   final bool dense;
 
   @override
+  State<InfoButton> createState() => _InfoButtonState();
+}
+
+class _InfoButtonState extends State<InfoButton> {
+  static const _openAfter = Duration(milliseconds: 150);
+  static const _closeAfter = Duration(milliseconds: 250);
+
+  final _menu = MenuController();
+  Timer? _timer;
+
+  void _after(Duration wait, VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(wait, () {
+      if (mounted) action();
+    });
+  }
+
+  void _enter(PointerEnterEvent _) => _after(_openAfter, _menu.open);
+  void _stay(PointerEnterEvent _) => _timer?.cancel();
+  void _exit(PointerExitEvent _) => _after(_closeAfter, _menu.close);
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
-    return IconButton(
-      key: ValueKey('info-$title'),
-      tooltip: '${MaterialLocalizations.of(context).moreButtonTooltip}: $title',
-      icon: Icon(Symbols.info_rounded, size: dense ? 16 : 18, color: dense ? palette.ink2 : palette.ink),
-      style: IconButton.styleFrom(
-        minimumSize: dense ? const Size(28, 28) : const Size(36, 36),
-        padding: EdgeInsets.all(dense ? 4 : 8),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    final s = S.of(context);
+    final russian = Localizations.localeOf(context).languageCode == 'ru';
+    return MenuAnchor(
+      controller: _menu,
+      alignmentOffset: const Offset(0, 4),
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(palette.raised),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        shadowColor: WidgetStatePropertyAll(palette.shadow),
+        elevation: const WidgetStatePropertyAll(8),
+        padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+        maximumSize: const WidgetStatePropertyAll(Size(360, 460)),
       ),
-      onPressed: () => showDialog<void>(
-        context: context,
-        barrierColor: palette.scrim,
-        animationStyle: AnimationStyle(
-          duration: Motion.of(context, Motion.medium),
-          reverseDuration: Motion.of(context, Motion.medium),
-        ),
-        builder: (context) => AlertDialog(
-          key: const ValueKey('feature-info-dialog'),
-          backgroundColor: palette.raised,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          constraints: const BoxConstraints(maxWidth: 420),
-          insetPadding: const EdgeInsets.all(24),
-          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          scrollable: true,
-          title: Text(title, style: Styles.heading.copyWith(color: palette.ink)),
-          content: Text(description, style: Styles.body.copyWith(color: palette.ink, height: 1.5)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(S.of(context).close, style: Styles.bodyStrong.copyWith(color: palette.ink)),
+      menuChildren: [
+        MouseRegion(
+          onEnter: _stay,
+          onExit: _exit,
+          child: SizedBox(
+            key: const ValueKey('feature-info'),
+            width: 340,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final (i, paragraph) in widget.description.split('\n\n').indexed)
+                    Padding(
+                      padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
+                      child: Text(paragraph, style: Styles.secondary.copyWith(color: palette.ink, height: 1.5)),
+                    ),
+                  if (widget.sources.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    Text(s.infoSources, style: Styles.caption.copyWith(color: palette.ink2)),
+                    const SizedBox(height: 2),
+                    for (final source in widget.sources)
+                      Pressable(
+                        radius: 6,
+                        onTap: () {
+                          _menu.close();
+                          unawaited(openLink(context, russian ? source.ruUrl ?? source.url : source.url));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(
+                            source.label,
+                            style: Styles.secondary.copyWith(color: palette.verified, height: 1.3),
+                          ),
+                        ),
+                      ),
+                  ],
+                ],
+              ),
             ),
-          ],
+          ),
+        ),
+      ],
+      builder: (context, controller, _) => MouseRegion(
+        onEnter: _enter,
+        onExit: _exit,
+        child: Semantics(
+          label: widget.title,
+          button: true,
+          excludeSemantics: true,
+          child: IconButton(
+            key: ValueKey('info-${widget.title}'),
+            icon: Icon(
+              Symbols.info_rounded,
+              size: widget.dense ? 16 : 18,
+              color: widget.dense ? palette.ink2 : palette.ink,
+            ),
+            style: IconButton.styleFrom(
+              minimumSize: widget.dense ? const Size(28, 28) : const Size(36, 36),
+              padding: EdgeInsets.all(widget.dense ? 4 : 8),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            onPressed: () => controller.isOpen ? controller.close() : controller.open(),
+          ),
         ),
       ),
     );
   }
+}
+
+/// Pages behind the info buttons, where a reader can go deeper.
+abstract final class Sources {
+  static const _dpi = InfoSource(
+    'Wikipedia: Deep packet inspection',
+    'https://en.wikipedia.org/wiki/Deep_packet_inspection',
+    'https://ru.wikipedia.org/wiki/Deep_packet_inspection',
+  );
+  static const _zapret = InfoSource('Zapret', 'https://github.com/bol-van/zapret');
+  static const _sni = InfoSource(
+    'Wikipedia: Server Name Indication',
+    'https://en.wikipedia.org/wiki/Server_Name_Indication',
+    'https://ru.wikipedia.org/wiki/Server_Name_Indication',
+  );
+  static const _tls = InfoSource(
+    'Wikipedia: TLS',
+    'https://en.wikipedia.org/wiki/Transport_Layer_Security',
+    'https://ru.wikipedia.org/wiki/Transport_Layer_Security',
+  );
+  static const _tcp = InfoSource(
+    'Wikipedia: TCP',
+    'https://en.wikipedia.org/wiki/Transmission_Control_Protocol',
+    'https://ru.wikipedia.org/wiki/Transmission_Control_Protocol',
+  );
+
+  static const engine = [
+    InfoSource('Xray', 'https://xtls.github.io/en/'),
+    InfoSource('sing-box', 'https://sing-box.sagernet.org/'),
+    InfoSource('mihomo', 'https://wiki.metacubex.one/en/'),
+  ];
+  static const tunStack = [
+    InfoSource('Wikipedia: TUN/TAP', 'https://en.wikipedia.org/wiki/TUN/TAP', 'https://ru.wikipedia.org/wiki/TUN/TAP'),
+    InfoSource('sing-box: TUN', 'https://sing-box.sagernet.org/configuration/inbound/tun/'),
+    InfoSource('gVisor: networking', 'https://gvisor.dev/docs/user_guide/networking/'),
+  ];
+  static const killSwitch = [
+    InfoSource('Proton VPN: kill switch', 'https://protonvpn.com/support/what-is-kill-switch'),
+  ];
+  static const bypass = [_dpi, _zapret];
+  static const failover = [
+    InfoSource('mihomo: fallback', 'https://wiki.metacubex.one/en/config/proxy-groups/fallback/'),
+  ];
+  static const ipv6 = [
+    InfoSource('Wikipedia: IPv6', 'https://en.wikipedia.org/wiki/IPv6', 'https://ru.wikipedia.org/wiki/IPv6'),
+  ];
+  static const fragment = [
+    _sni,
+    InfoSource('Xray: fragment', 'https://xtls.github.io/en/config/outbounds/freedom.html'),
+  ];
+  static const split = [_sni, _zapret];
+  static const disorder = [_tcp, _zapret];
+  static const tlsRecord = [_tls, _zapret];
+  static const hostCase = [
+    InfoSource('MDN: Host', 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Host'),
+    _zapret,
+  ];
+  static const probe = [
+    InfoSource(
+      'Wikipedia: ping',
+      'https://en.wikipedia.org/wiki/Ping_(networking_utility)',
+      'https://ru.wikipedia.org/wiki/Ping',
+    ),
+    _tls,
+  ];
 }
 
 /// Shows a dialog and returns true on confirmation. [destructive] colours the
@@ -393,6 +545,7 @@ class Tile extends StatelessWidget {
     this.titleStyle,
     this.selected = false,
     this.info,
+    this.sources = const [],
   });
 
   final String title;
@@ -401,6 +554,7 @@ class Tile extends StatelessWidget {
 
   /// What the feature does, behind an (i) after the title.
   final String? info;
+  final List<InfoSource> sources;
   final String? detail;
   final Color? detailColor;
   final Widget? trailing;
@@ -438,7 +592,7 @@ class Tile extends StatelessWidget {
                         ),
                         if (info != null) ...[
                           const SizedBox(width: 2),
-                          InfoButton(title: title, description: info!, dense: true),
+                          InfoButton(title: title, description: info!, sources: sources, dense: true),
                         ],
                       ],
                     ),
@@ -463,7 +617,14 @@ class Tile extends StatelessWidget {
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged, this.info});
+  const SwitchTile({
+    super.key,
+    this.sources = const [],
+    required this.title,
+    required this.value,
+    required this.onChanged,
+    this.info,
+  });
 
   final String title;
 
@@ -472,6 +633,7 @@ class SwitchTile extends StatelessWidget {
 
   /// What the switch does, behind an (i) after the title.
   final String? info;
+  final List<InfoSource> sources;
 
   @override
   Widget build(BuildContext context) {
@@ -479,6 +641,7 @@ class SwitchTile extends StatelessWidget {
     return Tile(
       title: title,
       info: info,
+      sources: sources,
       onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: CupertinoSwitch(
         value: value,
@@ -500,6 +663,7 @@ class ChoiceTile<T> extends StatelessWidget {
     required this.choices,
     required this.onChanged,
     this.info,
+    this.sources = const [],
   });
 
   final String title;
@@ -509,6 +673,7 @@ class ChoiceTile<T> extends StatelessWidget {
 
   /// What the setting changes, behind an (i) after the title.
   final String? info;
+  final List<InfoSource> sources;
 
   @override
   Widget build(BuildContext context) {
@@ -532,6 +697,7 @@ class ChoiceTile<T> extends StatelessWidget {
       builder: (context, controller, _) => Tile(
         title: title,
         info: info,
+        sources: sources,
         onTap: () => controller.isOpen ? controller.close() : controller.open(),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -555,7 +721,7 @@ class ChoiceTile<T> extends StatelessWidget {
 
 /// A navigation row with an optional current value.
 class LinkTile extends StatelessWidget {
-  const LinkTile({super.key, required this.title, required this.onTap, this.value, this.info});
+  const LinkTile({super.key, required this.title, required this.onTap, this.value, this.info, this.sources = const []});
 
   final String title;
   final String? value;
@@ -563,6 +729,7 @@ class LinkTile extends StatelessWidget {
 
   /// What the setting changes, behind an (i) after the title.
   final String? info;
+  final List<InfoSource> sources;
 
   @override
   Widget build(BuildContext context) {
@@ -570,6 +737,7 @@ class LinkTile extends StatelessWidget {
     return Tile(
       title: title,
       info: info,
+      sources: sources,
       onTap: onTap,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

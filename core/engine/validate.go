@@ -216,8 +216,9 @@ func (p *Plan) Validate() error {
 	}
 	// Profiles run alone because combining provider routing with other
 	// profiles or groups changes its semantics.
+	others := len(slices.DeleteFunc(slices.Clone(p.Outbounds), func(o Outbound) bool { return o.ID == ZapretDirect }))
 	if slices.ContainsFunc(p.Outbounds, func(o Outbound) bool { return o.Protocol == ProtocolXrayProfile }) &&
-		(len(p.Outbounds) > 1 || len(p.Groups) > 0) {
+		(others > 1 || len(p.Groups) > 0) {
 		errs = append(errs, errors.New("plan: an Xray profile runs alone, without other outbounds or groups"))
 	}
 

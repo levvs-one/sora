@@ -17,6 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/levvs-one/sora-client/core/engine"
+	"github.com/levvs-one/sora-client/core/engine/xray"
 	"github.com/levvs-one/sora-client/core/errs"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
 	"github.com/levvs-one/sora-client/core/logs"
@@ -345,6 +346,23 @@ func (s *Server) ListConnections(ctx context.Context, req *corev1.ListConnection
 	return out, nil
 }
 
+// GetServerConfig shows the configuration behind one server: a profile as the
+// provider wrote it, any other server as an Xray outbound.
+func (s *Server) GetServerConfig(_ context.Context, req *corev1.GetServerConfigRequest) (*corev1.GetServerConfigResponse, error) {
+	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
+		return nil, err
+	}
+	o, err := outboundFromProto(0, req.GetOutbound(), s.secrets)
+	if err != nil {
+		return &corev1.GetServerConfigResponse{Error: toWire(err, nil, "")}, nil
+	}
+	config, err := xray.OutboundConfig(o)
+	if err != nil {
+		return &corev1.GetServerConfigResponse{Error: toWire(errs.Wrap(err, errs.CodeInvalidArgument, errs.KeyPlanOutbounds), nil, "")}, nil
+	}
+	return &corev1.GetServerConfigResponse{Config: config}, nil
+}
+
 // CloseConnection drops one live connection of the running session.
 func (s *Server) CloseConnection(ctx context.Context, req *corev1.CloseConnectionRequest) (*corev1.CloseConnectionResponse, error) {
 	if err := s.authorize(req.GetApiVersion(), req.GetControlAuthenticator()); err != nil {
@@ -380,5 +398,5 @@ func (s *Server) runningSession(named string) (connectionSession, error) {
 
 func connectionToWire(c engine.Connection) *corev1.Connection {
 	return &corev1.Connection{Id: c.ID, Network: c.Network, Host: c.Host, Port: uint32(c.Port), Process: c.Process,
-		Rule: c.Rule, Chain: c.Chain, Upload: c.Upload, Download: c.Download, Start: timestamppb.New(c.Start)}
+		Rule: c.Rule, Chain: c.Chain, Upload: c.Upload, Download: c.Download, Closable: c.Closable, Start: timestamppb.New(c.Start)}
 }

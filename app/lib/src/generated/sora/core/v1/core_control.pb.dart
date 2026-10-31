@@ -6185,6 +6185,7 @@ class Connection extends $pb.GeneratedMessage {
     $fixnum.Int64? upload,
     $fixnum.Int64? download,
     $2.Timestamp? start,
+    $core.bool? closable,
   }) {
     final result = Connection._();
     if (id != null) result.id = id;
@@ -6197,6 +6198,7 @@ class Connection extends $pb.GeneratedMessage {
     if (upload != null) result.upload = upload;
     if (download != null) result.download = download;
     if (start != null) result.start = start;
+    if (closable != null) result.closable = closable;
     return result;
   }
 
@@ -6221,6 +6223,7 @@ class Connection extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(8, _omitFieldNames ? '' : 'upload', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(9, _omitFieldNames ? '' : 'download', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOM<$2.Timestamp>(10, _omitFieldNames ? '' : 'start', subBuilder: $2.Timestamp.$_createMessage)
+    ..aOB(11, _omitFieldNames ? '' : 'closable')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -6331,6 +6334,167 @@ class Connection extends $pb.GeneratedMessage {
   void clearStart() => $_clearField(10);
   @$pb.TagNumber(10)
   $2.Timestamp ensureStart() => $_ensure(9);
+
+  /// False where the engine only reports the connection: Xray lists what opened
+  /// in the last minute, without counters and without a way to close it.
+  @$pb.TagNumber(11)
+  $core.bool get closable => $_getBF(10);
+  @$pb.TagNumber(11)
+  set closable($core.bool value) => $_setBool(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasClosable() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearClosable() => $_clearField(11);
+}
+
+class GetServerConfigRequest extends $pb.GeneratedMessage {
+  factory GetServerConfigRequest({
+    ApiVersion? apiVersion,
+    $core.List<$core.int>? controlAuthenticator,
+    OutboundSpec? outbound,
+  }) {
+    final result = GetServerConfigRequest._();
+    if (apiVersion != null) result.apiVersion = apiVersion;
+    if (controlAuthenticator != null) result.controlAuthenticator = controlAuthenticator;
+    if (outbound != null) result.outbound = outbound;
+    return result;
+  }
+
+  GetServerConfigRequest._();
+
+  factory GetServerConfigRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetServerConfigRequest()..mergeFromBuffer(data, registry);
+  factory GetServerConfigRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetServerConfigRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetServerConfigRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetServerConfigRequest.$_createMessage)
+    ..aOM<ApiVersion>(1, _omitFieldNames ? '' : 'apiVersion', subBuilder: ApiVersion.$_createMessage)
+    ..a<$core.List<$core.int>>(2, _omitFieldNames ? '' : 'controlAuthenticator', $pb.PbFieldType.OY)
+    ..aOM<OutboundSpec>(3, _omitFieldNames ? '' : 'outbound', subBuilder: OutboundSpec.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetServerConfigRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetServerConfigRequest copyWith(void Function(GetServerConfigRequest) updates) =>
+      super.copyWith((message) => updates(message as GetServerConfigRequest)) as GetServerConfigRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetServerConfigRequest() / GetServerConfigRequest.new instead')
+  static GetServerConfigRequest create() => GetServerConfigRequest._();
+  static $pb.GeneratedMessage $_createMessage() => GetServerConfigRequest._();
+  @$core.override
+  GetServerConfigRequest createEmptyInstance() => GetServerConfigRequest._();
+  @$core.pragma('dart2js:noInline')
+  static GetServerConfigRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetServerConfigRequest>(GetServerConfigRequest.$_createMessage);
+  static GetServerConfigRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  ApiVersion get apiVersion => $_getN(0);
+  @$pb.TagNumber(1)
+  set apiVersion(ApiVersion value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasApiVersion() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearApiVersion() => $_clearField(1);
+  @$pb.TagNumber(1)
+  ApiVersion ensureApiVersion() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get controlAuthenticator => $_getN(1);
+  @$pb.TagNumber(2)
+  set controlAuthenticator($core.List<$core.int> value) => $_setBytes(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasControlAuthenticator() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearControlAuthenticator() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  OutboundSpec get outbound => $_getN(2);
+  @$pb.TagNumber(3)
+  set outbound(OutboundSpec value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasOutbound() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearOutbound() => $_clearField(3);
+  @$pb.TagNumber(3)
+  OutboundSpec ensureOutbound() => $_ensure(2);
+}
+
+class GetServerConfigResponse extends $pb.GeneratedMessage {
+  factory GetServerConfigResponse({
+    $core.String? config,
+    SoraError? error,
+  }) {
+    final result = GetServerConfigResponse._();
+    if (config != null) result.config = config;
+    if (error != null) result.error = error;
+    return result;
+  }
+
+  GetServerConfigResponse._();
+
+  factory GetServerConfigResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetServerConfigResponse()..mergeFromBuffer(data, registry);
+  factory GetServerConfigResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      GetServerConfigResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetServerConfigResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'sora.core.v1'),
+      createEmptyInstance: GetServerConfigResponse.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'config')
+    ..aOM<SoraError>(2, _omitFieldNames ? '' : 'error', subBuilder: SoraError.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetServerConfigResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  GetServerConfigResponse copyWith(void Function(GetServerConfigResponse) updates) =>
+      super.copyWith((message) => updates(message as GetServerConfigResponse)) as GetServerConfigResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use GetServerConfigResponse() / GetServerConfigResponse.new instead')
+  static GetServerConfigResponse create() => GetServerConfigResponse._();
+  static $pb.GeneratedMessage $_createMessage() => GetServerConfigResponse._();
+  @$core.override
+  GetServerConfigResponse createEmptyInstance() => GetServerConfigResponse._();
+  @$core.pragma('dart2js:noInline')
+  static GetServerConfigResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GetServerConfigResponse>(GetServerConfigResponse.$_createMessage);
+  static GetServerConfigResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get config => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set config($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasConfig() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearConfig() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  SoraError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(SoraError value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => $_clearField(2);
+  @$pb.TagNumber(2)
+  SoraError ensureError() => $_ensure(1);
 }
 
 class ListConnectionsRequest extends $pb.GeneratedMessage {

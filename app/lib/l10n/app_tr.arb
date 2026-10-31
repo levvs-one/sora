@@ -1030,5 +1030,14 @@
   "autoSelectInfo": "En hızlı seçeneğinin sunucuyu nasıl seçtiği: pinge, ölçülen hıza ya da ikisine göre.",
   "autoSwitchInfo": "Geçerli sunucu belirgin biçimde yavaşlarsa Sora daha hızlı bir sunucuya geçer.",
   "probeTls": "TLS el sıkışması",
-  "probeIcmp": "ICMP (ping)"
+  "probeIcmp": "ICMP (ping)",
+  "serverConfig": "Server config",
+  "copy": "Copy",
+  "profilesEnabled": "Use profiles",
+  "profilesEnabledInfo": "While this is off, Sora ignores networks and changes nothing on its own.",
+  "extensionBypassInfo": "Turns on this extension's blocking bypass instead of a VPN.",
+  "infoSources": "Read more",
+  "extFilter": "Filter",
+  "extBypassRun": "Blocking bypass",
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
 }

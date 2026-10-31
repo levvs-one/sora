@@ -163,6 +163,7 @@ void main() {
       serverId: 'server',
     );
     settings.networkProfiles = jsonEncode([profile.toJson()]);
+    settings.profilesEnabled = true;
     final sora = Sora(settings);
     final running = sora.run();
     try {

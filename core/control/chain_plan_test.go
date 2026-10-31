@@ -74,7 +74,7 @@ func TestPlanFromProtoZapretWithVPN(t *testing.T) {
 	}
 	var zb *engine.Outbound
 	for i := range plan.Outbounds {
-		if plan.Outbounds[i].ID == zapretDirectOutboundID {
+		if plan.Outbounds[i].ID == engine.ZapretDirect {
 			zb = &plan.Outbounds[i]
 		}
 	}
@@ -91,7 +91,7 @@ func TestPlanFromProtoZapretWithVPN(t *testing.T) {
 	}
 	found := false
 	for _, r := range plan.Rules {
-		if r.Target == zapretDirectOutboundID {
+		if r.Target == engine.ZapretDirect {
 			found = true
 		}
 	}
@@ -106,5 +106,33 @@ func TestPlanFromProtoZapretWithVPNNeedsTun(t *testing.T) {
 	in.ZapretWithVpn = true
 	if _, err := planFromProto(in, "s-1", nil); err == nil {
 		t.Fatal("zapret_with_vpn without TUN must be rejected")
+	}
+}
+
+func TestZapretDirectJoinsAnXrayProfile(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("zapret_with_vpn is Linux-only")
+	}
+	plan := &engine.Plan{
+		SessionID: "s-1",
+		Tun:       engine.Tun{Enabled: true, DeviceName: engine.TunDevice},
+		Outbounds: []engine.Outbound{{
+			ID: "profile", Name: "Profile", Protocol: engine.ProtocolXrayProfile, Server: "192.0.2.1", Port: 443,
+			Profile: []byte(`{"outbounds":[{"tag":"vpn","protocol":"vless"}]}`),
+		}},
+		Rules: []engine.Rule{
+			{Type: engine.RuleGeoIP, Value: "private", Target: "direct"},
+			{Type: engine.RuleGeoIP, Value: "ru", Target: "direct"},
+			{Type: engine.RuleMatchAll, Target: "profile"},
+		},
+	}
+	if err := applyZapretWithVPN(plan, &corev1.BypassStrategy{SplitPos: []string{"1"}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := plan.Validate(); err != nil {
+		t.Fatal(err)
+	}
+	if plan.Rules[0].Target != "direct" || plan.Rules[1].Target != engine.ZapretDirect {
+		t.Fatalf("rules: %+v", plan.Rules)
 	}
 }

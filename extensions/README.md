@@ -37,7 +37,8 @@ them. Verify the signed catalog with the pinned production root before deliverin
 Zapret 1.0.0, ByeDPI 1.0.0 and Hello Panel 1.0.1 require Sora 1.1.3 and are
 listed in `catalog-1.1.3.json`. Zapret 1.1.0 and ByeDPI 1.1.0 add panels
 that call `getBypass`/`setBypass`, so they require Sora 1.1.6 and are
-listed only in `catalog-1.1.6.json`, next to Hello Panel 1.0.1. The v1.1.2 client uses the legacy URL and
+listed only in `catalog-1.1.6.json`. Zapret and ByeDPI 1.1.1 match the app and
+follow its theme. Hello Panel left that catalog. The v1.1.2 client uses the legacy URL and
 offers an install action before it checks a package's minimum host version, so
 entries that require a newer host stay out of `catalog.json`.
 

@@ -56,8 +56,9 @@ func New(cfg supervise.Config) (*Engine, error) {
 }
 
 type driver struct {
-	mu  sync.Mutex
-	sel Selection
+	mu    sync.Mutex
+	sel   Selection
+	flows flows
 }
 
 func (*driver) Kind() engine.Kind { return engine.KindXray }
@@ -71,6 +72,7 @@ func (*driver) Route(ctx context.Context, p *engine.Plan) error {
 func (*driver) Unroute(ctx context.Context) error { return tunroute.Unroute(ctx) }
 
 func (d *driver) Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
+	d.flows.name(p)
 	return Render(p, rt, d.selection())
 }
 

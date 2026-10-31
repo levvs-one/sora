@@ -166,6 +166,11 @@ Calling a method without the permission rejects the promise. Navigation
 outside the package is blocked; `fetch`/`XMLHttpRequest` from panel JS have
 no network access in v1.
 
+The page URL carries `?lang=` with the language of the app and `?theme=light` or
+`?theme=dark` with its theme. While a panel stays open, Sora updates
+`document.documentElement.dataset.theme` when the theme changes, so style the page
+from that attribute rather than from `prefers-color-scheme`, which follows the system.
+
 ## 5. Catalog
 
 The v1.1.2 app uses `catalog.json` and `catalog.json.minisig`.

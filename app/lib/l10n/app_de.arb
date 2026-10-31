@@ -1030,5 +1030,14 @@
   "autoSelectInfo": "Wie „Am schnellsten“ einen Server wählt: nach Ping, nach gemessener Geschwindigkeit oder nach beidem.",
   "autoSwitchInfo": "Wird der aktuelle Server merklich langsamer, wechselt Sora zu einem schnelleren.",
   "probeTls": "TLS-Handshake",
-  "probeIcmp": "ICMP (Ping)"
+  "probeIcmp": "ICMP (Ping)",
+  "serverConfig": "Server config",
+  "copy": "Copy",
+  "profilesEnabled": "Use profiles",
+  "profilesEnabledInfo": "While this is off, Sora ignores networks and changes nothing on its own.",
+  "extensionBypassInfo": "Turns on this extension's blocking bypass instead of a VPN.",
+  "infoSources": "Read more",
+  "extFilter": "Filter",
+  "extBypassRun": "Blocking bypass",
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
 }

@@ -1030,5 +1030,14 @@
   "autoSelectInfo": "Ինչպես է «Ամենաարագը» ընտրում սերվերը՝ ըստ ping-ի, չափված արագության կամ երկուսի։",
   "autoSwitchInfo": "Եթե ընթացիկ սերվերը նկատելիորեն դանդաղի, Sora-ն կանցնի ավելի արագին։",
   "probeTls": "TLS ձեռքսեղմում",
-  "probeIcmp": "ICMP (ping)"
+  "probeIcmp": "ICMP (ping)",
+  "serverConfig": "Server config",
+  "copy": "Copy",
+  "profilesEnabled": "Use profiles",
+  "profilesEnabledInfo": "While this is off, Sora ignores networks and changes nothing on its own.",
+  "extensionBypassInfo": "Turns on this extension's blocking bypass instead of a VPN.",
+  "infoSources": "Read more",
+  "extFilter": "Filter",
+  "extBypassRun": "Blocking bypass",
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
 }
