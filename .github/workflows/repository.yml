@@ -193,8 +193,10 @@ jobs:
           --plain-name 'release catalog is available with a trusted signature'
       - name: Connection and export races over an isolated RPC socket
         run: SORA_CORE_SOCKET="/tmp/sora-race-$GITHUB_RUN_ID.sock" flutter test test/connection_race_test.dart
+      # Every app build turns LICM off: in Dart 3.13 it moves reads of captured
+      # or promoted values above their null checks, which crashes only in AOT.
       - name: Build for Linux
-        run: flutter build linux --release
+        run: flutter build linux --release "--extra-gen-snapshot-options=--compiler_passes=-LICM"
       - name: Native signed extension panel in WebKitGTK
         run: xvfb-run -a flutter test integration_test/extension_panel_test.dart -d linux --dart-define="SORA_PANEL_FIXTURE_ROOT=${{ github.workspace }}" --dart-define="SORA_VERSION=${{ env.SORA_COMPAT_VERSION }}" --dart-define=SORA_PANEL_CHECK_VERSION=true
       - name: Check the Linux update helper
@@ -371,7 +373,7 @@ jobs:
           flutter pub get
           flutter test test/app_test.dart test/dpi_defaults_test.dart test/update_metadata_test.dart test/ext_package_test.dart test/ext_portable_paths_test.dart test/winws_profile_test.dart test/extension_bypass_test.dart test/connections_screen_test.dart
           if ($LASTEXITCODE -ne 0) { throw 'Windows defaults, plan, metadata or extension package tests failed' }
-          flutter build windows --release --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+          flutter build windows --release "--extra-gen-snapshot-options=--compiler_passes=-LICM" --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: Check release-version catalog compatibility
         working-directory: app
         shell: pwsh
@@ -635,7 +637,7 @@ jobs:
           foreach ($revision in @($env:GITHUB_SHA, $env:SORA_REVIEW_HEAD, $env:SORA_REVIEW_BASE)) {
             if ($revision -notmatch '^[0-9a-f]{40}$') { throw 'Missing pull request revision' }
           }
-          flutter build windows --release --no-pub "--dart-define=SORA_VERSION=$env:SORA_COMPAT_VERSION"
+          flutter build windows --release --no-pub "--extra-gen-snapshot-options=--compiler_passes=-LICM" "--dart-define=SORA_VERSION=$env:SORA_COMPAT_VERSION"
           if ($LASTEXITCODE -ne 0) { throw 'Candidate app build failed' }
           $bundle = (Resolve-Path 'build/windows/x64/runner/Release').Path
           if (-not (Test-Path -LiteralPath (Join-Path $bundle 'sora.exe'))) { throw 'Candidate app is missing' }
@@ -913,7 +915,7 @@ jobs:
         run: |
           sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev xvfb bubblewrap shellcheck
           flutter pub get
-          flutter build linux --release --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
+          flutter build linux --release "--extra-gen-snapshot-options=--compiler_passes=-LICM" --target-platform=linux-${{ matrix.flutter_arch }} --dart-define=SORA_VERSION=${{ env.SORA_VERSION }}
       - name: App and Zapret through isolated peer networks
         timeout-minutes: 15
         working-directory: app

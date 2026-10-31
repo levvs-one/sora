@@ -29,13 +29,13 @@ packaging/engines/fetch.sh amd64 dist/engines
 packaging/zapret/build.sh dist/engines
 SORA_ARCH=amd64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm.yaml --packager deb --target dist/
 
-cd app && flutter build linux --release --dart-define=SORA_VERSION=1.0.6 && cd ..
+cd app && flutter build linux --release --extra-gen-snapshot-options=--compiler_passes=-LICM --dart-define=SORA_VERSION=1.0.6 && cd ..
 SORA_ARCH=amd64 SORA_FLUTTER_ARCH=x64 SORA_VERSION=1.0.6 nfpm package --config packaging/linux/nfpm-app.yaml --packager deb --target dist/
 ```
 
 `--packager rpm` и `--packager archlinux` собирают остальные форматы. Для нативной
 сборки ARM64 используются `SORA_ARCH=arm64`, `SORA_FLUTTER_ARCH=arm64` и
-`flutter build linux --release --target-platform=linux-arm64`. Для amd64
+`flutter build linux --release --extra-gen-snapshot-options=--compiler_passes=-LICM --target-platform=linux-arm64`. Для amd64
 значение Flutter-архитектуры - `x64`, имя архитектуры пакета - `amd64`.
 
 Для Linux amd64 и ARM64 `fetch.sh` проверяет хеш официального архива ByeDPI

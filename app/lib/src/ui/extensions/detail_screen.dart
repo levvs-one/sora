@@ -95,6 +95,10 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
       animation: Listenable.merge([store, store.logChanges]),
       builder: (context, _) {
         final live = store.get(m.id) ?? installed;
+        // Stays out of the permissions loop: Dart 3.13 AOT moves a read like
+        // this above its null check, which crashed the page for an extension
+        // that is not installed.
+        final hookMissing = live != null && live.manifest.networkHookEntry == null;
         return Scaffold(
           body: SafeArea(
             child: Column(
@@ -139,10 +143,7 @@ class _ExtensionDetailScreenState extends State<ExtensionDetailScreen> {
                                         // Same marker as the install prompt: a
                                         // permission whose runtime is not built must say
                                         // so here too, not only before the grant.
-                                        if (isNotYetActive(p) ||
-                                            (p == 'net.hooks' &&
-                                                live != null &&
-                                                live.manifest.networkHookEntry == null))
+                                        if (isNotYetActive(p) || (p == 'net.hooks' && hookMissing))
                                           Padding(
                                             padding: const EdgeInsets.only(left: 28, bottom: 4),
                                             child: Text(

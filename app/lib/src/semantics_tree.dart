@@ -5,9 +5,9 @@
 /// That parent is often missing from the update, or lost when two overlays
 /// share a semantics node, and then no parent lists the overlay at all.
 /// ui::AXTree on Windows rejects an update naming such a node ("X will not be
-/// in the tree and is not the new root"). The tree goes stale and Sora crashes
-/// shortly after: hovering a sidebar item was enough whenever anything had
-/// turned accessibility on.
+/// in the tree and is not the new root") and the tree goes stale for screen
+/// readers: hovering a sidebar item was enough whenever anything had turned
+/// accessibility on.
 /// https://github.com/flutter/flutter/issues/182444
 ///
 /// Two steps make every update a valid tree edit. Nodes keep their real
