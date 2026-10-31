@@ -76,13 +76,16 @@ const ProbeMethod$json = {
     {'1': 'PROBE_METHOD_UNSPECIFIED', '2': 0},
     {'1': 'PROBE_METHOD_ENGINE', '2': 1},
     {'1': 'PROBE_METHOD_CONNECT', '2': 2},
+    {'1': 'PROBE_METHOD_TLS', '2': 3},
+    {'1': 'PROBE_METHOD_ICMP', '2': 4},
   ],
 };
 
 /// Descriptor for `ProbeMethod`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List probeMethodDescriptor =
     $convert.base64Decode('CgtQcm9iZU1ldGhvZBIcChhQUk9CRV9NRVRIT0RfVU5TUEVDSUZJRUQQABIXChNQUk9CRV9NRV'
-        'RIT0RfRU5HSU5FEAESGAoUUFJPQkVfTUVUSE9EX0NPTk5FQ1QQAg==');
+        'RIT0RfRU5HSU5FEAESGAoUUFJPQkVfTUVUSE9EX0NPTk5FQ1QQAhIUChBQUk9CRV9NRVRIT0Rf'
+        'VExTEAMSFQoRUFJPQkVfTUVUSE9EX0lDTVAQBA==');
 
 @$core.Deprecated('Use diagnosticFormatDescriptor instead')
 const DiagnosticFormat$json = {

@@ -8,6 +8,7 @@ import '../../l10n/strings.dart';
 import '../design/theme.dart';
 import '../sora.dart';
 import 'kit.dart';
+import 'servers.dart' show serverNameSpan;
 
 /// Throughput benchmark screen.
 ///
@@ -145,8 +146,11 @@ class _BenchmarkRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  sora.displayNameOf(id),
+                // The same flag images as the server list: Windows has no
+                // flag emoji and would print bare country letters.
+                Text.rich(
+                  serverNameSpan(sora.displayNameOf(id)),
+                  semanticsLabel: sora.displayNameOf(id),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Styles.row.copyWith(color: palette.ink),

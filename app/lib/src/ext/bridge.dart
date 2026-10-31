@@ -16,6 +16,8 @@ const Map<String, String> _methodPermission = {
   'getConnections': 'connections.read',
   'getServers': 'servers.read',
   'notify': 'notifications',
+  'getBypass': 'net.hooks',
+  'setBypass': 'net.hooks',
 };
 
 class BridgeError implements Exception {
@@ -36,6 +38,8 @@ class PanelBridge {
     required this.notify,
     required this.getSettings,
     required this.setSettings,
+    this.getBypass,
+    this.setBypass,
   });
 
   final String extensionId;
@@ -60,6 +64,16 @@ class PanelBridge {
   /// contract, not as a bare store error, which [handle] would report
   /// to the panel as 'internal'.
   final Future<void> Function(Map<String, dynamic>) setSettings;
+
+  /// () -> {available, active, connecting, profile, profiles}: this
+  /// extension's own blocking bypass (network hook) and whether Sora runs
+  /// it now. Null for hosts without a bypass; the call then rejects.
+  final Future<Map<String, dynamic>> Function()? getBypass;
+
+  /// Turns this extension's bypass on (through the host's own consent and
+  /// connect flow) or off. Never touches another extension's bypass or a
+  /// VPN session it did not start.
+  final Future<void> Function(bool active)? setBypass;
 
   /// Handles one JSON message posted to the internal native JavaScript channel.
   /// Always returns a JSON reply: {id, ok, result?} or {id, ok, error}.
@@ -111,6 +125,16 @@ class PanelBridge {
       case 'setSettings':
         final values = (args['settings'] as Map<String, dynamic>?) ?? args;
         await setSettings(values);
+        return null;
+      case 'getBypass':
+        final read = getBypass;
+        if (read == null) throw BridgeError('invalid-argument', 'this host has no bypass');
+        return await read();
+      case 'setBypass':
+        final write = setBypass;
+        final active = args['active'];
+        if (write == null || active is! bool) throw BridgeError('invalid-argument', 'setBypass needs {active: bool}');
+        await write(active);
         return null;
       default:
         throw BridgeError('invalid-argument', 'unknown method $method');

@@ -10,6 +10,7 @@ import (
 	"github.com/levvs-one/sora-client/core/control"
 	"github.com/levvs-one/sora-client/core/engine"
 	corev1 "github.com/levvs-one/sora-client/core/gen/sora/core/v1"
+	"github.com/levvs-one/sora-client/core/probe"
 	"github.com/levvs-one/sora-client/core/session"
 )
 
@@ -129,5 +130,48 @@ func TestProbeConnectNeverStartsAnEngine(t *testing.T) {
 	}
 	if m.opts.Timeout != 0 || len(p.asked) != 2 || len(stream.sent) != 2 {
 		t.Errorf("connect must use the connection check only: measurer %+v, prober %v, sent %d", m.opts, p.asked, len(stream.sent))
+	}
+}
+
+// modeProber also measures with an explicit mode and records it.
+type modeProber struct {
+	fakeProber
+	modes []probe.Mode
+}
+
+func (f *modeProber) ProbeMode(ctx context.Context, endpoints []*corev1.Endpoint, ids []string, mode probe.Mode) (<-chan *corev1.ProbeResult, error) {
+	f.modes = append(f.modes, mode)
+	return f.Probe(ctx, endpoints, ids)
+}
+
+func TestProbeTLSAndICMPMeasureTheServerItselfWithoutAnEngine(t *testing.T) {
+	for method, want := range map[corev1.ProbeMethod]struct {
+		mode probe.Mode
+		name string
+	}{
+		corev1.ProbeMethod_PROBE_METHOD_TLS:  {probe.ModeTLS, "tls"},
+		corev1.ProbeMethod_PROBE_METHOD_ICMP: {probe.ModeICMP, "icmp"},
+	} {
+		m, p := &fakeMeasurer{}, &modeProber{}
+		stream := &probeStream{ctx: context.Background()}
+		if err := probeServer(t, m, p).ProbeServers(probeRequest(method), stream); err != nil {
+			t.Fatal(err)
+		}
+		if m.opts.Timeout != 0 || len(p.modes) != 1 || p.modes[0] != want.mode || len(stream.sent) != 2 {
+			t.Fatalf("%v: measurer %+v, modes %v, sent %d", method, m.opts, p.modes, len(stream.sent))
+		}
+		for _, r := range stream.sent {
+			if r.GetMethod() != want.name || !r.GetReachable() {
+				t.Errorf("%v: result %v", method, r)
+			}
+		}
+	}
+}
+
+func TestProbeTLSWithoutModeSupportFailsClearly(t *testing.T) {
+	stream := &probeStream{ctx: context.Background()}
+	err := probeServer(t, &fakeMeasurer{}, &fakeProber{}).ProbeServers(probeRequest(corev1.ProbeMethod_PROBE_METHOD_TLS), stream)
+	if err == nil || len(stream.sent) != 0 {
+		t.Fatalf("a prober without modes must refuse TLS, got err %v and %d results", err, len(stream.sent))
 	}
 }

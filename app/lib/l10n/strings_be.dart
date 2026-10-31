@@ -2042,4 +2042,99 @@ class SBe extends S {
 
   @override
   String get winwsRequirements => 'Гэты рэжым VPN недаступны';
+
+  @override
+  String get emptyServersTitle => 'Дадайце сервер або падпіску';
+
+  @override
+  String get emptyServersBody =>
+      'Устаўце спасылку на падпіску ад VPN-сэрвісу, дадайце свой сервер або адскануйце QR-код.';
+
+  @override
+  String get qrShort => 'QR-код';
+
+  @override
+  String get extAboutHello => 'Прыклад панэлі: паказвае актыўныя злучэнні і дасылае тэставае апавяшчэнне.';
+
+  @override
+  String get extAboutZapret => 'Абыход блакіровак без VPN: змяняе пачатак злучэнняў, каб правайдар не пазнаў сайт.';
+
+  @override
+  String get extAboutByedpi => 'Абыход блакіровак без VPN праз лакальны проксі ByeDPI.';
+
+  @override
+  String get modeTunHint => 'Увесь трафік камп\'ютара ідзе праз VPN';
+
+  @override
+  String get modeProxyHint => 'Толькі браўзеры і праграмы з сістэмным проксі';
+
+  @override
+  String get modeBypassHint => 'Абыход блакіровак без VPN-сервера';
+
+  @override
+  String get modeExtensionHint => 'Абыход блакіровак з пашырэння';
+
+  @override
+  String get engineInfo =>
+      'Ядро ўсталёўвае злучэнне з серверам.\n\nАўта: Sora сама бярэ ядро, якое падтрымлівае пратакол сервера.\nsing-box: хуткае і ўніверсальнае.\nXray: лепш за ўсё для VLESS з REALITY і XHTTP.\nmihomo: Clash-падпіскі і гнуткія правілы.\n\nМяняйце ядро, толькі калі сервер не падключаецца ў рэжыме «Аўта».';
+
+  @override
+  String get tunStackInfo =>
+      'Як трафік трапляе з сістэмы ў VPN.\n\nСістэмны: найхутчэйшы, праз сеткавы стэк АС.\ngVisor: уласны стэк, сумяшчальны з большасцю праграм.\nЗмешаны: TCP праз сістэму, UDP праз gVisor.\n\nКалі сайты ці гульні працуюць дрэнна, паспрабуйце іншы стэк.';
+
+  @override
+  String get protection => 'Абарона';
+
+  @override
+  String get killSwitchInfo =>
+      'Калі VPN адключыцца, Sora заблакуе інтэрнэт, каб трафік не пайшоў міма тунэля. Доступ вернецца пасля перападключэння або выключэння VPN.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Блакіроўка застаецца і пасля выхаду з Sora, і пасля перазагрузкі, пакуль вы не выключыце яе тут.';
+
+  @override
+  String get zapretWithVpnInfo => 'Сайты, якія па правілах ідуць міма VPN, атрымліваюць абыход блакіровак Zapret.';
+
+  @override
+  String get failoverInfo => 'Калі сервер перастаў адказваць, Sora сама пераключыцца на наступны працоўны.';
+
+  @override
+  String get ipv6Info =>
+      'Пускаць IPv6 праз VPN. Выключыце, калі сервер не падтрымлівае IPv6 і сайты адкрываюцца павольна.';
+
+  @override
+  String get fragmentInfo =>
+      'Разбівае пачатак TLS-злучэння на часткі, каб фільтр правайдара не ўбачыў назву сайта. Дапамагае, калі сервер блакуюць па SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Дзе рэзаць першы пакет: нумар байта або метка, напрыклад midsld (сярэдзіна дамена). Некалькі значэнняў — праз коску.';
+
+  @override
+  String get disorderInfo =>
+      'Дасылае часткі пакета ў адваротным парадку, каб збіць фільтры, якія збіраюць пакет па парадку.';
+
+  @override
+  String get tlsRecordInfo => 'Дзеліць TLS-прывітанне на некалькі запісаў, каб назва сайта не трапіла ў адзін цалкам.';
+
+  @override
+  String get hostCaseInfo =>
+      'Змяняе рэгістр загалоўка Host у HTTP-запытах (Host → hoSt), і старыя фільтры перастаюць пазнаваць запыт.';
+
+  @override
+  String get probeMethodInfo =>
+      'Праз ядро: сапраўдная затрымка да сайта праз сервер, найдакладней.\nТолькі злучэнне: толькі TCP-падключэнне да сервера, хутка, але не правярае VPN.\nTLS-поціск рук: TCP і TLS з серверам.\nICMP: звычайны ping, некаторыя серверы на яго не адказваюць.\nАўта: праз ядро, а дзе нельга — злучэнне.';
+
+  @override
+  String get autoSelectInfo => 'Як «Найхутчэйшы» выбірае сервер: па пінгу, па вымеранай хуткасці або па абодвух.';
+
+  @override
+  String get autoSwitchInfo => 'Калі бягучы сервер стаў прыкметна павольнейшым, Sora пераключыцца на хутчэйшы.';
+
+  @override
+  String get probeTls => 'TLS-поціск рук';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

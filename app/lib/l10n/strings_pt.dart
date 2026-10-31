@@ -2020,4 +2020,102 @@ class SPt extends S {
 
   @override
   String get winwsRequirements => 'Este modo VPN não está disponível';
+
+  @override
+  String get emptyServersTitle => 'Adicione um servidor ou uma assinatura';
+
+  @override
+  String get emptyServersBody =>
+      'Cole o link de assinatura do seu serviço de VPN, adicione seu próprio servidor ou escaneie um código QR.';
+
+  @override
+  String get qrShort => 'Código QR';
+
+  @override
+  String get extAboutHello => 'Painel de exemplo: mostra as conexões ativas e envia uma notificação de teste.';
+
+  @override
+  String get extAboutZapret =>
+      'Contorna bloqueios sem VPN, mudando o início das conexões para que o provedor não reconheça o site.';
+
+  @override
+  String get extAboutByedpi => 'Contorna bloqueios sem VPN pelo proxy local ByeDPI.';
+
+  @override
+  String get modeTunHint => 'Todo o tráfego do computador passa pela VPN';
+
+  @override
+  String get modeProxyHint => 'Apenas navegadores e apps que usam o proxy do sistema';
+
+  @override
+  String get modeBypassHint => 'Contornar bloqueios sem servidor VPN';
+
+  @override
+  String get modeExtensionHint => 'Contorno de bloqueios de uma extensão';
+
+  @override
+  String get engineInfo =>
+      'O núcleo faz a conexão com o servidor.\n\nAuto: o Sora escolhe um núcleo compatível com o protocolo do servidor.\nsing-box: rápido e versátil.\nXray: o melhor para VLESS com REALITY e XHTTP.\nmihomo: assinaturas Clash e regras flexíveis.\n\nTroque o núcleo só se um servidor não conectar no Auto.';
+
+  @override
+  String get tunStackInfo =>
+      'Como o tráfego vai do sistema para a VPN.\n\nSistema: o mais rápido, usa a pilha de rede do sistema.\ngVisor: pilha própria, compatível com a maioria dos apps.\nMista: TCP pelo sistema, UDP pelo gVisor.\n\nSe sites ou jogos falharem, experimente outra pilha.';
+
+  @override
+  String get protection => 'Proteção';
+
+  @override
+  String get killSwitchInfo =>
+      'Se a VPN cair, o Sora bloqueia a internet para que nenhum tráfego saia fora do túnel. O acesso volta quando a VPN reconecta ou é desligada.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'O bloqueio continua depois de sair do Sora e depois de reiniciar, até você desligá-lo aqui.';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'Sites que suas regras mandam por fora da VPN recebem o contorno de bloqueios do Zapret.';
+
+  @override
+  String get failoverInfo => 'Se um servidor parar de responder, o Sora troca sozinho para o próximo que funciona.';
+
+  @override
+  String get ipv6Info => 'Enviar IPv6 pela VPN. Desligue se o servidor não tiver IPv6 e os sites carregarem devagar.';
+
+  @override
+  String get fragmentInfo =>
+      'Divide o início de uma conexão TLS em pedaços para que o filtro do provedor não veja o nome do site. Ajuda quando um servidor é bloqueado por SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Onde cortar o primeiro pacote: um número de byte ou uma marca como midsld (meio do domínio). Separe vários valores com vírgulas.';
+
+  @override
+  String get disorderInfo =>
+      'Envia as partes de um pacote em ordem inversa para confundir filtros que o remontam em sequência.';
+
+  @override
+  String get tlsRecordInfo =>
+      'Divide o hello TLS em vários registros para que o nome do site nunca fique inteiro em um só.';
+
+  @override
+  String get hostCaseInfo =>
+      'Muda maiúsculas e minúsculas do cabeçalho Host em pedidos HTTP (Host → hoSt) para que filtros antigos não os reconheçam.';
+
+  @override
+  String get probeMethodInfo =>
+      'Pelo núcleo: atraso real até um site através do servidor, o mais preciso.\nSó conexão: apenas uma conexão TCP com o servidor, rápido mas não testa a VPN.\nHandshake TLS: TCP e TLS com o servidor.\nICMP: ping comum; alguns servidores não respondem.\nAuto: pelo núcleo e, quando não dá, uma conexão.';
+
+  @override
+  String get autoSelectInfo =>
+      'Como «O mais rápido» escolhe o servidor: por ping, por velocidade medida ou pelos dois.';
+
+  @override
+  String get autoSwitchInfo => 'Se o servidor atual ficar visivelmente mais lento, o Sora troca para um mais rápido.';
+
+  @override
+  String get probeTls => 'Handshake TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

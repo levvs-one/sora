@@ -2020,4 +2020,100 @@ class SKy extends S {
 
   @override
   String get winwsRequirements => 'Бул VPN режими жеткиликсиз';
+
+  @override
+  String get emptyServersTitle => 'Сервер же жазылуу кошуңуз';
+
+  @override
+  String get emptyServersBody =>
+      'VPN кызматынын жазылуу шилтемесин коюңуз, өз сервериңизди кошуңуз же QR кодду скандаңыз.';
+
+  @override
+  String get qrShort => 'QR код';
+
+  @override
+  String get extAboutHello => 'Панелдин үлгүсү: активдүү туташууларды көрсөтөт жана сыноо билдирмесин жөнөтөт.';
+
+  @override
+  String get extAboutZapret =>
+      'VPN\'сиз бөгөттөрдү айланып өтүү: провайдер сайтты тааныбашы үчүн туташуунун башын өзгөртөт.';
+
+  @override
+  String get extAboutByedpi => 'Жергиликтүү ByeDPI прокси аркылуу VPN\'сиз бөгөттөрдү айланып өтүү.';
+
+  @override
+  String get modeTunHint => 'Компьютердин бүт трафиги VPN аркылуу өтөт';
+
+  @override
+  String get modeProxyHint => 'Системалык проксини колдонгон браузерлер жана программалар гана';
+
+  @override
+  String get modeBypassHint => 'VPN серверсиз бөгөттөрдү айланып өтүү';
+
+  @override
+  String get modeExtensionHint => 'Кеңейтүүдөн бөгөттөрдү айланып өтүү';
+
+  @override
+  String get engineInfo =>
+      'Ядро сервер менен туташууну орнотот.\n\nАвто: Sora сервердин протоколун колдогон ядрону өзү тандайт.\nsing-box: тез жана универсалдуу.\nXray: REALITY жана XHTTP менен VLESS үчүн эң жакшы.\nmihomo: Clash жазылуулары жана ийкемдүү эрежелер.\n\nСервер «Авто» режиминде туташпаса гана ядрону алмаштырыңыз.';
+
+  @override
+  String get tunStackInfo =>
+      'Трафик системадан VPN\'ге кантип түшөт.\n\nСистемалык: эң тез, ОСтун тармак стеги аркылуу.\ngVisor: өз стеги, көпчүлүк программалар менен шайкеш.\nАралаш: TCP система аркылуу, UDP gVisor аркылуу.\n\nСайттар же оюндар начар иштесе, башка стекти сынап көрүңүз.';
+
+  @override
+  String get protection => 'Коргоо';
+
+  @override
+  String get killSwitchInfo =>
+      'VPN ажыраса, трафик туннелден тышкары кетпеши үчүн Sora интернетти бөгөттөйт. Кайра туташканда же VPN өчүрүлгөндө кирүү кайтат.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Бөгөт Sora\'дан чыккандан кийин да, кайра жүктөлгөндөн кийин да бул жерден өчүрмөйүнчө сакталат.';
+
+  @override
+  String get zapretWithVpnInfo => 'Эрежелер боюнча VPN\'ди айланып өткөн сайттар Zapret аркылуу бөгөттү айланып өтөт.';
+
+  @override
+  String get failoverInfo => 'Сервер жооп бербей калса, Sora кийинки иштеген серверге өзү которулат.';
+
+  @override
+  String get ipv6Info => 'IPv6\'ны VPN аркылуу жөнөтүү. Сервер IPv6\'ны колдобосо жана сайттар жай ачылса, өчүрүңүз.';
+
+  @override
+  String get fragmentInfo =>
+      'Провайдердин чыпкасы сайттын атын көрбөшү үчүн TLS туташуусунун башын бөлүктөргө бөлөт. Сервер SNI боюнча бөгөттөлгөндө жардам берет.';
+
+  @override
+  String get splitPosInfo =>
+      'Биринчи пакетти кайдан кесүү: байттын номери же белги, мисалы midsld (домендин ортосу). Бир нече маанини үтүр менен бөлүңүз.';
+
+  @override
+  String get disorderInfo =>
+      'Пакетти ирети менен чогулткан чыпкаларды адаштыруу үчүн пакеттин бөлүктөрүн тескери иретте жөнөтөт.';
+
+  @override
+  String get tlsRecordInfo => 'Сайттын аты бир жазууга толук түшпөшү үчүн TLS саламдашуусун бир нече жазууга бөлөт.';
+
+  @override
+  String get hostCaseInfo =>
+      'HTTP сурамдарындагы Host аталышынын регистрин өзгөртөт (Host → hoSt), эски чыпкалар сурамды тааныбай калат.';
+
+  @override
+  String get probeMethodInfo =>
+      'Ядро аркылуу: сервер аркылуу сайтка чейинки чыныгы кечигүү, эң так.\nТуташуу гана: серверге TCP туташуу гана, тез, бирок VPN\'ди текшербейт.\nTLS кол алышуу: сервер менен TCP жана TLS.\nICMP: кадимки ping, кээ бир серверлер жооп бербейт.\nАвто: ядро аркылуу, болбосо — туташуу.';
+
+  @override
+  String get autoSelectInfo =>
+      '«Эң тез» серверди кантип тандайт: пинг боюнча, өлчөнгөн ылдамдык боюнча же экөө боюнча.';
+
+  @override
+  String get autoSwitchInfo => 'Учурдагы сервер байкаларлык жайласа, Sora ылдамыраак серверге которулат.';
+
+  @override
+  String get probeTls => 'TLS кол алышуу';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

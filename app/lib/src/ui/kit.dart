@@ -235,11 +235,15 @@ class Heading extends StatelessWidget {
   );
 }
 
-/// Shows the cause of an unavailable extension action.
+/// The (i) after a feature's name: opens a short explanation of what it
+/// does, so rows stay one line instead of carrying grey paragraphs.
 class InfoButton extends StatelessWidget {
-  const InfoButton({super.key, required this.title, required this.description});
+  const InfoButton({super.key, required this.title, required this.description, this.dense = false});
   final String title;
   final String description;
+
+  /// The small variant that sits inside a settings row after its title.
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
@@ -247,10 +251,10 @@ class InfoButton extends StatelessWidget {
     return IconButton(
       key: ValueKey('info-$title'),
       tooltip: '${MaterialLocalizations.of(context).moreButtonTooltip}: $title',
-      icon: Icon(Symbols.info_rounded, size: 18, color: palette.ink),
+      icon: Icon(Symbols.info_rounded, size: dense ? 16 : 18, color: dense ? palette.ink2 : palette.ink),
       style: IconButton.styleFrom(
-        minimumSize: const Size(36, 36),
-        padding: const EdgeInsets.all(8),
+        minimumSize: dense ? const Size(28, 28) : const Size(36, 36),
+        padding: EdgeInsets.all(dense ? 4 : 8),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       onPressed: () => showDialog<void>(
@@ -388,11 +392,15 @@ class Tile extends StatelessWidget {
     this.titleColor,
     this.titleStyle,
     this.selected = false,
+    this.info,
   });
 
   final String title;
   final Color? titleColor;
   final TextStyle? titleStyle;
+
+  /// What the feature does, behind an (i) after the title.
+  final String? info;
   final String? detail;
   final Color? detailColor;
   final Widget? trailing;
@@ -428,6 +436,10 @@ class Tile extends StatelessWidget {
                             style: (titleStyle ?? Styles.body).copyWith(color: titleColor ?? palette.ink),
                           ),
                         ),
+                        if (info != null) ...[
+                          const SizedBox(width: 2),
+                          InfoButton(title: title, description: info!, dense: true),
+                        ],
                       ],
                     ),
                     if (detail != null)
@@ -451,18 +463,22 @@ class Tile extends StatelessWidget {
 
 /// A switch row that toggles when any part of the row is tapped.
 class SwitchTile extends StatelessWidget {
-  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged});
+  const SwitchTile({super.key, required this.title, required this.value, required this.onChanged, this.info});
 
   final String title;
 
   final bool value;
   final ValueChanged<bool>? onChanged;
 
+  /// What the switch does, behind an (i) after the title.
+  final String? info;
+
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
     return Tile(
       title: title,
+      info: info,
       onTap: onChanged == null ? null : () => onChanged!(!value),
       trailing: CupertinoSwitch(
         value: value,
@@ -483,12 +499,16 @@ class ChoiceTile<T> extends StatelessWidget {
     required this.value,
     required this.choices,
     required this.onChanged,
+    this.info,
   });
 
   final String title;
   final T value;
   final Map<T, String> choices;
   final ValueChanged<T> onChanged;
+
+  /// What the setting changes, behind an (i) after the title.
+  final String? info;
 
   @override
   Widget build(BuildContext context) {
@@ -511,6 +531,7 @@ class ChoiceTile<T> extends StatelessWidget {
       ],
       builder: (context, controller, _) => Tile(
         title: title,
+        info: info,
         onTap: () => controller.isOpen ? controller.close() : controller.open(),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -534,17 +555,21 @@ class ChoiceTile<T> extends StatelessWidget {
 
 /// A navigation row with an optional current value.
 class LinkTile extends StatelessWidget {
-  const LinkTile({super.key, required this.title, required this.onTap, this.value});
+  const LinkTile({super.key, required this.title, required this.onTap, this.value, this.info});
 
   final String title;
   final String? value;
   final VoidCallback onTap;
+
+  /// What the setting changes, behind an (i) after the title.
+  final String? info;
 
   @override
   Widget build(BuildContext context) {
     final palette = Palette.of(context);
     return Tile(
       title: title,
+      info: info,
       onTap: onTap,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -747,6 +772,73 @@ class PillButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
         ),
         child: Text(label, style: Styles.bodyStrong.copyWith(color: onTap == null ? palette.ink : palette.surface)),
+      ),
+    );
+  }
+}
+
+/// A secondary action in the outlined style of the mode button.
+class OutlineAction extends StatelessWidget {
+  const OutlineAction({super.key, required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: palette.ink,
+        side: BorderSide(color: palette.ink3.withValues(alpha: .35)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        minimumSize: const Size(0, 40),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: palette.ink),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Styles.secondary.copyWith(color: palette.ink, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A [RoundButton] that keeps its place while its action runs: a progress
+/// ring replaces the icon and taps are ignored.
+class BusyRoundButton extends StatelessWidget {
+  const BusyRoundButton({super.key, required this.icon, required this.label, required this.onTap, this.busy = false});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!busy) return RoundButton(icon: icon, label: label, onTap: onTap);
+    return Semantics(
+      label: label,
+      enabled: false,
+      excludeSemantics: true,
+      child: SizedBox.square(
+        dimension: 36,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: CircularProgressIndicator(strokeWidth: 2, color: Palette.of(context).ink),
+        ),
       ),
     );
   }

@@ -2018,4 +2018,99 @@ class SHy extends S {
 
   @override
   String get winwsRequirements => 'Այս VPN ռեժիմն անհասանելի է';
+
+  @override
+  String get emptyServersTitle => 'Ավելացրեք սերվեր կամ բաժանորդագրություն';
+
+  @override
+  String get emptyServersBody =>
+      'Տեղադրեք VPN ծառայության բաժանորդագրության հղումը, ավելացրեք ձեր սերվերը կամ սկանավորեք QR կոդը։';
+
+  @override
+  String get qrShort => 'QR կոդ';
+
+  @override
+  String get extAboutHello => 'Վահանակի օրինակ՝ ցույց է տալիս ակտիվ կապերը և ուղարկում փորձնական ծանուցում։';
+
+  @override
+  String get extAboutZapret =>
+      'Արգելափակումների շրջանցում առանց VPN-ի՝ փոխում է կապերի սկիզբը, որ մատակարարը չճանաչի կայքը։';
+
+  @override
+  String get extAboutByedpi => 'Արգելափակումների շրջանցում առանց VPN-ի տեղային ByeDPI պրոքսիով։';
+
+  @override
+  String get modeTunHint => 'Համակարգչի ամբողջ երթևեկությունն անցնում է VPN-ով';
+
+  @override
+  String get modeProxyHint => 'Միայն համակարգային պրոքսի օգտագործող դիտարկիչներն ու ծրագրերը';
+
+  @override
+  String get modeBypassHint => 'Արգելափակումների շրջանցում առանց VPN սերվերի';
+
+  @override
+  String get modeExtensionHint => 'Արգելափակումների շրջանցում ընդլայնումից';
+
+  @override
+  String get engineInfo =>
+      'Միջուկը կապ է հաստատում սերվերի հետ։\n\nԱվտո՝ Sora-ն ինքն է ընտրում սերվերի արձանագրությունն աջակցող միջուկը։\nsing-box՝ արագ և ունիվերսալ։\nXray՝ լավագույնը REALITY-ով և XHTTP-ով VLESS-ի համար։\nmihomo՝ Clash բաժանորդագրություններ և ճկուն կանոններ։\n\nՓոխեք միջուկը միայն եթե սերվերը չի միանում «Ավտո» ռեժիմում։';
+
+  @override
+  String get tunStackInfo =>
+      'Ինչպես է երթևեկությունը համակարգից հասնում VPN-ին։\n\nՀամակարգային՝ ամենաարագը, ՕՀ ցանցային ստեկով։\ngVisor՝ սեփական ստեկ, համատեղելի է ծրագրերի մեծ մասի հետ։\nԽառը՝ TCP-ն համակարգով, UDP-ն gVisor-ով։\n\nԵթե կայքերը կամ խաղերը վատ են աշխատում, փորձեք այլ ստեկ։';
+
+  @override
+  String get protection => 'Պաշտպանություն';
+
+  @override
+  String get killSwitchInfo =>
+      'Եթե VPN-ն անջատվի, Sora-ն կարգելափակի ինտերնետը, որ երթևեկությունը թունելից դուրս չգնա։ Մուտքը կվերադառնա վերամիացումից կամ VPN-ն անջատելուց հետո։';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Արգելափակումը մնում է Sora-ից դուրս գալուց և վերագործարկումից հետո, մինչև այն անջատեք այստեղ։';
+
+  @override
+  String get zapretWithVpnInfo => 'Կանոններով VPN-ը շրջանցող կայքերը ստանում են Zapret-ի արգելափակումների շրջանցում։';
+
+  @override
+  String get failoverInfo => 'Եթե սերվերը դադարի պատասխանել, Sora-ն ինքը կանցնի հաջորդ աշխատող սերվերին։';
+
+  @override
+  String get ipv6Info => 'Ուղարկել IPv6-ը VPN-ով։ Անջատեք, եթե սերվերը չի աջակցում IPv6 և կայքերը դանդաղ են բացվում։';
+
+  @override
+  String get fragmentInfo =>
+      'Բաժանում է TLS կապի սկիզբը մասերի, որ մատակարարի զտիչը չտեսնի կայքի անունը։ Օգնում է, երբ սերվերն արգելափակվում է ըստ SNI-ի։';
+
+  @override
+  String get splitPosInfo =>
+      'Որտեղից կտրել առաջին փաթեթը՝ բայթի համար կամ նշիչ, օրինակ midsld (դոմենի մեջտեղը)։ Մի քանի արժեք բաժանեք ստորակետով։';
+
+  @override
+  String get disorderInfo =>
+      'Ուղարկում է փաթեթի մասերը հակառակ հերթականությամբ, որ շփոթեցնի փաթեթը հերթով հավաքող զտիչներին։';
+
+  @override
+  String get tlsRecordInfo => 'Բաժանում է TLS ողջույնը մի քանի գրառման, որ կայքի անունն ամբողջությամբ չընկնի մեկի մեջ։';
+
+  @override
+  String get hostCaseInfo =>
+      'Փոխում է Host վերնագրի ռեգիստրը HTTP հարցումներում (Host → hoSt), և հին զտիչները չեն ճանաչում հարցումը։';
+
+  @override
+  String get probeMethodInfo =>
+      'Միջուկով՝ իրական ուշացում մինչև կայք սերվերի միջոցով, ամենաճշգրիտը։\nՄիայն կապ՝ միայն TCP կապ սերվերի հետ, արագ, բայց VPN-ը չի ստուգում։\nTLS ձեռքսեղմում՝ TCP և TLS սերվերի հետ։\nICMP՝ սովորական ping, որոշ սերվերներ չեն պատասխանում։\nԱվտո՝ միջուկով, իսկ որտեղ հնարավոր չէ՝ կապ։';
+
+  @override
+  String get autoSelectInfo => 'Ինչպես է «Ամենաարագը» ընտրում սերվերը՝ ըստ ping-ի, չափված արագության կամ երկուսի։';
+
+  @override
+  String get autoSwitchInfo => 'Եթե ընթացիկ սերվերը նկատելիորեն դանդաղի, Sora-ն կանցնի ավելի արագին։';
+
+  @override
+  String get probeTls => 'TLS ձեռքսեղմում';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

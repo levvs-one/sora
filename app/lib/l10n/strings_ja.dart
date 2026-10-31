@@ -2004,4 +2004,91 @@ class SJa extends S {
 
   @override
   String get winwsRequirements => 'このVPNモードは利用できません';
+
+  @override
+  String get emptyServersTitle => 'サーバーかサブスクリプションを追加';
+
+  @override
+  String get emptyServersBody => 'VPN サービスのサブスクリプションリンクを貼り付けるか、自分のサーバーを追加するか、QR コードを読み取ってください。';
+
+  @override
+  String get qrShort => 'QR コード';
+
+  @override
+  String get extAboutHello => 'サンプルパネル：アクティブな接続を表示し、テスト通知を送ります。';
+
+  @override
+  String get extAboutZapret => 'VPN なしでブロックを回避します。接続の先頭を変えて、プロバイダーにサイトを識別させません。';
+
+  @override
+  String get extAboutByedpi => 'ローカルの ByeDPI プロキシで VPN なしにブロックを回避します。';
+
+  @override
+  String get modeTunHint => 'コンピューターの全通信が VPN を通ります';
+
+  @override
+  String get modeProxyHint => 'システムプロキシを使うブラウザーとアプリのみ';
+
+  @override
+  String get modeBypassHint => 'VPN サーバーなしでブロックを回避';
+
+  @override
+  String get modeExtensionHint => '拡張機能によるブロック回避';
+
+  @override
+  String get engineInfo =>
+      'エンジンはサーバーとの接続を確立します。\n\n自動：サーバーのプロトコルに対応するエンジンを Sora が選びます。\nsing-box：高速で汎用的。\nXray：REALITY や XHTTP を使う VLESS に最適。\nmihomo：Clash サブスクリプションと柔軟なルール。\n\n「自動」で接続できないサーバーがある場合だけ変更してください。';
+
+  @override
+  String get tunStackInfo =>
+      '通信がシステムから VPN に入る方法です。\n\nシステム：最速。OS のネットワークスタックを使います。\ngVisor：独自のスタックで、ほとんどのアプリと互換。\n混合：TCP はシステム、UDP は gVisor。\n\nサイトやゲームが不調なら、別のスタックを試してください。';
+
+  @override
+  String get protection => '保護';
+
+  @override
+  String get killSwitchInfo => 'VPN が切れると、Sora はトンネルの外に通信が出ないようインターネットを遮断します。再接続するか VPN をオフにすると戻ります。';
+
+  @override
+  String get strictKillSwitchInfo => 'Sora を終了しても再起動しても、ここでオフにするまで遮断が続きます。';
+
+  @override
+  String get zapretWithVpnInfo => 'ルールで VPN の外へ送られるサイトに、Zapret のブロック回避を適用します。';
+
+  @override
+  String get failoverInfo => 'サーバーが応答しなくなると、Sora は次に使えるサーバーへ自動で切り替えます。';
+
+  @override
+  String get ipv6Info => 'IPv6 を VPN 経由にします。サーバーが IPv6 に対応せずサイトが遅い場合はオフにしてください。';
+
+  @override
+  String get fragmentInfo => 'TLS 接続の先頭を分割し、プロバイダーのフィルターにサイト名を見せません。SNI でサーバーがブロックされるときに有効です。';
+
+  @override
+  String get splitPosInfo => '最初のパケットを分割する位置：バイト番号、または midsld（ドメインの中央）などの目印。複数ある場合はカンマで区切ります。';
+
+  @override
+  String get disorderInfo => 'パケットの断片を逆順に送り、順番に組み立てるフィルターを惑わせます。';
+
+  @override
+  String get tlsRecordInfo => 'TLS の Hello を複数のレコードに分け、サイト名が一つにまとまらないようにします。';
+
+  @override
+  String get hostCaseInfo => 'HTTP リクエストの Host ヘッダーの大文字小文字を変え（Host → hoSt）、古いフィルターに認識させません。';
+
+  @override
+  String get probeMethodInfo =>
+      'エンジン経由：サーバーを通したサイトまでの実際の遅延。最も正確です。\n接続のみ：サーバーへの TCP 接続だけ。速いですが VPN は確認しません。\nTLS ハンドシェイク：サーバーとの TCP と TLS。\nICMP：通常の ping。応答しないサーバーもあります。\n自動：エンジン経由、できない場合は接続。';
+
+  @override
+  String get autoSelectInfo => '「最速」がサーバーを選ぶ基準：ping、測定した速度、またはその両方。';
+
+  @override
+  String get autoSwitchInfo => '現在のサーバーが明らかに遅くなると、Sora はより速いサーバーに切り替えます。';
+
+  @override
+  String get probeTls => 'TLS ハンドシェイク';
+
+  @override
+  String get probeIcmp => 'ICMP（ping）';
 }

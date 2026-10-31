@@ -59,6 +59,10 @@ class _ConnectionPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sora = SoraScope.of(context);
+    // With nothing added yet the servers pane below shows the empty card
+    // with every way to add servers; a second "add" tile here would repeat it.
+    final nothing = sora.subscriptions.isEmpty && sora.customServers.isEmpty && !sora.bypassSelected;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       child: Column(
@@ -71,19 +75,21 @@ class _ConnectionPane extends StatelessWidget {
           const Center(child: TourTarget(step: 2, radius: 88, child: _Orb())),
           const SizedBox(height: 28),
           const Center(child: TourTarget(step: 3, child: ModeButton())),
-          const SizedBox(height: 24),
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: SoraScope.of(context).subscriptions.isEmpty
-                  ? const TourTarget(
-                      step: 0,
-                      radius: 12,
-                      child: TourTarget(step: 1, radius: 12, child: _ServerCard(key: ValueKey('current-server'))),
-                    )
-                  : const _ServerCard(key: ValueKey('current-server')),
+          if (!nothing) ...[
+            const SizedBox(height: 24),
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: sora.subscriptions.isEmpty
+                    ? const TourTarget(
+                        step: 0,
+                        radius: 12,
+                        child: TourTarget(step: 1, radius: 12, child: _ServerCard(key: ValueKey('current-server'))),
+                      )
+                    : const _ServerCard(key: ValueKey('current-server')),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

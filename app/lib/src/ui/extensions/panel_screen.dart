@@ -23,11 +23,13 @@ import '../../design/theme.dart';
 import '../kit.dart';
 import '../../sora.dart';
 import '../../ext/bridge.dart';
+import '../../ext/bypass.dart';
 import '../../ext/manifest.dart';
 import '../../ext/store.dart';
 import '../../notifications.dart';
 import '../../core/link.dart';
 import '../../generated/sora/core/v1/core_control.pbgrpc.dart';
+import 'widgets.dart' show connectExtensionBypass;
 
 /// The lockdown policy for extension panels. Panels are embedded WebViews
 /// whose only sanctioned way out is the host API (the private JS channel to
@@ -256,10 +258,60 @@ class _ExtensionPanelScreenState extends State<ExtensionPanelScreen> {
           throw BridgeError('invalid-argument', e.message);
         }
       },
+      getBypass: _getBypass,
+      setBypass: _setBypass,
     );
     // Tear the panel down the moment the extension is disabled/removed.
     store.addListener(_onStoreChanged);
     _start();
+  }
+
+  String get _bypassChoice => '$extensionBypassPrefix${widget.extensionId}';
+
+  /// This extension's bypass as its panel sees it: the profiles its schema
+  /// offers, the chosen one, and whether Sora runs it now.
+  Future<Map<String, dynamic>> _getBypass() async {
+    if (!mounted) throw BridgeError('internal', 'the panel is closed');
+    final store = ExtScope.of(context);
+    final sora = SoraScope.read(context);
+    final profile = store.bypassProfile(_bypassChoice);
+    final settings = await store.getSettings(widget.extensionId);
+    final field = (_manifest.settingsSchema?['properties'] as Map<String, dynamic>?)?['profile'];
+    final names = field is Map && field['enum'] is List
+        ? [
+            for (final v in field['enum'] as List)
+              if (v is String) v,
+          ]
+        : <String>[];
+    final mine = sora.selected == _bypassChoice;
+    return {
+      'available': profile != null && sora.bypassProfileAvailable(profile),
+      'active': mine && sora.phase == Phase.connected,
+      'connecting': mine && (sora.phase == Phase.connecting || sora.phase == Phase.reconnecting),
+      'profile': settings['profile'],
+      'profiles': names,
+    };
+  }
+
+  /// Turns this extension's bypass on through the host's consent and
+  /// connect flow, or off. Never stops a session another choice started.
+  Future<void> _setBypass(bool active) async {
+    if (!mounted) throw BridgeError('internal', 'the panel is closed');
+    final sora = SoraScope.read(context);
+    if (!active) {
+      if (sora.selected == _bypassChoice && sora.phase != Phase.off && sora.phase != Phase.offline) {
+        await sora.disconnect();
+      }
+      return;
+    }
+    if (ExtScope.of(context).bypassProfile(_bypassChoice) == null) {
+      throw BridgeError('invalid-argument', 'the bypass is unavailable');
+    }
+    try {
+      await connectExtensionBypass(context, widget.extensionId);
+    } on ExtAssetError {
+      throw BridgeError('invalid-argument', 'the bypass is unavailable');
+    }
   }
 
   void _onStoreChanged() {

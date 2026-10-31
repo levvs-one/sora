@@ -2019,4 +2019,100 @@ class SKa extends S {
 
   @override
   String get winwsRequirements => 'VPN-ის ეს რეჟიმი მიუწვდომელია';
+
+  @override
+  String get emptyServersTitle => 'დაამატეთ სერვერი ან გამოწერა';
+
+  @override
+  String get emptyServersBody =>
+      'ჩასვით VPN სერვისის გამოწერის ბმული, დაამატეთ საკუთარი სერვერი ან დაასკანერეთ QR კოდი.';
+
+  @override
+  String get qrShort => 'QR კოდი';
+
+  @override
+  String get extAboutHello => 'პანელის მაგალითი: აჩვენებს აქტიურ კავშირებს და აგზავნის სატესტო შეტყობინებას.';
+
+  @override
+  String get extAboutZapret =>
+      'დაბლოკვის გვერდის ავლა VPN-ის გარეშე: ცვლის კავშირის დასაწყისს, რომ პროვაიდერმა საიტი ვერ ამოიცნოს.';
+
+  @override
+  String get extAboutByedpi => 'დაბლოკვის გვერდის ავლა VPN-ის გარეშე ლოკალური ByeDPI პროქსით.';
+
+  @override
+  String get modeTunHint => 'კომპიუტერის მთელი ტრაფიკი გადის VPN-ით';
+
+  @override
+  String get modeProxyHint => 'მხოლოდ ბრაუზერები და პროგრამები სისტემური პროქსით';
+
+  @override
+  String get modeBypassHint => 'დაბლოკვის გვერდის ავლა VPN სერვერის გარეშე';
+
+  @override
+  String get modeExtensionHint => 'დაბლოკვის გვერდის ავლა გაფართოებიდან';
+
+  @override
+  String get engineInfo =>
+      'ბირთვი ამყარებს კავშირს სერვერთან.\n\nავტო: Sora თავად ირჩევს ბირთვს, რომელიც სერვერის პროტოკოლს უჭერს მხარს.\nsing-box: სწრაფი და უნივერსალური.\nXray: საუკეთესოა VLESS-ისთვის REALITY-ით და XHTTP-ით.\nmihomo: Clash-ის გამოწერები და მოქნილი წესები.\n\nშეცვალეთ ბირთვი, მხოლოდ თუ სერვერი „ავტო“ რეჟიმში არ უკავშირდება.';
+
+  @override
+  String get tunStackInfo =>
+      'როგორ ხვდება ტრაფიკი სისტემიდან VPN-ში.\n\nსისტემური: ყველაზე სწრაფი, ოს-ის ქსელური სტეკით.\ngVisor: საკუთარი სტეკი, თავსებადია პროგრამების უმეტესობასთან.\nშერეული: TCP სისტემით, UDP gVisor-ით.\n\nთუ საიტები ან თამაშები ცუდად მუშაობს, სცადეთ სხვა სტეკი.';
+
+  @override
+  String get protection => 'დაცვა';
+
+  @override
+  String get killSwitchInfo =>
+      'თუ VPN გაითიშება, Sora დაბლოკავს ინტერნეტს, რომ ტრაფიკი გვირაბის გარეთ არ გავიდეს. წვდომა დაბრუნდება ხელახლა დაკავშირების ან VPN-ის გამორთვის შემდეგ.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'დაბლოკვა რჩება Sora-დან გასვლისა და გადატვირთვის შემდეგაც, სანამ აქ არ გამორთავთ.';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'საიტები, რომლებიც წესებით VPN-ს გვერდს უვლის, იღებს Zapret-ით დაბლოკვის გვერდის ავლას.';
+
+  @override
+  String get failoverInfo => 'თუ სერვერმა პასუხი შეწყვიტა, Sora თავად გადავა შემდეგ მომუშავე სერვერზე.';
+
+  @override
+  String get ipv6Info => 'IPv6-ის გაგზავნა VPN-ით. გამორთეთ, თუ სერვერი IPv6-ს არ უჭერს მხარს და საიტები ნელა იხსნება.';
+
+  @override
+  String get fragmentInfo =>
+      'ყოფს TLS კავშირის დასაწყისს ნაწილებად, რომ პროვაიდერის ფილტრმა საიტის სახელი ვერ დაინახოს. გეხმარებათ, როცა სერვერი SNI-ით იბლოკება.';
+
+  @override
+  String get splitPosInfo =>
+      'სად გაიჭრას პირველი პაკეტი: ბაიტის ნომერი ან ნიშნული, მაგალითად midsld (დომენის შუა). რამდენიმე მნიშვნელობა გამოყავით მძიმით.';
+
+  @override
+  String get disorderInfo =>
+      'აგზავნის პაკეტის ნაწილებს საპირისპირო თანმიმდევრობით, რომ დააბნიოს ფილტრები, რომლებიც პაკეტს რიგით აწყობენ.';
+
+  @override
+  String get tlsRecordInfo => 'ყოფს TLS მისალმებას რამდენიმე ჩანაწერად, რომ საიტის სახელი მთლიანად ერთში არ მოხვდეს.';
+
+  @override
+  String get hostCaseInfo =>
+      'ცვლის Host სათაურის რეგისტრს HTTP მოთხოვნებში (Host → hoSt) და ძველი ფილტრები მოთხოვნას ვეღარ ცნობენ.';
+
+  @override
+  String get probeMethodInfo =>
+      'ბირთვით: რეალური დაყოვნება საიტამდე სერვერის გავლით, ყველაზე ზუსტი.\nმხოლოდ კავშირი: მხოლოდ TCP კავშირი სერვერთან, სწრაფია, მაგრამ VPN-ს არ ამოწმებს.\nTLS ხელის ჩამორთმევა: TCP და TLS სერვერთან.\nICMP: ჩვეულებრივი ping, ზოგი სერვერი არ პასუხობს.\nავტო: ბირთვით, სადაც შეუძლებელია — კავშირი.';
+
+  @override
+  String get autoSelectInfo => 'როგორ ირჩევს „უსწრაფესი“ სერვერს: ping-ით, გაზომილი სიჩქარით ან ორივეთი.';
+
+  @override
+  String get autoSwitchInfo => 'თუ მიმდინარე სერვერი შესამჩნევად შენელდა, Sora გადავა უფრო სწრაფზე.';
+
+  @override
+  String get probeTls => 'TLS ხელის ჩამორთმევა';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

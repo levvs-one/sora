@@ -154,7 +154,7 @@ func TestTypeScriptDefsMatchBridgeContract(t *testing.T) {
 	// every documented error code / event kind must be named in the
 	// definitions panels are scaffolded with.
 	for _, want := range []string{
-		"getConnections", "getServers", "notify", "getSettings", "setSettings",
+		"getConnections", "getServers", "notify", "getSettings", "setSettings", "getBypass", "setBypass",
 		"'permission-denied'", "'invalid-argument'", "'not-connected'", "'internal'",
 		"'session.connected'", "'session.disconnected'", "'network.changed'", "'extension.disabled'",
 		"up_bytes", "down_bytes", "latency_ms",

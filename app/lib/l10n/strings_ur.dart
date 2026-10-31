@@ -2013,4 +2013,97 @@ class SUr extends S {
 
   @override
   String get winwsRequirements => 'یہ VPN موڈ دستیاب نہیں';
+
+  @override
+  String get emptyServersTitle => 'سرور یا سبسکرپشن شامل کریں';
+
+  @override
+  String get emptyServersBody => 'اپنی VPN سروس کا سبسکرپشن لنک چسپاں کریں، اپنا سرور شامل کریں یا QR کوڈ اسکین کریں۔';
+
+  @override
+  String get qrShort => 'QR کوڈ';
+
+  @override
+  String get extAboutHello => 'مثالی پینل: فعال کنکشن دکھاتا ہے اور آزمائشی اطلاع بھیجتا ہے۔';
+
+  @override
+  String get extAboutZapret => 'VPN کے بغیر پابندیوں سے بچاؤ: کنکشن کا آغاز بدلتا ہے تاکہ فراہم کنندہ سائٹ نہ پہچانے۔';
+
+  @override
+  String get extAboutByedpi => 'مقامی ByeDPI پراکسی کے ذریعے VPN کے بغیر پابندیوں سے بچاؤ۔';
+
+  @override
+  String get modeTunHint => 'کمپیوٹر کا سارا ٹریفک VPN سے گزرتا ہے';
+
+  @override
+  String get modeProxyHint => 'صرف وہ براؤزر اور ایپس جو سسٹم پراکسی استعمال کرتی ہیں';
+
+  @override
+  String get modeBypassHint => 'VPN سرور کے بغیر پابندیوں سے بچاؤ';
+
+  @override
+  String get modeExtensionHint => 'ایکسٹینشن سے پابندیوں سے بچاؤ';
+
+  @override
+  String get engineInfo =>
+      'انجن سرور سے کنکشن بناتا ہے۔\n\nخودکار: Sora خود ایسا انجن چنتا ہے جو سرور کا پروٹوکول سپورٹ کرے۔\nsing-box: تیز اور ہمہ گیر۔\nXray: REALITY اور XHTTP والے VLESS کے لیے بہترین۔\nmihomo: Clash سبسکرپشنز اور لچکدار اصول۔\n\nانجن صرف تب بدلیں جب سرور خودکار پر نہ جڑے۔';
+
+  @override
+  String get tunStackInfo =>
+      'ٹریفک سسٹم سے VPN تک کیسے پہنچتا ہے۔\n\nسسٹم: سب سے تیز، OS نیٹ ورک اسٹیک سے۔\ngVisor: اپنا اسٹیک، زیادہ تر ایپس کے ساتھ ہم آہنگ۔\nملا جلا: TCP سسٹم سے، UDP ‏gVisor سے۔\n\nاگر سائٹیں یا گیمز ٹھیک نہ چلیں تو دوسرا اسٹیک آزمائیں۔';
+
+  @override
+  String get protection => 'حفاظت';
+
+  @override
+  String get killSwitchInfo =>
+      'اگر VPN منقطع ہو جائے تو Sora انٹرنیٹ بند کر دیتا ہے تاکہ ٹریفک سرنگ سے باہر نہ جائے۔ دوبارہ جڑنے یا VPN بند کرنے پر رسائی واپس آتی ہے۔';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'یہ بندش Sora سے باہر نکلنے اور ری اسٹارٹ کے بعد بھی رہتی ہے، جب تک آپ اسے یہاں بند نہ کریں۔';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'جو سائٹیں اصولوں کے مطابق VPN سے باہر جاتی ہیں انہیں Zapret سے پابندیوں سے بچاؤ ملتا ہے۔';
+
+  @override
+  String get failoverInfo => 'اگر سرور جواب دینا بند کر دے تو Sora خود اگلے کام کرنے والے سرور پر چلا جاتا ہے۔';
+
+  @override
+  String get ipv6Info => 'IPv6 کو VPN سے بھیجیں۔ اگر سرور IPv6 سپورٹ نہیں کرتا اور سائٹیں آہستہ کھلتی ہیں تو بند کریں۔';
+
+  @override
+  String get fragmentInfo =>
+      'TLS کنکشن کے آغاز کو ٹکڑوں میں بانٹتا ہے تاکہ فراہم کنندہ کا فلٹر سائٹ کا نام نہ دیکھے۔ SNI سے بلاک ہونے پر مدد کرتا ہے۔';
+
+  @override
+  String get splitPosInfo =>
+      'پہلا پیکٹ کہاں سے کاٹنا ہے: بائٹ نمبر یا نشان جیسے midsld (ڈومین کا درمیان)۔ کئی قدریں کوما سے الگ کریں۔';
+
+  @override
+  String get disorderInfo => 'پیکٹ کے حصے الٹی ترتیب میں بھیجتا ہے تاکہ ترتیب سے جوڑنے والے فلٹر الجھ جائیں۔';
+
+  @override
+  String get tlsRecordInfo => 'TLS سلام کو کئی ریکارڈز میں بانٹتا ہے تاکہ سائٹ کا نام ایک ریکارڈ میں پورا نہ ہو۔';
+
+  @override
+  String get hostCaseInfo =>
+      'HTTP درخواستوں میں Host ہیڈر کے حروف کی شکل بدلتا ہے (Host → hoSt) تاکہ پرانے فلٹر درخواست نہ پہچانیں۔';
+
+  @override
+  String get probeMethodInfo =>
+      'انجن کے ذریعے: سرور سے کسی سائٹ تک اصل تاخیر، سب سے درست۔\nصرف کنکشن: سرور سے صرف TCP کنکشن، تیز مگر VPN کو نہیں جانچتا۔\nTLS ہینڈ شیک: سرور کے ساتھ TCP اور TLS۔\nICMP: عام ping، کچھ سرور جواب نہیں دیتے۔\nخودکار: انجن کے ذریعے، جہاں ممکن نہ ہو وہاں کنکشن۔';
+
+  @override
+  String get autoSelectInfo => '«سب سے تیز» سرور کیسے چنتا ہے: ping سے، ناپی گئی رفتار سے یا دونوں سے۔';
+
+  @override
+  String get autoSwitchInfo => 'اگر موجودہ سرور واضح طور پر سست ہو جائے تو Sora تیز سرور پر چلا جاتا ہے۔';
+
+  @override
+  String get probeTls => 'TLS ہینڈ شیک';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

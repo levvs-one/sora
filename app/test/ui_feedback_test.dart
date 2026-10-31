@@ -110,15 +110,23 @@ void main() {
   });
 
   for (final brightness in Brightness.values) {
-    testWidgets('settings contain labels and controls without explanatory dialogs $brightness', (tester) async {
+    testWidgets('settings explain complex rows behind info buttons, never inline $brightness', (tester) async {
       await mount(tester, (_) => const SettingsScreen(), brightness: brightness);
-      expect(find.byType(InfoButton), findsNothing);
       await tester.scrollUntilVisible(
         find.text(sora.strings.autoSwitchOnDegrade),
         240,
         scrollable: find.byType(Scrollable).first,
       );
-      expect(find.byType(InfoButton), findsNothing);
+      // Complex rows carry an (i) after their title; the explanation lives
+      // only in its dialog, so no row grows a grey paragraph.
+      expect(find.byType(InfoButton), findsWidgets);
+      expect(find.text(sora.strings.autoSwitchInfo), findsNothing);
+      final info = find.byKey(ValueKey('info-${sora.strings.autoSwitchOnDegrade}'));
+      await tester.ensureVisible(info);
+      await tester.pumpAndSettle();
+      await tester.tap(info);
+      await tester.pumpAndSettle();
+      expect(find.text(sora.strings.autoSwitchInfo), findsOneWidget);
       await shot(tester, 'settings-full-${brightness.name}');
       expect(tester.takeException(), isNull);
     });
@@ -174,7 +182,6 @@ void main() {
     sora.needsReconnect = true;
     await mount(tester, (_) => DesktopScope(desktop: Desktop(sora, navigator), child: const SettingsScreen()));
     final s = sora.strings;
-    expect(find.byType(InfoButton), findsNothing);
     expect(find.byKey(const ValueKey('apply-connection-changes')), findsNothing);
     expect(find.text('Чтобы применить изменения, переподключитесь.'), findsNothing);
     expect(find.text('Применить и переподключить'), findsNothing);

@@ -366,6 +366,11 @@ enum ProbeMethod {
   PROBE_METHOD_ENGINE = 1;
   // Only a TCP connection, which is fast and needs no engine but proves less.
   PROBE_METHOD_CONNECT = 2;
+  // Since capability "probe-tls-icmp": a TCP connection and a TLS handshake
+  // with the server, timed. The certificate is not checked.
+  PROBE_METHOD_TLS = 3;
+  // Since capability "probe-tls-icmp": one ICMP echo to the server's address.
+  PROBE_METHOD_ICMP = 4;
 }
 message RunDiagnosticsRequest { ApiVersion api_version = 1; string request_id = 2; string session_id = 3; }
 message RunDiagnosticsResponse { DiagnosticReport report = 1; SoraError error = 2; }

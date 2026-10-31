@@ -2026,4 +2026,103 @@ class SDe extends S {
 
   @override
   String get winwsRequirements => 'Dieser VPN-Modus ist nicht verfügbar';
+
+  @override
+  String get emptyServersTitle => 'Server oder Abonnement hinzufügen';
+
+  @override
+  String get emptyServersBody =>
+      'Fügen Sie einen Abo-Link Ihres VPN-Dienstes ein, richten Sie einen eigenen Server ein oder scannen Sie einen QR-Code.';
+
+  @override
+  String get qrShort => 'QR-Code';
+
+  @override
+  String get extAboutHello => 'Beispielpanel: zeigt aktive Verbindungen und sendet eine Testbenachrichtigung.';
+
+  @override
+  String get extAboutZapret =>
+      'Umgeht Sperren ohne VPN, indem es den Anfang von Verbindungen so verändert, dass der Anbieter die Website nicht erkennt.';
+
+  @override
+  String get extAboutByedpi => 'Umgeht Sperren ohne VPN über den lokalen ByeDPI-Proxy.';
+
+  @override
+  String get modeTunHint => 'Der gesamte Datenverkehr des Computers läuft über das VPN';
+
+  @override
+  String get modeProxyHint => 'Nur Browser und Apps, die den Systemproxy verwenden';
+
+  @override
+  String get modeBypassHint => 'Sperren ohne VPN-Server umgehen';
+
+  @override
+  String get modeExtensionHint => 'Sperrumgehung aus einer Erweiterung';
+
+  @override
+  String get engineInfo =>
+      'Der Kern baut die Verbindung zum Server auf.\n\nAuto: Sora wählt einen Kern, der das Protokoll des Servers unterstützt.\nsing-box: schnell und vielseitig.\nXray: am besten für VLESS mit REALITY und XHTTP.\nmihomo: Clash-Abonnements und flexible Regeln.\n\nWechseln Sie den Kern nur, wenn ein Server mit Auto keine Verbindung herstellt.';
+
+  @override
+  String get tunStackInfo =>
+      'Wie der Datenverkehr vom System ins VPN gelangt.\n\nSystem: am schnellsten, über den Netzwerkstack des Betriebssystems.\ngVisor: eigener Stack, mit den meisten Apps kompatibel.\nGemischt: TCP über das System, UDP über gVisor.\n\nWenn Websites oder Spiele Probleme machen, probieren Sie einen anderen Stack.';
+
+  @override
+  String get protection => 'Schutz';
+
+  @override
+  String get killSwitchInfo =>
+      'Bricht das VPN ab, sperrt Sora das Internet, damit kein Datenverkehr am Tunnel vorbeigeht. Der Zugang kehrt zurück, sobald das VPN wieder verbunden oder ausgeschaltet ist.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Die Sperre bleibt auch nach dem Beenden von Sora und nach einem Neustart bestehen, bis Sie sie hier ausschalten.';
+
+  @override
+  String get zapretWithVpnInfo => 'Websites, die Ihre Regeln am VPN vorbeiführen, erhalten die Zapret-Sperrumgehung.';
+
+  @override
+  String get failoverInfo =>
+      'Antwortet ein Server nicht mehr, wechselt Sora selbstständig zum nächsten funktionierenden.';
+
+  @override
+  String get ipv6Info =>
+      'IPv6 über das VPN leiten. Ausschalten, wenn der Server kein IPv6 hat und Websites langsam laden.';
+
+  @override
+  String get fragmentInfo =>
+      'Teilt den Anfang einer TLS-Verbindung in Stücke, damit der Filter des Anbieters den Namen der Website nicht sieht. Hilft, wenn ein Server per SNI gesperrt wird.';
+
+  @override
+  String get splitPosInfo =>
+      'Wo das erste Paket geteilt wird: eine Bytenummer oder eine Marke wie midsld (Mitte der Domain). Mehrere Werte durch Kommas trennen.';
+
+  @override
+  String get disorderInfo =>
+      'Sendet die Teile eines Pakets in umgekehrter Reihenfolge, um Filter zu verwirren, die es der Reihe nach zusammensetzen.';
+
+  @override
+  String get tlsRecordInfo =>
+      'Teilt das TLS-Hello in mehrere Records, damit der Name der Website nie an einem Stück vorliegt.';
+
+  @override
+  String get hostCaseInfo =>
+      'Ändert die Groß- und Kleinschreibung des Host-Headers in HTTP-Anfragen (Host → hoSt), sodass ältere Filter sie nicht mehr erkennen.';
+
+  @override
+  String get probeMethodInfo =>
+      'Über den Kern: echte Verzögerung zu einer Website über den Server, am genauesten.\nNur Verbindung: nur eine TCP-Verbindung zum Server, schnell, prüft aber nicht das VPN.\nTLS-Handshake: TCP und TLS mit dem Server.\nICMP: gewöhnlicher Ping; manche Server antworten nicht.\nAuto: über den Kern, sonst eine Verbindung.';
+
+  @override
+  String get autoSelectInfo =>
+      'Wie „Am schnellsten“ einen Server wählt: nach Ping, nach gemessener Geschwindigkeit oder nach beidem.';
+
+  @override
+  String get autoSwitchInfo => 'Wird der aktuelle Server merklich langsamer, wechselt Sora zu einem schnelleren.';
+
+  @override
+  String get probeTls => 'TLS-Handshake';
+
+  @override
+  String get probeIcmp => 'ICMP (Ping)';
 }

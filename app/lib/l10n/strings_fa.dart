@@ -2019,4 +2019,99 @@ class SFa extends S {
 
   @override
   String get winwsRequirements => 'این حالت VPN در دسترس نیست';
+
+  @override
+  String get emptyServersTitle => 'یک سرور یا اشتراک اضافه کنید';
+
+  @override
+  String get emptyServersBody =>
+      'پیوند اشتراک سرویس VPN خود را بچسبانید، سرور خودتان را اضافه کنید یا یک کد QR را اسکن کنید.';
+
+  @override
+  String get qrShort => 'کد QR';
+
+  @override
+  String get extAboutHello => 'نمونهٔ پنل: اتصال‌های فعال را نشان می‌دهد و یک اعلان آزمایشی می‌فرستد.';
+
+  @override
+  String get extAboutZapret => 'دور زدن فیلتر بدون VPN: آغاز اتصال‌ها را تغییر می‌دهد تا ارائه‌دهنده سایت را نشناسد.';
+
+  @override
+  String get extAboutByedpi => 'دور زدن فیلتر بدون VPN با پراکسی محلی ByeDPI.';
+
+  @override
+  String get modeTunHint => 'همهٔ ترافیک رایانه از VPN می‌گذرد';
+
+  @override
+  String get modeProxyHint => 'فقط مرورگرها و برنامه‌هایی که از پراکسی سیستم استفاده می‌کنند';
+
+  @override
+  String get modeBypassHint => 'دور زدن فیلتر بدون سرور VPN';
+
+  @override
+  String get modeExtensionHint => 'دور زدن فیلتر از یک افزونه';
+
+  @override
+  String get engineInfo =>
+      'هسته اتصال به سرور را برقرار می‌کند.\n\nخودکار: Sora خودش هسته‌ای را برمی‌دارد که پروتکل سرور را پشتیبانی کند.\nsing-box: سریع و همه‌کاره.\nXray: بهترین برای VLESS با REALITY و XHTTP.\nmihomo: اشتراک‌های Clash و قوانین انعطاف‌پذیر.\n\nفقط وقتی هسته را عوض کنید که سرور با «خودکار» وصل نشود.';
+
+  @override
+  String get tunStackInfo =>
+      'ترافیک چگونه از سیستم به VPN می‌رسد.\n\nسیستمی: سریع‌ترین، با پشتهٔ شبکهٔ سیستم‌عامل.\ngVisor: پشتهٔ خودش، سازگار با بیشتر برنامه‌ها.\nترکیبی: TCP از سیستم، UDP از gVisor.\n\nاگر سایت‌ها یا بازی‌ها درست کار نکردند، پشتهٔ دیگری را امتحان کنید.';
+
+  @override
+  String get protection => 'محافظت';
+
+  @override
+  String get killSwitchInfo =>
+      'اگر VPN قطع شود، Sora اینترنت را می‌بندد تا ترافیکی بیرون از تونل نرود. پس از اتصال دوباره یا خاموش کردن VPN دسترسی برمی‌گردد.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'این مسدودسازی پس از خروج از Sora و پس از راه‌اندازی دوباره هم می‌ماند تا وقتی که آن را اینجا خاموش کنید.';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'سایت‌هایی که طبق قوانین شما بیرون از VPN می‌روند، از دور زدن فیلتر Zapret بهره می‌برند.';
+
+  @override
+  String get failoverInfo => 'اگر سروری پاسخ ندهد، Sora خودش به سرور سالم بعدی می‌رود.';
+
+  @override
+  String get ipv6Info => 'فرستادن IPv6 از راه VPN. اگر سرور IPv6 ندارد و سایت‌ها کند باز می‌شوند، خاموشش کنید.';
+
+  @override
+  String get fragmentInfo =>
+      'آغاز اتصال TLS را تکه‌تکه می‌کند تا فیلتر ارائه‌دهنده نام سایت را نبیند. وقتی سرور با SNI مسدود می‌شود کمک می‌کند.';
+
+  @override
+  String get splitPosInfo =>
+      'جای برش بستهٔ اول: شمارهٔ بایت یا نشانه‌ای مانند midsld (وسط دامنه). چند مقدار را با ویرگول جدا کنید.';
+
+  @override
+  String get disorderInfo =>
+      'تکه‌های بسته را به ترتیب وارونه می‌فرستد تا فیلترهایی که بسته را به ترتیب سرهم می‌کنند گیج شوند.';
+
+  @override
+  String get tlsRecordInfo => 'سلام TLS را به چند رکورد تقسیم می‌کند تا نام سایت یکجا در یک رکورد نباشد.';
+
+  @override
+  String get hostCaseInfo =>
+      'بزرگی و کوچکی حروف سرآیند Host را در درخواست‌های HTTP تغییر می‌دهد (Host → hoSt) تا فیلترهای قدیمی درخواست را نشناسند.';
+
+  @override
+  String get probeMethodInfo =>
+      'از راه هسته: تأخیر واقعی تا یک سایت از طریق سرور، دقیق‌ترین.\nفقط اتصال: فقط اتصال TCP به سرور، سریع ولی VPN را نمی‌آزماید.\nدست‌دهی TLS: ‏TCP و TLS با سرور.\nICMP: پینگ معمولی؛ برخی سرورها پاسخ نمی‌دهند.\nخودکار: از راه هسته و هرجا ممکن نباشد، اتصال.';
+
+  @override
+  String get autoSelectInfo => '«سریع‌ترین» چگونه سرور را برمی‌گزیند: بر پایهٔ پینگ، سرعت اندازه‌گیری‌شده یا هر دو.';
+
+  @override
+  String get autoSwitchInfo => 'اگر سرور کنونی به‌طور محسوسی کند شود، Sora به سرور سریع‌تری می‌رود.';
+
+  @override
+  String get probeTls => 'دست‌دهی TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

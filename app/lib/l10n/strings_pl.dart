@@ -2043,4 +2043,98 @@ class SPl extends S {
 
   @override
   String get winwsRequirements => 'Ten tryb VPN jest niedostępny';
+
+  @override
+  String get emptyServersTitle => 'Dodaj serwer lub subskrypcję';
+
+  @override
+  String get emptyServersBody => 'Wklej link subskrypcji od usługi VPN, dodaj własny serwer albo zeskanuj kod QR.';
+
+  @override
+  String get qrShort => 'Kod QR';
+
+  @override
+  String get extAboutHello => 'Przykładowy panel: pokazuje aktywne połączenia i wysyła powiadomienie testowe.';
+
+  @override
+  String get extAboutZapret =>
+      'Omija blokady bez VPN, zmieniając początek połączeń tak, by dostawca nie rozpoznał strony.';
+
+  @override
+  String get extAboutByedpi => 'Omija blokady bez VPN przez lokalne proxy ByeDPI.';
+
+  @override
+  String get modeTunHint => 'Cały ruch komputera idzie przez VPN';
+
+  @override
+  String get modeProxyHint => 'Tylko przeglądarki i aplikacje korzystające z proxy systemowego';
+
+  @override
+  String get modeBypassHint => 'Omijanie blokad bez serwera VPN';
+
+  @override
+  String get modeExtensionHint => 'Omijanie blokad z rozszerzenia';
+
+  @override
+  String get engineInfo =>
+      'Rdzeń nawiązuje połączenie z serwerem.\n\nAuto: Sora sama wybiera rdzeń obsługujący protokół serwera.\nsing-box: szybki i uniwersalny.\nXray: najlepszy do VLESS z REALITY i XHTTP.\nmihomo: subskrypcje Clash i elastyczne reguły.\n\nZmieniaj rdzeń tylko wtedy, gdy serwer nie łączy się w trybie Auto.';
+
+  @override
+  String get tunStackInfo =>
+      'Jak ruch trafia z systemu do VPN.\n\nSystemowy: najszybszy, przez stos sieciowy systemu.\ngVisor: własny stos, zgodny z większością aplikacji.\nMieszany: TCP przez system, UDP przez gVisor.\n\nJeśli strony lub gry działają źle, spróbuj innego stosu.';
+
+  @override
+  String get protection => 'Ochrona';
+
+  @override
+  String get killSwitchInfo =>
+      'Gdy VPN się rozłączy, Sora blokuje internet, by żaden ruch nie wyszedł poza tunel. Dostęp wraca po ponownym połączeniu lub wyłączeniu VPN.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Blokada zostaje także po zamknięciu Sory i po restarcie, dopóki nie wyłączysz jej tutaj.';
+
+  @override
+  String get zapretWithVpnInfo => 'Strony, które Twoje reguły kierują poza VPN, dostają omijanie blokad Zapret.';
+
+  @override
+  String get failoverInfo => 'Jeśli serwer przestanie odpowiadać, Sora sama przełączy się na następny działający.';
+
+  @override
+  String get ipv6Info => 'Przesyłaj IPv6 przez VPN. Wyłącz, jeśli serwer nie ma IPv6, a strony ładują się wolno.';
+
+  @override
+  String get fragmentInfo =>
+      'Dzieli początek połączenia TLS na kawałki, by filtr dostawcy nie zobaczył nazwy strony. Pomaga, gdy serwer jest blokowany po SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Gdzie ciąć pierwszy pakiet: numer bajtu lub znacznik, np. midsld (środek domeny). Kilka wartości oddziel przecinkami.';
+
+  @override
+  String get disorderInfo => 'Wysyła części pakietu w odwrotnej kolejności, by zmylić filtry składające go po kolei.';
+
+  @override
+  String get tlsRecordInfo =>
+      'Dzieli powitanie TLS na kilka rekordów, by nazwa strony nigdy nie była w jednym kawałku.';
+
+  @override
+  String get hostCaseInfo =>
+      'Zmienia wielkość liter nagłówka Host w żądaniach HTTP (Host → hoSt), więc starsze filtry ich nie rozpoznają.';
+
+  @override
+  String get probeMethodInfo =>
+      'Przez rdzeń: prawdziwe opóźnienie do strony przez serwer, najdokładniejsze.\nTylko połączenie: samo połączenie TCP z serwerem, szybkie, ale nie sprawdza VPN.\nUzgadnianie TLS: TCP i TLS z serwerem.\nICMP: zwykły ping; niektóre serwery nie odpowiadają.\nAuto: przez rdzeń, a gdy się nie da — połączenie.';
+
+  @override
+  String get autoSelectInfo => 'Jak „Najszybszy” wybiera serwer: według pingu, zmierzonej prędkości lub obu.';
+
+  @override
+  String get autoSwitchInfo => 'Gdy bieżący serwer wyraźnie zwolni, Sora przełączy się na szybszy.';
+
+  @override
+  String get probeTls => 'Uzgadnianie TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

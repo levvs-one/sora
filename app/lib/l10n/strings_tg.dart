@@ -2015,4 +2015,102 @@ class STg extends S {
 
   @override
   String get winwsRequirements => 'Ин реҷаи VPN дастнорас аст';
+
+  @override
+  String get emptyServersTitle => 'Сервер ё обуна илова кунед';
+
+  @override
+  String get emptyServersBody =>
+      'Пайванди обунаро аз хидмати VPN гузоред, сервери худро илова кунед ё рамзи QR-ро скан кунед.';
+
+  @override
+  String get qrShort => 'Рамзи QR';
+
+  @override
+  String get extAboutHello => 'Намунаи панел: пайвастҳои фаъолро нишон медиҳад ва огоҳиномаи санҷишӣ мефиристад.';
+
+  @override
+  String get extAboutZapret =>
+      'Гузаштан аз бастаниҳо бе VPN: оғози пайвастро тағйир медиҳад, то провайдер сайтро нашиносад.';
+
+  @override
+  String get extAboutByedpi => 'Гузаштан аз бастаниҳо бе VPN тавассути проксии маҳаллии ByeDPI.';
+
+  @override
+  String get modeTunHint => 'Тамоми трафики компютер аз VPN мегузарад';
+
+  @override
+  String get modeProxyHint => 'Танҳо браузерҳо ва барномаҳое, ки проксии системаро истифода мебаранд';
+
+  @override
+  String get modeBypassHint => 'Гузаштан аз бастаниҳо бе сервери VPN';
+
+  @override
+  String get modeExtensionHint => 'Гузаштан аз бастаниҳо аз васеъшавӣ';
+
+  @override
+  String get engineInfo =>
+      'Ядро бо сервер пайваст барқарор мекунад.\n\nАвто: Sora ядроеро, ки протоколи серверро дастгирӣ мекунад, худ интихоб мекунад.\nsing-box: тез ва универсалӣ.\nXray: беҳтарин барои VLESS бо REALITY ва XHTTP.\nmihomo: обунаҳои Clash ва қоидаҳои чандир.\n\nЯдроро танҳо вақте иваз кунед, ки сервер дар реҷаи «Авто» пайваст намешавад.';
+
+  @override
+  String get tunStackInfo =>
+      'Трафик чӣ тавр аз система ба VPN мерасад.\n\nСистемавӣ: тезтарин, тавассути стеки шабакаи СО.\ngVisor: стеки худ, бо аксари барномаҳо мувофиқ.\nОмехта: TCP тавассути система, UDP тавассути gVisor.\n\nАгар сайтҳо ё бозиҳо бад кор кунанд, стеки дигарро санҷед.';
+
+  @override
+  String get protection => 'Ҳимоя';
+
+  @override
+  String get killSwitchInfo =>
+      'Агар VPN қатъ шавад, Sora интернетро мебандад, то трафик берун аз туннел наравад. Пас аз пайвасти дубора ё хомӯш кардани VPN дастрасӣ бармегардад.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Бастан пас аз баромадан аз Sora ва пас аз бозоғозӣ то он даме, ки онро дар ин ҷо хомӯш накунед, боқӣ мемонад.';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'Сайтҳое, ки тибқи қоидаҳо аз VPN берун мегузаранд, аз бастаниҳо тавассути Zapret мегузаранд.';
+
+  @override
+  String get failoverInfo => 'Агар сервер ҷавоб надиҳад, Sora худ ба сервери кории навбатӣ мегузарад.';
+
+  @override
+  String get ipv6Info =>
+      'IPv6-ро тавассути VPN фиристодан. Агар сервер IPv6-ро дастгирӣ накунад ва сайтҳо суст кушода шаванд, хомӯш кунед.';
+
+  @override
+  String get fragmentInfo =>
+      'Оғози пайвасти TLS-ро ба қисмҳо тақсим мекунад, то филтри провайдер номи сайтро набинад. Вақте ки сервер аз рӯи SNI баста мешавад, кумак мекунад.';
+
+  @override
+  String get splitPosInfo =>
+      'Бастаи аввалро аз куҷо буридан: рақами байт ё нишона, масалан midsld (миёнаи домен). Якчанд қиматро бо вергул ҷудо кунед.';
+
+  @override
+  String get disorderInfo =>
+      'Қисмҳои бастаро бо тартиби баръакс мефиристад, то филтрҳоеро, ки бастаро бо тартиб ҷамъ мекунанд, гумроҳ кунад.';
+
+  @override
+  String get tlsRecordInfo => 'Саломи TLS-ро ба якчанд сабт тақсим мекунад, то номи сайт пурра ба як сабт наафтад.';
+
+  @override
+  String get hostCaseInfo =>
+      'Регистри сарлавҳаи Host-ро дар дархостҳои HTTP иваз мекунад (Host → hoSt) ва филтрҳои кӯҳна дархостро намешиносанд.';
+
+  @override
+  String get probeMethodInfo =>
+      'Тавассути ядро: таъхири воқеӣ то сайт тавассути сервер, дақиқтарин.\nТанҳо пайваст: танҳо пайвасти TCP ба сервер, тез, вале VPN-ро тафтиш намекунад.\nДастфишории TLS: TCP ва TLS бо сервер.\nICMP: ping-и оддӣ, баъзе серверҳо ҷавоб намедиҳанд.\nАвто: тавассути ядро, вагарна — пайваст.';
+
+  @override
+  String get autoSelectInfo =>
+      '«Тезтарин» серверро чӣ тавр интихоб мекунад: аз рӯи ping, аз рӯи суръати ченшуда ё аз рӯи ҳарду.';
+
+  @override
+  String get autoSwitchInfo => 'Агар сервери ҷорӣ хеле суст шавад, Sora ба сервери тезтар мегузарад.';
+
+  @override
+  String get probeTls => 'Дастфишории TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

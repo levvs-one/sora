@@ -2028,4 +2028,102 @@ class SIt extends S {
 
   @override
   String get winwsRequirements => 'Questa modalità VPN non è disponibile';
+
+  @override
+  String get emptyServersTitle => 'Aggiungi un server o un abbonamento';
+
+  @override
+  String get emptyServersBody =>
+      'Incolla il link dell\'abbonamento del tuo servizio VPN, aggiungi un tuo server o scansiona un codice QR.';
+
+  @override
+  String get qrShort => 'Codice QR';
+
+  @override
+  String get extAboutHello => 'Pannello di esempio: mostra le connessioni attive e invia una notifica di prova.';
+
+  @override
+  String get extAboutZapret =>
+      'Aggira i blocchi senza VPN modificando l\'inizio delle connessioni perché il provider non riconosca il sito.';
+
+  @override
+  String get extAboutByedpi => 'Aggira i blocchi senza VPN tramite il proxy locale ByeDPI.';
+
+  @override
+  String get modeTunHint => 'Tutto il traffico del computer passa dalla VPN';
+
+  @override
+  String get modeProxyHint => 'Solo browser e app che usano il proxy di sistema';
+
+  @override
+  String get modeBypassHint => 'Aggirare i blocchi senza un server VPN';
+
+  @override
+  String get modeExtensionHint => 'Aggiramento dei blocchi da un\'estensione';
+
+  @override
+  String get engineInfo =>
+      'Il motore stabilisce la connessione con il server.\n\nAuto: Sora sceglie un motore che supporta il protocollo del server.\nsing-box: veloce e versatile.\nXray: il migliore per VLESS con REALITY e XHTTP.\nmihomo: abbonamenti Clash e regole flessibili.\n\nCambia motore solo se un server non si connette con Auto.';
+
+  @override
+  String get tunStackInfo =>
+      'Come il traffico passa dal sistema alla VPN.\n\nSistema: il più veloce, usa lo stack di rete del sistema.\ngVisor: stack proprio, compatibile con la maggior parte delle app.\nMisto: TCP tramite il sistema, UDP tramite gVisor.\n\nSe siti o giochi non funzionano bene, prova un altro stack.';
+
+  @override
+  String get protection => 'Protezione';
+
+  @override
+  String get killSwitchInfo =>
+      'Se la VPN cade, Sora blocca internet perché nessun traffico esca fuori dal tunnel. L\'accesso torna quando la VPN si riconnette o viene disattivata.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Il blocco resta anche dopo l\'uscita da Sora e dopo il riavvio, finché non lo disattivi qui.';
+
+  @override
+  String get zapretWithVpnInfo =>
+      'I siti che le tue regole mandano fuori dalla VPN ricevono l\'aggiramento dei blocchi di Zapret.';
+
+  @override
+  String get failoverInfo => 'Se un server smette di rispondere, Sora passa da solo al successivo funzionante.';
+
+  @override
+  String get ipv6Info =>
+      'Instrada IPv6 attraverso la VPN. Disattiva se il server non ha IPv6 e i siti si caricano lentamente.';
+
+  @override
+  String get fragmentInfo =>
+      'Divide l\'inizio di una connessione TLS in pezzi perché il filtro del provider non veda il nome del sito. Utile quando un server è bloccato tramite SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Dove tagliare il primo pacchetto: un numero di byte o un segnaposto come midsld (metà del dominio). Separa più valori con virgole.';
+
+  @override
+  String get disorderInfo =>
+      'Invia le parti di un pacchetto in ordine inverso per confondere i filtri che lo ricompongono in sequenza.';
+
+  @override
+  String get tlsRecordInfo => 'Divide l\'hello TLS in più record così il nome del sito non è mai tutto in uno.';
+
+  @override
+  String get hostCaseInfo =>
+      'Cambia maiuscole e minuscole dell\'intestazione Host nelle richieste HTTP (Host → hoSt) così i filtri più vecchi non le riconoscono.';
+
+  @override
+  String get probeMethodInfo =>
+      'Tramite il motore: ritardo reale verso un sito attraverso il server, il più preciso.\nSolo connessione: solo una connessione TCP al server, veloce ma non verifica la VPN.\nHandshake TLS: TCP e TLS con il server.\nICMP: ping normale; alcuni server non rispondono.\nAuto: tramite il motore, altrimenti una connessione.';
+
+  @override
+  String get autoSelectInfo =>
+      'Come «Il più veloce» sceglie un server: per ping, per velocità misurata o per entrambi.';
+
+  @override
+  String get autoSwitchInfo => 'Se il server attuale diventa sensibilmente più lento, Sora passa a uno più veloce.';
+
+  @override
+  String get probeTls => 'Handshake TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

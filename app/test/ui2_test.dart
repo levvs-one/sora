@@ -331,6 +331,8 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('mode-tun')));
     await tester.pumpAndSettle();
     expect(sora.selected, 'auto');
+    // Let the debounced connection replan run before the tree goes away.
+    await tester.pump(const Duration(milliseconds: 400));
   });
 
   for (final width in [1440.0, 420.0]) {
@@ -378,6 +380,7 @@ void main() {
       expect(sora.settings.mihomoTunStack, 'mips');
       expect(sora.settings.xrayTunStack, 'system');
       expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(milliseconds: 400));
     });
 
     testWidgets('mode details open as a page and return safely at $width', (tester) async {

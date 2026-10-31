@@ -2016,4 +2016,98 @@ class SVi extends S {
 
   @override
   String get winwsRequirements => 'Chế độ VPN này không khả dụng';
+
+  @override
+  String get emptyServersTitle => 'Thêm máy chủ hoặc gói đăng ký';
+
+  @override
+  String get emptyServersBody => 'Dán liên kết đăng ký từ dịch vụ VPN, thêm máy chủ của riêng bạn hoặc quét mã QR.';
+
+  @override
+  String get qrShort => 'Mã QR';
+
+  @override
+  String get extAboutHello => 'Bảng mẫu: hiển thị các kết nối đang hoạt động và gửi thông báo thử.';
+
+  @override
+  String get extAboutZapret =>
+      'Vượt chặn không cần VPN bằng cách thay đổi phần đầu kết nối để nhà mạng không nhận ra trang web.';
+
+  @override
+  String get extAboutByedpi => 'Vượt chặn không cần VPN qua proxy ByeDPI cục bộ.';
+
+  @override
+  String get modeTunHint => 'Toàn bộ lưu lượng của máy tính đi qua VPN';
+
+  @override
+  String get modeProxyHint => 'Chỉ trình duyệt và ứng dụng dùng proxy hệ thống';
+
+  @override
+  String get modeBypassHint => 'Vượt chặn không cần máy chủ VPN';
+
+  @override
+  String get modeExtensionHint => 'Vượt chặn từ một tiện ích';
+
+  @override
+  String get engineInfo =>
+      'Lõi tạo kết nối tới máy chủ.\n\nTự động: Sora chọn lõi hỗ trợ giao thức của máy chủ.\nsing-box: nhanh và đa năng.\nXray: tốt nhất cho VLESS với REALITY và XHTTP.\nmihomo: gói Clash và quy tắc linh hoạt.\n\nChỉ đổi lõi khi máy chủ không kết nối ở chế độ Tự động.';
+
+  @override
+  String get tunStackInfo =>
+      'Cách lưu lượng đi từ hệ thống vào VPN.\n\nHệ thống: nhanh nhất, dùng ngăn xếp mạng của HĐH.\ngVisor: ngăn xếp riêng, tương thích với hầu hết ứng dụng.\nHỗn hợp: TCP qua hệ thống, UDP qua gVisor.\n\nNếu trang web hoặc trò chơi gặp lỗi, hãy thử ngăn xếp khác.';
+
+  @override
+  String get protection => 'Bảo vệ';
+
+  @override
+  String get killSwitchInfo =>
+      'Nếu VPN bị ngắt, Sora chặn internet để không có lưu lượng nào đi ra ngoài đường hầm. Truy cập trở lại khi VPN kết nối lại hoặc được tắt.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Việc chặn vẫn giữ sau khi thoát Sora và sau khi khởi động lại, cho đến khi bạn tắt nó ở đây.';
+
+  @override
+  String get zapretWithVpnInfo => 'Các trang mà quy tắc của bạn gửi ra ngoài VPN sẽ được vượt chặn bằng Zapret.';
+
+  @override
+  String get failoverInfo => 'Nếu máy chủ ngừng phản hồi, Sora tự chuyển sang máy chủ hoạt động tiếp theo.';
+
+  @override
+  String get ipv6Info => 'Gửi IPv6 qua VPN. Tắt nếu máy chủ không có IPv6 và trang web tải chậm.';
+
+  @override
+  String get fragmentInfo =>
+      'Chia phần đầu kết nối TLS thành nhiều mảnh để bộ lọc của nhà mạng không thấy tên trang. Hữu ích khi máy chủ bị chặn theo SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Vị trí cắt gói đầu tiên: số byte hoặc mốc như midsld (giữa tên miền). Ngăn cách nhiều giá trị bằng dấu phẩy.';
+
+  @override
+  String get disorderInfo => 'Gửi các phần của gói theo thứ tự ngược để đánh lừa bộ lọc ghép gói theo thứ tự.';
+
+  @override
+  String get tlsRecordInfo =>
+      'Chia lời chào TLS thành nhiều bản ghi để tên trang không bao giờ nằm trọn trong một bản ghi.';
+
+  @override
+  String get hostCaseInfo =>
+      'Đổi chữ hoa thường của tiêu đề Host trong yêu cầu HTTP (Host → hoSt) để bộ lọc cũ không nhận ra.';
+
+  @override
+  String get probeMethodInfo =>
+      'Qua lõi: độ trễ thật tới một trang qua máy chủ, chính xác nhất.\nChỉ kết nối: chỉ kết nối TCP tới máy chủ, nhanh nhưng không kiểm tra VPN.\nBắt tay TLS: TCP và TLS với máy chủ.\nICMP: ping thông thường; một số máy chủ không trả lời.\nTự động: qua lõi, nếu không được thì kết nối.';
+
+  @override
+  String get autoSelectInfo => 'Cách «Nhanh nhất» chọn máy chủ: theo ping, theo tốc độ đã đo hoặc cả hai.';
+
+  @override
+  String get autoSwitchInfo => 'Nếu máy chủ hiện tại chậm đi rõ rệt, Sora chuyển sang máy chủ nhanh hơn.';
+
+  @override
+  String get probeTls => 'Bắt tay TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

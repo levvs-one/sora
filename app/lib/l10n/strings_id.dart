@@ -2016,4 +2016,101 @@ class SId extends S {
 
   @override
   String get winwsRequirements => 'Mode VPN ini tidak tersedia';
+
+  @override
+  String get emptyServersTitle => 'Tambahkan server atau langganan';
+
+  @override
+  String get emptyServersBody =>
+      'Tempel tautan langganan dari layanan VPN Anda, tambahkan server sendiri, atau pindai kode QR.';
+
+  @override
+  String get qrShort => 'Kode QR';
+
+  @override
+  String get extAboutHello => 'Panel contoh: menampilkan koneksi aktif dan mengirim notifikasi uji.';
+
+  @override
+  String get extAboutZapret =>
+      'Menembus pemblokiran tanpa VPN dengan mengubah awal koneksi agar penyedia tidak mengenali situs.';
+
+  @override
+  String get extAboutByedpi => 'Menembus pemblokiran tanpa VPN lewat proxy lokal ByeDPI.';
+
+  @override
+  String get modeTunHint => 'Semua lalu lintas komputer melewati VPN';
+
+  @override
+  String get modeProxyHint => 'Hanya browser dan aplikasi yang memakai proxy sistem';
+
+  @override
+  String get modeBypassHint => 'Menembus pemblokiran tanpa server VPN';
+
+  @override
+  String get modeExtensionHint => 'Penembus pemblokiran dari ekstensi';
+
+  @override
+  String get engineInfo =>
+      'Mesin membuat koneksi ke server.\n\nOtomatis: Sora memilih mesin yang mendukung protokol server.\nsing-box: cepat dan serbaguna.\nXray: terbaik untuk VLESS dengan REALITY dan XHTTP.\nmihomo: langganan Clash dan aturan fleksibel.\n\nGanti mesin hanya jika server tidak tersambung dengan Otomatis.';
+
+  @override
+  String get tunStackInfo =>
+      'Cara lalu lintas berpindah dari sistem ke VPN.\n\nSistem: tercepat, memakai tumpukan jaringan OS.\ngVisor: tumpukan sendiri, cocok dengan sebagian besar aplikasi.\nCampuran: TCP lewat sistem, UDP lewat gVisor.\n\nJika situs atau game bermasalah, coba tumpukan lain.';
+
+  @override
+  String get protection => 'Perlindungan';
+
+  @override
+  String get killSwitchInfo =>
+      'Jika VPN putus, Sora memblokir internet agar tidak ada lalu lintas keluar di luar terowongan. Akses kembali setelah VPN tersambung lagi atau dimatikan.';
+
+  @override
+  String get strictKillSwitchInfo =>
+      'Blokir tetap aktif setelah keluar dari Sora dan setelah mulai ulang, sampai Anda mematikannya di sini.';
+
+  @override
+  String get zapretWithVpnInfo => 'Situs yang aturan Anda kirim di luar VPN mendapat penembus pemblokiran Zapret.';
+
+  @override
+  String get failoverInfo =>
+      'Jika server berhenti merespons, Sora otomatis pindah ke server berikutnya yang berfungsi.';
+
+  @override
+  String get ipv6Info => 'Kirim IPv6 lewat VPN. Matikan jika server tidak punya IPv6 dan situs lambat terbuka.';
+
+  @override
+  String get fragmentInfo =>
+      'Memecah awal koneksi TLS agar filter penyedia tidak melihat nama situs. Berguna saat server diblokir lewat SNI.';
+
+  @override
+  String get splitPosInfo =>
+      'Tempat memotong paket pertama: nomor byte atau penanda seperti midsld (tengah domain). Pisahkan beberapa nilai dengan koma.';
+
+  @override
+  String get disorderInfo =>
+      'Mengirim bagian paket dalam urutan terbalik untuk mengecoh filter yang menyusunnya berurutan.';
+
+  @override
+  String get tlsRecordInfo =>
+      'Membagi hello TLS menjadi beberapa record agar nama situs tidak pernah utuh dalam satu record.';
+
+  @override
+  String get hostCaseInfo =>
+      'Mengubah huruf besar-kecil header Host di permintaan HTTP (Host → hoSt) sehingga filter lama tidak mengenalinya.';
+
+  @override
+  String get probeMethodInfo =>
+      'Lewat mesin: jeda nyata ke situs melalui server, paling akurat.\nHanya koneksi: hanya koneksi TCP ke server, cepat tetapi tidak menguji VPN.\nJabat tangan TLS: TCP dan TLS dengan server.\nICMP: ping biasa; beberapa server tidak menjawab.\nOtomatis: lewat mesin, jika tidak bisa maka koneksi.';
+
+  @override
+  String get autoSelectInfo => 'Cara «Tercepat» memilih server: berdasarkan ping, kecepatan terukur, atau keduanya.';
+
+  @override
+  String get autoSwitchInfo => 'Jika server saat ini jauh lebih lambat, Sora pindah ke yang lebih cepat.';
+
+  @override
+  String get probeTls => 'Jabat tangan TLS';
+
+  @override
+  String get probeIcmp => 'ICMP (ping)';
 }

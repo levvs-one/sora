@@ -647,6 +647,9 @@ class Sora extends ChangeNotifier {
 
   bool get deviceIdentitySupported => coreCapabilities.contains('device-identity');
 
+  /// Whether the core can ping by TLS handshake and ICMP echo.
+  bool get probeModesSupported => coreCapabilities.contains('probe-tls-icmp');
+
   Future<void> _loadDeviceIdentity(CoreLink link) async {
     final answer = await link.stub.getDeviceIdentity(
       GetDeviceIdentityRequest(apiVersion: apiVersion, controlAuthenticator: link.token),
@@ -2187,6 +2190,10 @@ class Sora extends ChangeNotifier {
                 method: switch (settings.probeMethod) {
                   'engine' => ProbeMethod.PROBE_METHOD_ENGINE,
                   'connect' => ProbeMethod.PROBE_METHOD_CONNECT,
+                  // An older core would not know these and would measure
+                  // through engines instead; it gets the automatic method.
+                  'tls' when probeModesSupported => ProbeMethod.PROBE_METHOD_TLS,
+                  'icmp' when probeModesSupported => ProbeMethod.PROBE_METHOD_ICMP,
                   _ => ProbeMethod.PROBE_METHOD_UNSPECIFIED,
                 },
                 url: settings.probeUrl,
