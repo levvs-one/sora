@@ -33,6 +33,8 @@ type Runtime struct {
 	MixedPort int
 	// TestURL is the default latency probe for groups without one.
 	TestURL string
+	// TunFD is the adapter the platform opened. Zero creates one.
+	TunFD int
 }
 
 // config models mihomo YAML. Unset keys are omitted because some empty values
@@ -268,6 +270,7 @@ type tunConfig struct {
 	Type                string   `yaml:"type"`
 	Stack               string   `yaml:"stack,omitempty"`
 	Device              string   `yaml:"device,omitempty"`
+	FileDescriptor      int      `yaml:"file-descriptor,omitempty"`
 	MTU                 int      `yaml:"mtu,omitempty"`
 	AutoRoute           *bool    `yaml:"auto-route,omitempty"`
 	AutoDetectInterface *bool    `yaml:"auto-detect-interface,omitempty"`

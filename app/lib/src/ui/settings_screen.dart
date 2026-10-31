@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import '../../l10n/strings.dart';
 import '../core/link.dart';
+import '../android/host.dart';
 import '../design/theme.dart';
 import '../desktop/desktop.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
@@ -14,10 +15,12 @@ import '../settings.dart';
 import '../sora.dart';
 import 'about.dart';
 import 'chains.dart';
+import 'connections.dart';
 import 'dns.dart';
 import 'kit.dart';
 import 'language.dart';
 import 'logs.dart';
+import 'notifications_screen.dart';
 import 'profiles.dart';
 import 'rules_screen.dart';
 import 'subscription.dart';
@@ -57,6 +60,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_readLog()));
+    if (Platform.isAndroid) {
+      unawaited(
+        AndroidHost.batteryUnrestricted().then((free) {
+          if (mounted) setState(() => _batteryFree = free);
+        }),
+      );
+    }
   }
 
   Future<void> _readLog({FailureMode mode = FailureMode.background}) async {
@@ -155,6 +165,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return uri != null && (uri.isScheme('https') || uri.isScheme('http')) && uri.host.isNotEmpty;
   }
 
+  bool _batteryFree = true;
+
   @override
   Widget build(BuildContext context) {
     final sora = SoraScope.of(context);
@@ -172,6 +184,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           source: 'log-settings',
           retry: () => unawaited(_readLog(mode: FailureMode.action)),
         ),
+        // A phone has four tabs, so the other sections start here.
+        if (Platform.isAndroid)
+          Group(
+            children: [
+              LinkTile(title: s.navConnections, onTap: () => push<void>(context, const ConnectionsScreen())),
+              LinkTile(title: s.notifications, onTap: () => push<void>(context, const NotificationsScreen())),
+            ],
+          ),
         Group(
           children: [
             ChoiceTile<String>(
@@ -220,6 +240,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: settings.connectOnStart,
               onChanged: (v) => set((x) => x.connectOnStart = v, replan: false),
             ),
+            if (Platform.isAndroid && !_batteryFree)
+              LinkTile(
+                title: s.batteryRestricted,
+                info: s.batteryRestrictedInfo,
+                onTap: () => unawaited(AndroidHost.askBatteryUnrestricted()),
+              ),
             if (desktop != null) ...[
               SwitchTile(
                 title: s.closeToTray,

@@ -32,6 +32,10 @@ type Spec struct {
 	Config []byte
 	// Lines receives every complete output line of the engine, when set.
 	Lines func(string)
+	// ExtraFiles are inherited from descriptor 3 up.
+	ExtraFiles []*os.File
+	// Env adds to the minimal environment of the engine.
+	Env []string
 }
 
 // Process is one running engine child process.
@@ -58,7 +62,8 @@ func Start(ctx context.Context, spec Spec) (*Process, error) {
 	cmd.WaitDelay = time.Second
 	HideWindow(cmd)
 	cmd.Dir = spec.Dir
-	cmd.Env = SafeEnv()
+	cmd.Env = append(SafeEnv(), spec.Env...)
+	cmd.ExtraFiles = spec.ExtraFiles
 	cmd.Stdin = bytes.NewReader(spec.Config)
 	tail := NewTail(80)
 	// Capture both streams because engine output varies by build and level;

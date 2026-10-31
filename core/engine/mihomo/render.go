@@ -125,7 +125,9 @@ func Render(p *engine.Plan, rt Runtime) (string, error) {
 	if p.Tun.Enabled {
 		// Top-level tun derives IPv4 from fake-ip-range. A named listener
 		// accepts an independent adapter subnet on Linux and Windows.
-		c.Listeners = append(c.Listeners, buildTun(p.Tun, p.DNS))
+		tun := buildTun(p.Tun, p.DNS)
+		tun.FileDescriptor = rt.TunFD
+		c.Listeners = append(c.Listeners, tun)
 	}
 
 	out, err := yaml.Marshal(&c) //nolint:gosec // the config carries the controller secret by design and is never written to disk

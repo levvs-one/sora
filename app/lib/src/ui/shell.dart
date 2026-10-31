@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -275,20 +276,30 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
     final sora = SoraScope.of(context), palette = Palette.of(context);
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < 720;
+    // A phone gets tabs under the thumb instead of the desktop's drawer.
+    final phone = compact && Platform.isAndroid;
     final expanded = width >= 1000 && sora.settings.sidebarExpanded;
     final page = _pages[_section];
     final content = KeyedSubtree(
       key: ObjectKey(_contentNavigator),
-      child: Navigator(
-        key: _contentNavigator,
-        onGenerateRoute: (_) => MaterialPageRoute<void>(builder: (_) => page),
+      child: NavigatorPopHandler(
+        onPopWithResult: (_) => _contentNavigator.currentState?.maybePop(),
+        child: Navigator(
+          key: _contentNavigator,
+          onGenerateRoute: (_) => MaterialPageRoute<void>(builder: (_) => page),
+        ),
       ),
     );
     // Native views must detach immediately when switching sections.
     final pane = _section == 6 || _instantSectionChange
         ? content
         : AnimatedSwitcher(duration: Motion.of(context, const Duration(milliseconds: 150)), child: content);
-    return ShellScope(
+    return PopScope(
+      canPop: _section == 0 || !phone,
+      onPopInvokedWithResult: (popped, _) {
+        if (!popped) _select(0);
+      },
+      child: ShellScope(
       select: _select,
       nativeContentVisible: _nativeContentVisible && (ModalRoute.of(context)?.isCurrent ?? true),
       replayTour: _startTour,
@@ -305,7 +316,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
             onDrawerChanged: (opened) {
               if (_section == 6 && !opened) setState(() => _nativeContentVisible = true);
             },
-            drawer: compact
+            drawer: compact && !phone
                 ? Drawer(
                     width: 224,
                     backgroundColor: palette.surface,
@@ -330,7 +341,7 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
                       child: _sidebar(expanded),
                     ),
                   Expanded(
-                    child: compact && _section == 6
+                    child: compact && !phone && _section == 6
                         ? Column(
                             children: [
                               Align(
@@ -350,7 +361,8 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
               ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-            floatingActionButton: compact && _section != 6
+            bottomNavigationBar: phone ? _tabs() : null,
+            floatingActionButton: compact && !phone && _section != 6
                 ? Builder(
                     builder: (context) => MediaQuery.sizeOf(context).width >= 720
                         ? const SizedBox.shrink()
@@ -371,6 +383,47 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
                           ),
                   )
                 : null,
+          ),
+        ),
+      ),
+      ),
+    );
+  }
+
+  Widget _tabs() {
+    final s = S.of(context), palette = Palette.of(context);
+    final tabs = [
+      (0, s.home, Symbols.home_rounded),
+      (6, s.speedtest, Symbols.speed_rounded),
+      (8, s.extensions, Symbols.category_rounded),
+      (5, s.settings, Symbols.settings_rounded),
+    ];
+    Widget tab(int section, String label, IconData icon) => _Tab(
+      key: ValueKey('tab-$section'),
+      label: label,
+      icon: icon,
+      selected: _section == section,
+      onTap: () => _select(section),
+    );
+    return DecoratedBox(
+      key: const ValueKey('phone-tabs'),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(top: BorderSide(color: palette.field)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            children: [
+              for (final (section, label, icon) in tabs)
+                Expanded(
+                  child: section == 5
+                      ? TourTarget(step: 4, radius: 12, child: tab(section, label, icon))
+                      : tab(section, label, icon),
+                ),
+            ],
           ),
         ),
       ),
@@ -515,4 +568,47 @@ class _DesktopShellState extends State<DesktopShell> with WidgetsBindingObserver
           ),
         ),
       );
+}
+
+class _Tab extends StatelessWidget {
+  const _Tab({super.key, required this.label, required this.icon, required this.selected, required this.onTap});
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    final color = selected ? palette.ink : palette.ink3;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      child: Pressable(
+        onTap: onTap,
+        radius: 12,
+        wash: false,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 24, color: color, fill: selected ? 1 : 0),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Styles.caption.copyWith(
+                color: color,
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

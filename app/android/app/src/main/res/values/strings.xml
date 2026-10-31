@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sora</string>
+    <string name="vpn_channel">VPN connection</string>
+    <string name="vpn_connected">Connected</string>
+    <string name="vpn_disconnect">Disconnect</string>
+</resources>

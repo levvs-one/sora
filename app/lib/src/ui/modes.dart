@@ -6,6 +6,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../l10n/strings.dart';
+import '../android/host.dart';
 import '../design/theme.dart';
 import '../sora.dart';
 import 'addserver.dart';
@@ -388,7 +389,13 @@ class _Modes extends StatelessWidget {
         _SectionTitle(s.engine, info: s.engineInfo, sources: Sources.engine),
         _EngineSegments(
           value: settings.engine,
-          choices: [('', s.engineAuto), ('sing-box', 'sing-box'), ('xray', 'Xray'), ('mihomo', 'mihomo')],
+          choices: [
+            ('', s.engineAuto),
+            // sing-box needs its library form to run from Android's adapter.
+            if (!Platform.isAndroid) ('sing-box', 'sing-box'),
+            ('xray', 'Xray'),
+            ('mihomo', 'mihomo'),
+          ],
           onChanged: (value) => unawaited(
             sora.change(
               (x) => x
@@ -422,8 +429,7 @@ class _Modes extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              routes,
-              const SizedBox(height: 20),
+              if (!Platform.isAndroid || sora.serverlessAvailable) ...[routes, const SizedBox(height: 20)],
               engines,
               if (current == 'tun' && settings.engine == 'mihomo') ...[
                 const SizedBox(height: 8),
@@ -457,13 +463,21 @@ class _Modes extends StatelessWidget {
                   padding: const EdgeInsets.all(4),
                   child: Column(
                     children: [
-                      SwitchTile(
-                        title: s.killSwitch,
-                        info: s.killSwitchInfo,
-                        sources: Sources.killSwitch,
-                        value: settings.killSwitch,
-                        onChanged: (v) => unawaited(sora.setKillSwitch(v)),
-                      ),
+                      if (Platform.isAndroid)
+                        LinkTile(
+                          title: s.killSwitch,
+                          info: s.killSwitchAndroidInfo,
+                          sources: Sources.killSwitch,
+                          onTap: () => unawaited(AndroidHost.openVpnSettings()),
+                        )
+                      else
+                        SwitchTile(
+                          title: s.killSwitch,
+                          info: s.killSwitchInfo,
+                          sources: Sources.killSwitch,
+                          value: settings.killSwitch,
+                          onChanged: (v) => unawaited(sora.setKillSwitch(v)),
+                        ),
                       if (Platform.isLinux || Platform.isWindows)
                         SwitchTile(
                           key: const ValueKey('strict-kill-switch'),

@@ -158,9 +158,11 @@ func buildTun(t engine.Tun, d engine.DNS) *tunConfig {
 		MTU:       orDefaultInt(t.MTU, 1500),
 		DNSHijack: orDefaultList(d.HijackTun, []string{"any:53"}),
 	}
-	auto := t.AutoRoute && runtime.GOOS != "linux"
+	// Sora routes on Linux, and Android routes through its VpnService.
+	routed := runtime.GOOS == "linux" || runtime.GOOS == "android"
+	auto := t.AutoRoute && !routed
 	out.AutoRoute = &auto
-	detect := runtime.GOOS != "linux"
+	detect := !routed
 	out.AutoDetectInterface = &detect
 	strict := t.StrictRoute
 	out.StrictRoute = &strict

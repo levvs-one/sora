@@ -43,6 +43,9 @@ type Runtime struct {
 	Secret string
 	// ProbeURL is the default latency endpoint for groups without one.
 	ProbeURL string
+	// TunFD is the adapter's descriptor inside the engine, when the platform
+	// owns the adapter. Zero means the engine creates it.
+	TunFD int
 }
 
 // Driver supplies engine-specific configuration, arguments, and the readiness
@@ -145,6 +148,7 @@ type Supervisor struct {
 	proc     *Process
 	stopping bool
 	routed   bool
+	adapter bool
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -387,6 +391,24 @@ func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
 	if err != nil {
 		return err
 	}
+	var extra []*os.File
+	var env []string
+	if p.Tun.Enabled && TunSource != nil {
+		adapter, err := TunSource(ctx, p.Tun)
+		if err != nil {
+			return err
+		}
+		// The engine keeps its own copy.
+		defer adapter.Close()
+		s.mu.Lock()
+		s.adapter = true
+		s.mu.Unlock()
+		extra = []*os.File{adapter}
+		rt.TunFD = tunChildFD
+		if d, ok := s.driver.(TunEnvironment); ok {
+			env = d.TunEnv(rt)
+		}
+	}
 	cfg, err := s.driver.Render(p, rt)
 	if err != nil {
 		return err
@@ -404,7 +426,7 @@ func (s *Supervisor) start(ctx context.Context, p *engine.Plan) error {
 	s.setState(engine.StateStarting)
 	kind := s.driver.Kind()
 	proc, err := Start(s.ctx, Spec{Name: string(kind), Path: s.cfg.Binary.Path,
-		Args: s.driver.RunArgs(rt), Dir: s.cfg.HomeDir, Config: cfg, Lines: s.logLine})
+		Args: s.driver.RunArgs(rt), Dir: s.cfg.HomeDir, Config: cfg, Lines: s.logLine, ExtraFiles: extra, Env: env})
 	if err != nil {
 		return err
 	}
@@ -632,8 +654,14 @@ func (s *Supervisor) Stop(ctx context.Context) error {
 // unroute retains ownership on failure so shutdown can retry route cleanup.
 func (s *Supervisor) unroute(ctx context.Context) error {
 	s.mu.Lock()
-	routed := s.routed
+	routed, adapter := s.routed, s.adapter
+	s.adapter = false
 	s.mu.Unlock()
+	if adapter && TunRelease != nil {
+		if err := TunRelease(ctx); err != nil && s.cfg.Logs != nil {
+			s.cfg.Logs.Write(time.Time{}, logs.LevelWarning, string(s.driver.Kind()), s.redactor.String(err.Error()))
+		}
+	}
 	if !routed {
 		return nil
 	}

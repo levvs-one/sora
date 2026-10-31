@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/strings.dart';
+import 'src/android/host.dart';
 import 'src/semantics_tree.dart';
 import 'src/design/theme.dart';
 import 'src/ext/store.dart';
@@ -21,6 +22,7 @@ import 'src/ui/toasts.dart';
 
 Future<void> main(List<String> args) async {
   SoraBinding();
+  if (Platform.isAndroid) await AndroidHost.init();
   final sora = Sora(await Settings.load());
   unawaited(sora.run());
   final navigator = GlobalKey<NavigatorState>();

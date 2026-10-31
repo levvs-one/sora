@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
+	"runtime"
 	"slices"
 )
 
@@ -29,9 +30,14 @@ func PrepareTun(p *Plan) error {
 	if err := validateInterfaceName("tun", p.Tun.DeviceName); err != nil {
 		return err
 	}
-	interfaces, err := net.Interfaces()
-	if err != nil {
-		return fmt.Errorf("tun: read interfaces: %w", err)
+	// Android hides the interface list from apps, and its adapter is private
+	// to the VPN, so the pools cannot collide there.
+	var interfaces []net.Interface
+	if runtime.GOOS != "android" {
+		var err error
+		if interfaces, err = net.Interfaces(); err != nil {
+			return fmt.Errorf("tun: read interfaces: %w", err)
+		}
 	}
 	var used []netip.Prefix
 	for _, iface := range interfaces {

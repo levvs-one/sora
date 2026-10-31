@@ -205,6 +205,33 @@ jobs:
           shellcheck packaging/linux/sora-update
           sudo env "PATH=$PATH" "GOCACHE=$(go env GOCACHE)" "GOMODCACHE=$(go env GOMODCACHE)" python3 -B packaging/linux/test_update.py -v
 
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.6
+          channel: stable
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: core/go.mod
+          cache: false
+      - name: Build the core and engines
+        run: packaging/android/natives.sh arm64
+      - name: Build the app
+        working-directory: app
+        run: flutter build apk --release --target-platform android-arm64 "--extra-gen-snapshot-options=--compiler_passes=-LICM"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sora-android-arm64
+          path: app/build/app/outputs/flutter-apk/app-release.apk
+
   msi-rollback-fixture:
     name: Build native MSI rollback probe
     runs-on: ubuntu-24.04

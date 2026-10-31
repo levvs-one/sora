@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,8 +69,11 @@ class _ConnectionPane extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Align(alignment: Alignment.centerRight, child: LanguageButton()),
-          const SizedBox(height: 8),
+          // Language lives in Settings on a phone, where the top is scarce.
+          if (!Platform.isAndroid) ...[
+            const Align(alignment: Alignment.centerRight, child: LanguageButton()),
+            const SizedBox(height: 8),
+          ],
           const _Status(),
           const SizedBox(height: 24),
           const Center(child: TourTarget(step: 2, radius: 88, child: _Orb())),

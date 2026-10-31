@@ -64,7 +64,7 @@ func (driver) PlanNames(p *engine.Plan) map[string]string {
 func (driver) Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	text, err := Render(p, Runtime{
 		HomeDir: rt.HomeDir, ControllerAddr: rt.ControlAddr, Secret: rt.Secret,
-		MixedPort: rt.LocalPort, TestURL: rt.ProbeURL,
+		MixedPort: rt.LocalPort, TestURL: rt.ProbeURL, TunFD: rt.TunFD,
 	})
 	return []byte(text), err
 }

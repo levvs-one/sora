@@ -7,6 +7,7 @@ import 'package:grpc/grpc.dart';
 import 'package:grpc/service_api.dart' as api;
 import 'package:retry/retry.dart';
 
+import '../android/host.dart';
 import '../generated/sora/core/v1/core_control.pbgrpc.dart';
 import '../generated/sora/custom/v1/custom.pbgrpc.dart';
 import '../generated/sora/leak/v1/leak.pbgrpc.dart';
@@ -46,7 +47,11 @@ class CoreLink {
   /// -socket.
   static String get socketPath =>
       Platform.environment['SORA_CORE_SOCKET'] ??
-      (Platform.isWindows ? r'\\.\pipe\sora-core-v1' : '/run/sora/core.sock');
+      (Platform.isAndroid
+          ? AndroidHost.socketPath
+          : Platform.isWindows
+          ? r'\\.\pipe\sora-core-v1'
+          : '/run/sora/core.sock');
 
   /// Opens a core connection with increasing retry delays while the service
   /// starts or restarts after an update.

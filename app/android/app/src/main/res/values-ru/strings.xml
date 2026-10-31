@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vpn_channel">Подключение VPN</string>
+    <string name="vpn_connected">Подключено</string>
+    <string name="vpn_disconnect">Отключить</string>
+</resources>

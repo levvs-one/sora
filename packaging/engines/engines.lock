@@ -22,3 +22,8 @@ mihomo    windows-amd64  974a4d7ad69aed27aa2e8f91d61113573c14dadb14562c63e58effa
 sing-box  win7-386  399fc669d9f637265c6bb2b5949a802cb098ee5e16683251f30c2a8056a9f7ff  https://github.com/Leadaxe/sing-box-lx/releases/download/v1.14.3-lx.14/sing-box-1.14.3-lx.14-windows-386-legacy-windows-7.zip
 xray      win7-386       33bc2686a77f6fe438616982b347f852eb7f9572dbe97adc1459f8fb639aea13  https://github.com/XTLS/Xray-core/releases/download/v26.3.27/Xray-win7-32.zip
 mihomo    win7-386       b8b777fa03db26934d944cb9689f8836c97bd62b215c177971456e99425484d7  https://github.com/MetaCubeX/mihomo/releases/download/v1.19.32/mihomo-windows-386-go120-v1.19.32.zip
+# Android. Each archive is the upstream android build of the same version.
+xray      android-arm64  57149ffd48b629c07bf76938e73ab2729fde5910091497eab3e93d1c190f4c1b  https://github.com/XTLS/Xray-core/releases/download/v26.3.27/Xray-android-arm64-v8a.zip
+xray      android-amd64  bfa1dd4cb3cd94f92af6c718ac6933cc84bd3ddd8343aa1e413162152930bee5  https://github.com/XTLS/Xray-core/releases/download/v26.3.27/Xray-android-amd64.zip
+mihomo    android-arm64  42b1f2be8702484d3ae6238daab392622f54bd0d264966700f1f28f52596e326  https://github.com/MetaCubeX/mihomo/releases/download/v1.19.32/mihomo-android-arm64-v8-v1.19.32.gz
+mihomo    android-amd64  91c159015e7d8aaff22153b9fd18749a0c7258d6f252ea344ecace975ce17413  https://github.com/MetaCubeX/mihomo/releases/download/v1.19.32/mihomo-android-amd64-v1.19.32.gz

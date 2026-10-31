@@ -50,4 +50,3 @@ key.properties
 Thumbs.db
 
 # Written by flutter pub get because android/ exists; the Android app is not set up yet.
-/app/android/app/

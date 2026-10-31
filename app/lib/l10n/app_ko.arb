@@ -1039,5 +1039,8 @@
   "infoSources": "Read more",
   "extFilter": "Filter",
   "extBypassRun": "Blocking bypass",
-  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here."
+  "chainNoServers": "Only regular servers can join a chain. Xray profiles run on their own, so they are not listed here.",
+  "killSwitchAndroidInfo": "Normally, when a VPN drops, apps carry on directly. On Android the block that prevents this lives in the system settings.\n\nOpen the VPN settings, tap the gear next to Sora and turn on Always-on VPN and Block connections without VPN. The names can differ a little between manufacturers.\n\nAfter that the system keeps Sora on, and there is no internet without the VPN.",
+  "batteryRestricted": "Background use is restricted",
+  "batteryRestrictedInfo": "The system may put Sora to sleep, and the VPN drops while the phone sits idle. Tap here and allow unrestricted use: battery life barely changes, because the VPN only runs while it is on."
 }

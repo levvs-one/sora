@@ -140,3 +140,10 @@ func (s *Session) reopenFlows(ctx context.Context) error {
 	}
 	return nil
 }
+
+// RenewNetwork reopens connections after the platform reports a network change.
+func (s *Session) RenewNetwork(ctx context.Context) {
+	if err := s.renewConnections(ctx, "network changed"); err != nil {
+		s.log.Append(Event{Kind: EventLog, Detail: "network change: " + err.Error()})
+	}
+}

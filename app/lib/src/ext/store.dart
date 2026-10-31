@@ -8,6 +8,7 @@
 /// The previous version directory is kept for one-tap rollback.
 library;
 
+import '../android/host.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -40,6 +41,7 @@ class ExtStoreError implements Exception {
 
 /// Where installed extensions live.
 String extensionsDir() {
+  if (Platform.isAndroid) return '${AndroidHost.filesDir}/extensions';
   if (Platform.isWindows) {
     final appData = Platform.environment['APPDATA'];
     if (appData != null && appData.isNotEmpty) {

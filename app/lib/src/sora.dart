@@ -28,6 +28,7 @@ import 'overrides.dart';
 import 'profiles.dart';
 import 'rules.dart';
 import 'ext/store.dart';
+import 'android/host.dart';
 import 'ext/bypass.dart';
 import 'ext/workers.dart';
 import 'settings.dart';
@@ -1592,7 +1593,8 @@ class Sora extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    final armed = settings.killSwitch || strict;
+    // On Android the system's always-on VPN does this.
+    final armed = (settings.killSwitch || strict) && !Platform.isAndroid;
     // Track the active profile because profile groups fail over in the client.
     _member = entry != null && entry.members.any(isProfile) ? plan.outbounds.single.id : null;
     if (!retry) _memberSpare = entry == null ? 0 : entry.members.length - 1;
@@ -1601,6 +1603,15 @@ class Sora extends ChangeNotifier {
     replacing = phase == Phase.connected || phase == Phase.reconnecting;
     phase = Phase.connecting;
     notifyListeners();
+    if (Platform.isAndroid && !await AndroidHost.prepareVpn()) {
+      phase = replacing ? Phase.connected : Phase.off;
+      _connectionWork = null;
+      replacing = false;
+      work.complete();
+      notifyListeners();
+      return;
+    }
+    if (Platform.isAndroid) await AndroidHost.startVpn();
     // Include events emitted during these requests, before the watch opens.
     final started = DateTime.now();
     var connected = false;
@@ -2584,8 +2595,10 @@ SessionPlan buildPlan({
   final extensionBypass = choice.startsWith(extensionBypassPrefix);
   final bypassMode = chain.isEmpty && (choice == 'bypass' || extensionBypass);
   final plan = SessionPlan(
-    tunnelMode: settings.tunnel == 'proxy' ? TunnelMode.TUNNEL_MODE_APPLICATION : TunnelMode.TUNNEL_MODE_SYSTEM,
-    tunStack: settings.tunnel == 'tun' && !bypassMode
+    tunnelMode: settings.tunnel == 'proxy' && !Platform.isAndroid
+        ? TunnelMode.TUNNEL_MODE_APPLICATION
+        : TunnelMode.TUNNEL_MODE_SYSTEM,
+    tunStack: settings.tunnel == 'tun' && !bypassMode && !Platform.isAndroid
         ? switch (settings.engine) {
             'mihomo' => settings.mihomoTunStack,
             'xray' when Platform.isWindows || settings.xrayTunStack != 'gvisor' => settings.xrayTunStack,

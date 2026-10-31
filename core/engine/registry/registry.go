@@ -268,7 +268,7 @@ func (r *Registry) selectPlan(p *engine.Plan, order []engine.Kind) (engine.Selec
 	for _, kind := range order {
 		candidate := *p
 		bridge := kind == engine.KindXray && p.Tun.Enabled &&
-			(runtime.GOOS != "linux" || slices.Contains([]string{"system", "mixed", "mips"}, p.Tun.Stack))
+			((runtime.GOOS != "linux" && runtime.GOOS != "android") || slices.Contains([]string{"system", "mixed", "mips"}, p.Tun.Stack))
 		if bridge {
 			candidate.Tun = engine.Tun{}
 			if candidate.DNS.Mode == string(engine.DNSFakeIP) {

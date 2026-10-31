@@ -40,6 +40,7 @@ import (
 	"github.com/levvs-one/sora-client/core/profiles"
 	"github.com/levvs-one/sora-client/core/secret"
 	"github.com/levvs-one/sora-client/core/session"
+	"github.com/levvs-one/sora-client/core/vpnhost"
 	"github.com/levvs-one/sora-client/core/subscription"
 )
 
@@ -67,6 +68,9 @@ type Options struct {
 	// Socket sets the control endpoint. Empty uses the platform address,
 	// which requires root for manual runs.
 	Socket string
+	// VPNHost names the app's socket on Android, where the app owns the
+	// adapter. Empty lets engines create it.
+	VPNHost string
 	// Log receives core logs. Nil uses the default handler.
 	Log *slog.Logger
 	// Factory overrides engine creation. Nil uses mihomo; tests can supply
@@ -238,6 +242,9 @@ func New(ctx context.Context, opts Options) (*App, error) {
 		Profiles: profStore,
 	})
 	app.sessions = manager
+	if opts.VPNHost != "" {
+		app.watchVPN(ctx, vpnhost.New(opts.VPNHost), manager)
+	}
 
 	if !opts.NoDiagnostics {
 		collector, err := diagnostics.New(diagnostics.Options{

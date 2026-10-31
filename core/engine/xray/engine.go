@@ -71,6 +71,11 @@ func (*driver) Route(ctx context.Context, p *engine.Plan) error {
 
 func (*driver) Unroute(ctx context.Context) error { return tunroute.Unroute(ctx) }
 
+// TunEnv hands Xray the adapter the platform owns.
+func (*driver) TunEnv(rt supervise.Runtime) []string {
+	return []string{"XRAY_TUN_FD=" + strconv.Itoa(rt.TunFD)}
+}
+
 func (d *driver) Render(p *engine.Plan, rt supervise.Runtime) ([]byte, error) {
 	d.flows.name(p)
 	return Render(p, rt, d.selection())
