@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zapret</title>
+<style>
+  @font-face { font-family: Inter; src: url("fonts/InterVariable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+  :root { color-scheme: light dark; --paper: #f5f5f7; --surface: #fff; --field: #ebebef; --ink: #1d1d1f; --ink2: #4a4d53; --line: #dddde2; --accent: #186b49; --accent-ink: #fff; --hover: #e9f1ed; --danger: #d02a22; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #191a1c; --surface: #242629; --field: #2c2c2e; --ink: #f0f0f2; --ink2: #b4b4bb; --line: #414349; --accent: #7bd5a7; --accent-ink: #10231a; --hover: #303c35; --danger: #ff5d52; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px 16px; background: var(--paper); color: var(--ink); font: 400 15px/1.5 Inter, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; }
+  .heading { display: flex; align-items: center; gap: 4px; margin-bottom: 16px; }
+  h1, h2 { font-size: 20px; line-height: 1.3; font-weight: 600; margin: 0; }
+  button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; transition: background-color 180ms ease, transform 180ms ease, border-color 180ms ease; }
+  button:hover { background: var(--hover); }
+  button:active { transform: translateY(1px); }
+  button:disabled { cursor: default; opacity: .55; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  #info { width: 44px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; }
+  #info:hover { background: var(--hover); }
+  #info svg { width: 20px; height: 20px; }
+  .card { background: var(--surface); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; }
+  .status { display: flex; align-items: center; gap: 14px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); flex: none; transition: background-color 180ms ease; }
+  .status[data-state="on"] .dot { background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+  .status[data-state="busy"] .dot { background: var(--accent); animation: pulse 1s ease-in-out infinite alternate; }
+  .status[data-state="off"] .dot { background: var(--ink2); }
+  .status[data-state="unavailable"] .dot { background: var(--danger); }
+  .status-text { flex: 1; min-width: 0; }
+  .status-title { font-weight: 600; font-size: 17px; }
+  .status-detail { color: var(--ink2); font-size: 13px; }
+  #toggle { min-width: 132px; border-color: var(--accent); }
+  #toggle.on { background: var(--accent); color: var(--accent-ink); }
+  .label { color: var(--ink2); font-size: 13px; font-weight: 600; margin: 4px 4px 8px; }
+  .profiles { display: grid; gap: 6px; }
+  .profile { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; min-height: 56px; padding: 10px 14px; border: 0; border-radius: 12px; background: transparent; }
+  .profile:hover { background: var(--hover); }
+  .profile[aria-checked="true"] { background: var(--field); }
+  .radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink2); flex: none; display: grid; place-items: center; }
+  .profile[aria-checked="true"] .radio { border-color: var(--ink); }
+  .profile[aria-checked="true"] .radio::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+  .profile b { display: block; font-weight: 600; }
+  .profile span { color: var(--ink2); font-size: 13px; }
+  dialog { width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 48px); padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); font: inherit; }
+  dialog[open] { animation: open-info 180ms ease-out; }
+  dialog::backdrop { background: rgb(0 0 0 / .28); }
+  dialog p { margin: 12px 0; white-space: pre-line; }
+  .dialog-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+  @keyframes open-info { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { from { opacity: .45; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  @media (max-width: 420px) { body { padding: 16px 12px; } .status { flex-wrap: wrap; } #toggle { width: 100%; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="heading">
+    <h1>Zapret</h1>
+    <button id="info" type="button" aria-haspopup="dialog" aria-controls="about">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></svg>
+    </button>
+  </div>
+  <section class="card">
+    <div class="status" id="status" data-state="off" aria-live="polite">
+      <div class="dot" aria-hidden="true"></div>
+      <div class="status-text">
+        <div class="status-title" id="status-title"></div>
+        <div class="status-detail" id="status-detail"></div>
+      </div>
+      <button id="toggle" type="button"></button>
+    </div>
+  </section>
+  <div class="label" id="profiles-label"></div>
+  <section class="card" style="padding: 6px">
+    <div class="profiles" id="profiles" role="radiogroup"></div>
+  </section>
+</main>
+<dialog id="about" aria-labelledby="about-title" aria-describedby="about-description">
+  <h2 id="about-title">Zapret</h2>
+  <p id="about-description"></p>
+  <div class="dialog-actions"><button id="close-info" type="button" autofocus></button></div>
+</dialog>
+<script>
+  // Strings for English and Russian, filled in per extension.
+  const STRINGS = {
+    "en": {
+      "profiles": "Profile",
+      "close": "Close",
+      "aboutLabel": "About",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "failed": "The bypass could not be switched.",
+      "unavailable": "This computer lacks the component it needs.",
+      "state": {
+        "on": "On",
+        "off": "Off",
+        "busy": "Turning on…",
+        "unavailable": "Unavailable"
+      },
+      "about": "Zapret bypasses blocking without a VPN: it reshapes the first packets of each connection so the provider cannot tell which site you open. No server is needed and speed stays the same.\n\nTurning it on switches Sora to the No server mode: traffic goes directly, through the bypass. To use the VPN again, pick a server or the TUN mode.\n\nIf a site still does not open, try another profile.",
+      "profileNames": {
+        "TCP+TLS": "Strong",
+        "TLS": "Gentle",
+        "HTTP": "Plain HTTP"
+      },
+      "profileHints": {
+        "TCP+TLS": "Splits and reorders the start of a connection. Works most often.",
+        "TLS": "Only splits TLS. Use it if Strong breaks something.",
+        "HTTP": "For sites without HTTPS: changes the case of HTTP headers."
+      }
+    },
+    "ru": {
+      "profiles": "Профиль",
+      "close": "Закрыть",
+      "aboutLabel": "О расширении",
+      "turnOn": "Включить",
+      "turnOff": "Выключить",
+      "failed": "Не удалось переключить обход.",
+      "unavailable": "На этом компьютере нет нужного компонента.",
+      "state": {
+        "on": "Включён",
+        "off": "Выключен",
+        "busy": "Включается…",
+        "unavailable": "Недоступен"
+      },
+      "about": "Zapret обходит блокировки без VPN: меняет первые пакеты соединения, и провайдер не узнаёт, какой сайт вы открываете. Сервер не нужен, скорость не падает.\n\nВключение переводит Sora в режим «Без сервера»: трафик идёт напрямую, через обход. Чтобы вернуть VPN, выберите сервер или режим TUN.\n\nЕсли сайт всё равно не открывается, попробуйте другой профиль.",
+      "profileNames": {
+        "TCP+TLS": "Сильный",
+        "TLS": "Мягкий",
+        "HTTP": "Обычный HTTP"
+      },
+      "profileHints": {
+        "TCP+TLS": "Режет и перемешивает начало соединения. Помогает чаще всего.",
+        "TLS": "Только режет TLS. Если с сильным что-то ломается.",
+        "HTTP": "Для сайтов без HTTPS: меняет регистр заголовков HTTP."
+      }
+    }
+  };
+  // Sora passes its own language as ?lang=; a plain browser falls back to its own.
+  const language = new URLSearchParams(location.search).get('lang') || navigator.language || 'en';
+  const t = STRINGS[language.toLowerCase().startsWith('ru') ? 'ru' : 'en'];
+  document.documentElement.lang = t === STRINGS.ru ? 'ru' : 'en';
+
+  const status = document.getElementById('status');
+  const statusTitle = document.getElementById('status-title');
+  const statusDetail = document.getElementById('status-detail');
+  const toggle = document.getElementById('toggle');
+  const list = document.getElementById('profiles');
+  let state = null;
+  let busy = false;
+
+  document.getElementById('profiles-label').textContent = t.profiles;
+  document.getElementById('about-description').textContent = t.about;
+  document.getElementById('close-info').textContent = t.close;
+  document.getElementById('info').setAttribute('aria-label', t.aboutLabel);
+
+  function render() {
+    if (!state) return;
+    const mode = !state.available ? 'unavailable' : state.connecting ? 'busy' : state.active ? 'on' : 'off';
+    status.dataset.state = mode;
+    statusTitle.textContent = t.state[mode];
+    statusDetail.textContent = mode === 'unavailable' ? t.unavailable : (t.profileNames[state.profile] || state.profile || '');
+    toggle.textContent = state.active || state.connecting ? t.turnOff : t.turnOn;
+    toggle.classList.toggle('on', !!(state.active || state.connecting));
+    toggle.disabled = busy || !state.available;
+    list.replaceChildren();
+    for (const name of state.profiles) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'profile';
+      item.setAttribute('role', 'radio');
+      item.setAttribute('aria-checked', String(name === state.profile));
+      item.disabled = busy;
+      const radio = document.createElement('div');
+      radio.className = 'radio';
+      const text = document.createElement('div');
+      const title = document.createElement('b');
+      title.textContent = t.profileNames[name] || name;
+      const hint = document.createElement('span');
+      hint.textContent = t.profileHints[name] || '';
+      text.append(title, hint);
+      item.append(radio, text);
+      item.addEventListener('click', () => { void choose(name); });
+      list.append(item);
+    }
+  }
+
+  async function load() {
+    try {
+      state = await window.soraExt.call('getBypass');
+    } catch (error) {
+      state = {available: false, active: false, connecting: false, profile: '', profiles: []};
+    }
+    render();
+  }
+
+  async function run(action) {
+    if (busy) return;
+    busy = true;
+    render();
+    try {
+      await action();
+    } catch (error) {
+      try { await window.soraExt.call('notify', {title: document.title, body: t.failed}); } catch (_) {}
+    } finally {
+      busy = false;
+      await load();
+    }
+  }
+
+  async function choose(name) {
+    if (!state || name === state.profile) return;
+    await run(async () => {
+      await window.soraExt.call('setSettings', {settings: {profile: name}});
+      // A running bypass picks the new profile up on the next connection.
+      if (state.active) await window.soraExt.call('setBypass', {active: true});
+    });
+  }
+
+  toggle.addEventListener('click', () => {
+    void run(() => window.soraExt.call('setBypass', {active: !(state.active || state.connecting)}));
+  });
+
+  const about = document.getElementById('about');
+  const info = document.getElementById('info');
+  info.addEventListener('click', () => about.showModal());
+  document.getElementById('close-info').addEventListener('click', () => about.close());
+  about.addEventListener('close', () => info.focus());
+  // Sora injects window.soraExt before the page runs; the sora-ext serve
+  // mock exposes it a moment later, so wait for it briefly.
+  function whenReady(start) {
+    const since = Date.now();
+    const timer = setInterval(() => {
+      if (window.soraExt || Date.now() - since > 5000) {
+        clearInterval(timer);
+        start();
+      }
+    }, 50);
+  }
+  whenReady(() => {
+    if (window.soraExt && window.soraExt.onEvent) {
+      window.soraExt.onEvent((kind) => {
+        if (kind === 'session.connected' || kind === 'session.disconnected') void load();
+      });
+    }
+    void load();
+    setInterval(() => { if (!busy) void load(); }, 3000);
+  });
+</script>
+</body>
+</html>

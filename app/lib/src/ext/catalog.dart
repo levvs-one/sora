@@ -20,7 +20,7 @@ class CatalogError implements Exception {
 }
 
 /// The team catalog, served from the repository and signed with the team key.
-const String defaultCatalogUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog-1.1.3.json';
+const String defaultCatalogUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/catalog-1.1.6.json';
 
 /// The team revocation list, signed with the same key as the catalog.
 const String defaultRevocationUrl = 'https://raw.githubusercontent.com/levvs-one/sora/main/extensions/revocations.json';

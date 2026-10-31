@@ -252,8 +252,10 @@ void main() {
     final catalog = ExtensionCatalog.parse(bytes);
     expect(catalog.entries.map((e) => e.id).toSet(), {'org.sora.zapret', 'org.sora.byedpi', 'org.sora.hello-panel'});
     for (final entry in catalog.entries) {
+      final parts = entry.minAppVersion.split('.').map(int.parse).toList();
       expect(entry.requiresNewerApp('1.1.2'), isTrue, reason: entry.id);
-      expect(entry.requiresNewerApp('1.1.3'), isFalse, reason: entry.id);
+      expect(entry.requiresNewerApp('${parts[0]}.${parts[1]}.${parts[2] - 1}'), isTrue, reason: entry.id);
+      expect(entry.requiresNewerApp(entry.minAppVersion), isFalse, reason: entry.id);
       expect(entry.supportsPlatform('windows'), isTrue, reason: entry.id);
       expect(entry.supportsPlatform('linux'), isTrue, reason: entry.id);
       expect(entry.supportsPlatform('android'), isFalse, reason: entry.id);
@@ -505,8 +507,10 @@ void main() {
         manifest['id'] = 'org.sora.dormant';
         manifest['name'] = 'Dormant network';
         manifest['capabilities'] = <String>[];
+        manifest['permissions'] = ['net.hooks'];
         manifest.remove('network_hook');
         manifest.remove('settings_schema');
+        manifest.remove('ui');
         await File('${genericSource.path}/sora-extension.json').writeAsString(jsonEncode(manifest));
         generic = await signed(sourceOverride: genericSource);
       });
@@ -852,7 +856,7 @@ void main() {
     expect(sora.approveSystemFilter(choice, key), true);
     await sora.select(choice);
     expect(sora.currentPlan.outbounds.single.protocol, 'winws');
-    final updated = await signed(id: winws.manifest.id, version: '1.0.1', descriptor: descriptor);
+    final updated = await signed(id: winws.manifest.id, version: '1.1.1', descriptor: descriptor);
     await install(updated);
     expect(sora.needsSystemFilterConsent(choice), true);
     expect(sora.approveSystemFilter(choice, key), false);
