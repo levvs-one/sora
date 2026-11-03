@@ -128,4 +128,4 @@ Bugs and ideas go to [issues](https://github.com/levvs-one/sora/issues).
 
 ## License
 
-This repository holds releases, documentation and the extension catalog. Sora 1.1.9 is distributed under [GPL-3.0](LICENSE), and its source is attached to the [release](https://github.com/levvs-one/sora/releases/tag/v1.1.9). Build files and engine patches are in [engine-build](engine-build). [Third-party licenses](THIRD-PARTY-NOTICES.md).
+This repository holds releases, documentation and the extension catalog. [Terms of use](LICENSE). Sora 1.1.9 and earlier are distributed under [GPL-3.0](LICENSE-GPL-3.0), and the 1.1.9 source is attached to its [release](https://github.com/levvs-one/sora/releases/tag/v1.1.9). Build files and engine patches are in [engine-build](engine-build). [Third-party licenses](THIRD-PARTY-NOTICES.md).

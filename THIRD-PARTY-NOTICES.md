@@ -43,7 +43,7 @@ Sora их не изменяет. Архивы ByeDPI отдельно прове
 | gRPC, protobuf для Go | Apache-2.0, BSD-3-Clause |
 | golang.org/x/sys | BSD-3-Clause |
 | go-winio | MIT |
-| tailscale/wf | BSD-3-Clause |
+| tailscale/wf с выравниванием из tailscale/wf#30, `third_party/wf` | BSD-3-Clause |
 | gopacket/gopacket 1.7.4 | BSD-3-Clause |
 | go.yaml.in/yaml/v4 4.0.0-rc.6 (импорт подписок) | Apache-2.0, MIT для файлов libyaml |
 
@@ -575,9 +575,7 @@ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
 0. You just DO WHAT THE FUCK YOU WANT TO.
 
-## mieru and Cronet
-
-The core imports the official mieru v3.38.1 protobuf schema and traffic-pattern validator. Copyright (C) 2023-2026 mieru authors, GPL-3.0-or-later. Source: https://github.com/enfein/mieru/tree/v3.38.1. The GPL text is provided in LICENSE.
+## Cronet
 
 The unmodified sing-box-lx v1.14.3-lx.14 Linux builds statically include Cronet. Its Windows amd64 archive supplies libcronet.dll. The archive checksum covers both engine and library. The bindings are pinned to cronet-go 0d28acc44093df24b2526dea3d6ffefd6b0a54f0 (GPL-3.0-or-later), with platform libraries c10c03c318db. Source and build instructions: https://github.com/SagerNet/cronet-go/tree/0d28acc44093df24b2526dea3d6ffefd6b0a54f0. Its NaiveProxy submodule is https://github.com/SagerNet/naiveproxy/tree/72a06c9fca0e2d228588c7f3074bf7efff3ff686. Chromium and NaiveProxy use BSD-3-Clause; third-party components retain their respective licenses in that source tree.
 
