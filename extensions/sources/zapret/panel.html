@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zapret</title>
+<style>
+  @font-face { font-family: Inter; src: url("fonts/InterVariable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+  /* Sora's palette. The host passes its theme; a plain browser follows the system. */
+  :root { color-scheme: light; --paper: #e9e9ee; --surface: #fff; --field: #e3e3e9; --ink: #101012; --ink2: #3a3d43; --line: #c9c9d1; --hover: rgb(16 16 18 / .05); --danger: #c0241c; }
+  :root[data-theme="dark"] { color-scheme: dark; --paper: #0b0b0c; --surface: #1c1c1e; --field: #2c2c2e; --ink: #f5f5f7; --ink2: #b4b4bb; --line: #3a3a3c; --hover: rgb(245 245 247 / .05); --danger: #ff5d52; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) { color-scheme: dark; --paper: #0b0b0c; --surface: #1c1c1e; --field: #2c2c2e; --ink: #f5f5f7; --ink2: #b4b4bb; --line: #3a3a3c; --hover: rgb(245 245 247 / .05); --danger: #ff5d52; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 8px 20px 24px; background: var(--paper); color: var(--ink); font: 400 15px/1.4 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 640px; margin: 0 auto; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  button:disabled { cursor: default; }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .group { background: var(--surface); border-radius: 12px; padding: 4px; }
+  .row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; border-radius: 8px; text-align: left; }
+  button.row:hover:not(:disabled) { background: var(--hover); }
+  .row-text { flex: 1; min-width: 0; }
+  .row-text b { display: block; font-weight: 500; }
+  .row-text span { display: block; color: var(--ink2); font-size: 13px; }
+  .row[data-state="unavailable"] .row-text span { color: var(--danger); }
+  .switch { flex: none; position: relative; width: 44px; height: 26px; border-radius: 13px; background: var(--field); transition: background 160ms ease; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px rgb(0 0 0 / .2); transition: transform 160ms ease; }
+  .switch[aria-checked="true"] { background: var(--ink); }
+  .switch[aria-checked="true"]::after { transform: translateX(18px); }
+  .switch:disabled { opacity: .5; }
+  .label { color: var(--ink2); font-size: 13px; font-weight: 600; margin: 20px 4px 8px; }
+  .check { flex: none; width: 18px; height: 18px; color: var(--ink); visibility: hidden; }
+  .row[aria-checked="true"] .check { visibility: visible; }
+  .about { color: var(--ink2); font-size: 13px; margin: 16px 4px 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="group">
+    <div class="row" id="status" data-state="off" aria-live="polite">
+      <div class="row-text">
+        <b id="status-title"></b>
+        <span id="status-detail"></span>
+      </div>
+      <button class="switch" id="toggle" type="button" role="switch" aria-checked="false"></button>
+    </div>
+  </section>
+  <div class="label" id="profiles-label"></div>
+  <section class="group">
+    <div id="profiles" role="radiogroup"></div>
+  </section>
+  <p class="about" id="about"></p>
+</main>
+<script>
+  // Strings for English and Russian, filled in per extension.
+  const STRINGS = {
+    "en": {
+      "profiles": "Profile",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "failed": "The bypass could not be switched.",
+      "unavailable": "This computer lacks the component it needs.",
+      "state": {
+        "on": "On",
+        "off": "Off",
+        "busy": "Turning on…",
+        "unavailable": "Unavailable"
+      },
+      "about": "Zapret bypasses blocking without a VPN: it reshapes the first packets of each connection so the provider cannot tell which site you open. No server is needed and speed stays the same.\n\nTurning it on switches Sora to the No server mode: traffic goes directly, through the bypass. To use the VPN again, pick a server or the TUN mode.\n\nIf a site still does not open, try another profile.",
+      "profileNames": {
+        "TCP+TLS": "Strong",
+        "TLS": "Gentle",
+        "HTTP": "Plain HTTP"
+      },
+      "profileHints": {
+        "TCP+TLS": "Splits and reorders the start of a connection. Works most often.",
+        "TLS": "Only splits TLS. Use it if Strong breaks something.",
+        "HTTP": "For sites without HTTPS: changes the case of HTTP headers."
+      }
+    },
+    "ru": {
+      "profiles": "Профиль",
+      "turnOn": "Включить",
+      "turnOff": "Выключить",
+      "failed": "Не удалось переключить обход.",
+      "unavailable": "На этом компьютере нет нужного компонента.",
+      "state": {
+        "on": "Включён",
+        "off": "Выключен",
+        "busy": "Включается…",
+        "unavailable": "Недоступен"
+      },
+      "about": "Zapret обходит блокировки без VPN: меняет первые пакеты соединения, и провайдер не узнаёт, какой сайт вы открываете. Сервер не нужен, скорость не падает.\n\nВключение переводит Sora в режим «Без сервера»: трафик идёт напрямую, через обход. Чтобы вернуть VPN, выберите сервер или режим TUN.\n\nЕсли сайт всё равно не открывается, попробуйте другой профиль.",
+      "profileNames": {
+        "TCP+TLS": "Сильный",
+        "TLS": "Мягкий",
+        "HTTP": "Обычный HTTP"
+      },
+      "profileHints": {
+        "TCP+TLS": "Режет и перемешивает начало соединения. Помогает чаще всего.",
+        "TLS": "Только режет TLS. Если с сильным что-то ломается.",
+        "HTTP": "Для сайтов без HTTPS: меняет регистр заголовков HTTP."
+      }
+    }
+  };
+  // Sora passes its own language as ?lang=; a plain browser falls back to its own.
+  const query = new URLSearchParams(location.search);
+  if (query.get('theme')) document.documentElement.dataset.theme = query.get('theme');
+  const language = query.get('lang') || navigator.language || 'en';
+  const t = STRINGS[language.toLowerCase().startsWith('ru') ? 'ru' : 'en'];
+  document.documentElement.lang = t === STRINGS.ru ? 'ru' : 'en';
+
+  const status = document.getElementById('status');
+  const statusTitle = document.getElementById('status-title');
+  const statusDetail = document.getElementById('status-detail');
+  const toggle = document.getElementById('toggle');
+  const list = document.getElementById('profiles');
+  let state = null;
+  let busy = false;
+
+  document.getElementById('profiles-label').textContent = t.profiles;
+  document.getElementById('about').textContent = t.about;
+
+  function render() {
+    if (!state) return;
+    const mode = !state.available ? 'unavailable' : state.connecting ? 'busy' : state.active ? 'on' : 'off';
+    status.dataset.state = mode;
+    statusTitle.textContent = t.state[mode];
+    statusDetail.textContent = mode === 'unavailable' ? t.unavailable : (t.profileNames[state.profile] || state.profile || '');
+    toggle.setAttribute('aria-checked', String(!!(state.active || state.connecting)));
+    toggle.setAttribute('aria-label', state.active || state.connecting ? t.turnOff : t.turnOn);
+    toggle.disabled = busy || !state.available;
+    list.replaceChildren();
+    for (const name of state.profiles) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'row';
+      item.setAttribute('role', 'radio');
+      item.setAttribute('aria-checked', String(name === state.profile));
+      item.disabled = busy;
+      const text = document.createElement('div');
+      text.className = 'row-text';
+      const title = document.createElement('b');
+      title.textContent = t.profileNames[name] || name;
+      const hint = document.createElement('span');
+      hint.textContent = t.profileHints[name] || '';
+      text.append(title, hint);
+      const check = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      check.setAttribute('class', 'check');
+      check.setAttribute('viewBox', '0 0 24 24');
+      check.innerHTML = '<path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+      item.append(text, check);
+      item.addEventListener('click', () => { void choose(name); });
+      list.append(item);
+    }
+  }
+
+  async function load() {
+    try {
+      state = await window.soraExt.call('getBypass');
+    } catch (error) {
+      state = {available: false, active: false, connecting: false, profile: '', profiles: []};
+    }
+    render();
+  }
+
+  async function run(action) {
+    if (busy) return;
+    busy = true;
+    render();
+    try {
+      await action();
+    } catch (error) {
+      try { await window.soraExt.call('notify', {title: document.title, body: t.failed}); } catch (_) {}
+    } finally {
+      busy = false;
+      await load();
+    }
+  }
+
+  async function choose(name) {
+    if (!state || name === state.profile) return;
+    await run(async () => {
+      await window.soraExt.call('setSettings', {settings: {profile: name}});
+      // A running bypass picks the new profile up on the next connection.
+      if (state.active) await window.soraExt.call('setBypass', {active: true});
+    });
+  }
+
+  toggle.addEventListener('click', () => {
+    void run(() => window.soraExt.call('setBypass', {active: !(state.active || state.connecting)}));
+  });
+
+  // Sora injects window.soraExt before the page runs; the sora-ext serve
+  // mock exposes it a moment later, so wait for it briefly.
+  function whenReady(start) {
+    const since = Date.now();
+    const timer = setInterval(() => {
+      if (window.soraExt || Date.now() - since > 5000) {
+        clearInterval(timer);
+        start();
+      }
+    }, 50);
+  }
+  whenReady(() => {
+    if (window.soraExt && window.soraExt.onEvent) {
+      window.soraExt.onEvent((kind) => {
+        if (kind === 'session.connected' || kind === 'session.disconnected') void load();
+      });
+    }
+    void load();
+    setInterval(() => { if (!busy) void load(); }, 3000);
+  });
+</script>
+</body>
+</html>

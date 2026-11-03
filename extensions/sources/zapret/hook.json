@@ -1,0 +1,56 @@
+{
+  "hook_version": 3,
+  "platforms": {
+    "linux": {
+      "backend": "tpws",
+      "profiles": {
+        "TCP+TLS": {
+          "splitPos": [
+            "1",
+            "midsld"
+          ],
+          "disorder": true,
+          "tlsRecord": "1"
+        },
+        "TLS": {
+          "splitPos": [
+            "1"
+          ],
+          "tlsRecord": "1"
+        },
+        "HTTP": {
+          "splitPos": [
+            "2"
+          ],
+          "hostCase": true,
+          "domainCase": true
+        }
+      }
+    },
+    "windows": {
+      "backend": "winws",
+      "scope": "system-tcp-80-443",
+      "profiles": {
+        "TCP+TLS": {
+          "splitPos": [
+            "1",
+            "midsld"
+          ],
+          "disorder": true
+        },
+        "TLS": {
+          "splitPos": [
+            "1"
+          ]
+        },
+        "HTTP": {
+          "splitPos": [
+            "2"
+          ],
+          "hostCase": true,
+          "domainCase": true
+        }
+      }
+    }
+  }
+}

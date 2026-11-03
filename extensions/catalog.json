@@ -1,0 +1,45 @@
+{
+  "catalog_version": 1,
+  "updated_at": "2026-10-21T03:16:12Z",
+  "max_age": 3600,
+  "extensions": [
+    {
+      "id": "org.sora.hello-panel",
+      "name": "Hello Panel",
+      "version": "1.0.0",
+      "description": "The official example extension: a panel with live connection statistics.",
+      "author": "Sora",
+      "author_identity": "github:levvs-one",
+      "author_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+",
+      "icon_url": "",
+      "rating": 0,
+      "ratings_count": 0,
+      "installs": 0,
+      "badges": [
+        "staff"
+      ],
+      "categories": [
+        "tools"
+      ],
+      "capabilities": [
+        "ui-panel"
+      ],
+      "permissions": [
+        "connections.read",
+        "notifications",
+        "ui.panel"
+      ],
+      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/hello-panel-1.0.0.soraext",
+      "sha256": "ba5fffb5b9c9b521fa39aebc8d2bb2efee048ad4da34af281d555e338fb19012",
+      "size": 3639,
+      "min_app_version": "1.1.0",
+      "changelog": [
+        {
+          "version": "1.0.0",
+          "date": "2026-10-21T03:16:12Z",
+          "notes": "First catalog release."
+        }
+      ]
+    }
+  ]
+}

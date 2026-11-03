@@ -1,0 +1,111 @@
+{
+  "catalog_version": 1,
+  "updated_at": "2026-10-31T19:49:41Z",
+  "max_age": 3600,
+  "extensions": [
+    {
+      "id": "org.sora.zapret",
+      "name": "Zapret",
+      "version": "1.1.1",
+      "description": "Blocking bypass without a VPN: reshapes the start of connections so the provider cannot recognise the site. A panel shows its state and switches profiles.",
+      "author": "Sora",
+      "author_identity": "github:levvs-one",
+      "author_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+",
+      "icon_url": "",
+      "rating": 0,
+      "ratings_count": 0,
+      "installs": 0,
+      "badges": [
+        "staff"
+      ],
+      "categories": [
+        "network"
+      ],
+      "capabilities": [
+        "network-hook",
+        "ui-panel"
+      ],
+      "permissions": [
+        "net.hooks",
+        "ui.panel"
+      ],
+      "platforms": [
+        "linux",
+        "windows"
+      ],
+      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/zapret-1.1.1.soraext",
+      "sha256": "49f09ccfe3488dab64975468a61416d19ebbaeab32dacc9eee34ff70f6dd74c7",
+      "size": 494461,
+      "min_app_version": "1.1.6",
+      "changelog": [
+        {
+          "version": "1.1.1",
+          "date": "2026-10-31T19:49:41Z",
+          "notes": "The panel matches Sora and follows its light or dark theme."
+        },
+        {
+          "version": "1.1.0",
+          "date": "2026-10-30T07:52:36Z",
+          "notes": "A panel like Hello Panel: on/off, state and profiles with plain descriptions."
+        },
+        {
+          "version": "1.0.0",
+          "date": "2026-10-28T22:44:38Z",
+          "notes": "First catalog release."
+        }
+      ]
+    },
+    {
+      "id": "org.sora.byedpi",
+      "name": "ByeDPI",
+      "version": "1.1.1",
+      "description": "Blocking bypass without a VPN through the local ByeDPI proxy. A panel shows its state and switches profiles.",
+      "author": "Sora",
+      "author_identity": "github:levvs-one",
+      "author_key": "RWQZfr8pZOLhNx/81iyyYi91cZMQTyJece9fX9OWIJoUqMPpN7eCYk/+",
+      "icon_url": "",
+      "rating": 0,
+      "ratings_count": 0,
+      "installs": 0,
+      "badges": [
+        "staff"
+      ],
+      "categories": [
+        "network"
+      ],
+      "capabilities": [
+        "network-hook",
+        "ui-panel"
+      ],
+      "permissions": [
+        "net.hooks",
+        "ui.panel"
+      ],
+      "platforms": [
+        "linux",
+        "windows"
+      ],
+      "download_url": "https://raw.githubusercontent.com/levvs-one/sora/main/extensions/packages/byedpi-1.1.1.soraext",
+      "sha256": "73471b5e5db6d4aed7dc7fc0360d79c2dbbe6073e8f4f6a1e09a9c1b662079a5",
+      "size": 494324,
+      "min_app_version": "1.1.6",
+      "changelog": [
+        {
+          "version": "1.1.1",
+          "date": "2026-10-31T19:49:41Z",
+          "notes": "The panel matches Sora and follows its light or dark theme."
+        },
+        {
+          "version": "1.1.0",
+          "date": "2026-10-30T07:52:36Z",
+          "notes": "A panel like Hello Panel: on/off, state and profiles with plain descriptions."
+        },
+        {
+          "version": "1.0.0",
+          "date": "2026-10-28T22:44:38Z",
+          "notes": "First catalog release."
+        }
+      ]
+    }
+  ]
+}
