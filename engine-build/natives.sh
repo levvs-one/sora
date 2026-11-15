@@ -27,22 +27,20 @@ fetch() { # engine arch destination
 # The upstream Android binary reads /data/system/packages.xml before it opens
 # the adapter, which only root can do. The cmfa tag, the one its Android app
 # builds with, leaves that out. The tag also closes the controller API the core
-# drives, so that one file goes.
+# drives, so that one file goes. The source carries Sora's REALITY patch, like
+# every other platform's build.
 build_mihomo() { # arch clang output
-	local url version
+	local toolchain
 	if [[ ! -d "$work/mihomo-source" ]]; then
-		fetch mihomo android-source "$work/mihomo.tar.gz"
-		mkdir "$work/mihomo-source"
-		tar --extract --gzip --file "$work/mihomo.tar.gz" --strip-components=1 --directory "$work/mihomo-source"
+		mihomo_version=$(bash "$root/packaging/engines/mihomo-source.sh" "$work/mihomo-source")
 		rm "$work/mihomo-source/hub/route/patch_android.go"
 	fi
-	url=$(awk '$1 == "mihomo" && $2 == "android-source" { print $4 }' "$lock")
-	version=$(basename "$url" .tar.gz)
+	toolchain=$(awk '$1 == "mihomo" && $2 == "toolchain" { print $3 }' "$lock")
 	(
 		cd "$work/mihomo-source"
-		GOOS=android GOARCH=$1 CGO_ENABLED=1 CC="$2" go build -buildvcs=false -trimpath \
+		GOTOOLCHAIN=$toolchain GOOS=android GOARCH=$1 CGO_ENABLED=1 CC="$2" go build -mod=readonly -buildvcs=false -trimpath \
 			-tags with_gvisor,cmfa \
-			-ldflags "-s -w -buildid= -X github.com/metacubex/mihomo/constant.Version=$version" \
+			-ldflags "-s -w -buildid= -X github.com/metacubex/mihomo/constant.Version=$mihomo_version" \
 			-o "$3" .
 	)
 }
@@ -132,7 +130,8 @@ for arch in "$@"; do
 	fetch xray "android-$arch" "$work/xray.zip"
 	unzip -o -q "$work/xray.zip" xray geoip.dat geosite.dat -d "$work/xray"
 	install -m 0755 "$work/xray/xray" "$out/libxray.so"
-	install -m 0644 "$work/xray/geoip.dat" "$work/xray/geosite.dat" "$geo/"
+	install -m 0644 "$work/xray/geosite.dat" "$geo/"
+	fetch geodata geoip "$geo/geoip.dat"
 	build_mihomo "$arch" "$clang/$target-clang" "$out/libmihomo.so"
 	build_singbox "$arch" "$clang/$target-clang" "$out/libsingbox.so"
 	fetch byedpi "android-$arch" "$work/byedpi.tar.gz"

@@ -10,9 +10,10 @@ Sora их не изменяет. Архивы ByeDPI отдельно прове
 
 | Компонент | Версия | Где | Лицензия | Исходный код |
 | --- | --- | --- | --- | --- |
-| sing-box-lx (на базе sing-box 1.14.3) | 1.14.3-lx.14 | Linux, Windows, Android (сборка из исходников, с файлами `packaging/android/sing-box-platform.go`, `sing-box-control.go` и правкой адреса API, см. `packaging/android/natives.sh`) | GPL-3.0-or-later с условием автора о названии | https://github.com/Leadaxe/sing-box-lx/tree/v1.14.3-lx.14 |
-| Xray-core | 26.3.27 | Linux, Windows, Android | MPL-2.0 | https://github.com/XTLS/Xray-core/tree/v26.3.27 |
-| mihomo | 1.19.32 | Linux, Windows (сборка compatible), Android (сборка из исходников с тегом cmfa) | GPL-3.0 | https://github.com/MetaCubeX/mihomo/tree/v1.19.32 |
+| sing-box-lx (на базе sing-box 1.14.4) | 1.14.4-lx.35 | Linux, Windows, Android (сборка из исходников, с файлами `packaging/android/sing-box-platform.go`, `sing-box-control.go` и правкой адреса API, см. `packaging/android/natives.sh`) | GPL-3.0-or-later с условием автора о названии | https://github.com/Leadaxe/sing-box-lx/tree/v1.14.4-lx.35 |
+| Xray-core | 26.11.9 | Linux, Windows, Android | MPL-2.0 | https://github.com/XTLS/Xray-core/tree/v26.11.9 |
+| mihomo | 1.19.34 | Linux, Windows, Android: сборка из исходников с правкой версии клиента REALITY ([`engine-build/mihomo-reality.patch`](engine-build/mihomo-reality.patch), сборка [`engine-build/mihomo-source.sh`](engine-build/mihomo-source.sh)); на Android ещё с тегом cmfa | GPL-3.0 | https://github.com/MetaCubeX/mihomo/tree/v1.19.34 |
+| v2fly geoip (база стран `geoip.dat`) | 202611080027 | Linux, Windows, Android | CC-BY-SA-4.0 | https://github.com/v2fly/geoip/tree/202611080027 |
 | olcrtc | f3ad8fb7c0d0fa981423f83269526fa94077c23d | Linux amd64/arm64, Windows amd64 | WTFPL 2 | https://github.com/openlibrecommunity/olcrtc/tree/f3ad8fb7c0d0fa981423f83269526fa94077c23d |
 | ByeDPI | 0.17.3 | Linux amd64/arm64, Windows amd64, Android | MIT | https://github.com/hufrea/byedpi/tree/v0.17.3 |
 | zapret (tpws, nfqws) | 72.1 | Linux | MIT, © bol-van | https://github.com/bol-van/zapret |
@@ -577,7 +578,7 @@ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
 ## Cronet
 
-The unmodified sing-box-lx v1.14.3-lx.14 Linux builds statically include Cronet. Its Windows amd64 archive supplies libcronet.dll. The archive checksum covers both engine and library. The bindings are pinned to cronet-go 0d28acc44093df24b2526dea3d6ffefd6b0a54f0 (GPL-3.0-or-later), with platform libraries c10c03c318db. Source and build instructions: https://github.com/SagerNet/cronet-go/tree/0d28acc44093df24b2526dea3d6ffefd6b0a54f0. Its NaiveProxy submodule is https://github.com/SagerNet/naiveproxy/tree/72a06c9fca0e2d228588c7f3074bf7efff3ff686. Chromium and NaiveProxy use BSD-3-Clause; third-party components retain their respective licenses in that source tree.
+The unmodified sing-box-lx v1.14.4-lx.35 Linux builds statically include Cronet. Its Windows amd64 archive supplies libcronet.dll. The archive checksum covers both engine and library. The bindings are pinned to cronet-go 0d28acc44093df24b2526dea3d6ffefd6b0a54f0 (GPL-3.0-or-later), with platform libraries c10c03c318db. Source and build instructions: https://github.com/SagerNet/cronet-go/tree/0d28acc44093df24b2526dea3d6ffefd6b0a54f0. Its NaiveProxy submodule is https://github.com/SagerNet/naiveproxy/tree/72a06c9fca0e2d228588c7f3074bf7efff3ff686. Chromium and NaiveProxy use BSD-3-Clause; third-party components retain their respective licenses in that source tree.
 
 Copyright (C) 2022 by nekohasekai <contact-sagernet@sekai.icu>
 

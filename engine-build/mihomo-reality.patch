@@ -1,0 +1,20 @@
+mihomo writes client version 1.8.2 into the REALITY session ID. An Xray server
+that sets minClientVer answers that version with the decoy certificate instead
+of authenticating (MetaCubeX/mihomo#3339, closed as not planned). Send the Xray
+version sing-box-lx announces, 26.3.27, so mihomo passes where sing-box does.
+
+--- a/component/tls/reality.go
++++ b/component/tls/reality.go
+@@ -71,9 +71,9 @@
+ 		binary.BigEndian.PutUint64(hello.SessionId, uint64(ntp.Now().Unix()))
+ 
+ 		copy(hello.SessionId[8:], realityConfig.ShortID[:])
+-		hello.SessionId[0] = 1
+-		hello.SessionId[1] = 8
+-		hello.SessionId[2] = 2
++		hello.SessionId[0] = 26
++		hello.SessionId[1] = 3
++		hello.SessionId[2] = 27
+ 
+ 		//log.Debugln("REALITY hello.sessionId[:16]: %v", hello.SessionId[:16])
+ 

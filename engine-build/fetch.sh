@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Downloads the engine builds of engines.lock for one architecture, refuses any
-# file whose SHA-256 differs from the lock, and lays them out as the core looks
-# for them: sing-box, xray, mihomo, geoip.dat and geosite.dat in one directory.
-# The geo databases come from the Xray archive, which is pinned like the rest.
+# file whose SHA-256 differs from the lock, builds mihomo from its pinned source,
+# and lays them out as the core looks for them: sing-box, xray, mihomo,
+# geoip.dat and geosite.dat in one directory. The geo databases come from the
+# Xray archive, which is pinned like the rest.
 #
 #   packaging/engines/fetch.sh amd64|arm64 <destination>
 set -euo pipefail
@@ -51,10 +52,6 @@ while read -r engine line_arch digest url; do
 		install -m 0755 "$work/xray/xray" "$dest/xray"
 		install -m 0644 "$work/xray/geoip.dat" "$work/xray/geosite.dat" "$dest/"
 		;;
-	mihomo)
-		gunzip --stdout "$file" >"$work/mihomo"
-		install -m 0755 "$work/mihomo" "$dest/mihomo"
-		;;
 	*)
 		echo "engines.lock: unknown engine $engine" >&2
 		exit 1
@@ -63,10 +60,48 @@ while read -r engine line_arch digest url; do
 	echo "$engine $arch: verified"
 done <"$lock"
 
-if [[ "$found" -ne 3 ]]; then
-	echo "engines.lock has $found engines for $arch, expected 3" >&2
+if [[ "$found" -ne 2 ]]; then
+	echo "engines.lock has $found engines for $arch, expected 2" >&2
 	exit 1
 fi
+
+# mihomo is built the way upstream builds its release binaries, from the source
+# mihomo-source.sh patches. Windows 7 takes Go 1.20 from the lock, the others
+# the Go of upstream's release.
+mihomo_version=$(bash "$(dirname "$0")/mihomo-source.sh" "$work/mihomo-source")
+mihomo_go=(env "GOTOOLCHAIN=$(awk '$1 == "mihomo" && $2 == "toolchain" { print $3 }' "$lock")" go)
+mihomo_output=$dest/mihomo
+case "$arch" in
+amd64 | arm64) mihomo_target=(GOOS=linux GOARCH=$arch) ;;
+windows-amd64) mihomo_target=(GOOS=windows GOARCH=amd64 GOAMD64=v1) ;;
+win7-386)
+	mihomo_target=(GOOS=windows GOARCH=386 GO386=sse2)
+	host=host-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
+	read -r _ _ go_digest go_url < <(awk -v h="$host" '$1 == "go1.20" && $2 == h' "$lock")
+	[[ -n "$go_url" ]] || { echo "engines.lock: no Go 1.20 for $host" >&2; exit 1; }
+	go_archive="$work/$(basename "$go_url")"
+	curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$go_archive" "$go_url"
+	echo "$go_digest  $go_archive" | sha256sum --check --quiet --strict
+	case "$go_archive" in
+	*.zip) unzip -q "$go_archive" -d "$work/go1.20" ;;
+	*) mkdir "$work/go1.20" && tar --extract --gzip --file "$go_archive" --directory "$work/go1.20" ;;
+	esac
+	mihomo_go=(env GOTOOLCHAIN=local GOROOT="$work/go1.20/go" "$work/go1.20/go/bin/go")
+	;;
+esac
+if [[ "$arch" == win* ]]; then
+	mihomo_output=$dest/mihomo.exe
+fi
+(cd "$work/mihomo-source" && env CGO_ENABLED=0 "${mihomo_target[@]}" "${mihomo_go[@]}" build -mod=readonly -trimpath -buildvcs=false \
+	-tags with_gvisor -ldflags "-s -w -buildid= -X github.com/metacubex/mihomo/constant.Version=$mihomo_version" -o "$mihomo_output" .)
+echo "mihomo $arch: source verified, built $mihomo_version"
+
+# The full country database replaces the one the Xray archive carries.
+read -r _ _ geoip_digest geoip_url < <(awk '$1 == "geodata" && $2 == "geoip"' "$lock")
+curl --fail --location --silent --show-error --retry 3 --proto '=https' --output "$work/geoip.dat" "$geoip_url"
+echo "$geoip_digest  $work/geoip.dat" | sha256sum --check --quiet --strict
+install -m 0644 "$work/geoip.dat" "$dest/geoip.dat"
+echo "geoip: verified"
 
 # ByeDPI is a host-owned SOCKS backend, pinned separately for each Linux ABI.
 if [[ "$arch" == amd64 || "$arch" == arm64 ]]; then
